@@ -1,11 +1,11 @@
 {
   "name": "druid-sql-parser",
-  "version": "1.2.7",
-  "description": "Parses Sql to an AST and re-stringifies SQL ASTs",
+  "version": "0.1.0",
+  "description": "Parses/stringifies DruidSQL",
   "main": "index.js",
-  "homepage": "https://github.com/mcbrewster/druid-sql-parser",
+  "homepage": "https://github.com/implydata/druid-sql-parser",
   "scripts": {
-    "test": "mocha",
+    "test": "jest",
     "build": " pegjs -o ./druidsql.js ./druidsql.pegjs"
   },
   "keywords": [
@@ -19,11 +19,9 @@
     "sql-ast"
   ],
   "author": "Maggie Brewster",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "devDependencies": {
-    "mocha": "^6.1.4"
-  },
-  "dependencies": {
+    "jest": "^24.8.0",
     "pegjs": "^0.10.0"
   }
 }
