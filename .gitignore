@@ -1,0 +1,9 @@
+.DS_Store
+.idea/inspectionProfiles/
+.idea/misc.xml
+.idea/modules.xml
+.idea/pivot*.iml
+.idea/vcs.xml
+.idea/workspace.xml
+
+/node_modules/
