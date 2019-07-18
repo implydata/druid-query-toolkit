@@ -1,5 +1,5 @@
-{
-  functions = functions || ["COUNT",
+ {
+  var  functions = functions || ["COUNT",
   "SUM","MIN", "MAX","AVG","APPROX_COUNT_DISTINCT",
   "APPROX_COUNT_DISTINCT_DS_HLL", "APPROX_COUNT_DISTINCT_DS_THETA",
   "APPROX_QUANTILE", "APPROX_QUANTILE_DS", "APPROX_QUANTILE_FIXED_BUCKETS"];
@@ -26,8 +26,7 @@ Query =
   unionAll: UnionAll?
   endSpacing: _
   {
-    return {
-      type: 'query',
+    return new SqlQuery({
       queryType: "SELECT",
       selectParts: selectParts,
       from: from,
@@ -40,7 +39,7 @@ Query =
       syntax: syntax,
       spacing: spacing,
       endSpacing: endSpacing
-    }
+    })
   }
 
 SelectParts =
@@ -128,10 +127,7 @@ GroupByPart =
 Having =
 	spacing: _
 	syntax: "HAVING"i
-	expr: (
-	  Expression
-	  / BinaryExpression
-  )
+	expr: Expression
   {
     return {
       type: "having",
@@ -260,8 +256,7 @@ ElseValue =
 	spacing: _
 	syntax: "ELSE"i?
 	elseValue: (
-	  BinaryExpression
-	  / Expression
+	  Expression
 	  / Integer
 	  / Variable
 	  / Constant
@@ -290,8 +285,7 @@ WhenClause =
 	spacing:_
 	syntax: "WHEN"i
 	when: (
-	  BinaryExpression
-	  / Expression
+	  Expression
 	  / Variable
 	  / Constant
 	  / Integer
@@ -313,7 +307,6 @@ Then =
   then: (
   Integer
   / Case
-  / BinaryExpression
   / Expression
   / Variable
   )
@@ -326,36 +319,6 @@ Then =
     }
   }
 
-
-BinaryExpression =
-	spacing: _
-	lhs: (
-	  Expression
-	  / Function
-	  / TimeStamp
-	  / Variable
-	  / Constant
-	  / Integer
-  )?
-  operator: BinaryOperator
-  rhs: (
-    BinaryExpression
-    / Function
-    / TimeStamp
-    / Expression
-    / Variable
-    / Constant
-    / Integer
-    )?
-  {
-    return {
-      type: "binaryExpression",
-      operator: operator,
-      lhs: lhs,
-      rhs: rhs,
-      spacing: spacing
-    }
-  }
 
 Expression =
 	spacing: _
@@ -416,19 +379,20 @@ Distinct =
   }
 
 Argument =
+	spacing: [\t\n\r,'']*
 	distinct: Distinct?
 	argumentValue: ArgumentValue
 	{
     return {
       type: 'argument',
       distinct: distinct,
-      argumentValue: argumentValue
+      argumentValue: argumentValue,
+      spacing: spacing
     }
   }
 
 ArgumentValue =
-     spacing: _
-     !Reserved
+     spacing: [\t\n\r,'']*
      argument: (
         Constant
         / Variable
@@ -544,11 +508,11 @@ Alias =
 	}
 
 Functions =
-	Function: IdentifierPart {
+	Function: IdentifierPart &{
    	if (functions.includes(Function)) {
-    	return Function
-    }
-  }
+    	return true
+    } else return false
+  } {return Function}
 
 
 
@@ -646,7 +610,7 @@ IdentifierPart =
 Reserved =
 	BinaryOperator
     /Operator
-    /Function
+    /Functions
     /Parts
 
 Parts =
@@ -659,3 +623,4 @@ Parts =
     /"SELECT"i
     /"AS"i
     /"ORDER BY"i
+

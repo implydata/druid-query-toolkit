@@ -19,8 +19,7 @@
     "endOfLine": "lf"
   },
   "scripts": {
-    "test": "jest",
-    "build": " pegjs -o src/druidsql.js src/druidsql.pegjs"
+    "test": "jest"
   },
   "keywords": [
     "sql",

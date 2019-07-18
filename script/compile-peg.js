@@ -1,11 +1,14 @@
 const fs = require('fs');
 const peg = require('pegjs');
 
-var parser = peg.generate(fs.readFileSync('./src/druidsql.pegjs', 'utf-8'), {
-  output: 'source'
+var parser = peg.generate(fs.readFileSync('./src/parser/druidsql.pegjs', 'utf-8'), {
+  output: 'source',
 });
 
 const wrappedParser = `
+var ast = require('../ast');
+var SqlQuery = ast.SqlQuery;
+
 function sqlParserFactory(functions) {
 var p =
 ${parser}
@@ -18,5 +21,4 @@ return function(druidSqlString) {
 module.exports.sqlParserFactory = sqlParserFactory;
 `;
 
-
-fs.writeFileSync('./lib/druidsql.js', wrappedParser);
+fs.writeFileSync('./src/parser/druidsql.js', wrappedParser);
