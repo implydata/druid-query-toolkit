@@ -15,12 +15,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export abstract class BaseAst {
-  public type: string;
 
-  constructor(type: string) {
-    this.type = type;
+import { AndExpression } from '../andExpression/andExpression';
+
+export interface OrPartValue {
+  ex: AndExpression;
+  keyword: string;
+  spacing: string[];
+}
+
+export class OrPart {
+  public ex: AndExpression;
+  public keyword: string;
+  public spacing: string[];
+
+  constructor(options: OrPartValue) {
+    this.ex = options.ex;
+    this.keyword = options.keyword;
+    this.spacing = options.spacing;
   }
 
-  abstract toString(indent?: string): string;
+  toString() {
+    return (this.keyword ? this.keyword : '') + this.spacing[0] + this.ex.toString();
+  }
 }

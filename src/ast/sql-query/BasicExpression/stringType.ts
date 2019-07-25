@@ -15,12 +15,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export abstract class BaseAst {
-  public type: string;
+export interface StringValue {
+  chars: string;
+  quote: string;
+  spacing: string[];
+}
 
-  constructor(type: string) {
-    this.type = type;
+export class StringType {
+  public chars: string;
+  public quote: string;
+  public spacing: string[];
+
+  constructor(options: StringValue) {
+    this.chars = options.chars;
+    this.quote = options.quote;
+    this.spacing = options.spacing;
   }
 
-  abstract toString(indent?: string): string;
+  toString(): string {
+    return (
+      this.quote +
+      (this.spacing[0] ? this.spacing[0] : '') +
+      this.chars +
+      (this.spacing[0] ? this.spacing[1] : '') +
+      this.quote
+    );
+  }
+
+  getBasicValue(): string {
+    return this.chars;
+  }
 }

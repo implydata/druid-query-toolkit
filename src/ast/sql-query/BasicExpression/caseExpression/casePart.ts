@@ -15,26 +15,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { OrExpression } from '../..';
+import { OrExpression } from '../../..';
 
-export interface WhereClauseValue {
-  keyword: string;
-  filter: OrExpression;
+export interface CaseValue {
+  whenKeyword: string;
+  whenExpr: OrExpression;
+  thenKeyword: string;
+  thenExpr: OrExpression;
   spacing: string[];
 }
 
-export class WhereClause {
-  public keyword: string;
-  public filter: OrExpression;
+export class CasePart {
+  public whenKeyword: string;
+  public whenExpr: OrExpression;
+  public thenKeyword: string;
+  public thenExpr: OrExpression;
   public spacing: string[];
 
-  constructor(options: WhereClauseValue) {
-    this.keyword = options.keyword;
-    this.filter = options.filter;
+  constructor(options: CaseValue) {
+    this.whenKeyword = options.whenKeyword;
+    this.whenExpr = options.whenExpr;
+    this.thenKeyword = options.thenKeyword;
+    this.thenExpr = options.thenExpr;
     this.spacing = options.spacing;
   }
 
-  toString(): string {
-    return this.keyword + this.spacing[0] + this.filter.toString();
+  toString() {
+    return (
+      this.whenKeyword +
+      this.spacing[0] +
+      this.whenExpr.toString() +
+      this.spacing[1] +
+      this.thenKeyword +
+      this.spacing[2] +
+      this.thenExpr.toString()
+    );
   }
 }

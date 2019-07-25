@@ -19,37 +19,27 @@ Column {
                             "chars": "value",
                             "quote": "'",
                             "spacing": Array [
-                              Array [
-                                "",
-                              ],
-                              Array [
-                                "",
-                              ],
+                              "",
+                              "",
                             ],
                           },
                         ],
                         "op": null,
                         "parens": Array [],
                         "spacing": Array [
-                          Array [
-                            "",
-                          ],
+                          "",
                         ],
                       },
                     ],
                     "op": null,
                     "parens": Array [],
                     "spacing": Array [
-                      Array [
-                        "",
-                      ],
+                      "",
                     ],
                   },
                   "parens": Array [],
                   "rhs": null,
-                  "spacing": Array [
-                    null,
-                  ],
+                  "spacing": null,
                 },
                 "keyword": null,
                 "parens": Array [],
@@ -57,9 +47,7 @@ Column {
               },
               "keyword": "",
               "spacing": Array [
-                Array [
-                  "",
-                ],
+                "",
               ],
             },
           ],
@@ -68,9 +56,7 @@ Column {
         },
         "keyword": "",
         "spacing": Array [
-          Array [
-            "",
-          ],
+          "",
         ],
       },
     ],
@@ -94,15 +80,15 @@ Column {
     },
   ],
   "spacing": Array [
-    Array [
-      "",
-    ],
+    "",
   ],
 }
 `;
 
 exports[`single column Tests column addparen to string 1`] = `"('value')"`;
 
-exports[`single column Tests column get basic value with bracket 1`] = `"value"`;
+exports[`single column Tests column getAlias 1`] = `"value"`;
+
+exports[`single column Tests column getBasicValue with bracket 1`] = `"value"`;
 
 exports[`single column Tests column with no brackets to string 1`] = `"'value'"`;

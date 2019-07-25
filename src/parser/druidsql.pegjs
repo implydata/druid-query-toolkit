@@ -21,6 +21,9 @@
   function makeListMapEmpty0(tail) {
     return [].concat(tail.map(function(t) { return t[0] }));
   }
+    function makeListMapEmptyConcat0(tail) {
+      return [].concat(tail.map(function(t) { return t[0].join('') }));
+    }
   function makeListMapEmpty01(tail) {
     return [].concat(tail.map(function(t) { return t[0][1] }));
   }
@@ -164,13 +167,13 @@ OrderByClause
     byKeyword: ByToken
     spacing1: _
     head: OrderByPart
-     tail:((Comma _) OrderByPart)*
+    tail:((Comma _) OrderByPart)*
     {
       return new OrderByClause({
         orderKeyword: orderKeyword,
         byKeyword : byKeyword,
         orderBy: makeListMap1(head, tail),
-        spacing: [spacing0,spacing1,makeListMapEmpty01(tail)]
+        spacing: [spacing0,spacing1].concat(makeListMapEmpty01(tail))
       });
     }
 
@@ -377,7 +380,7 @@ AdditiveOp
   }
 
 MultiplicativeExpression
-  = head:BasicExpression tail:(_? MultiplicativeOp _? BasicExpression)*
+  = head:BasicExpression tail:((_? MultiplicativeOp _?) BasicExpression)*
   {
     return new MultiplicativeExpression({
       parens : [],
@@ -428,10 +431,10 @@ Function
     {
       return new Function({
         parens : [],
-        distinct: distinct,
+        distinct: distinct ? distinct[0] : null,
         fn: fn,
         value: makeListMap1(valueHead, valueTail),
-        spacing:[spacing0, makeListMapEmpty(valueTail), spacing1]
+        spacing:[spacing0,(distinct? distinct[1] : ''), makeListMapEmpty(valueTail), spacing1]
        });
     }
     /open: (OpenParen _?) ex:Function close: (_? CloseParen)
@@ -654,7 +657,7 @@ CloseCurly "}"
 
 Comma = ','
 _
-  = [ \t\n\r]+
+  = spacing: [ \t\n\r]+ {return spacing.join('')}
 CharsetIntroducer
   = "N"
   / "n"

@@ -15,12 +15,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export abstract class BaseAst {
-  public type: string;
 
-  constructor(type: string) {
-    this.type = type;
+import { OrExpression } from '../../..';
+
+export interface OrderByPartValue {
+  direction: string | null;
+  orderBy: OrExpression;
+  spacing: string[];
+}
+
+export class OrderByPart {
+  public direction: string | null;
+  public orderBy: OrExpression;
+  public spacing: string[];
+
+  constructor(options: OrderByPartValue) {
+    this.direction = options.direction;
+    this.orderBy = options.orderBy;
+    this.spacing = options.spacing;
   }
 
-  abstract toString(indent?: string): string;
+  toString(): string {
+    return this.orderBy.toString() + this.spacing[0] + this.direction;
+  }
+
+  getBasicValue(): string {
+    return this.orderBy.getBasicValue();
+  }
 }

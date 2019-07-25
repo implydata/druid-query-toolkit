@@ -1,19 +1,37 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+import { RefExpression, SqlQuery } from '../..';
 import { Alias } from '../alias';
-import { parens, renderCloseParens, renderOpenParens } from '../helpers';
+import { Parens, renderCloseParens, renderOpenParens } from '../helpers';
 
 export interface FromClauseValue {
-  parens: parens[];
+  parens: Parens[];
   keyword: string;
-  fc: any;
-  spacing: string[][];
+  fc: RefExpression | SqlQuery;
+  spacing: string[];
   alias: Alias;
 }
 
 export class FromClause {
-  public parens: parens[];
+  public parens: Parens[];
   public keyword: string;
-  public fc: any;
-  public spacing: string[][];
+  public fc: RefExpression | SqlQuery;
+  public spacing: string[];
   public alias: Alias;
 
   constructor(options: FromClauseValue) {
@@ -29,9 +47,9 @@ export class FromClause {
       return (
         renderOpenParens(this.parens) +
         this.keyword +
-        this.spacing[0].join('') +
+        this.spacing[0] +
         this.fc.toString() +
-        this.spacing[1].join('') +
+        this.spacing[1] +
         Alias.toString() +
         renderCloseParens(this.parens)
       );
@@ -45,15 +63,15 @@ export class FromClause {
     );
   }
 
-  getFromNameSpace(): string {
-    return this.fc.namespace;
+  getFromNameSpace(): string | undefined {
+    return this.fc instanceof RefExpression ? this.fc.namespace : undefined;
   }
 
-  getFromName(): string {
-    return this.fc.name;
+  getFromName(): string | undefined {
+    return this.fc instanceof RefExpression ? this.fc.name : undefined;
   }
 
-  addParen(open: any[], close: any[]) {
+  addParen(open: string[], close: string[]) {
     this.parens.push({ open, close });
     return new FromClause({
       parens: this.parens,

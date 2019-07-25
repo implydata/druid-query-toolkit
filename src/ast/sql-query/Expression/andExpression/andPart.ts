@@ -15,12 +15,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export abstract class BaseAst {
-  public type: string;
 
-  constructor(type: string) {
-    this.type = type;
+import { NotExpression } from '../notExpression/notExpression';
+
+export interface AndPartValue {
+  keyword: string;
+  ex: NotExpression;
+  spacing: string[];
+}
+
+export class AndPart {
+  public ex: NotExpression;
+  public keyword: string;
+  public spacing: string[];
+
+  constructor(options: AndPartValue) {
+    this.ex = options.ex;
+    this.keyword = options.keyword;
+    this.spacing = options.spacing;
   }
 
-  abstract toString(indent?: string): string;
+  toString() {
+    return (this.keyword ? this.keyword : '') + this.spacing[0] + this.ex.toString();
+  }
+
+  getBasicValue(): string | undefined {
+    return this.ex.getBasicValue();
+  }
 }
