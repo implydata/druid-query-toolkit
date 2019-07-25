@@ -15,7 +15,7 @@ Column {
                     "ex": Array [
                       MultiplicativeExpression {
                         "ex": Array [
-                          String {
+                          StringType {
                             "chars": "value",
                             "quote": "'",
                             "spacing": Array [
@@ -66,16 +66,12 @@ Column {
   "parens": Array [
     Object {
       "close": Array [
-        Array [
-          null,
-        ],
+        "",
         ")",
       ],
       "open": Array [
         "(",
-        Array [
-          null,
-        ],
+        "",
       ],
     },
   ],

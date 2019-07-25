@@ -6,7 +6,7 @@ SqlQuery {
     "columns": Array [
       Column {
         "alias": null,
-        "ex": String {
+        "ex": StringType {
           "chars": "segment_id",
           "quote": "\\"",
           "spacing": Array [
@@ -19,7 +19,7 @@ SqlQuery {
       },
       Column {
         "alias": null,
-        "ex": String {
+        "ex": StringType {
           "chars": "datasource",
           "quote": "\\"",
           "spacing": Array [
@@ -32,7 +32,7 @@ SqlQuery {
       },
       Column {
         "alias": null,
-        "ex": String {
+        "ex": StringType {
           "chars": "start",
           "quote": "\\"",
           "spacing": Array [
@@ -45,7 +45,7 @@ SqlQuery {
       },
       Column {
         "alias": null,
-        "ex": String {
+        "ex": StringType {
           "chars": "end",
           "quote": "\\"",
           "spacing": Array [
@@ -58,7 +58,7 @@ SqlQuery {
       },
       Column {
         "alias": null,
-        "ex": String {
+        "ex": StringType {
           "chars": "size",
           "quote": "\\"",
           "spacing": Array [
@@ -71,7 +71,7 @@ SqlQuery {
       },
       Column {
         "alias": null,
-        "ex": String {
+        "ex": StringType {
           "chars": "version",
           "quote": "\\"",
           "spacing": Array [
@@ -84,7 +84,7 @@ SqlQuery {
       },
       Column {
         "alias": null,
-        "ex": String {
+        "ex": StringType {
           "chars": "partition_num",
           "quote": "\\"",
           "spacing": Array [
@@ -97,7 +97,7 @@ SqlQuery {
       },
       Column {
         "alias": null,
-        "ex": String {
+        "ex": StringType {
           "chars": "num_replicas",
           "quote": "\\"",
           "spacing": Array [
@@ -110,7 +110,7 @@ SqlQuery {
       },
       Column {
         "alias": null,
-        "ex": String {
+        "ex": StringType {
           "chars": "num_rows",
           "quote": "\\"",
           "spacing": Array [
@@ -123,7 +123,7 @@ SqlQuery {
       },
       Column {
         "alias": null,
-        "ex": String {
+        "ex": StringType {
           "chars": "is_published",
           "quote": "\\"",
           "spacing": Array [
@@ -136,7 +136,7 @@ SqlQuery {
       },
       Column {
         "alias": null,
-        "ex": String {
+        "ex": StringType {
           "chars": "is_available",
           "quote": "\\"",
           "spacing": Array [
@@ -149,7 +149,7 @@ SqlQuery {
       },
       Column {
         "alias": null,
-        "ex": String {
+        "ex": StringType {
           "chars": "is_realtime",
           "quote": "\\"",
           "spacing": Array [
@@ -162,7 +162,7 @@ SqlQuery {
       },
       Column {
         "alias": null,
-        "ex": String {
+        "ex": StringType {
           "chars": "is_overshadowed",
           "quote": "\\"",
           "spacing": Array [
@@ -175,7 +175,7 @@ SqlQuery {
       },
       Column {
         "alias": null,
-        "ex": String {
+        "ex": StringType {
           "chars": "payload",
           "quote": "\\"",
           "spacing": Array [
@@ -248,7 +248,7 @@ SqlQuery {
                           "ex": Array [
                             MultiplicativeExpression {
                               "ex": Array [
-                                String {
+                                StringType {
                                   "chars": "start",
                                   "quote": "\\"",
                                   "spacing": Array [
@@ -339,7 +339,7 @@ SqlQuery {
     "columns": Array [
       Column {
         "alias": null,
-        "ex": String {
+        "ex": StringType {
           "chars": "server",
           "quote": "\\"",
           "spacing": Array [
@@ -352,7 +352,7 @@ SqlQuery {
       },
       Column {
         "alias": null,
-        "ex": String {
+        "ex": StringType {
           "chars": "server_type",
           "quote": "\\"",
           "spacing": Array [
@@ -365,7 +365,7 @@ SqlQuery {
       },
       Column {
         "alias": null,
-        "ex": String {
+        "ex": StringType {
           "chars": "tier",
           "quote": "\\"",
           "spacing": Array [
@@ -378,7 +378,7 @@ SqlQuery {
       },
       Column {
         "alias": null,
-        "ex": String {
+        "ex": StringType {
           "chars": "host",
           "quote": "\\"",
           "spacing": Array [
@@ -391,7 +391,7 @@ SqlQuery {
       },
       Column {
         "alias": null,
-        "ex": String {
+        "ex": StringType {
           "chars": "plaintext_port",
           "quote": "\\"",
           "spacing": Array [
@@ -404,7 +404,7 @@ SqlQuery {
       },
       Column {
         "alias": null,
-        "ex": String {
+        "ex": StringType {
           "chars": "tls_port",
           "quote": "\\"",
           "spacing": Array [
@@ -417,7 +417,7 @@ SqlQuery {
       },
       Column {
         "alias": null,
-        "ex": String {
+        "ex": StringType {
           "chars": "curr_size",
           "quote": "\\"",
           "spacing": Array [
@@ -430,7 +430,7 @@ SqlQuery {
       },
       Column {
         "alias": null,
-        "ex": String {
+        "ex": StringType {
           "chars": "max_size",
           "quote": "\\"",
           "spacing": Array [
@@ -447,7 +447,7 @@ SqlQuery {
           "spacing": Array [
             " ",
           ],
-          "value": String {
+          "value": StringType {
             "chars": "rank",
             "quote": "\\"",
             "spacing": Array [
@@ -535,7 +535,7 @@ SqlQuery {
                                   "ex": Array [
                                     MultiplicativeExpression {
                                       "ex": Array [
-                                        String {
+                                        StringType {
                                           "chars": "coordinator",
                                           "quote": "'",
                                           "spacing": Array [
@@ -663,7 +663,7 @@ SqlQuery {
                                   "ex": Array [
                                     MultiplicativeExpression {
                                       "ex": Array [
-                                        String {
+                                        StringType {
                                           "chars": "overlord",
                                           "quote": "'",
                                           "spacing": Array [
@@ -791,7 +791,7 @@ SqlQuery {
                                   "ex": Array [
                                     MultiplicativeExpression {
                                       "ex": Array [
-                                        String {
+                                        StringType {
                                           "chars": "router",
                                           "quote": "'",
                                           "spacing": Array [
@@ -919,7 +919,7 @@ SqlQuery {
                                   "ex": Array [
                                     MultiplicativeExpression {
                                       "ex": Array [
-                                        String {
+                                        StringType {
                                           "chars": "broker",
                                           "quote": "'",
                                           "spacing": Array [
@@ -1047,7 +1047,7 @@ SqlQuery {
                                   "ex": Array [
                                     MultiplicativeExpression {
                                       "ex": Array [
-                                        String {
+                                        StringType {
                                           "chars": "historical",
                                           "quote": "'",
                                           "spacing": Array [
@@ -1175,7 +1175,7 @@ SqlQuery {
                                   "ex": Array [
                                     MultiplicativeExpression {
                                       "ex": Array [
-                                        String {
+                                        StringType {
                                           "chars": "middle_manager",
                                           "quote": "'",
                                           "spacing": Array [
@@ -1303,7 +1303,7 @@ SqlQuery {
                                   "ex": Array [
                                     MultiplicativeExpression {
                                       "ex": Array [
-                                        String {
+                                        StringType {
                                           "chars": "peon",
                                           "quote": "'",
                                           "spacing": Array [
@@ -1436,7 +1436,7 @@ SqlQuery {
                               "ex": Array [
                                 MultiplicativeExpression {
                                   "ex": Array [
-                                    String {
+                                    StringType {
                                       "chars": "server_type",
                                       "quote": "\\"",
                                       "spacing": Array [
@@ -1554,7 +1554,7 @@ SqlQuery {
                           "ex": Array [
                             MultiplicativeExpression {
                               "ex": Array [
-                                String {
+                                StringType {
                                   "chars": "rank",
                                   "quote": "\\"",
                                   "spacing": Array [
@@ -1620,7 +1620,7 @@ SqlQuery {
                           "ex": Array [
                             MultiplicativeExpression {
                               "ex": Array [
-                                String {
+                                StringType {
                                   "chars": "server",
                                   "quote": "\\"",
                                   "spacing": Array [
@@ -1743,7 +1743,7 @@ SqlQuery {
     "columns": Array [
       Column {
         "alias": null,
-        "ex": String {
+        "ex": StringType {
           "chars": "task_id",
           "quote": "\\"",
           "spacing": Array [
@@ -1756,7 +1756,7 @@ SqlQuery {
       },
       Column {
         "alias": null,
-        "ex": String {
+        "ex": StringType {
           "chars": "type",
           "quote": "\\"",
           "spacing": Array [
@@ -1769,7 +1769,7 @@ SqlQuery {
       },
       Column {
         "alias": null,
-        "ex": String {
+        "ex": StringType {
           "chars": "datasource",
           "quote": "\\"",
           "spacing": Array [
@@ -1782,7 +1782,7 @@ SqlQuery {
       },
       Column {
         "alias": null,
-        "ex": String {
+        "ex": StringType {
           "chars": "created_time",
           "quote": "\\"",
           "spacing": Array [
@@ -1795,7 +1795,7 @@ SqlQuery {
       },
       Column {
         "alias": null,
-        "ex": String {
+        "ex": StringType {
           "chars": "location",
           "quote": "\\"",
           "spacing": Array [
@@ -1808,7 +1808,7 @@ SqlQuery {
       },
       Column {
         "alias": null,
-        "ex": String {
+        "ex": StringType {
           "chars": "duration",
           "quote": "\\"",
           "spacing": Array [
@@ -1821,7 +1821,7 @@ SqlQuery {
       },
       Column {
         "alias": null,
-        "ex": String {
+        "ex": StringType {
           "chars": "error_msg",
           "quote": "\\"",
           "spacing": Array [
@@ -1838,7 +1838,7 @@ SqlQuery {
           "spacing": Array [
             " ",
           ],
-          "value": String {
+          "value": StringType {
             "chars": "status",
             "quote": "\\"",
             "spacing": Array [
@@ -1869,7 +1869,7 @@ SqlQuery {
                                   "ex": Array [
                                     MultiplicativeExpression {
                                       "ex": Array [
-                                        String {
+                                        StringType {
                                           "chars": "runner_status",
                                           "quote": "\\"",
                                           "spacing": Array [
@@ -1930,7 +1930,7 @@ SqlQuery {
                                   "ex": Array [
                                     MultiplicativeExpression {
                                       "ex": Array [
-                                        String {
+                                        StringType {
                                           "chars": "status",
                                           "quote": "\\"",
                                           "spacing": Array [
@@ -1958,7 +1958,7 @@ SqlQuery {
                                     "ex": Array [
                                       MultiplicativeExpression {
                                         "ex": Array [
-                                          String {
+                                          StringType {
                                             "chars": "RUNNING",
                                             "quote": "'",
                                             "spacing": Array [
@@ -2028,7 +2028,7 @@ SqlQuery {
                               "ex": Array [
                                 MultiplicativeExpression {
                                   "ex": Array [
-                                    String {
+                                    StringType {
                                       "chars": "status",
                                       "quote": "\\"",
                                       "spacing": Array [
@@ -2096,7 +2096,7 @@ SqlQuery {
           "spacing": Array [
             " ",
           ],
-          "value": String {
+          "value": StringType {
             "chars": "rank",
             "quote": "\\"",
             "spacing": Array [
@@ -2206,7 +2206,7 @@ SqlQuery {
                                                                   "ex": Array [
                                                                     MultiplicativeExpression {
                                                                       "ex": Array [
-                                                                        String {
+                                                                        StringType {
                                                                           "chars": "RUNNING",
                                                                           "quote": "'",
                                                                           "spacing": Array [
@@ -2333,7 +2333,7 @@ SqlQuery {
                                                                   "ex": Array [
                                                                     MultiplicativeExpression {
                                                                       "ex": Array [
-                                                                        String {
+                                                                        StringType {
                                                                           "chars": "PENDING",
                                                                           "quote": "'",
                                                                           "spacing": Array [
@@ -2464,7 +2464,7 @@ SqlQuery {
                                                               "ex": Array [
                                                                 MultiplicativeExpression {
                                                                   "ex": Array [
-                                                                    String {
+                                                                    StringType {
                                                                       "chars": "runner_status",
                                                                       "quote": "\\"",
                                                                       "spacing": Array [
@@ -2580,7 +2580,7 @@ SqlQuery {
                                   "ex": Array [
                                     MultiplicativeExpression {
                                       "ex": Array [
-                                        String {
+                                        StringType {
                                           "chars": "status",
                                           "quote": "\\"",
                                           "spacing": Array [
@@ -2608,7 +2608,7 @@ SqlQuery {
                                     "ex": Array [
                                       MultiplicativeExpression {
                                         "ex": Array [
-                                          String {
+                                          StringType {
                                             "chars": "RUNNING",
                                             "quote": "'",
                                             "spacing": Array [
@@ -2799,7 +2799,7 @@ SqlQuery {
                           "ex": Array [
                             MultiplicativeExpression {
                               "ex": Array [
-                                String {
+                                StringType {
                                   "chars": "rank",
                                   "quote": "\\"",
                                   "spacing": Array [
@@ -2865,7 +2865,7 @@ SqlQuery {
                           "ex": Array [
                             MultiplicativeExpression {
                               "ex": Array [
-                                String {
+                                StringType {
                                   "chars": "created_time",
                                   "quote": "\\"",
                                   "spacing": Array [
@@ -3122,7 +3122,7 @@ SqlQuery {
                                 "ex": Array [
                                   MultiplicativeExpression {
                                     "ex": Array [
-                                      String {
+                                      StringType {
                                         "chars": "size",
                                         "quote": "\\"",
                                         "spacing": Array [
@@ -3213,7 +3213,7 @@ SqlQuery {
                                 "ex": Array [
                                   MultiplicativeExpression {
                                     "ex": Array [
-                                      String {
+                                      StringType {
                                         "chars": "num_rows",
                                         "quote": "\\"",
                                         "spacing": Array [

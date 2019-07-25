@@ -39,7 +39,7 @@ describe('single column Tests', () => {
       alias: null,
       spacing: [''],
     });
-    val.addParen(['(', [null]], [[null], ')']);
+    val.addParen(['(', ''], ['', ')']);
     expect(val).toMatchSnapshot();
   });
   it('column addparen to string', () => {
@@ -51,7 +51,7 @@ describe('single column Tests', () => {
       alias: null,
       spacing: [''],
     });
-    val.addParen(['(', [null]], [[null], ')']);
+    val.addParen(['(', ''], ['', ')']);
     expect(val.toString()).toMatchSnapshot();
   });
   it('column getBasicValue with bracket', () => {
@@ -63,7 +63,7 @@ describe('single column Tests', () => {
       alias: null,
       spacing: [''],
     });
-    val.addParen(['(', [null]], [[null], ')']);
+    val.addParen(['(', ''], ['', ')']);
     expect(val.getBasicValue()).toMatchSnapshot();
   });
   it('column getAlias', () => {
@@ -75,7 +75,7 @@ describe('single column Tests', () => {
       alias: null,
       spacing: [''],
     });
-    val.addParen(['(', [null]], [[null], ')']);
+    val.addParen(['(', ''], ['', ')']);
     expect(val.getBasicValue()).toMatchSnapshot();
   });
 });
