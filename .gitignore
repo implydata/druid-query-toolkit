@@ -7,4 +7,4 @@
 .idea/workspace.xml
 
 /node_modules/
-#/src/parser/druidsql.js
+/src/parser/druidsql.js

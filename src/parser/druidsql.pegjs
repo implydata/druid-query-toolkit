@@ -1,626 +1,673 @@
- {
-  var  functions = functions || ["COUNT",
+{
+  function makeListMap1(head, tail) {
+  if (head == null) return [];
+  return [head].concat(tail.map(function(t) { return t[1] }));
+  }
+  function makeListMap(head, tail) {
+    if (head == null) return [];
+    return [head].concat(tail.map(function(t) { return t }));
+  }
+  function makeListMap_1(head, tail) {
+    if (head == null) return [];
+    return [head].concat(tail.map(function(t) { return t[0][1] }));
+  }
+  function makeListMap_2(head, tail) {
+    if (head == null) return [];
+    return [head].concat(tail.map(function(t) { return t[0][2] }));
+  }
+  function makeListMapEmpty(tail) {
+    return [].concat(tail.map(function(t) { return t[1] }));
+  }
+  function makeListMapEmpty0(tail) {
+    return [].concat(tail.map(function(t) { return t[0] }));
+  }
+  function makeListMapEmpty01(tail) {
+    return [].concat(tail.map(function(t) { return t[0][1] }));
+  }
+  function makeListCasesSpacing(caseValue) {
+    caseValue.map(caseValue => {caseValue[1].spacing = makeListMap(caseValue[0], caseValue[1].spacing)});
+    return makeListMapEmpty(caseValue);
+  }
+
+ functions = functions || ["COUNT", "FILTER",
   "SUM","MIN", "MAX","AVG","APPROX_COUNT_DISTINCT",
   "APPROX_COUNT_DISTINCT_DS_HLL", "APPROX_COUNT_DISTINCT_DS_THETA",
   "APPROX_QUANTILE", "APPROX_QUANTILE_DS", "APPROX_QUANTILE_FIXED_BUCKETS"];
 }
 
-Start =
-  Query
-  / spacing:_  expression: Expression endspacing:_ {
-  return {type: 'expressionOnly',
-  			spacing: spacing,
-  			expression: expression,
-  			endSpacing: endspacing }}
-
-Query =
-  spacing: _
-  syntax: "SELECT"i
-  selectParts: SelectParts
-  from: From?
-  where: Where?
-  groupby: GroupBy?
-  having: Having?
-  orderBy: OrderBy?
-  limit: Limit?
-  unionAll: UnionAll?
-  endSpacing: _
-  {
-    return new SqlQuery({
-      queryType: "SELECT",
-      selectParts: selectParts,
-      from: from,
-      where: where,
-      groupby: groupby,
-      having: having,
-      orderBy: orderBy,
-      limit: limit,
-      unionAll: unionAll,
-      syntax: syntax,
-      spacing: spacing,
-      endSpacing: endSpacing
-    })
-  }
-
-SelectParts =
-  SelectPart: (SelectPart)+
-  {
-    return SelectPart
-  }
-
-SelectPart =
- spacing: _
- distinct: Distinct?
- selectPart: (
-   Variable
-   / Function
-   / Case
-   / Constant
-   / star
- )
- alias:Alias?
-  {
-    return {
-      type: "selectPart",
-      distinct: distinct,
-      expr: selectPart,
-      alias: alias,
-      spacing: spacing
+start = SelectQuery
+SelectQuery
+  = SelectToken distinct:(_ DistinctToken)?
+  spacing1: _
+  columns:Columns?
+  spacing2: _
+  fromClause:FromClause?
+  whereClause: (_ WhereClause)?
+  groupByClause:(_ GroupByClause)?
+  havingClause:(_ HavingClause)?
+  orderByClause:(_ OrderByClause)?
+  limitClause:(_ LimitClause)?
+    {
+      return new SqlQuery({
+        verb: 'SELECT',
+        distinct: distinct ? distinct[1]: null,
+        columns: columns,
+        fromClause: fromClause,
+        whereClause: whereClause ? whereClause[1]: null,
+        groupByClause: groupByClause ? groupByClause[1] : null,
+        havingClause: havingClause ? havingClause[1] : null,
+        orderByClause: orderByClause ? orderByClause[1] : null,
+        spacing: [distinct ? distinct[0]: null,
+        	spacing1,
+            spacing2,
+            whereClause ? whereClause[0]:null,
+            groupByClause ? groupByClause[0]:null,
+            havingClause? havingClause[0]: null,
+            orderByClause? orderByClause[0]: null,
+            limitClause ? limitClause[0] : null,
+            ],
+        limitClause: limitClause ? limitClause[1] : null,
+      });
     }
-  }
 
-From =
-  spacing: _
-  syntax: "FROM"i
-  value: (
-  Query
-  / Table
-  )
-  {
-    return {
-      type: 'from',
-      value: value,
-      spacing: spacing,
-      syntax: syntax
+SelectSubQuery
+  = SelectQuery
+
+Columns
+  = head:(Column)
+    tail:((Comma _) Column)*
+    {
+    	return new Columns({
+    	    parens: [],
+        	columns: makeListMap1(head, tail),
+          spacing: tail ? makeListMapEmpty01(tail) : null
+      })
     }
-  }
-
-Where =
-	spacing: _
-	syntax: "WHERE"i
-	expr:
-	  Expression
-	{
-    return {
-      type: "where",
-      expr: expr,
-      spacing: spacing,
-      syntax: syntax
-    }
-  }
-
-GroupBy =
-	spacing: _
-	syntax:"GROUP BY"i
-	groupByParts: GroupByPart+
-	{
-    return {
-      type: 'groupBy',
-      groupByParts: groupByParts,
-      spacing: spacing,
-      syntax: syntax
-    }
-  }
-
-GroupByPart =
-	!Reserved
-	 groupByPart: (
-	   Integer
-	   / Variable
-	   / Constant
-	 )
-	 {
-    return groupByPart
+  /open: (OpenParen _?) ex:Columns close: (_? CloseParen)
+   {
+     return ex.addParen(open,close);
    }
 
 
-Having =
-	spacing: _
-	syntax: "HAVING"i
-	expr: Expression
+Column
+  = ex:(CaseExpression/Function/RefExpression/StarToken/String) alias:(_ AsOptional)?
   {
-    return {
-      type: "having",
-      expr: expr,
-      spacing: spacing,
-      syntax: syntax
-    }
+    return new Column({
+    parens:[],
+    ex: ex,
+    alias: alias ? alias[1]: null,
+    spacing: alias ? [alias[0]] : null});
   }
-
-OrderBy =
-	spacing: _
-	syntax: "ORDER BY"i
-	orderByParts: OrderByPart+
-	{
-    return {
-      type: 'orderBy',
-      orderByParts: orderByParts,
-      spacing: spacing,
-      syntax: syntax
-    }
-  }
-
-OrderByPart =
-	spacing: _
-	!"LIMIT"i
-	expr: ExprPart+
-	direction: Direction?
-	{
-    return {
-      type: "orderByPart",
-      expr: expr,
-      direction: direction,
-      spacing: spacing
-    }
-  }
-
-Direction =
-	spacing: _
-	direction: (
-	  "DESC"i
-	  / "ASC"i
-	)
-	{
-    return {
-      type: 'direction',
-      direction: direction,
-      spacing: spacing
-    }
-  }
-
-ExprPart =
-	spacing: _
-	!Direction
-	value: (
-	  Function
-	  / Variable
-	  / Constant
-	)
-	{
-    return {
-      type: 'exprPart',
-      value: value,
-      spacing: spacing
-    }
-  }
-
-Limit =
-	spacing: _
-	syntax: "LIMIT"i
-	value: Integer
-	{
-    return {
-      type: 'limit',
-      value: value,
-      spacing: spacing,
-      syntax: syntax
-    }
-  }
-
-UnionAll =
-	spacing: _
-	syntax: "UNION ALL"i
-	newQuery: Query
-	{
-    return {
-      type: 'unionAll',
-      expr: newQuery,
-      spacing: spacing,
-      syntax:syntax
-    }
-  }
-
-Case =
-  spacing:_
-  syntax: "CASE"i
-  caseValue: CaseValue?
-  whenClause: WhenClause+
-  elseValue: ElseValue
-  end: End?
-  {
-    return {
-      type: "case",
-      caseValue: caseValue,
-      when: whenClause,
-      elseValue: elseValue,
-      end: end,
-      spacing: spacing,
-      syntax: syntax
-
-    }
-  }
-
-CaseValue =
-	spacing: _
-	!"WHEN"i
-	caseValue: (Variable/Constant)
-	{
-    return {
-      type: 'caseValue',
-      caseValue: caseValue,
-      spacing: spacing
-      }
-  }
-
-ElseValue =
-	spacing: _
-	syntax: "ELSE"i?
-	elseValue: (
-	  Expression
-	  / Integer
-	  / Variable
-	  / Constant
-  )?
-  {
-    return {
-      type: 'elseValue',
-      elseValue: elseValue,
-      spacing: spacing,
-      syntax: syntax
-    }
-  }
-
-End =
-	spacing: _
-	syntax: "END"i
-	{
-	 return {
-      type:'end',
-      spacing: spacing,
-      syntax: syntax
-    }
-  }
-
-WhenClause =
-	spacing:_
-	syntax: "WHEN"i
-	when: (
-	  Expression
-	  / Variable
-	  / Constant
-	  / Integer
-	  )
-  then: Then
-  {
-    return {
-      type:'when',
-      when: when,
-      then: then,
-      syntax: syntax,
-      spacing: spacing
-    }
-  }
-
-Then =
-  spacing: _
-  syntax: "THEN"i
-  then: (
-  Integer
-  / Case
-  / Expression
-  / Variable
-  )
-  {
-	  return {
-      type: 'then',
-      syntax: syntax,
-      then: then,
-      spacing: spacing
-    }
-  }
-
-
-Expression =
-	spacing: _
-	lhs: (
-	  Function
-	  / TimeStamp
-	  / Variable
-	  / Constant
-	  / Integer
-	  )
-  operator: (
-    Operator /
-    BinaryOperator
-  )
-  rhs: (
-    Expression
-     / Function
-     / TimeStamp
-     / Interval
-     / Variable
-     / Constant
-     / Integer
-   )
+   /open: (OpenParen _?) ex:Column close: (_? CloseParen)
    {
-    return {
-      type: "expression",
-      operator: operator,
-      lhs: lhs,
-      rhs: rhs,
-      spacing: spacing
+     return ex.addParen(open,close);
+   }
+
+
+FromClause
+  = keyword: FromToken spacing0: _ fc:FromContent alias:(_ AsOptional)?
+    {
+    return new FromClause({
+    		keyword: keyword,
+    		spacing: [spacing0,alias ? alias[0] : null],
+        fc: fc,
+        alias: alias ? alias[1] : null
+    	});
     }
+
+FromContent
+  = RefExpression
+  / OpenParen subQuery:SelectQuery CloseParen
+    {
+      return subQuery;
+    }
+
+WhereClause
+  = keyword:WhereToken spacing0:_ filter:Expression
+    {
+      return new WhereClause({
+        keyword: keyword,
+        filter: filter,
+        spacing: [spacing0]
+      });
+    }
+
+GroupByClause
+  = groupKeyword: GroupToken
+    spacing0:_ byKeyWord:ByToken
+    spacing1:_ head:Expression
+    tail:((Comma _)Expression)*
+    {
+      return new GroupByClause ({
+        groupKeyword: groupKeyword,
+        byKeyword: byKeyWord,
+        groupBy: makeListMap1(head, tail),
+        spacing: [spacing0, spacing1, makeListMapEmpty(tail)]
+      });
+    }
+
+HavingClause
+  = keyword: HavingToken
+    spacing0:_
+    having: Expression
+    {
+      return new HavingClause({
+    		keyword: keyword,
+        having: having,
+        spacing: [spacing0]
+      });
+    }
+
+OrderByClause
+  = orderKeyword: OrderToken
+    spacing0 : _
+    byKeyword: ByToken
+    spacing1: _
+    head: OrderByPart
+     tail:((Comma _) OrderByPart)*
+    {
+      return new OrderByClause({
+        orderKeyword: orderKeyword,
+        byKeyword : byKeyword,
+        orderBy: makeListMap1(head, tail),
+        spacing: [spacing0,spacing1,makeListMapEmpty01(tail)]
+      });
+    }
+
+OrderByPart
+	= orderBy:Expression
+	direction:(_ Direction)?
+	{
+    return new OrderByPart({
+      orderBy: orderBy,
+      direction: direction ? direction[1] : null,
+      spacing: direction ? [direction[0]] : null
+    });
   }
 
-Function =
-  spacing: _
-  functionCall: Functions
-  OpenParen
-  argument: Argument+
-  CloseParen
+
+LimitClause
+  = keyword: LimitToken spacing0:_  a:Integer b:((Comma _?) Integer)*
   {
-    return {
-      type: "function",
-      functionCall: functionCall,
-      arguments: argument,
-      spacing: spacing
-    }
+    return new LimitClause({
+      keyword: keyword,
+      value: b ? makeListMap1(a, b) : [a],
+      spacing: b ? makeListMap_1(spacing0, b) : [spacing0]
+    });
   }
 
-Distinct =
-	spacing: _
-	distinct: "DISTINCT"i
+Direction
+  = AscToken
+  / DescToken
+
+AsOptional
+  = keyword: AsToken spacing0: _ value:(String / Ref)
+  {
+    return new Alias ({
+      keyword: keyword,
+      value: value,
+      spacing: [spacing0]
+    });
+  }
+
+/*
+Expressions are defined below in acceding priority order
+
+  Or (OR)
+  And (AND)
+  Not (NOT)
+  Comparison (=, <=>, <, >, <=, >=, <>, !=, IS, LIKE, BETWEEN, IN, CONTAINS, REGEXP)
+  Additive (+, -)
+  Multiplicative (*), Division (/)
+  Unary identity (+), negation (-)
+*/
+
+Expression = OrExpression
+
+OrExpression
+  = head:AndExpression tail:(_ OrPart)*
+  {
+    let headValue = new OrPart({keyword:null, ex:head, spacing:[['']]});
+    return new OrExpression({
+      parens: [],
+      ex: makeListMap1(headValue, tail),
+      spacing: makeListMapEmpty0(tail)
+    });
+  }
+  / open: (OpenParen _?) ex:AndExpression close: (_? CloseParen)
+  {
+    return ex.addParen({open,close});
+  }
+
+OrPart
+	= keyword:OrToken spacing0:_ 	ex:AndExpression
 	{
-    return {
-      type: 'distinct',
-      distinct: distinct,
-      spacing: spacing
-    }
+    return new OrPart({
+      keyword: keyword,
+      ex: ex,
+      spacing:[spacing0]
+    });
   }
 
-Argument =
-	spacing: [\t\n\r,'']*
-	distinct: Distinct?
-	argumentValue: ArgumentValue
-	{
-    return {
-      type: 'argument',
-      distinct: distinct,
-      argumentValue: argumentValue,
-      spacing: spacing
-    }
+AndExpression
+  = head:NotExpression tail:(_ AndPart)*
+  {
+    let headValue = new AndPart({keyword:null, ex:head, spacing:[['']]});
+    return new OrExpression({
+        parens: [],
+        ex: makeListMap1(headValue, tail),
+        spacing: makeListMapEmpty0(tail)
+    });
+  }
+  / open: (OpenParen _?) ex:AndExpression close: (_? CloseParen)
+  {
+    return ex.addParen({open,close});
   }
 
-ArgumentValue =
-     spacing: [\t\n\r,'']*
-     argument: (
-        Constant
-        / Variable
-        / star
-        / [^(), ]+
-     )
+AndPart
+	= keyword:AndToken spacing0:_ ex:NotExpression
+  {
+    return new AndPart({
+      keyword: keyword,
+      ex: ex,
+      spacing:[spacing0]
+    });
+  }
+
+NotExpression
+  = not:(NotToken _)? ex:ComparisonExpression
+  {
+    return new NotExpression ({
+      parens: [],
+      keyword: not ? not[0] : null,
+      ex: ex,
+      spacing: not ? [not[1]] : null
+    });
+  }
+  /open: (OpenParen _?) ex:NotExpression close: (_? CloseParen) {
+    return ex.addParen({open,close});
+  }
+
+
+ComparisonExpression
+  = ex:AdditiveExpression  rhs:(_? ComparisonExpressionRhs)?
+  {
+    //if (rhs) ex = rhs(ex);
+    return new ComparisonExpression({
+      parens: [],
+      ex: ex,
+      rhs: rhs ? rhs[1] : null,
+      spacing: rhs? rhs[0]: null
+     });
+  }
+  /open: (OpenParen _?) ex:ComparisonExpression close: (_? CloseParen)
+  {
+    return ex.addParen({open,close});
+  }
+
+ComparisonExpressionRhs
+  = not:NotToken? spacing0: _ rhs:ComparisonExpressionRhsNotable
+  {
+    return new ComparisonExpressionRhs({
+      parens: [],
+      op: null,
+      is: null,
+      not: not,
+      rhs: rhs,
+      spacing: [spacing0]
+    });
+  }
+  / is:IsToken spacing0:_  not: (NotToken _)? rhs:AdditiveExpression
+  {
+    return  new ComparisonExpressionRhs({
+      parens: [],
+      op:null,
+      is: is,
+      not: not ? not[0] : null,
+      rhs: rhs,
+      spacing: not ? [spacing0, not[1]]: [spacing0],
+    });
+  }
+  / op:ComparisonOp spacing0: _? rhs:AdditiveExpression
+  {
+    return  new ComparisonExpressionRhs({
+      parens: [],
+      is: null,
+      not: null,
+      op: op,
+      spacing: [spacing0],
+      rhs: rhs
+    });
+  }
+  /open: (OpenParen _?) ex:ComparisonExpressionRhs close: (_? CloseParen)
+  {
+    return ex.addParen({open,close});
+  }
+
+
+ComparisonExpressionRhsNotable
+  = BetweenToken start:(AdditiveExpression) AndToken end:(AdditiveExpression)
+  / InToken list:(InSetLiteralExpression / AdditiveExpression)
+  / ContainsToken string:String
+  / LikeRhs
+  / RegExpToken string:String
+
+
+LikeRhs
+  = LikeToken string:String escape:(EscapeToken String)?
+
+AdditiveExpression
+  = head:MultiplicativeExpression tail:((_? AdditiveOp _?) MultiplicativeExpression)*
+    {
+      return new AdditiveExpression({
+        parens:[],
+        ex: makeListMap1(head, tail),
+        spacing: makeListMapEmpty0(tail),
+        op: makeListMapEmpty(tail),
+      });
+    }
+    /open: (OpenParen _?) ex:AdditiveExpression close: (_? CloseParen) {
+        return ex.addParen({open,close});
+    }
+
+AdditiveOp
+  = op:("+" / "-") !"+"
+  {
+    return op;
+  }
+
+MultiplicativeExpression
+  = head:BasicExpression tail:(_? MultiplicativeOp _? BasicExpression)*
+  {
+    return new MultiplicativeExpression({
+      parens : [],
+      ex: makeListMap1(head, tail),
+      spacing: makeListMapEmpty0(tail),
+      op: makeListMapEmpty(tail),
+    });
+
+  }
+  /open: (OpenParen _?) ex:MultiplicativeExpression close: (_? CloseParen)
+  {
+    return ex.addParen({open,close});
+  }
+
+MultiplicativeOp
+  = op:("*" / "/")
+  {
+    return op;
+  }
+
+BasicExpression
+  = CaseExpression
+  /Function
+  /OpenParen spacing0: _? sub:(Expression/ SelectSubQuery) spacing1:_? CloseParen
+  {
+  	return {
+  	  parens: true,
+  		spacing:[spacing0,spacing1],
+      sub:sub
+    }
+  }
+  /String
+  /Integer
+  /RefExpression
+
+  /*LiteralExpression
+  / AggregateExpression
+  / FunctionCallExpression
+  / CaseExpression
+  / OpenParen sub:(Expression / SelectSubQuery) CloseParen
+  {
+    return sub.addParen(open,close);
+  }
+  / RefExpression*/
+
+Function
+  = fn:Functions OpenParen spacing0:_? distinct:(DistinctToken _)? valueHead:(ExpressionMaybeFiltered) valueTail:((Comma _)? ExpressionMaybeFiltered)* spacing1:_? CloseParen
+    {
+      return new Function({
+        parens : [],
+        distinct: distinct,
+        fn: fn,
+        value: makeListMap1(valueHead, valueTail),
+        spacing:[spacing0, makeListMapEmpty(valueTail), spacing1]
+       });
+    }
+    /open: (OpenParen _?) ex:Function close: (_? CloseParen)
+    {
+      return ex.addParen(open,close);
+    }
+
+ExpressionMaybeFiltered
+  = ex:(StarToken / Expression) filter:(_ WhereClause)?
+  {
+    return new ExpressionMaybeFiltered({
+      parens : [],
+      ex: ex,
+      filter: filter ? filter[1] : null,
+      spacing: filter ? [filter[0]] : null
+    })
+  }
+  /open: (OpenParen _?) ex:Function close: (_? CloseParen)
+  {
+    return ex.addParen(open,close);
+  }
+
+
+CaseExpression
+  =  keyword:CaseToken v: (_ !WhenToken Expression)? cases:(_ Case)* els:(_ ElseToken _ Expression)? end: (_ EndToken)
+    {
+      return new CaseExpression({
+        parens: [],
+      	keyword: keyword,
+        expr: v,
+        cases: cases,
+        else: els,
+        end: end
+      });
+    }
+     /open: (OpenParen _?) ex:CaseExpression close: (_? CloseParen)
      {
-       return {
-         type:'argumentValue',
-         spacing: spacing,
-         argument: Array.isArray(argument) ? argument.join("") : argument
-       }
+       return ex.addParen(open,close);
      }
 
-Variable =
-  spacing: _
-  quote: (
-    QuoteMark
-    / Apostrophe
-  )
-  value: [^"'()]+
-  (
-    QuoteMark
-    / Apostrophe
-  )
-  {
-    return {
-      type: "variable",
-      value: value.join(""),
-      spacing: spacing,
-      quote: quote
-    }
+Case
+	= whenKeyword: "When"i spacing0: _ whenExpr: Expression spacing1:_  thenKeyword: ThenToken spacing2:_ thenExpr: Expression
+	{
+    return new CasePart({
+      whenKeyword: whenKeyword,
+      whenExpr : whenExpr,
+      thenKeyword: thenKeyword,
+      thenExpr: thenExpr,
+      spacing: [spacing0, spacing1, spacing2]
+    });
   }
 
-Constant =
-  spacing: _
-  !Reserved
-  value: [a-zA-Z_.]+
+SetLiteral
+  = OpenCurly head:StringNumberOrNull? tail:(Comma StringNumberOrNull)* CloseCurly
+    {
+      return Set.fromJS(makeListMap1(head, tail).map(undummyNull));
+    }
+
+StringNumberOrNull = String / Integer / NullToken
+
+
+InSetLiteralExpression
+  = OpenParen head:StringOrNumber tail:(Comma StringOrNumber)* CloseParen
+    {
+      return r(Set.fromJS(makeListMap1(head, tail)));
+    }
+
+StringOrNumber = String / Integer
+
+Interval
+  = IntervalToken n:Integer unit:Name &{ return intervalUnits[unit] }
+    {
+      if (n !== 0) error('only zero intervals supported for now');
+      return 0;
+    }
+
+RefExpression
+  = ref:NamespacedRef
+  {
+    return ref;
+  }
+
+RelaxedNamespacedRef
+  = ns:(Ref Dot)? name:RelaxedRef
   {
     return {
-      type: "Constant",
-      value: value.join(""),
-      spacing: spacing
-    }
+      namespace: ns ? ns[0] : null,
+      name: name
+    };
+  }
+
+NamespacedRef
+  = ns:(Ref Dot)? name:Ref
+  {
+    return new RefExpression({
+      namespace: ns ? ns[0] : null,
+      name: name
+    });
+  }
+
+RelaxedRef
+  = name:RelaxedName !{ return reserved(name); }
+  {
+    return name
+  }
+  / BacktickRef
+
+Ref
+  = name:Name /*!{ return reserved(name); }*/
+  {
+    return name
+  }
+  / BacktickRef
+
+String
+  = CharsetIntroducer? "'"  spacing0: _? chars:NotSQuote spacing1: _? "'"
+  {
+    return new String({
+      chars: chars,
+      quote: "'",
+      spacing: [spacing0, spacing1]
+    });
+  }
+  / '"' spacing0: _? chars:NotDQuote spacing1: _?'"'
+  {
+    return new String({
+      chars: chars,
+      quote: '"',
+      spacing: [spacing0, spacing1]
+    });
+  }
+
+Name "Name"
+  = name:$([a-z_]i [a-z0-9_]i*)
+  {
+    return name;
+  }
+
+RelaxedName "RelaxedName"
+  = name:$([a-z_\-:*/]i [a-z0-9_\-:*/]i*)
+  {
+    return name;
   }
 
 Integer =
-	spacing: _
-	value: [0-9]+
+	value:$ [0-9]+
 	{
-    return {
-      type: "Integer",
-      value: value.join(""),
-      spacing: spacing
-    }
+    return new Integer(
+      value
+    );
   }
-
-TimeStamp =
-	spacing: _
-	"TIMESTAMP"i
-	_ Apostrophe
-	timeStamp: [0-9" ":-]+
-	Apostrophe {
-    return {
-      type: "timestamp",
-      value: timeStamp.join(""),
-      spacing: spacing
-    }
-  }
-
-Operator =
-	spacing:_ operator:(
-	"+"
-   /"-"
-   /"/"
-   /"*"
-   /"="
-   )
-   {
-     return {
-       type: 'operator',
-       spacing: spacing,
-       operator: operator
-     }
-   }
-
-Interval =
-	spacing:_
-	"INTERVAL"i
-	value: (
-	  Apostrophe
-	  / Integer
-	  / Apostrophe
-	  / Variable
-  )
-	constant: Constant
-	{
-    return {
-        type: "interval",
-        value: value,
-        constant: constant,
-        spacing: spacing
-    }
-  }
-
-Alias =
-	spacing:_ syntax:"AS"i  value:(Variable/Constant/Integer) {
-    return {type:'alias',
-    value: value,
-    spacing: spacing,
-    syntax: syntax
-    }
-	}
 
 Functions =
-	Function: IdentifierPart &{
-   	if (functions.includes(Function)) {
+	Function: Name &{
+   	if (functions.includes(Function.toUpperCase())) {
     	return true
-    } else return false
-  } {return Function}
-
-
-
-BinaryOperator =
-	spacing: _ !Parts operator:(
-    ">="
-    / ">"
-    / "=<"
-    / "="
-    / "!="
-    / "<"
-    / "<>"
-    / "BETWEEN"i
-    / "NOT BETWEEN"i
-    / "NOT LIKE"i
-    / "LIKE"i
-    / "IS NULL"i
-    / "IS NOT NULL"i
-    / "IS TRUE"i
-    / "IS NOT TRUE"i
-    / "IS FALSE"i
-    / "IN"i
-    / "NOT IN"i
-    / "NOT IN"i
-    / "OR"i
-    / "AND"i
-    / "NOT"i
-  )
-  {
-    return {
-      type: 'operator',
-      operator: operator,
-      spacing: spacing
     }
   }
+  {
+  return Function;
+  }
+
+ComparisonOp "Comparison"
+  = "="
+  / "<=>"
+  / "<>"
+  / "!="
+  / "<="
+  / ">="
+  / "<"
+  / ">"
+
+StarToken = keyword:"*"i  { return keyword}
+SelectToken = keyword:"SELECT"i  { return keyword}
+DistinctToken = keyword:"DISTINCT"i { return keyword}
+AsToken = keyword:"AS"i { return keyword}
+OrToken = keyword:"OR"i { return keyword}
+AndToken = keyword:"AND"i { return keyword}
+NotToken = keyword:"NOT"i { return keyword}
+CaseToken = keyword:"CASE"i { return keyword}
+WhenToken = keyword:"WHEN"i { return keyword}
+ThenToken = keyword:"THEN"i { return keyword}
+ElseToken = keyword:"ELSE"i { return keyword}
+EndToken = keyword:"END"i { return keyword}
+CountToken = keyword:"COUNT"i { return keyword}
+FromToken = keyword:"FROM"i { return keyword}
+WhereToken = keyword:"WHERE"i { return keyword}
+IsToken = keyword:"IS"i { return keyword}
+BetweenToken = keyword:"BETWEEN"i { return keyword}
+InToken = keyword:"BETWEEN"i { return keyword}
+GroupToken = keyword:"GROUP"i { return keyword}
+ByToken = keyword:"BY"i { return keyword}
+HavingToken = keyword:"HAVING"i { return keyword}
+OrderToken = keyword:"ORDER"i { return keyword}
+AscToken = keyword:"ASC"i { return keyword}
+DescToken = keyword:"DESC"i { return keyword}
+LimitToken = keyword:"LIMIT"i { return keyword}
+ContainsToken = keyword:"Contains"i { return keyword}
+RegExpToken = keyword:"REGEXP"i { return keyword}
+LikeToken = keyword:"LIKE"i { return keyword}
+EscapeToken = keyword:"ESCAPE"i { return keyword}
+NullToken = keyword:"NULL"i { return keyword}
+IntervalToken = keyword:"INTERVAL"i { return keyword}
+
+
+
+Dot
+= '.'
+OpenParen "("
+  = "("
+
+CloseParen ")"
+  = ")"
+
+OpenCurly "{"
+  = "{" _
+
+CloseCurly "}"
+  = "}" _
+
+Comma = ','
 _
-  = [ \t\n\r(),;]*
+  = [ \t\n\r]+
+CharsetIntroducer
+  = "N"
+  / "n"
+  / "_"$([a-z0-9]+) // assume all charsets are a combo of lowercase + number
 
-Table =
-  spacing: _
-  schema: (
-    IdentifierPart
-    Dot
-  )?
-  table: (
-    Variable
-    / IdentifierPart
-  )
-  alias: Alias?
+BacktickRef
+  = "`" name:$([^`]+) "`" _
   {
-    return {
-      type: 'table',
-      schema: schema ? schema.join("").replace(/[,.]/g, ""): null,
-      alias: alias,
-      table: table,
-      spacing: spacing
-    }
+    return name
   }
 
-star =
-	"*"
-	{
-		return {
-      type: "star",
-    }
-  }
+NotSQuote "NotSQuote"
+  = $([^']*)
 
-OpenParen =
-	"("
-
-CloseParen =
-	")"
-
-QuoteMark =
-	"\""
-
-Comma =
-	","
-
-SemiColon =
-	";"
-
-Apostrophe =
-	"\'"
-
-Dot =
-	"."
-
-IdentifierPart =
-	part:[a-z_]i+
-	{
-    return part.join("")
-  }
-
-Reserved =
-	BinaryOperator
-    /Operator
-    /Functions
-    /Parts
-
-Parts =
-    "FROM"i
-    /"WHERE"i
-    /"GROUP BY"i
-    /"HAVING"i
-    /"LIMIT"i
-    /"UNION ALL"i
-    /"SELECT"i
-    /"AS"i
-    /"ORDER BY"i
-
+NotDQuote "NotDQuote"
+  = $([^"]*)

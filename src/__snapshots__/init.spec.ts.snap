@@ -1,294 +1,375 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Druid Query Tests parsers segments query 1`] = `
-Object {
-  "endSpacing": Array [],
-  "from": Object {
-    "spacing": Array [
-      "
-",
-    ],
-    "syntax": "FROM",
-    "type": "from",
-    "value": Object {
-      "alias": null,
-      "schema": "sys",
-      "spacing": Array [
-        " ",
-      ],
-      "table": "segments",
-      "type": "table",
-    },
-  },
-  "groupby": null,
-  "having": null,
-  "limit": Object {
-    "spacing": Array [
-      "
-",
-    ],
-    "syntax": "LIMIT",
-    "type": "limit",
-    "value": Object {
-      "spacing": Array [
-        " ",
-      ],
-      "type": "Integer",
-      "value": "50",
-    },
-  },
-  "orderBy": Object {
-    "orderByParts": Array [
-      Object {
-        "direction": Object {
-          "direction": "DESC",
+SqlQuery {
+  "columns": Columns {
+    "columns": Array [
+      Column {
+        "alias": null,
+        "ex": String {
+          "chars": "segment_id",
+          "quote": "\\"",
           "spacing": Array [
+            null,
+            null,
+          ],
+        },
+        "parens": Array [],
+        "spacing": null,
+      },
+      Column {
+        "alias": null,
+        "ex": String {
+          "chars": "datasource",
+          "quote": "\\"",
+          "spacing": Array [
+            null,
+            null,
+          ],
+        },
+        "parens": Array [],
+        "spacing": null,
+      },
+      Column {
+        "alias": null,
+        "ex": String {
+          "chars": "start",
+          "quote": "\\"",
+          "spacing": Array [
+            null,
+            null,
+          ],
+        },
+        "parens": Array [],
+        "spacing": null,
+      },
+      Column {
+        "alias": null,
+        "ex": String {
+          "chars": "end",
+          "quote": "\\"",
+          "spacing": Array [
+            null,
+            null,
+          ],
+        },
+        "parens": Array [],
+        "spacing": null,
+      },
+      Column {
+        "alias": null,
+        "ex": String {
+          "chars": "size",
+          "quote": "\\"",
+          "spacing": Array [
+            null,
+            null,
+          ],
+        },
+        "parens": Array [],
+        "spacing": null,
+      },
+      Column {
+        "alias": null,
+        "ex": String {
+          "chars": "version",
+          "quote": "\\"",
+          "spacing": Array [
+            null,
+            null,
+          ],
+        },
+        "parens": Array [],
+        "spacing": null,
+      },
+      Column {
+        "alias": null,
+        "ex": String {
+          "chars": "partition_num",
+          "quote": "\\"",
+          "spacing": Array [
+            null,
+            null,
+          ],
+        },
+        "parens": Array [],
+        "spacing": null,
+      },
+      Column {
+        "alias": null,
+        "ex": String {
+          "chars": "num_replicas",
+          "quote": "\\"",
+          "spacing": Array [
+            null,
+            null,
+          ],
+        },
+        "parens": Array [],
+        "spacing": null,
+      },
+      Column {
+        "alias": null,
+        "ex": String {
+          "chars": "num_rows",
+          "quote": "\\"",
+          "spacing": Array [
+            null,
+            null,
+          ],
+        },
+        "parens": Array [],
+        "spacing": null,
+      },
+      Column {
+        "alias": null,
+        "ex": String {
+          "chars": "is_published",
+          "quote": "\\"",
+          "spacing": Array [
+            null,
+            null,
+          ],
+        },
+        "parens": Array [],
+        "spacing": null,
+      },
+      Column {
+        "alias": null,
+        "ex": String {
+          "chars": "is_available",
+          "quote": "\\"",
+          "spacing": Array [
+            null,
+            null,
+          ],
+        },
+        "parens": Array [],
+        "spacing": null,
+      },
+      Column {
+        "alias": null,
+        "ex": String {
+          "chars": "is_realtime",
+          "quote": "\\"",
+          "spacing": Array [
+            null,
+            null,
+          ],
+        },
+        "parens": Array [],
+        "spacing": null,
+      },
+      Column {
+        "alias": null,
+        "ex": String {
+          "chars": "is_overshadowed",
+          "quote": "\\"",
+          "spacing": Array [
+            null,
+            null,
+          ],
+        },
+        "parens": Array [],
+        "spacing": null,
+      },
+      Column {
+        "alias": null,
+        "ex": String {
+          "chars": "payload",
+          "quote": "\\"",
+          "spacing": Array [
+            null,
+            null,
+          ],
+        },
+        "parens": Array [],
+        "spacing": null,
+      },
+    ],
+    "parens": Array [],
+    "spacing": Array [
+      Array [
+        " ",
+      ],
+      Array [
+        " ",
+      ],
+      Array [
+        " ",
+      ],
+      Array [
+        " ",
+      ],
+      Array [
+        " ",
+      ],
+      Array [
+        " ",
+      ],
+      Array [
+        " ",
+      ],
+      Array [
+        " ",
+      ],
+      Array [
+        " ",
+      ],
+      Array [
+        " ",
+      ],
+      Array [
+        " ",
+      ],
+      Array [
+        " ",
+      ],
+      Array [
+        " ",
+      ],
+    ],
+  },
+  "distinct": null,
+  "fromClause": FromClause {
+    "alias": null,
+    "fc": RefExpression {
+      "name": "segments",
+      "namespace": "sys",
+    },
+    "keyword": "FROM",
+    "parens": undefined,
+    "spacing": Array [
+      Array [
+        " ",
+      ],
+      null,
+    ],
+  },
+  "groupByClause": null,
+  "havingClause": null,
+  "limitClause": LimitClause {
+    "keyword": "LIMIT",
+    "spacing": Array [
+      Array [
+        " ",
+      ],
+    ],
+    "value": Array [
+      Integer {
+        "value": "50",
+      },
+    ],
+  },
+  "orderByClause": OrderByClause {
+    "byKeyword": "BY",
+    "orderBy": Array [
+      OrderByPart {
+        "direction": "DESC",
+        "orderBy": OrExpression {
+          "ex": Array [
+            OrPart {
+              "ex": OrExpression {
+                "ex": Array [
+                  AndPart {
+                    "ex": NotExpression {
+                      "ex": ComparisonExpression {
+                        "ex": AdditiveExpression {
+                          "ex": Array [
+                            MultiplicativeExpression {
+                              "ex": Array [
+                                String {
+                                  "chars": "start",
+                                  "quote": "\\"",
+                                  "spacing": Array [
+                                    null,
+                                    null,
+                                  ],
+                                },
+                              ],
+                              "op": Array [],
+                              "parens": Array [],
+                              "spacing": Array [],
+                            },
+                          ],
+                          "op": Array [],
+                          "parens": Array [],
+                          "spacing": Array [],
+                        },
+                        "parens": Array [],
+                        "rhs": null,
+                        "spacing": Array [
+                          null,
+                        ],
+                      },
+                      "keyword": null,
+                      "parens": Array [],
+                      "spacing": null,
+                    },
+                    "keyword": null,
+                    "spacing": Array [
+                      Array [
+                        "",
+                      ],
+                    ],
+                  },
+                ],
+                "parens": Array [],
+                "spacing": Array [],
+              },
+              "keyword": null,
+              "spacing": Array [
+                Array [
+                  "",
+                ],
+              ],
+            },
+          ],
+          "parens": Array [],
+          "spacing": Array [],
+        },
+        "spacing": Array [
+          Array [
             " ",
           ],
-          "type": "direction",
-        },
-        "expr": Array [
-          Object {
-            "spacing": Array [],
-            "type": "exprPart",
-            "value": Object {
-              "quote": "\\"",
-              "spacing": Array [],
-              "type": "variable",
-              "value": "start",
-            },
-          },
         ],
-        "spacing": Array [
-          " ",
-        ],
-        "type": "orderByPart",
       },
     ],
+    "orderKeyword": "ORDER",
     "spacing": Array [
+      Array [
+        " ",
+      ],
+      Array [
+        " ",
+      ],
+      Array [],
+    ],
+  },
+  "spacing": Array [
+    null,
+    Array [
+      " ",
+    ],
+    Array [
       "
 ",
     ],
-    "syntax": "ORDER BY",
-    "type": "orderBy",
-  },
-  "queryType": "SELECT",
-  "selectParts": Array [
-    Object {
-      "alias": null,
-      "distinct": null,
-      "expr": Object {
-        "quote": "\\"",
-        "spacing": Array [],
-        "type": "variable",
-        "value": "segment_id",
-      },
-      "spacing": Array [
-        " ",
-      ],
-      "type": "selectPart",
-    },
-    Object {
-      "alias": null,
-      "distinct": null,
-      "expr": Object {
-        "quote": "\\"",
-        "spacing": Array [],
-        "type": "variable",
-        "value": "datasource",
-      },
-      "spacing": Array [
-        ",",
-        " ",
-      ],
-      "type": "selectPart",
-    },
-    Object {
-      "alias": null,
-      "distinct": null,
-      "expr": Object {
-        "quote": "\\"",
-        "spacing": Array [],
-        "type": "variable",
-        "value": "start",
-      },
-      "spacing": Array [
-        ",",
-        " ",
-      ],
-      "type": "selectPart",
-    },
-    Object {
-      "alias": null,
-      "distinct": null,
-      "expr": Object {
-        "quote": "\\"",
-        "spacing": Array [],
-        "type": "variable",
-        "value": "end",
-      },
-      "spacing": Array [
-        ",",
-        " ",
-      ],
-      "type": "selectPart",
-    },
-    Object {
-      "alias": null,
-      "distinct": null,
-      "expr": Object {
-        "quote": "\\"",
-        "spacing": Array [],
-        "type": "variable",
-        "value": "size",
-      },
-      "spacing": Array [
-        ",",
-        " ",
-      ],
-      "type": "selectPart",
-    },
-    Object {
-      "alias": null,
-      "distinct": null,
-      "expr": Object {
-        "quote": "\\"",
-        "spacing": Array [],
-        "type": "variable",
-        "value": "version",
-      },
-      "spacing": Array [
-        ",",
-        " ",
-      ],
-      "type": "selectPart",
-    },
-    Object {
-      "alias": null,
-      "distinct": null,
-      "expr": Object {
-        "quote": "\\"",
-        "spacing": Array [],
-        "type": "variable",
-        "value": "partition_num",
-      },
-      "spacing": Array [
-        ",",
-        " ",
-      ],
-      "type": "selectPart",
-    },
-    Object {
-      "alias": null,
-      "distinct": null,
-      "expr": Object {
-        "quote": "\\"",
-        "spacing": Array [],
-        "type": "variable",
-        "value": "num_replicas",
-      },
-      "spacing": Array [
-        ",",
-        " ",
-      ],
-      "type": "selectPart",
-    },
-    Object {
-      "alias": null,
-      "distinct": null,
-      "expr": Object {
-        "quote": "\\"",
-        "spacing": Array [],
-        "type": "variable",
-        "value": "num_rows",
-      },
-      "spacing": Array [
-        ",",
-        " ",
-      ],
-      "type": "selectPart",
-    },
-    Object {
-      "alias": null,
-      "distinct": null,
-      "expr": Object {
-        "quote": "\\"",
-        "spacing": Array [],
-        "type": "variable",
-        "value": "is_published",
-      },
-      "spacing": Array [
-        ",",
-        " ",
-      ],
-      "type": "selectPart",
-    },
-    Object {
-      "alias": null,
-      "distinct": null,
-      "expr": Object {
-        "quote": "\\"",
-        "spacing": Array [],
-        "type": "variable",
-        "value": "is_available",
-      },
-      "spacing": Array [
-        ",",
-        " ",
-      ],
-      "type": "selectPart",
-    },
-    Object {
-      "alias": null,
-      "distinct": null,
-      "expr": Object {
-        "quote": "\\"",
-        "spacing": Array [],
-        "type": "variable",
-        "value": "is_realtime",
-      },
-      "spacing": Array [
-        ",",
-        " ",
-      ],
-      "type": "selectPart",
-    },
-    Object {
-      "alias": null,
-      "distinct": null,
-      "expr": Object {
-        "quote": "\\"",
-        "spacing": Array [],
-        "type": "variable",
-        "value": "is_overshadowed",
-      },
-      "spacing": Array [
-        ",",
-        " ",
-      ],
-      "type": "selectPart",
-    },
-    Object {
-      "alias": null,
-      "distinct": null,
-      "expr": Object {
-        "quote": "\\"",
-        "spacing": Array [],
-        "type": "variable",
-        "value": "payload",
-      },
-      "spacing": Array [
-        ",",
-        " ",
-      ],
-      "type": "selectPart",
-    },
+    null,
+    null,
+    null,
+    Array [
+      "
+",
+    ],
+    Array [
+      "
+",
+    ],
   ],
-  "spacing": Array [],
-  "syntax": "SELECT",
   "type": "query",
-  "unionAll": null,
-  "where": null,
+  "verb": "SELECT",
+  "whereClause": null,
 }
 `;
 
@@ -300,1621 +381,2960 @@ LIMIT 50"
 `;
 
 exports[`Druid Query Tests parsers servers query 1`] = `
-Object {
-  "endSpacing": Array [],
-  "from": Object {
-    "spacing": Array [
-      "
-",
-    ],
-    "syntax": "FROM",
-    "type": "from",
-    "value": Object {
-      "alias": null,
-      "schema": "sys",
-      "spacing": Array [
-        " ",
-      ],
-      "table": "servers",
-      "type": "table",
-    },
-  },
-  "groupby": null,
-  "having": null,
-  "limit": null,
-  "orderBy": Object {
-    "orderByParts": Array [
-      Object {
-        "direction": Object {
-          "direction": "DESC",
-          "spacing": Array [
-            " ",
-          ],
-          "type": "direction",
-        },
-        "expr": Array [
-          Object {
-            "spacing": Array [],
-            "type": "exprPart",
-            "value": Object {
-              "quote": "\\"",
-              "spacing": Array [],
-              "type": "variable",
-              "value": "rank",
-            },
-          },
-        ],
-        "spacing": Array [
-          " ",
-        ],
-        "type": "orderByPart",
-      },
-      Object {
-        "direction": Object {
-          "direction": "DESC",
-          "spacing": Array [
-            " ",
-          ],
-          "type": "direction",
-        },
-        "expr": Array [
-          Object {
-            "spacing": Array [],
-            "type": "exprPart",
-            "value": Object {
-              "quote": "\\"",
-              "spacing": Array [],
-              "type": "variable",
-              "value": "server",
-            },
-          },
-        ],
-        "spacing": Array [
-          ",",
-          " ",
-        ],
-        "type": "orderByPart",
-      },
-    ],
-    "spacing": Array [
-      "
-",
-    ],
-    "syntax": "ORDER BY",
-    "type": "orderBy",
-  },
-  "queryType": "SELECT",
-  "selectParts": Array [
-    Object {
-      "alias": null,
-      "distinct": null,
-      "expr": Object {
-        "quote": "\\"",
-        "spacing": Array [],
-        "type": "variable",
-        "value": "server",
-      },
-      "spacing": Array [
-        "
-",
-        " ",
-        " ",
-      ],
-      "type": "selectPart",
-    },
-    Object {
-      "alias": null,
-      "distinct": null,
-      "expr": Object {
-        "quote": "\\"",
-        "spacing": Array [],
-        "type": "variable",
-        "value": "server_type",
-      },
-      "spacing": Array [
-        ",",
-        " ",
-      ],
-      "type": "selectPart",
-    },
-    Object {
-      "alias": null,
-      "distinct": null,
-      "expr": Object {
-        "quote": "\\"",
-        "spacing": Array [],
-        "type": "variable",
-        "value": "tier",
-      },
-      "spacing": Array [
-        ",",
-        " ",
-      ],
-      "type": "selectPart",
-    },
-    Object {
-      "alias": null,
-      "distinct": null,
-      "expr": Object {
-        "quote": "\\"",
-        "spacing": Array [],
-        "type": "variable",
-        "value": "host",
-      },
-      "spacing": Array [
-        ",",
-        " ",
-      ],
-      "type": "selectPart",
-    },
-    Object {
-      "alias": null,
-      "distinct": null,
-      "expr": Object {
-        "quote": "\\"",
-        "spacing": Array [],
-        "type": "variable",
-        "value": "plaintext_port",
-      },
-      "spacing": Array [
-        ",",
-        " ",
-      ],
-      "type": "selectPart",
-    },
-    Object {
-      "alias": null,
-      "distinct": null,
-      "expr": Object {
-        "quote": "\\"",
-        "spacing": Array [],
-        "type": "variable",
-        "value": "tls_port",
-      },
-      "spacing": Array [
-        ",",
-        " ",
-      ],
-      "type": "selectPart",
-    },
-    Object {
-      "alias": null,
-      "distinct": null,
-      "expr": Object {
-        "quote": "\\"",
-        "spacing": Array [],
-        "type": "variable",
-        "value": "curr_size",
-      },
-      "spacing": Array [
-        ",",
-        " ",
-      ],
-      "type": "selectPart",
-    },
-    Object {
-      "alias": null,
-      "distinct": null,
-      "expr": Object {
-        "quote": "\\"",
-        "spacing": Array [],
-        "type": "variable",
-        "value": "max_size",
-      },
-      "spacing": Array [
-        ",",
-        " ",
-      ],
-      "type": "selectPart",
-    },
-    Object {
-      "alias": Object {
-        "spacing": Array [
-          "
-",
-          " ",
-          " ",
-          ")",
-          " ",
-        ],
-        "syntax": "AS",
-        "type": "alias",
-        "value": Object {
+SqlQuery {
+  "columns": Columns {
+    "columns": Array [
+      Column {
+        "alias": null,
+        "ex": String {
+          "chars": "server",
           "quote": "\\"",
           "spacing": Array [
-            " ",
+            null,
+            null,
           ],
-          "type": "variable",
-          "value": "rank",
         },
+        "parens": Array [],
+        "spacing": null,
       },
-      "distinct": null,
-      "expr": Object {
-        "caseValue": Object {
-          "caseValue": Object {
-            "quote": "\\"",
-            "spacing": Array [],
-            "type": "variable",
-            "value": "server_type",
-          },
-          "spacing": Array [
-            " ",
-          ],
-          "type": "caseValue",
-        },
-        "elseValue": Object {
-          "elseValue": Object {
-            "spacing": Array [
-              " ",
-            ],
-            "type": "Integer",
-            "value": "0",
-          },
-          "spacing": Array [
-            "
-",
-            " ",
-            " ",
-            " ",
-            " ",
-          ],
-          "syntax": "ELSE",
-          "type": "elseValue",
-        },
-        "end": Object {
-          "spacing": Array [
-            "
-",
-            " ",
-            " ",
-            " ",
-            " ",
-          ],
-          "syntax": "END",
-          "type": "end",
-        },
-        "spacing": Array [],
-        "syntax": "CASE",
-        "type": "case",
-        "when": Array [
-          Object {
-            "spacing": Array [
-              "
-",
-              " ",
-              " ",
-              " ",
-              " ",
-            ],
-            "syntax": "WHEN",
-            "then": Object {
-              "spacing": Array [
-                " ",
-              ],
-              "syntax": "THEN",
-              "then": Object {
-                "spacing": Array [
-                  " ",
-                ],
-                "type": "Integer",
-                "value": "7",
-              },
-              "type": "then",
-            },
-            "type": "when",
-            "when": Object {
-              "quote": "'",
-              "spacing": Array [
-                " ",
-              ],
-              "type": "variable",
-              "value": "coordinator",
-            },
-          },
-          Object {
-            "spacing": Array [
-              "
-",
-              " ",
-              " ",
-              " ",
-              " ",
-            ],
-            "syntax": "WHEN",
-            "then": Object {
-              "spacing": Array [
-                " ",
-              ],
-              "syntax": "THEN",
-              "then": Object {
-                "spacing": Array [
-                  " ",
-                ],
-                "type": "Integer",
-                "value": "6",
-              },
-              "type": "then",
-            },
-            "type": "when",
-            "when": Object {
-              "quote": "'",
-              "spacing": Array [
-                " ",
-              ],
-              "type": "variable",
-              "value": "overlord",
-            },
-          },
-          Object {
-            "spacing": Array [
-              "
-",
-              " ",
-              " ",
-              " ",
-              " ",
-            ],
-            "syntax": "WHEN",
-            "then": Object {
-              "spacing": Array [
-                " ",
-              ],
-              "syntax": "THEN",
-              "then": Object {
-                "spacing": Array [
-                  " ",
-                ],
-                "type": "Integer",
-                "value": "5",
-              },
-              "type": "then",
-            },
-            "type": "when",
-            "when": Object {
-              "quote": "'",
-              "spacing": Array [
-                " ",
-              ],
-              "type": "variable",
-              "value": "router",
-            },
-          },
-          Object {
-            "spacing": Array [
-              "
-",
-              " ",
-              " ",
-              " ",
-              " ",
-            ],
-            "syntax": "WHEN",
-            "then": Object {
-              "spacing": Array [
-                " ",
-              ],
-              "syntax": "THEN",
-              "then": Object {
-                "spacing": Array [
-                  " ",
-                ],
-                "type": "Integer",
-                "value": "4",
-              },
-              "type": "then",
-            },
-            "type": "when",
-            "when": Object {
-              "quote": "'",
-              "spacing": Array [
-                " ",
-              ],
-              "type": "variable",
-              "value": "broker",
-            },
-          },
-          Object {
-            "spacing": Array [
-              "
-",
-              " ",
-              " ",
-              " ",
-              " ",
-            ],
-            "syntax": "WHEN",
-            "then": Object {
-              "spacing": Array [
-                " ",
-              ],
-              "syntax": "THEN",
-              "then": Object {
-                "spacing": Array [
-                  " ",
-                ],
-                "type": "Integer",
-                "value": "3",
-              },
-              "type": "then",
-            },
-            "type": "when",
-            "when": Object {
-              "quote": "'",
-              "spacing": Array [
-                " ",
-              ],
-              "type": "variable",
-              "value": "historical",
-            },
-          },
-          Object {
-            "spacing": Array [
-              "
-",
-              " ",
-              " ",
-              " ",
-              " ",
-            ],
-            "syntax": "WHEN",
-            "then": Object {
-              "spacing": Array [
-                " ",
-              ],
-              "syntax": "THEN",
-              "then": Object {
-                "spacing": Array [
-                  " ",
-                ],
-                "type": "Integer",
-                "value": "2",
-              },
-              "type": "then",
-            },
-            "type": "when",
-            "when": Object {
-              "quote": "'",
-              "spacing": Array [
-                " ",
-              ],
-              "type": "variable",
-              "value": "middle_manager",
-            },
-          },
-          Object {
-            "spacing": Array [
-              "
-",
-              " ",
-              " ",
-              " ",
-              " ",
-            ],
-            "syntax": "WHEN",
-            "then": Object {
-              "spacing": Array [
-                " ",
-              ],
-              "syntax": "THEN",
-              "then": Object {
-                "spacing": Array [
-                  " ",
-                ],
-                "type": "Integer",
-                "value": "1",
-              },
-              "type": "then",
-            },
-            "type": "when",
-            "when": Object {
-              "quote": "'",
-              "spacing": Array [
-                " ",
-              ],
-              "type": "variable",
-              "value": "peon",
-            },
-          },
-        ],
-      },
-      "spacing": Array [
-        ",",
-        "
-",
-        " ",
-        " ",
-        "(",
-        "
-",
-        " ",
-        " ",
-        " ",
-        " ",
-      ],
-      "type": "selectPart",
-    },
-  ],
-  "spacing": Array [],
-  "syntax": "SELECT",
-  "type": "query",
-  "unionAll": null,
-  "where": null,
-}
-`;
-
-exports[`Druid Query Tests parsers servers query to string 1`] = `
-Object {
-  "endSpacing": Array [],
-  "from": Object {
-    "spacing": Array [
-      "
-",
-    ],
-    "syntax": "FROM",
-    "type": "from",
-    "value": Object {
-      "alias": null,
-      "schema": "sys",
-      "spacing": Array [
-        " ",
-      ],
-      "table": "servers",
-      "type": "table",
-    },
-  },
-  "groupby": null,
-  "having": null,
-  "limit": null,
-  "orderBy": Object {
-    "orderByParts": Array [
-      Object {
-        "direction": Object {
-          "direction": "DESC",
-          "spacing": Array [
-            " ",
-          ],
-          "type": "direction",
-        },
-        "expr": Array [
-          Object {
-            "spacing": Array [],
-            "type": "exprPart",
-            "value": Object {
-              "quote": "\\"",
-              "spacing": Array [],
-              "type": "variable",
-              "value": "rank",
-            },
-          },
-        ],
-        "spacing": Array [
-          " ",
-        ],
-        "type": "orderByPart",
-      },
-      Object {
-        "direction": Object {
-          "direction": "DESC",
-          "spacing": Array [
-            " ",
-          ],
-          "type": "direction",
-        },
-        "expr": Array [
-          Object {
-            "spacing": Array [],
-            "type": "exprPart",
-            "value": Object {
-              "quote": "\\"",
-              "spacing": Array [],
-              "type": "variable",
-              "value": "server",
-            },
-          },
-        ],
-        "spacing": Array [
-          ",",
-          " ",
-        ],
-        "type": "orderByPart",
-      },
-    ],
-    "spacing": Array [
-      "
-",
-    ],
-    "syntax": "ORDER BY",
-    "type": "orderBy",
-  },
-  "queryType": "SELECT",
-  "selectParts": Array [
-    Object {
-      "alias": null,
-      "distinct": null,
-      "expr": Object {
-        "quote": "\\"",
-        "spacing": Array [],
-        "type": "variable",
-        "value": "server",
-      },
-      "spacing": Array [
-        "
-",
-        " ",
-        " ",
-      ],
-      "type": "selectPart",
-    },
-    Object {
-      "alias": null,
-      "distinct": null,
-      "expr": Object {
-        "quote": "\\"",
-        "spacing": Array [],
-        "type": "variable",
-        "value": "server_type",
-      },
-      "spacing": Array [
-        ",",
-        " ",
-      ],
-      "type": "selectPart",
-    },
-    Object {
-      "alias": null,
-      "distinct": null,
-      "expr": Object {
-        "quote": "\\"",
-        "spacing": Array [],
-        "type": "variable",
-        "value": "tier",
-      },
-      "spacing": Array [
-        ",",
-        " ",
-      ],
-      "type": "selectPart",
-    },
-    Object {
-      "alias": null,
-      "distinct": null,
-      "expr": Object {
-        "quote": "\\"",
-        "spacing": Array [],
-        "type": "variable",
-        "value": "host",
-      },
-      "spacing": Array [
-        ",",
-        " ",
-      ],
-      "type": "selectPart",
-    },
-    Object {
-      "alias": null,
-      "distinct": null,
-      "expr": Object {
-        "quote": "\\"",
-        "spacing": Array [],
-        "type": "variable",
-        "value": "plaintext_port",
-      },
-      "spacing": Array [
-        ",",
-        " ",
-      ],
-      "type": "selectPart",
-    },
-    Object {
-      "alias": null,
-      "distinct": null,
-      "expr": Object {
-        "quote": "\\"",
-        "spacing": Array [],
-        "type": "variable",
-        "value": "tls_port",
-      },
-      "spacing": Array [
-        ",",
-        " ",
-      ],
-      "type": "selectPart",
-    },
-    Object {
-      "alias": null,
-      "distinct": null,
-      "expr": Object {
-        "quote": "\\"",
-        "spacing": Array [],
-        "type": "variable",
-        "value": "curr_size",
-      },
-      "spacing": Array [
-        ",",
-        " ",
-      ],
-      "type": "selectPart",
-    },
-    Object {
-      "alias": null,
-      "distinct": null,
-      "expr": Object {
-        "quote": "\\"",
-        "spacing": Array [],
-        "type": "variable",
-        "value": "max_size",
-      },
-      "spacing": Array [
-        ",",
-        " ",
-      ],
-      "type": "selectPart",
-    },
-    Object {
-      "alias": Object {
-        "spacing": Array [
-          "
-",
-          " ",
-          " ",
-          ")",
-          " ",
-        ],
-        "syntax": "AS",
-        "type": "alias",
-        "value": Object {
+      Column {
+        "alias": null,
+        "ex": String {
+          "chars": "server_type",
           "quote": "\\"",
           "spacing": Array [
-            " ",
+            null,
+            null,
           ],
-          "type": "variable",
-          "value": "rank",
         },
+        "parens": Array [],
+        "spacing": null,
       },
-      "distinct": null,
-      "expr": Object {
-        "caseValue": Object {
-          "caseValue": Object {
-            "quote": "\\"",
-            "spacing": Array [],
-            "type": "variable",
-            "value": "server_type",
-          },
-          "spacing": Array [
-            " ",
-          ],
-          "type": "caseValue",
-        },
-        "elseValue": Object {
-          "elseValue": Object {
-            "spacing": Array [
-              " ",
-            ],
-            "type": "Integer",
-            "value": "0",
-          },
-          "spacing": Array [
-            "
-",
-            " ",
-            " ",
-            " ",
-            " ",
-          ],
-          "syntax": "ELSE",
-          "type": "elseValue",
-        },
-        "end": Object {
-          "spacing": Array [
-            "
-",
-            " ",
-            " ",
-            " ",
-            " ",
-          ],
-          "syntax": "END",
-          "type": "end",
-        },
-        "spacing": Array [],
-        "syntax": "CASE",
-        "type": "case",
-        "when": Array [
-          Object {
-            "spacing": Array [
-              "
-",
-              " ",
-              " ",
-              " ",
-              " ",
-            ],
-            "syntax": "WHEN",
-            "then": Object {
-              "spacing": Array [
-                " ",
-              ],
-              "syntax": "THEN",
-              "then": Object {
-                "spacing": Array [
-                  " ",
-                ],
-                "type": "Integer",
-                "value": "7",
-              },
-              "type": "then",
-            },
-            "type": "when",
-            "when": Object {
-              "quote": "'",
-              "spacing": Array [
-                " ",
-              ],
-              "type": "variable",
-              "value": "coordinator",
-            },
-          },
-          Object {
-            "spacing": Array [
-              "
-",
-              " ",
-              " ",
-              " ",
-              " ",
-            ],
-            "syntax": "WHEN",
-            "then": Object {
-              "spacing": Array [
-                " ",
-              ],
-              "syntax": "THEN",
-              "then": Object {
-                "spacing": Array [
-                  " ",
-                ],
-                "type": "Integer",
-                "value": "6",
-              },
-              "type": "then",
-            },
-            "type": "when",
-            "when": Object {
-              "quote": "'",
-              "spacing": Array [
-                " ",
-              ],
-              "type": "variable",
-              "value": "overlord",
-            },
-          },
-          Object {
-            "spacing": Array [
-              "
-",
-              " ",
-              " ",
-              " ",
-              " ",
-            ],
-            "syntax": "WHEN",
-            "then": Object {
-              "spacing": Array [
-                " ",
-              ],
-              "syntax": "THEN",
-              "then": Object {
-                "spacing": Array [
-                  " ",
-                ],
-                "type": "Integer",
-                "value": "5",
-              },
-              "type": "then",
-            },
-            "type": "when",
-            "when": Object {
-              "quote": "'",
-              "spacing": Array [
-                " ",
-              ],
-              "type": "variable",
-              "value": "router",
-            },
-          },
-          Object {
-            "spacing": Array [
-              "
-",
-              " ",
-              " ",
-              " ",
-              " ",
-            ],
-            "syntax": "WHEN",
-            "then": Object {
-              "spacing": Array [
-                " ",
-              ],
-              "syntax": "THEN",
-              "then": Object {
-                "spacing": Array [
-                  " ",
-                ],
-                "type": "Integer",
-                "value": "4",
-              },
-              "type": "then",
-            },
-            "type": "when",
-            "when": Object {
-              "quote": "'",
-              "spacing": Array [
-                " ",
-              ],
-              "type": "variable",
-              "value": "broker",
-            },
-          },
-          Object {
-            "spacing": Array [
-              "
-",
-              " ",
-              " ",
-              " ",
-              " ",
-            ],
-            "syntax": "WHEN",
-            "then": Object {
-              "spacing": Array [
-                " ",
-              ],
-              "syntax": "THEN",
-              "then": Object {
-                "spacing": Array [
-                  " ",
-                ],
-                "type": "Integer",
-                "value": "3",
-              },
-              "type": "then",
-            },
-            "type": "when",
-            "when": Object {
-              "quote": "'",
-              "spacing": Array [
-                " ",
-              ],
-              "type": "variable",
-              "value": "historical",
-            },
-          },
-          Object {
-            "spacing": Array [
-              "
-",
-              " ",
-              " ",
-              " ",
-              " ",
-            ],
-            "syntax": "WHEN",
-            "then": Object {
-              "spacing": Array [
-                " ",
-              ],
-              "syntax": "THEN",
-              "then": Object {
-                "spacing": Array [
-                  " ",
-                ],
-                "type": "Integer",
-                "value": "2",
-              },
-              "type": "then",
-            },
-            "type": "when",
-            "when": Object {
-              "quote": "'",
-              "spacing": Array [
-                " ",
-              ],
-              "type": "variable",
-              "value": "middle_manager",
-            },
-          },
-          Object {
-            "spacing": Array [
-              "
-",
-              " ",
-              " ",
-              " ",
-              " ",
-            ],
-            "syntax": "WHEN",
-            "then": Object {
-              "spacing": Array [
-                " ",
-              ],
-              "syntax": "THEN",
-              "then": Object {
-                "spacing": Array [
-                  " ",
-                ],
-                "type": "Integer",
-                "value": "1",
-              },
-              "type": "then",
-            },
-            "type": "when",
-            "when": Object {
-              "quote": "'",
-              "spacing": Array [
-                " ",
-              ],
-              "type": "variable",
-              "value": "peon",
-            },
-          },
-        ],
-      },
-      "spacing": Array [
-        ",",
-        "
-",
-        " ",
-        " ",
-        "(",
-        "
-",
-        " ",
-        " ",
-        " ",
-        " ",
-      ],
-      "type": "selectPart",
-    },
-  ],
-  "spacing": Array [],
-  "syntax": "SELECT",
-  "type": "query",
-  "unionAll": null,
-  "where": null,
-}
-`;
-
-exports[`Druid Query Tests parsers task query 1`] = `
-Object {
-  "endSpacing": Array [],
-  "from": Object {
-    "spacing": Array [
-      "
-",
-    ],
-    "syntax": "FROM",
-    "type": "from",
-    "value": Object {
-      "alias": null,
-      "schema": "sys",
-      "spacing": Array [
-        " ",
-      ],
-      "table": "tasks",
-      "type": "table",
-    },
-  },
-  "groupby": null,
-  "having": null,
-  "limit": null,
-  "orderBy": Object {
-    "orderByParts": Array [
-      Object {
-        "direction": Object {
-          "direction": "DESC",
-          "spacing": Array [
-            " ",
-          ],
-          "type": "direction",
-        },
-        "expr": Array [
-          Object {
-            "spacing": Array [],
-            "type": "exprPart",
-            "value": Object {
-              "quote": "\\"",
-              "spacing": Array [],
-              "type": "variable",
-              "value": "rank",
-            },
-          },
-        ],
-        "spacing": Array [
-          " ",
-        ],
-        "type": "orderByPart",
-      },
-      Object {
-        "direction": Object {
-          "direction": "DESC",
-          "spacing": Array [
-            " ",
-          ],
-          "type": "direction",
-        },
-        "expr": Array [
-          Object {
-            "spacing": Array [],
-            "type": "exprPart",
-            "value": Object {
-              "quote": "\\"",
-              "spacing": Array [],
-              "type": "variable",
-              "value": "created_time",
-            },
-          },
-        ],
-        "spacing": Array [
-          ",",
-          " ",
-        ],
-        "type": "orderByPart",
-      },
-    ],
-    "spacing": Array [
-      "
-",
-    ],
-    "syntax": "ORDER BY",
-    "type": "orderBy",
-  },
-  "queryType": "SELECT",
-  "selectParts": Array [
-    Object {
-      "alias": null,
-      "distinct": null,
-      "expr": Object {
-        "quote": "\\"",
-        "spacing": Array [],
-        "type": "variable",
-        "value": "task_id",
-      },
-      "spacing": Array [
-        "
-",
-        " ",
-        " ",
-      ],
-      "type": "selectPart",
-    },
-    Object {
-      "alias": null,
-      "distinct": null,
-      "expr": Object {
-        "quote": "\\"",
-        "spacing": Array [],
-        "type": "variable",
-        "value": "type",
-      },
-      "spacing": Array [
-        ",",
-        " ",
-      ],
-      "type": "selectPart",
-    },
-    Object {
-      "alias": null,
-      "distinct": null,
-      "expr": Object {
-        "quote": "\\"",
-        "spacing": Array [],
-        "type": "variable",
-        "value": "datasource",
-      },
-      "spacing": Array [
-        ",",
-        " ",
-      ],
-      "type": "selectPart",
-    },
-    Object {
-      "alias": null,
-      "distinct": null,
-      "expr": Object {
-        "quote": "\\"",
-        "spacing": Array [],
-        "type": "variable",
-        "value": "created_time",
-      },
-      "spacing": Array [
-        ",",
-        " ",
-      ],
-      "type": "selectPart",
-    },
-    Object {
-      "alias": null,
-      "distinct": null,
-      "expr": Object {
-        "quote": "\\"",
-        "spacing": Array [],
-        "type": "variable",
-        "value": "location",
-      },
-      "spacing": Array [
-        ",",
-        " ",
-      ],
-      "type": "selectPart",
-    },
-    Object {
-      "alias": null,
-      "distinct": null,
-      "expr": Object {
-        "quote": "\\"",
-        "spacing": Array [],
-        "type": "variable",
-        "value": "duration",
-      },
-      "spacing": Array [
-        ",",
-        " ",
-      ],
-      "type": "selectPart",
-    },
-    Object {
-      "alias": null,
-      "distinct": null,
-      "expr": Object {
-        "quote": "\\"",
-        "spacing": Array [],
-        "type": "variable",
-        "value": "error_msg",
-      },
-      "spacing": Array [
-        ",",
-        " ",
-      ],
-      "type": "selectPart",
-    },
-    Object {
-      "alias": Object {
-        "spacing": Array [
-          " ",
-        ],
-        "syntax": "AS",
-        "type": "alias",
-        "value": Object {
+      Column {
+        "alias": null,
+        "ex": String {
+          "chars": "tier",
           "quote": "\\"",
           "spacing": Array [
-            " ",
+            null,
+            null,
           ],
-          "type": "variable",
-          "value": "status",
         },
+        "parens": Array [],
+        "spacing": null,
       },
-      "distinct": null,
-      "expr": Object {
-        "caseValue": null,
-        "elseValue": Object {
-          "elseValue": Object {
+      Column {
+        "alias": null,
+        "ex": String {
+          "chars": "host",
+          "quote": "\\"",
+          "spacing": Array [
+            null,
+            null,
+          ],
+        },
+        "parens": Array [],
+        "spacing": null,
+      },
+      Column {
+        "alias": null,
+        "ex": String {
+          "chars": "plaintext_port",
+          "quote": "\\"",
+          "spacing": Array [
+            null,
+            null,
+          ],
+        },
+        "parens": Array [],
+        "spacing": null,
+      },
+      Column {
+        "alias": null,
+        "ex": String {
+          "chars": "tls_port",
+          "quote": "\\"",
+          "spacing": Array [
+            null,
+            null,
+          ],
+        },
+        "parens": Array [],
+        "spacing": null,
+      },
+      Column {
+        "alias": null,
+        "ex": String {
+          "chars": "curr_size",
+          "quote": "\\"",
+          "spacing": Array [
+            null,
+            null,
+          ],
+        },
+        "parens": Array [],
+        "spacing": null,
+      },
+      Column {
+        "alias": null,
+        "ex": String {
+          "chars": "max_size",
+          "quote": "\\"",
+          "spacing": Array [
+            null,
+            null,
+          ],
+        },
+        "parens": Array [],
+        "spacing": null,
+      },
+      Column {
+        "alias": Alias {
+          "keyword": "AS",
+          "spacing": Array [
+            Array [
+              " ",
+            ],
+          ],
+          "value": String {
+            "chars": "rank",
             "quote": "\\"",
             "spacing": Array [
-              " ",
+              null,
+              null,
             ],
-            "type": "variable",
-            "value": "status",
           },
-          "spacing": Array [
-            " ",
-          ],
-          "syntax": "ELSE",
-          "type": "elseValue",
         },
-        "end": Object {
-          "spacing": Array [
-            " ",
-          ],
-          "syntax": "END",
-          "type": "end",
-        },
-        "spacing": Array [],
-        "syntax": "CASE",
-        "type": "case",
-        "when": Array [
-          Object {
-            "spacing": Array [
-              " ",
-            ],
-            "syntax": "WHEN",
-            "then": Object {
-              "spacing": Array [
+        "ex": CaseExpression {
+          "cases": Array [
+            Array [
+              Array [
+                "
+",
+                " ",
+                " ",
+                " ",
                 " ",
               ],
-              "syntax": "THEN",
-              "then": Object {
-                "quote": "\\"",
+              CasePart {
                 "spacing": Array [
-                  " ",
-                ],
-                "type": "variable",
-                "value": "runner_status",
-              },
-              "type": "then",
-            },
-            "type": "when",
-            "when": Object {
-              "lhs": Object {
-                "quote": "\\"",
-                "spacing": Array [],
-                "type": "variable",
-                "value": "status",
-              },
-              "operator": Object {
-                "operator": "=",
-                "spacing": Array [
-                  " ",
-                ],
-                "type": "operator",
-              },
-              "rhs": Object {
-                "quote": "'",
-                "spacing": Array [
-                  " ",
-                ],
-                "type": "variable",
-                "value": "RUNNING",
-              },
-              "spacing": Array [
-                " ",
-              ],
-              "type": "expression",
-            },
-          },
-        ],
-      },
-      "spacing": Array [
-        ",",
-        "
-",
-        " ",
-        " ",
-      ],
-      "type": "selectPart",
-    },
-    Object {
-      "alias": Object {
-        "spacing": Array [
-          "
-",
-          " ",
-          " ",
-          ")",
-          " ",
-        ],
-        "syntax": "AS",
-        "type": "alias",
-        "value": Object {
-          "quote": "\\"",
-          "spacing": Array [
-            " ",
-          ],
-          "type": "variable",
-          "value": "rank",
-        },
-      },
-      "distinct": null,
-      "expr": Object {
-        "caseValue": null,
-        "elseValue": Object {
-          "elseValue": Object {
-            "spacing": Array [
-              " ",
-            ],
-            "type": "Integer",
-            "value": "1",
-          },
-          "spacing": Array [
-            ")",
-            "
-",
-            " ",
-            " ",
-            " ",
-            " ",
-          ],
-          "syntax": "ELSE",
-          "type": "elseValue",
-        },
-        "end": Object {
-          "spacing": Array [
-            "
-",
-            " ",
-            " ",
-            " ",
-            " ",
-          ],
-          "syntax": "END",
-          "type": "end",
-        },
-        "spacing": Array [],
-        "syntax": "CASE",
-        "type": "case",
-        "when": Array [
-          Object {
-            "spacing": Array [
-              " ",
-            ],
-            "syntax": "WHEN",
-            "then": Object {
-              "spacing": Array [
-                " ",
-              ],
-              "syntax": "THEN",
-              "then": Object {
-                "caseValue": Object {
-                  "caseValue": Object {
-                    "quote": "\\"",
-                    "spacing": Array [],
-                    "type": "variable",
-                    "value": "runner_status",
-                  },
-                  "spacing": Array [
+                  Array [
                     " ",
                   ],
-                  "type": "caseValue",
+                  Array [
+                    " ",
+                  ],
+                  Array [
+                    " ",
+                  ],
+                ],
+                "thenExpr": OrExpression {
+                  "ex": Array [
+                    OrPart {
+                      "ex": OrExpression {
+                        "ex": Array [
+                          AndPart {
+                            "ex": NotExpression {
+                              "ex": ComparisonExpression {
+                                "ex": AdditiveExpression {
+                                  "ex": Array [
+                                    MultiplicativeExpression {
+                                      "ex": Array [
+                                        Integer {
+                                          "value": "7",
+                                        },
+                                      ],
+                                      "op": Array [],
+                                      "parens": Array [],
+                                      "spacing": Array [],
+                                    },
+                                  ],
+                                  "op": Array [],
+                                  "parens": Array [],
+                                  "spacing": Array [],
+                                },
+                                "parens": Array [],
+                                "rhs": null,
+                                "spacing": Array [
+                                  null,
+                                ],
+                              },
+                              "keyword": null,
+                              "parens": Array [],
+                              "spacing": null,
+                            },
+                            "keyword": null,
+                            "spacing": Array [
+                              Array [
+                                "",
+                              ],
+                            ],
+                          },
+                        ],
+                        "parens": Array [],
+                        "spacing": Array [],
+                      },
+                      "keyword": null,
+                      "spacing": Array [
+                        Array [
+                          "",
+                        ],
+                      ],
+                    },
+                  ],
+                  "parens": Array [],
+                  "spacing": Array [],
                 },
-                "elseValue": Object {
-                  "elseValue": Object {
-                    "spacing": Array [
-                      " ",
+                "thenKeyword": "THEN",
+                "whenExpr": OrExpression {
+                  "ex": Array [
+                    OrPart {
+                      "ex": OrExpression {
+                        "ex": Array [
+                          AndPart {
+                            "ex": NotExpression {
+                              "ex": ComparisonExpression {
+                                "ex": AdditiveExpression {
+                                  "ex": Array [
+                                    MultiplicativeExpression {
+                                      "ex": Array [
+                                        String {
+                                          "chars": "coordinator",
+                                          "quote": "'",
+                                          "spacing": Array [
+                                            null,
+                                            null,
+                                          ],
+                                        },
+                                      ],
+                                      "op": Array [],
+                                      "parens": Array [],
+                                      "spacing": Array [],
+                                    },
+                                  ],
+                                  "op": Array [],
+                                  "parens": Array [],
+                                  "spacing": Array [],
+                                },
+                                "parens": Array [],
+                                "rhs": null,
+                                "spacing": Array [
+                                  null,
+                                ],
+                              },
+                              "keyword": null,
+                              "parens": Array [],
+                              "spacing": null,
+                            },
+                            "keyword": null,
+                            "spacing": Array [
+                              Array [
+                                "",
+                              ],
+                            ],
+                          },
+                        ],
+                        "parens": Array [],
+                        "spacing": Array [],
+                      },
+                      "keyword": null,
+                      "spacing": Array [
+                        Array [
+                          "",
+                        ],
+                      ],
+                    },
+                  ],
+                  "parens": Array [],
+                  "spacing": Array [],
+                },
+                "whenKeyword": "WHEN",
+              },
+            ],
+            Array [
+              Array [
+                "
+",
+                " ",
+                " ",
+                " ",
+                " ",
+              ],
+              CasePart {
+                "spacing": Array [
+                  Array [
+                    " ",
+                  ],
+                  Array [
+                    " ",
+                  ],
+                  Array [
+                    " ",
+                  ],
+                ],
+                "thenExpr": OrExpression {
+                  "ex": Array [
+                    OrPart {
+                      "ex": OrExpression {
+                        "ex": Array [
+                          AndPart {
+                            "ex": NotExpression {
+                              "ex": ComparisonExpression {
+                                "ex": AdditiveExpression {
+                                  "ex": Array [
+                                    MultiplicativeExpression {
+                                      "ex": Array [
+                                        Integer {
+                                          "value": "6",
+                                        },
+                                      ],
+                                      "op": Array [],
+                                      "parens": Array [],
+                                      "spacing": Array [],
+                                    },
+                                  ],
+                                  "op": Array [],
+                                  "parens": Array [],
+                                  "spacing": Array [],
+                                },
+                                "parens": Array [],
+                                "rhs": null,
+                                "spacing": Array [
+                                  null,
+                                ],
+                              },
+                              "keyword": null,
+                              "parens": Array [],
+                              "spacing": null,
+                            },
+                            "keyword": null,
+                            "spacing": Array [
+                              Array [
+                                "",
+                              ],
+                            ],
+                          },
+                        ],
+                        "parens": Array [],
+                        "spacing": Array [],
+                      },
+                      "keyword": null,
+                      "spacing": Array [
+                        Array [
+                          "",
+                        ],
+                      ],
+                    },
+                  ],
+                  "parens": Array [],
+                  "spacing": Array [],
+                },
+                "thenKeyword": "THEN",
+                "whenExpr": OrExpression {
+                  "ex": Array [
+                    OrPart {
+                      "ex": OrExpression {
+                        "ex": Array [
+                          AndPart {
+                            "ex": NotExpression {
+                              "ex": ComparisonExpression {
+                                "ex": AdditiveExpression {
+                                  "ex": Array [
+                                    MultiplicativeExpression {
+                                      "ex": Array [
+                                        String {
+                                          "chars": "overlord",
+                                          "quote": "'",
+                                          "spacing": Array [
+                                            null,
+                                            null,
+                                          ],
+                                        },
+                                      ],
+                                      "op": Array [],
+                                      "parens": Array [],
+                                      "spacing": Array [],
+                                    },
+                                  ],
+                                  "op": Array [],
+                                  "parens": Array [],
+                                  "spacing": Array [],
+                                },
+                                "parens": Array [],
+                                "rhs": null,
+                                "spacing": Array [
+                                  null,
+                                ],
+                              },
+                              "keyword": null,
+                              "parens": Array [],
+                              "spacing": null,
+                            },
+                            "keyword": null,
+                            "spacing": Array [
+                              Array [
+                                "",
+                              ],
+                            ],
+                          },
+                        ],
+                        "parens": Array [],
+                        "spacing": Array [],
+                      },
+                      "keyword": null,
+                      "spacing": Array [
+                        Array [
+                          "",
+                        ],
+                      ],
+                    },
+                  ],
+                  "parens": Array [],
+                  "spacing": Array [],
+                },
+                "whenKeyword": "WHEN",
+              },
+            ],
+            Array [
+              Array [
+                "
+",
+                " ",
+                " ",
+                " ",
+                " ",
+              ],
+              CasePart {
+                "spacing": Array [
+                  Array [
+                    " ",
+                  ],
+                  Array [
+                    " ",
+                  ],
+                  Array [
+                    " ",
+                  ],
+                ],
+                "thenExpr": OrExpression {
+                  "ex": Array [
+                    OrPart {
+                      "ex": OrExpression {
+                        "ex": Array [
+                          AndPart {
+                            "ex": NotExpression {
+                              "ex": ComparisonExpression {
+                                "ex": AdditiveExpression {
+                                  "ex": Array [
+                                    MultiplicativeExpression {
+                                      "ex": Array [
+                                        Integer {
+                                          "value": "5",
+                                        },
+                                      ],
+                                      "op": Array [],
+                                      "parens": Array [],
+                                      "spacing": Array [],
+                                    },
+                                  ],
+                                  "op": Array [],
+                                  "parens": Array [],
+                                  "spacing": Array [],
+                                },
+                                "parens": Array [],
+                                "rhs": null,
+                                "spacing": Array [
+                                  null,
+                                ],
+                              },
+                              "keyword": null,
+                              "parens": Array [],
+                              "spacing": null,
+                            },
+                            "keyword": null,
+                            "spacing": Array [
+                              Array [
+                                "",
+                              ],
+                            ],
+                          },
+                        ],
+                        "parens": Array [],
+                        "spacing": Array [],
+                      },
+                      "keyword": null,
+                      "spacing": Array [
+                        Array [
+                          "",
+                        ],
+                      ],
+                    },
+                  ],
+                  "parens": Array [],
+                  "spacing": Array [],
+                },
+                "thenKeyword": "THEN",
+                "whenExpr": OrExpression {
+                  "ex": Array [
+                    OrPart {
+                      "ex": OrExpression {
+                        "ex": Array [
+                          AndPart {
+                            "ex": NotExpression {
+                              "ex": ComparisonExpression {
+                                "ex": AdditiveExpression {
+                                  "ex": Array [
+                                    MultiplicativeExpression {
+                                      "ex": Array [
+                                        String {
+                                          "chars": "router",
+                                          "quote": "'",
+                                          "spacing": Array [
+                                            null,
+                                            null,
+                                          ],
+                                        },
+                                      ],
+                                      "op": Array [],
+                                      "parens": Array [],
+                                      "spacing": Array [],
+                                    },
+                                  ],
+                                  "op": Array [],
+                                  "parens": Array [],
+                                  "spacing": Array [],
+                                },
+                                "parens": Array [],
+                                "rhs": null,
+                                "spacing": Array [
+                                  null,
+                                ],
+                              },
+                              "keyword": null,
+                              "parens": Array [],
+                              "spacing": null,
+                            },
+                            "keyword": null,
+                            "spacing": Array [
+                              Array [
+                                "",
+                              ],
+                            ],
+                          },
+                        ],
+                        "parens": Array [],
+                        "spacing": Array [],
+                      },
+                      "keyword": null,
+                      "spacing": Array [
+                        Array [
+                          "",
+                        ],
+                      ],
+                    },
+                  ],
+                  "parens": Array [],
+                  "spacing": Array [],
+                },
+                "whenKeyword": "WHEN",
+              },
+            ],
+            Array [
+              Array [
+                "
+",
+                " ",
+                " ",
+                " ",
+                " ",
+              ],
+              CasePart {
+                "spacing": Array [
+                  Array [
+                    " ",
+                  ],
+                  Array [
+                    " ",
+                  ],
+                  Array [
+                    " ",
+                  ],
+                ],
+                "thenExpr": OrExpression {
+                  "ex": Array [
+                    OrPart {
+                      "ex": OrExpression {
+                        "ex": Array [
+                          AndPart {
+                            "ex": NotExpression {
+                              "ex": ComparisonExpression {
+                                "ex": AdditiveExpression {
+                                  "ex": Array [
+                                    MultiplicativeExpression {
+                                      "ex": Array [
+                                        Integer {
+                                          "value": "4",
+                                        },
+                                      ],
+                                      "op": Array [],
+                                      "parens": Array [],
+                                      "spacing": Array [],
+                                    },
+                                  ],
+                                  "op": Array [],
+                                  "parens": Array [],
+                                  "spacing": Array [],
+                                },
+                                "parens": Array [],
+                                "rhs": null,
+                                "spacing": Array [
+                                  null,
+                                ],
+                              },
+                              "keyword": null,
+                              "parens": Array [],
+                              "spacing": null,
+                            },
+                            "keyword": null,
+                            "spacing": Array [
+                              Array [
+                                "",
+                              ],
+                            ],
+                          },
+                        ],
+                        "parens": Array [],
+                        "spacing": Array [],
+                      },
+                      "keyword": null,
+                      "spacing": Array [
+                        Array [
+                          "",
+                        ],
+                      ],
+                    },
+                  ],
+                  "parens": Array [],
+                  "spacing": Array [],
+                },
+                "thenKeyword": "THEN",
+                "whenExpr": OrExpression {
+                  "ex": Array [
+                    OrPart {
+                      "ex": OrExpression {
+                        "ex": Array [
+                          AndPart {
+                            "ex": NotExpression {
+                              "ex": ComparisonExpression {
+                                "ex": AdditiveExpression {
+                                  "ex": Array [
+                                    MultiplicativeExpression {
+                                      "ex": Array [
+                                        String {
+                                          "chars": "broker",
+                                          "quote": "'",
+                                          "spacing": Array [
+                                            null,
+                                            null,
+                                          ],
+                                        },
+                                      ],
+                                      "op": Array [],
+                                      "parens": Array [],
+                                      "spacing": Array [],
+                                    },
+                                  ],
+                                  "op": Array [],
+                                  "parens": Array [],
+                                  "spacing": Array [],
+                                },
+                                "parens": Array [],
+                                "rhs": null,
+                                "spacing": Array [
+                                  null,
+                                ],
+                              },
+                              "keyword": null,
+                              "parens": Array [],
+                              "spacing": null,
+                            },
+                            "keyword": null,
+                            "spacing": Array [
+                              Array [
+                                "",
+                              ],
+                            ],
+                          },
+                        ],
+                        "parens": Array [],
+                        "spacing": Array [],
+                      },
+                      "keyword": null,
+                      "spacing": Array [
+                        Array [
+                          "",
+                        ],
+                      ],
+                    },
+                  ],
+                  "parens": Array [],
+                  "spacing": Array [],
+                },
+                "whenKeyword": "WHEN",
+              },
+            ],
+            Array [
+              Array [
+                "
+",
+                " ",
+                " ",
+                " ",
+                " ",
+              ],
+              CasePart {
+                "spacing": Array [
+                  Array [
+                    " ",
+                  ],
+                  Array [
+                    " ",
+                  ],
+                  Array [
+                    " ",
+                  ],
+                ],
+                "thenExpr": OrExpression {
+                  "ex": Array [
+                    OrPart {
+                      "ex": OrExpression {
+                        "ex": Array [
+                          AndPart {
+                            "ex": NotExpression {
+                              "ex": ComparisonExpression {
+                                "ex": AdditiveExpression {
+                                  "ex": Array [
+                                    MultiplicativeExpression {
+                                      "ex": Array [
+                                        Integer {
+                                          "value": "3",
+                                        },
+                                      ],
+                                      "op": Array [],
+                                      "parens": Array [],
+                                      "spacing": Array [],
+                                    },
+                                  ],
+                                  "op": Array [],
+                                  "parens": Array [],
+                                  "spacing": Array [],
+                                },
+                                "parens": Array [],
+                                "rhs": null,
+                                "spacing": Array [
+                                  null,
+                                ],
+                              },
+                              "keyword": null,
+                              "parens": Array [],
+                              "spacing": null,
+                            },
+                            "keyword": null,
+                            "spacing": Array [
+                              Array [
+                                "",
+                              ],
+                            ],
+                          },
+                        ],
+                        "parens": Array [],
+                        "spacing": Array [],
+                      },
+                      "keyword": null,
+                      "spacing": Array [
+                        Array [
+                          "",
+                        ],
+                      ],
+                    },
+                  ],
+                  "parens": Array [],
+                  "spacing": Array [],
+                },
+                "thenKeyword": "THEN",
+                "whenExpr": OrExpression {
+                  "ex": Array [
+                    OrPart {
+                      "ex": OrExpression {
+                        "ex": Array [
+                          AndPart {
+                            "ex": NotExpression {
+                              "ex": ComparisonExpression {
+                                "ex": AdditiveExpression {
+                                  "ex": Array [
+                                    MultiplicativeExpression {
+                                      "ex": Array [
+                                        String {
+                                          "chars": "historical",
+                                          "quote": "'",
+                                          "spacing": Array [
+                                            null,
+                                            null,
+                                          ],
+                                        },
+                                      ],
+                                      "op": Array [],
+                                      "parens": Array [],
+                                      "spacing": Array [],
+                                    },
+                                  ],
+                                  "op": Array [],
+                                  "parens": Array [],
+                                  "spacing": Array [],
+                                },
+                                "parens": Array [],
+                                "rhs": null,
+                                "spacing": Array [
+                                  null,
+                                ],
+                              },
+                              "keyword": null,
+                              "parens": Array [],
+                              "spacing": null,
+                            },
+                            "keyword": null,
+                            "spacing": Array [
+                              Array [
+                                "",
+                              ],
+                            ],
+                          },
+                        ],
+                        "parens": Array [],
+                        "spacing": Array [],
+                      },
+                      "keyword": null,
+                      "spacing": Array [
+                        Array [
+                          "",
+                        ],
+                      ],
+                    },
+                  ],
+                  "parens": Array [],
+                  "spacing": Array [],
+                },
+                "whenKeyword": "WHEN",
+              },
+            ],
+            Array [
+              Array [
+                "
+",
+                " ",
+                " ",
+                " ",
+                " ",
+              ],
+              CasePart {
+                "spacing": Array [
+                  Array [
+                    " ",
+                  ],
+                  Array [
+                    " ",
+                  ],
+                  Array [
+                    " ",
+                  ],
+                ],
+                "thenExpr": OrExpression {
+                  "ex": Array [
+                    OrPart {
+                      "ex": OrExpression {
+                        "ex": Array [
+                          AndPart {
+                            "ex": NotExpression {
+                              "ex": ComparisonExpression {
+                                "ex": AdditiveExpression {
+                                  "ex": Array [
+                                    MultiplicativeExpression {
+                                      "ex": Array [
+                                        Integer {
+                                          "value": "2",
+                                        },
+                                      ],
+                                      "op": Array [],
+                                      "parens": Array [],
+                                      "spacing": Array [],
+                                    },
+                                  ],
+                                  "op": Array [],
+                                  "parens": Array [],
+                                  "spacing": Array [],
+                                },
+                                "parens": Array [],
+                                "rhs": null,
+                                "spacing": Array [
+                                  null,
+                                ],
+                              },
+                              "keyword": null,
+                              "parens": Array [],
+                              "spacing": null,
+                            },
+                            "keyword": null,
+                            "spacing": Array [
+                              Array [
+                                "",
+                              ],
+                            ],
+                          },
+                        ],
+                        "parens": Array [],
+                        "spacing": Array [],
+                      },
+                      "keyword": null,
+                      "spacing": Array [
+                        Array [
+                          "",
+                        ],
+                      ],
+                    },
+                  ],
+                  "parens": Array [],
+                  "spacing": Array [],
+                },
+                "thenKeyword": "THEN",
+                "whenExpr": OrExpression {
+                  "ex": Array [
+                    OrPart {
+                      "ex": OrExpression {
+                        "ex": Array [
+                          AndPart {
+                            "ex": NotExpression {
+                              "ex": ComparisonExpression {
+                                "ex": AdditiveExpression {
+                                  "ex": Array [
+                                    MultiplicativeExpression {
+                                      "ex": Array [
+                                        String {
+                                          "chars": "middle_manager",
+                                          "quote": "'",
+                                          "spacing": Array [
+                                            null,
+                                            null,
+                                          ],
+                                        },
+                                      ],
+                                      "op": Array [],
+                                      "parens": Array [],
+                                      "spacing": Array [],
+                                    },
+                                  ],
+                                  "op": Array [],
+                                  "parens": Array [],
+                                  "spacing": Array [],
+                                },
+                                "parens": Array [],
+                                "rhs": null,
+                                "spacing": Array [
+                                  null,
+                                ],
+                              },
+                              "keyword": null,
+                              "parens": Array [],
+                              "spacing": null,
+                            },
+                            "keyword": null,
+                            "spacing": Array [
+                              Array [
+                                "",
+                              ],
+                            ],
+                          },
+                        ],
+                        "parens": Array [],
+                        "spacing": Array [],
+                      },
+                      "keyword": null,
+                      "spacing": Array [
+                        Array [
+                          "",
+                        ],
+                      ],
+                    },
+                  ],
+                  "parens": Array [],
+                  "spacing": Array [],
+                },
+                "whenKeyword": "WHEN",
+              },
+            ],
+            Array [
+              Array [
+                "
+",
+                " ",
+                " ",
+                " ",
+                " ",
+              ],
+              CasePart {
+                "spacing": Array [
+                  Array [
+                    " ",
+                  ],
+                  Array [
+                    " ",
+                  ],
+                  Array [
+                    " ",
+                  ],
+                ],
+                "thenExpr": OrExpression {
+                  "ex": Array [
+                    OrPart {
+                      "ex": OrExpression {
+                        "ex": Array [
+                          AndPart {
+                            "ex": NotExpression {
+                              "ex": ComparisonExpression {
+                                "ex": AdditiveExpression {
+                                  "ex": Array [
+                                    MultiplicativeExpression {
+                                      "ex": Array [
+                                        Integer {
+                                          "value": "1",
+                                        },
+                                      ],
+                                      "op": Array [],
+                                      "parens": Array [],
+                                      "spacing": Array [],
+                                    },
+                                  ],
+                                  "op": Array [],
+                                  "parens": Array [],
+                                  "spacing": Array [],
+                                },
+                                "parens": Array [],
+                                "rhs": null,
+                                "spacing": Array [
+                                  null,
+                                ],
+                              },
+                              "keyword": null,
+                              "parens": Array [],
+                              "spacing": null,
+                            },
+                            "keyword": null,
+                            "spacing": Array [
+                              Array [
+                                "",
+                              ],
+                            ],
+                          },
+                        ],
+                        "parens": Array [],
+                        "spacing": Array [],
+                      },
+                      "keyword": null,
+                      "spacing": Array [
+                        Array [
+                          "",
+                        ],
+                      ],
+                    },
+                  ],
+                  "parens": Array [],
+                  "spacing": Array [],
+                },
+                "thenKeyword": "THEN",
+                "whenExpr": OrExpression {
+                  "ex": Array [
+                    OrPart {
+                      "ex": OrExpression {
+                        "ex": Array [
+                          AndPart {
+                            "ex": NotExpression {
+                              "ex": ComparisonExpression {
+                                "ex": AdditiveExpression {
+                                  "ex": Array [
+                                    MultiplicativeExpression {
+                                      "ex": Array [
+                                        String {
+                                          "chars": "peon",
+                                          "quote": "'",
+                                          "spacing": Array [
+                                            null,
+                                            null,
+                                          ],
+                                        },
+                                      ],
+                                      "op": Array [],
+                                      "parens": Array [],
+                                      "spacing": Array [],
+                                    },
+                                  ],
+                                  "op": Array [],
+                                  "parens": Array [],
+                                  "spacing": Array [],
+                                },
+                                "parens": Array [],
+                                "rhs": null,
+                                "spacing": Array [
+                                  null,
+                                ],
+                              },
+                              "keyword": null,
+                              "parens": Array [],
+                              "spacing": null,
+                            },
+                            "keyword": null,
+                            "spacing": Array [
+                              Array [
+                                "",
+                              ],
+                            ],
+                          },
+                        ],
+                        "parens": Array [],
+                        "spacing": Array [],
+                      },
+                      "keyword": null,
+                      "spacing": Array [
+                        Array [
+                          "",
+                        ],
+                      ],
+                    },
+                  ],
+                  "parens": Array [],
+                  "spacing": Array [],
+                },
+                "whenKeyword": "WHEN",
+              },
+            ],
+          ],
+          "else": Array [
+            Array [
+              "
+",
+              " ",
+              " ",
+              " ",
+              " ",
+            ],
+            "ELSE",
+            Array [
+              " ",
+            ],
+            OrExpression {
+              "ex": Array [
+                OrPart {
+                  "ex": OrExpression {
+                    "ex": Array [
+                      AndPart {
+                        "ex": NotExpression {
+                          "ex": ComparisonExpression {
+                            "ex": AdditiveExpression {
+                              "ex": Array [
+                                MultiplicativeExpression {
+                                  "ex": Array [
+                                    Integer {
+                                      "value": "0",
+                                    },
+                                  ],
+                                  "op": Array [],
+                                  "parens": Array [],
+                                  "spacing": Array [],
+                                },
+                              ],
+                              "op": Array [],
+                              "parens": Array [],
+                              "spacing": Array [],
+                            },
+                            "parens": Array [],
+                            "rhs": null,
+                            "spacing": Array [
+                              null,
+                            ],
+                          },
+                          "keyword": null,
+                          "parens": Array [],
+                          "spacing": null,
+                        },
+                        "keyword": null,
+                        "spacing": Array [
+                          Array [
+                            "",
+                          ],
+                        ],
+                      },
                     ],
-                    "type": "Integer",
-                    "value": "2",
+                    "parens": Array [],
+                    "spacing": Array [],
                   },
+                  "keyword": null,
                   "spacing": Array [
-                    " ",
+                    Array [
+                      "",
+                    ],
                   ],
-                  "syntax": "ELSE",
-                  "type": "elseValue",
                 },
-                "end": Object {
+              ],
+              "parens": Array [],
+              "spacing": Array [],
+            },
+          ],
+          "end": Array [
+            Array [
+              "
+",
+              " ",
+              " ",
+              " ",
+              " ",
+            ],
+            "END",
+          ],
+          "expr": Array [
+            Array [
+              " ",
+            ],
+            undefined,
+            OrExpression {
+              "ex": Array [
+                OrPart {
+                  "ex": OrExpression {
+                    "ex": Array [
+                      AndPart {
+                        "ex": NotExpression {
+                          "ex": ComparisonExpression {
+                            "ex": AdditiveExpression {
+                              "ex": Array [
+                                MultiplicativeExpression {
+                                  "ex": Array [
+                                    String {
+                                      "chars": "server_type",
+                                      "quote": "\\"",
+                                      "spacing": Array [
+                                        null,
+                                        null,
+                                      ],
+                                    },
+                                  ],
+                                  "op": Array [],
+                                  "parens": Array [],
+                                  "spacing": Array [],
+                                },
+                              ],
+                              "op": Array [],
+                              "parens": Array [],
+                              "spacing": Array [],
+                            },
+                            "parens": Array [],
+                            "rhs": null,
+                            "spacing": Array [
+                              null,
+                            ],
+                          },
+                          "keyword": null,
+                          "parens": Array [],
+                          "spacing": null,
+                        },
+                        "keyword": null,
+                        "spacing": Array [
+                          Array [
+                            "",
+                          ],
+                        ],
+                      },
+                    ],
+                    "parens": Array [],
+                    "spacing": Array [],
+                  },
+                  "keyword": null,
                   "spacing": Array [
-                    " ",
+                    Array [
+                      "",
+                    ],
                   ],
-                  "syntax": "END",
-                  "type": "end",
                 },
-                "spacing": Array [
+              ],
+              "parens": Array [],
+              "spacing": Array [],
+            },
+          ],
+          "keyword": "CASE",
+          "parens": Array [
+            Object {
+              "close": Array [
+                Array [
+                  "
+",
+                  " ",
+                  " ",
+                ],
+                ")",
+              ],
+              "open": Array [
+                "(",
+                Array [
                   "
 ",
                   " ",
                   " ",
                   " ",
                   " ",
-                  " ",
-                  "(",
                 ],
-                "syntax": "CASE",
-                "type": "case",
-                "when": Array [
-                  Object {
-                    "spacing": Array [
-                      " ",
-                    ],
-                    "syntax": "WHEN",
-                    "then": Object {
-                      "spacing": Array [
-                        " ",
-                      ],
-                      "syntax": "THEN",
-                      "then": Object {
-                        "spacing": Array [
-                          " ",
-                        ],
-                        "type": "Integer",
-                        "value": "4",
-                      },
-                      "type": "then",
-                    },
-                    "type": "when",
-                    "when": Object {
-                      "quote": "'",
-                      "spacing": Array [
-                        " ",
-                      ],
-                      "type": "variable",
-                      "value": "RUNNING",
-                    },
-                  },
-                  Object {
-                    "spacing": Array [
-                      " ",
-                    ],
-                    "syntax": "WHEN",
-                    "then": Object {
-                      "spacing": Array [
-                        " ",
-                      ],
-                      "syntax": "THEN",
-                      "then": Object {
-                        "spacing": Array [
-                          " ",
-                        ],
-                        "type": "Integer",
-                        "value": "3",
-                      },
-                      "type": "then",
-                    },
-                    "type": "when",
-                    "when": Object {
-                      "quote": "'",
-                      "spacing": Array [
-                        " ",
-                      ],
-                      "type": "variable",
-                      "value": "PENDING",
-                    },
-                  },
-                ],
-              },
-              "type": "then",
-            },
-            "type": "when",
-            "when": Object {
-              "lhs": Object {
-                "quote": "\\"",
-                "spacing": Array [],
-                "type": "variable",
-                "value": "status",
-              },
-              "operator": Object {
-                "operator": "=",
-                "spacing": Array [
-                  " ",
-                ],
-                "type": "operator",
-              },
-              "rhs": Object {
-                "quote": "'",
-                "spacing": Array [
-                  " ",
-                ],
-                "type": "variable",
-                "value": "RUNNING",
-              },
-              "spacing": Array [
-                " ",
               ],
-              "type": "expression",
             },
-          },
+          ],
+        },
+        "parens": Array [],
+        "spacing": Array [
+          Array [
+            " ",
+          ],
         ],
       },
-      "spacing": Array [
-        ",",
+    ],
+    "parens": Array [],
+    "spacing": Array [
+      Array [
+        " ",
+      ],
+      Array [
+        " ",
+      ],
+      Array [
+        " ",
+      ],
+      Array [
+        " ",
+      ],
+      Array [
+        " ",
+      ],
+      Array [
+        " ",
+      ],
+      Array [
+        " ",
+      ],
+      Array [
         "
 ",
-        " ",
-        " ",
-        "(",
-        "
-",
-        " ",
-        " ",
         " ",
         " ",
       ],
-      "type": "selectPart",
+    ],
+  },
+  "distinct": null,
+  "fromClause": FromClause {
+    "alias": null,
+    "fc": RefExpression {
+      "name": "servers",
+      "namespace": "sys",
     },
+    "keyword": "FROM",
+    "parens": undefined,
+    "spacing": Array [
+      Array [
+        " ",
+      ],
+      null,
+    ],
+  },
+  "groupByClause": null,
+  "havingClause": null,
+  "limitClause": null,
+  "orderByClause": OrderByClause {
+    "byKeyword": "BY",
+    "orderBy": Array [
+      OrderByPart {
+        "direction": "DESC",
+        "orderBy": OrExpression {
+          "ex": Array [
+            OrPart {
+              "ex": OrExpression {
+                "ex": Array [
+                  AndPart {
+                    "ex": NotExpression {
+                      "ex": ComparisonExpression {
+                        "ex": AdditiveExpression {
+                          "ex": Array [
+                            MultiplicativeExpression {
+                              "ex": Array [
+                                String {
+                                  "chars": "rank",
+                                  "quote": "\\"",
+                                  "spacing": Array [
+                                    null,
+                                    null,
+                                  ],
+                                },
+                              ],
+                              "op": Array [],
+                              "parens": Array [],
+                              "spacing": Array [],
+                            },
+                          ],
+                          "op": Array [],
+                          "parens": Array [],
+                          "spacing": Array [],
+                        },
+                        "parens": Array [],
+                        "rhs": null,
+                        "spacing": Array [
+                          null,
+                        ],
+                      },
+                      "keyword": null,
+                      "parens": Array [],
+                      "spacing": null,
+                    },
+                    "keyword": null,
+                    "spacing": Array [
+                      Array [
+                        "",
+                      ],
+                    ],
+                  },
+                ],
+                "parens": Array [],
+                "spacing": Array [],
+              },
+              "keyword": null,
+              "spacing": Array [
+                Array [
+                  "",
+                ],
+              ],
+            },
+          ],
+          "parens": Array [],
+          "spacing": Array [],
+        },
+        "spacing": Array [
+          Array [
+            " ",
+          ],
+        ],
+      },
+      OrderByPart {
+        "direction": "DESC",
+        "orderBy": OrExpression {
+          "ex": Array [
+            OrPart {
+              "ex": OrExpression {
+                "ex": Array [
+                  AndPart {
+                    "ex": NotExpression {
+                      "ex": ComparisonExpression {
+                        "ex": AdditiveExpression {
+                          "ex": Array [
+                            MultiplicativeExpression {
+                              "ex": Array [
+                                String {
+                                  "chars": "server",
+                                  "quote": "\\"",
+                                  "spacing": Array [
+                                    null,
+                                    null,
+                                  ],
+                                },
+                              ],
+                              "op": Array [],
+                              "parens": Array [],
+                              "spacing": Array [],
+                            },
+                          ],
+                          "op": Array [],
+                          "parens": Array [],
+                          "spacing": Array [],
+                        },
+                        "parens": Array [],
+                        "rhs": null,
+                        "spacing": Array [
+                          null,
+                        ],
+                      },
+                      "keyword": null,
+                      "parens": Array [],
+                      "spacing": null,
+                    },
+                    "keyword": null,
+                    "spacing": Array [
+                      Array [
+                        "",
+                      ],
+                    ],
+                  },
+                ],
+                "parens": Array [],
+                "spacing": Array [],
+              },
+              "keyword": null,
+              "spacing": Array [
+                Array [
+                  "",
+                ],
+              ],
+            },
+          ],
+          "parens": Array [],
+          "spacing": Array [],
+        },
+        "spacing": Array [
+          Array [
+            " ",
+          ],
+        ],
+      },
+    ],
+    "orderKeyword": "ORDER",
+    "spacing": Array [
+      Array [
+        " ",
+      ],
+      Array [
+        " ",
+      ],
+      Array [
+        Array [
+          " ",
+        ],
+      ],
+    ],
+  },
+  "spacing": Array [
+    null,
+    Array [
+      "
+",
+      " ",
+      " ",
+    ],
+    Array [
+      "
+",
+    ],
+    null,
+    null,
+    null,
+    Array [
+      "
+",
+    ],
+    null,
   ],
-  "spacing": Array [],
-  "syntax": "SELECT",
   "type": "query",
-  "unionAll": null,
-  "where": null,
+  "verb": "SELECT",
+  "whereClause": null,
+}
+`;
+
+exports[`Druid Query Tests parsers servers query to string 1`] = `
+"SELECT
+  \\"server\\", \\"server_type\\", \\"tier\\", \\"host\\", \\"plaintext_port\\", \\"tls_port\\", \\"curr_size\\", \\"max_size\\",
+  (
+    CASE \\"server_type\\"
+    WHEN 'coordinator' THEN 7
+    WHEN 'overlord' THEN 6
+    WHEN 'router' THEN 5
+    WHEN 'broker' THEN 4
+    WHEN 'historical' THEN 3
+    WHEN 'middle_manager' THEN 2
+    WHEN 'peon' THEN 1
+    ELSE 0
+    END
+  ) AS \\"rank\\"
+FROM sys.servers
+ORDER BY \\"rank\\" DESC\\"server\\" DESC"
+`;
+
+exports[`Druid Query Tests parsers servers query with columns in brackets to string 1`] = `
+"SELECT
+  \\"server\\", \\"server_type\\", \\"tier\\", \\"host\\", \\"plaintext_port\\", \\"tls_port\\", \\"curr_size\\", \\"max_size\\",
+  (
+    CASE \\"server_type\\"
+    WHEN 'coordinator' THEN 7
+    WHEN 'overlord' THEN 6
+    WHEN 'router' THEN 5
+    WHEN 'broker' THEN 4
+    WHEN 'historical' THEN 3
+    WHEN 'middle_manager' THEN 2
+    WHEN 'peon' THEN 1
+    ELSE 0
+    END
+  ) AS \\"rank\\"
+FROM sys.servers
+ORDER BY \\"rank\\" DESC\\"server\\" DESC"
+`;
+
+exports[`Druid Query Tests parsers task query 1`] = `
+SqlQuery {
+  "columns": Columns {
+    "columns": Array [
+      Column {
+        "alias": null,
+        "ex": String {
+          "chars": "task_id",
+          "quote": "\\"",
+          "spacing": Array [
+            null,
+            null,
+          ],
+        },
+        "parens": Array [],
+        "spacing": null,
+      },
+      Column {
+        "alias": null,
+        "ex": String {
+          "chars": "type",
+          "quote": "\\"",
+          "spacing": Array [
+            null,
+            null,
+          ],
+        },
+        "parens": Array [],
+        "spacing": null,
+      },
+      Column {
+        "alias": null,
+        "ex": String {
+          "chars": "datasource",
+          "quote": "\\"",
+          "spacing": Array [
+            null,
+            null,
+          ],
+        },
+        "parens": Array [],
+        "spacing": null,
+      },
+      Column {
+        "alias": null,
+        "ex": String {
+          "chars": "created_time",
+          "quote": "\\"",
+          "spacing": Array [
+            null,
+            null,
+          ],
+        },
+        "parens": Array [],
+        "spacing": null,
+      },
+      Column {
+        "alias": null,
+        "ex": String {
+          "chars": "location",
+          "quote": "\\"",
+          "spacing": Array [
+            null,
+            null,
+          ],
+        },
+        "parens": Array [],
+        "spacing": null,
+      },
+      Column {
+        "alias": null,
+        "ex": String {
+          "chars": "duration",
+          "quote": "\\"",
+          "spacing": Array [
+            null,
+            null,
+          ],
+        },
+        "parens": Array [],
+        "spacing": null,
+      },
+      Column {
+        "alias": null,
+        "ex": String {
+          "chars": "error_msg",
+          "quote": "\\"",
+          "spacing": Array [
+            null,
+            null,
+          ],
+        },
+        "parens": Array [],
+        "spacing": null,
+      },
+      Column {
+        "alias": Alias {
+          "keyword": "AS",
+          "spacing": Array [
+            Array [
+              " ",
+            ],
+          ],
+          "value": String {
+            "chars": "status",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+        },
+        "ex": CaseExpression {
+          "cases": Array [
+            Array [
+              Array [
+                " ",
+              ],
+              CasePart {
+                "spacing": Array [
+                  Array [
+                    " ",
+                  ],
+                  Array [
+                    " ",
+                  ],
+                  Array [
+                    " ",
+                  ],
+                ],
+                "thenExpr": OrExpression {
+                  "ex": Array [
+                    OrPart {
+                      "ex": OrExpression {
+                        "ex": Array [
+                          AndPart {
+                            "ex": NotExpression {
+                              "ex": ComparisonExpression {
+                                "ex": AdditiveExpression {
+                                  "ex": Array [
+                                    MultiplicativeExpression {
+                                      "ex": Array [
+                                        String {
+                                          "chars": "runner_status",
+                                          "quote": "\\"",
+                                          "spacing": Array [
+                                            null,
+                                            null,
+                                          ],
+                                        },
+                                      ],
+                                      "op": Array [],
+                                      "parens": Array [],
+                                      "spacing": Array [],
+                                    },
+                                  ],
+                                  "op": Array [],
+                                  "parens": Array [],
+                                  "spacing": Array [],
+                                },
+                                "parens": Array [],
+                                "rhs": null,
+                                "spacing": Array [
+                                  null,
+                                ],
+                              },
+                              "keyword": null,
+                              "parens": Array [],
+                              "spacing": null,
+                            },
+                            "keyword": null,
+                            "spacing": Array [
+                              Array [
+                                "",
+                              ],
+                            ],
+                          },
+                        ],
+                        "parens": Array [],
+                        "spacing": Array [],
+                      },
+                      "keyword": null,
+                      "spacing": Array [
+                        Array [
+                          "",
+                        ],
+                      ],
+                    },
+                  ],
+                  "parens": Array [],
+                  "spacing": Array [],
+                },
+                "thenKeyword": "THEN",
+                "whenExpr": OrExpression {
+                  "ex": Array [
+                    OrPart {
+                      "ex": OrExpression {
+                        "ex": Array [
+                          AndPart {
+                            "ex": NotExpression {
+                              "ex": ComparisonExpression {
+                                "ex": AdditiveExpression {
+                                  "ex": Array [
+                                    MultiplicativeExpression {
+                                      "ex": Array [
+                                        String {
+                                          "chars": "status",
+                                          "quote": "\\"",
+                                          "spacing": Array [
+                                            null,
+                                            null,
+                                          ],
+                                        },
+                                      ],
+                                      "op": Array [],
+                                      "parens": Array [],
+                                      "spacing": Array [],
+                                    },
+                                  ],
+                                  "op": Array [],
+                                  "parens": Array [],
+                                  "spacing": Array [],
+                                },
+                                "parens": Array [],
+                                "rhs": ComparisonExpressionRhs {
+                                  "is": null,
+                                  "not": null,
+                                  "op": "=",
+                                  "parens": Array [],
+                                  "rhs": AdditiveExpression {
+                                    "ex": Array [
+                                      MultiplicativeExpression {
+                                        "ex": Array [
+                                          String {
+                                            "chars": "RUNNING",
+                                            "quote": "'",
+                                            "spacing": Array [
+                                              null,
+                                              null,
+                                            ],
+                                          },
+                                        ],
+                                        "op": Array [],
+                                        "parens": Array [],
+                                        "spacing": Array [],
+                                      },
+                                    ],
+                                    "op": Array [],
+                                    "parens": Array [],
+                                    "spacing": Array [],
+                                  },
+                                  "spacing": Array [
+                                    Array [
+                                      " ",
+                                    ],
+                                  ],
+                                },
+                                "spacing": Array [
+                                  " ",
+                                ],
+                              },
+                              "keyword": null,
+                              "parens": Array [],
+                              "spacing": null,
+                            },
+                            "keyword": null,
+                            "spacing": Array [
+                              Array [
+                                "",
+                              ],
+                            ],
+                          },
+                        ],
+                        "parens": Array [],
+                        "spacing": Array [],
+                      },
+                      "keyword": null,
+                      "spacing": Array [
+                        Array [
+                          "",
+                        ],
+                      ],
+                    },
+                  ],
+                  "parens": Array [],
+                  "spacing": Array [],
+                },
+                "whenKeyword": "WHEN",
+              },
+            ],
+          ],
+          "else": Array [
+            Array [
+              " ",
+            ],
+            "ELSE",
+            Array [
+              " ",
+            ],
+            OrExpression {
+              "ex": Array [
+                OrPart {
+                  "ex": OrExpression {
+                    "ex": Array [
+                      AndPart {
+                        "ex": NotExpression {
+                          "ex": ComparisonExpression {
+                            "ex": AdditiveExpression {
+                              "ex": Array [
+                                MultiplicativeExpression {
+                                  "ex": Array [
+                                    String {
+                                      "chars": "status",
+                                      "quote": "\\"",
+                                      "spacing": Array [
+                                        null,
+                                        null,
+                                      ],
+                                    },
+                                  ],
+                                  "op": Array [],
+                                  "parens": Array [],
+                                  "spacing": Array [],
+                                },
+                              ],
+                              "op": Array [],
+                              "parens": Array [],
+                              "spacing": Array [],
+                            },
+                            "parens": Array [],
+                            "rhs": null,
+                            "spacing": Array [
+                              null,
+                            ],
+                          },
+                          "keyword": null,
+                          "parens": Array [],
+                          "spacing": null,
+                        },
+                        "keyword": null,
+                        "spacing": Array [
+                          Array [
+                            "",
+                          ],
+                        ],
+                      },
+                    ],
+                    "parens": Array [],
+                    "spacing": Array [],
+                  },
+                  "keyword": null,
+                  "spacing": Array [
+                    Array [
+                      "",
+                    ],
+                  ],
+                },
+              ],
+              "parens": Array [],
+              "spacing": Array [],
+            },
+          ],
+          "end": Array [
+            Array [
+              " ",
+            ],
+            "END",
+          ],
+          "expr": null,
+          "keyword": "CASE",
+          "parens": Array [],
+        },
+        "parens": Array [],
+        "spacing": Array [
+          Array [
+            " ",
+          ],
+        ],
+      },
+      Column {
+        "alias": Alias {
+          "keyword": "AS",
+          "spacing": Array [
+            Array [
+              " ",
+            ],
+          ],
+          "value": String {
+            "chars": "rank",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+        },
+        "ex": CaseExpression {
+          "cases": Array [
+            Array [
+              Array [
+                " ",
+              ],
+              CasePart {
+                "spacing": Array [
+                  Array [
+                    " ",
+                  ],
+                  Array [
+                    " ",
+                  ],
+                  Array [
+                    "
+",
+                    " ",
+                    " ",
+                    " ",
+                    " ",
+                    " ",
+                  ],
+                ],
+                "thenExpr": OrExpression {
+                  "ex": Array [
+                    OrPart {
+                      "ex": OrExpression {
+                        "ex": Array [
+                          AndPart {
+                            "ex": NotExpression {
+                              "ex": ComparisonExpression {
+                                "ex": AdditiveExpression {
+                                  "ex": Array [
+                                    MultiplicativeExpression {
+                                      "ex": Array [
+                                        CaseExpression {
+                                          "cases": Array [
+                                            Array [
+                                              Array [
+                                                " ",
+                                              ],
+                                              CasePart {
+                                                "spacing": Array [
+                                                  Array [
+                                                    " ",
+                                                  ],
+                                                  Array [
+                                                    " ",
+                                                  ],
+                                                  Array [
+                                                    " ",
+                                                  ],
+                                                ],
+                                                "thenExpr": OrExpression {
+                                                  "ex": Array [
+                                                    OrPart {
+                                                      "ex": OrExpression {
+                                                        "ex": Array [
+                                                          AndPart {
+                                                            "ex": NotExpression {
+                                                              "ex": ComparisonExpression {
+                                                                "ex": AdditiveExpression {
+                                                                  "ex": Array [
+                                                                    MultiplicativeExpression {
+                                                                      "ex": Array [
+                                                                        Integer {
+                                                                          "value": "4",
+                                                                        },
+                                                                      ],
+                                                                      "op": Array [],
+                                                                      "parens": Array [],
+                                                                      "spacing": Array [],
+                                                                    },
+                                                                  ],
+                                                                  "op": Array [],
+                                                                  "parens": Array [],
+                                                                  "spacing": Array [],
+                                                                },
+                                                                "parens": Array [],
+                                                                "rhs": null,
+                                                                "spacing": Array [
+                                                                  null,
+                                                                ],
+                                                              },
+                                                              "keyword": null,
+                                                              "parens": Array [],
+                                                              "spacing": null,
+                                                            },
+                                                            "keyword": null,
+                                                            "spacing": Array [
+                                                              Array [
+                                                                "",
+                                                              ],
+                                                            ],
+                                                          },
+                                                        ],
+                                                        "parens": Array [],
+                                                        "spacing": Array [],
+                                                      },
+                                                      "keyword": null,
+                                                      "spacing": Array [
+                                                        Array [
+                                                          "",
+                                                        ],
+                                                      ],
+                                                    },
+                                                  ],
+                                                  "parens": Array [],
+                                                  "spacing": Array [],
+                                                },
+                                                "thenKeyword": "THEN",
+                                                "whenExpr": OrExpression {
+                                                  "ex": Array [
+                                                    OrPart {
+                                                      "ex": OrExpression {
+                                                        "ex": Array [
+                                                          AndPart {
+                                                            "ex": NotExpression {
+                                                              "ex": ComparisonExpression {
+                                                                "ex": AdditiveExpression {
+                                                                  "ex": Array [
+                                                                    MultiplicativeExpression {
+                                                                      "ex": Array [
+                                                                        String {
+                                                                          "chars": "RUNNING",
+                                                                          "quote": "'",
+                                                                          "spacing": Array [
+                                                                            null,
+                                                                            null,
+                                                                          ],
+                                                                        },
+                                                                      ],
+                                                                      "op": Array [],
+                                                                      "parens": Array [],
+                                                                      "spacing": Array [],
+                                                                    },
+                                                                  ],
+                                                                  "op": Array [],
+                                                                  "parens": Array [],
+                                                                  "spacing": Array [],
+                                                                },
+                                                                "parens": Array [],
+                                                                "rhs": null,
+                                                                "spacing": Array [
+                                                                  null,
+                                                                ],
+                                                              },
+                                                              "keyword": null,
+                                                              "parens": Array [],
+                                                              "spacing": null,
+                                                            },
+                                                            "keyword": null,
+                                                            "spacing": Array [
+                                                              Array [
+                                                                "",
+                                                              ],
+                                                            ],
+                                                          },
+                                                        ],
+                                                        "parens": Array [],
+                                                        "spacing": Array [],
+                                                      },
+                                                      "keyword": null,
+                                                      "spacing": Array [
+                                                        Array [
+                                                          "",
+                                                        ],
+                                                      ],
+                                                    },
+                                                  ],
+                                                  "parens": Array [],
+                                                  "spacing": Array [],
+                                                },
+                                                "whenKeyword": "WHEN",
+                                              },
+                                            ],
+                                            Array [
+                                              Array [
+                                                " ",
+                                              ],
+                                              CasePart {
+                                                "spacing": Array [
+                                                  Array [
+                                                    " ",
+                                                  ],
+                                                  Array [
+                                                    " ",
+                                                  ],
+                                                  Array [
+                                                    " ",
+                                                  ],
+                                                ],
+                                                "thenExpr": OrExpression {
+                                                  "ex": Array [
+                                                    OrPart {
+                                                      "ex": OrExpression {
+                                                        "ex": Array [
+                                                          AndPart {
+                                                            "ex": NotExpression {
+                                                              "ex": ComparisonExpression {
+                                                                "ex": AdditiveExpression {
+                                                                  "ex": Array [
+                                                                    MultiplicativeExpression {
+                                                                      "ex": Array [
+                                                                        Integer {
+                                                                          "value": "3",
+                                                                        },
+                                                                      ],
+                                                                      "op": Array [],
+                                                                      "parens": Array [],
+                                                                      "spacing": Array [],
+                                                                    },
+                                                                  ],
+                                                                  "op": Array [],
+                                                                  "parens": Array [],
+                                                                  "spacing": Array [],
+                                                                },
+                                                                "parens": Array [],
+                                                                "rhs": null,
+                                                                "spacing": Array [
+                                                                  null,
+                                                                ],
+                                                              },
+                                                              "keyword": null,
+                                                              "parens": Array [],
+                                                              "spacing": null,
+                                                            },
+                                                            "keyword": null,
+                                                            "spacing": Array [
+                                                              Array [
+                                                                "",
+                                                              ],
+                                                            ],
+                                                          },
+                                                        ],
+                                                        "parens": Array [],
+                                                        "spacing": Array [],
+                                                      },
+                                                      "keyword": null,
+                                                      "spacing": Array [
+                                                        Array [
+                                                          "",
+                                                        ],
+                                                      ],
+                                                    },
+                                                  ],
+                                                  "parens": Array [],
+                                                  "spacing": Array [],
+                                                },
+                                                "thenKeyword": "THEN",
+                                                "whenExpr": OrExpression {
+                                                  "ex": Array [
+                                                    OrPart {
+                                                      "ex": OrExpression {
+                                                        "ex": Array [
+                                                          AndPart {
+                                                            "ex": NotExpression {
+                                                              "ex": ComparisonExpression {
+                                                                "ex": AdditiveExpression {
+                                                                  "ex": Array [
+                                                                    MultiplicativeExpression {
+                                                                      "ex": Array [
+                                                                        String {
+                                                                          "chars": "PENDING",
+                                                                          "quote": "'",
+                                                                          "spacing": Array [
+                                                                            null,
+                                                                            null,
+                                                                          ],
+                                                                        },
+                                                                      ],
+                                                                      "op": Array [],
+                                                                      "parens": Array [],
+                                                                      "spacing": Array [],
+                                                                    },
+                                                                  ],
+                                                                  "op": Array [],
+                                                                  "parens": Array [],
+                                                                  "spacing": Array [],
+                                                                },
+                                                                "parens": Array [],
+                                                                "rhs": null,
+                                                                "spacing": Array [
+                                                                  null,
+                                                                ],
+                                                              },
+                                                              "keyword": null,
+                                                              "parens": Array [],
+                                                              "spacing": null,
+                                                            },
+                                                            "keyword": null,
+                                                            "spacing": Array [
+                                                              Array [
+                                                                "",
+                                                              ],
+                                                            ],
+                                                          },
+                                                        ],
+                                                        "parens": Array [],
+                                                        "spacing": Array [],
+                                                      },
+                                                      "keyword": null,
+                                                      "spacing": Array [
+                                                        Array [
+                                                          "",
+                                                        ],
+                                                      ],
+                                                    },
+                                                  ],
+                                                  "parens": Array [],
+                                                  "spacing": Array [],
+                                                },
+                                                "whenKeyword": "WHEN",
+                                              },
+                                            ],
+                                          ],
+                                          "else": Array [
+                                            Array [
+                                              " ",
+                                            ],
+                                            "ELSE",
+                                            Array [
+                                              " ",
+                                            ],
+                                            OrExpression {
+                                              "ex": Array [
+                                                OrPart {
+                                                  "ex": OrExpression {
+                                                    "ex": Array [
+                                                      AndPart {
+                                                        "ex": NotExpression {
+                                                          "ex": ComparisonExpression {
+                                                            "ex": AdditiveExpression {
+                                                              "ex": Array [
+                                                                MultiplicativeExpression {
+                                                                  "ex": Array [
+                                                                    Integer {
+                                                                      "value": "2",
+                                                                    },
+                                                                  ],
+                                                                  "op": Array [],
+                                                                  "parens": Array [],
+                                                                  "spacing": Array [],
+                                                                },
+                                                              ],
+                                                              "op": Array [],
+                                                              "parens": Array [],
+                                                              "spacing": Array [],
+                                                            },
+                                                            "parens": Array [],
+                                                            "rhs": null,
+                                                            "spacing": Array [
+                                                              null,
+                                                            ],
+                                                          },
+                                                          "keyword": null,
+                                                          "parens": Array [],
+                                                          "spacing": null,
+                                                        },
+                                                        "keyword": null,
+                                                        "spacing": Array [
+                                                          Array [
+                                                            "",
+                                                          ],
+                                                        ],
+                                                      },
+                                                    ],
+                                                    "parens": Array [],
+                                                    "spacing": Array [],
+                                                  },
+                                                  "keyword": null,
+                                                  "spacing": Array [
+                                                    Array [
+                                                      "",
+                                                    ],
+                                                  ],
+                                                },
+                                              ],
+                                              "parens": Array [],
+                                              "spacing": Array [],
+                                            },
+                                          ],
+                                          "end": Array [
+                                            Array [
+                                              " ",
+                                            ],
+                                            "END",
+                                          ],
+                                          "expr": Array [
+                                            Array [
+                                              " ",
+                                            ],
+                                            undefined,
+                                            OrExpression {
+                                              "ex": Array [
+                                                OrPart {
+                                                  "ex": OrExpression {
+                                                    "ex": Array [
+                                                      AndPart {
+                                                        "ex": NotExpression {
+                                                          "ex": ComparisonExpression {
+                                                            "ex": AdditiveExpression {
+                                                              "ex": Array [
+                                                                MultiplicativeExpression {
+                                                                  "ex": Array [
+                                                                    String {
+                                                                      "chars": "runner_status",
+                                                                      "quote": "\\"",
+                                                                      "spacing": Array [
+                                                                        null,
+                                                                        null,
+                                                                      ],
+                                                                    },
+                                                                  ],
+                                                                  "op": Array [],
+                                                                  "parens": Array [],
+                                                                  "spacing": Array [],
+                                                                },
+                                                              ],
+                                                              "op": Array [],
+                                                              "parens": Array [],
+                                                              "spacing": Array [],
+                                                            },
+                                                            "parens": Array [],
+                                                            "rhs": null,
+                                                            "spacing": Array [
+                                                              null,
+                                                            ],
+                                                          },
+                                                          "keyword": null,
+                                                          "parens": Array [],
+                                                          "spacing": null,
+                                                        },
+                                                        "keyword": null,
+                                                        "spacing": Array [
+                                                          Array [
+                                                            "",
+                                                          ],
+                                                        ],
+                                                      },
+                                                    ],
+                                                    "parens": Array [],
+                                                    "spacing": Array [],
+                                                  },
+                                                  "keyword": null,
+                                                  "spacing": Array [
+                                                    Array [
+                                                      "",
+                                                    ],
+                                                  ],
+                                                },
+                                              ],
+                                              "parens": Array [],
+                                              "spacing": Array [],
+                                            },
+                                          ],
+                                          "keyword": "CASE",
+                                          "parens": Array [
+                                            Object {
+                                              "close": Array [
+                                                null,
+                                                ")",
+                                              ],
+                                              "open": Array [
+                                                "(",
+                                                null,
+                                              ],
+                                            },
+                                          ],
+                                        },
+                                      ],
+                                      "op": Array [],
+                                      "parens": Array [],
+                                      "spacing": Array [],
+                                    },
+                                  ],
+                                  "op": Array [],
+                                  "parens": Array [],
+                                  "spacing": Array [],
+                                },
+                                "parens": Array [],
+                                "rhs": null,
+                                "spacing": Array [
+                                  null,
+                                ],
+                              },
+                              "keyword": null,
+                              "parens": Array [],
+                              "spacing": null,
+                            },
+                            "keyword": null,
+                            "spacing": Array [
+                              Array [
+                                "",
+                              ],
+                            ],
+                          },
+                        ],
+                        "parens": Array [],
+                        "spacing": Array [],
+                      },
+                      "keyword": null,
+                      "spacing": Array [
+                        Array [
+                          "",
+                        ],
+                      ],
+                    },
+                  ],
+                  "parens": Array [],
+                  "spacing": Array [],
+                },
+                "thenKeyword": "THEN",
+                "whenExpr": OrExpression {
+                  "ex": Array [
+                    OrPart {
+                      "ex": OrExpression {
+                        "ex": Array [
+                          AndPart {
+                            "ex": NotExpression {
+                              "ex": ComparisonExpression {
+                                "ex": AdditiveExpression {
+                                  "ex": Array [
+                                    MultiplicativeExpression {
+                                      "ex": Array [
+                                        String {
+                                          "chars": "status",
+                                          "quote": "\\"",
+                                          "spacing": Array [
+                                            null,
+                                            null,
+                                          ],
+                                        },
+                                      ],
+                                      "op": Array [],
+                                      "parens": Array [],
+                                      "spacing": Array [],
+                                    },
+                                  ],
+                                  "op": Array [],
+                                  "parens": Array [],
+                                  "spacing": Array [],
+                                },
+                                "parens": Array [],
+                                "rhs": ComparisonExpressionRhs {
+                                  "is": null,
+                                  "not": null,
+                                  "op": "=",
+                                  "parens": Array [],
+                                  "rhs": AdditiveExpression {
+                                    "ex": Array [
+                                      MultiplicativeExpression {
+                                        "ex": Array [
+                                          String {
+                                            "chars": "RUNNING",
+                                            "quote": "'",
+                                            "spacing": Array [
+                                              null,
+                                              null,
+                                            ],
+                                          },
+                                        ],
+                                        "op": Array [],
+                                        "parens": Array [],
+                                        "spacing": Array [],
+                                      },
+                                    ],
+                                    "op": Array [],
+                                    "parens": Array [],
+                                    "spacing": Array [],
+                                  },
+                                  "spacing": Array [
+                                    Array [
+                                      " ",
+                                    ],
+                                  ],
+                                },
+                                "spacing": Array [
+                                  " ",
+                                ],
+                              },
+                              "keyword": null,
+                              "parens": Array [],
+                              "spacing": null,
+                            },
+                            "keyword": null,
+                            "spacing": Array [
+                              Array [
+                                "",
+                              ],
+                            ],
+                          },
+                        ],
+                        "parens": Array [],
+                        "spacing": Array [],
+                      },
+                      "keyword": null,
+                      "spacing": Array [
+                        Array [
+                          "",
+                        ],
+                      ],
+                    },
+                  ],
+                  "parens": Array [],
+                  "spacing": Array [],
+                },
+                "whenKeyword": "WHEN",
+              },
+            ],
+          ],
+          "else": Array [
+            Array [
+              "
+",
+              " ",
+              " ",
+              " ",
+              " ",
+            ],
+            "ELSE",
+            Array [
+              " ",
+            ],
+            OrExpression {
+              "ex": Array [
+                OrPart {
+                  "ex": OrExpression {
+                    "ex": Array [
+                      AndPart {
+                        "ex": NotExpression {
+                          "ex": ComparisonExpression {
+                            "ex": AdditiveExpression {
+                              "ex": Array [
+                                MultiplicativeExpression {
+                                  "ex": Array [
+                                    Integer {
+                                      "value": "1",
+                                    },
+                                  ],
+                                  "op": Array [],
+                                  "parens": Array [],
+                                  "spacing": Array [],
+                                },
+                              ],
+                              "op": Array [],
+                              "parens": Array [],
+                              "spacing": Array [],
+                            },
+                            "parens": Array [],
+                            "rhs": null,
+                            "spacing": Array [
+                              null,
+                            ],
+                          },
+                          "keyword": null,
+                          "parens": Array [],
+                          "spacing": null,
+                        },
+                        "keyword": null,
+                        "spacing": Array [
+                          Array [
+                            "",
+                          ],
+                        ],
+                      },
+                    ],
+                    "parens": Array [],
+                    "spacing": Array [],
+                  },
+                  "keyword": null,
+                  "spacing": Array [
+                    Array [
+                      "",
+                    ],
+                  ],
+                },
+              ],
+              "parens": Array [],
+              "spacing": Array [],
+            },
+          ],
+          "end": Array [
+            Array [
+              "
+",
+              " ",
+              " ",
+              " ",
+              " ",
+            ],
+            "END",
+          ],
+          "expr": null,
+          "keyword": "CASE",
+          "parens": Array [
+            Object {
+              "close": Array [
+                Array [
+                  "
+",
+                  " ",
+                  " ",
+                ],
+                ")",
+              ],
+              "open": Array [
+                "(",
+                Array [
+                  "
+",
+                  " ",
+                  " ",
+                  " ",
+                  " ",
+                ],
+              ],
+            },
+          ],
+        },
+        "parens": Array [],
+        "spacing": Array [
+          Array [
+            " ",
+          ],
+        ],
+      },
+    ],
+    "parens": Array [],
+    "spacing": Array [
+      Array [
+        " ",
+      ],
+      Array [
+        " ",
+      ],
+      Array [
+        " ",
+      ],
+      Array [
+        " ",
+      ],
+      Array [
+        " ",
+      ],
+      Array [
+        " ",
+      ],
+      Array [
+        "
+",
+        " ",
+        " ",
+      ],
+      Array [
+        "
+",
+        " ",
+        " ",
+      ],
+    ],
+  },
+  "distinct": null,
+  "fromClause": FromClause {
+    "alias": null,
+    "fc": RefExpression {
+      "name": "tasks",
+      "namespace": "sys",
+    },
+    "keyword": "FROM",
+    "parens": undefined,
+    "spacing": Array [
+      Array [
+        " ",
+      ],
+      null,
+    ],
+  },
+  "groupByClause": null,
+  "havingClause": null,
+  "limitClause": null,
+  "orderByClause": OrderByClause {
+    "byKeyword": "BY",
+    "orderBy": Array [
+      OrderByPart {
+        "direction": "DESC",
+        "orderBy": OrExpression {
+          "ex": Array [
+            OrPart {
+              "ex": OrExpression {
+                "ex": Array [
+                  AndPart {
+                    "ex": NotExpression {
+                      "ex": ComparisonExpression {
+                        "ex": AdditiveExpression {
+                          "ex": Array [
+                            MultiplicativeExpression {
+                              "ex": Array [
+                                String {
+                                  "chars": "rank",
+                                  "quote": "\\"",
+                                  "spacing": Array [
+                                    null,
+                                    null,
+                                  ],
+                                },
+                              ],
+                              "op": Array [],
+                              "parens": Array [],
+                              "spacing": Array [],
+                            },
+                          ],
+                          "op": Array [],
+                          "parens": Array [],
+                          "spacing": Array [],
+                        },
+                        "parens": Array [],
+                        "rhs": null,
+                        "spacing": Array [
+                          null,
+                        ],
+                      },
+                      "keyword": null,
+                      "parens": Array [],
+                      "spacing": null,
+                    },
+                    "keyword": null,
+                    "spacing": Array [
+                      Array [
+                        "",
+                      ],
+                    ],
+                  },
+                ],
+                "parens": Array [],
+                "spacing": Array [],
+              },
+              "keyword": null,
+              "spacing": Array [
+                Array [
+                  "",
+                ],
+              ],
+            },
+          ],
+          "parens": Array [],
+          "spacing": Array [],
+        },
+        "spacing": Array [
+          Array [
+            " ",
+          ],
+        ],
+      },
+      OrderByPart {
+        "direction": "DESC",
+        "orderBy": OrExpression {
+          "ex": Array [
+            OrPart {
+              "ex": OrExpression {
+                "ex": Array [
+                  AndPart {
+                    "ex": NotExpression {
+                      "ex": ComparisonExpression {
+                        "ex": AdditiveExpression {
+                          "ex": Array [
+                            MultiplicativeExpression {
+                              "ex": Array [
+                                String {
+                                  "chars": "created_time",
+                                  "quote": "\\"",
+                                  "spacing": Array [
+                                    null,
+                                    null,
+                                  ],
+                                },
+                              ],
+                              "op": Array [],
+                              "parens": Array [],
+                              "spacing": Array [],
+                            },
+                          ],
+                          "op": Array [],
+                          "parens": Array [],
+                          "spacing": Array [],
+                        },
+                        "parens": Array [],
+                        "rhs": null,
+                        "spacing": Array [
+                          null,
+                        ],
+                      },
+                      "keyword": null,
+                      "parens": Array [],
+                      "spacing": null,
+                    },
+                    "keyword": null,
+                    "spacing": Array [
+                      Array [
+                        "",
+                      ],
+                    ],
+                  },
+                ],
+                "parens": Array [],
+                "spacing": Array [],
+              },
+              "keyword": null,
+              "spacing": Array [
+                Array [
+                  "",
+                ],
+              ],
+            },
+          ],
+          "parens": Array [],
+          "spacing": Array [],
+        },
+        "spacing": Array [
+          Array [
+            " ",
+          ],
+        ],
+      },
+    ],
+    "orderKeyword": "ORDER",
+    "spacing": Array [
+      Array [
+        " ",
+      ],
+      Array [
+        " ",
+      ],
+      Array [
+        Array [
+          " ",
+        ],
+      ],
+    ],
+  },
+  "spacing": Array [
+    null,
+    Array [
+      "
+",
+      " ",
+      " ",
+    ],
+    Array [
+      "
+",
+    ],
+    null,
+    null,
+    null,
+    Array [
+      "
+",
+    ],
+    null,
+  ],
+  "type": "query",
+  "verb": "SELECT",
+  "whereClause": null,
 }
 `;
 
@@ -1929,257 +3349,485 @@ exports[`Druid Query Tests parsers task query to string 1`] = `
     END
   ) AS \\"rank\\"
 FROM sys.tasks
-ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
+ORDER BY \\"rank\\" DESC\\"created_time\\" DESC"
 `;
 
 exports[`Druid Query Tests parsers the defaul data sources query 1`] = `
-Object {
-  "endSpacing": Array [],
-  "from": Object {
-    "spacing": Array [
-      "
-",
-    ],
-    "syntax": "FROM",
-    "type": "from",
-    "value": Object {
-      "alias": null,
-      "schema": "sys",
-      "spacing": Array [
-        " ",
-      ],
-      "table": "segments",
-      "type": "table",
-    },
-  },
-  "groupby": Object {
-    "groupByParts": Array [
-      Object {
-        "spacing": Array [
-          " ",
-        ],
-        "type": "Integer",
-        "value": "1",
+SqlQuery {
+  "columns": Columns {
+    "columns": Array [
+      Column {
+        "alias": null,
+        "ex": RefExpression {
+          "name": "datasource",
+          "namespace": null,
+        },
+        "parens": Array [],
+        "spacing": null,
       },
-    ],
-    "spacing": Array [
-      "
-",
-    ],
-    "syntax": "GROUP BY",
-    "type": "groupBy",
-  },
-  "having": null,
-  "limit": null,
-  "orderBy": null,
-  "queryType": "SELECT",
-  "selectParts": Array [
-    Object {
-      "alias": null,
-      "distinct": null,
-      "expr": Object {
-        "spacing": Array [],
-        "type": "Constant",
-        "value": "datasource",
-      },
-      "spacing": Array [
-        "
-",
-        " ",
-        " ",
-      ],
-      "type": "selectPart",
-    },
-    Object {
-      "alias": Object {
-        "spacing": Array [
-          " ",
-        ],
-        "syntax": "AS",
-        "type": "alias",
-        "value": Object {
+      Column {
+        "alias": Alias {
+          "keyword": "AS",
           "spacing": Array [
-            " ",
+            Array [
+              " ",
+            ],
           ],
-          "type": "Constant",
           "value": "num_segments",
         },
-      },
-      "distinct": null,
-      "expr": Object {
-        "arguments": Array [
-          Object {
-            "argumentValue": Object {
-              "argument": Object {
-                "type": "star",
-              },
-              "spacing": Array [],
-              "type": "argumentValue",
-            },
-            "distinct": null,
-            "spacing": Array [],
-            "type": "argument",
-          },
-        ],
-        "functionCall": "COUNT",
-        "spacing": Array [],
-        "type": "function",
-      },
-      "spacing": Array [
-        ",",
-        "
-",
-        " ",
-        " ",
-      ],
-      "type": "selectPart",
-    },
-    Object {
-      "alias": Object {
-        "spacing": Array [
-          " ",
-        ],
-        "syntax": "AS",
-        "type": "alias",
-        "value": Object {
+        "ex": Function {
+          "distinct": null,
+          "fn": "COUNT",
+          "parens": Array [],
           "spacing": Array [
+            null,
+            Array [],
+            null,
+          ],
+          "value": Array [
+            ExpressionMaybeFiltered {
+              "ex": "*",
+              "filter": null,
+              "parens": Array [],
+              "spacing": null,
+            },
+          ],
+        },
+        "parens": Array [],
+        "spacing": Array [
+          Array [
             " ",
           ],
-          "type": "Constant",
+        ],
+      },
+      Column {
+        "alias": Alias {
+          "keyword": "AS",
+          "spacing": Array [
+            Array [
+              " ",
+            ],
+          ],
           "value": "num_available_segments",
         },
-      },
-      "distinct": null,
-      "expr": Object {
-        "arguments": Array [
-          Object {
-            "argumentValue": Object {
-              "argument": Object {
-                "spacing": Array [],
-                "type": "Constant",
-                "value": "is_available",
-              },
-              "spacing": Array [],
-              "type": "argumentValue",
-            },
-            "distinct": null,
-            "spacing": Array [],
-            "type": "argument",
-          },
-        ],
-        "functionCall": "SUM",
-        "spacing": Array [],
-        "type": "function",
-      },
-      "spacing": Array [
-        ",",
-        "
-",
-        " ",
-        " ",
-      ],
-      "type": "selectPart",
-    },
-    Object {
-      "alias": Object {
-        "spacing": Array [
-          " ",
-        ],
-        "syntax": "AS",
-        "type": "alias",
-        "value": Object {
+        "ex": Function {
+          "distinct": null,
+          "fn": "SUM",
+          "parens": Array [],
           "spacing": Array [
+            null,
+            Array [],
+            null,
+          ],
+          "value": Array [
+            ExpressionMaybeFiltered {
+              "ex": OrExpression {
+                "ex": Array [
+                  OrPart {
+                    "ex": OrExpression {
+                      "ex": Array [
+                        AndPart {
+                          "ex": NotExpression {
+                            "ex": ComparisonExpression {
+                              "ex": AdditiveExpression {
+                                "ex": Array [
+                                  MultiplicativeExpression {
+                                    "ex": Array [
+                                      RefExpression {
+                                        "name": "is_available",
+                                        "namespace": null,
+                                      },
+                                    ],
+                                    "op": Array [],
+                                    "parens": Array [],
+                                    "spacing": Array [],
+                                  },
+                                ],
+                                "op": Array [],
+                                "parens": Array [],
+                                "spacing": Array [],
+                              },
+                              "parens": Array [],
+                              "rhs": null,
+                              "spacing": Array [
+                                null,
+                              ],
+                            },
+                            "keyword": null,
+                            "parens": Array [],
+                            "spacing": null,
+                          },
+                          "keyword": null,
+                          "spacing": Array [
+                            Array [
+                              "",
+                            ],
+                          ],
+                        },
+                      ],
+                      "parens": Array [],
+                      "spacing": Array [],
+                    },
+                    "keyword": null,
+                    "spacing": Array [
+                      Array [
+                        "",
+                      ],
+                    ],
+                  },
+                ],
+                "parens": Array [],
+                "spacing": Array [],
+              },
+              "filter": null,
+              "parens": Array [],
+              "spacing": null,
+            },
+          ],
+        },
+        "parens": Array [],
+        "spacing": Array [
+          Array [
             " ",
           ],
-          "type": "Constant",
+        ],
+      },
+      Column {
+        "alias": Alias {
+          "keyword": "AS",
+          "spacing": Array [
+            Array [
+              " ",
+            ],
+          ],
           "value": "size",
         },
-      },
-      "distinct": null,
-      "expr": Object {
-        "arguments": Array [
-          Object {
-            "argumentValue": Object {
-              "argument": Object {
-                "quote": "\\"",
-                "spacing": Array [],
-                "type": "variable",
-                "value": "size",
-              },
-              "spacing": Array [],
-              "type": "argumentValue",
-            },
-            "distinct": null,
-            "spacing": Array [],
-            "type": "argument",
-          },
-        ],
-        "functionCall": "SUM",
-        "spacing": Array [],
-        "type": "function",
-      },
-      "spacing": Array [
-        ",",
-        "
-",
-        " ",
-        " ",
-      ],
-      "type": "selectPart",
-    },
-    Object {
-      "alias": Object {
-        "spacing": Array [
-          " ",
-        ],
-        "syntax": "AS",
-        "type": "alias",
-        "value": Object {
+        "ex": Function {
+          "distinct": null,
+          "fn": "SUM",
+          "parens": Array [],
           "spacing": Array [
+            null,
+            Array [],
+            null,
+          ],
+          "value": Array [
+            ExpressionMaybeFiltered {
+              "ex": OrExpression {
+                "ex": Array [
+                  OrPart {
+                    "ex": OrExpression {
+                      "ex": Array [
+                        AndPart {
+                          "ex": NotExpression {
+                            "ex": ComparisonExpression {
+                              "ex": AdditiveExpression {
+                                "ex": Array [
+                                  MultiplicativeExpression {
+                                    "ex": Array [
+                                      String {
+                                        "chars": "size",
+                                        "quote": "\\"",
+                                        "spacing": Array [
+                                          null,
+                                          null,
+                                        ],
+                                      },
+                                    ],
+                                    "op": Array [],
+                                    "parens": Array [],
+                                    "spacing": Array [],
+                                  },
+                                ],
+                                "op": Array [],
+                                "parens": Array [],
+                                "spacing": Array [],
+                              },
+                              "parens": Array [],
+                              "rhs": null,
+                              "spacing": Array [
+                                null,
+                              ],
+                            },
+                            "keyword": null,
+                            "parens": Array [],
+                            "spacing": null,
+                          },
+                          "keyword": null,
+                          "spacing": Array [
+                            Array [
+                              "",
+                            ],
+                          ],
+                        },
+                      ],
+                      "parens": Array [],
+                      "spacing": Array [],
+                    },
+                    "keyword": null,
+                    "spacing": Array [
+                      Array [
+                        "",
+                      ],
+                    ],
+                  },
+                ],
+                "parens": Array [],
+                "spacing": Array [],
+              },
+              "filter": null,
+              "parens": Array [],
+              "spacing": null,
+            },
+          ],
+        },
+        "parens": Array [],
+        "spacing": Array [
+          Array [
             " ",
           ],
-          "type": "Constant",
+        ],
+      },
+      Column {
+        "alias": Alias {
+          "keyword": "AS",
+          "spacing": Array [
+            Array [
+              " ",
+            ],
+          ],
           "value": "num_rows",
         },
-      },
-      "distinct": null,
-      "expr": Object {
-        "arguments": Array [
-          Object {
-            "argumentValue": Object {
-              "argument": Object {
-                "quote": "\\"",
+        "ex": Function {
+          "distinct": null,
+          "fn": "SUM",
+          "parens": Array [],
+          "spacing": Array [
+            null,
+            Array [],
+            null,
+          ],
+          "value": Array [
+            ExpressionMaybeFiltered {
+              "ex": OrExpression {
+                "ex": Array [
+                  OrPart {
+                    "ex": OrExpression {
+                      "ex": Array [
+                        AndPart {
+                          "ex": NotExpression {
+                            "ex": ComparisonExpression {
+                              "ex": AdditiveExpression {
+                                "ex": Array [
+                                  MultiplicativeExpression {
+                                    "ex": Array [
+                                      String {
+                                        "chars": "num_rows",
+                                        "quote": "\\"",
+                                        "spacing": Array [
+                                          null,
+                                          null,
+                                        ],
+                                      },
+                                    ],
+                                    "op": Array [],
+                                    "parens": Array [],
+                                    "spacing": Array [],
+                                  },
+                                ],
+                                "op": Array [],
+                                "parens": Array [],
+                                "spacing": Array [],
+                              },
+                              "parens": Array [],
+                              "rhs": null,
+                              "spacing": Array [
+                                null,
+                              ],
+                            },
+                            "keyword": null,
+                            "parens": Array [],
+                            "spacing": null,
+                          },
+                          "keyword": null,
+                          "spacing": Array [
+                            Array [
+                              "",
+                            ],
+                          ],
+                        },
+                      ],
+                      "parens": Array [],
+                      "spacing": Array [],
+                    },
+                    "keyword": null,
+                    "spacing": Array [
+                      Array [
+                        "",
+                      ],
+                    ],
+                  },
+                ],
+                "parens": Array [],
                 "spacing": Array [],
-                "type": "variable",
-                "value": "num_rows",
               },
-              "spacing": Array [],
-              "type": "argumentValue",
+              "filter": null,
+              "parens": Array [],
+              "spacing": null,
             },
-            "distinct": null,
-            "spacing": Array [],
-            "type": "argument",
-          },
+          ],
+        },
+        "parens": Array [],
+        "spacing": Array [
+          Array [
+            " ",
+          ],
         ],
-        "functionCall": "SUM",
-        "spacing": Array [],
-        "type": "function",
       },
-      "spacing": Array [
-        ",",
+    ],
+    "parens": Array [],
+    "spacing": Array [
+      Array [
         "
 ",
         " ",
         " ",
       ],
-      "type": "selectPart",
+      Array [
+        "
+",
+        " ",
+        " ",
+      ],
+      Array [
+        "
+",
+        " ",
+        " ",
+      ],
+      Array [
+        "
+",
+        " ",
+        " ",
+      ],
+    ],
+  },
+  "distinct": null,
+  "fromClause": FromClause {
+    "alias": null,
+    "fc": RefExpression {
+      "name": "segments",
+      "namespace": "sys",
     },
+    "keyword": "FROM",
+    "parens": undefined,
+    "spacing": Array [
+      Array [
+        " ",
+      ],
+      null,
+    ],
+  },
+  "groupByClause": GroupByClause {
+    "byKeyword": "BY",
+    "groupBy": Array [
+      OrExpression {
+        "ex": Array [
+          OrPart {
+            "ex": OrExpression {
+              "ex": Array [
+                AndPart {
+                  "ex": NotExpression {
+                    "ex": ComparisonExpression {
+                      "ex": AdditiveExpression {
+                        "ex": Array [
+                          MultiplicativeExpression {
+                            "ex": Array [
+                              Integer {
+                                "value": "1",
+                              },
+                            ],
+                            "op": Array [],
+                            "parens": Array [],
+                            "spacing": Array [],
+                          },
+                        ],
+                        "op": Array [],
+                        "parens": Array [],
+                        "spacing": Array [],
+                      },
+                      "parens": Array [],
+                      "rhs": null,
+                      "spacing": Array [
+                        null,
+                      ],
+                    },
+                    "keyword": null,
+                    "parens": Array [],
+                    "spacing": null,
+                  },
+                  "keyword": null,
+                  "spacing": Array [
+                    Array [
+                      "",
+                    ],
+                  ],
+                },
+              ],
+              "parens": Array [],
+              "spacing": Array [],
+            },
+            "keyword": null,
+            "spacing": Array [
+              Array [
+                "",
+              ],
+            ],
+          },
+        ],
+        "parens": Array [],
+        "spacing": Array [],
+      },
+    ],
+    "groupKeyword": "GROUP",
+    "spacing": Array [
+      Array [
+        " ",
+      ],
+      Array [
+        " ",
+      ],
+      Array [],
+    ],
+  },
+  "havingClause": null,
+  "limitClause": null,
+  "orderByClause": null,
+  "spacing": Array [
+    null,
+    Array [
+      "
+",
+      " ",
+      " ",
+    ],
+    Array [
+      "
+",
+    ],
+    null,
+    Array [
+      "
+",
+    ],
+    null,
+    null,
+    null,
   ],
-  "spacing": Array [],
-  "syntax": "SELECT",
   "type": "query",
-  "unionAll": null,
-  "where": null,
+  "verb": "SELECT",
+  "whereClause": null,
 }
 `;
 
@@ -2193,229 +3841,3 @@ exports[`Druid Query Tests parsers the default data sources query to string 1`] 
 FROM sys.segments
 GROUP BY 1"
 `;
-
-exports[`Expression Tests parsers a basic math expression 1`] = `
-Object {
-  "endSpacing": Array [],
-  "expression": Object {
-    "lhs": Object {
-      "spacing": Array [],
-      "type": "Integer",
-      "value": "1",
-    },
-    "operator": Object {
-      "operator": "+",
-      "spacing": Array [
-        " ",
-      ],
-      "type": "operator",
-    },
-    "rhs": Object {
-      "spacing": Array [
-        " ",
-      ],
-      "type": "Integer",
-      "value": "1",
-    },
-    "spacing": Array [],
-    "type": "expression",
-  },
-  "spacing": Array [],
-  "type": "expressionOnly",
-}
-`;
-
-exports[`Expression Tests parsers an expression with all operators 1`] = `
-Object {
-  "endSpacing": Array [],
-  "expression": Object {
-    "lhs": Object {
-      "spacing": Array [],
-      "type": "Integer",
-      "value": "1",
-    },
-    "operator": Object {
-      "operator": "+",
-      "spacing": Array [
-        " ",
-      ],
-      "type": "operator",
-    },
-    "rhs": Object {
-      "lhs": Object {
-        "spacing": Array [],
-        "type": "Integer",
-        "value": "1",
-      },
-      "operator": Object {
-        "operator": "/",
-        "spacing": Array [
-          " ",
-        ],
-        "type": "operator",
-      },
-      "rhs": Object {
-        "lhs": Object {
-          "spacing": Array [],
-          "type": "Integer",
-          "value": "1",
-        },
-        "operator": Object {
-          "operator": "*",
-          "spacing": Array [
-            " ",
-          ],
-          "type": "operator",
-        },
-        "rhs": Object {
-          "lhs": Object {
-            "spacing": Array [],
-            "type": "Integer",
-            "value": "1",
-          },
-          "operator": Object {
-            "operator": "-",
-            "spacing": Array [
-              " ",
-            ],
-            "type": "operator",
-          },
-          "rhs": Object {
-            "spacing": Array [
-              " ",
-            ],
-            "type": "Integer",
-            "value": "1",
-          },
-          "spacing": Array [
-            " ",
-          ],
-          "type": "expression",
-        },
-        "spacing": Array [
-          " ",
-        ],
-        "type": "expression",
-      },
-      "spacing": Array [
-        " ",
-      ],
-      "type": "expression",
-    },
-    "spacing": Array [],
-    "type": "expression",
-  },
-  "spacing": Array [],
-  "type": "expressionOnly",
-}
-`;
-
-exports[`Expression Tests parsers an expression with brackets 1`] = `
-Object {
-  "endSpacing": Array [
-    ")",
-    "
-",
-    " ",
-    " ",
-    " ",
-    " ",
-  ],
-  "expression": Object {
-    "lhs": Object {
-      "spacing": Array [],
-      "type": "Integer",
-      "value": "2",
-    },
-    "operator": Object {
-      "operator": "*",
-      "spacing": Array [
-        " ",
-      ],
-      "type": "operator",
-    },
-    "rhs": Object {
-      "lhs": Object {
-        "spacing": Array [],
-        "type": "Integer",
-        "value": "3",
-      },
-      "operator": Object {
-        "operator": "+",
-        "spacing": Array [
-          " ",
-        ],
-        "type": "operator",
-      },
-      "rhs": Object {
-        "spacing": Array [
-          " ",
-        ],
-        "type": "Integer",
-        "value": "4",
-      },
-      "spacing": Array [
-        " ",
-        "(",
-      ],
-      "type": "expression",
-    },
-    "spacing": Array [],
-    "type": "expression",
-  },
-  "spacing": Array [
-    "
-",
-    " ",
-    " ",
-    " ",
-    " ",
-  ],
-  "type": "expressionOnly",
-}
-`;
-
-exports[`Expression Tests parsers an expression with string values 1`] = `
-Object {
-  "endSpacing": Array [],
-  "expression": Object {
-    "lhs": Object {
-      "quote": "'",
-      "spacing": Array [],
-      "type": "variable",
-      "value": "column",
-    },
-    "operator": Object {
-      "operator": "=",
-      "spacing": Array [
-        " ",
-      ],
-      "type": "operator",
-    },
-    "rhs": Object {
-      "quote": "\\"",
-      "spacing": Array [
-        " ",
-      ],
-      "type": "variable",
-      "value": "value",
-    },
-    "spacing": Array [],
-    "type": "expression",
-  },
-  "spacing": Array [],
-  "type": "expressionOnly",
-}
-`;
-
-exports[`Stringify Expression Tests parsers a basic math expression to string 1`] = `"1 + 1"`;
-
-exports[`Stringify Expression Tests parsers an expression with all operators to string 1`] = `"1 + 1 / 1 * 1 - 1"`;
-
-exports[`Stringify Expression Tests parsers an expression with brackets to string 1`] = `
-"
-    2 * (3 + 4)
-    "
-`;
-
-exports[`Stringify Expression Tests parsers an expression with string values to string 1`] = `"'column' = \\"value\\""`;

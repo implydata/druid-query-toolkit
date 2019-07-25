@@ -19,7 +19,8 @@
     "endOfLine": "lf"
   },
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "playground": "node script/compile-peg.js && jest src/playground.spec.ts"
   },
   "keywords": [
     "sql",

@@ -1,0 +1,108 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`single column Tests column addparen 1`] = `
+Column {
+  "alias": null,
+  "ex": OrExpression {
+    "ex": Array [
+      OrPart {
+        "ex": AndExpression {
+          "ex": Array [
+            AndPart {
+              "ex": NotExpression {
+                "ex": ComparisonExpression {
+                  "ex": AdditiveExpression {
+                    "ex": Array [
+                      MultiplicativeExpression {
+                        "ex": Array [
+                          String {
+                            "chars": "value",
+                            "quote": "'",
+                            "spacing": Array [
+                              Array [
+                                "",
+                              ],
+                              Array [
+                                "",
+                              ],
+                            ],
+                          },
+                        ],
+                        "op": null,
+                        "parens": Array [],
+                        "spacing": Array [
+                          Array [
+                            "",
+                          ],
+                        ],
+                      },
+                    ],
+                    "op": null,
+                    "parens": Array [],
+                    "spacing": Array [
+                      Array [
+                        "",
+                      ],
+                    ],
+                  },
+                  "parens": Array [],
+                  "rhs": null,
+                  "spacing": Array [
+                    null,
+                  ],
+                },
+                "keyword": null,
+                "parens": Array [],
+                "spacing": null,
+              },
+              "keyword": "",
+              "spacing": Array [
+                Array [
+                  "",
+                ],
+              ],
+            },
+          ],
+          "parens": Array [],
+          "spacing": null,
+        },
+        "keyword": "",
+        "spacing": Array [
+          Array [
+            "",
+          ],
+        ],
+      },
+    ],
+    "parens": Array [],
+    "spacing": null,
+  },
+  "parens": Array [
+    Object {
+      "close": Array [
+        Array [
+          null,
+        ],
+        ")",
+      ],
+      "open": Array [
+        "(",
+        Array [
+          null,
+        ],
+      ],
+    },
+  ],
+  "spacing": Array [
+    Array [
+      "",
+    ],
+  ],
+}
+`;
+
+exports[`single column Tests column addparen to string 1`] = `"('value')"`;
+
+exports[`single column Tests column get basic value with bracket 1`] = `"value"`;
+
+exports[`single column Tests column with no brackets to string 1`] = `"'value'"`;
