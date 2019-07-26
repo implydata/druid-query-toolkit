@@ -19,7 +19,7 @@ export function renderOpenParens(parens: Parens[]): string {
   const val: string[] = [];
   if (parens) {
     parens.map(paren => {
-      val.push(paren.open[0] + paren.open[1]);
+      val.push(paren.open[0] + (paren.open[1] ? paren.open[1] : ''));
     });
   }
   return val.join('');
@@ -29,7 +29,7 @@ export function renderCloseParens(parens: Parens[]): string {
   const val: string[] = [];
   if (parens) {
     parens.map(paren => {
-      val.push(paren.close[0] + paren.close[1]);
+      val.push((paren.close[0] ? paren.close[0] : '') + paren.close[1]);
     });
   }
   return val.join('');
