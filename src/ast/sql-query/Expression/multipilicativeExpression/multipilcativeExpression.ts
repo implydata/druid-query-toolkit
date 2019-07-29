@@ -67,10 +67,13 @@ export class MultiplicativeExpression {
     const val: string[] = [];
     val.push(renderOpenParens(this.parens));
     this.ex.map((ex, index) => {
-      // @ts-ignore
-      val.push(this.ex ? ex.toString() : '');
-      if (index > 0) {
-        val.push(this.spacing[index]);
+      val.push(ex ? ex.toString() : '');
+      if (index < this.ex.length - 1) {
+        val.push(
+          (this.spacing[index][0] ? this.spacing[index][0] : '') +
+            this.op +
+            (this.spacing[index][2] ? this.spacing[index][2] : ''),
+        );
       }
     });
     val.push(renderCloseParens(this.parens));

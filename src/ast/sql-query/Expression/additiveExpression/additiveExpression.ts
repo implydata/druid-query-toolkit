@@ -69,8 +69,12 @@ export class AdditiveExpression {
     });
     this.ex.map((ex: MultiplicativeExpression, index: number) => {
       val.push(ex.toString());
-      if (index > 0) {
-        val.push(this.spacing[index][0] + this.spacing[index][1] + this.spacing[index][2]);
+      if (index < this.ex.length - 1) {
+        val.push(
+          (this.spacing[index][0] ? this.spacing[index][0] : '') +
+            this.spacing[index][1] +
+            (this.spacing[index][2] ? this.spacing[index][2] : ''),
+        );
       }
     });
     this.parens.map(paren => {

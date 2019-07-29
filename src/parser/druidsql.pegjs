@@ -50,6 +50,7 @@ SelectQuery
   havingClause:(_ HavingClause)?
   orderByClause:(_ OrderByClause)?
   limitClause:(_ LimitClause)?
+  endSpacing: [;\t\n\r]*
     {
       return new SqlQuery({
         verb: 'SELECT',
@@ -68,6 +69,7 @@ SelectQuery
             havingClause? havingClause[0]: null,
             orderByClause? orderByClause[0]: null,
             limitClause ? limitClause[0] : null,
+            endSpacing.join(''),
             ],
         limitClause: limitClause ? limitClause[1] : null,
       });
@@ -386,7 +388,7 @@ MultiplicativeExpression
       parens : [],
       ex: makeListMap1(head, tail),
       spacing: makeListMapEmpty0(tail),
-      op: makeListMapEmpty(tail),
+      op: makeListMapEmpty01(tail),
     });
 
   }
@@ -406,11 +408,10 @@ BasicExpression
   /Function
   /OpenParen spacing0: _? sub:(Expression/ SelectSubQuery) spacing1:_? CloseParen
   {
-  	return {
-  	  parens: true,
+  	return new Sub({
   		spacing:[spacing0,spacing1],
-      sub:sub
-    }
+      ex:sub
+    });
   }
   /String
   /Integer
@@ -427,14 +428,23 @@ BasicExpression
   / RefExpression*/
 
 Function
-  = fn:Functions OpenParen spacing0:_? distinct:(DistinctToken _)? valueHead:(ExpressionMaybeFiltered) valueTail:((Comma _)? ExpressionMaybeFiltered)* spacing1:_? CloseParen
+  = fn:Functions
+   OpenParen spacing0:_?
+   distinct:(DistinctToken _)?
+   valueHead:(Expression/StarToken)
+   valueTail:((Comma _)?
+   (Expression/StarToken))*
+   spacing1:_?
+   CloseParen
+   filterClause:(_ FilterClause)?
     {
       return new Function({
         parens : [],
         distinct: distinct ? distinct[0] : null,
         fn: fn,
         value: makeListMap1(valueHead, valueTail),
-        spacing:[spacing0,(distinct? distinct[1] : ''), makeListMapEmpty(valueTail), spacing1]
+        filterClause: filterClause ? filterClause[1] : null,
+        spacing:[spacing0,(distinct? distinct[1] : ''), makeListMapEmpty(valueTail), spacing1, (filterClause ? filterClause[0] : null),]
        });
     }
     /open: (OpenParen _?) ex:Function close: (_? CloseParen)
@@ -442,20 +452,20 @@ Function
       return ex.addParen(open,close);
     }
 
-ExpressionMaybeFiltered
-  = ex:(StarToken / Expression) filter:(_ WhereClause)?
-  {
-    return new ExpressionMaybeFiltered({
-      parens : [],
-      ex: ex,
-      filter: filter ? filter[1] : null,
-      spacing: filter ? [filter[0]] : null
-    })
-  }
-  /open: (OpenParen _?) ex:Function close: (_? CloseParen)
-  {
-    return ex.addParen(open,close);
-  }
+FilterClause
+  = keyword: FilterToken
+    spacing0: _?
+    OpenParen spacing1: _?
+    ex:WhereClause
+    spacing2:_?
+    CloseParen
+    {
+      return new FilterClause({
+         keyword: keyword,
+         spacing: [spacing0, spacing1, spacing2],
+         ex: ex
+      });
+    }
 
 
 CaseExpression
@@ -552,7 +562,7 @@ Ref
 String
   = CharsetIntroducer? "'"  spacing0: _? chars:NotSQuote spacing1: _? "'"
   {
-    return new String({
+    return new StringType({
       chars: chars,
       quote: "'",
       spacing: [spacing0, spacing1]
@@ -560,7 +570,7 @@ String
   }
   / '"' spacing0: _? chars:NotDQuote spacing1: _?'"'
   {
-    return new String({
+    return new StringType({
       chars: chars,
       quote: '"',
       spacing: [spacing0, spacing1]
@@ -638,7 +648,7 @@ LikeToken = keyword:"LIKE"i { return keyword}
 EscapeToken = keyword:"ESCAPE"i { return keyword}
 NullToken = keyword:"NULL"i { return keyword}
 IntervalToken = keyword:"INTERVAL"i { return keyword}
-
+FilterToken = keyword:"FILTER"i { return keyword}
 
 
 Dot

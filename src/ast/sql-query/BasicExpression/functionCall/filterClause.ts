@@ -15,33 +15,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { OrExpression } from '../..';
+import { WhereClause } from '../../..';
 
-export interface SubValue {
-  ex: OrExpression | any;
+export interface FilterClauseValue {
+  keyword: string;
   spacing: string[];
+  ex: WhereClause;
 }
 
-export class Sub {
-  public ex: OrExpression | any;
+export class FilterClause {
+  public keyword: string;
   public spacing: string[];
+  public ex: WhereClause;
 
-  constructor(options: SubValue) {
-    this.ex = options.ex;
+  constructor(options: FilterClauseValue) {
+    this.keyword = options.keyword;
     this.spacing = options.spacing;
+    this.ex = options.ex;
   }
 
-  toString(): string {
+  toString() {
     return (
+      this.keyword +
+      this.spacing[0] +
       '(' +
-      (this.spacing[0] ? this.spacing[0] : '') +
-      this.ex.toString() +
       (this.spacing[1] ? this.spacing[1] : '') +
+      this.ex.toString() +
+      (this.spacing[2] ? this.spacing[2] : '') +
       ')'
     );
-  }
-
-  getBasicValue() {
-    return this.ex.getBasicValue();
   }
 }

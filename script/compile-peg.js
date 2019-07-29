@@ -35,9 +35,7 @@ var OrderByClause = ast.OrderByClause;
 var OrderByPart = ast.OrderByPart;
 var LimitClause = ast.LimitClause;
 var Sub = ast.Sub;
-
-
-
+var FilterClause = ast.FilterClause;
 
 
 function sqlParserFactory(functions) {

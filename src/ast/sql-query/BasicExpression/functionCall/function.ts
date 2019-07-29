@@ -15,9 +15,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Parens } from '../helpers';
+import { OrExpression } from '../../..';
+import { Parens } from '../../helpers';
+import { ExpressionMaybeFiltered } from '../expressionMaybeFiltered';
 
-import { ExpressionMaybeFiltered } from './expressionMaybeFiltered';
+import { FilterClause } from './filterClause';
 
 export interface FunctionValue {
   parens: Parens[];
@@ -25,6 +27,7 @@ export interface FunctionValue {
   value: ExpressionMaybeFiltered[];
   spacing: string[];
   distinct: string;
+  filterClause: FilterClause;
 }
 
 export class Function {
@@ -33,6 +36,7 @@ export class Function {
   public value: any[];
   public spacing: string[];
   public distinct: any;
+  public filterClause: FilterClause;
 
   constructor(options: FunctionValue) {
     this.parens = options.parens;
@@ -40,6 +44,7 @@ export class Function {
     this.value = options.value;
     this.spacing = options.spacing;
     this.distinct = options.distinct;
+    this.filterClause = options.filterClause;
   }
 
   toString() {
@@ -52,12 +57,16 @@ export class Function {
       val.push(this.distinct[0] + this.spacing[1]);
     }
     this.value.map((value, index: number) => {
-      val.push(value.toString());
-      if (index < this.spacing.length - 3 && this.spacing[2 + index]) {
+      val.push(value instanceof OrExpression ? value.toString() : value);
+      if (index < this.value.length - 1 && this.spacing[2 + index]) {
         val.push(',' + this.spacing[2 + index]);
       }
     });
-    val.push((this.spacing[2] ? this.spacing[3] : '') + ')');
+    val.push((this.spacing[3] ? this.spacing[3] : '') + ')');
+    if (this.filterClause) {
+      val.push(this.spacing[4] + this.filterClause.toString());
+      return val.join('');
+    }
     this.parens.map(paren => {
       val.push((paren.close[0] ? paren.close[0] : '') + paren.close[1]);
     });
@@ -72,6 +81,7 @@ export class Function {
       value: this.value,
       spacing: this.spacing,
       distinct: this.distinct,
+      filterClause: this.filterClause,
     });
   }
 }

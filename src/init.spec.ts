@@ -43,7 +43,7 @@ const parser = sqlParserFactory(FUNCTIONS);
 // });
 
 describe('Druid Query Tests', () => {
-  it('parsers the defaul data sources query', () => {
+  it('parsers the default data sources query', () => {
     expect(
       parser(
         'SELECT\n' +
@@ -141,10 +141,13 @@ describe('Druid Query Tests', () => {
       parser(
         'SELECT\n' +
           '  datasource,\n' +
-          '  COUNT(*) AS num_segments,\n' +
-          '  SUM(is_available) AS num_available_segments,\n' +
-          '  SUM("size") AS size,\n' +
-          '  SUM("num_rows") AS num_rows\n' +
+          '  COUNT(*) FILTER (WHERE (is_published = 1 AND is_overshadowed = 0) OR is_realtime = 1) AS num_segments,\n' +
+          '  COUNT(*) FILTER (WHERE is_available = 1 AND ((is_published = 1 AND is_overshadowed = 0) OR is_realtime = 1)) AS num_available_segments,\n' +
+          '  COUNT(*) FILTER (WHERE is_published = 1 AND is_overshadowed = 0 AND is_available = 0) AS num_segments_to_load,\n' +
+          '  COUNT(*) FILTER (WHERE is_available = 1 AND NOT ((is_published = 1 AND is_overshadowed = 0) OR is_realtime = 1)) AS num_segments_to_drop,\n' +
+          '  SUM("size") FILTER (WHERE (is_published = 1 AND is_overshadowed = 0) OR is_realtime = 1) AS size,\n' +
+          '  SUM("size" * "num_replicas") FILTER (WHERE (is_published = 1 AND is_overshadowed = 0) OR is_realtime = 1) AS replicated_size,\n' +
+          '  SUM("num_rows") FILTER (WHERE (is_published = 1 AND is_overshadowed = 0) OR is_realtime = 1) AS num_rows\n' +
           'FROM sys.segments\n' +
           'GROUP BY 1',
       ).toString(),

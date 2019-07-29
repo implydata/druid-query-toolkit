@@ -106,9 +106,14 @@ export class SqlQuery extends BaseAst {
     this.columns.columns.map((column, index) => {
       if (column.getAlias()) {
         const alias = column.getAlias();
-        if (alias ? alias.value : null! === columnVal) {
-          columns.push(column);
-          spacing.push(this.columns.spacing[index]);
+        if (alias) {
+          if (
+            (alias.value instanceof StringType ? alias.value.getBasicValue() : alias.value) !==
+            columnVal
+          ) {
+            columns.push(column);
+            spacing.push(this.columns.spacing[index]);
+          }
         }
       } else if (column.getBasicValue() !== columnVal) {
         columns.push(column);
@@ -297,6 +302,9 @@ export class SqlQuery extends BaseAst {
     if (this.limitClause) {
       query.push(this.spacing[7]);
       query.push(this.limitClause.toString());
+    }
+    if (this.spacing[8]) {
+      query.push(this.spacing[8]);
     }
 
     return query.join('');
