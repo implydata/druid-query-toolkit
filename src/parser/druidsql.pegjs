@@ -95,7 +95,7 @@ Columns
 
 
 Column
-  = ex:(CaseExpression/Function/RefExpression/StarToken/String) alias:(_ AsOptional)?
+  = ex:(CaseExpression/Function/RefExpression/StarToken/Concat/String) alias:(_ AsOptional)?
   {
     return new Column({
     parens:[],
@@ -351,11 +351,32 @@ ComparisonExpressionRhs
 
 
 ComparisonExpressionRhsNotable
-  = BetweenToken start:(AdditiveExpression) AndToken end:(AdditiveExpression)
-  / InToken list:(InSetLiteralExpression / AdditiveExpression)
-  / ContainsToken string:String
+  = keyword: BetweenToken spacing0:_ start:(AdditiveExpression) spacing1:_ AndToken spacing2:_ end:(AdditiveExpression) {
+    return new BetweenExpression({
+      keyword: keyword,
+      start: start,
+      andKeyword: andKeyword,
+      end: end,
+      spacing: [spacing0, spacing1, spacing2]
+    });
+  }
+  /  keyword:InToken spacing0:_ list:(InSetLiteralExpression / AdditiveExpression){
+    return new InExpression({
+        keyword: keyword,
+        list: list,
+        spacing: [spacing0]
+      });
+    }
+  / keyword:(ContainsToken/RegExpToken) spacing0:_ string:String
+  {
+    return new ContainsExpression({
+        keyword: keyword,
+        string: list,
+        spacing: [spacing0]
+    });
+  }
   / LikeRhs
-  / RegExpToken string:String
+
 
 
 LikeRhs
@@ -434,6 +455,14 @@ BasicExpression
     return sub.addParen(open,close);
   }
   / RefExpression*/
+
+Concat
+  = spacing0: _? head:BasicExpression  tail:( (_? '||' _?) BasicExpression)+ spacing1:_? {
+    return new Concat({
+      parts: makeListMap1(head, tail),
+      spacing: [spacing0].concat(makeListMapEmpty0(tail)).push(spacing1)
+    });
+  }
 
 Function
   = fn:Functions

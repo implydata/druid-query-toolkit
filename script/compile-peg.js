@@ -37,6 +37,10 @@ var LimitClause = ast.LimitClause;
 var Sub = ast.Sub;
 var FilterClause = ast.FilterClause;
 var LikeExpression = ast.LikeExpression;
+var InExpression = ast.InExpression;
+var ContainsExpression = ast.ContainsExpression;
+var BetweenExpression = ast.BetweenExpression;
+var Concat = ast.Concat;
 
 
 function sqlParserFactory(functions) {

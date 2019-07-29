@@ -45,3 +45,7 @@ export * from './sql-query/Clauses/orderByClause/orderByPart';
 export * from './sql-query/Clauses/limitClause';
 export * from './sql-query/BasicExpression/sub';
 export * from './sql-query/Expression/comparisionExpression/likeExpression';
+export * from './sql-query/Expression/comparisionExpression/inExpression';
+export * from './sql-query/Expression/comparisionExpression/containsExpression';
+export * from './sql-query/Expression/comparisionExpression/betweenExpression';
+export * from './sql-query/BasicExpression/concat';
