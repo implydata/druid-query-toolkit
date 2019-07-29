@@ -311,15 +311,15 @@ ComparisonExpression
   }
 
 ComparisonExpressionRhs
-  = not:NotToken? spacing0: _ rhs:ComparisonExpressionRhsNotable
+  = not:(NotToken _)? rhs:ComparisonExpressionRhsNotable
   {
     return new ComparisonExpressionRhs({
       parens: [],
       op: null,
       is: null,
-      not: not,
+      not: not ? not[0] : null,
       rhs: rhs,
-      spacing: [spacing0]
+      spacing: [not ? not[1] : null]
     });
   }
   / is:IsToken spacing0:_  not: (NotToken _)? rhs:AdditiveExpression
@@ -359,7 +359,15 @@ ComparisonExpressionRhsNotable
 
 
 LikeRhs
-  = LikeToken string:String escape:(EscapeToken String)?
+  =keyword:LikeToken spacing0:_ ex:(String/Function) escape:(_ EscapeToken _ String)?{
+    return new LikeExpression({
+      keyword: keyword,
+      ex: ex,
+      spacing: [spacing0,(escape ? escape[0]: ''), (escape ? escape[2]: '')],
+      escape: escape? escape[3] : null ,
+      escapeKeyword: escape ? escape[1] : null
+    });
+  }
 
 AdditiveExpression
   = head:MultiplicativeExpression tail:((_? AdditiveOp _?) MultiplicativeExpression)*

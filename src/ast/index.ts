@@ -44,3 +44,4 @@ export * from './sql-query/Clauses/orderByClause/orderByClause';
 export * from './sql-query/Clauses/orderByClause/orderByPart';
 export * from './sql-query/Clauses/limitClause';
 export * from './sql-query/BasicExpression/sub';
+export * from './sql-query/Expression/comparisionExpression/likeExpression';

@@ -61,8 +61,10 @@ export class ComparisonExpressionRhs {
       } else {
         val.push(this.op + (this.spacing[0] ? this.spacing[0] : '') + this.rhs.toString());
       }
-    } else {
+    } else if (this.op) {
       val.push(this.not + (this.spacing[0] ? this.spacing[0] : '') + this.rhs.toString());
+    } else {
+      val.push((this.spacing[0] ? this.spacing[0] : '') + this.rhs.toString());
     }
     if (this.is) {
       val.push(this.is + (this.spacing[0] ? this.spacing[0] : '') + this.rhs.toString());

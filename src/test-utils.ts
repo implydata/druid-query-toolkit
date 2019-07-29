@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 export const FUNCTIONS = [
+  'LOWER',
   'COUNT',
   'SUM',
   'MIN',
