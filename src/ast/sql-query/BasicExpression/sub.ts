@@ -16,32 +16,35 @@
  * limitations under the License.
  */
 import { OrExpression } from '../..';
+import { Parens, renderCloseParens, renderOpenParens } from '../helpers';
 
 export interface SubValue {
+  parens: Parens[];
   ex: OrExpression | any;
-  spacing: string[];
 }
 
 export class Sub {
+  public parens: Parens[];
   public ex: OrExpression | any;
-  public spacing: string[];
 
   constructor(options: SubValue) {
+    this.parens = options.parens;
     this.ex = options.ex;
-    this.spacing = options.spacing;
   }
 
   toString(): string {
-    return (
-      '(' +
-      (this.spacing[0] ? this.spacing[0] : '') +
-      this.ex.toString() +
-      (this.spacing[1] ? this.spacing[1] : '') +
-      ')'
-    );
+    return renderOpenParens(this.parens) + this.ex.toString() + renderCloseParens(this.parens);
   }
 
   getBasicValue() {
     return this.ex.getBasicValue();
+  }
+
+  addParen(open: string[], close: string[]) {
+    this.parens.push({ open, close });
+    return new Sub({
+      parens: this.parens,
+      ex: this.ex,
+    });
   }
 }

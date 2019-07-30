@@ -15,35 +15,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Column } from '../..';
+import { Column } from '../../../index';
+import { Parens, renderCloseParens, renderOpenParens } from '../../helpers';
 
 export interface ConcatValue {
+  parens: Parens[];
   parts: Column[];
   spacing: string[];
 }
 
 export class Concat {
+  public parens: Parens[];
   public parts: Column[];
   public spacing: string[];
 
-  constructor(options: Concat) {
+  constructor(options: ConcatValue) {
+    this.parens = options.parens;
     this.parts = options.parts;
     this.spacing = options.spacing;
   }
 
   toString(): string {
-    const val: string[] = ['(' + (this.spacing[0] ? this.spacing[0] : '')];
+    const val: string[] = [];
+    val.push(renderOpenParens(this.parens));
     this.parts.map((part, index) => {
-      val.push(
-        (this.spacing[1 + index] ? this.spacing[1 + index] : '') +
-          '||' +
-          (this.spacing[2 + index] ? this.spacing[2 + index] : '') +
-          part.toString(),
-      );
+      val.push(part.toString());
+      if (index < this.parts.length - 1) {
+        val.push(
+          (this.spacing[index][0] ? this.spacing[index][0] : '') +
+            '||' +
+            (this.spacing[index][2] ? this.spacing[index][2] : ''),
+        );
+      }
     });
-    val.push(
-      (this.spacing[this.spacing.length - 1] ? this.spacing[this.spacing.length - 1] : '') + ')',
-    );
+    val.push(renderCloseParens(this.parens));
     return val.join('');
   }
 
@@ -53,5 +58,14 @@ export class Concat {
         return part.toString();
       })
       .join('');
+  }
+
+  addParen(open: string[], close: string[]) {
+    this.parens.push({ open, close });
+    return new Concat({
+      parens: this.parens,
+      parts: this.parts,
+      spacing: this.spacing,
+    });
   }
 }

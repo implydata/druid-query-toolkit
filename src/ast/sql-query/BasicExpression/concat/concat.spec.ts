@@ -15,25 +15,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export function renderOpenParens(parens?: Parens[]): string {
-  if (!parens) return '';
-  const val: string[] = [];
-  parens.map(paren => {
-    val.push(paren.open[0] + (paren.open[1] ? paren.open[1] : ''));
-  });
-  return val.join('');
-}
 
-export function renderCloseParens(parens: Parens[]): string {
-  if (!parens) return '';
-  const val: string[] = [];
-  parens.map(paren => {
-    val.push((paren.close[0] ? paren.close[0] : '') + paren.close[1]);
-  });
-  return val.join('');
-}
+import { Column, OrExpression, StringType } from '../../../index';
 
-export interface Parens {
-  open: string[];
-  close: string[];
-}
+describe('single column Tests', () => {
+  it('column with no brackets to string', () => {
+    const val = new Column({
+      parens: [],
+      ex: new OrExpression({
+        basicExpression: new StringType({ chars: 'value', quote: "'", spacing: ['', ''] }),
+      }),
+      alias: null,
+      spacing: [''],
+    });
+    expect(val.toString()).toMatchSnapshot();
+  });
+});

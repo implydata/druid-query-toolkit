@@ -173,7 +173,7 @@ export class SqlQuery extends BaseAst {
               new AndPart({
                 ex: new NotExpression({
                   basicExpression: new Sub({
-                    spacing: ['', ''],
+                    parens: [{ open: ['(', ''], close: ['', ')'] }],
                     ex: this.whereClause.filter,
                   }),
                 }),

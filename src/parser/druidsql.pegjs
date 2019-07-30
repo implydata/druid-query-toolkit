@@ -51,51 +51,54 @@ SelectQuery
   orderByClause:(_ OrderByClause)?
   limitClause:(_ LimitClause)?
   endSpacing: [;\t\n\r]*
-    {
-      return new SqlQuery({
-        verb: 'SELECT',
-        distinct: distinct ? distinct[1]: null,
-        columns: columns,
-        fromClause: fromClause,
-        whereClause: whereClause ? whereClause[1]: null,
-        groupByClause: groupByClause ? groupByClause[1] : null,
-        havingClause: havingClause ? havingClause[1] : null,
-        orderByClause: orderByClause ? orderByClause[1] : null,
-        spacing: [distinct ? distinct[0]: null,
-        	spacing1,
-            spacing2,
-            whereClause ? whereClause[0]:null,
-            groupByClause ? groupByClause[0]:null,
-            havingClause? havingClause[0]: null,
-            orderByClause? orderByClause[0]: null,
-            limitClause ? limitClause[0] : null,
-            endSpacing.join(''),
-            ],
-        limitClause: limitClause ? limitClause[1] : null,
-      });
-    }
+  {
+    return new SqlQuery({
+      verb: 'SELECT',
+      distinct: distinct ? distinct[1]: null,
+      columns: columns,
+      fromClause: fromClause,
+      whereClause: whereClause ? whereClause[1]: null,
+      groupByClause: groupByClause ? groupByClause[1] : null,
+      havingClause: havingClause ? havingClause[1] : null,
+      orderByClause: orderByClause ? orderByClause[1] : null,
+      spacing: [distinct ? distinct[0]: null,
+        spacing1,
+          spacing2,
+          whereClause ? whereClause[0]:null,
+          groupByClause ? groupByClause[0]:null,
+          havingClause? havingClause[0]: null,
+          orderByClause? orderByClause[0]: null,
+          limitClause ? limitClause[0] : null,
+          endSpacing.join(''),
+          ],
+      limitClause: limitClause ? limitClause[1] : null,
+    });
+  }
 
 SelectSubQuery
   = SelectQuery
 
 Columns
   = head:(Column)
-    tail:((Comma _) Column)*
-    {
-    	return new Columns({
-    	    parens: [],
-        	columns: makeListMap1(head, tail),
-          spacing: tail ? makeListMapEmpty01(tail) : null
-      })
-    }
-  /open: (OpenParen _?) ex:Columns close: (_? CloseParen)
-   {
-     return ex.addParen(open,close);
-   }
+  tail:((Comma _) Column)*
+  {
+    return new Columns({
+        parens: [],
+        columns: makeListMap1(head, tail),
+        spacing: tail ? makeListMapEmpty01(tail) : null
+    })
+  }
+  /open: (OpenParen _?)
+  ex:Columns
+  close: (_? CloseParen)
+  {
+    return ex.addParen(open,close);
+  }
 
 
 Column
-  = ex:(CaseExpression/Function/RefExpression/StarToken/Concat/String) alias:(_ AsOptional)?
+  = ex:(CaseExpression/Concat/Function/RefExpression/StarToken/String)
+  alias:(_ AsOptional)?
   {
     return new Column({
     parens:[],
@@ -103,81 +106,90 @@ Column
     alias: alias ? alias[1]: null,
     spacing: alias ? [alias[0]] : null});
   }
-   /open: (OpenParen _?) ex:Column close: (_? CloseParen)
+   /open: (OpenParen _?)
+   ex:Column
+   close: (_? CloseParen)
    {
      return ex.addParen(open,close);
    }
 
 
 FromClause
-  = keyword: FromToken spacing0: _ fc:FromContent alias:(_ AsOptional)?
-    {
-    return new FromClause({
-    		keyword: keyword,
-    		spacing: [spacing0,alias ? alias[0] : null],
-        fc: fc,
-        alias: alias ? alias[1] : null
-    	});
-    }
+  = keyword: FromToken
+  spacing0: _
+  fc:FromContent
+  alias:(_ AsOptional)?
+  {
+  return new FromClause({
+      keyword: keyword,
+      spacing: [spacing0,alias ? alias[0] : null],
+      fc: fc,
+      alias: alias ? alias[1] : null
+    });
+  }
 
 FromContent
   = RefExpression
-  / OpenParen subQuery:SelectQuery CloseParen
-    {
-      return subQuery;
-    }
+  / OpenParen
+  subQuery:SelectQuery
+  CloseParen
+  {
+    return subQuery;
+  }
 
 WhereClause
-  = keyword:WhereToken spacing0:_ filter:Expression
-    {
-      return new WhereClause({
-        keyword: keyword,
-        filter: filter,
-        spacing: [spacing0]
-      });
-    }
+  = keyword:WhereToken
+  spacing0:_
+  filter:Expression
+  {
+    return new WhereClause({
+      keyword: keyword,
+      filter: filter,
+      spacing: [spacing0]
+    });
+  }
 
 GroupByClause
   = groupKeyword: GroupToken
-    spacing0:_ byKeyWord:ByToken
-    spacing1:_ head:Expression
-    tail:((Comma _)Expression)*
-    {
-      return new GroupByClause ({
-        groupKeyword: groupKeyword,
-        byKeyword: byKeyWord,
-        groupBy: makeListMap1(head, tail),
-        spacing: [spacing0, spacing1, makeListMapEmpty(tail)]
-      });
-    }
+  spacing0:_ byKeyWord:ByToken
+  spacing1:_ head:Expression
+  tail:((Comma _)Expression)*
+  {
+    return new GroupByClause ({
+      groupKeyword: groupKeyword,
+      byKeyword: byKeyWord,
+      groupBy: makeListMap1(head, tail),
+      spacing: [spacing0, spacing1, makeListMapEmpty(tail)]
+    });
+  }
 
 HavingClause
   = keyword: HavingToken
-    spacing0:_
-    having: Expression
-    {
-      return new HavingClause({
-    		keyword: keyword,
-        having: having,
-        spacing: [spacing0]
-      });
-    }
+  spacing0:_
+  having: Expression
+  {
+    return new HavingClause({
+      keyword: keyword,
+      having: having,
+      spacing: [spacing0]
+    });
+  }
 
 OrderByClause
   = orderKeyword: OrderToken
-    spacing0 : _
-    byKeyword: ByToken
-    spacing1: _
-    head: OrderByPart
-    tail:((Comma _) OrderByPart)*
-    {
-      return new OrderByClause({
-        orderKeyword: orderKeyword,
-        byKeyword : byKeyword,
-        orderBy: makeListMap1(head, tail),
-        spacing: [spacing0,spacing1].concat(makeListMapEmpty01(tail))
-      });
-    }
+  spacing0 : _
+  byKeyword: ByToken
+  spacing1: _
+  head: OrderByPart
+  tail:((Comma _) OrderByPart)*
+  {
+    return new OrderByClause({
+      orderKeyword: orderKeyword,
+      byKeyword : byKeyword,
+      orderBy: makeListMap1(head, tail),
+      spacing: [spacing0,spacing1].concat(makeListMapEmpty01(tail))
+    });
+  }
 
 OrderByPart
 	= orderBy:Expression
@@ -192,7 +204,10 @@ OrderByPart
 
 
 LimitClause
-  = keyword: LimitToken spacing0:_  a:Integer b:((Comma _?) Integer)*
+  = keyword: LimitToken
+  spacing0:_
+  a:Integer
+  b:((Comma _?) Integer)*
   {
     return new LimitClause({
       keyword: keyword,
@@ -227,10 +242,12 @@ Expressions are defined below in acceding priority order
   Unary identity (+), negation (-)
 */
 
-Expression = OrExpression
+Expression
+  = OrExpression
 
 OrExpression
-  = head:AndExpression tail:(_ OrPart)*
+  = head:AndExpression
+  tail:(_ OrPart)*
   {
     let headValue = new OrPart({keyword:null, ex:head, spacing:[['']]});
     return new OrExpression({
@@ -239,13 +256,17 @@ OrExpression
       spacing: makeListMapEmpty0(tail)
     });
   }
-  / open: (OpenParen _?) ex:AndExpression close: (_? CloseParen)
+  / open: (OpenParen _?)
+  ex:AndExpression
+  close: (_? CloseParen)
   {
-    return ex.addParen({open,close});
+    return ex.addParen(open,close);
   }
 
 OrPart
-	= keyword:OrToken spacing0:_ 	ex:AndExpression
+	= keyword:OrToken
+	spacing0:_
+	ex:AndExpression
 	{
     return new OrPart({
       keyword: keyword,
@@ -255,7 +276,8 @@ OrPart
   }
 
 AndExpression
-  = head:NotExpression tail:(_ AndPart)*
+  = head:NotExpression
+  tail:(_ AndPart)*
   {
     let headValue = new AndPart({keyword:null, ex:head, spacing:[['']]});
     return new OrExpression({
@@ -264,13 +286,17 @@ AndExpression
         spacing: makeListMapEmpty0(tail)
     });
   }
-  / open: (OpenParen _?) ex:AndExpression close: (_? CloseParen)
+  / open: (OpenParen _?)
+  ex:AndExpression
+  close: (_? CloseParen)
   {
-    return ex.addParen({open,close});
+     return ex.addParen(open,close);
   }
 
 AndPart
-	= keyword:AndToken spacing0:_ ex:NotExpression
+	= keyword:AndToken
+	spacing0:_
+	ex:NotExpression
   {
     return new AndPart({
       keyword: keyword,
@@ -280,7 +306,8 @@ AndPart
   }
 
 NotExpression
-  = not:(NotToken _)? ex:ComparisonExpression
+  = not:(NotToken _)?
+  ex:ComparisonExpression
   {
     return new NotExpression ({
       parens: [],
@@ -289,13 +316,16 @@ NotExpression
       spacing: not ? [not[1]] : null
     });
   }
-  /open: (OpenParen _?) ex:NotExpression close: (_? CloseParen) {
-    return ex.addParen({open,close});
+  /open: (OpenParen _?)
+  ex:NotExpression
+  close: (_? CloseParen) {
+     return ex.addParen(open,close);
   }
 
 
 ComparisonExpression
-  = ex:AdditiveExpression  rhs:(_? ComparisonExpressionRhs)?
+  = ex:AdditiveExpression
+  rhs:(_? ComparisonExpressionRhs)?
   {
     //if (rhs) ex = rhs(ex);
     return new ComparisonExpression({
@@ -305,13 +335,16 @@ ComparisonExpression
       spacing: rhs? rhs[0]: null
      });
   }
-  /open: (OpenParen _?) ex:ComparisonExpression close: (_? CloseParen)
+  /open: (OpenParen _?)
+  ex:ComparisonExpression
+  close: (_? CloseParen)
   {
-    return ex.addParen({open,close});
+     return ex.addParen(open,close);
   }
 
 ComparisonExpressionRhs
-  = not:(NotToken _)? rhs:ComparisonExpressionRhsNotable
+  = not:(NotToken _)?
+  rhs:ComparisonExpressionRhsNotable
   {
     return new ComparisonExpressionRhs({
       parens: [],
@@ -322,9 +355,12 @@ ComparisonExpressionRhs
       spacing: [not ? not[1] : null]
     });
   }
-  / is:IsToken spacing0:_  not: (NotToken _)? rhs:AdditiveExpression
+  / is:IsToken
+  spacing0:_
+  not: (NotToken _)?
+  rhs:AdditiveExpression
   {
-    return  new ComparisonExpressionRhs({
+    return new ComparisonExpressionRhs({
       parens: [],
       op:null,
       is: is,
@@ -333,7 +369,9 @@ ComparisonExpressionRhs
       spacing: not ? [spacing0, not[1]]: [spacing0],
     });
   }
-  / op:ComparisonOp spacing0: _? rhs:AdditiveExpression
+  / op:ComparisonOp
+  spacing0: _?
+  rhs:AdditiveExpression
   {
     return  new ComparisonExpressionRhs({
       parens: [],
@@ -344,14 +382,22 @@ ComparisonExpressionRhs
       rhs: rhs
     });
   }
-  /open: (OpenParen _?) ex:ComparisonExpressionRhs close: (_? CloseParen)
+  /open: (OpenParen _?)
+  ex:ComparisonExpressionRhs
+  close: (_? CloseParen)
   {
-    return ex.addParen({open,close});
+     return ex.addParen(open,close);
   }
 
 
 ComparisonExpressionRhsNotable
-  = keyword: BetweenToken spacing0:_ start:(AdditiveExpression) spacing1:_ AndToken spacing2:_ end:(AdditiveExpression) {
+  = keyword: BetweenToken
+  spacing0:_
+  start:(AdditiveExpression)
+  spacing1:_
+  AndToken
+  spacing2:_
+  end:(AdditiveExpression) {
     return new BetweenExpression({
       keyword: keyword,
       start: start,
@@ -360,14 +406,19 @@ ComparisonExpressionRhsNotable
       spacing: [spacing0, spacing1, spacing2]
     });
   }
-  /  keyword:InToken spacing0:_ list:(InSetLiteralExpression / AdditiveExpression){
+  / keyword:InToken
+  spacing0:_
+  list:(Sub/AdditiveExpression/InSetLiteralExpression)
+  {
     return new InExpression({
         keyword: keyword,
         list: list,
         spacing: [spacing0]
       });
     }
-  / keyword:(ContainsToken/RegExpToken) spacing0:_ string:String
+  / keyword:(ContainsToken/RegExpToken)
+  spacing0:_
+  string:String
   {
     return new ContainsExpression({
         keyword: keyword,
@@ -380,7 +431,11 @@ ComparisonExpressionRhsNotable
 
 
 LikeRhs
-  =keyword:LikeToken spacing0:_ ex:(String/Function) escape:(_ EscapeToken _ String)?{
+  =keyword:LikeToken
+  spacing0:_
+  ex:(String/Function)
+  escape:(_ EscapeToken _ String)?
+  {
     return new LikeExpression({
       keyword: keyword,
       ex: ex,
@@ -391,18 +446,22 @@ LikeRhs
   }
 
 AdditiveExpression
-  = head:MultiplicativeExpression tail:((_? AdditiveOp _?) MultiplicativeExpression)*
-    {
-      return new AdditiveExpression({
-        parens:[],
-        ex: makeListMap1(head, tail),
-        spacing: makeListMapEmpty0(tail),
-        op: makeListMapEmpty(tail),
-      });
-    }
-    /open: (OpenParen _?) ex:AdditiveExpression close: (_? CloseParen) {
-        return ex.addParen({open,close});
-    }
+  = head:MultiplicativeExpression
+  tail:((_? AdditiveOp _?)
+  MultiplicativeExpression)*
+  {
+    return new AdditiveExpression({
+      parens:[],
+      ex: makeListMap1(head, tail),
+      spacing: makeListMapEmpty0(tail),
+      op: makeListMapEmpty(tail),
+    });
+  }
+  /open: (OpenParen _?)
+  ex:AdditiveExpression
+  close: (_? CloseParen) {
+   return ex.addParen(open,close);
+  }
 
 AdditiveOp
   = op:("+" / "-") !"+"
@@ -411,7 +470,9 @@ AdditiveOp
   }
 
 MultiplicativeExpression
-  = head:BasicExpression tail:((_? MultiplicativeOp _?) BasicExpression)*
+  = head:(BasicExpression/Concat)
+  tail:((_? MultiplicativeOp _?)
+  (BasicExpression/Concat))*
   {
     return new MultiplicativeExpression({
       parens : [],
@@ -421,9 +482,11 @@ MultiplicativeExpression
     });
 
   }
-  /open: (OpenParen _?) ex:MultiplicativeExpression close: (_? CloseParen)
+  /open: (OpenParen _?)
+  ex:MultiplicativeExpression
+  close: (_? CloseParen)
   {
-    return ex.addParen({open,close});
+     return ex.addParen(open,close);
   }
 
 MultiplicativeOp
@@ -435,34 +498,47 @@ MultiplicativeOp
 BasicExpression
   = CaseExpression
   /Function
-  /OpenParen spacing0: _? sub:(Expression/ SelectSubQuery) spacing1:_? CloseParen
-  {
-  	return new Sub({
-  		spacing:[spacing0,spacing1],
-      ex:sub
-    });
-  }
+  /Sub
   /String
   /Integer
   /RefExpression
 
-  /*LiteralExpression
-  / AggregateExpression
-  / FunctionCallExpression
-  / CaseExpression
-  / OpenParen sub:(Expression / SelectSubQuery) CloseParen
-  {
-    return sub.addParen(open,close);
-  }
-  / RefExpression*/
 
-Concat
-  = spacing0: _? head:BasicExpression  tail:( (_? '||' _?) BasicExpression)+ spacing1:_? {
-    return new Concat({
-      parts: makeListMap1(head, tail),
-      spacing: [spacing0].concat(makeListMapEmpty0(tail)).push(spacing1)
+Sub
+  = open: (OpenParen _?)
+  sub:(SelectSubQuery/Expression)
+  close: (_? CloseParen)
+  {
+    return new Sub({
+      parens: [{open,close}],
+      ex:sub
     });
   }
+  /open: (OpenParen _?)
+   ex:Sub
+   close: (_? CloseParen)
+   {
+     return ex.addParen(open,close);
+   }
+
+
+Concat
+  = head:BasicExpression
+  tail:( (_? '||' _?) BasicExpression)+
+  {
+    return new Concat({
+      parens: [],
+      parts: makeListMap1(head, tail),
+      spacing: makeListMapEmpty0(tail)
+    });
+  }
+  /open: (OpenParen _?)
+  ex:Concat
+  close: (_? CloseParen)
+  {
+     return ex.addParen(open,close);
+  }
+
 
 Function
   = fn:Functions
@@ -484,9 +560,11 @@ Function
         spacing:[spacing0,(distinct? distinct[1] : ''), makeListMapEmpty(valueTail), spacing1, (filterClause ? filterClause[0] : null),]
        });
     }
-    /open: (OpenParen _?) ex:Function close: (_? CloseParen)
+    /open: (OpenParen _?)
+    ex:Function
+    close: (_? CloseParen)
     {
-      return ex.addParen(open,close);
+     return ex.addParen(open,close);
     }
 
 FilterClause
@@ -506,24 +584,34 @@ FilterClause
 
 
 CaseExpression
-  =  keyword:CaseToken v: (_ !WhenToken Expression)? cases:(_ Case)* els:(_ ElseToken _ Expression)? end: (_ EndToken)
-    {
-      return new CaseExpression({
-        parens: [],
-      	keyword: keyword,
-        expr: v,
-        cases: cases,
-        else: els,
-        end: end
-      });
-    }
-     /open: (OpenParen _?) ex:CaseExpression close: (_? CloseParen)
-     {
-       return ex.addParen(open,close);
-     }
+  =  keyword:CaseToken
+  v: (_ !WhenToken Expression)?
+  cases:(_ Case)*
+  els:(_ ElseToken _ Expression)?
+  end: (_ EndToken)
+  {
+    return new CaseExpression({
+      parens: [],
+      keyword: keyword,
+      expr: v,
+      cases: cases,
+      else: els,
+      end: end
+    });
+  }
+  /open: (OpenParen _?) ex:CaseExpression close: (_? CloseParen)
+  {
+  return ex.addParen(open,close);
+  }
 
 Case
-	= whenKeyword: "When"i spacing0: _ whenExpr: Expression spacing1:_  thenKeyword: ThenToken spacing2:_ thenExpr: Expression
+	= whenKeyword: "When"i
+	spacing0: _
+	whenExpr: Expression
+	spacing1:_
+	thenKeyword: ThenToken
+	spacing2:_
+	thenExpr: Expression
 	{
     return new CasePart({
       whenKeyword: whenKeyword,
@@ -535,28 +623,42 @@ Case
   }
 
 SetLiteral
-  = OpenCurly head:StringNumberOrNull? tail:(Comma StringNumberOrNull)* CloseCurly
+  = OpenCurly
+  head:StringNumberOrNull?
+  tail:(Comma StringNumberOrNull)*
+  CloseCurly
     {
       return Set.fromJS(makeListMap1(head, tail).map(undummyNull));
     }
 
-StringNumberOrNull = String / Integer / NullToken
+StringNumberOrNull
+  = String
+  / Integer
+  / NullToken
 
 
 InSetLiteralExpression
-  = OpenParen head:StringOrNumber tail:(Comma StringOrNumber)* CloseParen
-    {
-      return r(Set.fromJS(makeListMap1(head, tail)));
-    }
+  = OpenParen
+  head:StringOrNumber
+  tail:(Comma StringOrNumber)*
+  CloseParen
+  {
+    return r(Set.fromJS(makeListMap1(head, tail)));
+  }
 
-StringOrNumber = String / Integer
+StringOrNumber
+  = String
+  / Integer
 
 Interval
-  = IntervalToken n:Integer unit:Name &{ return intervalUnits[unit] }
-    {
-      if (n !== 0) error('only zero intervals supported for now');
-      return 0;
-    }
+  = IntervalToken
+  n:Integer
+  unit:Name
+  &{ return intervalUnits[unit] }
+  {
+    if (n !== 0) error('only zero intervals supported for now');
+    return 0;
+  }
 
 RefExpression
   = ref:NamespacedRef
@@ -565,7 +667,8 @@ RefExpression
   }
 
 RelaxedNamespacedRef
-  = ns:(Ref Dot)? name:RelaxedRef
+  = ns:(Ref Dot)?
+  name:RelaxedRef
   {
     return {
       namespace: ns ? ns[0] : null,
@@ -574,7 +677,8 @@ RelaxedNamespacedRef
   }
 
 NamespacedRef
-  = ns:(Ref Dot)? name:Ref
+  = ns:(Ref Dot)?
+  name:Ref
   {
     return new RefExpression({
       namespace: ns ? ns[0] : null,
@@ -583,21 +687,25 @@ NamespacedRef
   }
 
 RelaxedRef
-  = name:RelaxedName !{ return reserved(name); }
+  = name:RelaxedName
+  !{ return reserved(name); }
   {
     return name
   }
   / BacktickRef
 
 Ref
-  = name:Name /*!{ return reserved(name); }*/
+  = name:Name
   {
     return name
   }
   / BacktickRef
 
 String
-  = CharsetIntroducer? "'"  spacing0: _? chars:NotSQuote spacing1: _? "'"
+  = CharsetIntroducer? "'"
+  spacing0: _?
+  chars:NotSQuote
+  spacing1: _? "'"
   {
     return new StringType({
       chars: chars,
@@ -605,7 +713,10 @@ String
       spacing: [spacing0, spacing1]
     });
   }
-  / '"' spacing0: _? chars:NotDQuote spacing1: _?'"'
+  / '"'
+  spacing0: _?
+  chars:NotDQuote
+  spacing1: _?'"'
   {
     return new StringType({
       chars: chars,
@@ -671,7 +782,7 @@ FromToken = keyword:"FROM"i { return keyword}
 WhereToken = keyword:"WHERE"i { return keyword}
 IsToken = keyword:"IS"i { return keyword}
 BetweenToken = keyword:"BETWEEN"i { return keyword}
-InToken = keyword:"BETWEEN"i { return keyword}
+InToken = keyword:"IN"i { return keyword}
 GroupToken = keyword:"GROUP"i { return keyword}
 ByToken = keyword:"BY"i { return keyword}
 HavingToken = keyword:"HAVING"i { return keyword}
@@ -721,3 +832,4 @@ NotSQuote "NotSQuote"
 
 NotDQuote "NotDQuote"
   = $([^"]*)
+

@@ -23,22 +23,12 @@ const parser = sqlParserFactory(FUNCTIONS);
 describe('Playground', () => {
   it('basic', () => {
     expect(
-      parser(
-        'SELECT "segment_id", "datasource", "start", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed", "payload"\n' +
-          'FROM sys.segments\n' +
-          'ORDER BY "start" DESC\n' +
-          'LIMIT 25',
-      ).toString(),
+      parser('(SELECT "start" || \'/\' || "end" FROM sys.segments GROUP BY 1 LIMIT 25)').toString(),
     ).toEqual({});
   });
   it('basic', () => {
     expect(
-      parser(
-        'SELECT "segment_id", "datasource", "start", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed", "payload"\n' +
-          'FROM sys.segments\n' +
-          'ORDER BY "start" DESC\n' +
-          'LIMIT 25',
-      ),
+      parser('(SELECT "start" || \'/\' || "end" FROM sys.segments GROUP BY 1 LIMIT 25)').toString(),
     ).toEqual({});
   });
 });
