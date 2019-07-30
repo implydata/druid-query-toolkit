@@ -38,7 +38,7 @@
   "APPROX_QUANTILE", "APPROX_QUANTILE_DS", "APPROX_QUANTILE_FIXED_BUCKETS"];
 }
 
-start = SelectQuery
+start = SelectQuery/Expression
 SelectQuery
   = SelectToken distinct:(_ DistinctToken)?
   spacing1: _

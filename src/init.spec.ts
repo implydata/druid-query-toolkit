@@ -227,4 +227,18 @@ describe('Druid Query Tests', () => {
       ).toString(),
     ).toMatchSnapshot();
   });
+  it('parsers segments query with concat', () => {
+    expect(
+      parser(
+        'SELECT\n' +
+          '  ("start" || \'/\' || "end") AS "interval",\n' +
+          '  "segment_id", "datasource", "start", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed", "payload"\n' +
+          'FROM sys.segments\n' +
+          'WHERE\n' +
+          ' ("start" || \'/\' || "end") IN (SELECT "start" || \'/\' || "end" FROM sys.segments GROUP BY 1 LIMIT 25)\n' +
+          'ORDER BY "start" DESC\n' +
+          'LIMIT 25000',
+      ).toString(),
+    ).toMatchSnapshot();
+  });
 });
