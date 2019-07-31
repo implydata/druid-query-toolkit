@@ -62,11 +62,11 @@ export class OrderByClause {
   }
 
   getSorted() {
-    const sorted: { id: string; desc: string | null }[] = [];
+    const sorted: { id: string; desc: boolean }[] = [];
     this.orderBy.map(part => {
       sorted.push({
         id: part.getBasicValue(),
-        desc: part.direction,
+        desc: part.direction === 'DESC' ? true : false,
       });
     });
     return sorted;

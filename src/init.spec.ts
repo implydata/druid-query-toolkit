@@ -241,4 +241,9 @@ describe('Druid Query Tests', () => {
       ).toString(),
     ).toMatchSnapshot();
   });
+  it('parsers segments query with concat', () => {
+    expect(
+      parser(`SELECT "start" || ' / ' || "end" FROM sys.segments GROUP BY 1,2`).toString(),
+    ).toMatchSnapshot();
+  });
 });

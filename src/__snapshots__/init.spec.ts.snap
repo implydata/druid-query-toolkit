@@ -6,182 +6,252 @@ SqlQuery {
     "columns": Array [
       Column {
         "alias": null,
-        "ex": StringType {
-          "chars": "segment_id",
-          "quote": "\\"",
-          "spacing": Array [
-            null,
-            null,
-          ],
+        "ex": RefExpression {
+          "name": StringType {
+            "chars": "segment_id",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+          "namespace": null,
+          "quote": undefined,
+          "quoteSpacing": undefined,
         },
         "parens": Array [],
         "spacing": null,
       },
       Column {
         "alias": null,
-        "ex": StringType {
-          "chars": "datasource",
-          "quote": "\\"",
-          "spacing": Array [
-            null,
-            null,
-          ],
+        "ex": RefExpression {
+          "name": StringType {
+            "chars": "datasource",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+          "namespace": null,
+          "quote": undefined,
+          "quoteSpacing": undefined,
         },
         "parens": Array [],
         "spacing": null,
       },
       Column {
         "alias": null,
-        "ex": StringType {
-          "chars": "start",
-          "quote": "\\"",
-          "spacing": Array [
-            null,
-            null,
-          ],
+        "ex": RefExpression {
+          "name": StringType {
+            "chars": "start",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+          "namespace": null,
+          "quote": undefined,
+          "quoteSpacing": undefined,
         },
         "parens": Array [],
         "spacing": null,
       },
       Column {
         "alias": null,
-        "ex": StringType {
-          "chars": "end",
-          "quote": "\\"",
-          "spacing": Array [
-            null,
-            null,
-          ],
+        "ex": RefExpression {
+          "name": StringType {
+            "chars": "end",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+          "namespace": null,
+          "quote": undefined,
+          "quoteSpacing": undefined,
         },
         "parens": Array [],
         "spacing": null,
       },
       Column {
         "alias": null,
-        "ex": StringType {
-          "chars": "size",
-          "quote": "\\"",
-          "spacing": Array [
-            null,
-            null,
-          ],
+        "ex": RefExpression {
+          "name": StringType {
+            "chars": "size",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+          "namespace": null,
+          "quote": undefined,
+          "quoteSpacing": undefined,
         },
         "parens": Array [],
         "spacing": null,
       },
       Column {
         "alias": null,
-        "ex": StringType {
-          "chars": "version",
-          "quote": "\\"",
-          "spacing": Array [
-            null,
-            null,
-          ],
+        "ex": RefExpression {
+          "name": StringType {
+            "chars": "version",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+          "namespace": null,
+          "quote": undefined,
+          "quoteSpacing": undefined,
         },
         "parens": Array [],
         "spacing": null,
       },
       Column {
         "alias": null,
-        "ex": StringType {
-          "chars": "partition_num",
-          "quote": "\\"",
-          "spacing": Array [
-            null,
-            null,
-          ],
+        "ex": RefExpression {
+          "name": StringType {
+            "chars": "partition_num",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+          "namespace": null,
+          "quote": undefined,
+          "quoteSpacing": undefined,
         },
         "parens": Array [],
         "spacing": null,
       },
       Column {
         "alias": null,
-        "ex": StringType {
-          "chars": "num_replicas",
-          "quote": "\\"",
-          "spacing": Array [
-            null,
-            null,
-          ],
+        "ex": RefExpression {
+          "name": StringType {
+            "chars": "num_replicas",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+          "namespace": null,
+          "quote": undefined,
+          "quoteSpacing": undefined,
         },
         "parens": Array [],
         "spacing": null,
       },
       Column {
         "alias": null,
-        "ex": StringType {
-          "chars": "num_rows",
-          "quote": "\\"",
-          "spacing": Array [
-            null,
-            null,
-          ],
+        "ex": RefExpression {
+          "name": StringType {
+            "chars": "num_rows",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+          "namespace": null,
+          "quote": undefined,
+          "quoteSpacing": undefined,
         },
         "parens": Array [],
         "spacing": null,
       },
       Column {
         "alias": null,
-        "ex": StringType {
-          "chars": "is_published",
-          "quote": "\\"",
-          "spacing": Array [
-            null,
-            null,
-          ],
+        "ex": RefExpression {
+          "name": StringType {
+            "chars": "is_published",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+          "namespace": null,
+          "quote": undefined,
+          "quoteSpacing": undefined,
         },
         "parens": Array [],
         "spacing": null,
       },
       Column {
         "alias": null,
-        "ex": StringType {
-          "chars": "is_available",
-          "quote": "\\"",
-          "spacing": Array [
-            null,
-            null,
-          ],
+        "ex": RefExpression {
+          "name": StringType {
+            "chars": "is_available",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+          "namespace": null,
+          "quote": undefined,
+          "quoteSpacing": undefined,
         },
         "parens": Array [],
         "spacing": null,
       },
       Column {
         "alias": null,
-        "ex": StringType {
-          "chars": "is_realtime",
-          "quote": "\\"",
-          "spacing": Array [
-            null,
-            null,
-          ],
+        "ex": RefExpression {
+          "name": StringType {
+            "chars": "is_realtime",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+          "namespace": null,
+          "quote": undefined,
+          "quoteSpacing": undefined,
         },
         "parens": Array [],
         "spacing": null,
       },
       Column {
         "alias": null,
-        "ex": StringType {
-          "chars": "is_overshadowed",
-          "quote": "\\"",
-          "spacing": Array [
-            null,
-            null,
-          ],
+        "ex": RefExpression {
+          "name": StringType {
+            "chars": "is_overshadowed",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+          "namespace": null,
+          "quote": undefined,
+          "quoteSpacing": undefined,
         },
         "parens": Array [],
         "spacing": null,
       },
       Column {
         "alias": null,
-        "ex": StringType {
-          "chars": "payload",
-          "quote": "\\"",
-          "spacing": Array [
-            null,
-            null,
-          ],
+        "ex": RefExpression {
+          "name": StringType {
+            "chars": "payload",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+          "namespace": null,
+          "quote": undefined,
+          "quoteSpacing": undefined,
         },
         "parens": Array [],
         "spacing": null,
@@ -210,6 +280,8 @@ SqlQuery {
     "fc": RefExpression {
       "name": "segments",
       "namespace": "sys",
+      "quote": undefined,
+      "quoteSpacing": undefined,
     },
     "keyword": "FROM",
     "parens": undefined,
@@ -345,110 +417,152 @@ ORDER BY \\"start\\" DESC
 LIMIT 25000"
 `;
 
+exports[`Druid Query Tests parsers segments query with concat 2`] = `"SELECT \\"start\\" || ' / null' || \\"end\\" FROM sys.segments GROUP BY 1,22"`;
+
 exports[`Druid Query Tests parsers servers query 1`] = `
 SqlQuery {
   "columns": Columns {
     "columns": Array [
       Column {
         "alias": null,
-        "ex": StringType {
-          "chars": "server",
-          "quote": "\\"",
-          "spacing": Array [
-            null,
-            null,
-          ],
+        "ex": RefExpression {
+          "name": StringType {
+            "chars": "server",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+          "namespace": null,
+          "quote": undefined,
+          "quoteSpacing": undefined,
         },
         "parens": Array [],
         "spacing": null,
       },
       Column {
         "alias": null,
-        "ex": StringType {
-          "chars": "server_type",
-          "quote": "\\"",
-          "spacing": Array [
-            null,
-            null,
-          ],
+        "ex": RefExpression {
+          "name": StringType {
+            "chars": "server_type",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+          "namespace": null,
+          "quote": undefined,
+          "quoteSpacing": undefined,
         },
         "parens": Array [],
         "spacing": null,
       },
       Column {
         "alias": null,
-        "ex": StringType {
-          "chars": "tier",
-          "quote": "\\"",
-          "spacing": Array [
-            null,
-            null,
-          ],
+        "ex": RefExpression {
+          "name": StringType {
+            "chars": "tier",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+          "namespace": null,
+          "quote": undefined,
+          "quoteSpacing": undefined,
         },
         "parens": Array [],
         "spacing": null,
       },
       Column {
         "alias": null,
-        "ex": StringType {
-          "chars": "host",
-          "quote": "\\"",
-          "spacing": Array [
-            null,
-            null,
-          ],
+        "ex": RefExpression {
+          "name": StringType {
+            "chars": "host",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+          "namespace": null,
+          "quote": undefined,
+          "quoteSpacing": undefined,
         },
         "parens": Array [],
         "spacing": null,
       },
       Column {
         "alias": null,
-        "ex": StringType {
-          "chars": "plaintext_port",
-          "quote": "\\"",
-          "spacing": Array [
-            null,
-            null,
-          ],
+        "ex": RefExpression {
+          "name": StringType {
+            "chars": "plaintext_port",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+          "namespace": null,
+          "quote": undefined,
+          "quoteSpacing": undefined,
         },
         "parens": Array [],
         "spacing": null,
       },
       Column {
         "alias": null,
-        "ex": StringType {
-          "chars": "tls_port",
-          "quote": "\\"",
-          "spacing": Array [
-            null,
-            null,
-          ],
+        "ex": RefExpression {
+          "name": StringType {
+            "chars": "tls_port",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+          "namespace": null,
+          "quote": undefined,
+          "quoteSpacing": undefined,
         },
         "parens": Array [],
         "spacing": null,
       },
       Column {
         "alias": null,
-        "ex": StringType {
-          "chars": "curr_size",
-          "quote": "\\"",
-          "spacing": Array [
-            null,
-            null,
-          ],
+        "ex": RefExpression {
+          "name": StringType {
+            "chars": "curr_size",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+          "namespace": null,
+          "quote": undefined,
+          "quoteSpacing": undefined,
         },
         "parens": Array [],
         "spacing": null,
       },
       Column {
         "alias": null,
-        "ex": StringType {
-          "chars": "max_size",
-          "quote": "\\"",
-          "spacing": Array [
-            null,
-            null,
-          ],
+        "ex": RefExpression {
+          "name": StringType {
+            "chars": "max_size",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+          "namespace": null,
+          "quote": undefined,
+          "quoteSpacing": undefined,
         },
         "parens": Array [],
         "spacing": null,
@@ -1538,6 +1652,8 @@ SqlQuery {
     "fc": RefExpression {
       "name": "servers",
       "namespace": "sys",
+      "quote": undefined,
+      "quoteSpacing": undefined,
     },
     "keyword": "FROM",
     "parens": undefined,
@@ -1756,91 +1872,126 @@ SqlQuery {
     "columns": Array [
       Column {
         "alias": null,
-        "ex": StringType {
-          "chars": "task_id",
-          "quote": "\\"",
-          "spacing": Array [
-            null,
-            null,
-          ],
+        "ex": RefExpression {
+          "name": StringType {
+            "chars": "task_id",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+          "namespace": null,
+          "quote": undefined,
+          "quoteSpacing": undefined,
         },
         "parens": Array [],
         "spacing": null,
       },
       Column {
         "alias": null,
-        "ex": StringType {
-          "chars": "type",
-          "quote": "\\"",
-          "spacing": Array [
-            null,
-            null,
-          ],
+        "ex": RefExpression {
+          "name": StringType {
+            "chars": "type",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+          "namespace": null,
+          "quote": undefined,
+          "quoteSpacing": undefined,
         },
         "parens": Array [],
         "spacing": null,
       },
       Column {
         "alias": null,
-        "ex": StringType {
-          "chars": "datasource",
-          "quote": "\\"",
-          "spacing": Array [
-            null,
-            null,
-          ],
+        "ex": RefExpression {
+          "name": StringType {
+            "chars": "datasource",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+          "namespace": null,
+          "quote": undefined,
+          "quoteSpacing": undefined,
         },
         "parens": Array [],
         "spacing": null,
       },
       Column {
         "alias": null,
-        "ex": StringType {
-          "chars": "created_time",
-          "quote": "\\"",
-          "spacing": Array [
-            null,
-            null,
-          ],
+        "ex": RefExpression {
+          "name": StringType {
+            "chars": "created_time",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+          "namespace": null,
+          "quote": undefined,
+          "quoteSpacing": undefined,
         },
         "parens": Array [],
         "spacing": null,
       },
       Column {
         "alias": null,
-        "ex": StringType {
-          "chars": "location",
-          "quote": "\\"",
-          "spacing": Array [
-            null,
-            null,
-          ],
+        "ex": RefExpression {
+          "name": StringType {
+            "chars": "location",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+          "namespace": null,
+          "quote": undefined,
+          "quoteSpacing": undefined,
         },
         "parens": Array [],
         "spacing": null,
       },
       Column {
         "alias": null,
-        "ex": StringType {
-          "chars": "duration",
-          "quote": "\\"",
-          "spacing": Array [
-            null,
-            null,
-          ],
+        "ex": RefExpression {
+          "name": StringType {
+            "chars": "duration",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+          "namespace": null,
+          "quote": undefined,
+          "quoteSpacing": undefined,
         },
         "parens": Array [],
         "spacing": null,
       },
       Column {
         "alias": null,
-        "ex": StringType {
-          "chars": "error_msg",
-          "quote": "\\"",
-          "spacing": Array [
-            null,
-            null,
-          ],
+        "ex": RefExpression {
+          "name": StringType {
+            "chars": "error_msg",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+          "namespace": null,
+          "quote": undefined,
+          "quoteSpacing": undefined,
         },
         "parens": Array [],
         "spacing": null,
@@ -2784,6 +2935,8 @@ SqlQuery {
     "fc": RefExpression {
       "name": "tasks",
       "namespace": "sys",
+      "quote": undefined,
+      "quoteSpacing": undefined,
     },
     "keyword": "FROM",
     "parens": undefined,
@@ -2981,6 +3134,8 @@ SqlQuery {
         "ex": RefExpression {
           "name": "datasource",
           "namespace": null,
+          "quote": undefined,
+          "quoteSpacing": undefined,
         },
         "parens": Array [],
         "spacing": null,
@@ -3050,6 +3205,8 @@ SqlQuery {
                                     RefExpression {
                                       "name": "is_available",
                                       "namespace": null,
+                                      "quote": undefined,
+                                      "quoteSpacing": undefined,
                                     },
                                   ],
                                   "op": Array [],
@@ -3293,6 +3450,8 @@ SqlQuery {
     "fc": RefExpression {
       "name": "segments",
       "namespace": "sys",
+      "quote": undefined,
+      "quoteSpacing": undefined,
     },
     "keyword": "FROM",
     "parens": undefined,

@@ -42,7 +42,7 @@ export class GroupByClause {
     this.groupBy.map((groupBy, index: number) => {
       val.push(groupBy.toString());
       if (index < this.groupBy.length - 1) {
-        val.push(',' + this.spacing[2][index]);
+        val.push(',' + (this.spacing[2][index] ? this.spacing[2][index] : ''));
       }
     });
     return val.join('');

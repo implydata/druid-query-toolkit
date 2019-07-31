@@ -36,7 +36,6 @@ import { ComparisonExpressionRhs } from './Expression/comparisionExpression/comp
 import { NotExpression } from './Expression/notExpression/notExpression';
 import { OrExpression } from './Expression/orExpression/orExpression';
 import { OrPart } from './Expression/orExpression/orPart';
-
 export interface SqlQueryValue {
   verb: string;
   distinct: string;
@@ -76,7 +75,7 @@ export class SqlQuery extends BaseAst {
     this.spacing = options.spacing;
   }
 
-  orderBy(column: string, direction: string): SqlQueryValue {
+  orderBy(column: string, direction: string): SqlQuery {
     const orderByClause = new OrderByClause({
       orderKeyword: 'ORDER',
       byKeyword: 'BY',
@@ -100,7 +99,7 @@ export class SqlQuery extends BaseAst {
     });
   }
 
-  excludeColumn(columnVal: string): SqlQueryValue {
+  excludeColumn(columnVal: string): SqlQuery {
     const columns: Column[] = [];
     const spacing: string[] = [];
     this.columns.columns.map((column, index) => {
@@ -125,8 +124,7 @@ export class SqlQuery extends BaseAst {
       spacing: spacing,
       parens: this.columns.parens,
     });
-
-    return new SqlQuery({
+    const query = new SqlQuery({
       columns: columnsArray,
       distinct: this.distinct,
       fromClause: this.fromClause,
@@ -138,9 +136,10 @@ export class SqlQuery extends BaseAst {
       verb: this.verb,
       whereClause: this.whereClause,
     });
+    return query;
   }
 
-  excludeRow(header: string, row: string, operator: string): SqlQueryValue {
+  excludeRow(header: string, row: string, operator: string): SqlQuery {
     const spacing = this.spacing;
     let whereClause = this.whereClause;
     const headerBaseString = new StringType({ chars: header, quote: "'", spacing: ['', ''] });
@@ -261,7 +260,7 @@ export class SqlQuery extends BaseAst {
     return '';
   }
 
-  getSorted() {
+  getSorted(): { id: string; desc: boolean }[] {
     if (this.orderByClause) {
       return this.orderByClause.getSorted();
     }

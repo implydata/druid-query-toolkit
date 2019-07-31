@@ -15,28 +15,55 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { StringType } from './stringType';
+
 export interface RefExpressionValue {
-  namespace: string;
-  name: string;
+  quote: string;
+  quoteSpacing: string[];
+  namespace: string | StringType;
+  name: string | StringType;
 }
 
 export class RefExpression {
-  public namespace: string;
-  public name: string;
+  public namespace: string | StringType;
+  public name: string | StringType;
+  public quote: string;
+  public quoteSpacing: string[];
 
   constructor(options: RefExpressionValue) {
     this.namespace = options.namespace;
     this.name = options.name;
+    this.quote = options.quote;
+    this.quoteSpacing = options.quoteSpacing;
   }
 
   toString(): string {
     if (this.namespace) {
-      return this.namespace + '.' + this.name;
+      return (
+        (this.quote ? this.quote + this.quoteSpacing[0] : '') +
+        (this.namespace instanceof StringType ? this.namespace.toString() : this.namespace) +
+        '.' +
+        (this.name instanceof StringType ? this.name.toString() : this.name) +
+        (this.quote ? this.quote + this.quoteSpacing[1] : '')
+      );
     }
-    return this.name;
+    return (
+      (this.quote ? this.quote + this.quoteSpacing[0] : '') +
+      (this.name instanceof StringType ? this.name.toString() : this.name) +
+      (this.quote ? this.quote + this.quoteSpacing[1] : '')
+    );
   }
 
   getBasicValue(): string {
-    return this.toString();
+    return (
+      (this.namespace
+        ? (this.namespace instanceof StringType ? this.namespace.chars : this.quoteSpacing) + '.'
+        : '') + (this.name instanceof StringType ? this.name.chars : this.name)
+    );
+  }
+
+  addQuote(quote: string, spacing: string[]) {
+    this.quote = quote;
+    this.quoteSpacing = spacing;
   }
 }

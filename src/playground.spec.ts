@@ -28,7 +28,9 @@ describe('Playground', () => {
   });
   it('basic', () => {
     expect(
-      parser('(SELECT "start" || \'/\' || "end" FROM sys.segments GROUP BY 1 LIMIT 25)').toString(),
+      parser(
+        '(SELECT "start" || \'/\' || "end" FROM sys.segments GROUP BY 1,2 LIMIT 25)',
+      ).toString(),
     ).toEqual({});
   });
 });

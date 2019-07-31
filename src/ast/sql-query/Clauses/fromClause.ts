@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { RefExpression, SqlQuery } from '../..';
+import { RefExpression, SqlQuery, StringType } from '../..';
 import { Alias } from '../alias';
 import { Parens, renderCloseParens, renderOpenParens } from '../helpers';
 
@@ -64,11 +64,19 @@ export class FromClause {
   }
 
   getFromNameSpace(): string | undefined {
-    return this.fc instanceof RefExpression ? this.fc.namespace : undefined;
+    return this.fc instanceof RefExpression
+      ? this.fc.namespace instanceof StringType
+        ? this.fc.namespace.chars
+        : this.fc.namespace
+      : undefined;
   }
 
   getFromName(): string | undefined {
-    return this.fc instanceof RefExpression ? this.fc.name : undefined;
+    return this.fc instanceof RefExpression
+      ? this.fc.name instanceof StringType
+        ? this.fc.name.chars
+        : this.fc.name
+      : undefined;
   }
 
   addParen(open: string[], close: string[]) {

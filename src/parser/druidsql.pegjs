@@ -153,13 +153,13 @@ GroupByClause
   = groupKeyword: GroupToken
   spacing0:_ byKeyWord:ByToken
   spacing1:_ head:Expression
-  tail:((Comma _)Expression)*
+  tail:((Comma _?)Expression)*
   {
     return new GroupByClause ({
       groupKeyword: groupKeyword,
       byKeyword: byKeyWord,
       groupBy: makeListMap1(head, tail),
-      spacing: [spacing0, spacing1, makeListMapEmpty(tail)]
+      spacing: [spacing0, spacing1, makeListMapEmpty01(tail)]
     });
   }
 
@@ -677,13 +677,20 @@ RelaxedNamespacedRef
   }
 
 NamespacedRef
-  = ns:(Ref Dot)?
-  name:Ref
+  =ns:((Ref/String) Dot)?
+  name:(Ref/String)
   {
     return new RefExpression({
+      quotes: [],
       namespace: ns ? ns[0] : null,
       name: name
     });
+  }
+  /quote:["] spacing0:_? ex: NamespacedRef spacing1: _? ["] {
+    return ex.addQuotes( quote, [spacing0, spacing1]);
+  }
+  /quote:['] spacing0:_? ex: NamespacedRef spacing1: _? ['] {
+       return ex.addQuotes( quote, [spacing0, spacing1]);
   }
 
 RelaxedRef
