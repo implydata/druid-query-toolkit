@@ -21,18 +21,18 @@ import {
   ExpressionMaybeFiltered,
   Function,
   Integer,
+  MultiplicativeExpression,
   RefExpression,
   StringType,
   Sub,
-} from '../../..';
+} from '../../../index';
 import { Parens } from '../../helpers';
-import { ComparisonExpression } from '../comparisionExpression/comparisonExpression';
 
-export interface NotExpressionValue {
+export interface AdditiveExpressionValue {
   parens?: Parens[];
-  keyword?: string | null;
-  ex?: ComparisonExpression;
-  spacing?: string[] | null;
+  op?: string[] | null;
+  ex?: MultiplicativeExpression[];
+  spacing?: string[];
   basicExpression?:
     | Sub
     | StringType
@@ -43,48 +43,57 @@ export interface NotExpressionValue {
     | CaseExpression;
 }
 
-export class NotExpression {
+export class AdditiveExpression {
   public parens: Parens[];
-  public ex: ComparisonExpression;
-  public keyword: string | null;
-  public spacing: string[] | null;
+  public ex: MultiplicativeExpression[];
+  public op: string[] | null;
+  public spacing: string[];
 
-  constructor(options: NotExpressionValue) {
-    this.keyword = options.keyword ? options.keyword : null;
+  constructor(options: AdditiveExpressionValue) {
     this.parens = options.parens ? options.parens : [];
+    this.op = options.op ? options.op : null;
     this.ex = options.ex
       ? options.ex
-      : new ComparisonExpression({ basicExpression: options.basicExpression });
-    this.spacing = options.spacing ? options.spacing : null;
+      : [
+          new MultiplicativeExpression({
+            ex: [options.basicExpression ? options.basicExpression : null],
+          }),
+        ];
+    this.spacing = options.spacing ? options.spacing : [''];
   }
 
   toString() {
-    const val = [];
+    const val: string[] = [];
     this.parens.map(paren => {
       val.push(paren.open[0] + paren.open[1]);
     });
-    val.push(
-      (this.keyword ? this.keyword : '') +
-        (this.spacing ? this.spacing[0] : '') +
-        this.ex.toString(),
-    );
+    this.ex.map((ex: MultiplicativeExpression, index: number) => {
+      val.push(ex.toString());
+      if (index < this.ex.length - 1) {
+        val.push(
+          (this.spacing[index][0] ? this.spacing[index][0] : '') +
+            this.spacing[index][1] +
+            (this.spacing[index][2] ? this.spacing[index][2] : ''),
+        );
+      }
+    });
     this.parens.map(paren => {
       val.push(paren.close[0] + paren.close[1]);
     });
     return val.join('');
   }
 
-  getBasicValue(): string | undefined {
-    return this.ex.getBasicValue();
-  }
-
   addParen(open: string[], close: string[]) {
     this.parens.push({ open, close });
-    return new NotExpression({
+    return new AdditiveExpression({
       parens: this.parens,
       ex: this.ex,
       spacing: this.spacing,
-      keyword: this.keyword,
+      op: this.op,
     });
+  }
+
+  getBasicValue(): string | undefined {
+    return this.ex[0].getBasicValue();
   }
 }

@@ -37,3 +37,10 @@ export interface Parens {
   open: string[];
   close: string[];
 }
+
+export function arrayContains(StringValue?: string, arrayValue?: string[]) {
+  if (!arrayValue || !StringValue) {
+    return false;
+  }
+  return arrayValue.indexOf(StringValue) > -1;
+}

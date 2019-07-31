@@ -16,20 +16,20 @@
  * limitations under the License.
  */
 
-import { AndExpression } from '../andExpression/andExpression';
+import { NotExpression } from '../../../index';
 
-export interface OrPartValue {
-  ex: AndExpression;
+export interface AndPartValue {
   keyword: string;
+  ex: NotExpression;
   spacing: string[];
 }
 
-export class OrPart {
-  public ex: AndExpression;
+export class AndPart {
+  public ex: NotExpression;
   public keyword: string;
   public spacing: string[];
 
-  constructor(options: OrPartValue) {
+  constructor(options: AndPartValue) {
     this.ex = options.ex;
     this.keyword = options.keyword;
     this.spacing = options.spacing;
@@ -37,5 +37,9 @@ export class OrPart {
 
   toString() {
     return (this.keyword ? this.keyword : '') + this.spacing[0] + this.ex.toString();
+  }
+
+  getBasicValue(): string | undefined {
+    return this.ex.getBasicValue();
   }
 }

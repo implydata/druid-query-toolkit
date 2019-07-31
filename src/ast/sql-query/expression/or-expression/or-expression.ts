@@ -17,22 +17,21 @@
  */
 
 import {
+  AndExpression,
   CaseExpression,
   ExpressionMaybeFiltered,
   Function,
   Integer,
+  OrPart,
   RefExpression,
   StringType,
   Sub,
-} from '../../..';
+} from '../../../index';
 import { Parens } from '../../helpers';
-import { NotExpression } from '../notExpression/notExpression';
 
-import { AndPart } from './andPart';
-
-export interface AndExpressionValue {
+export interface OrExpressionValue {
   parens?: Parens[];
-  ex?: AndPart[];
+  ex?: OrPart[];
   spacing?: string[] | null;
   basicExpression?:
     | Sub
@@ -44,18 +43,18 @@ export interface AndExpressionValue {
     | CaseExpression;
 }
 
-export class AndExpression {
+export class OrExpression {
   public parens: Parens[];
-  public ex: AndPart[];
+  public ex: OrPart[];
   public spacing: string[] | null;
 
-  constructor(options: AndExpressionValue) {
+  constructor(options: OrExpressionValue) {
     this.parens = options.parens ? options.parens : [];
     this.ex = options.ex
       ? options.ex
       : [
-          new AndPart({
-            ex: new NotExpression({ basicExpression: options.basicExpression }),
+          new OrPart({
+            ex: new AndExpression({ basicExpression: options.basicExpression }),
             keyword: '',
             spacing: [''],
           }),
@@ -80,12 +79,13 @@ export class AndExpression {
     return val.join('');
   }
 
-  getBasicValue(): string | undefined {
-    return this.ex[0].ex.getBasicValue();
-  }
-
   addParen(open: string[], close: string[]) {
     this.parens.push({ open, close });
-    return new AndExpression({ parens: this.parens, ex: this.ex, spacing: this.spacing });
+    return new OrExpression({ parens: this.parens, ex: this.ex, spacing: this.spacing });
+  }
+
+  getBasicValue(): string {
+    // @ts-ignore
+    return this.ex[0].ex.getBasicValue();
   }
 }

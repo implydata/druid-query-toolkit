@@ -17,18 +17,17 @@
  */
 
 import {
+  AdditiveExpression,
   CaseExpression,
+  ComparisonExpressionRhs,
   ExpressionMaybeFiltered,
   Function,
   Integer,
   RefExpression,
   StringType,
   Sub,
-} from '../../..';
+} from '../../../index';
 import { Parens } from '../../helpers';
-import { AdditiveExpression } from '../additiveExpression/additiveExpression';
-
-import { ComparisonExpressionRhs } from './comparisonExpressionRhs';
 
 export interface ComparisonExpressionValue {
   parens?: Parens[];

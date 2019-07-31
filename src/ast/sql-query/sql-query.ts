@@ -17,35 +17,39 @@
  */
 
 import { BaseAst } from '../base-ast';
+import {
+  AdditiveExpression,
+  AndExpression,
+  AndPart,
+  Column,
+  Columns,
+  ComparisonExpression,
+  ComparisonExpressionRhs,
+  FromClause,
+  GroupByClause,
+  HavingClause,
+  Integer,
+  LimitClause,
+  NotExpression,
+  OrderByClause,
+  OrExpression,
+  OrPart,
+  StringType,
+  Sub,
+  WhereClause,
+} from '../index';
 
-import { StringType } from './BasicExpression/stringType';
-import { Sub } from './BasicExpression/sub';
-import { Column } from './Clauses/columns/column';
-import { Columns } from './Clauses/columns/columns';
-import { FromClause } from './Clauses/fromClause';
-import { GroupByClause } from './Clauses/groupByClause';
-import { HavingClause } from './Clauses/havingClause';
-import { LimitClause } from './Clauses/limitClause';
-import { OrderByClause } from './Clauses/orderByClause/orderByClause';
-import { WhereClause } from './Clauses/whereClause';
-import { AdditiveExpression } from './Expression/additiveExpression/additiveExpression';
-import { AndExpression } from './Expression/andExpression/andExpression';
-import { AndPart } from './Expression/andExpression/andPart';
-import { ComparisonExpression } from './Expression/comparisionExpression/comparisonExpression';
-import { ComparisonExpressionRhs } from './Expression/comparisionExpression/comparisonExpressionRhs';
-import { NotExpression } from './Expression/notExpression/notExpression';
-import { OrExpression } from './Expression/orExpression/orExpression';
-import { OrPart } from './Expression/orExpression/orPart';
+import { arrayContains } from './helpers';
 export interface SqlQueryValue {
   verb: string;
   distinct: string;
   columns: Columns;
   fromClause: FromClause;
-  whereClause: WhereClause;
-  groupByClause: GroupByClause;
-  havingClause: HavingClause;
-  orderByClause: OrderByClause;
-  limitClause: LimitClause;
+  whereClause?: WhereClause;
+  groupByClause?: GroupByClause;
+  havingClause?: HavingClause;
+  orderByClause?: OrderByClause;
+  limitClause?: LimitClause;
   spacing: string[];
 }
 
@@ -54,11 +58,11 @@ export class SqlQuery extends BaseAst {
   public distinct: string;
   public columns: Columns;
   public fromClause: FromClause;
-  public whereClause: WhereClause;
-  public groupByClause: GroupByClause;
-  public havingClause: HavingClause;
-  public orderByClause: OrderByClause;
-  public limitClause: LimitClause;
+  public whereClause?: WhereClause;
+  public groupByClause?: GroupByClause;
+  public havingClause?: HavingClause;
+  public orderByClause?: OrderByClause;
+  public limitClause?: LimitClause;
   public spacing: string[];
 
   constructor(options: SqlQueryValue) {
@@ -128,7 +132,7 @@ export class SqlQuery extends BaseAst {
       columns: columnsArray,
       distinct: this.distinct,
       fromClause: this.fromClause,
-      groupByClause: this.groupByClause,
+      groupByClause: this.getGroupByClauseWithoutColumn(columnVal),
       havingClause: this.havingClause,
       limitClause: this.limitClause,
       orderByClause: this.orderByClause,
@@ -137,6 +141,36 @@ export class SqlQuery extends BaseAst {
       whereClause: this.whereClause,
     });
     return query;
+  }
+
+  getGroupByClauseWithoutColumn(columnVal: string): GroupByClause | undefined {
+    let groupByClause;
+    if (this.groupByClause) {
+      if (arrayContains(columnVal, this.getAggregateColumns())) {
+        const groupByColumns = this.groupByClause.groupBy.map(part => part.getBasicValue());
+        const newGroupByColumns: OrExpression[] = [];
+        groupByColumns.map((groupByColumn, index) => {
+          if (this.getColumnsArray().indexOf(columnVal) + 1 < Number(groupByColumn)) {
+            newGroupByColumns.push(
+              new OrExpression({ basicExpression: new Integer(Number(groupByColumn) - 1) }),
+            );
+          } else {
+            if (this.groupByClause) {
+              newGroupByColumns.push(this.groupByClause.groupBy[index]);
+            }
+          }
+        });
+        groupByClause = new GroupByClause({
+          groupBy: newGroupByColumns,
+          groupKeyword: this.groupByClause.groupKeyword,
+          byKeyword: this.groupByClause.byKeyword,
+          spacing: this.groupByClause.spacing,
+        });
+      } else {
+        groupByClause = undefined;
+      }
+    }
+    return groupByClause;
   }
 
   excludeRow(header: string, row: string, operator: string): SqlQuery {
@@ -207,7 +241,7 @@ export class SqlQuery extends BaseAst {
         });
       } else {
         let found = false;
-        const WhereAndParts = whereClause.filter.ex[0].ex.ex;
+        const WhereAndParts = whereClause ? whereClause.filter.ex[0].ex.ex : [];
 
         WhereAndParts.map(part => {
           if (part.ex.getBasicValue() === header) {
@@ -230,11 +264,12 @@ export class SqlQuery extends BaseAst {
             }),
           );
         }
-
-        if (whereClause.filter.ex[0].ex.spacing) {
-          whereClause.filter.ex[0].ex.spacing.push(' ');
-        } else {
-          whereClause.filter.ex[0].ex.spacing = [' '];
+        if (whereClause) {
+          if (whereClause.filter.ex[0].ex.spacing) {
+            whereClause.filter.ex[0].ex.spacing.push(' ');
+          } else {
+            whereClause.filter.ex[0].ex.spacing = [' '];
+          }
         }
       }
     }
@@ -273,6 +308,56 @@ export class SqlQuery extends BaseAst {
 
   getFromName(): string | undefined {
     return this.fromClause.getFromName();
+  }
+
+  getAggregateColumns() {
+    if (!this.groupByClause) {
+      return;
+    }
+    const aggregateColumns: string[] = [];
+    const groupByColumns = this.groupByClause.groupBy.map(part => part.getBasicValue());
+    this.columns.columns.map((column, index) => {
+      index = index + 1;
+      if (column.getAlias()) {
+        const alias = column.getAlias();
+        if (alias) {
+          if (
+            !arrayContains(
+              alias.value instanceof StringType ? alias.value.getBasicValue() : alias.value,
+              groupByColumns,
+            ) &&
+            !arrayContains(String(index), groupByColumns)
+          ) {
+            aggregateColumns.push(
+              alias.value instanceof StringType ? alias.value.getBasicValue() : alias.value,
+            );
+          }
+        }
+      } else if (
+        !arrayContains(column.getBasicValue(), groupByColumns) &&
+        !arrayContains(String(index), groupByColumns)
+      ) {
+        aggregateColumns.push(column.getBasicValue());
+      }
+    });
+    return aggregateColumns;
+  }
+
+  getColumnsArray() {
+    const columnsArray: string[] = [];
+    this.columns.columns.map(column => {
+      if (column.getAlias()) {
+        const alias = column.getAlias();
+        if (alias) {
+          columnsArray.push(
+            alias.value instanceof StringType ? alias.value.getBasicValue() : alias.value,
+          );
+        }
+      } else if (column.getBasicValue()) {
+        columnsArray.push(column.getBasicValue());
+      }
+    });
+    return columnsArray;
   }
 
   toString() {

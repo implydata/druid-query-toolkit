@@ -38,7 +38,10 @@
   "APPROX_QUANTILE", "APPROX_QUANTILE_DS", "APPROX_QUANTILE_FIXED_BUCKETS"];
 }
 
-start = SelectQuery/Expression
+Start
+  = SelectQuery
+  /Expression
+
 SelectQuery
   = SelectToken distinct:(_ DistinctToken)?
   spacing1: _
@@ -230,18 +233,6 @@ AsOptional
     });
   }
 
-/*
-Expressions are defined below in acceding priority order
-
-  Or (OR)
-  And (AND)
-  Not (NOT)
-  Comparison (=, <=>, <, >, <=, >=, <>, !=, IS, LIKE, BETWEEN, IN, CONTAINS, REGEXP)
-  Additive (+, -)
-  Multiplicative (*), Division (/)
-  Unary identity (+), negation (-)
-*/
-
 Expression
   = OrExpression
 
@@ -327,7 +318,6 @@ ComparisonExpression
   = ex:AdditiveExpression
   rhs:(_? ComparisonExpressionRhs)?
   {
-    //if (rhs) ex = rhs(ex);
     return new ComparisonExpression({
       parens: [],
       ex: ex,
@@ -598,7 +588,7 @@ FilterClause
 
 
 CaseExpression
-  =  keyword:CaseToken
+  = keyword:CaseToken
   v: (_ !WhenToken Expression)?
   cases:(_ Case)*
   els:(_ ElseToken _ Expression)?
@@ -801,42 +791,11 @@ ComparisonOp "Comparison"
   / "<"
   / ">"
 
-StarToken = keyword:"*"i  { return keyword}
-SelectToken = keyword:"SELECT"i  { return keyword}
-DistinctToken = keyword:"DISTINCT"i { return keyword}
-AsToken = keyword:"AS"i { return keyword}
-OrToken = keyword:"OR"i { return keyword}
-AndToken = keyword:"AND"i { return keyword}
-NotToken = keyword:"NOT"i { return keyword}
-CaseToken = keyword:"CASE"i { return keyword}
-WhenToken = keyword:"WHEN"i { return keyword}
-ThenToken = keyword:"THEN"i { return keyword}
-ElseToken = keyword:"ELSE"i { return keyword}
-EndToken = keyword:"END"i { return keyword}
-CountToken = keyword:"COUNT"i { return keyword}
-FromToken = keyword:"FROM"i { return keyword}
-WhereToken = keyword:"WHERE"i { return keyword}
-IsToken = keyword:"IS"i { return keyword}
-BetweenToken = keyword:"BETWEEN"i { return keyword}
-InToken = keyword:"IN"i { return keyword}
-GroupToken = keyword:"GROUP"i { return keyword}
-ByToken = keyword:"BY"i { return keyword}
-HavingToken = keyword:"HAVING"i { return keyword}
-OrderToken = keyword:"ORDER"i { return keyword}
-AscToken = keyword:"ASC"i { return keyword}
-DescToken = keyword:"DESC"i { return keyword}
-LimitToken = keyword:"LIMIT"i { return keyword}
-ContainsToken = keyword:"Contains"i { return keyword}
-RegExpToken = keyword:"REGEXP"i { return keyword}
-LikeToken = keyword:"LIKE"i { return keyword}
-EscapeToken = keyword:"ESCAPE"i { return keyword}
-NullToken = keyword:"NULL"i { return keyword}
-FilterToken = keyword:"FILTER"i { return keyword}
-IntervalToken = keyword:"INTERVAL"i { return keyword}
-DayToken = keyword:"DAY"i { return keyword}
-
-
-CurrentTimeStamp = keyword:"CURRENT_TIMESTAMP"i { return keyword}
+CurrentTimeStamp
+  = keyword:"CURRENT_TIMESTAMP"i
+  {
+    return keyword
+  }
 
 
 Dot
@@ -873,3 +832,36 @@ NotSQuote "NotSQuote"
 NotDQuote "NotDQuote"
   = $([^"]*)
 
+StarToken = keyword:"*"i  { return keyword}
+SelectToken = keyword:"SELECT"i  { return keyword}
+DistinctToken = keyword:"DISTINCT"i { return keyword}
+AsToken = keyword:"AS"i { return keyword}
+OrToken = keyword:"OR"i { return keyword}
+AndToken = keyword:"AND"i { return keyword}
+NotToken = keyword:"NOT"i { return keyword}
+CaseToken = keyword:"CASE"i { return keyword}
+WhenToken = keyword:"WHEN"i { return keyword}
+ThenToken = keyword:"THEN"i { return keyword}
+ElseToken = keyword:"ELSE"i { return keyword}
+EndToken = keyword:"END"i { return keyword}
+CountToken = keyword:"COUNT"i { return keyword}
+FromToken = keyword:"FROM"i { return keyword}
+WhereToken = keyword:"WHERE"i { return keyword}
+IsToken = keyword:"IS"i { return keyword}
+BetweenToken = keyword:"BETWEEN"i { return keyword}
+InToken = keyword:"IN"i { return keyword}
+GroupToken = keyword:"GROUP"i { return keyword}
+ByToken = keyword:"BY"i { return keyword}
+HavingToken = keyword:"HAVING"i { return keyword}
+OrderToken = keyword:"ORDER"i { return keyword}
+AscToken = keyword:"ASC"i { return keyword}
+DescToken = keyword:"DESC"i { return keyword}
+LimitToken = keyword:"LIMIT"i { return keyword}
+ContainsToken = keyword:"Contains"i { return keyword}
+RegExpToken = keyword:"REGEXP"i { return keyword}
+LikeToken = keyword:"LIKE"i { return keyword}
+EscapeToken = keyword:"ESCAPE"i { return keyword}
+NullToken = keyword:"NULL"i { return keyword}
+FilterToken = keyword:"FILTER"i { return keyword}
+IntervalToken = keyword:"INTERVAL"i { return keyword}
+DayToken = keyword:"DAY"i { return keyword}

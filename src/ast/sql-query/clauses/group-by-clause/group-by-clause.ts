@@ -15,26 +15,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { StringType } from '../index';
 
-export interface Alias {
+import { OrExpression } from '../../../index';
+
+export interface GroupByClauseValue {
+  groupKeyword: string;
+  byKeyword: string;
+  groupBy: OrExpression[];
   spacing: string[];
-  value: StringType | string;
-  keyword: string;
 }
 
-export class Alias {
+export class GroupByClause {
+  public groupKeyword: string;
+  public byKeyword: string;
+  public groupBy: OrExpression[];
   public spacing: string[];
-  public value: StringType | string;
-  public keyword: string;
 
-  constructor(options: Alias) {
-    this.keyword = options.keyword;
-    this.value = options.value;
+  constructor(options: GroupByClauseValue) {
+    this.groupKeyword = options.groupKeyword;
+    this.byKeyword = options.byKeyword;
+    this.groupBy = options.groupBy;
     this.spacing = options.spacing;
   }
 
-  toString() {
-    return this.keyword + this.spacing[0] + this.value;
+  toString(): string {
+    const val = [this.groupKeyword + this.spacing[0] + this.byKeyword + this.spacing[1]];
+    this.groupBy.map((groupBy, index: number) => {
+      val.push(groupBy.toString());
+      if (index < this.groupBy.length - 1) {
+        val.push(',' + (this.spacing[2][index] ? this.spacing[2][index] : ''));
+      }
+    });
+    return val.join('');
   }
 }

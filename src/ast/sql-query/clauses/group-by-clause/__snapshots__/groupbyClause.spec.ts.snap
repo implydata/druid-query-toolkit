@@ -1,0 +1,8 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`groupbyclause tests remove low index column 1`] = `
+"SELECT \\"task_id\\"
+FROM sys.tasks
+GROUP BY 1
+ORDER BY \\"datasource\\" DESC"
+`;

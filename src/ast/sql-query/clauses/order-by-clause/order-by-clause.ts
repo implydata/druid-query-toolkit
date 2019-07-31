@@ -16,9 +16,7 @@
  * limitations under the License.
  */
 
-import { OrExpression, StringType } from '../../../index';
-
-import { OrderByPart } from './orderByPart';
+import { OrderByPart, OrExpression, StringType } from '../../../index';
 
 export interface OrderByClauseValue {
   orderKeyword: string;

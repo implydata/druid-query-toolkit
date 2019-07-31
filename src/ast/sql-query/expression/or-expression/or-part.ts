@@ -15,36 +15,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { OrExpression } from '../..';
 
-export interface GroupByClauseValue {
-  groupKeyword: string;
-  byKeyword: string;
-  groupBy: OrExpression[];
+import { AndExpression } from '../../../index';
+
+export interface OrPartValue {
+  ex: AndExpression;
+  keyword: string;
   spacing: string[];
 }
 
-export class GroupByClause {
-  public groupKeyword: string;
-  public byKeyword: string;
-  public groupBy: OrExpression[];
+export class OrPart {
+  public ex: AndExpression;
+  public keyword: string;
   public spacing: string[];
 
-  constructor(options: GroupByClauseValue) {
-    this.groupKeyword = options.groupKeyword;
-    this.byKeyword = options.byKeyword;
-    this.groupBy = options.groupBy;
+  constructor(options: OrPartValue) {
+    this.ex = options.ex;
+    this.keyword = options.keyword;
     this.spacing = options.spacing;
   }
 
-  toString(): string {
-    const val = [this.groupKeyword + this.spacing[0] + this.byKeyword + this.spacing[1]];
-    this.groupBy.map((groupBy, index: number) => {
-      val.push(groupBy.toString());
-      if (index < this.groupBy.length - 1) {
-        val.push(',' + (this.spacing[2][index] ? this.spacing[2][index] : ''));
-      }
-    });
-    return val.join('');
+  toString() {
+    return (this.keyword ? this.keyword : '') + this.spacing[0] + this.ex.toString();
   }
 }

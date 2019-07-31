@@ -17,22 +17,22 @@
  */
 
 import {
+  AndPart,
   CaseExpression,
   ExpressionMaybeFiltered,
   Function,
   Integer,
+  NotExpression,
   RefExpression,
   StringType,
   Sub,
-} from '../../..';
+} from '../../../index';
 import { Parens } from '../../helpers';
-import { MultiplicativeExpression } from '../multipilicativeExpression/multipilcativeExpression';
 
-export interface AdditiveExpressionValue {
+export interface AndExpressionValue {
   parens?: Parens[];
-  op?: string[] | null;
-  ex?: MultiplicativeExpression[];
-  spacing?: string[];
+  ex?: AndPart[];
+  spacing?: string[] | null;
   basicExpression?:
     | Sub
     | StringType
@@ -43,23 +43,23 @@ export interface AdditiveExpressionValue {
     | CaseExpression;
 }
 
-export class AdditiveExpression {
+export class AndExpression {
   public parens: Parens[];
-  public ex: MultiplicativeExpression[];
-  public op: string[] | null;
-  public spacing: string[];
+  public ex: AndPart[];
+  public spacing: string[] | null;
 
-  constructor(options: AdditiveExpressionValue) {
+  constructor(options: AndExpressionValue) {
     this.parens = options.parens ? options.parens : [];
-    this.op = options.op ? options.op : null;
     this.ex = options.ex
       ? options.ex
       : [
-          new MultiplicativeExpression({
-            ex: [options.basicExpression ? options.basicExpression : null],
+          new AndPart({
+            ex: new NotExpression({ basicExpression: options.basicExpression }),
+            keyword: '',
+            spacing: [''],
           }),
         ];
-    this.spacing = options.spacing ? options.spacing : [''];
+    this.spacing = options.spacing ? options.spacing : null;
   }
 
   toString() {
@@ -67,15 +67,11 @@ export class AdditiveExpression {
     this.parens.map(paren => {
       val.push(paren.open[0] + paren.open[1]);
     });
-    this.ex.map((ex: MultiplicativeExpression, index: number) => {
-      val.push(ex.toString());
-      if (index < this.ex.length - 1) {
-        val.push(
-          (this.spacing[index][0] ? this.spacing[index][0] : '') +
-            this.spacing[index][1] +
-            (this.spacing[index][2] ? this.spacing[index][2] : ''),
-        );
+    this.ex.map((part, index: number) => {
+      if (index !== 0 && this.spacing) {
+        val.push(this.spacing[index - 1]);
       }
+      val.push(part.toString());
     });
     this.parens.map(paren => {
       val.push(paren.close[0] + paren.close[1]);
@@ -83,17 +79,12 @@ export class AdditiveExpression {
     return val.join('');
   }
 
-  addParen(open: string[], close: string[]) {
-    this.parens.push({ open, close });
-    return new AdditiveExpression({
-      parens: this.parens,
-      ex: this.ex,
-      spacing: this.spacing,
-      op: this.op,
-    });
+  getBasicValue(): string | undefined {
+    return this.ex[0].ex.getBasicValue();
   }
 
-  getBasicValue(): string | undefined {
-    return this.ex[0].getBasicValue();
+  addParen(open: string[], close: string[]) {
+    this.parens.push({ open, close });
+    return new AndExpression({ parens: this.parens, ex: this.ex, spacing: this.spacing });
   }
 }

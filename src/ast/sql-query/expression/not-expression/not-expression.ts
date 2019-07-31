@@ -18,21 +18,20 @@
 
 import {
   CaseExpression,
+  ComparisonExpression,
   ExpressionMaybeFiltered,
   Function,
   Integer,
   RefExpression,
   StringType,
   Sub,
-} from '../../..';
+} from '../../../index';
 import { Parens } from '../../helpers';
-import { AndExpression } from '../andExpression/andExpression';
 
-import { OrPart } from './orPart';
-
-export interface OrExpressionValue {
+export interface NotExpressionValue {
   parens?: Parens[];
-  ex?: OrPart[];
+  keyword?: string | null;
+  ex?: ComparisonExpression;
   spacing?: string[] | null;
   basicExpression?:
     | Sub
@@ -44,49 +43,48 @@ export interface OrExpressionValue {
     | CaseExpression;
 }
 
-export class OrExpression {
+export class NotExpression {
   public parens: Parens[];
-  public ex: OrPart[];
+  public ex: ComparisonExpression;
+  public keyword: string | null;
   public spacing: string[] | null;
 
-  constructor(options: OrExpressionValue) {
+  constructor(options: NotExpressionValue) {
+    this.keyword = options.keyword ? options.keyword : null;
     this.parens = options.parens ? options.parens : [];
     this.ex = options.ex
       ? options.ex
-      : [
-          new OrPart({
-            ex: new AndExpression({ basicExpression: options.basicExpression }),
-            keyword: '',
-            spacing: [''],
-          }),
-        ];
+      : new ComparisonExpression({ basicExpression: options.basicExpression });
     this.spacing = options.spacing ? options.spacing : null;
   }
 
   toString() {
-    const val: string[] = [];
+    const val = [];
     this.parens.map(paren => {
       val.push(paren.open[0] + paren.open[1]);
     });
-    this.ex.map((part, index: number) => {
-      if (index !== 0 && this.spacing) {
-        val.push(this.spacing[index - 1]);
-      }
-      val.push(part.toString());
-    });
+    val.push(
+      (this.keyword ? this.keyword : '') +
+        (this.spacing ? this.spacing[0] : '') +
+        this.ex.toString(),
+    );
     this.parens.map(paren => {
       val.push(paren.close[0] + paren.close[1]);
     });
     return val.join('');
   }
 
-  addParen(open: string[], close: string[]) {
-    this.parens.push({ open, close });
-    return new OrExpression({ parens: this.parens, ex: this.ex, spacing: this.spacing });
+  getBasicValue(): string | undefined {
+    return this.ex.getBasicValue();
   }
 
-  getBasicValue(): string {
-    // @ts-ignore
-    return this.ex[0].ex.getBasicValue();
+  addParen(open: string[], close: string[]) {
+    this.parens.push({ open, close });
+    return new NotExpression({
+      parens: this.parens,
+      ex: this.ex,
+      spacing: this.spacing,
+      keyword: this.keyword,
+    });
   }
 }

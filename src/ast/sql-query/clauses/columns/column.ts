@@ -15,8 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Alias } from '../../alias';
-import { CaseExpression } from '../../BasicExpression/caseExpression/caseExpression';
+import { Alias, CaseExpression } from '../../../index';
 import { Parens, renderCloseParens, renderOpenParens } from '../../helpers';
 
 export interface ColumnValue {

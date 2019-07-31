@@ -15,11 +15,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { OrExpression } from '../../..';
+import { ExpressionMaybeFiltered, FilterClause, OrExpression } from '../../../index';
 import { Parens } from '../../helpers';
-import { ExpressionMaybeFiltered } from '../expressionMaybeFiltered';
-
-import { FilterClause } from './filterClause';
 
 export interface FunctionValue {
   parens: Parens[];

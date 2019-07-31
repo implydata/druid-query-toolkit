@@ -16,30 +16,22 @@
  * limitations under the License.
  */
 
-import { NotExpression } from '../notExpression/notExpression';
+import { sqlParserFactory } from '../../../../parser/druidsql';
+import { FUNCTIONS } from '../../../../test-utils';
 
-export interface AndPartValue {
-  keyword: string;
-  ex: NotExpression;
-  spacing: string[];
-}
+const parser = sqlParserFactory(FUNCTIONS);
 
-export class AndPart {
-  public ex: NotExpression;
-  public keyword: string;
-  public spacing: string[];
-
-  constructor(options: AndPartValue) {
-    this.ex = options.ex;
-    this.keyword = options.keyword;
-    this.spacing = options.spacing;
-  }
-
-  toString() {
-    return (this.keyword ? this.keyword : '') + this.spacing[0] + this.ex.toString();
-  }
-
-  getBasicValue(): string | undefined {
-    return this.ex.getBasicValue();
-  }
-}
+describe('groupbyclause tests', () => {
+  it('remove low index column', () => {
+    expect(
+      parser(
+        'SELECT COUNT(*) AS "Count", "task_id"\n' +
+          'FROM sys.tasks\n' +
+          'GROUP BY 2\n' +
+          'ORDER BY "datasource" DESC',
+      )
+        .excludeColumn('Count')
+        .toString(),
+    ).toMatchSnapshot();
+  });
+});
