@@ -29,7 +29,9 @@ describe('Playground', () => {
   it('basic', () => {
     expect(
       parser(
-        '(SELECT "start" || \'/\' || "end" FROM sys.segments GROUP BY 1,2 LIMIT 25)',
+        'SELECT *\n' +
+          'FROM "github"\n' +
+          'WHERE "__time" >= CURRENT_TIMESTAMP - INTERVAL \'1\' DAY',
       ).toString(),
     ).toEqual({});
   });

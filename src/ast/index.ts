@@ -49,3 +49,4 @@ export * from './sql-query/Expression/comparisionExpression/inExpression';
 export * from './sql-query/Expression/comparisionExpression/containsExpression';
 export * from './sql-query/Expression/comparisionExpression/betweenExpression';
 export * from './sql-query/BasicExpression/concat/concat';
+export * from './sql-query/BasicExpression/interval';

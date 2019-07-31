@@ -499,9 +499,23 @@ BasicExpression
   = CaseExpression
   /Function
   /Sub
+  /CurrentTimeStamp
+  /Interval
   /String
   /Integer
   /RefExpression
+
+
+Interval
+  = intervalKeyword:IntervalToken spacing0:_  ex:NumericString spacing1:_ unitKeyword:Name
+  {
+    return new Interval ({
+      intervalKeyword: intervalKeyword,
+      ex: ex,
+      unitKeyword: unitKeyword,
+      spacing: [spacing0, spacing1]
+    });
+  }
 
 
 Sub
@@ -650,16 +664,6 @@ StringOrNumber
   = String
   / Integer
 
-Interval
-  = IntervalToken
-  n:Integer
-  unit:Name
-  &{ return intervalUnits[unit] }
-  {
-    if (n !== 0) error('only zero intervals supported for now');
-    return 0;
-  }
-
 RefExpression
   = ref:NamespacedRef
   {
@@ -723,6 +727,31 @@ String
   / '"'
   spacing0: _?
   chars:NotDQuote
+  spacing1: _?'"'
+  {
+    return new StringType({
+      chars: chars,
+      quote: '"',
+      spacing: [spacing0, spacing1]
+    });
+  }
+
+
+NumericString
+  = CharsetIntroducer? "'"
+  spacing0: _?
+  chars:$ [0-9]+
+  spacing1: _? "'"
+  {
+    return new StringType({
+      chars: chars,
+      quote: "'",
+      spacing: [spacing0, spacing1]
+    });
+  }
+  / '"'
+  spacing0: _?
+  chars:$ [0-9]+
   spacing1: _?'"'
   {
     return new StringType({
@@ -802,8 +831,12 @@ RegExpToken = keyword:"REGEXP"i { return keyword}
 LikeToken = keyword:"LIKE"i { return keyword}
 EscapeToken = keyword:"ESCAPE"i { return keyword}
 NullToken = keyword:"NULL"i { return keyword}
-IntervalToken = keyword:"INTERVAL"i { return keyword}
 FilterToken = keyword:"FILTER"i { return keyword}
+IntervalToken = keyword:"INTERVAL"i { return keyword}
+DayToken = keyword:"DAY"i { return keyword}
+
+
+CurrentTimeStamp = keyword:"CURRENT_TIMESTAMP"i { return keyword}
 
 
 Dot
