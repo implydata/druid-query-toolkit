@@ -18,7 +18,6 @@
 
 import {
   CaseExpression,
-  ExpressionMaybeFiltered,
   Function,
   Integer,
   MultiplicativeExpression,
@@ -31,34 +30,34 @@ import { Parens } from '../../helpers';
 export interface AdditiveExpressionValue {
   parens?: Parens[];
   op?: string[] | null;
-  ex?: MultiplicativeExpression[];
-  spacing?: string[];
-  basicExpression?:
+  ex: (
+    | MultiplicativeExpression
     | Sub
     | StringType
     | RefExpression
     | Integer
     | Function
-    | ExpressionMaybeFiltered
-    | CaseExpression;
+    | CaseExpression)[];
+  spacing?: string[];
 }
 
 export class AdditiveExpression {
   public parens: Parens[];
-  public ex: MultiplicativeExpression[];
+  public ex: (
+    | MultiplicativeExpression
+    | Sub
+    | StringType
+    | RefExpression
+    | Integer
+    | Function
+    | CaseExpression)[];
   public op: string[] | null;
   public spacing: string[];
 
   constructor(options: AdditiveExpressionValue) {
     this.parens = options.parens ? options.parens : [];
     this.op = options.op ? options.op : null;
-    this.ex = options.ex
-      ? options.ex
-      : [
-          new MultiplicativeExpression({
-            ex: [options.basicExpression ? options.basicExpression : null],
-          }),
-        ];
+    this.ex = options.ex;
     this.spacing = options.spacing ? options.spacing : [''];
   }
 
@@ -67,7 +66,7 @@ export class AdditiveExpression {
     this.parens.map(paren => {
       val.push(paren.open[0] + paren.open[1]);
     });
-    this.ex.map((ex: MultiplicativeExpression, index: number) => {
+    this.ex.map((ex, index) => {
       val.push(ex.toString());
       if (index < this.ex.length - 1) {
         val.push(
@@ -91,9 +90,5 @@ export class AdditiveExpression {
       spacing: this.spacing,
       op: this.op,
     });
-  }
-
-  getBasicValue(): string | undefined {
-    return this.ex[0].getBasicValue();
   }
 }

@@ -23,15 +23,15 @@ const parser = sqlParserFactory(FUNCTIONS);
 describe('Playground', () => {
   it('basic', () => {
     expect(
-      parser('(SELECT "start" || \'/\' || "end" FROM sys.segments GROUP BY 1 LIMIT 25)').toString(),
+      parser(
+        `("task_id"!='index_kafka_twitter-v2_4783a5f7782897d_phfbmpeo' OR "datasource"!='flow0') And 1 + 1`,
+      ),
     ).toEqual({});
   });
   it('basic', () => {
     expect(
       parser(
-        'SELECT *\n' +
-          'FROM "github"\n' +
-          'WHERE "__time" >= CURRENT_TIMESTAMP - INTERVAL \'1\' DAY',
+        `("task_id"!='index_kafka_twitter_2d7ff8cb0e3dbed_jnkjiceg' AND "task_id"!='index_kafka_twitter_2d7ff8cb0e3dbed_jnkjiceg')`,
       ).toString(),
     ).toEqual({});
   });

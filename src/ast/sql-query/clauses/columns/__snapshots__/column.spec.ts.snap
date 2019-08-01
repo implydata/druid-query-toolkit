@@ -4,62 +4,7 @@ exports[`single column Tests column addparen 1`] = `
 Column {
   "alias": null,
   "ex": OrExpression {
-    "ex": Array [
-      OrPart {
-        "ex": AndExpression {
-          "ex": Array [
-            AndPart {
-              "ex": NotExpression {
-                "ex": ComparisonExpression {
-                  "ex": AdditiveExpression {
-                    "ex": Array [
-                      MultiplicativeExpression {
-                        "ex": Array [
-                          StringType {
-                            "chars": "value",
-                            "quote": "'",
-                            "spacing": Array [
-                              "",
-                              "",
-                            ],
-                          },
-                        ],
-                        "op": null,
-                        "parens": Array [],
-                        "spacing": Array [
-                          "",
-                        ],
-                      },
-                    ],
-                    "op": null,
-                    "parens": Array [],
-                    "spacing": Array [
-                      "",
-                    ],
-                  },
-                  "parens": Array [],
-                  "rhs": null,
-                  "spacing": null,
-                },
-                "keyword": null,
-                "parens": Array [],
-                "spacing": null,
-              },
-              "keyword": "",
-              "spacing": Array [
-                "",
-              ],
-            },
-          ],
-          "parens": Array [],
-          "spacing": null,
-        },
-        "keyword": "",
-        "spacing": Array [
-          "",
-        ],
-      },
-    ],
+    "ex": undefined,
     "parens": Array [],
     "spacing": null,
   },

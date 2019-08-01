@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { OrderByPart, OrExpression, StringType } from '../../../index';
+import { OrderByPart, StringType } from '../../../index';
 
 export interface OrderByClauseValue {
   orderKeyword: string;
@@ -62,8 +62,9 @@ export class OrderByClause {
   getSorted() {
     const sorted: { id: string; desc: boolean }[] = [];
     this.orderBy.map(part => {
+      const basicValue = part.getBasicValue();
       sorted.push({
-        id: part.getBasicValue(),
+        id: basicValue ? basicValue : '',
         desc: part.direction === 'DESC' ? true : false,
       });
     });
@@ -76,7 +77,7 @@ export class OrderByClause {
       new OrderByPart({
         direction: direction,
         spacing: [' '],
-        orderBy: new OrExpression({ basicExpression: baseString }),
+        orderBy: baseString,
       }),
     ];
   }

@@ -16,30 +16,30 @@
  * limitations under the License.
  */
 
-import { OrExpression } from '../../..';
+import { CaseExpression, Function, Integer, RefExpression, StringType } from '../../..';
 
 export interface OrderByPartValue {
   direction: string | null;
-  orderBy: OrExpression;
+  orderBy: StringType | RefExpression | Integer | Function | CaseExpression;
   spacing: string[];
 }
 
 export class OrderByPart {
   public direction: string | null;
-  public orderBy: OrExpression;
+  orderBy: StringType | RefExpression | Integer | Function | CaseExpression;
   public spacing: string[];
 
   constructor(options: OrderByPartValue) {
     this.direction = options.direction;
-    this.orderBy = options.orderBy;
     this.spacing = options.spacing;
+    this.orderBy = options.orderBy;
   }
 
   toString(): string {
     return this.orderBy.toString() + this.spacing[0] + this.direction;
   }
 
-  getBasicValue(): string {
-    return this.orderBy.getBasicValue();
+  getBasicValue() {
+    return this.orderBy.toString();
   }
 }

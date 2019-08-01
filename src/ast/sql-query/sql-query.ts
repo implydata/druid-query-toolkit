@@ -18,9 +18,7 @@
 
 import { BaseAst } from '../base-ast';
 import {
-  AdditiveExpression,
   AndExpression,
-  AndPart,
   Column,
   Columns,
   ComparisonExpression,
@@ -30,10 +28,8 @@ import {
   HavingClause,
   Integer,
   LimitClause,
-  NotExpression,
   OrderByClause,
   OrExpression,
-  OrPart,
   StringType,
   Sub,
   WhereClause,
@@ -148,12 +144,10 @@ export class SqlQuery extends BaseAst {
     if (this.groupByClause) {
       if (arrayContains(columnVal, this.getAggregateColumns())) {
         const groupByColumns = this.groupByClause.groupBy.map(part => part.getBasicValue());
-        const newGroupByColumns: OrExpression[] = [];
+        const newGroupByColumns: any[] = [];
         groupByColumns.map((groupByColumn, index) => {
           if (this.getColumnsArray().indexOf(columnVal) + 1 < Number(groupByColumn)) {
-            newGroupByColumns.push(
-              new OrExpression({ basicExpression: new Integer(Number(groupByColumn) - 1) }),
-            );
+            newGroupByColumns.push(new Integer(Number(groupByColumn) - 1));
           } else {
             if (this.groupByClause) {
               newGroupByColumns.push(this.groupByClause.groupBy[index]);
@@ -176,101 +170,82 @@ export class SqlQuery extends BaseAst {
   excludeRow(header: string, row: string, operator: string): SqlQuery {
     const spacing = this.spacing;
     let whereClause = this.whereClause;
-    const headerBaseString = new StringType({ chars: header, quote: "'", spacing: ['', ''] });
+    const headerBaseString = new StringType({ chars: header, quote: '"', spacing: ['', ''] });
     const rowBaseString = new StringType({ chars: row, quote: "'", spacing: ['', ''] });
     const rhs = new ComparisonExpressionRhs({
       parens: [],
       op: operator,
       is: null,
       not: null,
-      rhs: new AdditiveExpression({ basicExpression: rowBaseString }),
+      rhs: rowBaseString,
+      spacing: [''],
+    });
+    const comparisonExpression = new ComparisonExpression({
+      ex: headerBaseString,
+      rhs: rhs,
+      parens: [],
       spacing: [''],
     });
 
-    if (!this.whereClause) {
-      spacing[3] = '\n';
-      const or = new OrExpression({ basicExpression: headerBaseString, spacing: [''] });
-      or.ex[0].ex.ex[0].ex.ex.rhs = rhs;
+    // No where clause present
+    if (!whereClause) {
       whereClause = new WhereClause({
         keyword: 'WHERE',
-        filter: or,
         spacing: [' '],
+        filter: comparisonExpression,
       });
-    } else {
-      if (this.whereClause.filter.ex.length > 1) {
-        const head = new OrPart({
-          keyword: '',
-          spacing: [''],
-          ex: new AndExpression({
-            ex: [
-              new AndPart({
-                ex: new NotExpression({
-                  basicExpression: new Sub({
-                    parens: [{ open: ['(', ''], close: ['', ')'] }],
-                    ex: this.whereClause.filter,
-                  }),
-                }),
-                spacing: [''],
-                keyword: '',
-              }),
-            ],
-          }),
-        });
-        const tail = new OrPart({
-          keyword: 'OR',
-          spacing: [' '],
-          ex: new AndExpression({
-            ex: [
-              new AndPart({
-                ex: new NotExpression({
-                  ex: new ComparisonExpression({
-                    basicExpression: headerBaseString,
-                    rhs: rhs,
-                  }),
-                }),
-                keyword: '',
-                spacing: [''],
-              }),
-            ],
-          }),
-        });
-        whereClause = new WhereClause({
-          keyword: 'WHERE',
-          filter: new OrExpression({ ex: [head, tail], spacing: [' '] }),
-          spacing: [' '],
-        });
+      this.spacing[3] = '\n';
+    } else if (whereClause && whereClause.filter instanceof OrExpression) {
+      // filtered by an or clause
+      whereClause = new WhereClause({
+        keyword: 'WHERE',
+        spacing: [' '],
+        filter: new AndExpression({
+          parens: [],
+          ex: [
+            new Sub({ parens: [{ open: ['(', ''], close: ['', ')'] }], ex: whereClause.filter }),
+            comparisonExpression,
+          ],
+          spacing: [' AND '],
+        }),
+      });
+      this.spacing[3] = '\n';
+    } else if (whereClause && whereClause && whereClause.filter instanceof AndExpression) {
+      let contained = false;
+      whereClause.filter.ex = whereClause.filter.ex.map(filter => {
+        if (
+          filter instanceof ComparisonExpression &&
+          filter.ex instanceof StringType &&
+          filter.ex.chars === header
+        ) {
+          contained = true;
+          return comparisonExpression;
+        } else {
+          return filter;
+        }
+      });
+      if (!contained) {
+        whereClause.filter.ex.push(comparisonExpression);
+        if (whereClause.filter.spacing) {
+          whereClause.filter.spacing.push(' AND ');
+        } else {
+          whereClause.filter.spacing = [' AND '];
+        }
+      }
+    } else if (!(whereClause.filter instanceof AndExpression)) {
+      if (
+        whereClause.filter instanceof ComparisonExpression &&
+        whereClause.filter.ex instanceof StringType &&
+        whereClause.filter.ex.chars === header
+      ) {
+        whereClause.filter = comparisonExpression;
       } else {
-        let found = false;
-        const WhereAndParts = whereClause ? whereClause.filter.ex[0].ex.ex : [];
-
-        WhereAndParts.map(part => {
-          if (part.ex.getBasicValue() === header) {
-            found = true;
-            part.ex.ex.rhs = rhs;
-          }
+        whereClause.filter = new AndExpression({
+          parens: [],
+          spacing: [' AND '],
+          // @ts-ignore I know this is wrong but Idk how to fix it
+          ex: [whereClause.filter, comparisonExpression],
         });
-
-        if (!found) {
-          WhereAndParts.push(
-            new AndPart({
-              keyword: 'AND',
-              spacing: [' '],
-              ex: new NotExpression({
-                ex: new ComparisonExpression({
-                  basicExpression: headerBaseString,
-                  rhs: rhs,
-                }),
-              }),
-            }),
-          );
-        }
-        if (whereClause) {
-          if (whereClause.filter.ex[0].ex.spacing) {
-            whereClause.filter.ex[0].ex.spacing.push(' ');
-          } else {
-            whereClause.filter.ex[0].ex.spacing = [' '];
-          }
-        }
       }
     }
 

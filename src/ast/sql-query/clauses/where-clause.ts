@@ -15,17 +15,54 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { OrExpression } from '../..';
+import {
+  AdditiveExpression,
+  AndExpression,
+  CaseExpression,
+  ComparisonExpression,
+  Function,
+  Integer,
+  MultiplicativeExpression,
+  NotExpression,
+  OrExpression,
+  RefExpression,
+  StringType,
+  Sub,
+} from '../..';
 
 export interface WhereClauseValue {
   keyword: string;
-  filter: OrExpression;
+  filter:
+    | OrExpression
+    | AndExpression
+    | ComparisonExpression
+    | MultiplicativeExpression
+    | AdditiveExpression
+    | NotExpression
+    | Sub
+    | StringType
+    | RefExpression
+    | Integer
+    | Function
+    | CaseExpression;
   spacing: string[];
 }
 
 export class WhereClause {
   public keyword: string;
-  public filter: OrExpression;
+  public filter:
+    | OrExpression
+    | AndExpression
+    | ComparisonExpression
+    | MultiplicativeExpression
+    | AdditiveExpression
+    | NotExpression
+    | Sub
+    | StringType
+    | RefExpression
+    | Integer
+    | Function
+    | CaseExpression;
   public spacing: string[];
 
   constructor(options: WhereClauseValue) {

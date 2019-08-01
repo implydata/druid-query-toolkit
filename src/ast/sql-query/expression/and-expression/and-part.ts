@@ -38,8 +38,4 @@ export class AndPart {
   toString() {
     return (this.keyword ? this.keyword : '') + this.spacing[0] + this.ex.toString();
   }
-
-  getBasicValue(): string | undefined {
-    return this.ex.getBasicValue();
-  }
 }

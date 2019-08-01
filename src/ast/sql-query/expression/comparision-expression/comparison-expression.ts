@@ -20,62 +20,50 @@ import {
   AdditiveExpression,
   CaseExpression,
   ComparisonExpressionRhs,
-  ExpressionMaybeFiltered,
   Function,
   Integer,
   RefExpression,
   StringType,
   Sub,
 } from '../../../index';
-import { Parens } from '../../helpers';
+import { Parens, renderCloseParens, renderOpenParens } from '../../helpers';
 
 export interface ComparisonExpressionValue {
   parens?: Parens[];
   rhs?: ComparisonExpressionRhs | null;
-  ex?: AdditiveExpression;
+  ex: AdditiveExpression | Sub | StringType | RefExpression | Integer | Function | CaseExpression;
   spacing?: string[] | null;
-  basicExpression?:
+}
+
+export class ComparisonExpression {
+  public parens: Parens[];
+  public ex:
+    | AdditiveExpression
     | Sub
     | StringType
     | RefExpression
     | Integer
     | Function
-    | ExpressionMaybeFiltered
     | CaseExpression;
-}
-
-export class ComparisonExpression {
-  public parens: Parens[];
-  public ex: AdditiveExpression;
   public rhs: ComparisonExpressionRhs | null;
   public spacing: string[] | null;
 
   constructor(options: ComparisonExpressionValue) {
     this.rhs = options.rhs ? options.rhs : null;
     this.parens = options.parens ? options.parens : [];
-    this.ex = options.ex
-      ? options.ex
-      : new AdditiveExpression({ basicExpression: options.basicExpression });
+    this.ex = options.ex;
     this.spacing = options.spacing ? options.spacing : null;
   }
 
   toString() {
     const val: string[] = [];
-    this.parens.map(paren => {
-      val.push(paren.open[0] + paren.open[1]);
-    });
+    renderOpenParens(this.parens);
     val.push(this.ex.toString());
     if (this.rhs) {
       val.push((this.spacing ? this.spacing[0] : '') + this.rhs.toString());
     }
-    this.parens.map(paren => {
-      val.push(paren.close[0] + paren.close[1]);
-    });
+    renderCloseParens(this.parens);
     return val.join('');
-  }
-
-  getBasicValue(): string | undefined {
-    return this.ex.getBasicValue();
   }
 
   addParen(open: string[], close: string[]) {

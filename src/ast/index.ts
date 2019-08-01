@@ -36,7 +36,6 @@ export * from './sql-query/basic-expression/case-expression/case-expression';
 export * from './sql-query/basic-expression/case-expression/case-part';
 export * from './sql-query/basic-expression/function-call/function';
 export * from './sql-query/basic-expression/function-call/filter-clause';
-export * from './sql-query/basic-expression/expression-maybe-filtered';
 export * from './sql-query/clauses/where-clause';
 export * from './sql-query/clauses/group-by-clause/group-by-clause';
 export * from './sql-query/clauses/having-clause';

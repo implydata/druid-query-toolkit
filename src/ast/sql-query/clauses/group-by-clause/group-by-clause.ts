@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { OrExpression } from '../../../index';
+import { Function, Integer, OrExpression, RefExpression, StringType, Sub } from '../../../index';
 
 export interface GroupByClauseValue {
   groupKeyword: string;
@@ -28,7 +28,7 @@ export interface GroupByClauseValue {
 export class GroupByClause {
   public groupKeyword: string;
   public byKeyword: string;
-  public groupBy: OrExpression[];
+  public groupBy: (Sub | StringType | RefExpression | Integer | Function)[];
   public spacing: string[];
 
   constructor(options: GroupByClauseValue) {

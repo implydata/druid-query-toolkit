@@ -21,9 +21,12 @@
   function makeListMapEmpty0(tail) {
     return [].concat(tail.map(function(t) { return t[0] }));
   }
-    function makeListMapEmptyConcat0(tail) {
+   function makeListMapEmpty0Joined(tail) {
       return [].concat(tail.map(function(t) { return t[0].join('') }));
     }
+  function makeListMapEmptyConcat0(tail) {
+    return [].concat(tail.map(function(t) { return t[0].join('') }));
+  }
   function makeListMapEmpty01(tail) {
     return [].concat(tail.map(function(t) { return t[0][1] }));
   }
@@ -238,44 +241,42 @@ Expression
 
 OrExpression
   = head:AndExpression
-  tail:(_ OrPart)*
+  tail:((_ OrToken _) AndExpression)*
   {
-    let headValue = new OrPart({keyword:null, ex:head, spacing:[['']]});
+    let ex = makeListMap1(head, tail);
+    if(ex.length >1 ){
     return new OrExpression({
       parens: [],
-      ex: makeListMap1(headValue, tail),
-      spacing: makeListMapEmpty0(tail)
+      ex: makeListMap1(head, tail),
+      spacing: makeListMapEmpty0Joined(tail)
     });
+    } else {
+    return head;
+    }
   }
   / open: (OpenParen _?)
-  ex:AndExpression
+  ex:OrExpression
   close: (_? CloseParen)
   {
     return ex.addParen(open,close);
   }
 
-OrPart
-	= keyword:OrToken
-	spacing0:_
-	ex:AndExpression
-	{
-    return new OrPart({
-      keyword: keyword,
-      ex: ex,
-      spacing:[spacing0]
-    });
-  }
 
 AndExpression
   = head:NotExpression
-  tail:(_ AndPart)*
+  tail:((_ AndToken _) NotExpression)*
   {
-    let headValue = new AndPart({keyword:null, ex:head, spacing:[['']]});
-    return new OrExpression({
-        parens: [],
-        ex: makeListMap1(headValue, tail),
-        spacing: makeListMapEmpty0(tail)
-    });
+    let ex = makeListMap1(head, tail);
+    if(ex.length >1 )
+    {
+      return new AndExpression({
+          parens: [],
+          ex: ex,
+          spacing: makeListMapEmpty0Joined(tail)
+      });
+    } else {
+      return head;
+    }
   }
   / open: (OpenParen _?)
   ex:AndExpression
@@ -284,22 +285,13 @@ AndExpression
      return ex.addParen(open,close);
   }
 
-AndPart
-	= keyword:AndToken
-	spacing0:_
-	ex:NotExpression
-  {
-    return new AndPart({
-      keyword: keyword,
-      ex: ex,
-      spacing:[spacing0]
-    });
-  }
 
 NotExpression
   = not:(NotToken _)?
   ex:ComparisonExpression
-  {
+  {  if (!not) {
+        return ex
+     }
     return new NotExpression ({
       parens: [],
       keyword: not ? not[0] : null,
@@ -317,7 +309,9 @@ NotExpression
 ComparisonExpression
   = ex:AdditiveExpression
   rhs:(_? ComparisonExpressionRhs)?
-  {
+  { if (!rhs) {
+      return ex;
+    }
     return new ComparisonExpression({
       parens: [],
       ex: ex,
@@ -440,11 +434,15 @@ AdditiveExpression
   tail:((_? AdditiveOp _?)
   MultiplicativeExpression)*
   {
+    let ex = makeListMap1(head, tail);
+    if(ex.length <= 1) {
+      return head
+    }
     return new AdditiveExpression({
       parens:[],
       ex: makeListMap1(head, tail),
       spacing: makeListMapEmpty0(tail),
-      op: makeListMapEmpty(tail),
+      op: makeListMapEmpty0(tail),
     });
   }
   /open: (OpenParen _?)
@@ -464,6 +462,10 @@ MultiplicativeExpression
   tail:((_? MultiplicativeOp _?)
   (BasicExpression/Concat))*
   {
+   let ex = makeListMap1(head, tail);
+      if(ex.length <= 1) {
+        return head
+      }
     return new MultiplicativeExpression({
       parens : [],
       ex: makeListMap1(head, tail),

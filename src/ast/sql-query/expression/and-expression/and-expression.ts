@@ -19,10 +19,9 @@
 import {
   AndPart,
   CaseExpression,
-  ExpressionMaybeFiltered,
+  ComparisonExpression,
   Function,
   Integer,
-  NotExpression,
   RefExpression,
   StringType,
   Sub,
@@ -31,34 +30,34 @@ import { Parens } from '../../helpers';
 
 export interface AndExpressionValue {
   parens?: Parens[];
-  ex?: AndPart[];
-  spacing?: string[] | null;
-  basicExpression?:
+  ex: (
+    | ComparisonExpression
+    | AndPart
     | Sub
     | StringType
     | RefExpression
     | Integer
     | Function
-    | ExpressionMaybeFiltered
-    | CaseExpression;
+    | CaseExpression)[];
+  spacing?: string[] | null;
 }
 
 export class AndExpression {
   public parens: Parens[];
-  public ex: AndPart[];
+  public ex: (
+    | ComparisonExpression
+    | AndPart
+    | Sub
+    | StringType
+    | RefExpression
+    | Integer
+    | Function
+    | CaseExpression)[];
   public spacing: string[] | null;
 
   constructor(options: AndExpressionValue) {
     this.parens = options.parens ? options.parens : [];
-    this.ex = options.ex
-      ? options.ex
-      : [
-          new AndPart({
-            ex: new NotExpression({ basicExpression: options.basicExpression }),
-            keyword: '',
-            spacing: [''],
-          }),
-        ];
+    this.ex = options.ex;
     this.spacing = options.spacing ? options.spacing : null;
   }
 
@@ -77,10 +76,6 @@ export class AndExpression {
       val.push(paren.close[0] + paren.close[1]);
     });
     return val.join('');
-  }
-
-  getBasicValue(): string | undefined {
-    return this.ex[0].ex.getBasicValue();
   }
 
   addParen(open: string[], close: string[]) {

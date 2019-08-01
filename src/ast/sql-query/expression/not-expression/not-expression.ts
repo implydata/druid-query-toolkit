@@ -19,7 +19,6 @@
 import {
   CaseExpression,
   ComparisonExpression,
-  ExpressionMaybeFiltered,
   Function,
   Integer,
   RefExpression,
@@ -31,30 +30,27 @@ import { Parens } from '../../helpers';
 export interface NotExpressionValue {
   parens?: Parens[];
   keyword?: string | null;
-  ex?: ComparisonExpression;
+  ex: ComparisonExpression | Sub | StringType | RefExpression | Integer | Function | CaseExpression;
   spacing?: string[] | null;
-  basicExpression?:
+}
+
+export class NotExpression {
+  public parens: Parens[];
+  public ex:
+    | ComparisonExpression
     | Sub
     | StringType
     | RefExpression
     | Integer
     | Function
-    | ExpressionMaybeFiltered
     | CaseExpression;
-}
-
-export class NotExpression {
-  public parens: Parens[];
-  public ex: ComparisonExpression;
   public keyword: string | null;
   public spacing: string[] | null;
 
   constructor(options: NotExpressionValue) {
     this.keyword = options.keyword ? options.keyword : null;
     this.parens = options.parens ? options.parens : [];
-    this.ex = options.ex
-      ? options.ex
-      : new ComparisonExpression({ basicExpression: options.basicExpression });
+    this.ex = options.ex;
     this.spacing = options.spacing ? options.spacing : null;
   }
 
@@ -72,10 +68,6 @@ export class NotExpression {
       val.push(paren.close[0] + paren.close[1]);
     });
     return val.join('');
-  }
-
-  getBasicValue(): string | undefined {
-    return this.ex.getBasicValue();
   }
 
   addParen(open: string[], close: string[]) {

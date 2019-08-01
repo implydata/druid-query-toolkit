@@ -17,9 +17,7 @@
  */
 
 import {
-  AndExpression,
   CaseExpression,
-  ExpressionMaybeFiltered,
   Function,
   Integer,
   OrPart,
@@ -31,34 +29,18 @@ import { Parens } from '../../helpers';
 
 export interface OrExpressionValue {
   parens?: Parens[];
-  ex?: OrPart[];
+  ex: (OrPart | Sub | StringType | RefExpression | Integer | Function | CaseExpression)[];
   spacing?: string[] | null;
-  basicExpression?:
-    | Sub
-    | StringType
-    | RefExpression
-    | Integer
-    | Function
-    | ExpressionMaybeFiltered
-    | CaseExpression;
 }
 
 export class OrExpression {
   public parens: Parens[];
-  public ex: OrPart[];
+  public ex: (OrPart | Sub | StringType | RefExpression | Integer | Function | CaseExpression)[];
   public spacing: string[] | null;
 
   constructor(options: OrExpressionValue) {
     this.parens = options.parens ? options.parens : [];
-    this.ex = options.ex
-      ? options.ex
-      : [
-          new OrPart({
-            ex: new AndExpression({ basicExpression: options.basicExpression }),
-            keyword: '',
-            spacing: [''],
-          }),
-        ];
+    this.ex = options.ex;
     this.spacing = options.spacing ? options.spacing : null;
   }
 

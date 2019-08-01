@@ -15,13 +15,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ExpressionMaybeFiltered, FilterClause, OrExpression } from '../../../index';
+import { FilterClause, OrExpression } from '../../../index';
 import { Parens } from '../../helpers';
 
 export interface FunctionValue {
   parens: Parens[];
   fn: string;
-  value: ExpressionMaybeFiltered[];
+  value: any;
   spacing: string[];
   distinct: string;
   filterClause: FilterClause;
@@ -80,5 +80,9 @@ export class Function {
       distinct: this.distinct,
       filterClause: this.filterClause,
     });
+  }
+
+  getBasicValue() {
+    return undefined;
   }
 }
