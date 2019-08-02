@@ -301,13 +301,6 @@ export class SqlQuery extends BaseAst {
     });
   }
 
-  getDirection(column: string): string | null {
-    if (this.orderByClause) {
-      return this.orderByClause.getDirection(column);
-    }
-    return '';
-  }
-
   getSorted(): { id: string; desc: boolean }[] {
     if (this.orderByClause) {
       return this.orderByClause.getSorted(this.columns);
