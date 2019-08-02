@@ -135,7 +135,7 @@ export class SqlQuery extends BaseAst {
       orderByClause: this.getOrderByCluaseWithoutColumn(columnVal),
       spacing: this.spacing,
       verb: this.verb,
-      whereClause: this.getWhereClauseWithoutColumn(columnVal),
+      whereClause: this.whereClause,
     });
     return query;
   }
@@ -201,29 +201,6 @@ export class SqlQuery extends BaseAst {
       }
     }
     return groupByClause;
-  }
-
-  getWhereClauseWithoutColumn(columnVal: string) {
-    if (!this.whereClause) return undefined;
-    let whereClause: WhereClause | undefined = this.whereClause;
-    if (whereClause.filter && whereClause.filter instanceof AndExpression) {
-      whereClause.filter.ex = whereClause.filter.ex.filter(
-        filter =>
-          filter instanceof ComparisonExpression &&
-          filter.ex instanceof StringType &&
-          filter.ex.chars === columnVal,
-      );
-    } else if (!(whereClause.filter instanceof AndExpression)) {
-      // only one
-      if (
-        whereClause.filter instanceof ComparisonExpression &&
-        whereClause.filter.ex instanceof StringType &&
-        whereClause.filter.ex.chars === columnVal
-      ) {
-        whereClause = undefined;
-      }
-    }
-    return whereClause;
   }
 
   excludeRow(header: string, row: string, operator: string): SqlQuery {
