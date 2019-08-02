@@ -15,6 +15,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { StringType } from './basic-expression/string-type';
+import { Columns } from './clauses/columns/columns';
+
 export function renderOpenParens(parens?: Parens[]): string {
   if (!parens) return '';
   const val: string[] = [];
@@ -43,4 +46,28 @@ export function arrayContains(StringValue?: string, arrayValue?: string[]) {
     return false;
   }
   return arrayValue.indexOf(StringValue) > -1;
+}
+
+export function getColumns(columns: Columns) {
+  const columnsArray: string[] = [];
+  columns.columns.map(column => {
+    if (column.getAlias()) {
+      const alias = column.getAlias();
+      if (alias) {
+        columnsArray.push(
+          alias.value instanceof StringType ? alias.value.getBasicValue() : alias.value,
+        );
+      }
+    } else if (column.getBasicValue()) {
+      columnsArray.push(column.getBasicValue());
+    }
+  });
+  return columnsArray;
+}
+
+export function basicLiteralEscape(literalValue?: string): string {
+  return `'${literalValue}'`;
+}
+export function basicIdentifierEscape(identifierValue?: string): string {
+  return `"${identifierValue}"`;
 }

@@ -68,4 +68,8 @@ export class CaseExpression {
       end: this.end,
     });
   }
+
+  getBasicValue(): string {
+    return this.toString();
+  }
 }

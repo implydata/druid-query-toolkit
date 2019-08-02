@@ -29,13 +29,14 @@ import {
   Integer,
   LimitClause,
   OrderByClause,
+  OrderByPart,
   OrExpression,
   StringType,
   Sub,
   WhereClause,
 } from '../index';
 
-import { arrayContains } from './helpers';
+import { arrayContains, getColumns } from './helpers';
 export interface SqlQueryValue {
   verb: string;
   distinct: string;
@@ -131,29 +132,64 @@ export class SqlQuery extends BaseAst {
       groupByClause: this.getGroupByClauseWithoutColumn(columnVal),
       havingClause: this.havingClause,
       limitClause: this.limitClause,
-      orderByClause: this.orderByClause,
+      orderByClause: this.getOrderByCluaseWithoutColumn(columnVal),
       spacing: this.spacing,
       verb: this.verb,
-      whereClause: this.whereClause,
+      whereClause: this.getWhereClauseWithoutColumn(columnVal),
     });
     return query;
+  }
+
+  getOrderByCluaseWithoutColumn(columnVal: string): OrderByClause | undefined {
+    if (!this.orderByClause) {
+      return;
+    } else {
+      const orderByClause: OrderByClause | undefined = this.orderByClause;
+      const orderByArray: OrderByPart[] = [];
+      const spacing = [this.orderByClause.spacing[0], this.orderByClause.spacing[1]];
+
+      orderByClause.orderBy.map((filter, index) => {
+        if (filter.orderBy.getBasicValue() !== columnVal && this.orderByClause) {
+          orderByArray.push(filter);
+          spacing.push(this.orderByClause.spacing[2 + index]);
+        }
+      });
+
+      if (orderByArray.length) {
+        orderByClause.orderBy = orderByArray;
+        return orderByClause;
+      }
+    }
+    return undefined;
   }
 
   getGroupByClauseWithoutColumn(columnVal: string): GroupByClause | undefined {
     let groupByClause;
     if (this.groupByClause) {
-      if (arrayContains(columnVal, this.getAggregateColumns())) {
-        const groupByColumns = this.groupByClause.groupBy.map(part => part.getBasicValue());
+      const groupByColumns = this.groupByClause.groupBy.map(part => part.getBasicValue());
+
+      if (this.groupByClause.groupBy.length > 1) {
+        // get array of grouping columns as strings
         const newGroupByColumns: any[] = [];
+
         groupByColumns.map((groupByColumn, index) => {
+          // if grouping column is a number and the column to be removed is less than that column decrease the value of the grouping column by 1
           if (this.getColumnsArray().indexOf(columnVal) + 1 < Number(groupByColumn)) {
             newGroupByColumns.push(new Integer(Number(groupByColumn) - 1));
-          } else {
+          } else if (this.getColumnsArray().indexOf(columnVal) + 1 > Number(groupByColumn)) {
+            if (this.groupByClause) {
+              newGroupByColumns.push(this.groupByClause.groupBy[index]);
+            }
+          } else if (
+            columnVal !== groupByColumn &&
+            this.getColumnsArray().indexOf(columnVal) + 1 !== Number(groupByColumn)
+          ) {
             if (this.groupByClause) {
               newGroupByColumns.push(this.groupByClause.groupBy[index]);
             }
           }
         });
+
         groupByClause = new GroupByClause({
           groupBy: newGroupByColumns,
           groupKeyword: this.groupByClause.groupKeyword,
@@ -165,6 +201,29 @@ export class SqlQuery extends BaseAst {
       }
     }
     return groupByClause;
+  }
+
+  getWhereClauseWithoutColumn(columnVal: string) {
+    if (!this.whereClause) return undefined;
+    let whereClause: WhereClause | undefined = this.whereClause;
+    if (whereClause.filter && whereClause.filter instanceof AndExpression) {
+      whereClause.filter.ex = whereClause.filter.ex.filter(
+        filter =>
+          filter instanceof ComparisonExpression &&
+          filter.ex instanceof StringType &&
+          filter.ex.chars === columnVal,
+      );
+    } else if (!(whereClause.filter instanceof AndExpression)) {
+      // only one
+      if (
+        whereClause.filter instanceof ComparisonExpression &&
+        whereClause.filter.ex instanceof StringType &&
+        whereClause.filter.ex.chars === columnVal
+      ) {
+        whereClause = undefined;
+      }
+    }
+    return whereClause;
   }
 
   excludeRow(header: string, row: string, operator: string): SqlQuery {
@@ -210,7 +269,8 @@ export class SqlQuery extends BaseAst {
         }),
       });
       this.spacing[3] = '\n';
-    } else if (whereClause && whereClause && whereClause.filter instanceof AndExpression) {
+    } else if (whereClause && whereClause.filter instanceof AndExpression) {
+      // Multiple
       let contained = false;
       whereClause.filter.ex = whereClause.filter.ex.map(filter => {
         if (
@@ -233,6 +293,7 @@ export class SqlQuery extends BaseAst {
         }
       }
     } else if (!(whereClause.filter instanceof AndExpression)) {
+      // only one
       if (
         whereClause.filter instanceof ComparisonExpression &&
         whereClause.filter.ex instanceof StringType &&
@@ -272,7 +333,7 @@ export class SqlQuery extends BaseAst {
 
   getSorted(): { id: string; desc: boolean }[] {
     if (this.orderByClause) {
-      return this.orderByClause.getSorted();
+      return this.orderByClause.getSorted(this.columns);
     }
     return [];
   }
@@ -319,20 +380,7 @@ export class SqlQuery extends BaseAst {
   }
 
   getColumnsArray() {
-    const columnsArray: string[] = [];
-    this.columns.columns.map(column => {
-      if (column.getAlias()) {
-        const alias = column.getAlias();
-        if (alias) {
-          columnsArray.push(
-            alias.value instanceof StringType ? alias.value.getBasicValue() : alias.value,
-          );
-        }
-      } else if (column.getBasicValue()) {
-        columnsArray.push(column.getBasicValue());
-      }
-    });
-    return columnsArray;
+    return getColumns(this.columns);
   }
 
   toString() {

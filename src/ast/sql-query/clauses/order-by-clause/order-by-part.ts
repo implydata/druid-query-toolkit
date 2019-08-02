@@ -17,7 +17,8 @@
  */
 
 import { CaseExpression, Function, Integer, RefExpression, StringType } from '../../..';
-
+import { Columns } from '../../../../../build/ast';
+import { getColumns } from '../../helpers';
 export interface OrderByPartValue {
   direction: string | null;
   orderBy: StringType | RefExpression | Integer | Function | CaseExpression;
@@ -39,7 +40,18 @@ export class OrderByPart {
     return this.orderBy.toString() + this.spacing[0] + this.direction;
   }
 
-  getBasicValue() {
+  getOrderValue(columns: Columns): string | undefined {
+    if (!(this.orderBy instanceof CaseExpression)) {
+      if (this.orderBy instanceof Integer) {
+        return getColumns(columns)[this.orderBy.value];
+      }
+      const value: string | number | undefined = this.orderBy.getBasicValue();
+      return value;
+    }
+    return;
+  }
+
+  getBasicValue(): string {
     return this.orderBy.toString();
   }
 }

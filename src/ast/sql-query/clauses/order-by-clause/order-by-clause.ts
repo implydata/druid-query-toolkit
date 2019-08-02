@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+import { Columns } from '../../../../../build/ast';
 import { OrderByPart, StringType } from '../../../index';
 
 export interface OrderByClauseValue {
@@ -42,7 +43,7 @@ export class OrderByClause {
     const val = [this.orderKeyword + this.spacing[0] + this.byKeyword + this.spacing[1]];
     this.orderBy.map((orderBy, index) => {
       val.push(orderBy.toString());
-      if (index < this.spacing.length - 2 && this.spacing[2 + index]) {
+      if (index < this.orderBy.length - 1 && this.spacing[2 + index]) {
         val.push(',' + this.spacing[2 + index]);
       }
     });
@@ -59,10 +60,10 @@ export class OrderByClause {
     return direction;
   }
 
-  getSorted() {
+  getSorted(columns: Columns) {
     const sorted: { id: string; desc: boolean }[] = [];
     this.orderBy.map(part => {
-      const basicValue = part.getBasicValue();
+      const basicValue = part.getOrderValue(columns);
       sorted.push({
         id: basicValue ? basicValue : '',
         desc: part.direction === 'DESC' ? true : false,
