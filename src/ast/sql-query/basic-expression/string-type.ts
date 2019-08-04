@@ -15,10 +15,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const parse = require('./druidsql');
-const stringify = require('./druidsqltostring');
+export interface StringValue {
+  chars: string;
+  quote: string;
+  spacing: string[];
+}
 
-module.exports = {
-  parse: parse.parse,
-  stringify: stringify.toSQL,
-};
+export class StringType {
+  public chars: string;
+  public quote: string;
+  public spacing: string[];
+
+  constructor(options: StringValue) {
+    this.chars = options.chars;
+    this.quote = options.quote;
+    this.spacing = options.spacing;
+  }
+
+  toString(): string {
+    return (
+      this.quote +
+      (this.spacing[0] ? this.spacing[0] : '') +
+      this.chars +
+      (this.spacing[0] ? this.spacing[1] : '') +
+      this.quote
+    );
+  }
+
+  getBasicValue(): string {
+    return this.chars;
+  }
+}

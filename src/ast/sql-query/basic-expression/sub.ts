@@ -15,10 +15,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const parse = require('./druidsql');
-const stringify = require('./druidsqltostring');
+import { OrExpression } from '../..';
+import { Parens, renderCloseParens, renderOpenParens } from '../helpers';
 
-module.exports = {
-  parse: parse.parse,
-  stringify: stringify.toSQL,
-};
+export interface SubValue {
+  parens: Parens[];
+  ex: OrExpression | any;
+}
+
+export class Sub {
+  public parens: Parens[];
+  public ex: OrExpression | any;
+
+  constructor(options: SubValue) {
+    this.parens = options.parens;
+    this.ex = options.ex;
+  }
+
+  toString(): string {
+    return renderOpenParens(this.parens) + this.ex.toString() + renderCloseParens(this.parens);
+  }
+
+  getBasicValue() {
+    return this.ex.getBasicValue();
+  }
+
+  addParen(open: string[], close: string[]) {
+    this.parens.push({ open, close });
+    return new Sub({
+      parens: this.parens,
+      ex: this.ex,
+    });
+  }
+}

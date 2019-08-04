@@ -15,10 +15,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const parse = require('./druidsql');
-const stringify = require('./druidsqltostring');
+export class Integer {
+  public value: number;
 
-module.exports = {
-  parse: parse.parse,
-  stringify: stringify.toSQL,
-};
+  constructor(options: number) {
+    this.value = options;
+  }
+
+  toString(): string {
+    return this.value.toString();
+  }
+
+  getBasicValue() {
+    return this.value;
+  }
+}

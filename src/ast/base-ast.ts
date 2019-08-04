@@ -15,10 +15,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const parse = require('./druidsql');
-const stringify = require('./druidsqltostring');
+export abstract class BaseAst {
+  public type: string;
 
-module.exports = {
-  parse: parse.parse,
-  stringify: stringify.toSQL,
-};
+  constructor(type: string) {
+    this.type = type;
+  }
+
+  abstract toString(indent?: string): string;
+}

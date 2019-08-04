@@ -15,10 +15,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const parse = require('./druidsql');
-const stringify = require('./druidsqltostring');
+import { OrExpression } from '../..';
 
-module.exports = {
-  parse: parse.parse,
-  stringify: stringify.toSQL,
-};
+export interface HavingClauseValue {
+  keyword: string;
+  having: OrExpression;
+  spacing: string[];
+}
+
+export class HavingClause {
+  public keyword: string;
+  public having: OrExpression;
+  public spacing: string[];
+
+  constructor(options: HavingClauseValue) {
+    this.keyword = options.keyword;
+    this.having = options.having;
+    this.spacing = options.spacing;
+  }
+
+  toString(): string {
+    const val = this.keyword + this.spacing[0] + this.having.toString();
+    return val;
+  }
+}

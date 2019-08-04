@@ -15,10 +15,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const parse = require('./druidsql');
-const stringify = require('./druidsqltostring');
+export interface LimitClauseValue {
+  keyword: string;
+  value: number[];
+  spacing: string[];
+}
 
-module.exports = {
-  parse: parse.parse,
-  stringify: stringify.toSQL,
-};
+export class LimitClause {
+  public keyword: string;
+  public value: number[];
+  public spacing: string[];
+
+  constructor(options: LimitClauseValue) {
+    this.keyword = options.keyword;
+    this.value = options.value;
+    this.spacing = options.spacing;
+  }
+
+  toString(): string {
+    const val: string[] = [this.keyword + this.spacing[0]];
+    this.value.map((limit, index: number) => {
+      val.push(String(limit));
+      if (index < this.value.length - 1) {
+        val.push(',' + this.spacing[index]);
+      }
+    });
+    return val.join('');
+  }
+}

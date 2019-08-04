@@ -15,10 +15,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const parse = require('./druidsql');
-const stringify = require('./druidsqltostring');
 
-module.exports = {
-  parse: parse.parse,
-  stringify: stringify.toSQL,
-};
+import { Column, OrExpression, StringType } from '../../../index';
+
+describe('single column Tests', () => {
+  it('column with no brackets to string', () => {
+    const val = new Column({
+      parens: [],
+      ex: new OrExpression({
+        basicExpression: new StringType({ chars: 'value', quote: "'", spacing: ['', ''] }),
+      }),
+      alias: null,
+      spacing: [''],
+    });
+    expect(val.toString()).toMatchSnapshot();
+  });
+});

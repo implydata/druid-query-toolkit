@@ -15,10 +15,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const parse = require('./druidsql');
-const stringify = require('./druidsqltostring');
 
-module.exports = {
-  parse: parse.parse,
-  stringify: stringify.toSQL,
-};
+import { AdditiveExpression } from '../../..';
+
+export interface InExpressionValue {
+  keyword: string;
+  list: AdditiveExpression;
+  spacing: string[];
+}
+
+export class InExpression {
+  public keyword: string;
+  public list: AdditiveExpression;
+  public spacing: string[];
+
+  constructor(options: InExpression) {
+    this.keyword = options.keyword;
+    this.list = options.list;
+    this.spacing = options.spacing;
+  }
+
+  toString() {
+    return this.keyword + this.spacing[0] + this.list.toString();
+  }
+}

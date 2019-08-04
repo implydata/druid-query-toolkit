@@ -1,0 +1,1622 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Druid Query Tests parsers segments query 1`] = `
+SqlQuery {
+  "columns": Columns {
+    "columns": Array [
+      Column {
+        "alias": null,
+        "ex": RefExpression {
+          "name": StringType {
+            "chars": "segment_id",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+          "namespace": null,
+          "quote": undefined,
+          "quoteSpacing": undefined,
+        },
+        "parens": Array [],
+        "spacing": null,
+      },
+      Column {
+        "alias": null,
+        "ex": RefExpression {
+          "name": StringType {
+            "chars": "datasource",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+          "namespace": null,
+          "quote": undefined,
+          "quoteSpacing": undefined,
+        },
+        "parens": Array [],
+        "spacing": null,
+      },
+      Column {
+        "alias": null,
+        "ex": RefExpression {
+          "name": StringType {
+            "chars": "start",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+          "namespace": null,
+          "quote": undefined,
+          "quoteSpacing": undefined,
+        },
+        "parens": Array [],
+        "spacing": null,
+      },
+      Column {
+        "alias": null,
+        "ex": RefExpression {
+          "name": StringType {
+            "chars": "end",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+          "namespace": null,
+          "quote": undefined,
+          "quoteSpacing": undefined,
+        },
+        "parens": Array [],
+        "spacing": null,
+      },
+      Column {
+        "alias": null,
+        "ex": RefExpression {
+          "name": StringType {
+            "chars": "size",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+          "namespace": null,
+          "quote": undefined,
+          "quoteSpacing": undefined,
+        },
+        "parens": Array [],
+        "spacing": null,
+      },
+      Column {
+        "alias": null,
+        "ex": RefExpression {
+          "name": StringType {
+            "chars": "version",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+          "namespace": null,
+          "quote": undefined,
+          "quoteSpacing": undefined,
+        },
+        "parens": Array [],
+        "spacing": null,
+      },
+      Column {
+        "alias": null,
+        "ex": RefExpression {
+          "name": StringType {
+            "chars": "partition_num",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+          "namespace": null,
+          "quote": undefined,
+          "quoteSpacing": undefined,
+        },
+        "parens": Array [],
+        "spacing": null,
+      },
+      Column {
+        "alias": null,
+        "ex": RefExpression {
+          "name": StringType {
+            "chars": "num_replicas",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+          "namespace": null,
+          "quote": undefined,
+          "quoteSpacing": undefined,
+        },
+        "parens": Array [],
+        "spacing": null,
+      },
+      Column {
+        "alias": null,
+        "ex": RefExpression {
+          "name": StringType {
+            "chars": "num_rows",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+          "namespace": null,
+          "quote": undefined,
+          "quoteSpacing": undefined,
+        },
+        "parens": Array [],
+        "spacing": null,
+      },
+      Column {
+        "alias": null,
+        "ex": RefExpression {
+          "name": StringType {
+            "chars": "is_published",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+          "namespace": null,
+          "quote": undefined,
+          "quoteSpacing": undefined,
+        },
+        "parens": Array [],
+        "spacing": null,
+      },
+      Column {
+        "alias": null,
+        "ex": RefExpression {
+          "name": StringType {
+            "chars": "is_available",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+          "namespace": null,
+          "quote": undefined,
+          "quoteSpacing": undefined,
+        },
+        "parens": Array [],
+        "spacing": null,
+      },
+      Column {
+        "alias": null,
+        "ex": RefExpression {
+          "name": StringType {
+            "chars": "is_realtime",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+          "namespace": null,
+          "quote": undefined,
+          "quoteSpacing": undefined,
+        },
+        "parens": Array [],
+        "spacing": null,
+      },
+      Column {
+        "alias": null,
+        "ex": RefExpression {
+          "name": StringType {
+            "chars": "is_overshadowed",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+          "namespace": null,
+          "quote": undefined,
+          "quoteSpacing": undefined,
+        },
+        "parens": Array [],
+        "spacing": null,
+      },
+      Column {
+        "alias": null,
+        "ex": RefExpression {
+          "name": StringType {
+            "chars": "payload",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+          "namespace": null,
+          "quote": undefined,
+          "quoteSpacing": undefined,
+        },
+        "parens": Array [],
+        "spacing": null,
+      },
+    ],
+    "parens": Array [],
+    "spacing": Array [
+      " ",
+      " ",
+      " ",
+      " ",
+      " ",
+      " ",
+      " ",
+      " ",
+      " ",
+      " ",
+      " ",
+      " ",
+      " ",
+    ],
+  },
+  "distinct": null,
+  "fromClause": FromClause {
+    "alias": null,
+    "fc": RefExpression {
+      "name": "segments",
+      "namespace": "sys",
+      "quote": undefined,
+      "quoteSpacing": undefined,
+    },
+    "keyword": "FROM",
+    "parens": undefined,
+    "spacing": Array [
+      " ",
+      null,
+    ],
+  },
+  "groupByClause": null,
+  "havingClause": null,
+  "limitClause": LimitClause {
+    "keyword": "LIMIT",
+    "spacing": Array [
+      " ",
+    ],
+    "value": Array [
+      Integer {
+        "value": "50",
+      },
+    ],
+  },
+  "orderByClause": OrderByClause {
+    "byKeyword": "BY",
+    "orderBy": Array [
+      OrderByPart {
+        "direction": "DESC",
+        "orderBy": StringType {
+          "chars": "start",
+          "quote": "\\"",
+          "spacing": Array [
+            null,
+            null,
+          ],
+        },
+        "spacing": Array [
+          " ",
+        ],
+      },
+    ],
+    "orderKeyword": "ORDER",
+    "spacing": Array [
+      " ",
+      " ",
+    ],
+  },
+  "spacing": Array [
+    null,
+    " ",
+    "
+",
+    null,
+    null,
+    null,
+    "
+",
+    "
+",
+    "",
+  ],
+  "type": "query",
+  "verb": "SELECT",
+  "whereClause": null,
+}
+`;
+
+exports[`Druid Query Tests parsers segments query to string 1`] = `
+"SELECT \\"segment_id\\", \\"datasource\\", \\"start\\", \\"end\\", \\"size\\", \\"version\\", \\"partition_num\\", \\"num_replicas\\", \\"num_rows\\", \\"is_published\\", \\"is_available\\", \\"is_realtime\\", \\"is_overshadowed\\", \\"payload\\"
+FROM sys.segments
+ORDER BY \\"start\\" DESC
+LIMIT 50"
+`;
+
+exports[`Druid Query Tests parsers segments query with concat 1`] = `
+"SELECT
+  (\\"start\\" || '/' || \\"end\\") AS \\"interval\\",
+  \\"segment_id\\", \\"datasource\\", \\"start\\", \\"end\\", \\"size\\", \\"version\\", \\"partition_num\\", \\"num_replicas\\", \\"num_rows\\", \\"is_published\\", \\"is_available\\", \\"is_realtime\\", \\"is_overshadowed\\", \\"payload\\"
+FROM sys.segments
+WHERE
+ (\\"start\\" || '/' || \\"end\\") IN (SELECT \\"start\\" || '/' || \\"end\\" FROM sys.segments GROUP BY 1 LIMIT 25)
+ORDER BY \\"start\\" DESC
+LIMIT 25000"
+`;
+
+exports[`Druid Query Tests parsers segments query with concat 2`] = `"SELECT \\"start\\" || ' / null' || \\"end\\" FROM sys.segments GROUP BY 1,2"`;
+
+exports[`Druid Query Tests parsers servers query 1`] = `
+SqlQuery {
+  "columns": Columns {
+    "columns": Array [
+      Column {
+        "alias": null,
+        "ex": RefExpression {
+          "name": StringType {
+            "chars": "server",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+          "namespace": null,
+          "quote": undefined,
+          "quoteSpacing": undefined,
+        },
+        "parens": Array [],
+        "spacing": null,
+      },
+      Column {
+        "alias": null,
+        "ex": RefExpression {
+          "name": StringType {
+            "chars": "server_type",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+          "namespace": null,
+          "quote": undefined,
+          "quoteSpacing": undefined,
+        },
+        "parens": Array [],
+        "spacing": null,
+      },
+      Column {
+        "alias": null,
+        "ex": RefExpression {
+          "name": StringType {
+            "chars": "tier",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+          "namespace": null,
+          "quote": undefined,
+          "quoteSpacing": undefined,
+        },
+        "parens": Array [],
+        "spacing": null,
+      },
+      Column {
+        "alias": null,
+        "ex": RefExpression {
+          "name": StringType {
+            "chars": "host",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+          "namespace": null,
+          "quote": undefined,
+          "quoteSpacing": undefined,
+        },
+        "parens": Array [],
+        "spacing": null,
+      },
+      Column {
+        "alias": null,
+        "ex": RefExpression {
+          "name": StringType {
+            "chars": "plaintext_port",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+          "namespace": null,
+          "quote": undefined,
+          "quoteSpacing": undefined,
+        },
+        "parens": Array [],
+        "spacing": null,
+      },
+      Column {
+        "alias": null,
+        "ex": RefExpression {
+          "name": StringType {
+            "chars": "tls_port",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+          "namespace": null,
+          "quote": undefined,
+          "quoteSpacing": undefined,
+        },
+        "parens": Array [],
+        "spacing": null,
+      },
+      Column {
+        "alias": null,
+        "ex": RefExpression {
+          "name": StringType {
+            "chars": "curr_size",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+          "namespace": null,
+          "quote": undefined,
+          "quoteSpacing": undefined,
+        },
+        "parens": Array [],
+        "spacing": null,
+      },
+      Column {
+        "alias": null,
+        "ex": RefExpression {
+          "name": StringType {
+            "chars": "max_size",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+          "namespace": null,
+          "quote": undefined,
+          "quoteSpacing": undefined,
+        },
+        "parens": Array [],
+        "spacing": null,
+      },
+      Column {
+        "alias": Alias {
+          "keyword": "AS",
+          "spacing": Array [
+            " ",
+          ],
+          "value": StringType {
+            "chars": "rank",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+        },
+        "ex": CaseExpression {
+          "cases": Array [
+            Array [
+              "
+    ",
+              CasePart {
+                "spacing": Array [
+                  " ",
+                  " ",
+                  " ",
+                ],
+                "thenExpr": Integer {
+                  "value": "7",
+                },
+                "thenKeyword": "THEN",
+                "whenExpr": StringType {
+                  "chars": "coordinator",
+                  "quote": "'",
+                  "spacing": Array [
+                    null,
+                    null,
+                  ],
+                },
+                "whenKeyword": "WHEN",
+              },
+            ],
+            Array [
+              "
+    ",
+              CasePart {
+                "spacing": Array [
+                  " ",
+                  " ",
+                  " ",
+                ],
+                "thenExpr": Integer {
+                  "value": "6",
+                },
+                "thenKeyword": "THEN",
+                "whenExpr": StringType {
+                  "chars": "overlord",
+                  "quote": "'",
+                  "spacing": Array [
+                    null,
+                    null,
+                  ],
+                },
+                "whenKeyword": "WHEN",
+              },
+            ],
+            Array [
+              "
+    ",
+              CasePart {
+                "spacing": Array [
+                  " ",
+                  " ",
+                  " ",
+                ],
+                "thenExpr": Integer {
+                  "value": "5",
+                },
+                "thenKeyword": "THEN",
+                "whenExpr": StringType {
+                  "chars": "router",
+                  "quote": "'",
+                  "spacing": Array [
+                    null,
+                    null,
+                  ],
+                },
+                "whenKeyword": "WHEN",
+              },
+            ],
+            Array [
+              "
+    ",
+              CasePart {
+                "spacing": Array [
+                  " ",
+                  " ",
+                  " ",
+                ],
+                "thenExpr": Integer {
+                  "value": "4",
+                },
+                "thenKeyword": "THEN",
+                "whenExpr": StringType {
+                  "chars": "broker",
+                  "quote": "'",
+                  "spacing": Array [
+                    null,
+                    null,
+                  ],
+                },
+                "whenKeyword": "WHEN",
+              },
+            ],
+            Array [
+              "
+    ",
+              CasePart {
+                "spacing": Array [
+                  " ",
+                  " ",
+                  " ",
+                ],
+                "thenExpr": Integer {
+                  "value": "3",
+                },
+                "thenKeyword": "THEN",
+                "whenExpr": StringType {
+                  "chars": "historical",
+                  "quote": "'",
+                  "spacing": Array [
+                    null,
+                    null,
+                  ],
+                },
+                "whenKeyword": "WHEN",
+              },
+            ],
+            Array [
+              "
+    ",
+              CasePart {
+                "spacing": Array [
+                  " ",
+                  " ",
+                  " ",
+                ],
+                "thenExpr": Integer {
+                  "value": "2",
+                },
+                "thenKeyword": "THEN",
+                "whenExpr": StringType {
+                  "chars": "middle_manager",
+                  "quote": "'",
+                  "spacing": Array [
+                    null,
+                    null,
+                  ],
+                },
+                "whenKeyword": "WHEN",
+              },
+            ],
+            Array [
+              "
+    ",
+              CasePart {
+                "spacing": Array [
+                  " ",
+                  " ",
+                  " ",
+                ],
+                "thenExpr": Integer {
+                  "value": "1",
+                },
+                "thenKeyword": "THEN",
+                "whenExpr": StringType {
+                  "chars": "peon",
+                  "quote": "'",
+                  "spacing": Array [
+                    null,
+                    null,
+                  ],
+                },
+                "whenKeyword": "WHEN",
+              },
+            ],
+          ],
+          "else": Array [
+            "
+    ",
+            "ELSE",
+            " ",
+            Integer {
+              "value": "0",
+            },
+          ],
+          "end": Array [
+            "
+    ",
+            "END",
+          ],
+          "expr": Array [
+            " ",
+            undefined,
+            StringType {
+              "chars": "server_type",
+              "quote": "\\"",
+              "spacing": Array [
+                null,
+                null,
+              ],
+            },
+          ],
+          "keyword": "CASE",
+          "parens": Array [
+            Object {
+              "close": Array [
+                "
+  ",
+                ")",
+              ],
+              "open": Array [
+                "(",
+                "
+    ",
+              ],
+            },
+          ],
+        },
+        "parens": Array [],
+        "spacing": Array [
+          " ",
+        ],
+      },
+    ],
+    "parens": Array [],
+    "spacing": Array [
+      " ",
+      " ",
+      " ",
+      " ",
+      " ",
+      " ",
+      " ",
+      "
+  ",
+    ],
+  },
+  "distinct": null,
+  "fromClause": FromClause {
+    "alias": null,
+    "fc": RefExpression {
+      "name": "servers",
+      "namespace": "sys",
+      "quote": undefined,
+      "quoteSpacing": undefined,
+    },
+    "keyword": "FROM",
+    "parens": undefined,
+    "spacing": Array [
+      " ",
+      null,
+    ],
+  },
+  "groupByClause": null,
+  "havingClause": null,
+  "limitClause": null,
+  "orderByClause": OrderByClause {
+    "byKeyword": "BY",
+    "orderBy": Array [
+      OrderByPart {
+        "direction": "DESC",
+        "orderBy": StringType {
+          "chars": "rank",
+          "quote": "\\"",
+          "spacing": Array [
+            null,
+            null,
+          ],
+        },
+        "spacing": Array [
+          " ",
+        ],
+      },
+      OrderByPart {
+        "direction": "DESC",
+        "orderBy": StringType {
+          "chars": "server",
+          "quote": "\\"",
+          "spacing": Array [
+            null,
+            null,
+          ],
+        },
+        "spacing": Array [
+          " ",
+        ],
+      },
+    ],
+    "orderKeyword": "ORDER",
+    "spacing": Array [
+      " ",
+      " ",
+      " ",
+    ],
+  },
+  "spacing": Array [
+    null,
+    "
+  ",
+    "
+",
+    null,
+    null,
+    null,
+    "
+",
+    null,
+    "",
+  ],
+  "type": "query",
+  "verb": "SELECT",
+  "whereClause": null,
+}
+`;
+
+exports[`Druid Query Tests parsers servers query to string 1`] = `
+"SELECT
+  \\"server\\", \\"server_type\\", \\"tier\\", \\"host\\", \\"plaintext_port\\", \\"tls_port\\", \\"curr_size\\", \\"max_size\\",
+  (
+    CASE \\"server_type\\"
+    WHEN 'coordinator' THEN 7
+    WHEN 'overlord' THEN 6
+    WHEN 'router' THEN 5
+    WHEN 'broker' THEN 4
+    WHEN 'historical' THEN 3
+    WHEN 'middle_manager' THEN 2
+    WHEN 'peon' THEN 1
+    ELSE 0
+    END
+  ) AS \\"rank\\"
+FROM sys.servers
+ORDER BY \\"rank\\" DESC, \\"server\\" DESC"
+`;
+
+exports[`Druid Query Tests parsers servers query with columns in brackets to string 1`] = `
+"SELECT
+  (\\"server\\"), \\"server_type\\", \\"tier\\", \\"host\\", \\"plaintext_port\\", \\"tls_port\\", \\"curr_size\\", \\"max_size\\",
+  (
+    CASE \\"server_type\\"
+    WHEN 'coordinator' THEN 7
+    WHEN 'overlord' THEN 6
+    WHEN 'router' THEN 5
+    WHEN 'broker' THEN 4
+    WHEN 'historical' THEN 3
+    WHEN 'middle_manager' THEN 2
+    WHEN 'peon' THEN 1
+    ELSE 0
+    END
+  ) AS \\"rank\\"
+FROM sys.servers
+ORDER BY \\"rank\\" DESC, \\"server\\" DESC"
+`;
+
+exports[`Druid Query Tests parsers task query 1`] = `
+SqlQuery {
+  "columns": Columns {
+    "columns": Array [
+      Column {
+        "alias": null,
+        "ex": RefExpression {
+          "name": StringType {
+            "chars": "task_id",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+          "namespace": null,
+          "quote": undefined,
+          "quoteSpacing": undefined,
+        },
+        "parens": Array [],
+        "spacing": null,
+      },
+      Column {
+        "alias": null,
+        "ex": RefExpression {
+          "name": StringType {
+            "chars": "type",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+          "namespace": null,
+          "quote": undefined,
+          "quoteSpacing": undefined,
+        },
+        "parens": Array [],
+        "spacing": null,
+      },
+      Column {
+        "alias": null,
+        "ex": RefExpression {
+          "name": StringType {
+            "chars": "datasource",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+          "namespace": null,
+          "quote": undefined,
+          "quoteSpacing": undefined,
+        },
+        "parens": Array [],
+        "spacing": null,
+      },
+      Column {
+        "alias": null,
+        "ex": RefExpression {
+          "name": StringType {
+            "chars": "created_time",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+          "namespace": null,
+          "quote": undefined,
+          "quoteSpacing": undefined,
+        },
+        "parens": Array [],
+        "spacing": null,
+      },
+      Column {
+        "alias": null,
+        "ex": RefExpression {
+          "name": StringType {
+            "chars": "location",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+          "namespace": null,
+          "quote": undefined,
+          "quoteSpacing": undefined,
+        },
+        "parens": Array [],
+        "spacing": null,
+      },
+      Column {
+        "alias": null,
+        "ex": RefExpression {
+          "name": StringType {
+            "chars": "duration",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+          "namespace": null,
+          "quote": undefined,
+          "quoteSpacing": undefined,
+        },
+        "parens": Array [],
+        "spacing": null,
+      },
+      Column {
+        "alias": null,
+        "ex": RefExpression {
+          "name": StringType {
+            "chars": "error_msg",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+          "namespace": null,
+          "quote": undefined,
+          "quoteSpacing": undefined,
+        },
+        "parens": Array [],
+        "spacing": null,
+      },
+      Column {
+        "alias": Alias {
+          "keyword": "AS",
+          "spacing": Array [
+            " ",
+          ],
+          "value": StringType {
+            "chars": "status",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+        },
+        "ex": CaseExpression {
+          "cases": Array [
+            Array [
+              " ",
+              CasePart {
+                "spacing": Array [
+                  " ",
+                  " ",
+                  " ",
+                ],
+                "thenExpr": StringType {
+                  "chars": "runner_status",
+                  "quote": "\\"",
+                  "spacing": Array [
+                    null,
+                    null,
+                  ],
+                },
+                "thenKeyword": "THEN",
+                "whenExpr": ComparisonExpression {
+                  "ex": StringType {
+                    "chars": "status",
+                    "quote": "\\"",
+                    "spacing": Array [
+                      null,
+                      null,
+                    ],
+                  },
+                  "parens": Array [],
+                  "rhs": ComparisonExpressionRhs {
+                    "is": null,
+                    "not": null,
+                    "op": "=",
+                    "parens": Array [],
+                    "rhs": StringType {
+                      "chars": "RUNNING",
+                      "quote": "'",
+                      "spacing": Array [
+                        null,
+                        null,
+                      ],
+                    },
+                    "spacing": Array [
+                      " ",
+                    ],
+                  },
+                  "spacing": " ",
+                },
+                "whenKeyword": "WHEN",
+              },
+            ],
+          ],
+          "else": Array [
+            " ",
+            "ELSE",
+            " ",
+            StringType {
+              "chars": "status",
+              "quote": "\\"",
+              "spacing": Array [
+                null,
+                null,
+              ],
+            },
+          ],
+          "end": Array [
+            " ",
+            "END",
+          ],
+          "expr": null,
+          "keyword": "CASE",
+          "parens": Array [],
+        },
+        "parens": Array [],
+        "spacing": Array [
+          " ",
+        ],
+      },
+      Column {
+        "alias": Alias {
+          "keyword": "AS",
+          "spacing": Array [
+            " ",
+          ],
+          "value": StringType {
+            "chars": "rank",
+            "quote": "\\"",
+            "spacing": Array [
+              null,
+              null,
+            ],
+          },
+        },
+        "ex": CaseExpression {
+          "cases": Array [
+            Array [
+              " ",
+              CasePart {
+                "spacing": Array [
+                  " ",
+                  " ",
+                  "
+     ",
+                ],
+                "thenExpr": CaseExpression {
+                  "cases": Array [
+                    Array [
+                      " ",
+                      CasePart {
+                        "spacing": Array [
+                          " ",
+                          " ",
+                          " ",
+                        ],
+                        "thenExpr": Integer {
+                          "value": "4",
+                        },
+                        "thenKeyword": "THEN",
+                        "whenExpr": StringType {
+                          "chars": "RUNNING",
+                          "quote": "'",
+                          "spacing": Array [
+                            null,
+                            null,
+                          ],
+                        },
+                        "whenKeyword": "WHEN",
+                      },
+                    ],
+                    Array [
+                      " ",
+                      CasePart {
+                        "spacing": Array [
+                          " ",
+                          " ",
+                          " ",
+                        ],
+                        "thenExpr": Integer {
+                          "value": "3",
+                        },
+                        "thenKeyword": "THEN",
+                        "whenExpr": StringType {
+                          "chars": "PENDING",
+                          "quote": "'",
+                          "spacing": Array [
+                            null,
+                            null,
+                          ],
+                        },
+                        "whenKeyword": "WHEN",
+                      },
+                    ],
+                  ],
+                  "else": Array [
+                    " ",
+                    "ELSE",
+                    " ",
+                    Integer {
+                      "value": "2",
+                    },
+                  ],
+                  "end": Array [
+                    " ",
+                    "END",
+                  ],
+                  "expr": Array [
+                    " ",
+                    undefined,
+                    StringType {
+                      "chars": "runner_status",
+                      "quote": "\\"",
+                      "spacing": Array [
+                        null,
+                        null,
+                      ],
+                    },
+                  ],
+                  "keyword": "CASE",
+                  "parens": Array [
+                    Object {
+                      "close": Array [
+                        null,
+                        ")",
+                      ],
+                      "open": Array [
+                        "(",
+                        null,
+                      ],
+                    },
+                  ],
+                },
+                "thenKeyword": "THEN",
+                "whenExpr": ComparisonExpression {
+                  "ex": StringType {
+                    "chars": "status",
+                    "quote": "\\"",
+                    "spacing": Array [
+                      null,
+                      null,
+                    ],
+                  },
+                  "parens": Array [],
+                  "rhs": ComparisonExpressionRhs {
+                    "is": null,
+                    "not": null,
+                    "op": "=",
+                    "parens": Array [],
+                    "rhs": StringType {
+                      "chars": "RUNNING",
+                      "quote": "'",
+                      "spacing": Array [
+                        null,
+                        null,
+                      ],
+                    },
+                    "spacing": Array [
+                      " ",
+                    ],
+                  },
+                  "spacing": " ",
+                },
+                "whenKeyword": "WHEN",
+              },
+            ],
+          ],
+          "else": Array [
+            "
+    ",
+            "ELSE",
+            " ",
+            Integer {
+              "value": "1",
+            },
+          ],
+          "end": Array [
+            "
+    ",
+            "END",
+          ],
+          "expr": null,
+          "keyword": "CASE",
+          "parens": Array [
+            Object {
+              "close": Array [
+                "
+  ",
+                ")",
+              ],
+              "open": Array [
+                "(",
+                "
+    ",
+              ],
+            },
+          ],
+        },
+        "parens": Array [],
+        "spacing": Array [
+          " ",
+        ],
+      },
+    ],
+    "parens": Array [],
+    "spacing": Array [
+      " ",
+      " ",
+      " ",
+      " ",
+      " ",
+      " ",
+      "
+  ",
+      "
+  ",
+    ],
+  },
+  "distinct": null,
+  "fromClause": FromClause {
+    "alias": null,
+    "fc": RefExpression {
+      "name": "tasks",
+      "namespace": "sys",
+      "quote": undefined,
+      "quoteSpacing": undefined,
+    },
+    "keyword": "FROM",
+    "parens": undefined,
+    "spacing": Array [
+      " ",
+      null,
+    ],
+  },
+  "groupByClause": null,
+  "havingClause": null,
+  "limitClause": null,
+  "orderByClause": OrderByClause {
+    "byKeyword": "BY",
+    "orderBy": Array [
+      OrderByPart {
+        "direction": "DESC",
+        "orderBy": StringType {
+          "chars": "rank",
+          "quote": "\\"",
+          "spacing": Array [
+            null,
+            null,
+          ],
+        },
+        "spacing": Array [
+          " ",
+        ],
+      },
+      OrderByPart {
+        "direction": "DESC",
+        "orderBy": StringType {
+          "chars": "created_time",
+          "quote": "\\"",
+          "spacing": Array [
+            null,
+            null,
+          ],
+        },
+        "spacing": Array [
+          " ",
+        ],
+      },
+    ],
+    "orderKeyword": "ORDER",
+    "spacing": Array [
+      " ",
+      " ",
+      " ",
+    ],
+  },
+  "spacing": Array [
+    null,
+    "
+  ",
+    "
+",
+    null,
+    null,
+    null,
+    "
+",
+    null,
+    "",
+  ],
+  "type": "query",
+  "verb": "SELECT",
+  "whereClause": null,
+}
+`;
+
+exports[`Druid Query Tests parsers task query to string 1`] = `
+"SELECT
+  \\"task_id\\", \\"type\\", \\"datasource\\", \\"created_time\\", \\"location\\", \\"duration\\", \\"error_msg\\",
+  CASE WHEN \\"status\\" = 'RUNNING' THEN \\"runner_status\\" ELSE \\"status\\" END AS \\"status\\",
+  (
+    CASE WHEN \\"status\\" = 'RUNNING' THEN
+     (CASE \\"runner_status\\" WHEN 'RUNNING' THEN 4 WHEN 'PENDING' THEN 3 ELSE 2 END)
+    ELSE 1
+    END
+  ) AS \\"rank\\"
+FROM sys.tasks
+ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
+`;
+
+exports[`Druid Query Tests parsers the default data sources query 1`] = `
+SqlQuery {
+  "columns": Columns {
+    "columns": Array [
+      Column {
+        "alias": null,
+        "ex": RefExpression {
+          "name": "datasource",
+          "namespace": null,
+          "quote": undefined,
+          "quoteSpacing": undefined,
+        },
+        "parens": Array [],
+        "spacing": null,
+      },
+      Column {
+        "alias": Alias {
+          "keyword": "AS",
+          "spacing": Array [
+            " ",
+          ],
+          "value": "num_segments",
+        },
+        "ex": Function {
+          "distinct": null,
+          "filterClause": null,
+          "fn": "COUNT",
+          "parens": Array [],
+          "spacing": Array [
+            null,
+            "",
+            Array [],
+            null,
+            null,
+          ],
+          "value": Array [
+            "*",
+          ],
+        },
+        "parens": Array [],
+        "spacing": Array [
+          " ",
+        ],
+      },
+      Column {
+        "alias": Alias {
+          "keyword": "AS",
+          "spacing": Array [
+            " ",
+          ],
+          "value": "num_available_segments",
+        },
+        "ex": Function {
+          "distinct": null,
+          "filterClause": null,
+          "fn": "SUM",
+          "parens": Array [],
+          "spacing": Array [
+            null,
+            "",
+            Array [],
+            null,
+            null,
+          ],
+          "value": Array [
+            RefExpression {
+              "name": "is_available",
+              "namespace": null,
+              "quote": undefined,
+              "quoteSpacing": undefined,
+            },
+          ],
+        },
+        "parens": Array [],
+        "spacing": Array [
+          " ",
+        ],
+      },
+      Column {
+        "alias": Alias {
+          "keyword": "AS",
+          "spacing": Array [
+            " ",
+          ],
+          "value": "size",
+        },
+        "ex": Function {
+          "distinct": null,
+          "filterClause": null,
+          "fn": "SUM",
+          "parens": Array [],
+          "spacing": Array [
+            null,
+            "",
+            Array [],
+            null,
+            null,
+          ],
+          "value": Array [
+            StringType {
+              "chars": "size",
+              "quote": "\\"",
+              "spacing": Array [
+                null,
+                null,
+              ],
+            },
+          ],
+        },
+        "parens": Array [],
+        "spacing": Array [
+          " ",
+        ],
+      },
+      Column {
+        "alias": Alias {
+          "keyword": "AS",
+          "spacing": Array [
+            " ",
+          ],
+          "value": "num_rows",
+        },
+        "ex": Function {
+          "distinct": null,
+          "filterClause": null,
+          "fn": "SUM",
+          "parens": Array [],
+          "spacing": Array [
+            null,
+            "",
+            Array [],
+            null,
+            null,
+          ],
+          "value": Array [
+            StringType {
+              "chars": "num_rows",
+              "quote": "\\"",
+              "spacing": Array [
+                null,
+                null,
+              ],
+            },
+          ],
+        },
+        "parens": Array [],
+        "spacing": Array [
+          " ",
+        ],
+      },
+    ],
+    "parens": Array [],
+    "spacing": Array [
+      "
+  ",
+      "
+  ",
+      "
+  ",
+      "
+  ",
+    ],
+  },
+  "distinct": null,
+  "fromClause": FromClause {
+    "alias": null,
+    "fc": RefExpression {
+      "name": "segments",
+      "namespace": "sys",
+      "quote": undefined,
+      "quoteSpacing": undefined,
+    },
+    "keyword": "FROM",
+    "parens": undefined,
+    "spacing": Array [
+      " ",
+      null,
+    ],
+  },
+  "groupByClause": GroupByClause {
+    "byKeyword": "BY",
+    "groupBy": Array [
+      Integer {
+        "value": "1",
+      },
+    ],
+    "groupKeyword": "GROUP",
+    "spacing": Array [
+      " ",
+      " ",
+      Array [],
+    ],
+  },
+  "havingClause": null,
+  "limitClause": null,
+  "orderByClause": null,
+  "spacing": Array [
+    null,
+    "
+  ",
+    "
+",
+    null,
+    "
+",
+    null,
+    null,
+    null,
+    "",
+  ],
+  "type": "query",
+  "verb": "SELECT",
+  "whereClause": null,
+}
+`;
+
+exports[`Druid Query Tests parsers the default data sources query to string 1`] = `
+"SELECT
+  datasource,
+  COUNT(*) FILTER (WHERE (is_published = 1 AND is_overshadowed = 0) OR is_realtime = 1) AS num_segments,
+  COUNT(*) FILTER (WHERE is_available = 1 AND ((is_published = 1 AND is_overshadowed = 0) OR is_realtime = 1)) AS num_available_segments,
+  COUNT(*) FILTER (WHERE is_published = 1 AND is_overshadowed = 0 AND is_available = 0) AS num_segments_to_load,
+  COUNT(*) FILTER (WHERE is_available = 1 AND NOT ((is_published = 1 AND is_overshadowed = 0) OR is_realtime = 1)) AS num_segments_to_drop,
+  SUM(\\"size\\") FILTER (WHERE (is_published = 1 AND is_overshadowed = 0) OR is_realtime = 1) AS size,
+  SUM(\\"size\\" * \\"num_replicas\\") FILTER (WHERE (is_published = 1 AND is_overshadowed = 0) OR is_realtime = 1) AS replicated_size,
+  SUM(\\"num_rows\\") FILTER (WHERE (is_published = 1 AND is_overshadowed = 0) OR is_realtime = 1) AS num_rows
+FROM sys.segments
+GROUP BY 1"
+`;

@@ -15,10 +15,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const parse = require('./druidsql');
-const stringify = require('./druidsqltostring');
 
-module.exports = {
-  parse: parse.parse,
-  stringify: stringify.toSQL,
-};
+import { NotExpression } from '../../../index';
+
+export interface AndPartValue {
+  keyword: string;
+  ex: NotExpression;
+  spacing: string[];
+}
+
+export class AndPart {
+  public ex: NotExpression;
+  public keyword: string;
+  public spacing: string[];
+
+  constructor(options: AndPartValue) {
+    this.ex = options.ex;
+    this.keyword = options.keyword;
+    this.spacing = options.spacing;
+  }
+
+  toString() {
+    return (this.keyword ? this.keyword : '') + this.spacing[0] + this.ex.toString();
+  }
+}

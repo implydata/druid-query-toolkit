@@ -15,10 +15,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const parse = require('./druidsql');
-const stringify = require('./druidsqltostring');
+import { StringType } from '../..';
 
-module.exports = {
-  parse: parse.parse,
-  stringify: stringify.toSQL,
-};
+export interface IntervalValue {
+  intervalKeyword: string;
+  ex: StringType;
+  unitKeyword: string;
+  spacing: string[];
+}
+
+export class Interval {
+  public intervalKeyword: string;
+  public ex: StringType;
+  public unitKeyword: string;
+  public spacing: string[];
+
+  constructor(options: IntervalValue) {
+    this.intervalKeyword = options.intervalKeyword;
+    this.ex = options.ex;
+    this.unitKeyword = options.unitKeyword;
+    this.spacing = options.spacing;
+  }
+
+  toString(): string {
+    return (
+      this.intervalKeyword +
+      this.spacing[0] +
+      this.ex.toString() +
+      this.spacing[1] +
+      this.unitKeyword
+    );
+  }
+}

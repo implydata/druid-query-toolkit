@@ -15,10 +15,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const parse = require('./druidsql');
-const stringify = require('./druidsqltostring');
+import { WhereClause } from '../../..';
 
-module.exports = {
-  parse: parse.parse,
-  stringify: stringify.toSQL,
-};
+export interface FilterClauseValue {
+  keyword: string;
+  spacing: string[];
+  ex: WhereClause;
+}
+
+export class FilterClause {
+  public keyword: string;
+  public spacing: string[];
+  public ex: WhereClause;
+
+  constructor(options: FilterClauseValue) {
+    this.keyword = options.keyword;
+    this.spacing = options.spacing;
+    this.ex = options.ex;
+  }
+
+  toString() {
+    return (
+      this.keyword +
+      this.spacing[0] +
+      '(' +
+      (this.spacing[1] ? this.spacing[1] : '') +
+      this.ex.toString() +
+      (this.spacing[2] ? this.spacing[2] : '') +
+      ')'
+    );
+  }
+}

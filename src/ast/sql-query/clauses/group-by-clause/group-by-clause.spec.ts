@@ -15,10 +15,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const parse = require('./druidsql');
-const stringify = require('./druidsqltostring');
 
-module.exports = {
-  parse: parse.parse,
-  stringify: stringify.toSQL,
-};
+import { sqlParserFactory } from '../../../../parser/druidsql';
+import { FUNCTIONS } from '../../../../test-utils';
+
+const parser = sqlParserFactory(FUNCTIONS);
+
+describe('groupbyclause tests', () => {
+  it('remove low index column', () => {
+    expect(
+      parser(
+        'SELECT COUNT(*) AS "Count", "task_id"\n' +
+          'FROM sys.tasks\n' +
+          'GROUP BY 2\n' +
+          'ORDER BY "datasource" DESC',
+      )
+        .excludeColumn('Count')
+        .toString(),
+    ).toMatchSnapshot();
+  });
+});

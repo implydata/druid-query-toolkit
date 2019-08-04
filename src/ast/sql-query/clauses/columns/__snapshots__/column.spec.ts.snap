@@ -1,0 +1,35 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`single column Tests column addparen 1`] = `
+Column {
+  "alias": null,
+  "ex": OrExpression {
+    "ex": undefined,
+    "parens": Array [],
+    "spacing": null,
+  },
+  "parens": Array [
+    Object {
+      "close": Array [
+        "",
+        ")",
+      ],
+      "open": Array [
+        "(",
+        "",
+      ],
+    },
+  ],
+  "spacing": Array [
+    "",
+  ],
+}
+`;
+
+exports[`single column Tests column addparen to string 1`] = `"('value')"`;
+
+exports[`single column Tests column getAlias 1`] = `"value"`;
+
+exports[`single column Tests column getBasicValue with bracket 1`] = `"value"`;
+
+exports[`single column Tests column with no brackets to string 1`] = `"'value'"`;

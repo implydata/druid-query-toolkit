@@ -15,10 +15,4 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const parse = require('./druidsql');
-const stringify = require('./druidsqltostring');
-
-module.exports = {
-  parse: parse.parse,
-  stringify: stringify.toSQL,
-};
+export function sqlParserFactory(functions: string[]): (druidSql: string) => any;
