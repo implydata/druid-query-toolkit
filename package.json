@@ -26,7 +26,8 @@
     "pretest": "npm run compile",
     "test": "npm run tslint && jest",
     "playground": "node script/compile-peg.js && jest src/playground.spec.ts",
-    "compile": "node script/compile-peg.js && tsc",
+    "compile": "node script/compile-peg.js && tsc && npm run cp-parser",
+    "cp-parser": "cp -r src/parser build/parser",
     "tslint": "./node_modules/.bin/tslint -c tslint.json --project tsconfig.json --formatters-dir ./node_modules/awesome-code-style/formatter 'src/**/*.ts?(x)'",
     "tslint-fix": "npm run tslint -- --fix",
     "tslint-changed-only": "git diff --diff-filter=ACMR --name-only | grep -E \\.tsx\\?$ | xargs ./node_modules/.bin/tslint -c tslint.json --project tsconfig.json --formatters-dir ./node_modules/awesome-code-style/formatter",
@@ -48,6 +49,12 @@
     "type": "git",
     "url": "https://github.com/implydata/druid-query-toolkit"
   },
+  "files": [
+    "build/"
+  ],
+  "dependencies": {
+    "tslib": "^1.10.0"
+  },
   "devDependencies": {
     "@types/jest": "^24.0.17",
     "awesome-code-style": "^1.4.3",
@@ -57,8 +64,5 @@
     "ts-jest": "^24.0.2",
     "tslint": "^5.18.0",
     "typescript": "^3.5.3"
-  },
-  "dependencies": {
-    "tslib": "^1.10.0"
   }
 }
