@@ -46,6 +46,7 @@ ORDER BY "start" DESC
 LIMIT 25`)
       .excludeColumn('datasource')
       .toString();
+
     expect(tree).toMatchInlineSnapshot(`
                         "SELECT \\"segment_id\\", \\"start\\", \\"end\\", \\"size\\", \\"version\\", \\"partition_num\\", \\"num_replicas\\", \\"num_rows\\", \\"is_published\\", \\"is_available\\", \\"is_realtime\\", \\"is_overshadowed\\", \\"payload\\"
                         FROM sys.segments
@@ -61,6 +62,7 @@ ORDER BY "start" DESC
 LIMIT 25`)
       .orderBy('datasource', 'DESC')
       .toString();
+
     expect(tree).toMatchInlineSnapshot(`
                         "SELECT \\"segment_id\\", \\"datasource\\", \\"start\\", \\"end\\", \\"size\\", \\"version\\", \\"partition_num\\", \\"num_replicas\\", \\"num_rows\\", \\"is_published\\", \\"is_available\\", \\"is_realtime\\", \\"is_overshadowed\\", \\"payload\\"
                         FROM sys.segments
@@ -76,6 +78,7 @@ ORDER BY "start" DESC
 LIMIT 25`)
       .excludeRow('datasource', 'rowvalue', '!=')
       .toString();
+
     expect(tree).toMatchInlineSnapshot(`
                         "SELECT \\"segment_id\\", \\"datasource\\", \\"start\\", \\"end\\", \\"size\\", \\"version\\", \\"partition_num\\", \\"num_replicas\\", \\"num_rows\\", \\"is_published\\", \\"is_available\\", \\"is_realtime\\", \\"is_overshadowed\\", \\"payload\\"
                         FROM sys.segments
@@ -155,6 +158,7 @@ LIMIT 25`).getColumnsArray();
 FROM sys.segments
 ORDER BY "start" DESC
 LIMIT 25`).toString();
+
     expect(tree).toMatchInlineSnapshot(`
                                           "SELECT \\"segment_id\\", \\"datasource\\", \\"start\\", \\"end\\", \\"size\\", \\"version\\", \\"partition_num\\", \\"num_replicas\\", \\"num_rows\\", \\"is_published\\", \\"is_available\\", \\"is_realtime\\", \\"is_overshadowed\\", \\"payload\\"
                                           FROM sys.segments
@@ -180,6 +184,7 @@ GROUP BY 1,2
 ORDER BY "rank" DESC, "created_time" DESC`)
       .excludeColumn('datasource')
       .toString();
+
     expect(tree).toMatchInlineSnapshot(`
                         "SELECT
                           COUNT(*) AS num_segments,
@@ -210,6 +215,7 @@ GROUP BY 1,2
 ORDER BY "rank" DESC, "created_time" DESC`)
       .orderBy('datasource', 'DESC')
       .toString();
+
     expect(tree).toMatchInlineSnapshot(`
                         "SELECT
                           datasource,
@@ -241,6 +247,7 @@ GROUP BY 1,2
 ORDER BY "rank" DESC, "created_time" DESC`)
       .excludeRow('datasource', 'rowvalue', '!=')
       .toString();
+
     expect(tree).toMatchInlineSnapshot(`
                         "SELECT
                           datasource,
@@ -378,6 +385,7 @@ ORDER BY "rank" DESC, "created_time" DESC`).getColumnsArray();
 FROM sys.segments
 GROUP BY 1,2
 ORDER BY "rank" DESC, "created_time" DESC`).toString();
+
     expect(tree).toMatchInlineSnapshot(`
                                     "SELECT
                                       datasource,
@@ -412,6 +420,7 @@ GROUP BY 1,2
 ORDER BY "rank" DESC, "created_time" DESC`)
       .excludeColumn('datasource')
       .toString();
+
     expect(tree).toMatchInlineSnapshot(`
                         "SELECT
                           COUNT(*) AS num_segments,
@@ -444,6 +453,7 @@ GROUP BY 1,2
 ORDER BY "rank" DESC, "created_time" DESC`)
       .orderBy('datasource', 'DESC')
       .toString();
+
     expect(tree).toMatchInlineSnapshot(`
                         "SELECT
                           datasource,
@@ -477,6 +487,7 @@ GROUP BY 1,2
 ORDER BY "rank" DESC, "created_time" DESC`)
       .excludeRow('datasource', 'rowvalue', '!=')
       .toString();
+
     expect(tree).toMatchInlineSnapshot(`
                         "SELECT
                           datasource,
@@ -620,6 +631,7 @@ FROM sys.segments
 WHERE "size" = '12'
 GROUP BY 1,2
 ORDER BY "rank" DESC, "created_time" DESC`).toString();
+
     expect(tree).toMatchInlineSnapshot(`
                               "SELECT
                                 datasource,
@@ -655,6 +667,7 @@ GROUP BY 1,2
 ORDER BY "rank" DESC, "created_time" DESC`)
       .excludeColumn('datasource')
       .toString();
+
     expect(tree).toMatchInlineSnapshot(`
                         "SELECT
                           COUNT(*) AS num_segments,
@@ -687,6 +700,7 @@ GROUP BY 1,2
 ORDER BY "rank" DESC, "created_time" DESC`)
       .excludeColumn('num_segments')
       .toString();
+
     expect(tree).toMatchInlineSnapshot(`
                   "SELECT
                     datasource,
@@ -719,6 +733,7 @@ GROUP BY datasource,num_segments
 ORDER BY "rank" DESC, "created_time" DESC`)
       .excludeColumn('datasource')
       .toString();
+
     expect(tree).toMatchInlineSnapshot(`
             "SELECT
               COUNT(*) AS num_segments,
@@ -751,6 +766,7 @@ GROUP BY datasource,num_segments
 ORDER BY "rank" DESC, "created_time" DESC`)
       .excludeColumn('num_segments')
       .toString();
+
     expect(tree).toMatchInlineSnapshot(`
             "SELECT
               datasource,
@@ -783,6 +799,7 @@ GROUP BY datasource
 ORDER BY "rank" DESC, "created_time" DESC`)
       .excludeColumn('datasource')
       .toString();
+
     expect(tree).toMatchInlineSnapshot(`
       "SELECT
         COUNT(*) AS num_segments,
@@ -814,6 +831,7 @@ GROUP BY 1
 ORDER BY "rank" DESC, "created_time" DESC`)
       .excludeColumn('datasource')
       .toString();
+
     expect(tree).toMatchInlineSnapshot(`
       "SELECT
         COUNT(*) AS num_segments,

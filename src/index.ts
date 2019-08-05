@@ -13,3 +13,4 @@
  */
 
 export * from './parser/druidsql';
+export * from './query-result-decoder/query-result-decoder';

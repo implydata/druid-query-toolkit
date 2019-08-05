@@ -1,8 +1,9 @@
 {
   "name": "druid-query-toolkit",
   "version": "0.3.4",
-  "description": "A collection of utilities for working with Druid queries\n",
+  "description": "A collection of utilities for working with Druid queries",
   "main": "build/index.ts",
+  "typings": "build/index.d.ts",
   "homepage": "https://github.com/implydata/druid-sql-parser",
   "jest": {
     "preset": "ts-jest",
@@ -38,6 +39,10 @@
   ],
   "author": "Imply Data",
   "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/implydata/druid-query-toolkit"
+  },
   "devDependencies": {
     "@types/jest": "^24.0.17",
     "awesome-code-style": "^1.4.3",
