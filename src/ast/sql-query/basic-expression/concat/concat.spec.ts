@@ -25,5 +25,5 @@ describe('single column Tests', () => {
       spacing: [''],
     });
     expect(val.toString()).toMatchSnapshot();
-  })
+  });
 });
