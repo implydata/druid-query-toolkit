@@ -19,7 +19,7 @@ describe('single column Tests', () => {
     const val = new Column({
       parens: [],
       ex: new OrExpression({
-        basicExpression: new StringType({ chars: 'value', quote: "'", spacing: ['', ''] }),
+        ex: [new StringType({ chars: 'value', quote: "'", spacing: ['', ''] })],
       }),
       alias: null,
       spacing: [''],
@@ -30,7 +30,7 @@ describe('single column Tests', () => {
     const val = new Column({
       parens: [],
       ex: new OrExpression({
-        basicExpression: new StringType({ chars: 'value', quote: "'", spacing: ['', ''] }),
+        ex: [new StringType({ chars: 'value', quote: "'", spacing: ['', ''] })],
       }),
       alias: null,
       spacing: [''],
@@ -42,36 +42,12 @@ describe('single column Tests', () => {
     const val = new Column({
       parens: [],
       ex: new OrExpression({
-        basicExpression: new StringType({ chars: 'value', quote: "'", spacing: ['', ''] }),
+        ex: [new StringType({ chars: 'value', quote: "'", spacing: ['', ''] })],
       }),
       alias: null,
       spacing: [''],
     });
     val.addParen(['(', ''], ['', ')']);
     expect(val.toString()).toMatchSnapshot();
-  });
-  it('column getBasicValue with bracket', () => {
-    const val = new Column({
-      parens: [],
-      ex: new OrExpression({
-        basicExpression: new StringType({ chars: 'value', quote: "'", spacing: ['', ''] }),
-      }),
-      alias: null,
-      spacing: [''],
-    });
-    val.addParen(['(', ''], ['', ')']);
-    expect(val.getBasicValue()).toMatchSnapshot();
-  });
-  it('column getAlias', () => {
-    const val = new Column({
-      parens: [],
-      ex: new OrExpression({
-        basicExpression: new StringType({ chars: 'value', quote: "'", spacing: ['', ''] }),
-      }),
-      alias: null,
-      spacing: [''],
-    });
-    val.addParen(['(', ''], ['', ')']);
-    expect(val.getBasicValue()).toMatchSnapshot();
   });
 });

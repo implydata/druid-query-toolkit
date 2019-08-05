@@ -4,7 +4,16 @@ exports[`single column Tests column addparen 1`] = `
 Column {
   "alias": null,
   "ex": OrExpression {
-    "ex": undefined,
+    "ex": Array [
+      StringType {
+        "chars": "value",
+        "quote": "'",
+        "spacing": Array [
+          "",
+          "",
+        ],
+      },
+    ],
     "parens": Array [],
     "spacing": null,
   },
@@ -27,9 +36,5 @@ Column {
 `;
 
 exports[`single column Tests column addparen to string 1`] = `"('value')"`;
-
-exports[`single column Tests column getAlias 1`] = `"value"`;
-
-exports[`single column Tests column getBasicValue with bracket 1`] = `"value"`;
 
 exports[`single column Tests column with no brackets to string 1`] = `"'value'"`;

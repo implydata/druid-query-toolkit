@@ -2,7 +2,7 @@
   "name": "druid-query-toolkit",
   "version": "0.3.4",
   "description": "A collection of utilities for working with Druid queries\n",
-  "main": "src/index.js",
+  "main": "build/index.ts",
   "homepage": "https://github.com/implydata/druid-sql-parser",
   "jest": {
     "preset": "ts-jest",

@@ -19,11 +19,11 @@ describe('single column Tests', () => {
     const val = new Column({
       parens: [],
       ex: new OrExpression({
-        basicExpression: new StringType({ chars: 'value', quote: "'", spacing: ['', ''] }),
+        ex: [new StringType({ chars: 'value', quote: "'", spacing: ['', ''] })],
       }),
       alias: null,
       spacing: [''],
     });
     expect(val.toString()).toMatchSnapshot();
-  });
+  })
 });
