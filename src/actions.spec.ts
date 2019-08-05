@@ -53,6 +53,7 @@ LIMIT 25`)
                         LIMIT 25"
                 `);
   });
+
   it('renders orderBy', () => {
     const tree = parser(`SELECT "segment_id", "datasource", "start", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed", "payload"
 FROM sys.segments
@@ -67,6 +68,7 @@ LIMIT 25`)
                         LIMIT 25"
                 `);
   });
+
   it('renders exclude row', () => {
     const tree = parser(`SELECT "segment_id", "datasource", "start", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed", "payload"
 FROM sys.segments
@@ -82,11 +84,13 @@ LIMIT 25`)
                         LIMIT 25"
                 `);
   });
+
   it('renders getSorted', () => {
     const tree = parser(`SELECT "segment_id", "datasource", "start", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed", "payload"
 FROM sys.segments
 ORDER BY "start" DESC
 LIMIT 25`).getSorted();
+
     expect(tree).toMatchInlineSnapshot(`
                                                             Array [
                                                               Object {
@@ -96,6 +100,7 @@ LIMIT 25`).getSorted();
                                                             ]
                                         `);
   });
+
   it('renders getFromNameSpace', () => {
     const tree = parser(`SELECT "segment_id", "datasource", "start", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed", "payload"
 FROM sys.segments
@@ -103,6 +108,7 @@ ORDER BY "start" DESC
 LIMIT 25`).getFromNameSpace();
     expect(tree).toMatchInlineSnapshot(`"sys"`);
   });
+
   it('renders getFromName', () => {
     const tree = parser(`SELECT "segment_id", "datasource", "start", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed", "payload"
 FROM sys.segments
@@ -110,6 +116,7 @@ ORDER BY "start" DESC
 LIMIT 25`).getFromName();
     expect(tree).toMatchInlineSnapshot(`"segments"`);
   });
+
   it('renders getAggregateColumns', () => {
     const tree = parser(`SELECT "segment_id", "datasource", "start", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed", "payload"
 FROM sys.segments
@@ -117,6 +124,7 @@ ORDER BY "start" DESC
 LIMIT 25`).getAggregateColumns();
     expect(tree).toMatchInlineSnapshot(`undefined`);
   });
+
   it('renders getColumnsArray', () => {
     const tree = parser(`SELECT "segment_id", "datasource", "start", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed", "payload"
 FROM sys.segments
@@ -186,6 +194,7 @@ ORDER BY "rank" DESC, "created_time" DESC`)
                         ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
                 `);
   });
+
   it('renders orderBy', () => {
     const tree = parser(`SELECT
   datasource,
@@ -216,6 +225,7 @@ ORDER BY "rank" DESC, "created_time" DESC`)
                         ORDER BY \\"datasource\\" DESC"
                 `);
   });
+
   it('renders exclude row', () => {
     const tree = parser(`SELECT
   datasource,
@@ -247,6 +257,7 @@ ORDER BY "rank" DESC, "created_time" DESC`)
                         ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
                 `);
   });
+
   it('renders getSorted', () => {
     const tree = parser(`SELECT
   datasource,
@@ -273,6 +284,7 @@ ORDER BY "rank" DESC, "created_time" DESC`).getSorted();
                                     ]
                         `);
   });
+
   it('renders getFromNameSpace', () => {
     const tree = parser(`SELECT
   datasource,
@@ -288,6 +300,7 @@ GROUP BY 1,2
 ORDER BY "rank" DESC, "created_time" DESC`).getFromNameSpace();
     expect(tree).toMatchInlineSnapshot(`"sys"`);
   });
+
   it('renders getFromName', () => {
     const tree = parser(`SELECT
   datasource,
@@ -303,6 +316,7 @@ GROUP BY 1,2
 ORDER BY "rank" DESC, "created_time" DESC`).getFromName();
     expect(tree).toMatchInlineSnapshot(`"segments"`);
   });
+
   it('renders getAggregateColumns', () => {
     const tree = parser(`SELECT
   datasource,
@@ -325,6 +339,7 @@ ORDER BY "rank" DESC, "created_time" DESC`).getAggregateColumns();
                                     ]
                         `);
   });
+
   it('renders getColumnsArray', () => {
     const tree = parser(`SELECT
   datasource,
@@ -412,6 +427,7 @@ ORDER BY "rank" DESC, "created_time" DESC`)
                         ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
                 `);
   });
+
   it('renders orderBy', () => {
     const tree = parser(`SELECT
   datasource,
@@ -444,6 +460,7 @@ ORDER BY "rank" DESC, "created_time" DESC`)
                         ORDER BY \\"datasource\\" DESC"
                 `);
   });
+
   it('renders exclude row', () => {
     const tree = parser(`SELECT
   datasource,
@@ -476,6 +493,7 @@ ORDER BY "rank" DESC, "created_time" DESC`)
                         ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
                 `);
   });
+
   it('renders getSorted', () => {
     const tree = parser(`SELECT
   datasource,
@@ -503,6 +521,7 @@ ORDER BY "rank" DESC, "created_time" DESC`).getSorted();
                                     ]
                         `);
   });
+
   it('renders getFromNameSpace', () => {
     const tree = parser(`SELECT
   datasource,
@@ -519,6 +538,7 @@ GROUP BY 1,2
 ORDER BY "rank" DESC, "created_time" DESC`).getFromNameSpace();
     expect(tree).toMatchInlineSnapshot(`"sys"`);
   });
+
   it('renders getFromName', () => {
     const tree = parser(`SELECT
   datasource,
@@ -535,6 +555,7 @@ GROUP BY 1,2
 ORDER BY "rank" DESC, "created_time" DESC`).getFromName();
     expect(tree).toMatchInlineSnapshot(`"segments"`);
   });
+
   it('renders getAggregateColumns', () => {
     const tree = parser(`SELECT
   datasource,
@@ -558,6 +579,7 @@ ORDER BY "rank" DESC, "created_time" DESC`).getAggregateColumns();
                                     ]
                         `);
   });
+
   it('renders getColumnsArray', () => {
     const tree = parser(`SELECT
   datasource,
@@ -648,6 +670,7 @@ ORDER BY "rank" DESC, "created_time" DESC`)
                         ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
                 `);
   });
+
   it('renders remove second of 2 columns', () => {
     const tree = parser(`SELECT
   datasource,
@@ -679,6 +702,7 @@ ORDER BY "rank" DESC, "created_time" DESC`)
                   ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
             `);
   });
+
   it('renders remove first of 2 named columns', () => {
     const tree = parser(`SELECT
   datasource,
@@ -710,6 +734,7 @@ ORDER BY "rank" DESC, "created_time" DESC`)
             ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
         `);
   });
+
   it('renders remove second of 2 named columns', () => {
     const tree = parser(`SELECT
   datasource,
@@ -741,6 +766,7 @@ ORDER BY "rank" DESC, "created_time" DESC`)
             ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
         `);
   });
+
   it('renders remove second of 1 of 1 columns', () => {
     const tree = parser(`SELECT
   datasource,
@@ -771,6 +797,7 @@ ORDER BY "rank" DESC, "created_time" DESC`)
       ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
     `);
   });
+
   it('renders remove second of 1 of 1 columns by index', () => {
     const tree = parser(`SELECT
   datasource,
