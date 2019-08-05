@@ -12,8 +12,8 @@
  * limitations under the License.
  */
 
-import { Columns } from '../columns/columns';
 import { OrderByPart, StringType } from '../../../index';
+import { Columns } from '../columns/columns';
 
 export interface OrderByClauseValue {
   orderKeyword: string;
