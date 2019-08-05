@@ -8,6 +8,9 @@
     "preset": "ts-jest",
     "testMatch": [
       "**/?(*.)+(spec).ts"
+    ],
+    "setupFilesAfterEnv": [
+      "<rootDir>jest-env.ts"
     ]
   },
   "prettier": {
@@ -36,8 +39,9 @@
   "author": "Imply Data",
   "license": "Apache-2.0",
   "devDependencies": {
-    "@types/jest": "^24.0.16",
+    "@types/jest": "^24.0.17",
     "awesome-code-style": "^1.4.3",
+    "core-js": "^3.1.4",
     "jest": "^24.8.0",
     "pegjs": "^0.10.0",
     "ts-jest": "^24.0.2",
