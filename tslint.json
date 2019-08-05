@@ -1,7 +1,7 @@
 {
   "extends": "awesome-code-style",
   "rules": {
-    "file-header": [true, "Licensed to the Apache Software Foundation \\(ASF\\).+"],
+    "file-header": [true, "Licensed under the Apache License, Version.+"],
     "no-shadowed-variable": false,
     "variable-name": false,
     "no-conditional-assignment": true,

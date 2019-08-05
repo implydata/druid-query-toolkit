@@ -1,7 +1,7 @@
 {
-  "name": "druid-sql-parser",
-  "version": "0.1.0",
-  "description": "Parses/stringifies DruidSQL",
+  "name": "druid-query-toolkit",
+  "version": "0.3.4",
+  "description": "A collection of utilities for working with Druid queries\n",
   "main": "src/index.js",
   "homepage": "https://github.com/implydata/druid-sql-parser",
   "jest": {
@@ -20,7 +20,8 @@
   },
   "scripts": {
     "test": "jest",
-    "playground": "node script/compile-peg.js && jest src/playground.spec.ts"
+    "playground": "node script/compile-peg.js && jest src/playground.spec.ts",
+    "compile": "node script/compile-peg.js && tsc"
   },
   "keywords": [
     "sql",
@@ -32,16 +33,18 @@
     "ast",
     "sql-ast"
   ],
-  "author": "Maggie Brewster",
+  "author": "Imply Data",
   "license": "Apache-2.0",
   "devDependencies": {
-    "@types/jest": "^24.0.15",
-    "awesome-code-style": "^1.4.2",
+    "@types/jest": "^24.0.16",
+    "awesome-code-style": "^1.4.3",
     "jest": "^24.8.0",
     "pegjs": "^0.10.0",
     "ts-jest": "^24.0.2",
     "tslint": "^5.18.0",
     "typescript": "^3.5.3"
   },
-  "dependencies": {}
+  "dependencies": {
+    "tslib": "^1.10.0"
+  }
 }
