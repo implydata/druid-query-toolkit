@@ -72,7 +72,7 @@ export class SqlQuery extends BaseAst {
     this.spacing = options.spacing;
   }
 
-  orderBy(column: string, direction: string): SqlQuery {
+  orderBy(column: string, direction: 'ASC' | 'DESC'): SqlQuery {
     const orderByClause = new OrderByClause({
       orderKeyword: 'ORDER',
       byKeyword: 'BY',
@@ -128,7 +128,7 @@ export class SqlQuery extends BaseAst {
       groupByClause: this.getGroupByClauseWithoutColumn(columnVal),
       havingClause: this.havingClause,
       limitClause: this.limitClause,
-      orderByClause: this.getOrderByCluaseWithoutColumn(columnVal),
+      orderByClause: this.getOrderByClauseWithoutColumn(columnVal),
       spacing: this.spacing,
       verb: this.verb,
       whereClause: this.whereClause,
@@ -136,7 +136,7 @@ export class SqlQuery extends BaseAst {
     return query;
   }
 
-  getOrderByCluaseWithoutColumn(columnVal: string): OrderByClause | undefined {
+  getOrderByClauseWithoutColumn(columnVal: string): OrderByClause | undefined {
     if (!this.orderByClause) {
       return;
     } else {
@@ -199,7 +199,7 @@ export class SqlQuery extends BaseAst {
     return groupByClause;
   }
 
-  excludeRow(header: string, row: string, operator: string): SqlQuery {
+  filterRow(header: string, row: string, operator: '!=' | '='): SqlQuery {
     const spacing = this.spacing;
     let whereClause = this.whereClause;
     const headerBaseString = new StringType({ chars: header, quote: '"', spacing: ['', ''] });
@@ -304,11 +304,11 @@ export class SqlQuery extends BaseAst {
     return [];
   }
 
-  getFromNameSpace(): string | undefined {
+  getSchema(): string | undefined {
     return this.fromClause.getFromNameSpace();
   }
 
-  getFromName(): string | undefined {
+  getTableName(): string | undefined {
     return this.fromClause.getFromName();
   }
 
