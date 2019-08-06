@@ -199,11 +199,19 @@ export class SqlQuery extends BaseAst {
     return groupByClause;
   }
 
-  filterRow(header: string, row: string, operator: '!=' | '='): SqlQuery {
+  filterRow(header: string, row: string | number, operator: '!=' | '='): SqlQuery {
     const spacing = this.spacing;
     let whereClause = this.whereClause;
     const headerBaseString = new StringType({ chars: header, quote: '"', spacing: ['', ''] });
-    const rowBaseString = new StringType({ chars: row, quote: "'", spacing: ['', ''] });
+    // @ts-ignore
+    const rowBaseString =
+      typeof row === 'number'
+        ? new Integer(row)
+        : new StringType({
+            chars: String(row),
+            quote: "'",
+            spacing: ['', ''],
+          });
     const rhs = new ComparisonExpressionRhs({
       parens: [],
       op: operator,
