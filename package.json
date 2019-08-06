@@ -14,6 +14,12 @@
       "<rootDir>jest-env.ts"
     ]
   },
+  "husky": {
+    "hooks": {
+      "pre-push": "npm run tslint",
+      "pre-commit": "npm run tslint-changed-only"
+    }
+  },
   "prettier": {
     "trailingComma": "all",
     "tabWidth": 2,
@@ -59,6 +65,7 @@
     "@types/jest": "^24.0.17",
     "awesome-code-style": "^1.4.3",
     "core-js": "^3.1.4",
+    "husky": "^3.0.2",
     "jest": "^24.8.0",
     "pegjs": "^0.10.0",
     "ts-jest": "^24.0.2",

@@ -11,9 +11,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { basicIdentifierEscape, basicLiteralEscape } from './ast/sql-query/helpers';
 import { sqlParserFactory } from './parser/druidsql';
 import { FUNCTIONS } from './test-utils';
-import { basicIdentifierEscape, basicLiteralEscape } from './ast/sql-query/helpers';
 
 const parser = sqlParserFactory(FUNCTIONS);
 
