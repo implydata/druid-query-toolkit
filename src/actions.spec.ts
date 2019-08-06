@@ -43,312 +43,14 @@ describe('ast action for segments test', () => {
     const tree = parser(`SELECT "segment_id", "datasource", "start", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed", "payload"
 FROM sys.segments
 ORDER BY "start" DESC
-LIMIT 25`).excludeColumn('start');
+LIMIT 25`)
+      .excludeColumn('start')
+      .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-            SqlQuery {
-              "columns": Columns {
-                "columns": Array [
-                  Column {
-                    "alias": null,
-                    "ex": RefExpression {
-                      "name": StringType {
-                        "chars": "segment_id",
-                        "quote": "\\"",
-                        "spacing": Array [
-                          null,
-                          null,
-                        ],
-                      },
-                      "namespace": null,
-                      "quote": undefined,
-                      "quoteSpacing": undefined,
-                    },
-                    "parens": Array [],
-                    "spacing": null,
-                  },
-                  Column {
-                    "alias": null,
-                    "ex": RefExpression {
-                      "name": StringType {
-                        "chars": "datasource",
-                        "quote": "\\"",
-                        "spacing": Array [
-                          null,
-                          null,
-                        ],
-                      },
-                      "namespace": null,
-                      "quote": undefined,
-                      "quoteSpacing": undefined,
-                    },
-                    "parens": Array [],
-                    "spacing": null,
-                  },
-                  Column {
-                    "alias": null,
-                    "ex": RefExpression {
-                      "name": StringType {
-                        "chars": "end",
-                        "quote": "\\"",
-                        "spacing": Array [
-                          null,
-                          null,
-                        ],
-                      },
-                      "namespace": null,
-                      "quote": undefined,
-                      "quoteSpacing": undefined,
-                    },
-                    "parens": Array [],
-                    "spacing": null,
-                  },
-                  Column {
-                    "alias": null,
-                    "ex": RefExpression {
-                      "name": StringType {
-                        "chars": "size",
-                        "quote": "\\"",
-                        "spacing": Array [
-                          null,
-                          null,
-                        ],
-                      },
-                      "namespace": null,
-                      "quote": undefined,
-                      "quoteSpacing": undefined,
-                    },
-                    "parens": Array [],
-                    "spacing": null,
-                  },
-                  Column {
-                    "alias": null,
-                    "ex": RefExpression {
-                      "name": StringType {
-                        "chars": "version",
-                        "quote": "\\"",
-                        "spacing": Array [
-                          null,
-                          null,
-                        ],
-                      },
-                      "namespace": null,
-                      "quote": undefined,
-                      "quoteSpacing": undefined,
-                    },
-                    "parens": Array [],
-                    "spacing": null,
-                  },
-                  Column {
-                    "alias": null,
-                    "ex": RefExpression {
-                      "name": StringType {
-                        "chars": "partition_num",
-                        "quote": "\\"",
-                        "spacing": Array [
-                          null,
-                          null,
-                        ],
-                      },
-                      "namespace": null,
-                      "quote": undefined,
-                      "quoteSpacing": undefined,
-                    },
-                    "parens": Array [],
-                    "spacing": null,
-                  },
-                  Column {
-                    "alias": null,
-                    "ex": RefExpression {
-                      "name": StringType {
-                        "chars": "num_replicas",
-                        "quote": "\\"",
-                        "spacing": Array [
-                          null,
-                          null,
-                        ],
-                      },
-                      "namespace": null,
-                      "quote": undefined,
-                      "quoteSpacing": undefined,
-                    },
-                    "parens": Array [],
-                    "spacing": null,
-                  },
-                  Column {
-                    "alias": null,
-                    "ex": RefExpression {
-                      "name": StringType {
-                        "chars": "num_rows",
-                        "quote": "\\"",
-                        "spacing": Array [
-                          null,
-                          null,
-                        ],
-                      },
-                      "namespace": null,
-                      "quote": undefined,
-                      "quoteSpacing": undefined,
-                    },
-                    "parens": Array [],
-                    "spacing": null,
-                  },
-                  Column {
-                    "alias": null,
-                    "ex": RefExpression {
-                      "name": StringType {
-                        "chars": "is_published",
-                        "quote": "\\"",
-                        "spacing": Array [
-                          null,
-                          null,
-                        ],
-                      },
-                      "namespace": null,
-                      "quote": undefined,
-                      "quoteSpacing": undefined,
-                    },
-                    "parens": Array [],
-                    "spacing": null,
-                  },
-                  Column {
-                    "alias": null,
-                    "ex": RefExpression {
-                      "name": StringType {
-                        "chars": "is_available",
-                        "quote": "\\"",
-                        "spacing": Array [
-                          null,
-                          null,
-                        ],
-                      },
-                      "namespace": null,
-                      "quote": undefined,
-                      "quoteSpacing": undefined,
-                    },
-                    "parens": Array [],
-                    "spacing": null,
-                  },
-                  Column {
-                    "alias": null,
-                    "ex": RefExpression {
-                      "name": StringType {
-                        "chars": "is_realtime",
-                        "quote": "\\"",
-                        "spacing": Array [
-                          null,
-                          null,
-                        ],
-                      },
-                      "namespace": null,
-                      "quote": undefined,
-                      "quoteSpacing": undefined,
-                    },
-                    "parens": Array [],
-                    "spacing": null,
-                  },
-                  Column {
-                    "alias": null,
-                    "ex": RefExpression {
-                      "name": StringType {
-                        "chars": "is_overshadowed",
-                        "quote": "\\"",
-                        "spacing": Array [
-                          null,
-                          null,
-                        ],
-                      },
-                      "namespace": null,
-                      "quote": undefined,
-                      "quoteSpacing": undefined,
-                    },
-                    "parens": Array [],
-                    "spacing": null,
-                  },
-                  Column {
-                    "alias": null,
-                    "ex": RefExpression {
-                      "name": StringType {
-                        "chars": "payload",
-                        "quote": "\\"",
-                        "spacing": Array [
-                          null,
-                          null,
-                        ],
-                      },
-                      "namespace": null,
-                      "quote": undefined,
-                      "quoteSpacing": undefined,
-                    },
-                    "parens": Array [],
-                    "spacing": null,
-                  },
-                ],
-                "parens": Array [],
-                "spacing": Array [
-                  " ",
-                  " ",
-                  " ",
-                  " ",
-                  " ",
-                  " ",
-                  " ",
-                  " ",
-                  " ",
-                  " ",
-                  " ",
-                  " ",
-                  undefined,
-                ],
-              },
-              "distinct": null,
-              "fromClause": FromClause {
-                "alias": null,
-                "fc": RefExpression {
-                  "name": "segments",
-                  "namespace": "sys",
-                  "quote": undefined,
-                  "quoteSpacing": undefined,
-                },
-                "keyword": "FROM",
-                "parens": undefined,
-                "spacing": Array [
-                  " ",
-                  null,
-                ],
-              },
-              "groupByClause": undefined,
-              "havingClause": null,
-              "limitClause": LimitClause {
-                "keyword": "LIMIT",
-                "spacing": Array [
-                  " ",
-                ],
-                "value": Array [
-                  Integer {
-                    "value": "25",
-                  },
-                ],
-              },
-              "orderByClause": undefined,
-              "spacing": Array [
-                null,
-                " ",
-                "
-            ",
-                null,
-                null,
-                null,
-                "
-            ",
-                "
-            ",
-                "",
-              ],
-              "type": "query",
-              "verb": "SELECT",
-              "whereClause": null,
-            }
+            "SELECT \\"segment_id\\", \\"datasource\\", \\"end\\", \\"size\\", \\"version\\", \\"partition_num\\", \\"num_replicas\\", \\"num_rows\\", \\"is_published\\", \\"is_available\\", \\"is_realtime\\", \\"is_overshadowed\\", \\"payload\\"
+            FROM sys.segments
+            LIMIT 25"
         `);
   });
 
@@ -361,401 +63,27 @@ LIMIT 25`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                    "SELECT \\"segment_id\\", \\"datasource\\", \\"start\\", \\"end\\", \\"size\\", \\"version\\", \\"partition_num\\", \\"num_replicas\\", \\"num_rows\\", \\"is_published\\", \\"is_available\\", \\"is_realtime\\", \\"is_overshadowed\\", \\"payload\\"
-                                    FROM sys.segments
-                                    ORDER BY \\"datasource\\" DESC
-                                    LIMIT 25"
-                        `);
+                                                "SELECT \\"segment_id\\", \\"datasource\\", \\"start\\", \\"end\\", \\"size\\", \\"version\\", \\"partition_num\\", \\"num_replicas\\", \\"num_rows\\", \\"is_published\\", \\"is_available\\", \\"is_realtime\\", \\"is_overshadowed\\", \\"payload\\"
+                                                FROM sys.segments
+                                                ORDER BY \\"datasource\\" DESC
+                                                LIMIT 25"
+                                `);
   });
 
   it('renders exclude row', () => {
     const tree = parser(`SELECT "segment_id", "datasource", "start", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed", "payload"
 FROM sys.segments
 ORDER BY "start" DESC
-LIMIT 25`).filterRow('datasource', 'github', '!=');
+LIMIT 25`)
+      .filterRow('datasource', 'github', '!=')
+      .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-      SqlQuery {
-        "columns": Columns {
-          "columns": Array [
-            Column {
-              "alias": null,
-              "ex": RefExpression {
-                "name": StringType {
-                  "chars": "segment_id",
-                  "quote": "\\"",
-                  "spacing": Array [
-                    null,
-                    null,
-                  ],
-                },
-                "namespace": null,
-                "quote": undefined,
-                "quoteSpacing": undefined,
-              },
-              "parens": Array [],
-              "spacing": null,
-            },
-            Column {
-              "alias": null,
-              "ex": RefExpression {
-                "name": StringType {
-                  "chars": "datasource",
-                  "quote": "\\"",
-                  "spacing": Array [
-                    null,
-                    null,
-                  ],
-                },
-                "namespace": null,
-                "quote": undefined,
-                "quoteSpacing": undefined,
-              },
-              "parens": Array [],
-              "spacing": null,
-            },
-            Column {
-              "alias": null,
-              "ex": RefExpression {
-                "name": StringType {
-                  "chars": "start",
-                  "quote": "\\"",
-                  "spacing": Array [
-                    null,
-                    null,
-                  ],
-                },
-                "namespace": null,
-                "quote": undefined,
-                "quoteSpacing": undefined,
-              },
-              "parens": Array [],
-              "spacing": null,
-            },
-            Column {
-              "alias": null,
-              "ex": RefExpression {
-                "name": StringType {
-                  "chars": "end",
-                  "quote": "\\"",
-                  "spacing": Array [
-                    null,
-                    null,
-                  ],
-                },
-                "namespace": null,
-                "quote": undefined,
-                "quoteSpacing": undefined,
-              },
-              "parens": Array [],
-              "spacing": null,
-            },
-            Column {
-              "alias": null,
-              "ex": RefExpression {
-                "name": StringType {
-                  "chars": "size",
-                  "quote": "\\"",
-                  "spacing": Array [
-                    null,
-                    null,
-                  ],
-                },
-                "namespace": null,
-                "quote": undefined,
-                "quoteSpacing": undefined,
-              },
-              "parens": Array [],
-              "spacing": null,
-            },
-            Column {
-              "alias": null,
-              "ex": RefExpression {
-                "name": StringType {
-                  "chars": "version",
-                  "quote": "\\"",
-                  "spacing": Array [
-                    null,
-                    null,
-                  ],
-                },
-                "namespace": null,
-                "quote": undefined,
-                "quoteSpacing": undefined,
-              },
-              "parens": Array [],
-              "spacing": null,
-            },
-            Column {
-              "alias": null,
-              "ex": RefExpression {
-                "name": StringType {
-                  "chars": "partition_num",
-                  "quote": "\\"",
-                  "spacing": Array [
-                    null,
-                    null,
-                  ],
-                },
-                "namespace": null,
-                "quote": undefined,
-                "quoteSpacing": undefined,
-              },
-              "parens": Array [],
-              "spacing": null,
-            },
-            Column {
-              "alias": null,
-              "ex": RefExpression {
-                "name": StringType {
-                  "chars": "num_replicas",
-                  "quote": "\\"",
-                  "spacing": Array [
-                    null,
-                    null,
-                  ],
-                },
-                "namespace": null,
-                "quote": undefined,
-                "quoteSpacing": undefined,
-              },
-              "parens": Array [],
-              "spacing": null,
-            },
-            Column {
-              "alias": null,
-              "ex": RefExpression {
-                "name": StringType {
-                  "chars": "num_rows",
-                  "quote": "\\"",
-                  "spacing": Array [
-                    null,
-                    null,
-                  ],
-                },
-                "namespace": null,
-                "quote": undefined,
-                "quoteSpacing": undefined,
-              },
-              "parens": Array [],
-              "spacing": null,
-            },
-            Column {
-              "alias": null,
-              "ex": RefExpression {
-                "name": StringType {
-                  "chars": "is_published",
-                  "quote": "\\"",
-                  "spacing": Array [
-                    null,
-                    null,
-                  ],
-                },
-                "namespace": null,
-                "quote": undefined,
-                "quoteSpacing": undefined,
-              },
-              "parens": Array [],
-              "spacing": null,
-            },
-            Column {
-              "alias": null,
-              "ex": RefExpression {
-                "name": StringType {
-                  "chars": "is_available",
-                  "quote": "\\"",
-                  "spacing": Array [
-                    null,
-                    null,
-                  ],
-                },
-                "namespace": null,
-                "quote": undefined,
-                "quoteSpacing": undefined,
-              },
-              "parens": Array [],
-              "spacing": null,
-            },
-            Column {
-              "alias": null,
-              "ex": RefExpression {
-                "name": StringType {
-                  "chars": "is_realtime",
-                  "quote": "\\"",
-                  "spacing": Array [
-                    null,
-                    null,
-                  ],
-                },
-                "namespace": null,
-                "quote": undefined,
-                "quoteSpacing": undefined,
-              },
-              "parens": Array [],
-              "spacing": null,
-            },
-            Column {
-              "alias": null,
-              "ex": RefExpression {
-                "name": StringType {
-                  "chars": "is_overshadowed",
-                  "quote": "\\"",
-                  "spacing": Array [
-                    null,
-                    null,
-                  ],
-                },
-                "namespace": null,
-                "quote": undefined,
-                "quoteSpacing": undefined,
-              },
-              "parens": Array [],
-              "spacing": null,
-            },
-            Column {
-              "alias": null,
-              "ex": RefExpression {
-                "name": StringType {
-                  "chars": "payload",
-                  "quote": "\\"",
-                  "spacing": Array [
-                    null,
-                    null,
-                  ],
-                },
-                "namespace": null,
-                "quote": undefined,
-                "quoteSpacing": undefined,
-              },
-              "parens": Array [],
-              "spacing": null,
-            },
-          ],
-          "parens": Array [],
-          "spacing": Array [
-            " ",
-            " ",
-            " ",
-            " ",
-            " ",
-            " ",
-            " ",
-            " ",
-            " ",
-            " ",
-            " ",
-            " ",
-            " ",
-          ],
-        },
-        "distinct": null,
-        "fromClause": FromClause {
-          "alias": null,
-          "fc": RefExpression {
-            "name": "segments",
-            "namespace": "sys",
-            "quote": undefined,
-            "quoteSpacing": undefined,
-          },
-          "keyword": "FROM",
-          "parens": undefined,
-          "spacing": Array [
-            " ",
-            null,
-          ],
-        },
-        "groupByClause": null,
-        "havingClause": null,
-        "limitClause": LimitClause {
-          "keyword": "LIMIT",
-          "spacing": Array [
-            " ",
-          ],
-          "value": Array [
-            Integer {
-              "value": "25",
-            },
-          ],
-        },
-        "orderByClause": OrderByClause {
-          "byKeyword": "BY",
-          "orderBy": Array [
-            OrderByPart {
-              "direction": "DESC",
-              "orderBy": StringType {
-                "chars": "start",
-                "quote": "\\"",
-                "spacing": Array [
-                  null,
-                  null,
-                ],
-              },
-              "spacing": Array [
-                " ",
-              ],
-            },
-          ],
-          "orderKeyword": "ORDER",
-          "spacing": Array [
-            " ",
-            " ",
-          ],
-        },
-        "spacing": Array [
-          null,
-          " ",
-          "
-      ",
-          "
-      ",
-          null,
-          null,
-          "
-      ",
-          "
-      ",
-          "",
-        ],
-        "type": "query",
-        "verb": "SELECT",
-        "whereClause": WhereClause {
-          "filter": ComparisonExpression {
-            "ex": StringType {
-              "chars": "datasource",
-              "quote": "\\"",
-              "spacing": Array [
-                "",
-                "",
-              ],
-            },
-            "parens": Array [],
-            "rhs": ComparisonExpressionRhs {
-              "is": null,
-              "not": null,
-              "op": "!=",
-              "parens": Array [],
-              "rhs": StringType {
-                "chars": "github",
-                "quote": "'",
-                "spacing": Array [
-                  "",
-                  "",
-                ],
-              },
-              "spacing": Array [
-                "",
-              ],
-            },
-            "spacing": Array [
-              "",
-            ],
-          },
-          "keyword": "WHERE",
-          "spacing": Array [
-            " ",
-          ],
-        },
-      }
+      "SELECT \\"segment_id\\", \\"datasource\\", \\"start\\", \\"end\\", \\"size\\", \\"version\\", \\"partition_num\\", \\"num_replicas\\", \\"num_rows\\", \\"is_published\\", \\"is_available\\", \\"is_realtime\\", \\"is_overshadowed\\", \\"payload\\"
+      FROM sys.segments
+      WHERE \\"datasource\\"!='github'
+      ORDER BY \\"start\\" DESC
+      LIMIT 25"
     `);
   });
 
@@ -766,13 +94,13 @@ ORDER BY "start" DESC
 LIMIT 25`).getSorted();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                        Array [
-                                                                          Object {
-                                                                            "desc": true,
-                                                                            "id": "start",
-                                                                          },
-                                                                        ]
-                                                `);
+                                                                                    Array [
+                                                                                      Object {
+                                                                                        "desc": true,
+                                                                                        "id": "start",
+                                                                                      },
+                                                                                    ]
+                                                        `);
   });
 
   it('renders getSchema', () => {
@@ -805,23 +133,23 @@ FROM sys.segments
 ORDER BY "start" DESC
 LIMIT 25`).getColumnsArray();
     expect(tree).toMatchInlineSnapshot(`
-                                                            Array [
-                                                              "segment_id",
-                                                              "datasource",
-                                                              "start",
-                                                              "end",
-                                                              "size",
-                                                              "version",
-                                                              "partition_num",
-                                                              "num_replicas",
-                                                              "num_rows",
-                                                              "is_published",
-                                                              "is_available",
-                                                              "is_realtime",
-                                                              "is_overshadowed",
-                                                              "payload",
-                                                            ]
-                                        `);
+                                                                        Array [
+                                                                          "segment_id",
+                                                                          "datasource",
+                                                                          "start",
+                                                                          "end",
+                                                                          "size",
+                                                                          "version",
+                                                                          "partition_num",
+                                                                          "num_replicas",
+                                                                          "num_rows",
+                                                                          "is_published",
+                                                                          "is_available",
+                                                                          "is_realtime",
+                                                                          "is_overshadowed",
+                                                                          "payload",
+                                                                        ]
+                                                `);
   });
 
   it('renders toString', () => {
@@ -831,11 +159,11 @@ ORDER BY "start" DESC
 LIMIT 25`).toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                      "SELECT \\"segment_id\\", \\"datasource\\", \\"start\\", \\"end\\", \\"size\\", \\"version\\", \\"partition_num\\", \\"num_replicas\\", \\"num_rows\\", \\"is_published\\", \\"is_available\\", \\"is_realtime\\", \\"is_overshadowed\\", \\"payload\\"
-                                                      FROM sys.segments
-                                                      ORDER BY \\"start\\" DESC
-                                                      LIMIT 25"
-                                    `);
+                                                                  "SELECT \\"segment_id\\", \\"datasource\\", \\"start\\", \\"end\\", \\"size\\", \\"version\\", \\"partition_num\\", \\"num_replicas\\", \\"num_rows\\", \\"is_published\\", \\"is_available\\", \\"is_realtime\\", \\"is_overshadowed\\", \\"payload\\"
+                                                                  FROM sys.segments
+                                                                  ORDER BY \\"start\\" DESC
+                                                                  LIMIT 25"
+                                            `);
   });
 });
 
@@ -857,18 +185,18 @@ ORDER BY "rank" DESC, "created_time" DESC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                    "SELECT
-                                      COUNT(*) AS num_segments,
-                                      SUM(is_available) AS num_available_segments,
-                                      SUM(\\"size\\") AS size,
-                                      SUM(\\"num_rows\\") AS num_rows,
-                                      CASE WHEN \\"status\\" = 'RUNNING' THEN
-                                      (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
-                                      ELSE 1 END AS \\"rank\\"
-                                    FROM sys.segments
-                                    GROUP BY 1
-                                    ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
-                        `);
+                                                "SELECT
+                                                  COUNT(*) AS num_segments,
+                                                  SUM(is_available) AS num_available_segments,
+                                                  SUM(\\"size\\") AS size,
+                                                  SUM(\\"num_rows\\") AS num_rows,
+                                                  CASE WHEN \\"status\\" = 'RUNNING' THEN
+                                                  (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
+                                                  ELSE 1 END AS \\"rank\\"
+                                                FROM sys.segments
+                                                GROUP BY 1
+                                                ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
+                                `);
   });
 
   it('renders orderBy', () => {
@@ -888,19 +216,19 @@ ORDER BY "rank" DESC, "created_time" DESC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                    "SELECT
-                                      datasource,
-                                      COUNT(*) AS num_segments,
-                                      SUM(is_available) AS num_available_segments,
-                                      SUM(\\"size\\") AS size,
-                                      SUM(\\"num_rows\\") AS num_rows,
-                                      CASE WHEN \\"status\\" = 'RUNNING' THEN
-                                      (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
-                                      ELSE 1 END AS \\"rank\\"
-                                    FROM sys.segments
-                                    GROUP BY 1,2
-                                    ORDER BY \\"datasource\\" DESC"
-                        `);
+                                                "SELECT
+                                                  datasource,
+                                                  COUNT(*) AS num_segments,
+                                                  SUM(is_available) AS num_available_segments,
+                                                  SUM(\\"size\\") AS size,
+                                                  SUM(\\"num_rows\\") AS num_rows,
+                                                  CASE WHEN \\"status\\" = 'RUNNING' THEN
+                                                  (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
+                                                  ELSE 1 END AS \\"rank\\"
+                                                FROM sys.segments
+                                                GROUP BY 1,2
+                                                ORDER BY \\"datasource\\" DESC"
+                                `);
   });
 
   it('renders exclude row', () => {
@@ -920,20 +248,20 @@ ORDER BY "rank" DESC, "created_time" DESC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                    "SELECT
-                                      datasource,
-                                      COUNT(*) AS num_segments,
-                                      SUM(is_available) AS num_available_segments,
-                                      SUM(\\"size\\") AS size,
-                                      SUM(\\"num_rows\\") AS num_rows,
-                                      CASE WHEN \\"status\\" = 'RUNNING' THEN
-                                      (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
-                                      ELSE 1 END AS \\"rank\\"
-                                    FROM sys.segments
-                                    WHERE \\"datasource\\"!='rowvalue'
-                                    GROUP BY 1,2
-                                    ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
-                        `);
+                                                "SELECT
+                                                  datasource,
+                                                  COUNT(*) AS num_segments,
+                                                  SUM(is_available) AS num_available_segments,
+                                                  SUM(\\"size\\") AS size,
+                                                  SUM(\\"num_rows\\") AS num_rows,
+                                                  CASE WHEN \\"status\\" = 'RUNNING' THEN
+                                                  (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
+                                                  ELSE 1 END AS \\"rank\\"
+                                                FROM sys.segments
+                                                WHERE \\"datasource\\"!='rowvalue'
+                                                GROUP BY 1,2
+                                                ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
+                                `);
   });
 
   it('renders getSorted', () => {
@@ -950,17 +278,17 @@ FROM sys.segments
 GROUP BY 1,2
 ORDER BY "rank" DESC, "created_time" DESC`).getSorted();
     expect(tree).toMatchInlineSnapshot(`
-                                                Array [
-                                                  Object {
-                                                    "desc": true,
-                                                    "id": "rank",
-                                                  },
-                                                  Object {
-                                                    "desc": true,
-                                                    "id": "created_time",
-                                                  },
-                                                ]
-                                `);
+                                                            Array [
+                                                              Object {
+                                                                "desc": true,
+                                                                "id": "rank",
+                                                              },
+                                                              Object {
+                                                                "desc": true,
+                                                                "id": "created_time",
+                                                              },
+                                                            ]
+                                        `);
   });
 
   it('renders getSchema', () => {
@@ -1009,13 +337,13 @@ FROM sys.segments
 GROUP BY 1,2
 ORDER BY "rank" DESC, "created_time" DESC`).getAggregateColumns();
     expect(tree).toMatchInlineSnapshot(`
-                                                Array [
-                                                  "num_available_segments",
-                                                  "size",
-                                                  "num_rows",
-                                                  "rank",
-                                                ]
-                                `);
+                                                            Array [
+                                                              "num_available_segments",
+                                                              "size",
+                                                              "num_rows",
+                                                              "rank",
+                                                            ]
+                                        `);
   });
 
   it('renders getColumnsArray', () => {
@@ -1032,15 +360,15 @@ FROM sys.segments
 GROUP BY 1,2
 ORDER BY "rank" DESC, "created_time" DESC`).getColumnsArray();
     expect(tree).toMatchInlineSnapshot(`
-                                                Array [
-                                                  "datasource",
-                                                  "num_segments",
-                                                  "num_available_segments",
-                                                  "size",
-                                                  "num_rows",
-                                                  "rank",
-                                                ]
-                                `);
+                                                            Array [
+                                                              "datasource",
+                                                              "num_segments",
+                                                              "num_available_segments",
+                                                              "size",
+                                                              "num_rows",
+                                                              "rank",
+                                                            ]
+                                        `);
   });
 
   it('renders toString', () => {
@@ -1058,19 +386,19 @@ GROUP BY 1,2
 ORDER BY "rank" DESC, "created_time" DESC`).toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                "SELECT
-                                                  datasource,
-                                                  COUNT(*) AS num_segments,
-                                                  SUM(is_available) AS num_available_segments,
-                                                  SUM(\\"size\\") AS size,
-                                                  SUM(\\"num_rows\\") AS num_rows,
-                                                  CASE WHEN \\"status\\" = 'RUNNING' THEN
-                                                  (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
-                                                  ELSE 1 END AS \\"rank\\"
-                                                FROM sys.segments
-                                                GROUP BY 1,2
-                                                ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
-                                `);
+                                                            "SELECT
+                                                              datasource,
+                                                              COUNT(*) AS num_segments,
+                                                              SUM(is_available) AS num_available_segments,
+                                                              SUM(\\"size\\") AS size,
+                                                              SUM(\\"num_rows\\") AS num_rows,
+                                                              CASE WHEN \\"status\\" = 'RUNNING' THEN
+                                                              (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
+                                                              ELSE 1 END AS \\"rank\\"
+                                                            FROM sys.segments
+                                                            GROUP BY 1,2
+                                                            ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
+                                        `);
   });
 });
 
@@ -1093,19 +421,19 @@ ORDER BY "rank" DESC, "created_time" DESC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                    "SELECT
-                                      COUNT(*) AS num_segments,
-                                      SUM(is_available) AS num_available_segments,
-                                      SUM(\\"size\\") AS size,
-                                      SUM(\\"num_rows\\") AS num_rows,
-                                      CASE WHEN \\"status\\" = 'RUNNING' THEN
-                                      (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
-                                      ELSE 1 END AS \\"rank\\"
-                                    FROM sys.segments
-                                    WHERE \\"size\\" = '12'
-                                    GROUP BY 1
-                                    ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
-                        `);
+                                                "SELECT
+                                                  COUNT(*) AS num_segments,
+                                                  SUM(is_available) AS num_available_segments,
+                                                  SUM(\\"size\\") AS size,
+                                                  SUM(\\"num_rows\\") AS num_rows,
+                                                  CASE WHEN \\"status\\" = 'RUNNING' THEN
+                                                  (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
+                                                  ELSE 1 END AS \\"rank\\"
+                                                FROM sys.segments
+                                                WHERE \\"size\\" = '12'
+                                                GROUP BY 1
+                                                ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
+                                `);
   });
 
   it('renders orderBy', () => {
@@ -1126,20 +454,20 @@ ORDER BY "rank" DESC, "created_time" DESC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                    "SELECT
-                                      datasource,
-                                      COUNT(*) AS num_segments,
-                                      SUM(is_available) AS num_available_segments,
-                                      SUM(\\"size\\") AS size,
-                                      SUM(\\"num_rows\\") AS num_rows,
-                                      CASE WHEN \\"status\\" = 'RUNNING' THEN
-                                      (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
-                                      ELSE 1 END AS \\"rank\\"
-                                    FROM sys.segments
-                                    WHERE \\"size\\" = '12'
-                                    GROUP BY 1,2
-                                    ORDER BY \\"datasource\\" DESC"
-                        `);
+                                                "SELECT
+                                                  datasource,
+                                                  COUNT(*) AS num_segments,
+                                                  SUM(is_available) AS num_available_segments,
+                                                  SUM(\\"size\\") AS size,
+                                                  SUM(\\"num_rows\\") AS num_rows,
+                                                  CASE WHEN \\"status\\" = 'RUNNING' THEN
+                                                  (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
+                                                  ELSE 1 END AS \\"rank\\"
+                                                FROM sys.segments
+                                                WHERE \\"size\\" = '12'
+                                                GROUP BY 1,2
+                                                ORDER BY \\"datasource\\" DESC"
+                                `);
   });
 
   it('renders exclude row', () => {
@@ -1160,20 +488,20 @@ ORDER BY "rank" DESC, "created_time" DESC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                    "SELECT
-                                      datasource,
-                                      COUNT(*) AS num_segments,
-                                      SUM(is_available) AS num_available_segments,
-                                      SUM(\\"size\\") AS size,
-                                      SUM(\\"num_rows\\") AS num_rows,
-                                      CASE WHEN \\"status\\" = 'RUNNING' THEN
-                                      (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
-                                      ELSE 1 END AS \\"rank\\"
-                                    FROM sys.segments
-                                    WHERE \\"size\\" = '12' AND \\"datasource\\"!='rowvalue'
-                                    GROUP BY 1,2
-                                    ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
-                        `);
+                                                "SELECT
+                                                  datasource,
+                                                  COUNT(*) AS num_segments,
+                                                  SUM(is_available) AS num_available_segments,
+                                                  SUM(\\"size\\") AS size,
+                                                  SUM(\\"num_rows\\") AS num_rows,
+                                                  CASE WHEN \\"status\\" = 'RUNNING' THEN
+                                                  (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
+                                                  ELSE 1 END AS \\"rank\\"
+                                                FROM sys.segments
+                                                WHERE \\"size\\" = '12' AND \\"datasource\\"!='rowvalue'
+                                                GROUP BY 1,2
+                                                ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
+                                `);
   });
 
   it('renders getSorted', () => {
@@ -1191,17 +519,17 @@ WHERE "size" = '12'
 GROUP BY 1,2
 ORDER BY "rank" DESC, "created_time" DESC`).getSorted();
     expect(tree).toMatchInlineSnapshot(`
-                                                Array [
-                                                  Object {
-                                                    "desc": true,
-                                                    "id": "rank",
-                                                  },
-                                                  Object {
-                                                    "desc": true,
-                                                    "id": "created_time",
-                                                  },
-                                                ]
-                                `);
+                                                            Array [
+                                                              Object {
+                                                                "desc": true,
+                                                                "id": "rank",
+                                                              },
+                                                              Object {
+                                                                "desc": true,
+                                                                "id": "created_time",
+                                                              },
+                                                            ]
+                                        `);
   });
 
   it('renders getSchema', () => {
@@ -1253,13 +581,13 @@ WHERE "size" = '12'
 GROUP BY 1,2
 ORDER BY "rank" DESC, "created_time" DESC`).getAggregateColumns();
     expect(tree).toMatchInlineSnapshot(`
-                                                Array [
-                                                  "num_available_segments",
-                                                  "size",
-                                                  "num_rows",
-                                                  "rank",
-                                                ]
-                                `);
+                                                            Array [
+                                                              "num_available_segments",
+                                                              "size",
+                                                              "num_rows",
+                                                              "rank",
+                                                            ]
+                                        `);
   });
 
   it('renders getColumnsArray', () => {
@@ -1277,15 +605,15 @@ WHERE "size" = '12'
 GROUP BY 1,2
 ORDER BY "rank" DESC, "created_time" DESC`).getColumnsArray();
     expect(tree).toMatchInlineSnapshot(`
-                                                Array [
-                                                  "datasource",
-                                                  "num_segments",
-                                                  "num_available_segments",
-                                                  "size",
-                                                  "num_rows",
-                                                  "rank",
-                                                ]
-                                `);
+                                                            Array [
+                                                              "datasource",
+                                                              "num_segments",
+                                                              "num_available_segments",
+                                                              "size",
+                                                              "num_rows",
+                                                              "rank",
+                                                            ]
+                                        `);
   });
 
   it('renders toString', () => {
@@ -1304,20 +632,20 @@ GROUP BY 1,2
 ORDER BY "rank" DESC, "created_time" DESC`).toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                          "SELECT
-                                            datasource,
-                                            COUNT(*) AS num_segments,
-                                            SUM(is_available) AS num_available_segments,
-                                            SUM(\\"size\\") AS size,
-                                            SUM(\\"num_rows\\") AS num_rows,
-                                            CASE WHEN \\"status\\" = 'RUNNING' THEN
-                                            (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
-                                            ELSE 1 END AS \\"rank\\"
-                                          FROM sys.segments
-                                          WHERE \\"size\\" = '12'
-                                          GROUP BY 1,2
-                                          ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
-                            `);
+                                                      "SELECT
+                                                        datasource,
+                                                        COUNT(*) AS num_segments,
+                                                        SUM(is_available) AS num_available_segments,
+                                                        SUM(\\"size\\") AS size,
+                                                        SUM(\\"num_rows\\") AS num_rows,
+                                                        CASE WHEN \\"status\\" = 'RUNNING' THEN
+                                                        (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
+                                                        ELSE 1 END AS \\"rank\\"
+                                                      FROM sys.segments
+                                                      WHERE \\"size\\" = '12'
+                                                      GROUP BY 1,2
+                                                      ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
+                                    `);
   });
 });
 
@@ -1340,19 +668,19 @@ ORDER BY "rank" DESC, "created_time" DESC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                    "SELECT
-                                      COUNT(*) AS num_segments,
-                                      SUM(is_available) AS num_available_segments,
-                                      SUM(\\"size\\") AS size,
-                                      SUM(\\"num_rows\\") AS num_rows,
-                                      CASE WHEN \\"status\\" = 'RUNNING' THEN
-                                      (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
-                                      ELSE 1 END AS \\"rank\\"
-                                    FROM sys.segments
-                                    WHERE \\"size\\" = '12'
-                                    GROUP BY 1
-                                    ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
-                        `);
+                                                "SELECT
+                                                  COUNT(*) AS num_segments,
+                                                  SUM(is_available) AS num_available_segments,
+                                                  SUM(\\"size\\") AS size,
+                                                  SUM(\\"num_rows\\") AS num_rows,
+                                                  CASE WHEN \\"status\\" = 'RUNNING' THEN
+                                                  (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
+                                                  ELSE 1 END AS \\"rank\\"
+                                                FROM sys.segments
+                                                WHERE \\"size\\" = '12'
+                                                GROUP BY 1
+                                                ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
+                                `);
   });
 
   it('renders remove second of 2 columns', () => {
@@ -1373,19 +701,19 @@ ORDER BY "rank" DESC, "created_time" DESC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                              "SELECT
-                                datasource,
-                                SUM(is_available) AS num_available_segments,
-                                SUM(\\"size\\") AS size,
-                                SUM(\\"num_rows\\") AS num_rows,
-                                CASE WHEN \\"status\\" = 'RUNNING' THEN
-                                (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
-                                ELSE 1 END AS \\"rank\\"
-                              FROM sys.segments
-                              WHERE \\"size\\" = '12'
-                              GROUP BY 1
-                              ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
-                    `);
+                                          "SELECT
+                                            datasource,
+                                            SUM(is_available) AS num_available_segments,
+                                            SUM(\\"size\\") AS size,
+                                            SUM(\\"num_rows\\") AS num_rows,
+                                            CASE WHEN \\"status\\" = 'RUNNING' THEN
+                                            (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
+                                            ELSE 1 END AS \\"rank\\"
+                                          FROM sys.segments
+                                          WHERE \\"size\\" = '12'
+                                          GROUP BY 1
+                                          ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
+                            `);
   });
 
   it('renders remove first of 2 named columns', () => {
@@ -1406,19 +734,19 @@ ORDER BY "rank" DESC, "created_time" DESC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                        "SELECT
-                          COUNT(*) AS num_segments,
-                          SUM(is_available) AS num_available_segments,
-                          SUM(\\"size\\") AS size,
-                          SUM(\\"num_rows\\") AS num_rows,
-                          CASE WHEN \\"status\\" = 'RUNNING' THEN
-                          (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
-                          ELSE 1 END AS \\"rank\\"
-                        FROM sys.segments
-                        WHERE \\"size\\" = '12'
-                        GROUP BY num_segments
-                        ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
-                `);
+                                    "SELECT
+                                      COUNT(*) AS num_segments,
+                                      SUM(is_available) AS num_available_segments,
+                                      SUM(\\"size\\") AS size,
+                                      SUM(\\"num_rows\\") AS num_rows,
+                                      CASE WHEN \\"status\\" = 'RUNNING' THEN
+                                      (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
+                                      ELSE 1 END AS \\"rank\\"
+                                    FROM sys.segments
+                                    WHERE \\"size\\" = '12'
+                                    GROUP BY num_segments
+                                    ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
+                        `);
   });
 
   it('renders remove second of 2 named columns', () => {
@@ -1439,19 +767,19 @@ ORDER BY "rank" DESC, "created_time" DESC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                        "SELECT
-                          datasource,
-                          SUM(is_available) AS num_available_segments,
-                          SUM(\\"size\\") AS size,
-                          SUM(\\"num_rows\\") AS num_rows,
-                          CASE WHEN \\"status\\" = 'RUNNING' THEN
-                          (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
-                          ELSE 1 END AS \\"rank\\"
-                        FROM sys.segments
-                        WHERE \\"size\\" = '12'
-                        GROUP BY datasource
-                        ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
-                `);
+                                    "SELECT
+                                      datasource,
+                                      SUM(is_available) AS num_available_segments,
+                                      SUM(\\"size\\") AS size,
+                                      SUM(\\"num_rows\\") AS num_rows,
+                                      CASE WHEN \\"status\\" = 'RUNNING' THEN
+                                      (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
+                                      ELSE 1 END AS \\"rank\\"
+                                    FROM sys.segments
+                                    WHERE \\"size\\" = '12'
+                                    GROUP BY datasource
+                                    ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
+                        `);
   });
 
   it('renders remove second of 1 of 1 columns', () => {
@@ -1472,18 +800,18 @@ ORDER BY "rank" DESC, "created_time" DESC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                  "SELECT
-                    COUNT(*) AS num_segments,
-                    SUM(is_available) AS num_available_segments,
-                    SUM(\\"size\\") AS size,
-                    SUM(\\"num_rows\\") AS num_rows,
-                    CASE WHEN \\"status\\" = 'RUNNING' THEN
-                    (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
-                    ELSE 1 END AS \\"rank\\"
-                  FROM sys.segments
-                  WHERE \\"size\\" = '12'
-                  ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
-            `);
+                              "SELECT
+                                COUNT(*) AS num_segments,
+                                SUM(is_available) AS num_available_segments,
+                                SUM(\\"size\\") AS size,
+                                SUM(\\"num_rows\\") AS num_rows,
+                                CASE WHEN \\"status\\" = 'RUNNING' THEN
+                                (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
+                                ELSE 1 END AS \\"rank\\"
+                              FROM sys.segments
+                              WHERE \\"size\\" = '12'
+                              ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
+                    `);
   });
 
   it('renders remove second of 1 of 1 columns by index', () => {
@@ -1504,17 +832,17 @@ ORDER BY "rank" DESC, "created_time" DESC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                  "SELECT
-                    COUNT(*) AS num_segments,
-                    SUM(is_available) AS num_available_segments,
-                    SUM(\\"size\\") AS size,
-                    SUM(\\"num_rows\\") AS num_rows,
-                    CASE WHEN \\"status\\" = 'RUNNING' THEN
-                    (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
-                    ELSE 1 END AS \\"rank\\"
-                  FROM sys.segments
-                  WHERE \\"size\\" = '12'
-                  ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
-            `);
+                              "SELECT
+                                COUNT(*) AS num_segments,
+                                SUM(is_available) AS num_available_segments,
+                                SUM(\\"size\\") AS size,
+                                SUM(\\"num_rows\\") AS num_rows,
+                                CASE WHEN \\"status\\" = 'RUNNING' THEN
+                                (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
+                                ELSE 1 END AS \\"rank\\"
+                              FROM sys.segments
+                              WHERE \\"size\\" = '12'
+                              ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
+                    `);
   });
 });
