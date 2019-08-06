@@ -17,9 +17,9 @@ import {
   CaseExpression,
   ComparisonExpression,
   Function,
-  Integer,
   MultiplicativeExpression,
   NotExpression,
+  NumberType,
   OrExpression,
   RefExpression,
   StringType,
@@ -38,7 +38,7 @@ export interface WhereClauseValue {
     | Sub
     | StringType
     | RefExpression
-    | Integer
+    | NumberType
     | Function
     | CaseExpression;
   spacing: string[];
@@ -56,7 +56,7 @@ export class WhereClause {
     | Sub
     | StringType
     | RefExpression
-    | Integer
+    | NumberType
     | Function
     | CaseExpression;
   public spacing: string[];

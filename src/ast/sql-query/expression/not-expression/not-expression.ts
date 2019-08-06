@@ -16,7 +16,7 @@ import {
   CaseExpression,
   ComparisonExpression,
   Function,
-  Integer,
+  NumberType,
   RefExpression,
   StringType,
   Sub,
@@ -26,7 +26,14 @@ import { Parens } from '../../helpers';
 export interface NotExpressionValue {
   parens?: Parens[];
   keyword?: string | null;
-  ex: ComparisonExpression | Sub | StringType | RefExpression | Integer | Function | CaseExpression;
+  ex:
+    | ComparisonExpression
+    | Sub
+    | StringType
+    | RefExpression
+    | NumberType
+    | Function
+    | CaseExpression;
   spacing?: string[] | null;
 }
 
@@ -37,7 +44,7 @@ export class NotExpression {
     | Sub
     | StringType
     | RefExpression
-    | Integer
+    | NumberType
     | Function
     | CaseExpression;
   public keyword: string | null;

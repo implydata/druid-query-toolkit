@@ -12,19 +12,19 @@
  * limitations under the License.
  */
 
-import { CaseExpression, Function, Integer, RefExpression, StringType, Sub } from '../../..';
+import { CaseExpression, Function, NumberType, RefExpression, StringType, Sub } from '../../..';
 import { Parens, renderCloseParens, renderOpenParens } from '../../helpers';
 
 export interface MultiplicativeExpressionValue {
   parens?: Parens[];
   op?: string[] | null;
-  ex?: (Sub | StringType | RefExpression | Integer | Function | CaseExpression | null)[];
+  ex?: (Sub | StringType | RefExpression | NumberType | Function | CaseExpression | null)[];
   spacing?: string[];
 }
 
 export class MultiplicativeExpression {
   public parens: Parens[];
-  public ex: (Sub | StringType | RefExpression | Integer | Function | CaseExpression | null)[];
+  public ex: (Sub | StringType | RefExpression | NumberType | Function | CaseExpression | null)[];
   public op: string[] | null;
   public spacing: string[];
 

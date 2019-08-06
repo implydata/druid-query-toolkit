@@ -15,7 +15,7 @@
 import {
   CaseExpression,
   Function,
-  Integer,
+  NumberType,
   OrPart,
   RefExpression,
   StringType,
@@ -25,13 +25,13 @@ import { Parens } from '../../helpers';
 
 export interface OrExpressionValue {
   parens?: Parens[];
-  ex: (OrPart | Sub | StringType | RefExpression | Integer | Function | CaseExpression)[];
+  ex: (OrPart | Sub | StringType | RefExpression | NumberType | Function | CaseExpression)[];
   spacing?: string[] | null;
 }
 
 export class OrExpression {
   public parens: Parens[];
-  public ex: (OrPart | Sub | StringType | RefExpression | Integer | Function | CaseExpression)[];
+  public ex: (OrPart | Sub | StringType | RefExpression | NumberType | Function | CaseExpression)[];
   public spacing: string[] | null;
 
   constructor(options: OrExpressionValue) {

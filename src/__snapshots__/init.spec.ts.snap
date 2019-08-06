@@ -298,7 +298,7 @@ SqlQuery {
       " ",
     ],
     "value": Array [
-      Integer {
+      NumberType {
         "value": "50",
       },
     ],
@@ -541,7 +541,7 @@ SqlQuery {
                   " ",
                   " ",
                 ],
-                "thenExpr": Integer {
+                "thenExpr": NumberType {
                   "value": "7",
                 },
                 "thenKeyword": "THEN",
@@ -565,7 +565,7 @@ SqlQuery {
                   " ",
                   " ",
                 ],
-                "thenExpr": Integer {
+                "thenExpr": NumberType {
                   "value": "6",
                 },
                 "thenKeyword": "THEN",
@@ -589,7 +589,7 @@ SqlQuery {
                   " ",
                   " ",
                 ],
-                "thenExpr": Integer {
+                "thenExpr": NumberType {
                   "value": "5",
                 },
                 "thenKeyword": "THEN",
@@ -613,7 +613,7 @@ SqlQuery {
                   " ",
                   " ",
                 ],
-                "thenExpr": Integer {
+                "thenExpr": NumberType {
                   "value": "4",
                 },
                 "thenKeyword": "THEN",
@@ -637,7 +637,7 @@ SqlQuery {
                   " ",
                   " ",
                 ],
-                "thenExpr": Integer {
+                "thenExpr": NumberType {
                   "value": "3",
                 },
                 "thenKeyword": "THEN",
@@ -661,7 +661,7 @@ SqlQuery {
                   " ",
                   " ",
                 ],
-                "thenExpr": Integer {
+                "thenExpr": NumberType {
                   "value": "2",
                 },
                 "thenKeyword": "THEN",
@@ -685,7 +685,7 @@ SqlQuery {
                   " ",
                   " ",
                 ],
-                "thenExpr": Integer {
+                "thenExpr": NumberType {
                   "value": "1",
                 },
                 "thenKeyword": "THEN",
@@ -706,7 +706,7 @@ SqlQuery {
     ",
             "ELSE",
             " ",
-            Integer {
+            NumberType {
               "value": "0",
             },
           ],
@@ -1137,7 +1137,7 @@ SqlQuery {
                           " ",
                           " ",
                         ],
-                        "thenExpr": Integer {
+                        "thenExpr": NumberType {
                           "value": "4",
                         },
                         "thenKeyword": "THEN",
@@ -1160,7 +1160,7 @@ SqlQuery {
                           " ",
                           " ",
                         ],
-                        "thenExpr": Integer {
+                        "thenExpr": NumberType {
                           "value": "3",
                         },
                         "thenKeyword": "THEN",
@@ -1180,7 +1180,7 @@ SqlQuery {
                     " ",
                     "ELSE",
                     " ",
-                    Integer {
+                    NumberType {
                       "value": "2",
                     },
                   ],
@@ -1253,7 +1253,7 @@ SqlQuery {
     ",
             "ELSE",
             " ",
-            Integer {
+            NumberType {
               "value": "1",
             },
           ],
@@ -1573,7 +1573,7 @@ SqlQuery {
   "groupByClause": GroupByClause {
     "byKeyword": "BY",
     "groupBy": Array [
-      Integer {
+      NumberType {
         "value": "1",
       },
     ],

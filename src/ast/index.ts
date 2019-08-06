@@ -28,7 +28,7 @@ export * from './sql-query/expression/comparision-expression/comparison-expressi
 export * from './sql-query/expression/additive-expression/additive-expression';
 export * from './sql-query/expression/multipilicative-expression/multipilcative-expression';
 export * from './sql-query/basic-expression/string-type';
-export * from './sql-query/basic-expression/integer';
+export * from './sql-query/basic-expression/number-type';
 export * from './sql-query/basic-expression/case-expression/case-expression';
 export * from './sql-query/basic-expression/case-expression/case-part';
 export * from './sql-query/basic-expression/function-call/function';

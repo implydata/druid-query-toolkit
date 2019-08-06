@@ -17,7 +17,7 @@ import {
   CaseExpression,
   ComparisonExpressionRhs,
   Function,
-  Integer,
+  NumberType,
   RefExpression,
   StringType,
   Sub,
@@ -27,7 +27,14 @@ import { Parens, renderCloseParens, renderOpenParens } from '../../helpers';
 export interface ComparisonExpressionValue {
   parens?: Parens[];
   rhs?: ComparisonExpressionRhs | null;
-  ex: AdditiveExpression | Sub | StringType | RefExpression | Integer | Function | CaseExpression;
+  ex:
+    | AdditiveExpression
+    | Sub
+    | StringType
+    | RefExpression
+    | NumberType
+    | Function
+    | CaseExpression;
   spacing?: string[] | null;
 }
 
@@ -38,7 +45,7 @@ export class ComparisonExpression {
     | Sub
     | StringType
     | RefExpression
-    | Integer
+    | NumberType
     | Function
     | CaseExpression;
   public rhs: ComparisonExpressionRhs | null;
