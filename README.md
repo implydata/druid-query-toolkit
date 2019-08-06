@@ -1473,7 +1473,7 @@ SqlQuery {
 ```
 
 ## getSorted
-Returns an array of objects of type {desc: string, id:string} representing the direction of each column in the ORDER BY clause.
+Returns an array of objects of type `{desc: string, id:string}` representing the direction of each column in the ORDER BY clause.
 ```
 const getSortedArray = ast.getSorted();
 console.log(getSortedArray);
