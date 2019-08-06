@@ -17,7 +17,7 @@ import {
   CaseExpression,
   ComparisonExpression,
   Function,
-  Integer,
+  NumberType,
   RefExpression,
   StringType,
   Sub,
@@ -32,7 +32,7 @@ export interface AndExpressionValue {
     | Sub
     | StringType
     | RefExpression
-    | Integer
+    | NumberType
     | Function
     | CaseExpression)[];
   spacing?: string[] | null;
@@ -46,7 +46,7 @@ export class AndExpression {
     | Sub
     | StringType
     | RefExpression
-    | Integer
+    | NumberType
     | Function
     | CaseExpression)[];
   public spacing: string[] | null;

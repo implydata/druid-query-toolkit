@@ -12,19 +12,19 @@
  * limitations under the License.
  */
 
-import { CaseExpression, Function, Integer, RefExpression, StringType } from '../../..';
+import { CaseExpression, Function, NumberType, RefExpression, StringType } from '../../..';
 import { getColumns } from '../../helpers';
 import { Columns } from '../columns/columns';
 
 export interface OrderByPartValue {
   direction: string | null;
-  orderBy: StringType | RefExpression | Integer | Function | CaseExpression;
+  orderBy: StringType | RefExpression | NumberType | Function | CaseExpression;
   spacing: string[];
 }
 
 export class OrderByPart {
   public direction: string | null;
-  orderBy: StringType | RefExpression | Integer | Function | CaseExpression;
+  orderBy: StringType | RefExpression | NumberType | Function | CaseExpression;
   public spacing: string[];
 
   constructor(options: OrderByPartValue) {
@@ -39,7 +39,7 @@ export class OrderByPart {
 
   getOrderValue(columns: Columns): string | undefined {
     if (!(this.orderBy instanceof CaseExpression)) {
-      if (this.orderBy instanceof Integer) {
+      if (this.orderBy instanceof NumberType) {
         return getColumns(columns)[this.orderBy.value];
       }
       const value: string | number | undefined = this.orderBy.getBasicValue();

@@ -212,8 +212,8 @@ OrderByPart
 LimitClause
   = keyword: LimitToken
   spacing0:_
-  a:Integer
-  b:((Comma _?) Integer)*
+  a:NumberType
+  b:((Comma _?) NumberType)*
   {
     return new LimitClause({
       keyword: keyword,
@@ -494,7 +494,7 @@ BasicExpression
   /CurrentTimeStamp
   /Interval
   /String
-  /Integer
+  /NumberType
   /RefExpression
 
 
@@ -639,7 +639,7 @@ SetLiteral
 
 StringNumberOrNull
   = String
-  / Integer
+  / NumberType
   / NullToken
 
 
@@ -654,7 +654,7 @@ InSetLiteralExpression
 
 StringOrNumber
   = String
-  / Integer
+  / NumberType
 
 RefExpression
   = ref:NamespacedRef
@@ -765,10 +765,10 @@ RelaxedName "RelaxedName"
     return name;
   }
 
-Integer =
+NumberType =
 	value:$ [0-9]+
 	{
-    return new Integer(
+    return new NumberType(
       value
     );
   }

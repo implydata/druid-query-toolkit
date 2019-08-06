@@ -22,8 +22,8 @@ import {
   FromClause,
   GroupByClause,
   HavingClause,
-  Integer,
   LimitClause,
+  NumberType,
   OrderByClause,
   OrderByPart,
   OrExpression,
@@ -171,7 +171,7 @@ export class SqlQuery extends BaseAst {
         groupByColumns.map((groupByColumn, index) => {
           // if grouping column is a number and the column to be removed is less than that column decrease the value of the grouping column by 1
           if (this.getColumnsArray().indexOf(columnVal) + 1 < Number(groupByColumn)) {
-            newGroupByColumns.push(new Integer(Number(groupByColumn) - 1));
+            newGroupByColumns.push(new NumberType(Number(groupByColumn) - 1));
           } else if (this.getColumnsArray().indexOf(columnVal) + 1 > Number(groupByColumn)) {
             if (this.groupByClause) {
               newGroupByColumns.push(this.groupByClause.groupBy[index]);
@@ -206,7 +206,7 @@ export class SqlQuery extends BaseAst {
     // @ts-ignore
     const rowBaseString =
       typeof row === 'number'
-        ? new Integer(row)
+        ? new NumberType(row)
         : new StringType({
             chars: String(row),
             quote: "'",

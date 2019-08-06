@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-export class Integer {
+export class NumberType {
   public value: number;
 
   constructor(options: number) {

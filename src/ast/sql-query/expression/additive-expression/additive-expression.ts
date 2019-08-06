@@ -15,8 +15,8 @@
 import {
   CaseExpression,
   Function,
-  Integer,
   MultiplicativeExpression,
+  NumberType,
   RefExpression,
   StringType,
   Sub,
@@ -31,7 +31,7 @@ export interface AdditiveExpressionValue {
     | Sub
     | StringType
     | RefExpression
-    | Integer
+    | NumberType
     | Function
     | CaseExpression)[];
   spacing?: string[];
@@ -44,7 +44,7 @@ export class AdditiveExpression {
     | Sub
     | StringType
     | RefExpression
-    | Integer
+    | NumberType
     | Function
     | CaseExpression)[];
   public op: string[] | null;
