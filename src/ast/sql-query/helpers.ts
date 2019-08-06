@@ -61,8 +61,8 @@ export function getColumns(columns: Columns) {
   return columnsArray;
 }
 
-export function basicLiteralEscape(literalValue?: string): string {
-  return `'${literalValue}'`;
+export function basicLiteralEscape(literalValue?: string | number): string {
+  return typeof literalValue === 'number' ? `${literalValue}` : `'${literalValue}'`;
 }
 export function basicIdentifierEscape(identifierValue?: string): string {
   return `"${identifierValue}"`;
