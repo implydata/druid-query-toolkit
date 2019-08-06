@@ -204,11 +204,14 @@ export class SqlQuery extends BaseAst {
     let whereClause = this.whereClause;
     const headerBaseString = new StringType({ chars: header, quote: '"', spacing: ['', ''] });
     // @ts-ignore
-    const rowBaseString = new StringType({
-      chars: String(row),
-      quote: typeof row === 'number' ? '' : "'",
-      spacing: ['', ''],
-    });
+    const rowBaseString =
+      typeof row === 'number'
+        ? new Integer(row)
+        : new StringType({
+            chars: String(row),
+            quote: "'",
+            spacing: ['', ''],
+          });
     const rhs = new ComparisonExpressionRhs({
       parens: [],
       op: operator,
