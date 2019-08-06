@@ -204,7 +204,6 @@ export class SqlQuery extends BaseAst {
     let whereClause = this.whereClause;
     const headerBaseString = new StringType({ chars: header, quote: '"', spacing: ['', ''] });
     // @ts-ignore
-    console.log(typeof row === 'number');
     const rowBaseString = new StringType({
       chars: String(row),
       quote: typeof row === 'number' ? '' : "'",
