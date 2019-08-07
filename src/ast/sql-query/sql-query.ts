@@ -264,7 +264,7 @@ export class SqlQuery extends BaseAst {
         spacing: [' '],
         filter: comparisonExpression,
       });
-      this.spacing[3] = '\n';
+      this.spacing[4] = '\n';
     } else if (whereClause && whereClause.filter instanceof OrExpression) {
       // filtered by an or clause
       whereClause = new WhereClause({
@@ -279,7 +279,7 @@ export class SqlQuery extends BaseAst {
           spacing: [' AND '],
         }),
       });
-      this.spacing[3] = '\n';
+      this.spacing[4] = '\n';
     } else if (whereClause && whereClause.filter instanceof AndExpression) {
       // Multiple
       let contained = false;
@@ -369,7 +369,7 @@ export class SqlQuery extends BaseAst {
         spacing: [' '],
         having: comparisonExpression,
       });
-      this.spacing[5] = '\n';
+      this.spacing[6] = '\n';
     } else if (havingClause && havingClause.having instanceof OrExpression) {
       // filtered by an or clause
       havingClause = new HavingClause({
@@ -384,7 +384,7 @@ export class SqlQuery extends BaseAst {
           spacing: [' AND '],
         }),
       });
-      this.spacing[5] = '\n';
+      this.spacing[6] = '\n';
     } else if (havingClause && havingClause.having instanceof AndExpression) {
       // Multiple
       let contained = false;
@@ -493,34 +493,42 @@ export class SqlQuery extends BaseAst {
   }
 
   toString() {
-    const query = [this.verb, this.spacing[1]];
+    const query = [];
+    if (this.spacing[0]) {
+      query.push(this.spacing[0]);
+    }
+    query.push(this.verb);
+    if (this.spacing[1] && this.distinct) {
+      query.push(this.spacing[1] + this.distinct);
+    }
+    query.push(this.spacing[2]);
     query.push(this.columns.toString());
     if (this.fromClause) {
-      query.push(this.spacing[2]);
+      query.push(this.spacing[3]);
       query.push(this.fromClause.toString());
     }
     if (this.whereClause) {
-      query.push(this.spacing[3]);
+      query.push(this.spacing[4]);
       query.push(this.whereClause.toString());
     }
     if (this.groupByClause) {
-      query.push(this.spacing[4]);
+      query.push(this.spacing[5]);
       query.push(this.groupByClause.toString());
     }
     if (this.havingClause) {
-      query.push(this.spacing[5]);
+      query.push(this.spacing[6]);
       query.push(this.havingClause.toString());
     }
     if (this.orderByClause) {
-      query.push(this.spacing[6]);
+      query.push(this.spacing[7]);
       query.push(this.orderByClause.toString());
     }
     if (this.limitClause) {
-      query.push(this.spacing[7]);
+      query.push(this.spacing[8]);
       query.push(this.limitClause.toString());
     }
-    if (this.spacing[8]) {
-      query.push(this.spacing[8]);
+    if (this.spacing[9]) {
+      query.push(this.spacing[9]);
     }
 
     return query.join('');
