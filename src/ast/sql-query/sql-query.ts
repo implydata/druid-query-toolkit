@@ -193,13 +193,43 @@ export class SqlQuery extends BaseAst {
           spacing: this.groupByClause.spacing,
         });
       } else {
-        groupByClause = undefined;
+        if (
+          columnVal !== groupByColumns[0] &&
+          this.getColumnsArray().indexOf(columnVal) + 1 < Number(groupByColumns[0])
+        ) {
+          groupByClause = new GroupByClause({
+            groupBy: [
+              new OrExpression({
+                ex: [new NumberType(groupByColumns[0] - 1)],
+                parens: [],
+                spacing: [],
+              }),
+            ],
+            groupKeyword: this.groupByClause.groupKeyword,
+            byKeyword: this.groupByClause.byKeyword,
+            spacing: this.groupByClause.spacing,
+          });
+        } else if (
+          columnVal !== groupByColumns[0] &&
+          this.getColumnsArray().indexOf(columnVal) + 1 > Number(groupByColumns[0])
+        ) {
+          groupByClause = this.groupByClause;
+        } else {
+          groupByClause = undefined;
+        }
       }
     }
     return groupByClause;
   }
 
   filterRow(header: string, row: string | number, operator: '!=' | '='): SqlQuery {
+    const aggregateColumns = this.getAggregateColumns();
+    if (aggregateColumns) {
+      if (aggregateColumns.includes(header)) {
+        return this.filterAggregateRow(header, row, operator);
+      }
+    }
+
     const spacing = this.spacing;
     let whereClause = this.whereClause;
     const headerBaseString = new StringType({ chars: header, quote: '"', spacing: ['', ''] });
@@ -302,6 +332,111 @@ export class SqlQuery extends BaseAst {
       spacing: spacing,
       verb: this.verb,
       whereClause: whereClause,
+    });
+  }
+
+  filterAggregateRow(header: string, row: string | number, operator: '!=' | '='): SqlQuery {
+    const spacing = this.spacing;
+    let havingClause = this.havingClause;
+    const headerBaseString = new StringType({ chars: header, quote: '"', spacing: ['', ''] });
+    const rowBaseString =
+      typeof row === 'number'
+        ? new NumberType(row)
+        : new StringType({
+            chars: String(row),
+            quote: "'",
+            spacing: ['', ''],
+          });
+    const rhs = new ComparisonExpressionRhs({
+      parens: [],
+      op: operator,
+      is: null,
+      not: null,
+      rhs: rowBaseString,
+      spacing: [''],
+    });
+    const comparisonExpression = new ComparisonExpression({
+      ex: headerBaseString,
+      rhs: rhs,
+      parens: [],
+      spacing: [''],
+    });
+
+    // No having clause present
+    if (!havingClause) {
+      havingClause = new HavingClause({
+        keyword: 'HAVING',
+        spacing: [' '],
+        having: comparisonExpression,
+      });
+      this.spacing[5] = '\n';
+    } else if (havingClause && havingClause.having instanceof OrExpression) {
+      // filtered by an or clause
+      havingClause = new HavingClause({
+        keyword: 'HAVING',
+        spacing: [' '],
+        having: new AndExpression({
+          parens: [],
+          ex: [
+            new Sub({ parens: [{ open: ['(', ''], close: ['', ')'] }], ex: havingClause.having }),
+            comparisonExpression,
+          ],
+          spacing: [' AND '],
+        }),
+      });
+      this.spacing[5] = '\n';
+    } else if (havingClause && havingClause.having instanceof AndExpression) {
+      // Multiple
+      let contained = false;
+      havingClause.having.ex = havingClause.having.ex.map(filter => {
+        if (
+          filter instanceof ComparisonExpression &&
+          filter.ex instanceof StringType &&
+          filter.ex.chars === header
+        ) {
+          contained = true;
+          return comparisonExpression;
+        } else {
+          return filter;
+        }
+      });
+      if (!contained) {
+        havingClause.having.ex.push(comparisonExpression);
+        if (havingClause.having.spacing) {
+          havingClause.having.spacing.push(' AND ');
+        } else {
+          havingClause.having.spacing = [' AND '];
+        }
+      }
+    } else if (!(havingClause.having instanceof AndExpression)) {
+      // only one
+      if (
+        havingClause.having instanceof ComparisonExpression &&
+        havingClause.having.ex instanceof StringType &&
+        havingClause.having.ex.chars === header
+      ) {
+        havingClause.having = comparisonExpression;
+      } else {
+        havingClause.having = new AndExpression({
+          parens: [],
+          spacing: [' AND '],
+          // @ts-ignore I know this is wrong but Idk how to fix it
+          ex: [havingClause.having, comparisonExpression],
+        });
+      }
+    }
+
+    return new SqlQuery({
+      columns: this.columns,
+      distinct: this.distinct,
+      fromClause: this.fromClause,
+      groupByClause: this.groupByClause,
+      havingClause: havingClause,
+      limitClause: this.limitClause,
+      orderByClause: this.orderByClause,
+      spacing: spacing,
+      verb: this.verb,
+      whereClause: this.whereClause,
     });
   }
 
