@@ -46,7 +46,10 @@ Start
   /Expression
 
 SelectQuery
-  = SelectToken distinct:(_ DistinctToken)?
+  =
+  startSpacing: _?
+  SelectToken
+  distinct:(_ DistinctToken)?
   spacing1: _
   columns:Columns?
   spacing2: _
@@ -56,7 +59,7 @@ SelectQuery
   havingClause:(_ HavingClause)?
   orderByClause:(_ OrderByClause)?
   limitClause:(_ LimitClause)?
-  endSpacing: [;\t\n\r]*
+  endSpacing: [ \t\n\r;]*
   {
     return new SqlQuery({
       verb: 'SELECT',
@@ -67,7 +70,9 @@ SelectQuery
       groupByClause: groupByClause ? groupByClause[1] : null,
       havingClause: havingClause ? havingClause[1] : null,
       orderByClause: orderByClause ? orderByClause[1] : null,
-      spacing: [distinct ? distinct[0]: null,
+      spacing: [
+      startSpacing,
+      distinct ? distinct[0]: null,
         spacing1,
           spacing2,
           whereClause ? whereClause[0]:null,
