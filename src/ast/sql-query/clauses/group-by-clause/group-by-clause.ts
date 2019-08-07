@@ -17,14 +17,14 @@ import { Function, NumberType, OrExpression, RefExpression, StringType, Sub } fr
 export interface GroupByClauseValue {
   groupKeyword: string;
   byKeyword: string;
-  groupBy: OrExpression[];
+  groupBy: (Sub | StringType | RefExpression | NumberType | Function | OrExpression)[];
   spacing: string[];
 }
 
 export class GroupByClause {
   public groupKeyword: string;
   public byKeyword: string;
-  public groupBy: (Sub | StringType | RefExpression | NumberType | Function)[];
+  public groupBy: (Sub | StringType | RefExpression | NumberType | Function | OrExpression)[];
   public spacing: string[];
 
   constructor(options: GroupByClauseValue) {

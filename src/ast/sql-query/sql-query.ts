@@ -20,6 +20,7 @@ import {
   ComparisonExpression,
   ComparisonExpressionRhs,
   FromClause,
+  Function,
   GroupByClause,
   HavingClause,
   LimitClause,
@@ -134,6 +135,77 @@ export class SqlQuery extends BaseAst {
       whereClause: this.whereClause,
     });
     return query;
+  }
+
+  addToGroupBy(columnName: string): SqlQuery {
+    if (!this.groupByClause) {
+      return this;
+    }
+    const columns = this.columns.columns;
+    const columnSpacing = this.columns.spacing;
+    columnSpacing.unshift(' ');
+    columns.unshift(
+      new Column({
+        alias: null,
+        spacing: [],
+        parens: [],
+        ex: new StringType({ chars: columnName, quote: '"', spacing: [] }),
+      }),
+    );
+    const groupby = this.groupByClause.groupBy.map(part =>
+      part instanceof NumberType ? new NumberType(Number(part.value) + 1) : part,
+    );
+    groupby.unshift(new NumberType(1));
+    return new SqlQuery({
+      columns: new Columns({ columns: columns, parens: [], spacing: columnSpacing }),
+      distinct: this.distinct,
+      fromClause: this.fromClause,
+      groupByClause: new GroupByClause({
+        groupKeyword: this.groupByClause.groupKeyword,
+        byKeyword: this.groupByClause.byKeyword,
+        groupBy: groupby,
+        spacing: this.groupByClause.spacing,
+      }),
+      havingClause: this.havingClause,
+      limitClause: this.limitClause,
+      orderByClause: this.orderByClause,
+      spacing: this.spacing,
+      verb: this.verb,
+      whereClause: this.whereClause,
+    });
+  }
+
+  addAggregateColumn(columnName: string, functionName: string): SqlQuery {
+    const column = new Function({
+      parens: [],
+      fn: functionName,
+      value: [new StringType({ spacing: [], quote: '"', chars: columnName })],
+      spacing: [],
+    });
+    const columns = this.columns.columns;
+    const columnSpacing = this.columns.spacing;
+    columnSpacing.push(' ');
+    columns.push(
+      new Column({
+        alias: null,
+        spacing: [],
+        parens: [],
+        ex: column,
+      }),
+    );
+
+    return new SqlQuery({
+      columns: new Columns({ columns: columns, parens: [], spacing: columnSpacing }),
+      distinct: this.distinct,
+      fromClause: this.fromClause,
+      groupByClause: this.groupByClause,
+      havingClause: this.havingClause,
+      limitClause: this.limitClause,
+      orderByClause: this.orderByClause,
+      spacing: this.spacing,
+      verb: this.verb,
+      whereClause: this.whereClause,
+    });
   }
 
   getOrderByClauseWithoutColumn(columnVal: string): OrderByClause | undefined {

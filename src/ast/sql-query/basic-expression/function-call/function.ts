@@ -19,8 +19,8 @@ export interface FunctionValue {
   fn: string;
   value: any;
   spacing: string[];
-  distinct: string;
-  filterClause: FilterClause;
+  distinct?: string;
+  filterClause?: FilterClause;
 }
 
 export class Function {
@@ -28,8 +28,8 @@ export class Function {
   public fn: any;
   public value: any[];
   public spacing: string[];
-  public distinct: any;
-  public filterClause: FilterClause;
+  public distinct?: any;
+  public filterClause?: FilterClause;
 
   constructor(options: FunctionValue) {
     this.parens = options.parens;
