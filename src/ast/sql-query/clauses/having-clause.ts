@@ -11,17 +11,54 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { OrExpression } from '../..';
+import {
+  AdditiveExpression,
+  AndExpression,
+  CaseExpression,
+  ComparisonExpression,
+  Function,
+  MultiplicativeExpression,
+  NotExpression,
+  NumberType,
+  OrExpression,
+  RefExpression,
+  StringType,
+  Sub,
+} from '../..';
 
 export interface HavingClauseValue {
   keyword: string;
-  having: OrExpression;
+  having:
+    | OrExpression
+    | AndExpression
+    | ComparisonExpression
+    | MultiplicativeExpression
+    | AdditiveExpression
+    | NotExpression
+    | Sub
+    | StringType
+    | RefExpression
+    | NumberType
+    | Function
+    | CaseExpression;
   spacing: string[];
 }
 
 export class HavingClause {
   public keyword: string;
-  public having: OrExpression;
+  public having:
+    | OrExpression
+    | AndExpression
+    | ComparisonExpression
+    | MultiplicativeExpression
+    | AdditiveExpression
+    | NotExpression
+    | Sub
+    | StringType
+    | RefExpression
+    | NumberType
+    | Function
+    | CaseExpression;
   public spacing: string[];
 
   constructor(options: HavingClauseValue) {
