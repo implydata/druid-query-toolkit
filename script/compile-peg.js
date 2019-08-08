@@ -1,7 +1,10 @@
 const fs = require('fs');
 const peg = require('pegjs');
 
-var parser = peg.generate(fs.readFileSync('./src/parser/druidsql.pegjs', 'utf-8'), {
+var header = fs.readFileSync('./src/parser/druidsql.header.js', 'utf-8');
+var rules = fs.readFileSync('./src/parser/druidsql.pegjs', 'utf-8');
+
+var parser = peg.generate(header + '\n\n' + rules, {
   output: 'source',
 });
 
