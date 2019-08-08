@@ -40,11 +40,11 @@ export class MultiplicativeExpression {
     val.push(renderOpenParens(this.parens));
     this.ex.map((ex, index) => {
       val.push(ex ? ex.toString() : '');
-      if (index < this.ex.length - 1) {
+      if (index < this.ex.length - 1 && this.op) {
         val.push(
-          (this.spacing[index][0] ? this.spacing[index][0] : '') +
-            this.op +
-            (this.spacing[index][2] ? this.spacing[index][2] : ''),
+          (this.spacing[index * 2] ? this.spacing[index * 2] : '') +
+            this.op[index] +
+            (this.spacing[index * 2 + 1] ? this.spacing[index * 2 + 1] : ''),
         );
       }
     });

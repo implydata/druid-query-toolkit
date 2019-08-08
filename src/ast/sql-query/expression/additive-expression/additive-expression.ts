@@ -15,6 +15,7 @@
 import {
   CaseExpression,
   Function,
+  Interval,
   MultiplicativeExpression,
   NumberType,
   RefExpression,
@@ -33,7 +34,8 @@ export interface AdditiveExpressionValue {
     | RefExpression
     | NumberType
     | Function
-    | CaseExpression)[];
+    | CaseExpression
+    | Interval)[];
   spacing?: string[];
 }
 
@@ -46,7 +48,8 @@ export class AdditiveExpression {
     | RefExpression
     | NumberType
     | Function
-    | CaseExpression)[];
+    | CaseExpression
+    | Interval)[];
   public op: string[] | null;
   public spacing: string[];
 
@@ -64,11 +67,11 @@ export class AdditiveExpression {
     });
     this.ex.map((ex, index) => {
       val.push(ex.toString());
-      if (index < this.ex.length - 1) {
+      if (index < this.ex.length - 1 && this.op) {
         val.push(
-          (this.spacing[index][0] ? this.spacing[index][0] : '') +
-            this.spacing[index][1] +
-            (this.spacing[index][2] ? this.spacing[index][2] : ''),
+          (this.spacing[index * 2] ? this.spacing[index * 2] : '') +
+            this.op[index] +
+            (this.spacing[index * 2 + 1] ? this.spacing[index * 2 + 1] : ''),
         );
       }
     });

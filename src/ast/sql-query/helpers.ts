@@ -11,6 +11,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { Alias } from './alias';
+import { Interval } from './basic-expression/interval';
+import { RefExpression } from './basic-expression/ref-expression';
 import { StringType } from './basic-expression/string-type';
 import { Columns } from './clauses/columns/columns';
 
@@ -66,4 +69,46 @@ export function basicLiteralEscape(literalValue?: string | number): string {
 }
 export function basicIdentifierEscape(identifierValue?: string): string {
   return `"${identifierValue}"`;
+}
+
+export function aliasFactory(alias: string): Alias {
+  return new Alias({
+    keyword: 'AS',
+    spacing: [' '],
+    value: new StringType({
+      spacing: [],
+      chars: alias,
+      quote: `"`,
+    }),
+  });
+}
+
+export function refExpressionFactory(name: string): RefExpression {
+  return new RefExpression({
+    quoteSpacing: [],
+    quote: '',
+    namespace: '',
+    name: name,
+  });
+}
+
+export function intervalFactory(unit: string, chars: string): Interval {
+  return new Interval({
+    intervalKeyword: 'INTERVAL',
+    unitKeyword: unit,
+    spacing: [' ', ' '],
+    ex: new StringType({
+      spacing: [],
+      chars: chars,
+      quote: `'`,
+    }),
+  });
+}
+
+export function stringFactory(chars: string, quote: '"' | "'"): StringType {
+  return new StringType({
+    spacing: [],
+    chars: chars,
+    quote: quote,
+  });
 }

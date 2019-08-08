@@ -16,18 +16,18 @@ import { Parens } from '../../helpers';
 
 export interface ComparisonExpressionRhsValue {
   parens: Parens[];
-  op: string | null;
-  is: string | null;
-  not: string | null;
+  op?: string;
+  is?: string;
+  not?: string;
   rhs: any;
   spacing: string[];
 }
 
 export class ComparisonExpressionRhs {
   public parens: Parens[];
-  public op: string | null;
-  public is: string | null;
-  public not: string | null;
+  public op?: string;
+  public is?: string;
+  public not?: string;
   public rhs: any;
   public spacing: string[];
 

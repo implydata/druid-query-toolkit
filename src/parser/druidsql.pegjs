@@ -1,46 +1,3 @@
-{
-  function makeListMap1(head, tail) {
-  if (head == null) return [];
-  return [head].concat(tail.map(function(t) { return t[1] }));
-  }
-  function makeListMap(head, tail) {
-    if (head == null) return [];
-    return [head].concat(tail.map(function(t) { return t }));
-  }
-  function makeListMap_1(head, tail) {
-    if (head == null) return [];
-    return [head].concat(tail.map(function(t) { return t[0][1] }));
-  }
-  function makeListMap_2(head, tail) {
-    if (head == null) return [];
-    return [head].concat(tail.map(function(t) { return t[0][2] }));
-  }
-  function makeListMapEmpty(tail) {
-    return [].concat(tail.map(function(t) { return t[1] }));
-  }
-  function makeListMapEmpty0(tail) {
-    return [].concat(tail.map(function(t) { return t[0] }));
-  }
-   function makeListMapEmpty0Joined(tail) {
-      return [].concat(tail.map(function(t) { return t[0].join('') }));
-    }
-  function makeListMapEmptyConcat0(tail) {
-    return [].concat(tail.map(function(t) { return t[0].join('') }));
-  }
-  function makeListMapEmpty01(tail) {
-    return [].concat(tail.map(function(t) { return t[0][1] }));
-  }
-  function makeListCasesSpacing(caseValue) {
-    caseValue.map(caseValue => {caseValue[1].spacing = makeListMap(caseValue[0], caseValue[1].spacing)});
-    return makeListMapEmpty(caseValue);
-  }
-
- functions = functions || ["COUNT", "FILTER",
-  "SUM","MIN", "MAX","AVG","APPROX_COUNT_DISTINCT",
-  "APPROX_COUNT_DISTINCT_DS_HLL", "APPROX_COUNT_DISTINCT_DS_THETA",
-  "APPROX_QUANTILE", "APPROX_QUANTILE_DS", "APPROX_QUANTILE_FIXED_BUCKETS"];
-}
-
 Start
   = SelectQuery
   /Expression
@@ -446,8 +403,8 @@ AdditiveExpression
     return new AdditiveExpression({
       parens:[],
       ex: makeListMap1(head, tail),
-      spacing: makeListMapEmpty0(tail),
-      op: makeListMapEmpty0(tail),
+      spacing: makeListMapEmpty0BookEnd(tail),
+      op: makeListMapEmpty(makeListMapEmpty0(tail)),
     });
   }
   /open: (OpenParen _?)
@@ -474,8 +431,8 @@ MultiplicativeExpression
     return new MultiplicativeExpression({
       parens : [],
       ex: makeListMap1(head, tail),
-      spacing: makeListMapEmpty0(tail),
-      op: makeListMapEmpty01(tail),
+      spacing: makeListMapEmpty0BookEnd(tail),
+      op: makeListMapEmpty(makeListMapEmpty0(tail)),
     });
 
   }
@@ -568,7 +525,7 @@ Function
         fn: fn,
         value: makeListMap1(valueHead, valueTail),
         filterClause: filterClause ? filterClause[1] : null,
-        spacing:[spacing0,(distinct? distinct[1] : ''), makeListMapEmpty(valueTail), spacing1, (filterClause ? filterClause[0] : null),]
+        spacing:[spacing0,(distinct? distinct[1] : ''), makeListMapEmpty(valueTail), spacing1, (filterClause ? filterClause[0] : null)]
        });
     }
     /open: (OpenParen _?)
