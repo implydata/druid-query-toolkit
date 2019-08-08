@@ -62,7 +62,7 @@ SelectQuery
   havingClause:(_ HavingClause)?
   orderByClause:(_ OrderByClause)?
   limitClause:(_ LimitClause)?
-  endSpacing: [;\t\n\r]*
+  endSpacing: [ \t\n\r;]*
   {
     return new SqlQuery({
       verb: 'SELECT',
