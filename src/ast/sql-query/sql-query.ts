@@ -14,11 +14,14 @@
 
 import { BaseAst } from '../base-ast';
 import {
+  AdditiveExpression,
+  Alias,
   AndExpression,
   Column,
   Columns,
   ComparisonExpression,
   ComparisonExpressionRhs,
+  FilterClause,
   FromClause,
   Function,
   GroupByClause,
@@ -137,6 +140,55 @@ export class SqlQuery extends BaseAst {
     return query;
   }
 
+  addFunctionToGroupBy(
+    functionName: string,
+    spacing: string[],
+    argumentsArray: (StringType | number)[],
+  ): SqlQuery {
+    if (!this.groupByClause) {
+      return this;
+    }
+
+    const functionValue = new Function({
+      parens: [],
+      fn: functionName,
+      value: argumentsArray,
+      spacing: spacing,
+    });
+    const columns = this.columns.columns;
+    const columnSpacing = this.columns.spacing;
+    columnSpacing.unshift(' ');
+    columns.unshift(
+      new Column({
+        alias: null,
+        spacing: [],
+        parens: [],
+        ex: functionValue,
+      }),
+    );
+    const groupby = this.groupByClause.groupBy.map(part =>
+      part instanceof NumberType ? new NumberType(Number(part.value) + 1) : part,
+    );
+    groupby.unshift(new NumberType(1));
+    return new SqlQuery({
+      columns: new Columns({ columns: columns, parens: [], spacing: columnSpacing }),
+      distinct: this.distinct,
+      fromClause: this.fromClause,
+      groupByClause: new GroupByClause({
+        groupKeyword: this.groupByClause.groupKeyword,
+        byKeyword: this.groupByClause.byKeyword,
+        groupBy: groupby,
+        spacing: this.groupByClause.spacing,
+      }),
+      havingClause: this.havingClause,
+      limitClause: this.limitClause,
+      orderByClause: this.orderByClause,
+      spacing: this.spacing,
+      verb: this.verb,
+      whereClause: this.whereClause,
+    });
+  }
+
   addToGroupBy(columnName: string): SqlQuery {
     if (!this.groupByClause) {
       return this;
@@ -175,20 +227,39 @@ export class SqlQuery extends BaseAst {
     });
   }
 
-  addAggregateColumn(columnName: string, functionName: string): SqlQuery {
+  addAggregateColumn(
+    columnName: string,
+    functionName: string,
+    alias?: Alias,
+    distinct?: boolean,
+    filter?: FilterClause,
+  ): SqlQuery {
     const column = new Function({
       parens: [],
       fn: functionName,
       value: [new StringType({ spacing: [], quote: '"', chars: columnName })],
-      spacing: [],
+      spacing: distinct ? ['', ' '] : [],
+      filterClause: filter ? filter : undefined,
+      distinct: distinct ? 'DISTINCT' : undefined,
     });
+    if (distinct) {
+      column.spacing = ['', ' ', '', '', ''];
+    }
+    if (filter) {
+      if (column.spacing.length) {
+        column.spacing[4] = ' ';
+      } else {
+        column.spacing = ['', '', '', '', ' '];
+      }
+    }
+
     const columns = this.columns.columns;
     const columnSpacing = this.columns.spacing;
     columnSpacing.push(' ');
     columns.push(
       new Column({
-        alias: null,
-        spacing: [],
+        alias: alias ? alias : null,
+        spacing: [alias ? ' ' : ''],
         parens: [],
         ex: column,
       }),
@@ -294,7 +365,11 @@ export class SqlQuery extends BaseAst {
     return groupByClause;
   }
 
-  filterRow(header: string, row: string | number, operator: '!=' | '='): SqlQuery {
+  filterRow(
+    header: string,
+    row: string | number | AdditiveExpression,
+    operator: '!=' | '=' | '>' | '<' | 'like' | '>=' | '<=' | 'LIKE',
+  ): SqlQuery {
     const aggregateColumns = this.getAggregateColumns();
     if (aggregateColumns) {
       if (aggregateColumns.includes(header)) {
@@ -306,27 +381,30 @@ export class SqlQuery extends BaseAst {
     let whereClause = this.whereClause;
     const headerBaseString = new StringType({ chars: header, quote: '"', spacing: ['', ''] });
     // @ts-ignore
-    const rowBaseString =
-      typeof row === 'number'
-        ? new NumberType(row)
-        : new StringType({
-            chars: String(row),
-            quote: "'",
-            spacing: ['', ''],
-          });
+    let rowBaseString;
+    if (typeof row === 'number') {
+      rowBaseString = new NumberType(row);
+    } else if (row instanceof AdditiveExpression) {
+      rowBaseString = row;
+    } else {
+      rowBaseString = new StringType({
+        chars: String(row),
+        quote: "'",
+        spacing: ['', ''],
+      });
+    }
+
     const rhs = new ComparisonExpressionRhs({
       parens: [],
       op: operator,
-      is: null,
-      not: null,
       rhs: rowBaseString,
-      spacing: [''],
+      spacing: [' '],
     });
     const comparisonExpression = new ComparisonExpression({
       ex: headerBaseString,
       rhs: rhs,
       parens: [],
-      spacing: [''],
+      spacing: [' '],
     });
 
     // No where clause present
@@ -407,23 +485,29 @@ export class SqlQuery extends BaseAst {
     });
   }
 
-  filterAggregateRow(header: string, row: string | number, operator: '!=' | '='): SqlQuery {
+  filterAggregateRow(
+    header: string,
+    row: string | number | AdditiveExpression,
+    operator: '!=' | '=' | '>' | '<' | 'like' | '>=' | '<=' | 'LIKE',
+  ): SqlQuery {
     const spacing = this.spacing;
     let havingClause = this.havingClause;
     const headerBaseString = new StringType({ chars: header, quote: '"', spacing: ['', ''] });
-    const rowBaseString =
-      typeof row === 'number'
-        ? new NumberType(row)
-        : new StringType({
-            chars: String(row),
-            quote: "'",
-            spacing: ['', ''],
-          });
+    let rowBaseString;
+    if (typeof row === 'number') {
+      rowBaseString = new NumberType(row);
+    } else if (row instanceof AdditiveExpression) {
+      rowBaseString = row;
+    } else {
+      rowBaseString = new StringType({
+        chars: String(row),
+        quote: "'",
+        spacing: ['', ''],
+      });
+    }
     const rhs = new ComparisonExpressionRhs({
       parens: [],
       op: operator,
-      is: null,
-      not: null,
       rhs: rowBaseString,
       spacing: [''],
     });

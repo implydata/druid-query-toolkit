@@ -33,20 +33,25 @@ describe.skip('Playground', () => {
   });
 });
 
-// describe('Playground', () => {
-//   it('basic', () => {
-//     expect(
-//       parser(`SELECT CASE WHEN "status" = 'RUNNING' THEN "runner_status" ELSE "status" END AS "status"
-// FROM Customers`),
-//     ).toEqual({});
-//   });
-// });
-//
-// describe('Playground', () => {
-//   it('basic', () => {
-//     expect(
-//       parser(`SELECT CASE WHEN "status" = 'RUNNING' THEN "runner_status" ELSE "status" END AS "status"
-// FROM Customers`).toString(),
-//     ).toEqual({});
-//   });
-// });
+describe('Playground', () => {
+  it('renders  add function to Groupby', () => {
+    const tree = parser(`SELECT
+  "cityName",
+  COUNT(*) AS "Count",
+  SUM(added) AS "Added"
+FROM "wikiticker"
+WHERE "__time" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY
+GROUP BY 1
+ORDER BY "Count" DESC`).toString();
+    expect(tree).toMatchInlineSnapshot(`
+      "SELECT
+        \\"cityName\\",
+        COUNT(*) AS \\"Count\\",
+        SUM(added) AS \\"Added\\"
+      FROM \\"wikiticker\\"
+      WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY
+      GROUP BY 1
+      ORDER BY \\"Count\\" DESC"
+    `);
+  });
+});

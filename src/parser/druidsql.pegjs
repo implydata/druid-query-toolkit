@@ -21,9 +21,12 @@
   function makeListMapEmpty0(tail) {
     return [].concat(tail.map(function(t) { return t[0] }));
   }
-   function makeListMapEmpty0Joined(tail) {
-      return [].concat(tail.map(function(t) { return t[0].join('') }));
-    }
+ function makeListMapEmpty0BookEnd(tail) {
+    return [].concat(tail.map(function(t) { return [t[0][0],t[0][2]] })).flat();
+  }
+ function makeListMapEmpty0Joined(tail) {
+    return [].concat(tail.map(function(t) { return t[0].join('') }));
+  }
   function makeListMapEmptyConcat0(tail) {
     return [].concat(tail.map(function(t) { return t[0].join('') }));
   }
@@ -446,8 +449,8 @@ AdditiveExpression
     return new AdditiveExpression({
       parens:[],
       ex: makeListMap1(head, tail),
-      spacing: makeListMapEmpty0(tail),
-      op: makeListMapEmpty0(tail),
+      spacing: makeListMapEmpty0BookEnd(tail),
+      op: makeListMapEmpty(makeListMapEmpty0(tail)),
     });
   }
   /open: (OpenParen _?)
@@ -474,8 +477,8 @@ MultiplicativeExpression
     return new MultiplicativeExpression({
       parens : [],
       ex: makeListMap1(head, tail),
-      spacing: makeListMapEmpty0(tail),
-      op: makeListMapEmpty01(tail),
+      spacing: makeListMapEmpty0BookEnd(tail),
+      op: makeListMapEmpty(makeListMapEmpty0(tail)),
     });
 
   }
@@ -568,7 +571,7 @@ Function
         fn: fn,
         value: makeListMap1(valueHead, valueTail),
         filterClause: filterClause ? filterClause[1] : null,
-        spacing:[spacing0,(distinct? distinct[1] : ''), makeListMapEmpty(valueTail), spacing1, (filterClause ? filterClause[0] : null),]
+        spacing:[spacing0,(distinct? distinct[1] : ''), makeListMapEmpty(valueTail), spacing1, (filterClause ? filterClause[0] : null)]
        });
     }
     /open: (OpenParen _?)

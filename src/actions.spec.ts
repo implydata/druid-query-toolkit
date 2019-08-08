@@ -11,7 +11,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { basicIdentifierEscape, basicLiteralEscape } from './ast/sql-query/helpers';
+import {
+  AdditiveExpression,
+  Alias,
+  ComparisonExpression,
+  ComparisonExpressionRhs,
+  FilterClause,
+  Interval,
+  RefExpression,
+  StringType,
+  WhereClause,
+} from './ast';
+import { basicIdentifierEscape, basicLiteralEscape, stringFactory } from './ast/sql-query/helpers';
 import { sqlParserFactory } from './parser/druidsql';
 import { FUNCTIONS } from './test-utils';
 
@@ -49,10 +60,10 @@ LIMIT 25`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                    "SELECT \\"segment_id\\", \\"datasource\\", \\"end\\", \\"size\\", \\"version\\", \\"partition_num\\", \\"num_replicas\\", \\"num_rows\\", \\"is_published\\", \\"is_available\\", \\"is_realtime\\", \\"is_overshadowed\\", \\"payload\\"
-                                                                                    FROM sys.segments
-                                                                                    LIMIT 25"
-                                                        `);
+                                                                                                                                                                                    "SELECT \\"segment_id\\", \\"datasource\\", \\"end\\", \\"size\\", \\"version\\", \\"partition_num\\", \\"num_replicas\\", \\"num_rows\\", \\"is_published\\", \\"is_available\\", \\"is_realtime\\", \\"is_overshadowed\\", \\"payload\\"
+                                                                                                                                                                                    FROM sys.segments
+                                                                                                                                                                                    LIMIT 25"
+                                                                                                                        `);
   });
 
   it('renders orderBy', () => {
@@ -64,11 +75,11 @@ LIMIT 25`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                    "SELECT \\"segment_id\\", \\"datasource\\", \\"start\\", \\"end\\", \\"size\\", \\"version\\", \\"partition_num\\", \\"num_replicas\\", \\"num_rows\\", \\"is_published\\", \\"is_available\\", \\"is_realtime\\", \\"is_overshadowed\\", \\"payload\\"
-                                                                                    FROM sys.segments
-                                                                                    ORDER BY \\"datasource\\" DESC
-                                                                                    LIMIT 25"
-                                                        `);
+                                                                                                                                                                                    "SELECT \\"segment_id\\", \\"datasource\\", \\"start\\", \\"end\\", \\"size\\", \\"version\\", \\"partition_num\\", \\"num_replicas\\", \\"num_rows\\", \\"is_published\\", \\"is_available\\", \\"is_realtime\\", \\"is_overshadowed\\", \\"payload\\"
+                                                                                                                                                                                    FROM sys.segments
+                                                                                                                                                                                    ORDER BY \\"datasource\\" DESC
+                                                                                                                                                                                    LIMIT 25"
+                                                                                                                        `);
   });
 
   it('renders exclude row', () => {
@@ -80,12 +91,12 @@ LIMIT 25`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                    "SELECT \\"segment_id\\", \\"datasource\\", \\"start\\", \\"end\\", \\"size\\", \\"version\\", \\"partition_num\\", \\"num_replicas\\", \\"num_rows\\", \\"is_published\\", \\"is_available\\", \\"is_realtime\\", \\"is_overshadowed\\", \\"payload\\"
-                                                                                    FROM sys.segments
-                                                                                    WHERE \\"datasource\\"!='github'
-                                                                                    ORDER BY \\"start\\" DESC
-                                                                                    LIMIT 25"
-                                                        `);
+      "SELECT \\"segment_id\\", \\"datasource\\", \\"start\\", \\"end\\", \\"size\\", \\"version\\", \\"partition_num\\", \\"num_replicas\\", \\"num_rows\\", \\"is_published\\", \\"is_available\\", \\"is_realtime\\", \\"is_overshadowed\\", \\"payload\\"
+      FROM sys.segments
+      WHERE \\"datasource\\" != 'github'
+      ORDER BY \\"start\\" DESC
+      LIMIT 25"
+    `);
   });
 
   it('renders getSorted', () => {
@@ -95,13 +106,13 @@ ORDER BY "start" DESC
 LIMIT 25`).getSorted();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                    Array [
-                                                                                      Object {
-                                                                                        "desc": true,
-                                                                                        "id": "start",
-                                                                                      },
-                                                                                    ]
-                                                        `);
+                                                                                                                                                                                    Array [
+                                                                                                                                                                                      Object {
+                                                                                                                                                                                        "desc": true,
+                                                                                                                                                                                        "id": "start",
+                                                                                                                                                                                      },
+                                                                                                                                                                                    ]
+                                                                                                                        `);
   });
 
   it('renders getSchema', () => {
@@ -134,23 +145,23 @@ FROM sys.segments
 ORDER BY "start" DESC
 LIMIT 25`).getColumnsArray();
     expect(tree).toMatchInlineSnapshot(`
-                                                                                    Array [
-                                                                                      "segment_id",
-                                                                                      "datasource",
-                                                                                      "start",
-                                                                                      "end",
-                                                                                      "size",
-                                                                                      "version",
-                                                                                      "partition_num",
-                                                                                      "num_replicas",
-                                                                                      "num_rows",
-                                                                                      "is_published",
-                                                                                      "is_available",
-                                                                                      "is_realtime",
-                                                                                      "is_overshadowed",
-                                                                                      "payload",
-                                                                                    ]
-                                                        `);
+                                                                                                                                                                                    Array [
+                                                                                                                                                                                      "segment_id",
+                                                                                                                                                                                      "datasource",
+                                                                                                                                                                                      "start",
+                                                                                                                                                                                      "end",
+                                                                                                                                                                                      "size",
+                                                                                                                                                                                      "version",
+                                                                                                                                                                                      "partition_num",
+                                                                                                                                                                                      "num_replicas",
+                                                                                                                                                                                      "num_rows",
+                                                                                                                                                                                      "is_published",
+                                                                                                                                                                                      "is_available",
+                                                                                                                                                                                      "is_realtime",
+                                                                                                                                                                                      "is_overshadowed",
+                                                                                                                                                                                      "payload",
+                                                                                                                                                                                    ]
+                                                                                                                        `);
   });
 
   it('renders toString', () => {
@@ -160,11 +171,11 @@ ORDER BY "start" DESC
 LIMIT 25`).toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                    "SELECT \\"segment_id\\", \\"datasource\\", \\"start\\", \\"end\\", \\"size\\", \\"version\\", \\"partition_num\\", \\"num_replicas\\", \\"num_rows\\", \\"is_published\\", \\"is_available\\", \\"is_realtime\\", \\"is_overshadowed\\", \\"payload\\"
-                                                                                    FROM sys.segments
-                                                                                    ORDER BY \\"start\\" DESC
-                                                                                    LIMIT 25"
-                                                        `);
+                                                                                                                                                                                    "SELECT \\"segment_id\\", \\"datasource\\", \\"start\\", \\"end\\", \\"size\\", \\"version\\", \\"partition_num\\", \\"num_replicas\\", \\"num_rows\\", \\"is_published\\", \\"is_available\\", \\"is_realtime\\", \\"is_overshadowed\\", \\"payload\\"
+                                                                                                                                                                                    FROM sys.segments
+                                                                                                                                                                                    ORDER BY \\"start\\" DESC
+                                                                                                                                                                                    LIMIT 25"
+                                                                                                                        `);
   });
 });
 
@@ -186,18 +197,18 @@ ORDER BY "rank" DESC, "created_time" DESC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                    "SELECT
-                                                                                      COUNT(*) AS num_segments,
-                                                                                      SUM(is_available) AS num_available_segments,
-                                                                                      SUM(\\"size\\") AS size,
-                                                                                      SUM(\\"num_rows\\") AS num_rows,
-                                                                                      CASE WHEN \\"status\\" = 'RUNNING' THEN
-                                                                                      (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
-                                                                                      ELSE 1 END AS \\"rank\\"
-                                                                                    FROM sys.segments
-                                                                                    GROUP BY 1
-                                                                                    ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
-                                                        `);
+                                                                                                                                                                                    "SELECT
+                                                                                                                                                                                      COUNT(*) AS num_segments,
+                                                                                                                                                                                      SUM(is_available) AS num_available_segments,
+                                                                                                                                                                                      SUM(\\"size\\") AS size,
+                                                                                                                                                                                      SUM(\\"num_rows\\") AS num_rows,
+                                                                                                                                                                                      CASE WHEN \\"status\\" = 'RUNNING' THEN
+                                                                                                                                                                                      (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
+                                                                                                                                                                                      ELSE 1 END AS \\"rank\\"
+                                                                                                                                                                                    FROM sys.segments
+                                                                                                                                                                                    GROUP BY 1
+                                                                                                                                                                                    ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
+                                                                                                                        `);
   });
 
   it('renders orderBy', () => {
@@ -217,19 +228,19 @@ ORDER BY "rank" DESC, "created_time" DESC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                    "SELECT
-                                                                                      datasource,
-                                                                                      COUNT(*) AS num_segments,
-                                                                                      SUM(is_available) AS num_available_segments,
-                                                                                      SUM(\\"size\\") AS size,
-                                                                                      SUM(\\"num_rows\\") AS num_rows,
-                                                                                      CASE WHEN \\"status\\" = 'RUNNING' THEN
-                                                                                      (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
-                                                                                      ELSE 1 END AS \\"rank\\"
-                                                                                    FROM sys.segments
-                                                                                    GROUP BY 1,2
-                                                                                    ORDER BY \\"datasource\\" DESC"
-                                                        `);
+                                                                                                                                                                                    "SELECT
+                                                                                                                                                                                      datasource,
+                                                                                                                                                                                      COUNT(*) AS num_segments,
+                                                                                                                                                                                      SUM(is_available) AS num_available_segments,
+                                                                                                                                                                                      SUM(\\"size\\") AS size,
+                                                                                                                                                                                      SUM(\\"num_rows\\") AS num_rows,
+                                                                                                                                                                                      CASE WHEN \\"status\\" = 'RUNNING' THEN
+                                                                                                                                                                                      (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
+                                                                                                                                                                                      ELSE 1 END AS \\"rank\\"
+                                                                                                                                                                                    FROM sys.segments
+                                                                                                                                                                                    GROUP BY 1,2
+                                                                                                                                                                                    ORDER BY \\"datasource\\" DESC"
+                                                                                                                        `);
   });
 
   it('renders exclude row', () => {
@@ -249,20 +260,20 @@ ORDER BY "rank" DESC, "created_time" DESC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                    "SELECT
-                                                                                      datasource,
-                                                                                      COUNT(*) AS num_segments,
-                                                                                      SUM(is_available) AS num_available_segments,
-                                                                                      SUM(\\"size\\") AS size,
-                                                                                      SUM(\\"num_rows\\") AS num_rows,
-                                                                                      CASE WHEN \\"status\\" = 'RUNNING' THEN
-                                                                                      (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
-                                                                                      ELSE 1 END AS \\"rank\\"
-                                                                                    FROM sys.segments
-                                                                                    WHERE \\"datasource\\"!='rowvalue'
-                                                                                    GROUP BY 1,2
-                                                                                    ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
-                                                        `);
+      "SELECT
+        datasource,
+        COUNT(*) AS num_segments,
+        SUM(is_available) AS num_available_segments,
+        SUM(\\"size\\") AS size,
+        SUM(\\"num_rows\\") AS num_rows,
+        CASE WHEN \\"status\\" = 'RUNNING' THEN
+        (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
+        ELSE 1 END AS \\"rank\\"
+      FROM sys.segments
+      WHERE \\"datasource\\" != 'rowvalue'
+      GROUP BY 1,2
+      ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
+    `);
   });
 
   it('renders getSorted', () => {
@@ -279,17 +290,17 @@ FROM sys.segments
 GROUP BY 1,2
 ORDER BY "rank" DESC, "created_time" DESC`).getSorted();
     expect(tree).toMatchInlineSnapshot(`
-                                                                                    Array [
-                                                                                      Object {
-                                                                                        "desc": true,
-                                                                                        "id": "rank",
-                                                                                      },
-                                                                                      Object {
-                                                                                        "desc": true,
-                                                                                        "id": "created_time",
-                                                                                      },
-                                                                                    ]
-                                                        `);
+                                                                                                                                                                                    Array [
+                                                                                                                                                                                      Object {
+                                                                                                                                                                                        "desc": true,
+                                                                                                                                                                                        "id": "rank",
+                                                                                                                                                                                      },
+                                                                                                                                                                                      Object {
+                                                                                                                                                                                        "desc": true,
+                                                                                                                                                                                        "id": "created_time",
+                                                                                                                                                                                      },
+                                                                                                                                                                                    ]
+                                                                                                                        `);
   });
 
   it('renders getSchema', () => {
@@ -338,13 +349,13 @@ FROM sys.segments
 GROUP BY 1,2
 ORDER BY "rank" DESC, "created_time" DESC`).getAggregateColumns();
     expect(tree).toMatchInlineSnapshot(`
-                                                                                    Array [
-                                                                                      "num_available_segments",
-                                                                                      "size",
-                                                                                      "num_rows",
-                                                                                      "rank",
-                                                                                    ]
-                                                        `);
+                                                                                                                                                                                    Array [
+                                                                                                                                                                                      "num_available_segments",
+                                                                                                                                                                                      "size",
+                                                                                                                                                                                      "num_rows",
+                                                                                                                                                                                      "rank",
+                                                                                                                                                                                    ]
+                                                                                                                        `);
   });
 
   it('renders getColumnsArray', () => {
@@ -361,15 +372,15 @@ FROM sys.segments
 GROUP BY 1,2
 ORDER BY "rank" DESC, "created_time" DESC`).getColumnsArray();
     expect(tree).toMatchInlineSnapshot(`
-                                                                                    Array [
-                                                                                      "datasource",
-                                                                                      "num_segments",
-                                                                                      "num_available_segments",
-                                                                                      "size",
-                                                                                      "num_rows",
-                                                                                      "rank",
-                                                                                    ]
-                                                        `);
+                                                                                                                                                                                    Array [
+                                                                                                                                                                                      "datasource",
+                                                                                                                                                                                      "num_segments",
+                                                                                                                                                                                      "num_available_segments",
+                                                                                                                                                                                      "size",
+                                                                                                                                                                                      "num_rows",
+                                                                                                                                                                                      "rank",
+                                                                                                                                                                                    ]
+                                                                                                                        `);
   });
 
   it('renders toString', () => {
@@ -387,19 +398,19 @@ GROUP BY 1,2
 ORDER BY "rank" DESC, "created_time" DESC`).toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                    "SELECT
-                                                                                      datasource,
-                                                                                      COUNT(*) AS num_segments,
-                                                                                      SUM(is_available) AS num_available_segments,
-                                                                                      SUM(\\"size\\") AS size,
-                                                                                      SUM(\\"num_rows\\") AS num_rows,
-                                                                                      CASE WHEN \\"status\\" = 'RUNNING' THEN
-                                                                                      (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
-                                                                                      ELSE 1 END AS \\"rank\\"
-                                                                                    FROM sys.segments
-                                                                                    GROUP BY 1,2
-                                                                                    ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
-                                                        `);
+                                                                                                                                                                                    "SELECT
+                                                                                                                                                                                      datasource,
+                                                                                                                                                                                      COUNT(*) AS num_segments,
+                                                                                                                                                                                      SUM(is_available) AS num_available_segments,
+                                                                                                                                                                                      SUM(\\"size\\") AS size,
+                                                                                                                                                                                      SUM(\\"num_rows\\") AS num_rows,
+                                                                                                                                                                                      CASE WHEN \\"status\\" = 'RUNNING' THEN
+                                                                                                                                                                                      (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
+                                                                                                                                                                                      ELSE 1 END AS \\"rank\\"
+                                                                                                                                                                                    FROM sys.segments
+                                                                                                                                                                                    GROUP BY 1,2
+                                                                                                                                                                                    ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
+                                                                                                                        `);
   });
 });
 
@@ -422,19 +433,19 @@ ORDER BY "rank" DESC, "created_time" DESC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                    "SELECT
-                                                                                      COUNT(*) AS num_segments,
-                                                                                      SUM(is_available) AS num_available_segments,
-                                                                                      SUM(\\"size\\") AS size,
-                                                                                      SUM(\\"num_rows\\") AS num_rows,
-                                                                                      CASE WHEN \\"status\\" = 'RUNNING' THEN
-                                                                                      (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
-                                                                                      ELSE 1 END AS \\"rank\\"
-                                                                                    FROM sys.segments
-                                                                                    WHERE \\"size\\" = '12'
-                                                                                    GROUP BY 1
-                                                                                    ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
-                                                        `);
+                                                                                                                                                                                    "SELECT
+                                                                                                                                                                                      COUNT(*) AS num_segments,
+                                                                                                                                                                                      SUM(is_available) AS num_available_segments,
+                                                                                                                                                                                      SUM(\\"size\\") AS size,
+                                                                                                                                                                                      SUM(\\"num_rows\\") AS num_rows,
+                                                                                                                                                                                      CASE WHEN \\"status\\" = 'RUNNING' THEN
+                                                                                                                                                                                      (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
+                                                                                                                                                                                      ELSE 1 END AS \\"rank\\"
+                                                                                                                                                                                    FROM sys.segments
+                                                                                                                                                                                    WHERE \\"size\\" = '12'
+                                                                                                                                                                                    GROUP BY 1
+                                                                                                                                                                                    ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
+                                                                                                                        `);
   });
 
   it('renders orderBy', () => {
@@ -455,20 +466,20 @@ ORDER BY "rank" DESC, "created_time" DESC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                    "SELECT
-                                                                                      datasource,
-                                                                                      COUNT(*) AS num_segments,
-                                                                                      SUM(is_available) AS num_available_segments,
-                                                                                      SUM(\\"size\\") AS size,
-                                                                                      SUM(\\"num_rows\\") AS num_rows,
-                                                                                      CASE WHEN \\"status\\" = 'RUNNING' THEN
-                                                                                      (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
-                                                                                      ELSE 1 END AS \\"rank\\"
-                                                                                    FROM sys.segments
-                                                                                    WHERE \\"size\\" = '12'
-                                                                                    GROUP BY 1,2
-                                                                                    ORDER BY \\"datasource\\" DESC"
-                                                        `);
+                                                                                                                                                                                    "SELECT
+                                                                                                                                                                                      datasource,
+                                                                                                                                                                                      COUNT(*) AS num_segments,
+                                                                                                                                                                                      SUM(is_available) AS num_available_segments,
+                                                                                                                                                                                      SUM(\\"size\\") AS size,
+                                                                                                                                                                                      SUM(\\"num_rows\\") AS num_rows,
+                                                                                                                                                                                      CASE WHEN \\"status\\" = 'RUNNING' THEN
+                                                                                                                                                                                      (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
+                                                                                                                                                                                      ELSE 1 END AS \\"rank\\"
+                                                                                                                                                                                    FROM sys.segments
+                                                                                                                                                                                    WHERE \\"size\\" = '12'
+                                                                                                                                                                                    GROUP BY 1,2
+                                                                                                                                                                                    ORDER BY \\"datasource\\" DESC"
+                                                                                                                        `);
   });
 
   it('renders exclude row', () => {
@@ -489,20 +500,20 @@ ORDER BY "rank" DESC, "created_time" DESC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                    "SELECT
-                                                                                      datasource,
-                                                                                      COUNT(*) AS num_segments,
-                                                                                      SUM(is_available) AS num_available_segments,
-                                                                                      SUM(\\"size\\") AS size,
-                                                                                      SUM(\\"num_rows\\") AS num_rows,
-                                                                                      CASE WHEN \\"status\\" = 'RUNNING' THEN
-                                                                                      (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
-                                                                                      ELSE 1 END AS \\"rank\\"
-                                                                                    FROM sys.segments
-                                                                                    WHERE \\"size\\" = '12' AND \\"datasource\\"!='rowvalue'
-                                                                                    GROUP BY 1,2
-                                                                                    ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
-                                                        `);
+      "SELECT
+        datasource,
+        COUNT(*) AS num_segments,
+        SUM(is_available) AS num_available_segments,
+        SUM(\\"size\\") AS size,
+        SUM(\\"num_rows\\") AS num_rows,
+        CASE WHEN \\"status\\" = 'RUNNING' THEN
+        (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
+        ELSE 1 END AS \\"rank\\"
+      FROM sys.segments
+      WHERE \\"size\\" = '12' AND \\"datasource\\" != 'rowvalue'
+      GROUP BY 1,2
+      ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
+    `);
   });
 
   it('renders getSorted', () => {
@@ -520,17 +531,17 @@ WHERE "size" = '12'
 GROUP BY 1,2
 ORDER BY "rank" DESC, "created_time" DESC`).getSorted();
     expect(tree).toMatchInlineSnapshot(`
-                                                                                    Array [
-                                                                                      Object {
-                                                                                        "desc": true,
-                                                                                        "id": "rank",
-                                                                                      },
-                                                                                      Object {
-                                                                                        "desc": true,
-                                                                                        "id": "created_time",
-                                                                                      },
-                                                                                    ]
-                                                        `);
+                                                                                                                                                                                    Array [
+                                                                                                                                                                                      Object {
+                                                                                                                                                                                        "desc": true,
+                                                                                                                                                                                        "id": "rank",
+                                                                                                                                                                                      },
+                                                                                                                                                                                      Object {
+                                                                                                                                                                                        "desc": true,
+                                                                                                                                                                                        "id": "created_time",
+                                                                                                                                                                                      },
+                                                                                                                                                                                    ]
+                                                                                                                        `);
   });
 
   it('renders getSchema', () => {
@@ -582,13 +593,13 @@ WHERE "size" = '12'
 GROUP BY 1,2
 ORDER BY "rank" DESC, "created_time" DESC`).getAggregateColumns();
     expect(tree).toMatchInlineSnapshot(`
-                                                                                    Array [
-                                                                                      "num_available_segments",
-                                                                                      "size",
-                                                                                      "num_rows",
-                                                                                      "rank",
-                                                                                    ]
-                                                        `);
+                                                                                                                                                                                    Array [
+                                                                                                                                                                                      "num_available_segments",
+                                                                                                                                                                                      "size",
+                                                                                                                                                                                      "num_rows",
+                                                                                                                                                                                      "rank",
+                                                                                                                                                                                    ]
+                                                                                                                        `);
   });
 
   it('renders getColumnsArray', () => {
@@ -606,15 +617,15 @@ WHERE "size" = '12'
 GROUP BY 1,2
 ORDER BY "rank" DESC, "created_time" DESC`).getColumnsArray();
     expect(tree).toMatchInlineSnapshot(`
-                                                                                    Array [
-                                                                                      "datasource",
-                                                                                      "num_segments",
-                                                                                      "num_available_segments",
-                                                                                      "size",
-                                                                                      "num_rows",
-                                                                                      "rank",
-                                                                                    ]
-                                                        `);
+                                                                                                                                                                                    Array [
+                                                                                                                                                                                      "datasource",
+                                                                                                                                                                                      "num_segments",
+                                                                                                                                                                                      "num_available_segments",
+                                                                                                                                                                                      "size",
+                                                                                                                                                                                      "num_rows",
+                                                                                                                                                                                      "rank",
+                                                                                                                                                                                    ]
+                                                                                                                        `);
   });
 
   it('renders toString', () => {
@@ -633,20 +644,20 @@ GROUP BY 1,2
 ORDER BY "rank" DESC, "created_time" DESC`).toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                    "SELECT
-                                                                                      datasource,
-                                                                                      COUNT(*) AS num_segments,
-                                                                                      SUM(is_available) AS num_available_segments,
-                                                                                      SUM(\\"size\\") AS size,
-                                                                                      SUM(\\"num_rows\\") AS num_rows,
-                                                                                      CASE WHEN \\"status\\" = 'RUNNING' THEN
-                                                                                      (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
-                                                                                      ELSE 1 END AS \\"rank\\"
-                                                                                    FROM sys.segments
-                                                                                    WHERE \\"size\\" = '12'
-                                                                                    GROUP BY 1,2
-                                                                                    ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
-                                                        `);
+                                                                                                                                                                                    "SELECT
+                                                                                                                                                                                      datasource,
+                                                                                                                                                                                      COUNT(*) AS num_segments,
+                                                                                                                                                                                      SUM(is_available) AS num_available_segments,
+                                                                                                                                                                                      SUM(\\"size\\") AS size,
+                                                                                                                                                                                      SUM(\\"num_rows\\") AS num_rows,
+                                                                                                                                                                                      CASE WHEN \\"status\\" = 'RUNNING' THEN
+                                                                                                                                                                                      (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
+                                                                                                                                                                                      ELSE 1 END AS \\"rank\\"
+                                                                                                                                                                                    FROM sys.segments
+                                                                                                                                                                                    WHERE \\"size\\" = '12'
+                                                                                                                                                                                    GROUP BY 1,2
+                                                                                                                                                                                    ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
+                                                                                                                        `);
   });
 });
 
@@ -669,19 +680,19 @@ ORDER BY "rank" DESC, "created_time" DESC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                    "SELECT
-                                                                                      COUNT(*) AS num_segments,
-                                                                                      SUM(is_available) AS num_available_segments,
-                                                                                      SUM(\\"size\\") AS size,
-                                                                                      SUM(\\"num_rows\\") AS num_rows,
-                                                                                      CASE WHEN \\"status\\" = 'RUNNING' THEN
-                                                                                      (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
-                                                                                      ELSE 1 END AS \\"rank\\"
-                                                                                    FROM sys.segments
-                                                                                    WHERE \\"size\\" = '12'
-                                                                                    GROUP BY 1
-                                                                                    ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
-                                                        `);
+                                                                                                                                                                                    "SELECT
+                                                                                                                                                                                      COUNT(*) AS num_segments,
+                                                                                                                                                                                      SUM(is_available) AS num_available_segments,
+                                                                                                                                                                                      SUM(\\"size\\") AS size,
+                                                                                                                                                                                      SUM(\\"num_rows\\") AS num_rows,
+                                                                                                                                                                                      CASE WHEN \\"status\\" = 'RUNNING' THEN
+                                                                                                                                                                                      (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
+                                                                                                                                                                                      ELSE 1 END AS \\"rank\\"
+                                                                                                                                                                                    FROM sys.segments
+                                                                                                                                                                                    WHERE \\"size\\" = '12'
+                                                                                                                                                                                    GROUP BY 1
+                                                                                                                                                                                    ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
+                                                                                                                        `);
   });
 
   it('renders remove second of 2 columns', () => {
@@ -702,19 +713,19 @@ ORDER BY "rank" DESC, "created_time" DESC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                    "SELECT
-                                                                                      datasource,
-                                                                                      SUM(is_available) AS num_available_segments,
-                                                                                      SUM(\\"size\\") AS size,
-                                                                                      SUM(\\"num_rows\\") AS num_rows,
-                                                                                      CASE WHEN \\"status\\" = 'RUNNING' THEN
-                                                                                      (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
-                                                                                      ELSE 1 END AS \\"rank\\"
-                                                                                    FROM sys.segments
-                                                                                    WHERE \\"size\\" = '12'
-                                                                                    GROUP BY 1
-                                                                                    ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
-                                                        `);
+                                                                                                                                                                                    "SELECT
+                                                                                                                                                                                      datasource,
+                                                                                                                                                                                      SUM(is_available) AS num_available_segments,
+                                                                                                                                                                                      SUM(\\"size\\") AS size,
+                                                                                                                                                                                      SUM(\\"num_rows\\") AS num_rows,
+                                                                                                                                                                                      CASE WHEN \\"status\\" = 'RUNNING' THEN
+                                                                                                                                                                                      (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
+                                                                                                                                                                                      ELSE 1 END AS \\"rank\\"
+                                                                                                                                                                                    FROM sys.segments
+                                                                                                                                                                                    WHERE \\"size\\" = '12'
+                                                                                                                                                                                    GROUP BY 1
+                                                                                                                                                                                    ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
+                                                                                                                        `);
   });
 
   it('renders remove first of 2 named columns', () => {
@@ -735,19 +746,19 @@ ORDER BY "rank" DESC, "created_time" DESC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                    "SELECT
-                                                                                      COUNT(*) AS num_segments,
-                                                                                      SUM(is_available) AS num_available_segments,
-                                                                                      SUM(\\"size\\") AS size,
-                                                                                      SUM(\\"num_rows\\") AS num_rows,
-                                                                                      CASE WHEN \\"status\\" = 'RUNNING' THEN
-                                                                                      (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
-                                                                                      ELSE 1 END AS \\"rank\\"
-                                                                                    FROM sys.segments
-                                                                                    WHERE \\"size\\" = '12'
-                                                                                    GROUP BY num_segments
-                                                                                    ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
-                                                        `);
+                                                                                                                                                                                    "SELECT
+                                                                                                                                                                                      COUNT(*) AS num_segments,
+                                                                                                                                                                                      SUM(is_available) AS num_available_segments,
+                                                                                                                                                                                      SUM(\\"size\\") AS size,
+                                                                                                                                                                                      SUM(\\"num_rows\\") AS num_rows,
+                                                                                                                                                                                      CASE WHEN \\"status\\" = 'RUNNING' THEN
+                                                                                                                                                                                      (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
+                                                                                                                                                                                      ELSE 1 END AS \\"rank\\"
+                                                                                                                                                                                    FROM sys.segments
+                                                                                                                                                                                    WHERE \\"size\\" = '12'
+                                                                                                                                                                                    GROUP BY num_segments
+                                                                                                                                                                                    ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
+                                                                                                                        `);
   });
 
   it('renders remove second of 2 named columns', () => {
@@ -768,19 +779,19 @@ ORDER BY "rank" DESC, "created_time" DESC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                    "SELECT
-                                                                                      datasource,
-                                                                                      SUM(is_available) AS num_available_segments,
-                                                                                      SUM(\\"size\\") AS size,
-                                                                                      SUM(\\"num_rows\\") AS num_rows,
-                                                                                      CASE WHEN \\"status\\" = 'RUNNING' THEN
-                                                                                      (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
-                                                                                      ELSE 1 END AS \\"rank\\"
-                                                                                    FROM sys.segments
-                                                                                    WHERE \\"size\\" = '12'
-                                                                                    GROUP BY datasource
-                                                                                    ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
-                                                        `);
+                                                                                                                                                                                    "SELECT
+                                                                                                                                                                                      datasource,
+                                                                                                                                                                                      SUM(is_available) AS num_available_segments,
+                                                                                                                                                                                      SUM(\\"size\\") AS size,
+                                                                                                                                                                                      SUM(\\"num_rows\\") AS num_rows,
+                                                                                                                                                                                      CASE WHEN \\"status\\" = 'RUNNING' THEN
+                                                                                                                                                                                      (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
+                                                                                                                                                                                      ELSE 1 END AS \\"rank\\"
+                                                                                                                                                                                    FROM sys.segments
+                                                                                                                                                                                    WHERE \\"size\\" = '12'
+                                                                                                                                                                                    GROUP BY datasource
+                                                                                                                                                                                    ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
+                                                                                                                        `);
   });
 
   it('renders remove second of 1 of 1 columns', () => {
@@ -801,18 +812,18 @@ ORDER BY "rank" DESC, "created_time" DESC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                    "SELECT
-                                                                                      COUNT(*) AS num_segments,
-                                                                                      SUM(is_available) AS num_available_segments,
-                                                                                      SUM(\\"size\\") AS size,
-                                                                                      SUM(\\"num_rows\\") AS num_rows,
-                                                                                      CASE WHEN \\"status\\" = 'RUNNING' THEN
-                                                                                      (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
-                                                                                      ELSE 1 END AS \\"rank\\"
-                                                                                    FROM sys.segments
-                                                                                    WHERE \\"size\\" = '12'
-                                                                                    ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
-                                                        `);
+                                                                                                                                                                                    "SELECT
+                                                                                                                                                                                      COUNT(*) AS num_segments,
+                                                                                                                                                                                      SUM(is_available) AS num_available_segments,
+                                                                                                                                                                                      SUM(\\"size\\") AS size,
+                                                                                                                                                                                      SUM(\\"num_rows\\") AS num_rows,
+                                                                                                                                                                                      CASE WHEN \\"status\\" = 'RUNNING' THEN
+                                                                                                                                                                                      (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
+                                                                                                                                                                                      ELSE 1 END AS \\"rank\\"
+                                                                                                                                                                                    FROM sys.segments
+                                                                                                                                                                                    WHERE \\"size\\" = '12'
+                                                                                                                                                                                    ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
+                                                                                                                        `);
   });
 
   it('renders remove second of 1 of 1 columns by index', () => {
@@ -833,18 +844,18 @@ ORDER BY "rank" DESC, "created_time" DESC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                    "SELECT
-                                                                                      COUNT(*) AS num_segments,
-                                                                                      SUM(is_available) AS num_available_segments,
-                                                                                      SUM(\\"size\\") AS size,
-                                                                                      SUM(\\"num_rows\\") AS num_rows,
-                                                                                      CASE WHEN \\"status\\" = 'RUNNING' THEN
-                                                                                      (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
-                                                                                      ELSE 1 END AS \\"rank\\"
-                                                                                    FROM sys.segments
-                                                                                    WHERE \\"size\\" = '12'
-                                                                                    ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
-                                                        `);
+                                                                                                                                                                                    "SELECT
+                                                                                                                                                                                      COUNT(*) AS num_segments,
+                                                                                                                                                                                      SUM(is_available) AS num_available_segments,
+                                                                                                                                                                                      SUM(\\"size\\") AS size,
+                                                                                                                                                                                      SUM(\\"num_rows\\") AS num_rows,
+                                                                                                                                                                                      CASE WHEN \\"status\\" = 'RUNNING' THEN
+                                                                                                                                                                                      (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
+                                                                                                                                                                                      ELSE 1 END AS \\"rank\\"
+                                                                                                                                                                                    FROM sys.segments
+                                                                                                                                                                                    WHERE \\"size\\" = '12'
+                                                                                                                                                                                    ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
+                                                                                                                        `);
   });
 
   it('test basicIdentifierEscape', () => {
@@ -874,12 +885,12 @@ LIMIT 25`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                    "SELECT \\"segment_id\\", \\"datasource\\", \\"start\\", \\"end\\", \\"size\\", \\"version\\", \\"partition_num\\", \\"num_replicas\\", \\"num_rows\\", \\"is_published\\", \\"is_available\\", \\"is_realtime\\", \\"is_overshadowed\\", \\"payload\\"
-                                                                                    FROM sys.segments
-                                                                                    WHERE \\"datasource\\"!=1
-                                                                                    ORDER BY \\"start\\" DESC
-                                                                                    LIMIT 25"
-                                                        `);
+      "SELECT \\"segment_id\\", \\"datasource\\", \\"start\\", \\"end\\", \\"size\\", \\"version\\", \\"partition_num\\", \\"num_replicas\\", \\"num_rows\\", \\"is_published\\", \\"is_available\\", \\"is_realtime\\", \\"is_overshadowed\\", \\"payload\\"
+      FROM sys.segments
+      WHERE \\"datasource\\" != 1
+      ORDER BY \\"start\\" DESC
+      LIMIT 25"
+    `);
   });
 
   it('renders filter row with number', () => {
@@ -895,13 +906,13 @@ ORDER BY "Count" DESC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                              "SELECT
-                                                                                \\"cityName\\",
-                                                                                SUM(added) AS \\"Added\\"
-                                                                              FROM \\"wikiticker\\"
-                                                                              WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY
-                                                                              GROUP BY 1"
-                                                    `);
+                                                                                                                                                                              "SELECT
+                                                                                                                                                                                \\"cityName\\",
+                                                                                                                                                                                SUM(added) AS \\"Added\\"
+                                                                                                                                                                              FROM \\"wikiticker\\"
+                                                                                                                                                                              WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY
+                                                                                                                                                                              GROUP BY 1"
+                                                                                                                    `);
   });
 
   it('renders filter aggregate row', () => {
@@ -917,16 +928,16 @@ ORDER BY "Count" DESC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                  "SELECT
-                                                                    \\"cityName\\",
-                                                                    COUNT(*) AS \\"Count\\",
-                                                                    SUM(added) AS \\"Added\\"
-                                                                  FROM \\"wikiticker\\"
-                                                                  WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY
-                                                                  GROUP BY 1
-                                                                  HAVING \\"Count\\"!='value'
-                                                                  ORDER BY \\"Count\\" DESC"
-                                            `);
+                                                                                                                                                                  "SELECT
+                                                                                                                                                                    \\"cityName\\",
+                                                                                                                                                                    COUNT(*) AS \\"Count\\",
+                                                                                                                                                                    SUM(added) AS \\"Added\\"
+                                                                                                                                                                  FROM \\"wikiticker\\"
+                                                                                                                                                                  WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY
+                                                                                                                                                                  GROUP BY 1
+                                                                                                                                                                  HAVING \\"Count\\"!='value'
+                                                                                                                                                                  ORDER BY \\"Count\\" DESC"
+                                                                                                            `);
   });
 
   it('renders  add to group by ', () => {
@@ -942,15 +953,15 @@ ORDER BY "Count" DESC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                  "SELECT
-                    \\"testValue\\", \\"cityName\\",
-                    COUNT(*) AS \\"Count\\",
-                    SUM(added) AS \\"Added\\"
-                  FROM \\"wikiticker\\"
-                  WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY
-                  GROUP BY 1,2
-                  ORDER BY \\"Count\\" DESC"
-            `);
+                                                                                                                  "SELECT
+                                                                                                                    \\"testValue\\", \\"cityName\\",
+                                                                                                                    COUNT(*) AS \\"Count\\",
+                                                                                                                    SUM(added) AS \\"Added\\"
+                                                                                                                  FROM \\"wikiticker\\"
+                                                                                                                  WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY
+                                                                                                                  GROUP BY 1,2
+                                                                                                                  ORDER BY \\"Count\\" DESC"
+                                                                            `);
   });
 
   it('renders add to group by for a second time ', () => {
@@ -967,16 +978,16 @@ ORDER BY "Count" DESC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-            "SELECT
-                \\"testValue\\", \\"somevalue\\",
-              \\"cityName\\",
-              COUNT(*) AS \\"Count\\",
-              SUM(added) AS \\"Added\\"
-            FROM \\"wikiticker\\"
-            WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY
-            GROUP BY 1,2,3
-            ORDER BY \\"Count\\" DESC"
-        `);
+                                                                                                            "SELECT
+                                                                                                                \\"testValue\\", \\"somevalue\\",
+                                                                                                              \\"cityName\\",
+                                                                                                              COUNT(*) AS \\"Count\\",
+                                                                                                              SUM(added) AS \\"Added\\"
+                                                                                                            FROM \\"wikiticker\\"
+                                                                                                            WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY
+                                                                                                            GROUP BY 1,2,3
+                                                                                                            ORDER BY \\"Count\\" DESC"
+                                                                        `);
   });
 
   it('renders  add to group by out of order', () => {
@@ -992,15 +1003,15 @@ ORDER BY "Count" DESC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                  "SELECT
-                    \\"testValue\\", COUNT(*) AS \\"Count\\",
-                      \\"cityName\\",
-                    SUM(added) AS \\"Added\\"
-                  FROM \\"wikiticker\\"
-                  WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY
-                  GROUP BY 1,3
-                  ORDER BY \\"Count\\" DESC"
-            `);
+                                                                                                                  "SELECT
+                                                                                                                    \\"testValue\\", COUNT(*) AS \\"Count\\",
+                                                                                                                      \\"cityName\\",
+                                                                                                                    SUM(added) AS \\"Added\\"
+                                                                                                                  FROM \\"wikiticker\\"
+                                                                                                                  WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY
+                                                                                                                  GROUP BY 1,3
+                                                                                                                  ORDER BY \\"Count\\" DESC"
+                                                                            `);
   });
 
   it('renders  add to group by out of no groupby, Should not change', () => {
@@ -1015,14 +1026,14 @@ ORDER BY "Count" DESC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                              "SELECT
-                                COUNT(*) AS \\"Count\\",
-                                  \\"cityName\\",
-                                SUM(added) AS \\"Added\\"
-                              FROM \\"wikiticker\\"
-                              WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY
-                              ORDER BY \\"Count\\" DESC"
-                    `);
+                                                                                                                              "SELECT
+                                                                                                                                COUNT(*) AS \\"Count\\",
+                                                                                                                                  \\"cityName\\",
+                                                                                                                                SUM(added) AS \\"Added\\"
+                                                                                                                              FROM \\"wikiticker\\"
+                                                                                                                              WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY
+                                                                                                                              ORDER BY \\"Count\\" DESC"
+                                                                                    `);
   });
 
   it('renders  add aggregate column', () => {
@@ -1038,14 +1049,196 @@ ORDER BY "Count" DESC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
+                                                                                                      "SELECT
+                                                                                                        \\"cityName\\",
+                                                                                                        COUNT(*) AS \\"Count\\",
+                                                                                                        SUM(added) AS \\"Added\\", SUM(\\"testValue\\")
+                                                                                                      FROM \\"wikiticker\\"
+                                                                                                      WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY
+                                                                                                      GROUP BY 1
+                                                                                                      ORDER BY \\"Count\\" DESC"
+                                                                    `);
+  });
+
+  it('renders  add function to Groupby', () => {
+    const tree = parser(`SELECT
+  "cityName",
+  COUNT(*) AS "Count",
+  SUM(added) AS "Added"
+FROM "wikiticker"
+WHERE "__time" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY
+GROUP BY 1
+ORDER BY "Count" DESC`)
+      .addFunctionToGroupBy('TRUNCATE', ['', '', ' '], ['added', 1])
+      .toString();
+
+    expect(tree).toMatchInlineSnapshot(`
+                                                                                    "SELECT
+                                                                                      TRUNCATE(added, 1), \\"cityName\\",
+                                                                                      COUNT(*) AS \\"Count\\",
+                                                                                      SUM(added) AS \\"Added\\"
+                                                                                    FROM \\"wikiticker\\"
+                                                                                    WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY
+                                                                                    GROUP BY 1,2
+                                                                                    ORDER BY \\"Count\\" DESC"
+                                                        `);
+  });
+
+  it('renders filter by additive ex', () => {
+    const interval = new Interval({
+      intervalKeyword: 'INTERVAL',
+      unitKeyword: 'HOUR',
+      spacing: [' ', ' '],
+      ex: new StringType({
+        spacing: [],
+        chars: '1',
+        quote: `'`,
+      }),
+    });
+    const refEx = new RefExpression({
+      quoteSpacing: [],
+      quote: '',
+      namespace: '',
+      name: 'CURRENT_TIMESTAMP',
+    });
+    const additiveExpression = new AdditiveExpression({
+      parens: [],
+      op: ['-'],
+      ex: [refEx, interval],
+      spacing: [' ', ' '],
+    });
+
+    const tree = parser(`SELECT
+  "cityName",
+  COUNT(*) AS "Count",
+  SUM(added) AS "Added"
+FROM "wikiticker"
+GROUP BY 1
+ORDER BY "Count" DESC`)
+      .filterRow(additiveExpression, 'columnName', '>=')
+      .toString();
+
+    expect(tree).toMatchInlineSnapshot(`
       "SELECT
         \\"cityName\\",
         COUNT(*) AS \\"Count\\",
-        SUM(added) AS \\"Added\\", SUM(\\"testValue\\")
+        SUM(added) AS \\"Added\\"
       FROM \\"wikiticker\\"
-      WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY
+      WHERE \\"CURRENT_TIMESTAMP - INTERVAL '1' HOUR\\" >= 'columnName'
       GROUP BY 1
       ORDER BY \\"Count\\" DESC"
     `);
+  });
+  it('renders filter by additive ex', () => {
+    const tree = parser(`SELECT
+  "cityName",
+  COUNT(*) AS "Count",
+  SUM(added) AS "Added"
+FROM "wikiticker"
+GROUP BY 1
+ORDER BY "Count" DESC`)
+      .addAggregateColumn(
+        'columnName',
+        'MIN',
+        new Alias({
+          keyword: 'AS',
+          spacing: [' '],
+          value: new StringType({
+            spacing: [],
+            chars: 'min___time',
+            quote: `"`,
+          }),
+        }),
+      )
+      .toString();
+
+    expect(tree).toMatchInlineSnapshot(`
+                                                            "SELECT
+                                                              \\"cityName\\",
+                                                              COUNT(*) AS \\"Count\\",
+                                                              SUM(added) AS \\"Added\\", MIN(\\"columnName\\") AS \\"min___time\\"
+                                                            FROM \\"wikiticker\\"
+                                                            GROUP BY 1
+                                                            ORDER BY \\"Count\\" DESC"
+                                        `);
+  });
+  it('renders filter by additive ex', () => {
+    const tree = parser(`SELECT
+    "cityName",
+    COUNT(*) AS "Count",
+    SUM(added) AS "Added"
+  FROM "wikiticker"
+  GROUP BY 1
+  ORDER BY "Count" DESC`)
+      .addAggregateColumn(
+        'columnName',
+        'MIN',
+        new Alias({
+          keyword: 'AS',
+          spacing: [' '],
+          value: new StringType({
+            spacing: [],
+            chars: 'min___time',
+            quote: `"`,
+          }),
+        }),
+        true,
+      )
+      .toString();
+
+    expect(tree).toMatchInlineSnapshot(`
+                                                "SELECT
+                                                    \\"cityName\\",
+                                                    COUNT(*) AS \\"Count\\",
+                                                    SUM(added) AS \\"Added\\", MIN(DISTINCT \\"columnName\\") AS \\"min___time\\"
+                                                  FROM \\"wikiticker\\"
+                                                  GROUP BY 1
+                                                  ORDER BY \\"Count\\" DESC"
+                                `);
+  });
+  it('renders filter by additive ex', () => {
+    const tree = parser(`SELECT
+    "cityName",
+    COUNT(*) AS "Count",
+    SUM(added) AS "Added"
+  FROM "wikiticker"
+  GROUP BY 1
+  ORDER BY "Count" DESC`)
+      .addAggregateColumn(
+        '*',
+        'COUNT',
+        false,
+        undefined,
+        new FilterClause({
+          keyword: 'FILTER',
+          spacing: [' '],
+          ex: new WhereClause({
+            keyword: 'WHERE',
+            spacing: [' '],
+            filter: new ComparisonExpression({
+              parens: [],
+              spacing: [' '],
+              ex: stringFactory('test', '"'),
+              rhs: new ComparisonExpressionRhs({
+                parens: [],
+                op: '=',
+                rhs: stringFactory('xxx', `'`),
+                spacing: [' '],
+              }),
+            }),
+          }),
+        }),
+      )
+      .toString();
+
+    expect(tree).toMatchInlineSnapshot(`
+            "SELECT
+                \\"cityName\\",
+                COUNT(*) AS \\"Count\\",
+                SUM(added) AS \\"Added\\", COUNT(\\"*\\") FILTER (WHERE \\"test\\" = 'xxx')
+              FROM \\"wikiticker\\"
+              GROUP BY 1
+              ORDER BY \\"Count\\" DESC"
+        `);
   });
 });

@@ -47,7 +47,7 @@ export class Function {
     });
     val.push(this.fn + '(' + (this.spacing[0] ? this.spacing[0] : ''));
     if (this.distinct) {
-      val.push(this.distinct[0] + this.spacing[1]);
+      val.push(this.distinct + this.spacing[1]);
     }
     this.value.map((value, index: number) => {
       val.push(value instanceof OrExpression ? value.toString() : value);
