@@ -604,11 +604,17 @@ export class SqlQuery extends BaseAst {
   }
 
   getSchema(): string | undefined {
-    return this.fromClause.getFromNameSpace();
+    if (this.fromClause) {
+      return this.fromClause.getFromNameSpace();
+    }
+    return;
   }
 
   getTableName(): string | undefined {
-    return this.fromClause.getFromName();
+    if (this.fromClause) {
+      return this.fromClause.getFromName();
+    }
+    return;
   }
 
   getAggregateColumns() {
