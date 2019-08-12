@@ -16,7 +16,7 @@ import { FUNCTIONS } from './test-utils';
 
 const parser = sqlParserFactory(FUNCTIONS);
 
-describe.skip('Playground', () => {
+describe.skip('Playground 1', () => {
   it('basic', () => {
     expect(
       parser(
