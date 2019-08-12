@@ -33,6 +33,7 @@ import {
   OrExpression,
   StringType,
   Sub,
+  Timestamp,
   WhereClause,
 } from '../index';
 
@@ -77,6 +78,13 @@ export class SqlQuery extends BaseAst {
   }
 
   orderBy(column: string, direction: 'ASC' | 'DESC'): SqlQuery {
+    if (this.fromClause) {
+      if (this.fromClause.fc instanceof SqlQuery) {
+        this.fromClause.fc = this.fromClause.fc.orderBy(column, direction);
+        return this;
+      }
+    }
+
     const orderByClause = new OrderByClause({
       orderKeyword: 'ORDER',
       byKeyword: 'BY',
@@ -101,6 +109,13 @@ export class SqlQuery extends BaseAst {
   }
 
   excludeColumn(columnVal: string): SqlQuery {
+    if (this.fromClause) {
+      if (this.fromClause.fc instanceof SqlQuery) {
+        this.fromClause.fc = this.fromClause.fc.excludeColumn(columnVal);
+        return this;
+      }
+    }
+
     const columns: Column[] = [];
     const spacing: string[] = [];
     this.columns.columns.map((column, index) => {
@@ -145,6 +160,17 @@ export class SqlQuery extends BaseAst {
     spacing: string[],
     argumentsArray: (StringType | number)[],
   ): SqlQuery {
+    if (this.fromClause) {
+      if (this.fromClause.fc instanceof SqlQuery) {
+        this.fromClause.fc = this.fromClause.fc.addFunctionToGroupBy(
+          functionName,
+          spacing,
+          argumentsArray,
+        );
+        return this;
+      }
+    }
+
     if (!this.groupByClause) {
       return this;
     }
@@ -190,6 +216,13 @@ export class SqlQuery extends BaseAst {
   }
 
   addToGroupBy(columnName: string): SqlQuery {
+    if (this.fromClause) {
+      if (this.fromClause.fc instanceof SqlQuery) {
+        this.fromClause.fc = this.fromClause.fc.addToGroupBy(columnName);
+        return this;
+      }
+    }
+
     if (!this.groupByClause) {
       return this;
     }
@@ -234,6 +267,19 @@ export class SqlQuery extends BaseAst {
     distinct?: boolean,
     filter?: FilterClause,
   ): SqlQuery {
+    if (this.fromClause) {
+      if (this.fromClause.fc instanceof SqlQuery) {
+        this.fromClause.fc = this.fromClause.fc.addAggregateColumn(
+          columnName,
+          functionName,
+          alias,
+          distinct,
+          filter,
+        );
+        return this;
+      }
+    }
+
     const column = new Function({
       parens: [],
       fn: functionName,
@@ -280,6 +326,12 @@ export class SqlQuery extends BaseAst {
   }
 
   getOrderByClauseWithoutColumn(columnVal: string): OrderByClause | undefined {
+    if (this.fromClause) {
+      if (this.fromClause.fc instanceof SqlQuery) {
+        return this.fromClause.fc.getOrderByClauseWithoutColumn(columnVal);
+      }
+    }
+
     if (!this.orderByClause) {
       return;
     } else {
@@ -303,6 +355,12 @@ export class SqlQuery extends BaseAst {
   }
 
   getGroupByClauseWithoutColumn(columnVal: string): GroupByClause | undefined {
+    if (this.fromClause) {
+      if (this.fromClause.fc instanceof SqlQuery) {
+        return this.fromClause.fc.getGroupByClauseWithoutColumn(columnVal);
+      }
+    }
+
     let groupByClause;
     if (this.groupByClause) {
       const groupByColumns = this.groupByClause.groupBy.map(part => part.getBasicValue());
@@ -366,12 +424,19 @@ export class SqlQuery extends BaseAst {
   }
 
   filterRow(
-    header: string,
-    row: string | number | AdditiveExpression,
+    header: string | Timestamp,
+    row: string | number | AdditiveExpression | Timestamp,
     operator: '!=' | '=' | '>' | '<' | 'like' | '>=' | '<=' | 'LIKE',
   ): SqlQuery {
+    if (this.fromClause) {
+      if (this.fromClause.fc instanceof SqlQuery) {
+        this.fromClause.fc = this.fromClause.fc.filterRow(header, row, operator);
+        return this;
+      }
+    }
+
     const aggregateColumns = this.getAggregateColumns();
-    if (aggregateColumns) {
+    if (aggregateColumns && !(header instanceof Timestamp)) {
       if (aggregateColumns.includes(header)) {
         return this.filterAggregateRow(header, row, operator);
       }
@@ -379,12 +444,17 @@ export class SqlQuery extends BaseAst {
 
     const spacing = this.spacing;
     let whereClause = this.whereClause;
-    const headerBaseString = new StringType({ chars: header, quote: '"', spacing: ['', ''] });
+    let headerBaseString;
+    if (header instanceof Timestamp) {
+      headerBaseString = header;
+    } else {
+      headerBaseString = new StringType({ chars: header, quote: '"', spacing: ['', ''] });
+    }
     // @ts-ignore
     let rowBaseString;
     if (typeof row === 'number') {
       rowBaseString = new NumberType(row);
-    } else if (row instanceof AdditiveExpression) {
+    } else if (row instanceof AdditiveExpression || row instanceof Timestamp) {
       rowBaseString = row;
     } else {
       rowBaseString = new StringType({
@@ -486,13 +556,23 @@ export class SqlQuery extends BaseAst {
   }
 
   filterAggregateRow(
-    header: string,
-    row: string | number | AdditiveExpression,
+    header: string | Timestamp,
+    row: string | number | AdditiveExpression | Timestamp,
     operator: '!=' | '=' | '>' | '<' | 'like' | '>=' | '<=' | 'LIKE',
   ): SqlQuery {
+    if (this.fromClause) {
+      if (this.fromClause.fc instanceof SqlQuery) {
+        this.fromClause.fc = this.fromClause.fc.filterAggregateRow(header, row, operator);
+        return this;
+      }
+    }
+
     const spacing = this.spacing;
     let havingClause = this.havingClause;
-    const headerBaseString = new StringType({ chars: header, quote: '"', spacing: ['', ''] });
+    const headerBaseString =
+      header instanceof Timestamp
+        ? header
+        : new StringType({ chars: header, quote: '"', spacing: ['', ''] });
     let rowBaseString;
     if (typeof row === 'number') {
       rowBaseString = new NumberType(row);

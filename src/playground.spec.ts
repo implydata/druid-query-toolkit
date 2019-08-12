@@ -36,20 +36,18 @@ describe.skip('Playground', () => {
 describe('Playground', () => {
   it('renders  add function to Groupby', () => {
     const tree = parser(`SELECT
-  "cityName",
-  COUNT(*) AS "Count",
-  SUM(added) AS "Added"
-FROM "wikiticker"
-WHERE "__time" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY
+  "count",
+  COUNT(*) AS "Count"
+FROM "sensu-metrics"
+WHERE "__time" < TIMESTAMP '2019-07-01 011:00:00'
 GROUP BY 1
 ORDER BY "Count" DESC`).toString();
     expect(tree).toMatchInlineSnapshot(`
       "SELECT
-        \\"cityName\\",
-        COUNT(*) AS \\"Count\\",
-        SUM(added) AS \\"Added\\"
-      FROM \\"wikiticker\\"
-      WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY
+        \\"count\\",
+        COUNT(*) AS \\"Count\\"
+      FROM \\"sensu-metrics\\"
+      WHERE \\"__time\\" < TIMESTAMP '2019-07-01 011:00:00'
       GROUP BY 1
       ORDER BY \\"Count\\" DESC"
     `);

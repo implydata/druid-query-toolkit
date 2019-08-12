@@ -45,6 +45,7 @@ var ContainsExpression = ast.ContainsExpression;
 var BetweenExpression = ast.BetweenExpression;
 var Concat = ast.Concat;
 var Interval = ast.Interval;
+var Timestamp = ast.Timestamp;
 
 
 function sqlParserFactory(functions) {

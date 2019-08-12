@@ -39,40 +39,45 @@ export class FromClause {
   }
 
   toString(): string {
-    if (this.alias) {
-      return (
-        renderOpenParens(this.parens) +
-        this.keyword +
-        this.spacing[0] +
-        this.fc.toString() +
-        this.spacing[1] +
-        Alias.toString() +
-        renderCloseParens(this.parens)
-      );
+    const stringVal = [];
+    stringVal.push(renderOpenParens(this.parens));
+    stringVal.push(this.keyword + this.spacing[0]);
+    if (this.fc instanceof SqlQuery) {
+      stringVal.push('(' + this.fc.toString() + ')');
+    } else {
+      stringVal.push(this.fc.toString());
     }
-    return (
-      renderOpenParens(this.parens) +
-      this.keyword +
-      this.spacing[0] +
-      this.fc.toString() +
-      renderCloseParens(this.parens)
-    );
+    if (this.alias) {
+      stringVal.push(this.alias.toString());
+    }
+    stringVal.push(renderCloseParens(this.parens));
+    return stringVal.join('');
   }
 
   getFromNameSpace(): string | undefined {
-    return this.fc instanceof RefExpression
-      ? this.fc.namespace instanceof StringType
-        ? this.fc.namespace.chars
-        : this.fc.namespace
-      : undefined;
+    if (this.fc instanceof RefExpression) {
+      if (this.fc.namespace instanceof StringType) {
+        return this.fc.namespace.chars;
+      }
+      return this.fc.namespace;
+    }
+    if (this.fc instanceof SqlQuery) {
+      return this.fc.getSchema();
+    }
+    return;
   }
 
   getFromName(): string | undefined {
-    return this.fc instanceof RefExpression
-      ? this.fc.name instanceof StringType
-        ? this.fc.name.chars
-        : this.fc.name
-      : undefined;
+    if (this.fc instanceof RefExpression) {
+      if (this.fc.name instanceof StringType) {
+        return this.fc.name.chars;
+      }
+      return this.fc.name;
+    }
+    if (this.fc instanceof SqlQuery) {
+      return this.fc.getTableName();
+    }
+    return;
   }
 
   addParen(open: string[], close: string[]) {
