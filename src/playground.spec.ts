@@ -44,10 +44,10 @@ GROUP BY 1
 ORDER BY "Count" DESC`).toString();
     expect(tree).toMatchInlineSnapshot(`
       "SELECT
-        \\"cityName\\",
-        COUNT(*) AS \\"Count\\",
-        SUM(added) AS \\"Added\\"
-      FROM \\"wikiticker\\"
+        \\"count\\",
+        COUNT(*) AS \\"Count\\"
+      FROM \\"sensu-metrics\\"
+      WHERE \\"__time\\" < TIMESTAMP '2019-07-01 011:00:00'
       GROUP BY 1
       ORDER BY \\"Count\\" DESC"
     `);

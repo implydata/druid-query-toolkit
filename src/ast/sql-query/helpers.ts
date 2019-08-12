@@ -15,7 +15,7 @@ import { Alias } from './alias';
 import { Interval } from './basic-expression/interval';
 import { RefExpression } from './basic-expression/ref-expression';
 import { StringType } from './basic-expression/string-type';
-import { TimeStamp } from './basic-expression/time-stamp';
+import { Timestamp } from './basic-expression/timestamp';
 import { Columns } from './clauses/columns/columns';
 
 export function renderOpenParens(parens?: Parens[]): string {
@@ -114,8 +114,8 @@ export function stringFactory(chars: string, quote: '"' | "'"): StringType {
   });
 }
 
-export function timeStampFactory(chars: string): TimeStamp {
-  return new TimeStamp({
+export function timeStampFactory(chars: string): Timestamp {
+  return new Timestamp({
     spacing: [' '],
     value: stringFactory(chars, `'`),
     keyword: 'TIMESTAMP',

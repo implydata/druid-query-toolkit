@@ -33,7 +33,7 @@ import {
   OrExpression,
   StringType,
   Sub,
-  TimeStamp,
+  Timestamp,
   WhereClause,
 } from '../index';
 
@@ -424,8 +424,8 @@ export class SqlQuery extends BaseAst {
   }
 
   filterRow(
-    header: string | TimeStamp,
-    row: string | number | AdditiveExpression | TimeStamp,
+    header: string | Timestamp,
+    row: string | number | AdditiveExpression | Timestamp,
     operator: '!=' | '=' | '>' | '<' | 'like' | '>=' | '<=' | 'LIKE',
   ): SqlQuery {
     if (this.fromClause) {
@@ -436,7 +436,7 @@ export class SqlQuery extends BaseAst {
     }
 
     const aggregateColumns = this.getAggregateColumns();
-    if (aggregateColumns && !(header instanceof TimeStamp)) {
+    if (aggregateColumns && !(header instanceof Timestamp)) {
       if (aggregateColumns.includes(header)) {
         return this.filterAggregateRow(header, row, operator);
       }
@@ -445,7 +445,7 @@ export class SqlQuery extends BaseAst {
     const spacing = this.spacing;
     let whereClause = this.whereClause;
     let headerBaseString;
-    if (header instanceof TimeStamp) {
+    if (header instanceof Timestamp) {
       headerBaseString = header;
     } else {
       headerBaseString = new StringType({ chars: header, quote: '"', spacing: ['', ''] });
@@ -454,7 +454,7 @@ export class SqlQuery extends BaseAst {
     let rowBaseString;
     if (typeof row === 'number') {
       rowBaseString = new NumberType(row);
-    } else if (row instanceof AdditiveExpression || row instanceof TimeStamp) {
+    } else if (row instanceof AdditiveExpression || row instanceof Timestamp) {
       rowBaseString = row;
     } else {
       rowBaseString = new StringType({
@@ -556,8 +556,8 @@ export class SqlQuery extends BaseAst {
   }
 
   filterAggregateRow(
-    header: string | TimeStamp,
-    row: string | number | AdditiveExpression | TimeStamp,
+    header: string | Timestamp,
+    row: string | number | AdditiveExpression | Timestamp,
     operator: '!=' | '=' | '>' | '<' | 'like' | '>=' | '<=' | 'LIKE',
   ): SqlQuery {
     if (this.fromClause) {
@@ -570,7 +570,7 @@ export class SqlQuery extends BaseAst {
     const spacing = this.spacing;
     let havingClause = this.havingClause;
     const headerBaseString =
-      header instanceof TimeStamp
+      header instanceof Timestamp
         ? header
         : new StringType({ chars: header, quote: '"', spacing: ['', ''] });
     let rowBaseString;

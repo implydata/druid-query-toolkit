@@ -21,7 +21,7 @@ import {
   RefExpression,
   StringType,
   Sub,
-  TimeStamp,
+  Timestamp,
 } from '../../../index';
 import { Parens, renderCloseParens, renderOpenParens } from '../../helpers';
 
@@ -36,7 +36,7 @@ export interface ComparisonExpressionValue {
     | NumberType
     | Function
     | CaseExpression
-    | TimeStamp;
+    | Timestamp;
   spacing?: string[] | null;
 }
 
@@ -50,7 +50,7 @@ export class ComparisonExpression {
     | NumberType
     | Function
     | CaseExpression
-    | TimeStamp;
+    | Timestamp;
   public rhs: ComparisonExpressionRhs | null;
   public spacing: string[] | null;
 

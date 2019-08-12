@@ -14,18 +14,18 @@
 
 import { NumberType, RefExpression, StringType } from '../../index';
 
-export interface TimeStampValue {
+export interface TimestampValue {
   value: NumberType | StringType | RefExpression;
   spacing: string[];
   keyword: string;
 }
 
-export class TimeStamp {
+export class Timestamp {
   public value: NumberType | StringType | RefExpression;
   public spacing: string[];
   public keyword: string;
 
-  constructor(options: TimeStampValue) {
+  constructor(options: TimestampValue) {
     this.value = options.value;
     this.spacing = options.spacing;
     this.keyword = options.keyword;
