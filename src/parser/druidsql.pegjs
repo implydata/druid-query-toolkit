@@ -453,12 +453,12 @@ BasicExpression
   = CaseExpression
   /Function
   /Sub
+  /TimeStamp
   /CurrentTimeStamp
   /Interval
   /String
   /NumberType
   /RefExpression
-
 
 Interval
   = intervalKeyword:IntervalToken spacing0:_  ex:NumericString spacing1:_ unitKeyword:Name
@@ -690,6 +690,27 @@ String
     });
   }
 
+TimeStamp
+  = keyword:TimeStampToken
+  spacing: _
+  value: DateTime
+  {
+    return new TimeStamp({keyword: keyword, spacing: [spacing], value: value});
+  }
+
+DateTime
+  = CharsetIntroducer? "'"
+  spacing0: _?
+  chars:[0-9 :-]*
+  spacing1: _? "'"
+  {
+    return new StringType({
+      chars: chars.join(''),
+      quote: "'",
+      spacing: [spacing0, spacing1]
+    });
+  }
+
 
 NumericString
   = CharsetIntroducer? "'"
@@ -829,3 +850,4 @@ NullToken = keyword:"NULL"i { return keyword}
 FilterToken = keyword:"FILTER"i { return keyword}
 IntervalToken = keyword:"INTERVAL"i { return keyword}
 DayToken = keyword:"DAY"i { return keyword}
+TimeStampToken = keyword:"TIMESTAMP"i { return keyword}
