@@ -1,6 +1,5 @@
 Start
   = SelectQuery
-  /Expression
 
 SelectQuery
   =
@@ -513,7 +512,7 @@ Function
    OpenParen spacing0:_?
    distinct:(DistinctToken _)?
    valueHead:(Expression/StarToken)
-   valueTail:((Comma _)?
+   valueTail:((Comma _?)?
    (Expression/StarToken))*
    spacing1:_?
    CloseParen
