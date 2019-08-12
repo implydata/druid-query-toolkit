@@ -15,8 +15,8 @@ import { Alias } from './alias';
 import { Interval } from './basic-expression/interval';
 import { RefExpression } from './basic-expression/ref-expression';
 import { StringType } from './basic-expression/string-type';
-import { Columns } from './clauses/columns/columns';
 import { TimeStamp } from './basic-expression/time-stamp';
+import { Columns } from './clauses/columns/columns';
 
 export function renderOpenParens(parens?: Parens[]): string {
   if (!parens) return '';
