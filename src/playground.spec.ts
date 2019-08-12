@@ -36,12 +36,12 @@ describe.skip('Playground', () => {
 describe('Playground', () => {
   it('renders  add function to Groupby', () => {
     const tree = parser(`SELECT
-  "count",
+  TIME_FLOOR("__time") AS "Time",
   COUNT(*) AS "Count"
-FROM "sensu-metrics"
-WHERE "__time" < TIMESTAMP '2019-07-01 011:00:00'
+FROM "github"
+WHERE TIMESTAMP '2019-01-01 00:00:00' <= '__time' AND "__time" < TIMESTAMP '2020-01-01 00:00:00'
 GROUP BY 1
-ORDER BY "Count" DESC`).toString();
+ORDER BY "Time" ASC`).toString();
     expect(tree).toMatchInlineSnapshot(`
       "SELECT
         \\"count\\",

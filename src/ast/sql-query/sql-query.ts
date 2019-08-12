@@ -424,41 +424,51 @@ export class SqlQuery extends BaseAst {
   }
 
   filterRow(
-    header: string | Timestamp,
-    row: string | number | AdditiveExpression | Timestamp,
+    left: string | Timestamp | StringType,
+    right: string | number | AdditiveExpression | Timestamp | StringType,
     operator: '!=' | '=' | '>' | '<' | 'like' | '>=' | '<=' | 'LIKE',
   ): SqlQuery {
     if (this.fromClause) {
       if (this.fromClause.fc instanceof SqlQuery) {
-        this.fromClause.fc = this.fromClause.fc.filterRow(header, row, operator);
+        this.fromClause.fc = this.fromClause.fc.filterRow(left, right, operator);
         return this;
       }
     }
 
     const aggregateColumns = this.getAggregateColumns();
-    if (aggregateColumns && !(header instanceof Timestamp)) {
-      if (aggregateColumns.includes(header)) {
-        return this.filterAggregateRow(header, row, operator);
+    if (aggregateColumns) {
+      if (typeof left === 'string') {
+        if (aggregateColumns.includes(left)) {
+          return this.filterAggregateRow(left, right, operator);
+        }
+      }
+      if (left instanceof StringType) {
+        if (aggregateColumns.includes(left.chars)) {
+          return this.filterAggregateRow(left, right, operator);
+        }
       }
     }
 
     const spacing = this.spacing;
     let whereClause = this.whereClause;
     let headerBaseString;
-    if (header instanceof Timestamp) {
-      headerBaseString = header;
+    if (left instanceof Timestamp || left instanceof StringType) {
+      headerBaseString = left;
     } else {
-      headerBaseString = new StringType({ chars: header, quote: '"', spacing: ['', ''] });
+      headerBaseString = new StringType({ chars: left, quote: '"', spacing: ['', ''] });
     }
-    // @ts-ignore
     let rowBaseString;
-    if (typeof row === 'number') {
-      rowBaseString = new NumberType(row);
-    } else if (row instanceof AdditiveExpression || row instanceof Timestamp) {
-      rowBaseString = row;
+    if (typeof right === 'number') {
+      rowBaseString = new NumberType(right);
+    } else if (
+      right instanceof StringType ||
+      right instanceof AdditiveExpression ||
+      right instanceof Timestamp
+    ) {
+      rowBaseString = right;
     } else {
       rowBaseString = new StringType({
-        chars: String(row),
+        chars: String(right),
         quote: "'",
         spacing: ['', ''],
       });
@@ -507,7 +517,7 @@ export class SqlQuery extends BaseAst {
         if (
           filter instanceof ComparisonExpression &&
           filter.ex instanceof StringType &&
-          filter.ex.chars === header
+          filter.ex.chars === left
         ) {
           contained = true;
           return comparisonExpression;
@@ -528,7 +538,7 @@ export class SqlQuery extends BaseAst {
       if (
         whereClause.filter instanceof ComparisonExpression &&
         whereClause.filter.ex instanceof StringType &&
-        whereClause.filter.ex.chars === header
+        whereClause.filter.ex.chars === left
       ) {
         whereClause.filter = comparisonExpression;
       } else {
@@ -556,8 +566,8 @@ export class SqlQuery extends BaseAst {
   }
 
   filterAggregateRow(
-    header: string | Timestamp,
-    row: string | number | AdditiveExpression | Timestamp,
+    header: string | Timestamp | StringType,
+    row: string | number | AdditiveExpression | Timestamp | StringType,
     operator: '!=' | '=' | '>' | '<' | 'like' | '>=' | '<=' | 'LIKE',
   ): SqlQuery {
     if (this.fromClause) {
@@ -570,13 +580,13 @@ export class SqlQuery extends BaseAst {
     const spacing = this.spacing;
     let havingClause = this.havingClause;
     const headerBaseString =
-      header instanceof Timestamp
+      header instanceof Timestamp || header instanceof StringType
         ? header
         : new StringType({ chars: header, quote: '"', spacing: ['', ''] });
     let rowBaseString;
     if (typeof row === 'number') {
       rowBaseString = new NumberType(row);
-    } else if (row instanceof AdditiveExpression) {
+    } else if (row instanceof AdditiveExpression || row instanceof StringType) {
       rowBaseString = row;
     } else {
       rowBaseString = new StringType({
