@@ -299,7 +299,7 @@ export class SqlQuery extends BaseAst {
     }
     if (filter) {
       if (column.spacing.length) {
-        column.spacing[4] = ' ';
+        column.spacing[3] = ' ';
       } else {
         column.spacing = ['', '', '', '', ' '];
       }
