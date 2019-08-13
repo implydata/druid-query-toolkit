@@ -17,24 +17,33 @@ import {
   AdditiveExpression,
   Alias,
   AndExpression,
+  andExpressionFactory,
   Column,
+  columnFactory,
   Columns,
+  columnsFactory,
   ComparisonExpression,
-  ComparisonExpressionRhs,
+  comparisonFactory,
+  comparisonRhsFactory,
   FilterClause,
   FromClause,
-  Function,
+  functionFactory,
   GroupByClause,
   HavingClause,
+  havingFactory,
   LimitClause,
+  numberFactory,
   NumberType,
   OrderByClause,
   OrderByPart,
   OrExpression,
+  orExpressionFactory,
+  stringFactory,
   StringType,
-  Sub,
+  subFactory,
   Timestamp,
   WhereClause,
+  whereFactory,
 } from '../index';
 
 import { arrayContains, getColumns } from './helpers';
@@ -78,6 +87,7 @@ export class SqlQuery extends BaseAst {
   }
 
   orderBy(column: string, direction: 'ASC' | 'DESC'): SqlQuery {
+    // If selecting from a sub query apply actions to sub query
     if (this.fromClause) {
       if (this.fromClause.fc instanceof SqlQuery) {
         this.fromClause.fc = this.fromClause.fc.orderBy(column, direction);
@@ -92,6 +102,7 @@ export class SqlQuery extends BaseAst {
       spacing: [' ', ' ', ''],
     });
     const spacing = this.spacing;
+
     spacing[6] = '\n';
     orderByClause.orderByColumn(column, direction);
     return new SqlQuery({
@@ -109,6 +120,7 @@ export class SqlQuery extends BaseAst {
   }
 
   excludeColumn(columnVal: string): SqlQuery {
+    // If selecting from a sub query apply actions to sub query
     if (this.fromClause) {
       if (this.fromClause.fc instanceof SqlQuery) {
         this.fromClause.fc = this.fromClause.fc.excludeColumn(columnVal);
@@ -118,6 +130,7 @@ export class SqlQuery extends BaseAst {
 
     const columns: Column[] = [];
     const spacing: string[] = [];
+
     this.columns.columns.map((column, index) => {
       if (column.getAlias()) {
         const alias = column.getAlias();
@@ -135,6 +148,7 @@ export class SqlQuery extends BaseAst {
         spacing.push(this.columns.spacing[index]);
       }
     });
+
     const columnsArray = new Columns({
       columns: columns,
       spacing: spacing,
@@ -159,13 +173,16 @@ export class SqlQuery extends BaseAst {
     functionName: string,
     spacing: string[],
     argumentsArray: (StringType | number)[],
+    alias: Alias,
   ): SqlQuery {
+    // If selecting from a sub query apply actions to sub query
     if (this.fromClause) {
       if (this.fromClause.fc instanceof SqlQuery) {
         this.fromClause.fc = this.fromClause.fc.addFunctionToGroupBy(
           functionName,
           spacing,
           argumentsArray,
+          alias,
         );
         return this;
       }
@@ -175,27 +192,16 @@ export class SqlQuery extends BaseAst {
       return this;
     }
 
-    const functionValue = new Function({
-      parens: [],
-      fn: functionName,
-      value: argumentsArray,
-      spacing: spacing,
-    });
     const columns = this.columns.columns;
     const columnSpacing = this.columns.spacing;
+
     columnSpacing.unshift(' ');
-    columns.unshift(
-      new Column({
-        alias: null,
-        spacing: [],
-        parens: [],
-        ex: functionValue,
-      }),
-    );
+    columns.unshift(columnFactory(functionFactory(functionName, spacing, argumentsArray), alias));
     const groupby = this.groupByClause.groupBy.map(part =>
-      part instanceof NumberType ? new NumberType(Number(part.value) + 1) : part,
+      part instanceof NumberType ? numberFactory(Number(part.value) + 1) : part,
     );
-    groupby.unshift(new NumberType(1));
+    groupby.unshift(numberFactory(1));
+
     return new SqlQuery({
       columns: new Columns({ columns: columns, parens: [], spacing: columnSpacing }),
       distinct: this.distinct,
@@ -216,6 +222,7 @@ export class SqlQuery extends BaseAst {
   }
 
   addToGroupBy(columnName: string): SqlQuery {
+    // If selecting from a sub query apply actions to sub query
     if (this.fromClause) {
       if (this.fromClause.fc instanceof SqlQuery) {
         this.fromClause.fc = this.fromClause.fc.addToGroupBy(columnName);
@@ -226,21 +233,17 @@ export class SqlQuery extends BaseAst {
     if (!this.groupByClause) {
       return this;
     }
+
     const columns = this.columns.columns;
     const columnSpacing = this.columns.spacing;
+
     columnSpacing.unshift(' ');
-    columns.unshift(
-      new Column({
-        alias: null,
-        spacing: [],
-        parens: [],
-        ex: new StringType({ chars: columnName, quote: '"', spacing: [] }),
-      }),
-    );
+    columns.unshift(columnFactory(columnName));
     const groupby = this.groupByClause.groupBy.map(part =>
-      part instanceof NumberType ? new NumberType(Number(part.value) + 1) : part,
+      part instanceof NumberType ? numberFactory(Number(part.value) + 1) : part,
     );
     groupby.unshift(new NumberType(1));
+
     return new SqlQuery({
       columns: new Columns({ columns: columns, parens: [], spacing: columnSpacing }),
       distinct: this.distinct,
@@ -267,6 +270,7 @@ export class SqlQuery extends BaseAst {
     distinct?: boolean,
     filter?: FilterClause,
   ): SqlQuery {
+    // If selecting from a sub query apply actions to sub query
     if (this.fromClause) {
       if (this.fromClause.fc instanceof SqlQuery) {
         this.fromClause.fc = this.fromClause.fc.addAggregateColumn(
@@ -280,14 +284,16 @@ export class SqlQuery extends BaseAst {
       }
     }
 
-    const column = new Function({
-      parens: [],
-      fn: functionName,
-      value: [new StringType({ spacing: [], quote: '"', chars: columnName })],
-      spacing: distinct ? ['', ' '] : [],
-      filterClause: filter ? filter : undefined,
-      distinct: distinct ? 'DISTINCT' : undefined,
-    });
+    const columns = this.columns.columns;
+    const columnSpacing = this.columns.spacing;
+    const column = functionFactory(
+      functionName,
+      distinct ? ['', ' '] : [],
+      [stringFactory(columnName, `"`)],
+      filter,
+      distinct,
+    );
+
     if (distinct) {
       column.spacing = ['', ' ', '', '', ''];
     }
@@ -298,21 +304,11 @@ export class SqlQuery extends BaseAst {
         column.spacing = ['', '', '', '', ' '];
       }
     }
-
-    const columns = this.columns.columns;
-    const columnSpacing = this.columns.spacing;
     columnSpacing.push(' ');
-    columns.push(
-      new Column({
-        alias: alias ? alias : null,
-        spacing: [alias ? ' ' : ''],
-        parens: [],
-        ex: column,
-      }),
-    );
+    columns.push(columnFactory(column, alias));
 
     return new SqlQuery({
-      columns: new Columns({ columns: columns, parens: [], spacing: columnSpacing }),
+      columns: columnsFactory(columns, columnSpacing),
       distinct: this.distinct,
       fromClause: this.fromClause,
       groupByClause: this.groupByClause,
@@ -326,100 +322,97 @@ export class SqlQuery extends BaseAst {
   }
 
   getOrderByClauseWithoutColumn(columnVal: string): OrderByClause | undefined {
+    // If selecting from a sub query apply actions to sub query
     if (this.fromClause) {
       if (this.fromClause.fc instanceof SqlQuery) {
         return this.fromClause.fc.getOrderByClauseWithoutColumn(columnVal);
       }
     }
 
-    if (!this.orderByClause) {
-      return;
-    } else {
-      const orderByClause: OrderByClause | undefined = this.orderByClause;
-      const orderByArray: OrderByPart[] = [];
-      const spacing = [this.orderByClause.spacing[0], this.orderByClause.spacing[1]];
+    if (!this.orderByClause) return;
 
-      orderByClause.orderBy.map((filter, index) => {
-        if (filter.orderBy.getBasicValue() !== columnVal && this.orderByClause) {
-          orderByArray.push(filter);
-          spacing.push(this.orderByClause.spacing[2 + index]);
-        }
-      });
+    const orderByClause: OrderByClause | undefined = this.orderByClause;
+    const orderByArray: OrderByPart[] = [];
+    const spacing = [this.orderByClause.spacing[0], this.orderByClause.spacing[1]];
 
-      if (orderByArray.length) {
-        orderByClause.orderBy = orderByArray;
-        return orderByClause;
+    orderByClause.orderBy.map((filter, index) => {
+      if (filter.orderBy.getBasicValue() !== columnVal && this.orderByClause) {
+        orderByArray.push(filter);
+        spacing.push(this.orderByClause.spacing[2 + index]);
       }
+    });
+
+    if (orderByArray.length) {
+      orderByClause.orderBy = orderByArray;
+      return orderByClause;
     }
+
     return undefined;
   }
 
   getGroupByClauseWithoutColumn(columnVal: string): GroupByClause | undefined {
+    // If selecting from a sub query apply actions to sub query
     if (this.fromClause) {
       if (this.fromClause.fc instanceof SqlQuery) {
         return this.fromClause.fc.getGroupByClauseWithoutColumn(columnVal);
       }
     }
 
+    if (!this.groupByClause) return;
+
     let groupByClause;
-    if (this.groupByClause) {
-      const groupByColumns = this.groupByClause.groupBy.map(part => part.getBasicValue());
+    // get array of grouping columns as strings
+    const groupByColumns = this.groupByClause.groupBy.map(part => part.getBasicValue());
 
-      if (this.groupByClause.groupBy.length > 1) {
-        // get array of grouping columns as strings
-        const newGroupByColumns: any[] = [];
+    if (this.groupByClause.groupBy.length > 1) {
+      const newGroupByColumns: any[] = [];
 
-        groupByColumns.map((groupByColumn, index) => {
-          // if grouping column is a number and the column to be removed is less than that column decrease the value of the grouping column by 1
-          if (this.getColumnsArray().indexOf(columnVal) + 1 < Number(groupByColumn)) {
-            newGroupByColumns.push(new NumberType(Number(groupByColumn) - 1));
-          } else if (this.getColumnsArray().indexOf(columnVal) + 1 > Number(groupByColumn)) {
-            if (this.groupByClause) {
-              newGroupByColumns.push(this.groupByClause.groupBy[index]);
-            }
-          } else if (
-            columnVal !== groupByColumn &&
-            this.getColumnsArray().indexOf(columnVal) + 1 !== Number(groupByColumn)
-          ) {
-            if (this.groupByClause) {
-              newGroupByColumns.push(this.groupByClause.groupBy[index]);
-            }
+      groupByColumns.map((groupByColumn, index) => {
+        // if grouping column is a number and the column to be removed is less than that column decrease the value of the grouping column by 1
+        if (this.getColumnsArray().indexOf(columnVal) + 1 < Number(groupByColumn)) {
+          newGroupByColumns.push(new NumberType(Number(groupByColumn) - 1));
+        } else if (this.getColumnsArray().indexOf(columnVal) + 1 > Number(groupByColumn)) {
+          // if column index is greater than grouping column groupbyclause remains the same
+          if (this.groupByClause) {
+            newGroupByColumns.push(this.groupByClause.groupBy[index]);
           }
-        });
-
+        } else if (
+          columnVal !== groupByColumn &&
+          this.getColumnsArray().indexOf(columnVal) + 1 !== Number(groupByColumn)
+        ) {
+          if (this.groupByClause) {
+            newGroupByColumns.push(this.groupByClause.groupBy[index]);
+          }
+        }
+      });
+      groupByClause = new GroupByClause({
+        groupBy: newGroupByColumns,
+        groupKeyword: this.groupByClause.groupKeyword,
+        byKeyword: this.groupByClause.byKeyword,
+        spacing: this.groupByClause.spacing,
+      });
+    } else {
+      // only grouping column
+      if (
+        columnVal !== groupByColumns[0] &&
+        this.getColumnsArray().indexOf(columnVal) + 1 < Number(groupByColumns[0])
+      ) {
         groupByClause = new GroupByClause({
-          groupBy: newGroupByColumns,
+          groupBy: [orExpressionFactory([new NumberType(groupByColumns[0] - 1)])],
           groupKeyword: this.groupByClause.groupKeyword,
           byKeyword: this.groupByClause.byKeyword,
           spacing: this.groupByClause.spacing,
         });
+      } else if (
+        columnVal !== groupByColumns[0] &&
+        this.getColumnsArray().indexOf(columnVal) + 1 > Number(groupByColumns[0])
+      ) {
+        groupByClause = this.groupByClause;
       } else {
-        if (
-          columnVal !== groupByColumns[0] &&
-          this.getColumnsArray().indexOf(columnVal) + 1 < Number(groupByColumns[0])
-        ) {
-          groupByClause = new GroupByClause({
-            groupBy: [
-              new OrExpression({
-                ex: [new NumberType(groupByColumns[0] - 1)],
-                parens: [],
-                spacing: [],
-              }),
-            ],
-            groupKeyword: this.groupByClause.groupKeyword,
-            byKeyword: this.groupByClause.byKeyword,
-            spacing: this.groupByClause.spacing,
-          });
-        } else if (
-          columnVal !== groupByColumns[0] &&
-          this.getColumnsArray().indexOf(columnVal) + 1 > Number(groupByColumns[0])
-        ) {
-          groupByClause = this.groupByClause;
-        } else {
-          groupByClause = undefined;
-        }
+        groupByClause = undefined;
       }
     }
+
     return groupByClause;
   }
 
@@ -435,7 +428,13 @@ export class SqlQuery extends BaseAst {
       }
     }
 
+    // If selecting from a sub query apply actions to sub query
     const aggregateColumns = this.getAggregateColumns();
+    const spacing = this.spacing;
+    let whereClause = this.whereClause;
+    let headerBaseString;
+    let rowBaseString;
+
     if (aggregateColumns) {
       if (typeof left === 'string') {
         if (aggregateColumns.includes(left)) {
@@ -449,15 +448,12 @@ export class SqlQuery extends BaseAst {
       }
     }
 
-    const spacing = this.spacing;
-    let whereClause = this.whereClause;
-    let headerBaseString;
     if (left instanceof Timestamp || left instanceof StringType) {
       headerBaseString = left;
     } else {
       headerBaseString = new StringType({ chars: left, quote: '"', spacing: ['', ''] });
     }
-    let rowBaseString;
+
     if (typeof right === 'number') {
       rowBaseString = new NumberType(right);
     } else if (
@@ -467,48 +463,23 @@ export class SqlQuery extends BaseAst {
     ) {
       rowBaseString = right;
     } else {
-      rowBaseString = new StringType({
-        chars: String(right),
-        quote: "'",
-        spacing: ['', ''],
-      });
+      rowBaseString = stringFactory(String(right), `'`);
     }
 
-    const rhs = new ComparisonExpressionRhs({
-      parens: [],
-      op: operator,
-      rhs: rowBaseString,
-      spacing: [' '],
-    });
-    const comparisonExpression = new ComparisonExpression({
-      ex: headerBaseString,
-      rhs: rhs,
-      parens: [],
-      spacing: [' '],
-    });
+    const comparisonExpression = comparisonFactory(
+      headerBaseString,
+      comparisonRhsFactory(operator, rowBaseString),
+    );
 
     // No where clause present
     if (!whereClause) {
-      whereClause = new WhereClause({
-        keyword: 'WHERE',
-        spacing: [' '],
-        filter: comparisonExpression,
-      });
+      whereClause = whereFactory(comparisonExpression);
       this.spacing[4] = '\n';
     } else if (whereClause && whereClause.filter instanceof OrExpression) {
       // filtered by an or clause
-      whereClause = new WhereClause({
-        keyword: 'WHERE',
-        spacing: [' '],
-        filter: new AndExpression({
-          parens: [],
-          ex: [
-            new Sub({ parens: [{ open: ['(', ''], close: ['', ')'] }], ex: whereClause.filter }),
-            comparisonExpression,
-          ],
-          spacing: [' AND '],
-        }),
-      });
+      whereClause = whereFactory(
+        andExpressionFactory([subFactory(whereClause.filter), comparisonExpression]),
+      );
       this.spacing[4] = '\n';
     } else if (whereClause && whereClause.filter instanceof AndExpression) {
       // Multiple
@@ -542,12 +513,8 @@ export class SqlQuery extends BaseAst {
       ) {
         whereClause.filter = comparisonExpression;
       } else {
-        whereClause.filter = new AndExpression({
-          parens: [],
-          spacing: [' AND '],
-          // @ts-ignore I know this is wrong but Idk how to fix it
-          ex: [whereClause.filter, comparisonExpression],
-        });
+        // @ts-ignore
+        whereClause.filter = andExpressionFactory([whereClause.filter, comparisonExpression]);
       }
     }
 
@@ -582,54 +549,30 @@ export class SqlQuery extends BaseAst {
     const headerBaseString =
       header instanceof Timestamp || header instanceof StringType
         ? header
-        : new StringType({ chars: header, quote: '"', spacing: ['', ''] });
+        : stringFactory(header, '"');
     let rowBaseString;
     if (typeof row === 'number') {
-      rowBaseString = new NumberType(row);
+      rowBaseString = numberFactory(row);
     } else if (row instanceof AdditiveExpression || row instanceof StringType) {
       rowBaseString = row;
     } else {
-      rowBaseString = new StringType({
-        chars: String(row),
-        quote: "'",
-        spacing: ['', ''],
-      });
+      rowBaseString = stringFactory(String(row), `'`);
     }
-    const rhs = new ComparisonExpressionRhs({
-      parens: [],
-      op: operator,
-      rhs: rowBaseString,
-      spacing: [''],
-    });
-    const comparisonExpression = new ComparisonExpression({
-      ex: headerBaseString,
-      rhs: rhs,
-      parens: [],
-      spacing: [''],
-    });
+
+    const comparisonExpression = comparisonFactory(
+      headerBaseString,
+      comparisonRhsFactory(operator, rowBaseString),
+    );
 
     // No having clause present
     if (!havingClause) {
-      havingClause = new HavingClause({
-        keyword: 'HAVING',
-        spacing: [' '],
-        having: comparisonExpression,
-      });
+      havingClause = havingFactory(comparisonExpression);
       this.spacing[6] = '\n';
     } else if (havingClause && havingClause.having instanceof OrExpression) {
       // filtered by an or clause
-      havingClause = new HavingClause({
-        keyword: 'HAVING',
-        spacing: [' '],
-        having: new AndExpression({
-          parens: [],
-          ex: [
-            new Sub({ parens: [{ open: ['(', ''], close: ['', ')'] }], ex: havingClause.having }),
-            comparisonExpression,
-          ],
-          spacing: [' AND '],
-        }),
-      });
+      havingClause = havingFactory(
+        andExpressionFactory([subFactory(havingClause.having), comparisonExpression]),
+      );
       this.spacing[6] = '\n';
     } else if (havingClause && havingClause.having instanceof AndExpression) {
       // Multiple
@@ -663,12 +606,8 @@ export class SqlQuery extends BaseAst {
       ) {
         havingClause.having = comparisonExpression;
       } else {
-        havingClause.having = new AndExpression({
-          parens: [],
-          spacing: [' AND '],
-          // @ts-ignore I know this is wrong but Idk how to fix it
-          ex: [havingClause.having, comparisonExpression],
-        });
+        // @ts-ignore
+        havingClause.having = andExpressionFactory([havingClause.having, comparisonExpression]);
       }
     }
 

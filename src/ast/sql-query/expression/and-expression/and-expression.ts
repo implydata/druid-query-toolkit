@@ -13,6 +13,7 @@
  */
 
 import {
+  AdditiveExpression,
   AndPart,
   CaseExpression,
   ComparisonExpression,
@@ -33,6 +34,7 @@ export interface AndExpressionValue {
     | StringType
     | RefExpression
     | NumberType
+    | AdditiveExpression
     | Function
     | CaseExpression)[];
   spacing?: string[] | null;
@@ -48,6 +50,7 @@ export class AndExpression {
     | RefExpression
     | NumberType
     | Function
+    | AdditiveExpression
     | CaseExpression)[];
   public spacing: string[] | null;
 

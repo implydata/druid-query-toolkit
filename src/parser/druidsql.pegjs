@@ -509,7 +509,8 @@ Concat
 
 Function
   = fn:Functions
-   OpenParen spacing0:_?
+   OpenParen
+   spacing0:_?
    distinct:(DistinctToken _)?
    valueHead:(Expression/StarToken)
    valueTail:((Comma _?)?
@@ -524,7 +525,7 @@ Function
         fn: fn,
         value: makeListMap1(valueHead, valueTail),
         filterClause: filterClause ? filterClause[1] : null,
-        spacing:[spacing0,(distinct? distinct[1] : ''), makeListMapEmpty(valueTail), spacing1, (filterClause ? filterClause[0] : null)]
+        spacing:[spacing0,(distinct? distinct[1] : ''), makeListMapEmpty(makeListMapEmpty0(valueTail)), spacing1, (filterClause ? filterClause[0] : null)]
        });
     }
     /open: (OpenParen _?)
