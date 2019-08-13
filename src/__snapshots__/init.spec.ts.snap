@@ -1418,6 +1418,7 @@ SqlQuery {
           "value": "num_segments",
         },
         "ex": Function {
+          "argumentSpacing": Array [],
           "distinct": null,
           "filterClause": null,
           "fn": "COUNT",
@@ -1425,7 +1426,6 @@ SqlQuery {
           "spacing": Array [
             null,
             "",
-            Array [],
             null,
             null,
           ],
@@ -1447,6 +1447,7 @@ SqlQuery {
           "value": "num_available_segments",
         },
         "ex": Function {
+          "argumentSpacing": Array [],
           "distinct": null,
           "filterClause": null,
           "fn": "SUM",
@@ -1454,7 +1455,6 @@ SqlQuery {
           "spacing": Array [
             null,
             "",
-            Array [],
             null,
             null,
           ],
@@ -1481,6 +1481,7 @@ SqlQuery {
           "value": "size",
         },
         "ex": Function {
+          "argumentSpacing": Array [],
           "distinct": null,
           "filterClause": null,
           "fn": "SUM",
@@ -1488,7 +1489,6 @@ SqlQuery {
           "spacing": Array [
             null,
             "",
-            Array [],
             null,
             null,
           ],
@@ -1517,6 +1517,7 @@ SqlQuery {
           "value": "num_rows",
         },
         "ex": Function {
+          "argumentSpacing": Array [],
           "distinct": null,
           "filterClause": null,
           "fn": "SUM",
@@ -1524,7 +1525,6 @@ SqlQuery {
           "spacing": Array [
             null,
             "",
-            Array [],
             null,
             null,
           ],

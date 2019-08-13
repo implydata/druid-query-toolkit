@@ -19,6 +19,7 @@ export interface FunctionValue {
   fn: string;
   value: any;
   spacing: string[];
+  argumentSpacing: string[];
   distinct?: string;
   filterClause?: FilterClause;
 }
@@ -30,6 +31,7 @@ export class Function {
   public spacing: string[];
   public distinct?: any;
   public filterClause?: FilterClause;
+  public argumentSpacing: string[];
 
   constructor(options: FunctionValue) {
     this.parens = options.parens;
@@ -38,6 +40,7 @@ export class Function {
     this.spacing = options.spacing;
     this.distinct = options.distinct;
     this.filterClause = options.filterClause;
+    this.argumentSpacing = options.argumentSpacing;
   }
 
   toString() {
@@ -51,13 +54,13 @@ export class Function {
     }
     this.value.map((value, index: number) => {
       val.push(value instanceof OrExpression ? value.toString() : value);
-      if (index < this.value.length - 1 && this.spacing[2][index]) {
-        val.push(',' + this.spacing[2][index]);
+      if (index < this.value.length - 1 && this.argumentSpacing[index]) {
+        val.push(',' + this.argumentSpacing[index]);
       }
     });
-    val.push((this.spacing[3] ? this.spacing[3] : '') + ')');
+    val.push((this.spacing[2] ? this.spacing[2] : '') + ')');
     if (this.filterClause) {
-      val.push(this.spacing[4] + this.filterClause.toString());
+      val.push(this.spacing[3] + this.filterClause.toString());
       return val.join('');
     }
     this.parens.map(paren => {
@@ -75,6 +78,7 @@ export class Function {
       spacing: this.spacing,
       distinct: this.distinct,
       filterClause: this.filterClause,
+      argumentSpacing: this.argumentSpacing,
     });
   }
 

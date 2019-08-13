@@ -525,7 +525,8 @@ Function
         fn: fn,
         value: makeListMap1(valueHead, valueTail),
         filterClause: filterClause ? filterClause[1] : null,
-        spacing:[spacing0,(distinct? distinct[1] : ''), makeListMapEmpty(makeListMapEmpty0(valueTail)), spacing1, (filterClause ? filterClause[0] : null)]
+        argumentSpacing: makeListMapEmpty(makeListMapEmpty0(valueTail)),
+        spacing:[spacing0,(distinct? distinct[1] : ''), spacing1, (filterClause ? filterClause[0] : null)]
        });
     }
     /open: (OpenParen _?)

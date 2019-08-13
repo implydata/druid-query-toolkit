@@ -151,7 +151,8 @@ export function functionFactory(
     parens: [],
     fn: name,
     value: argumentsArray,
-    spacing: spacing,
+    spacing: ['', '', '', ''],
+    argumentSpacing: spacing,
     filterClause: filter,
     distinct: distinct ? 'DISTINCT' : undefined,
   });
