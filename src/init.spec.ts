@@ -260,7 +260,7 @@ describe('Druid Query Tests', () => {
           '  SUM("size" * "num_replicas") FILTER (WHERE (is_published = 1 AND is_overshadowed = 0) OR is_realtime = 1) AS replicated_size,\n' +
           '  SUM("num_rows") FILTER (WHERE (is_published = 1 AND is_overshadowed = 0) OR is_realtime = 1) AS num_rows\n' +
           'FROM sys.segments\n' +
-          'GROUP BY 1 \n;',
+          'GROUP 1 \n;',
       ).toString(),
     ).toMatchInlineSnapshot(`
       " 
