@@ -27,7 +27,6 @@ export class ExpressionMaybeFiltered {
   public ex: OrExpression | string;
   public filter: WhereClause | null;
   public spacing: string[];
-
   constructor(options: ExpressionMaybeFilteredValue) {
     this.parens = options.parens;
     this.ex = options.ex;

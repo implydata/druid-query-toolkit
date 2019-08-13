@@ -12,11 +12,29 @@
  * limitations under the License.
  */
 import { Alias } from './alias';
+import { CaseExpression } from './basic-expression/case-expression/case-expression';
+import { FilterClause } from './basic-expression/function-call/filter-clause';
+import { Function } from './basic-expression/function-call/function';
 import { Interval } from './basic-expression/interval';
+import { NumberType } from './basic-expression/number-type';
 import { RefExpression } from './basic-expression/ref-expression';
 import { StringType } from './basic-expression/string-type';
+import { Sub } from './basic-expression/sub';
 import { Timestamp } from './basic-expression/timestamp';
+import { Column } from './clauses/columns/column';
 import { Columns } from './clauses/columns/columns';
+import { HavingClause } from './clauses/having-clause';
+import { WhereClause } from './clauses/where-clause';
+import { AdditiveExpression } from './expression/additive-expression/additive-expression';
+import { AndExpression } from './expression/and-expression/and-expression';
+import { AndPart } from './expression/and-expression/and-part';
+import { ComparisonExpression } from './expression/comparision-expression/comparison-expression';
+import { ComparisonExpressionRhs } from './expression/comparision-expression/comparison-expression-rhs';
+import { MultiplicativeExpression } from './expression/multipilicative-expression/multipilcative-expression';
+import { NotExpression } from './expression/not-expression/not-expression';
+import { OrExpression } from './expression/or-expression/or-expression';
+import { OrPart } from './expression/or-expression/or-part';
+import { SqlQuery } from './sql-query';
 
 export function renderOpenParens(parens?: Parens[]): string {
   if (!parens) return '';
@@ -114,10 +132,176 @@ export function stringFactory(chars: string, quote: '"' | "'"): StringType {
   });
 }
 
-export function timeStampFactory(chars: string): Timestamp {
+export function timestampFactory(chars: string): Timestamp {
   return new Timestamp({
     spacing: [' '],
     value: stringFactory(chars, `'`),
     keyword: 'TIMESTAMP',
+  });
+}
+
+export function functionFactory(
+  name: string,
+  spacing: string[],
+  argumentsArray: (StringType | number)[],
+  filter?: FilterClause,
+  distinct?: boolean,
+): Function {
+  return new Function({
+    parens: [],
+    fn: name,
+    value: argumentsArray,
+    spacing: spacing,
+    filterClause: filter,
+    distinct: distinct ? 'DISTINCT' : undefined,
+  });
+}
+
+export function columnFactory(ex: string | Function, alias?: Alias): Column {
+  return new Column({
+    spacing: [alias ? ' ' : ''],
+    parens: [],
+    ex: ex instanceof Function ? ex : stringFactory(ex, `"`),
+    alias: alias ? alias : null,
+  });
+}
+
+export function columnsFactory(columns: Column[], spacing: string[]): Columns {
+  return new Columns({
+    columns: columns,
+    parens: [],
+    spacing: spacing,
+  });
+}
+
+export function numberFactory(numberValue: number): NumberType {
+  return new NumberType(numberValue);
+}
+
+export function orExpressionFactory(
+  ex: (OrPart | Sub | StringType | RefExpression | NumberType | Function | CaseExpression)[],
+): OrExpression {
+  return new OrExpression({
+    ex: ex,
+    parens: [],
+    spacing: [],
+  });
+}
+
+export function comparisonRhsFactory(
+  op: string,
+  rhs:
+    | Sub
+    | StringType
+    | RefExpression
+    | NumberType
+    | Function
+    | CaseExpression
+    | string
+    | number
+    | AdditiveExpression
+    | Timestamp,
+): ComparisonExpressionRhs {
+  return new ComparisonExpressionRhs({
+    parens: [],
+    op: op,
+    rhs: rhs,
+    spacing: [' '],
+  });
+}
+
+export function comparisonFactory(
+  ex:
+    | Sub
+    | StringType
+    | RefExpression
+    | NumberType
+    | Function
+    | CaseExpression
+    | AdditiveExpression
+    | Timestamp,
+  rhs: ComparisonExpressionRhs,
+): ComparisonExpression {
+  return new ComparisonExpression({
+    ex: ex,
+    rhs: rhs,
+    parens: [],
+    spacing: [' '],
+  });
+}
+
+export function whereFactory(
+  filter:
+    | OrExpression
+    | AndExpression
+    | ComparisonExpression
+    | MultiplicativeExpression
+    | AdditiveExpression
+    | NotExpression
+    | Sub
+    | StringType
+    | RefExpression
+    | NumberType
+    | Function
+    | CaseExpression,
+): WhereClause {
+  return new WhereClause({
+    keyword: 'WHERE',
+    spacing: [' '],
+    filter: filter,
+  });
+}
+
+export function andExpressionFactory(
+  ex: (
+    | ComparisonExpression
+    | AndPart
+    | Sub
+    | StringType
+    | RefExpression
+    | NumberType
+    | Function
+    | AdditiveExpression
+    | CaseExpression)[],
+): AndExpression {
+  return new AndExpression({
+    parens: [],
+    ex: ex,
+    spacing: [' AND '],
+  });
+}
+
+export function subFactory(
+  ex:
+    | SqlQuery
+    | OrExpression
+    | AndExpression
+    | ComparisonExpression
+    | MultiplicativeExpression
+    | AdditiveExpression
+    | NotExpression,
+): Sub {
+  return new Sub({ parens: [{ open: ['(', ''], close: ['', ')'] }], ex: ex });
+}
+
+export function havingFactory(
+  having:
+    | OrExpression
+    | AndExpression
+    | ComparisonExpression
+    | MultiplicativeExpression
+    | AdditiveExpression
+    | NotExpression
+    | Sub
+    | StringType
+    | RefExpression
+    | NumberType
+    | Function
+    | CaseExpression,
+): HavingClause {
+  return new HavingClause({
+    keyword: 'HAVING',
+    spacing: [' '],
+    having: having,
   });
 }

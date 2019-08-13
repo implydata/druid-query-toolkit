@@ -55,9 +55,11 @@ export class Function {
         val.push(',' + this.spacing[2 + index]);
       }
     });
-    val.push((this.spacing[3] ? this.spacing[3] : '') + ')');
+    val.push(
+      (this.spacing[2 + this.value.length] ? this.spacing[2 + this.value.length] : '') + ')',
+    );
     if (this.filterClause) {
-      val.push(this.spacing[4] + this.filterClause.toString());
+      val.push(this.spacing[3 + this.value.length] + this.filterClause.toString());
       return val.join('');
     }
     this.parens.map(paren => {
