@@ -143,7 +143,7 @@ export function timestampFactory(chars: string): Timestamp {
 export function functionFactory(
   name: string,
   spacing: string[],
-  argumentsArray: (StringType | number)[],
+  argumentsArray: (StringType | number | RefExpression)[],
   filter?: FilterClause,
   distinct?: boolean,
 ): Function {

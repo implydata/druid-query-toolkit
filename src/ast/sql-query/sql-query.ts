@@ -38,6 +38,7 @@ import {
   OrderByPart,
   OrExpression,
   orExpressionFactory,
+  RefExpression,
   stringFactory,
   StringType,
   subFactory,
@@ -264,7 +265,7 @@ export class SqlQuery extends BaseAst {
   }
 
   addAggregateColumn(
-    columnName: string,
+    columnName: string | RefExpression,
     functionName: string,
     alias?: Alias,
     distinct?: boolean,
@@ -289,7 +290,7 @@ export class SqlQuery extends BaseAst {
     const column = functionFactory(
       functionName,
       distinct ? ['', ' '] : [],
-      [stringFactory(columnName, `"`)],
+      [columnName instanceof RefExpression ? columnName : stringFactory(columnName, `"`)],
       filter,
       distinct,
     );
