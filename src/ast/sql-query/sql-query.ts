@@ -626,6 +626,97 @@ export class SqlQuery extends BaseAst {
     });
   }
 
+  getCurrentFilters(): string[] {
+    if (this.whereClause) {
+      if (this.whereClause.filter instanceof AndExpression) {
+        return this.whereClause.filter.ex.flatMap(expression => {
+          if (expression instanceof ComparisonExpression) {
+            const filteredColumns: string[] = [];
+            if (expression.ex instanceof StringType) {
+              filteredColumns.push(expression.ex.getBasicValue());
+            }
+            if (expression.rhs && expression.rhs.rhs instanceof StringType) {
+              filteredColumns.push(expression.rhs.rhs.getBasicValue());
+            }
+            return filteredColumns;
+          }
+          return [];
+        });
+      }
+      if (this.whereClause.filter instanceof ComparisonExpression) {
+        const filteredColumns: string[] = [];
+        if (this.whereClause.filter.ex instanceof StringType) {
+          filteredColumns.push(this.whereClause.filter.ex.getBasicValue());
+        }
+        if (this.whereClause.filter.rhs && this.whereClause.filter.rhs.rhs instanceof StringType) {
+          filteredColumns.push(this.whereClause.filter.rhs.rhs.getBasicValue());
+        }
+        return filteredColumns;
+      }
+    }
+    return [];
+  }
+
+  removeFilter(column: string): SqlQuery {
+    let whereClauseEx = this.whereClause;
+    if (this.whereClause && whereClauseEx && whereClauseEx.filter) {
+      if (
+        this.whereClause.filter instanceof AndExpression &&
+        whereClauseEx.filter instanceof AndExpression
+      ) {
+        whereClauseEx.filter.ex = this.whereClause.filter.ex.filter(expression => {
+          if (expression instanceof ComparisonExpression) {
+            if (expression.ex) {
+              if (
+                expression.rhs &&
+                expression.rhs.rhs instanceof StringType &&
+                expression.rhs.rhs.getBasicValue() === column
+              ) {
+                return;
+              } else if (
+                expression.ex instanceof StringType &&
+                expression.ex.getBasicValue() === column
+              ) {
+                return;
+              }
+            }
+          }
+          return expression;
+        });
+        if (!whereClauseEx.filter.ex.length) {
+          whereClauseEx = undefined;
+        }
+      }
+      if (this.whereClause.filter instanceof ComparisonExpression) {
+        if (
+          this.whereClause.filter.ex instanceof StringType &&
+          this.whereClause.filter.ex.getBasicValue() === column
+        ) {
+          whereClauseEx = undefined;
+        }
+        if (
+          this.whereClause.filter.rhs &&
+          this.whereClause.filter.rhs.rhs instanceof StringType &&
+          this.whereClause.filter.rhs.rhs.getBasicValue() === column
+        ) {
+          whereClauseEx = undefined;
+        }
+      }
+    }
+    return new SqlQuery({
+      columns: this.columns,
+      distinct: this.distinct,
+      fromClause: this.fromClause,
+      groupByClause: this.groupByClause,
+      havingClause: this.havingClause,
+      limitClause: this.limitClause,
+      orderByClause: this.orderByClause,
+      spacing: this.spacing,
+      verb: this.verb,
+      whereClause: whereClauseEx,
+    });
+  }
+
   getSorted(): { id: string; desc: boolean }[] {
     if (this.orderByClause) {
       return this.orderByClause.getSorted(this.columns);
