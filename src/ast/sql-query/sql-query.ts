@@ -632,12 +632,15 @@ export class SqlQuery extends BaseAst {
         return this.whereClause.filter.ex.flatMap(expression => {
           if (expression instanceof ComparisonExpression) {
             const filteredColumns: string[] = [];
-            if (expression.ex instanceof StringType || expression.ex instanceof RefExpression) {
+            if (
+              (expression.ex instanceof StringType && expression.ex.quote === '"') ||
+              expression.ex instanceof RefExpression
+            ) {
               filteredColumns.push(expression.ex.getBasicValue());
             }
             if (
               expression.rhs &&
-              (expression.rhs.rhs instanceof StringType ||
+              ((expression.rhs.rhs instanceof StringType && expression.rhs.rhs.quote === '"') ||
                 expression.rhs.rhs instanceof RefExpression)
             ) {
               filteredColumns.push(expression.rhs.rhs.getBasicValue());
@@ -650,14 +653,16 @@ export class SqlQuery extends BaseAst {
       if (this.whereClause.filter instanceof ComparisonExpression) {
         const filteredColumns: string[] = [];
         if (
-          this.whereClause.filter.ex instanceof StringType ||
+          (this.whereClause.filter.ex instanceof StringType &&
+            this.whereClause.filter.ex.quote === '"') ||
           this.whereClause.filter.ex instanceof RefExpression
         ) {
           filteredColumns.push(this.whereClause.filter.ex.getBasicValue());
         }
         if (
           this.whereClause.filter.rhs &&
-          (this.whereClause.filter.rhs.rhs instanceof StringType ||
+          ((this.whereClause.filter.rhs.rhs instanceof StringType &&
+            this.whereClause.filter.rhs.rhs.quote === '"') ||
             this.whereClause.filter.rhs.rhs instanceof RefExpression)
         ) {
           filteredColumns.push(this.whereClause.filter.rhs.rhs.getBasicValue());
