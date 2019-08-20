@@ -52,7 +52,7 @@ const parser = sqlParserFactory(FUNCTIONS);
 //   });
 // });
 
-describe('ast action for segments test', () => {
+describe('Ast action for segments test', () => {
   it('renders remove Column', () => {
     const tree = parser(`SELECT "segment_id", "datasource", "start", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed", "payload"
 FROM sys.segments
@@ -181,7 +181,7 @@ LIMIT 25`).toString();
   });
 });
 
-describe('ast for full query action Tests', () => {
+describe('Ast for full query action tests', () => {
   it('renders remove Column', () => {
     const tree = parser(`SELECT
   datasource,
@@ -416,7 +416,7 @@ ORDER BY "rank" DESC, "created_time" DESC`).toString();
   });
 });
 
-describe('ast for full query including whereClause action Tests', () => {
+describe('Ast for full query including whereClause action tests', () => {
   it('renders remove Column', () => {
     const tree = parser(`SELECT
   datasource,
@@ -663,7 +663,7 @@ ORDER BY "rank" DESC, "created_time" DESC`).toString();
   });
 });
 
-describe('test how remove effect groupBy', () => {
+describe('Test how remove effect groupBy', () => {
   it('renders remove first of 2 columns', () => {
     const tree = parser(`SELECT
   datasource,
@@ -1394,7 +1394,7 @@ ORDER BY "Time" ASC`)
   });
 });
 
-describe('test getting current filters and removing specific filters', () => {
+describe('Test getting current filters and removing specific filters', () => {
   it('get simple current filter', () => {
     const tree = parser(`SELECT
   TIME_FLOOR("__time", 'PT1H') AS "Time",
