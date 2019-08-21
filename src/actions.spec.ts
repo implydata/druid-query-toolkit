@@ -20,6 +20,7 @@ import {
   FilterClause,
   Interval,
   RefExpression,
+  refExpressionFactory,
   StringType,
   timestampFactory,
   WhereClause,
@@ -1872,6 +1873,70 @@ ORDER BY "Time" ASC`)
         COUNT(*) AS \\"Count\\"
       FROM \\"flow0\\"
       WHERE \\"dstaddr_long\\" > 100
+      GROUP BY 1
+      ORDER BY \\"Time\\" ASC"
+    `);
+  });
+});
+describe('Replace from', () => {
+  it('replace with no namespace', () => {
+    const tree = parser(`SELECT
+  TIME_FLOOR("__time", 'PT1H') AS "Time",
+  COUNT(*) AS "Count"
+FROM "flow0"
+WHERE "dstaddr_long" > 100 AND TIMESTAMP '2019-7-1 13:00:00' <= __time AND __time < TIMESTAMP '2019-7-1 14:00:00'
+GROUP BY 1
+ORDER BY "Time" ASC`)
+      .replaceFrom(refExpressionFactory('test'))
+      .toString();
+    expect(tree).toMatchInlineSnapshot(`
+      "SELECT
+        TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
+        COUNT(*) AS \\"Count\\"
+      FROM test
+      WHERE \\"dstaddr_long\\" > 100 AND TIMESTAMP '2019-7-1 13:00:00' <= __time AND __time < TIMESTAMP '2019-7-1 14:00:00'
+      GROUP BY 1
+      ORDER BY \\"Time\\" ASC"
+    `);
+  });
+
+  it('replace with namespace', () => {
+    const tree = parser(`SELECT
+  TIME_FLOOR("__time", 'PT1H') AS "Time",
+  COUNT(*) AS "Count"
+FROM "flow0"
+WHERE "dstaddr_long" > 100 AND TIMESTAMP '2019-7-1 13:00:00' <= __time AND __time < TIMESTAMP '2019-7-1 14:00:00'
+GROUP BY 1
+ORDER BY "Time" ASC`)
+      .replaceFrom(refExpressionFactory('test', 'test'))
+      .toString();
+    expect(tree).toMatchInlineSnapshot(`
+      "SELECT
+        TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
+        COUNT(*) AS \\"Count\\"
+      FROM test.test
+      WHERE \\"dstaddr_long\\" > 100 AND TIMESTAMP '2019-7-1 13:00:00' <= __time AND __time < TIMESTAMP '2019-7-1 14:00:00'
+      GROUP BY 1
+      ORDER BY \\"Time\\" ASC"
+    `);
+  });
+
+  it('replace with quotes', () => {
+    const tree = parser(`SELECT
+  TIME_FLOOR("__time", 'PT1H') AS "Time",
+  COUNT(*) AS "Count"
+FROM "flow0"
+WHERE "dstaddr_long" > 100 AND TIMESTAMP '2019-7-1 13:00:00' <= __time AND __time < TIMESTAMP '2019-7-1 14:00:00'
+GROUP BY 1
+ORDER BY "Time" ASC`)
+      .replaceFrom(refExpressionFactory(stringFactory('test', '"')))
+      .toString();
+    expect(tree).toMatchInlineSnapshot(`
+      "SELECT
+        TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
+        COUNT(*) AS \\"Count\\"
+      FROM \\"test\\"
+      WHERE \\"dstaddr_long\\" > 100 AND TIMESTAMP '2019-7-1 13:00:00' <= __time AND __time < TIMESTAMP '2019-7-1 14:00:00'
       GROUP BY 1
       ORDER BY \\"Time\\" ASC"
     `);

@@ -20,7 +20,7 @@ export interface FromClauseValue {
   keyword: string;
   fc: RefExpression | SqlQuery;
   spacing: string[];
-  alias: Alias;
+  alias?: Alias;
 }
 
 export class FromClause {
@@ -28,7 +28,7 @@ export class FromClause {
   public keyword: string;
   public fc: RefExpression | SqlQuery;
   public spacing: string[];
-  public alias: Alias;
+  public alias?: Alias;
 
   constructor(options: FromClauseValue) {
     this.parens = options.parens;
