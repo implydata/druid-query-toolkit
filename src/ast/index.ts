@@ -48,3 +48,5 @@ export * from './sql-query/basic-expression/concat/concat';
 export * from './sql-query/basic-expression/interval';
 export * from './sql-query/helpers';
 export * from './sql-query/basic-expression/timestamp';
+export * from './sql-query/clauses/with-clause/with-clause';
+export * from './sql-query/clauses/with-clause/with-clauses';

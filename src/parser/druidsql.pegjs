@@ -4,6 +4,8 @@ Start
 SelectQuery
   =
   startSpacing: _?
+  withClause: WithClauses?
+  spacing0:_?
   SelectToken
   distinct:(_ DistinctToken)?
   spacing1: _
@@ -20,6 +22,7 @@ SelectQuery
     return new SqlQuery({
       verb: 'SELECT',
       distinct: distinct ? distinct[1]: null,
+      withClause: withClause,
       columns: columns,
       fromClause: fromClause,
       whereClause: whereClause ? whereClause[1]: null,
@@ -27,20 +30,59 @@ SelectQuery
       havingClause: havingClause ? havingClause[1] : null,
       orderByClause: orderByClause ? orderByClause[1] : null,
       spacing: [
-      startSpacing,
-      distinct ? distinct[0]: null,
+        startSpacing,
+        spacing0,
+        distinct ? distinct[0]: null,
         spacing1,
-          spacing2,
-          whereClause ? whereClause[0]:null,
-          groupByClause ? groupByClause[0]:null,
-          havingClause? havingClause[0]: null,
-          orderByClause? orderByClause[0]: null,
-          limitClause ? limitClause[0] : null,
-          endSpacing.join(''),
-          ],
+        spacing2,
+        whereClause ? whereClause[0]:null,
+        groupByClause ? groupByClause[0]:null,
+        havingClause? havingClause[0]: null,
+        orderByClause? orderByClause[0]: null,
+        limitClause ? limitClause[0] : null,
+        endSpacing.join(''),
+      ],
       limitClause: limitClause ? limitClause[1] : null,
     });
   }
+
+WithClauses
+  = head:(WithClause)
+  tail:((Comma _?) WithClause)*
+  {
+    return new WithClauses({
+        parens: [],
+        withClauses: makeListMap1(head, tail),
+        spacing: tail ? makeListMapEmpty01(tail) : null
+    })
+  }
+
+WithClause
+  = keyword:(WithToken _)?
+  tableName: RefExpression
+  spacing1: _?
+  OpenParen
+  spacing2: _?
+  columns: Columns
+  spacing3: _?
+  CloseParen
+  spacing4: _
+  asKeyword: AsToken
+  spacing5: _
+  sub: Sub
+{
+  return new WithClause({
+    keyword: keyword ? keyword[0] : null,
+    tableName: tableName,
+    columns: columns,
+    asKeyword: asKeyword,
+    sub: sub,
+    spacing: [ keyword ? keyword[1] : '', spacing1, spacing2, spacing3, spacing4, spacing5]
+  })
+}
+
+
+
 
 SelectSubQuery
   = SelectQuery
@@ -852,3 +894,4 @@ FilterToken = keyword:"FILTER"i { return keyword}
 IntervalToken = keyword:"INTERVAL"i { return keyword}
 DayToken = keyword:"DAY"i { return keyword}
 TimestampToken = keyword:"TIMESTAMP"i { return keyword}
+WithToken = keyword:"WITH"i { return keyword}

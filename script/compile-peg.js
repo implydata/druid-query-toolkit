@@ -46,7 +46,8 @@ var BetweenExpression = ast.BetweenExpression;
 var Concat = ast.Concat;
 var Interval = ast.Interval;
 var Timestamp = ast.Timestamp;
-
+var WithClause = ast.WithClause;
+var WithClauses = ast.WithClauses;
 
 function sqlParserFactory(functions) {
 var p =
