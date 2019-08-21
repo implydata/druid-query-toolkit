@@ -19,8 +19,7 @@ const parser = sqlParserFactory(FUNCTIONS);
 describe.skip('Playground', () => {
   it('basic', () => {
     expect(
-      parser(
-        `WITH totalSalary(Airline, total) as
+      parser(`WITH totalSalary(Airline, total) as
     (SELECT Airline, sum(Salary)
     FROM Pilot
     GROUP BY Airline),
@@ -29,19 +28,7 @@ describe.skip('Playground', () => {
     FROM totalSalary )
     SELECT Airline
     FROM totalSalary
-    WHERE totalSalary.total > airlineAverage.avgSalary;`,
-      ).toString(),
-    ).toMatchInlineSnapshot(`
-      "WITH totalSalary(Airline, total) 
-          (SELECT Airline, sum(Salary)
-          FROM Pilot
-          GROUP BY Airline),
-          airlineAverage(avgSalary)  
-          (SELECT avg(total)
-          FROM totalSalary )
-          SELECT Airline
-          FROM totalSalary
-          WHERE totalSalary.total > airlineAverage.avgSalary;"
-    `);
+    WHERE totalSalary.total > airlineAverage.avgSalary;`).toString(),
+    ).toMatchInlineSnapshot();
   });
 });
