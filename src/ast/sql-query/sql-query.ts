@@ -108,7 +108,7 @@ export class SqlQuery extends BaseAst {
     });
     const spacing = this.spacing;
 
-    spacing[7] = '\n';
+    spacing[8] = '\n';
     orderByClause.orderByColumn(column, direction);
     return new SqlQuery({
       columns: this.columns,
@@ -424,6 +424,27 @@ export class SqlQuery extends BaseAst {
     }
 
     return groupByClause;
+  }
+
+  replaceFrom(from: RefExpression) {
+    return new SqlQuery({
+      columns: this.columns,
+      distinct: this.distinct,
+      withClause: this.withClause,
+      fromClause: new FromClause({
+        parens: [],
+        keyword: 'FROM',
+        fc: from,
+        spacing: [' '],
+      }),
+      groupByClause: this.groupByClause,
+      havingClause: this.havingClause,
+      limitClause: this.limitClause,
+      orderByClause: this.orderByClause,
+      spacing: this.spacing,
+      verb: this.verb,
+      whereClause: this.whereClause,
+    });
   }
 
   filterRow(

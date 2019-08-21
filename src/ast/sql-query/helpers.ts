@@ -102,11 +102,14 @@ export function aliasFactory(alias: string): Alias {
   });
 }
 
-export function refExpressionFactory(name: string): RefExpression {
+export function refExpressionFactory(
+  name: string | StringType,
+  nameSpace?: string | StringType,
+): RefExpression {
   return new RefExpression({
     quoteSpacing: [],
     quote: '',
-    namespace: '',
+    namespace: nameSpace ? nameSpace : '',
     name: name,
   });
 }
