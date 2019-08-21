@@ -1383,14 +1383,14 @@ ORDER BY "Time" ASC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-    "SELECT
-      SUBSTRING(\\"test\\", 0, 2) AS \\"__test-substring\\", TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
-      COUNT(*) AS \\"Count\\"
-    FROM \\"lineitem\\"
-    WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY
-    GROUP BY 1,2
-    ORDER BY \\"Time\\" ASC"
-  `);
+      "SELECT
+        SUBSTRING(\\"test\\", 0, 2) AS \\"__test-substring\\", TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
+        COUNT(*) AS \\"Count\\"
+      FROM \\"lineitem\\"
+      WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY
+      GROUP BY 1,2
+      ORDER BY \\"Time\\" ASC"
+    `);
   });
 });
 
@@ -1405,10 +1405,10 @@ GROUP BY 1
 ORDER BY "Time" ASC`).getCurrentFilters();
 
     expect(tree).toMatchInlineSnapshot(`
-    Array [
-      "__time",
-    ]
-  `);
+      Array [
+        "__time",
+      ]
+    `);
   });
 
   it('get simple current filter with expression', () => {
@@ -1421,10 +1421,10 @@ GROUP BY 1
 ORDER BY "Time" ASC`).getCurrentFilters();
 
     expect(tree).toMatchInlineSnapshot(`
-    Array [
-      "__time",
-    ]
-  `);
+      Array [
+        "__time",
+      ]
+    `);
   });
 
   it('get simple current filter with backwards expression', () => {
@@ -1437,10 +1437,10 @@ GROUP BY 1
 ORDER BY "Time" ASC`).getCurrentFilters();
 
     expect(tree).toMatchInlineSnapshot(`
-    Array [
-      "__time",
-    ]
-  `);
+      Array [
+        "__time",
+      ]
+    `);
   });
 
   it('get current filter with multiple simple expressions', () => {
@@ -1453,12 +1453,12 @@ GROUP BY 1
 ORDER BY "Time" ASC`).getCurrentFilters();
 
     expect(tree).toMatchInlineSnapshot(`
-    Array [
-      "__time",
-      "__time2",
-      "__time3",
-    ]
-  `);
+      Array [
+        "__time",
+        "__time2",
+        "__time3",
+      ]
+    `);
   });
 
   it('get current filter with multiple expressions', () => {
@@ -1471,12 +1471,12 @@ GROUP BY 1
 ORDER BY "Time" ASC`).getCurrentFilters();
 
     expect(tree).toMatchInlineSnapshot(`
-    Array [
-      "__time",
-      "__time",
-      "__time3",
-    ]
-  `);
+      Array [
+        "__time",
+        "__time",
+        "__time3",
+      ]
+    `);
   });
 
   it('remove current filter with single simple expression', () => {
@@ -1491,13 +1491,13 @@ ORDER BY "Time" ASC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-    "SELECT
-      TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
-      COUNT(*) AS \\"Count\\"
-    FROM \\"lineitem\\" 
-    GROUP BY 1
-    ORDER BY \\"Time\\" ASC"
-  `);
+      "SELECT
+        TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
+        COUNT(*) AS \\"Count\\"
+      FROM \\"lineitem\\" 
+      GROUP BY 1
+      ORDER BY \\"Time\\" ASC"
+    `);
   });
 
   it('remove current filter with backwards simple expression', () => {
@@ -1512,13 +1512,13 @@ ORDER BY "Time" ASC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-    "SELECT
-      TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
-      COUNT(*) AS \\"Count\\"
-    FROM \\"lineitem\\" 
-    GROUP BY 1
-    ORDER BY \\"Time\\" ASC"
-  `);
+      "SELECT
+        TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
+        COUNT(*) AS \\"Count\\"
+      FROM \\"lineitem\\" 
+      GROUP BY 1
+      ORDER BY \\"Time\\" ASC"
+    `);
   });
 
   it('remove current filter with no matching expression', () => {
@@ -1533,14 +1533,14 @@ ORDER BY "Time" ASC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-    "SELECT
-      TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
-      COUNT(*) AS \\"Count\\"
-    FROM \\"lineitem\\"
-    WHERE \\"value\\" >= 'value' 
-    GROUP BY 1
-    ORDER BY \\"Time\\" ASC"
-  `);
+      "SELECT
+        TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
+        COUNT(*) AS \\"Count\\"
+      FROM \\"lineitem\\"
+      WHERE \\"value\\" >= 'value' 
+      GROUP BY 1
+      ORDER BY \\"Time\\" ASC"
+    `);
   });
 
   it('remove current filter with multiple simple & backwards expressions', () => {
@@ -1554,14 +1554,14 @@ ORDER BY "Time" ASC`)
       .removeFilter('value2')
       .toString();
     expect(tree).toMatchInlineSnapshot(`
-    "SELECT
-      TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
-      COUNT(*) AS \\"Count\\"
-    FROM \\"lineitem\\"
-    WHERE \\"__time\\" >= 'value' AND \\"__time3\\" >= 'value3' 
-    GROUP BY 1
-    ORDER BY \\"Time\\" ASC"
-  `);
+      "SELECT
+        TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
+        COUNT(*) AS \\"Count\\"
+      FROM \\"lineitem\\"
+      WHERE \\"__time\\" >= 'value' AND \\"__time3\\" >= 'value3' 
+      GROUP BY 1
+      ORDER BY \\"Time\\" ASC"
+    `);
   });
 
   it('remove one of two filters', () => {
@@ -1575,14 +1575,14 @@ ORDER BY "Time" ASC`)
       .removeFilter('value2')
       .toString();
     expect(tree).toMatchInlineSnapshot(`
-    "SELECT
-      TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
-      COUNT(*) AS \\"Count\\"
-    FROM \\"lineitem\\"
-    WHERE \\"__time\\" >= 'value'
-    GROUP BY 1
-    ORDER BY \\"Time\\" ASC"
-  `);
+      "SELECT
+        TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
+        COUNT(*) AS \\"Count\\"
+      FROM \\"lineitem\\"
+      WHERE \\"__time\\" >= 'value'
+      GROUP BY 1
+      ORDER BY \\"Time\\" ASC"
+    `);
   });
 
   it('remove time stamp', () => {
@@ -1596,13 +1596,13 @@ ORDER BY "Time" ASC`)
       .removeFilter('__time')
       .toString();
     expect(tree).toMatchInlineSnapshot(`
-    "SELECT
-      TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
-      COUNT(*) AS \\"Count\\"
-    FROM \\"flow0\\"
-    GROUP BY 1
-    ORDER BY \\"Time\\" ASC"
-  `);
+      "SELECT
+        TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
+        COUNT(*) AS \\"Count\\"
+      FROM \\"flow0\\"
+      GROUP BY 1
+      ORDER BY \\"Time\\" ASC"
+    `);
   });
 
   it('remove time stamp', () => {
@@ -1616,14 +1616,14 @@ ORDER BY "Time" ASC`)
       .removeFilter('__time')
       .toString();
     expect(tree).toMatchInlineSnapshot(`
-    "SELECT
-      TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
-      COUNT(*) AS \\"Count\\"
-    FROM \\"flow0\\"
-    WHERE \\"dstaddr_long\\" > 100
-    GROUP BY 1
-    ORDER BY \\"Time\\" ASC"
-  `);
+      "SELECT
+        TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
+        COUNT(*) AS \\"Count\\"
+      FROM \\"flow0\\"
+      WHERE \\"dstaddr_long\\" > 100
+      GROUP BY 1
+      ORDER BY \\"Time\\" ASC"
+    `);
   });
 
   it('remove whereClause', () => {
@@ -1637,13 +1637,13 @@ ORDER BY "Time" ASC`)
       .removeFilter('__time')
       .toString();
     expect(tree).toMatchInlineSnapshot(`
-    "SELECT
-      TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
-      COUNT(*) AS \\"Count\\"
-    FROM \\"flow0\\" 
-    GROUP BY 1
-    ORDER BY \\"Time\\" ASC"
-  `);
+      "SELECT
+        TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
+        COUNT(*) AS \\"Count\\"
+      FROM \\"flow0\\" 
+      GROUP BY 1
+      ORDER BY \\"Time\\" ASC"
+    `);
   });
 
   it('get simple current filter', () => {
@@ -1656,10 +1656,10 @@ GROUP BY 1
 ORDER BY "Time" ASC`).getCurrentFilters();
 
     expect(tree).toMatchInlineSnapshot(`
-    Array [
-      "__time",
-    ]
-  `);
+      Array [
+        "__time",
+      ]
+    `);
   });
 
   it('get simple current filter with expression', () => {
@@ -1672,10 +1672,10 @@ GROUP BY 1
 ORDER BY "Time" ASC`).getCurrentFilters();
 
     expect(tree).toMatchInlineSnapshot(`
-    Array [
-      "__time",
-    ]
-  `);
+      Array [
+        "__time",
+      ]
+    `);
   });
 
   it('get simple current filter with backwards expression', () => {
@@ -1688,10 +1688,10 @@ GROUP BY 1
 ORDER BY "Time" ASC`).getCurrentFilters();
 
     expect(tree).toMatchInlineSnapshot(`
-    Array [
-      "__time",
-    ]
-  `);
+      Array [
+        "__time",
+      ]
+    `);
   });
 
   it('get current filter with multiple simple expressions', () => {
@@ -1704,12 +1704,12 @@ GROUP BY 1
 ORDER BY "Time" ASC`).getCurrentFilters();
 
     expect(tree).toMatchInlineSnapshot(`
-    Array [
-      "__time",
-      "__time2",
-      "__timeThree",
-    ]
-  `);
+      Array [
+        "__time",
+        "__time2",
+        "__timeThree",
+      ]
+    `);
   });
 
   it('get current filter with multiple expressions', () => {
@@ -1722,12 +1722,12 @@ GROUP BY 1
 ORDER BY "Time" ASC`).getCurrentFilters();
 
     expect(tree).toMatchInlineSnapshot(`
-    Array [
-      "__time",
-      "__time",
-      "__timeThree",
-    ]
-  `);
+      Array [
+        "__time",
+        "__time",
+        "__timeThree",
+      ]
+    `);
   });
 
   it('remove current filter with single simple expression', () => {
@@ -1742,13 +1742,13 @@ ORDER BY "Time" ASC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-    "SELECT
-      TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
-      COUNT(*) AS \\"Count\\"
-    FROM \\"lineitem\\" 
-    GROUP BY 1
-    ORDER BY \\"Time\\" ASC"
-  `);
+      "SELECT
+        TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
+        COUNT(*) AS \\"Count\\"
+      FROM \\"lineitem\\" 
+      GROUP BY 1
+      ORDER BY \\"Time\\" ASC"
+    `);
   });
 
   it('remove current filter with backwards simple expression', () => {
@@ -1763,13 +1763,13 @@ ORDER BY "Time" ASC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-    "SELECT
-      TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
-      COUNT(*) AS \\"Count\\"
-    FROM \\"lineitem\\"
-    GROUP BY 1
-    ORDER BY \\"Time\\" ASC"
-  `);
+      "SELECT
+        TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
+        COUNT(*) AS \\"Count\\"
+      FROM \\"lineitem\\"
+      GROUP BY 1
+      ORDER BY \\"Time\\" ASC"
+    `);
   });
 
   it('remove current filter with no matching expression', () => {
@@ -1784,14 +1784,14 @@ ORDER BY "Time" ASC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-    "SELECT
-      TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
-      COUNT(*) AS \\"Count\\"
-    FROM \\"lineitem\\"
-    WHERE \\"value\\" >= 'value'
-    GROUP BY 1
-    ORDER BY \\"Time\\" ASC"
-  `);
+      "SELECT
+        TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
+        COUNT(*) AS \\"Count\\"
+      FROM \\"lineitem\\"
+      WHERE \\"value\\" >= 'value'
+      GROUP BY 1
+      ORDER BY \\"Time\\" ASC"
+    `);
   });
 
   it('remove current filter with multiple simple & backwards expressions', () => {
@@ -1805,14 +1805,14 @@ ORDER BY "Time" ASC`)
       .removeFilter('valueTwo')
       .toString();
     expect(tree).toMatchInlineSnapshot(`
-    "SELECT
-      TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
-      COUNT(*) AS \\"Count\\"
-    FROM \\"lineitem\\"
-    WHERE \\"__time\\" >= 'value' AND \\"__time3\\" >= 'value3'
-    GROUP BY 1
-    ORDER BY \\"Time\\" ASC"
-  `);
+      "SELECT
+        TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
+        COUNT(*) AS \\"Count\\"
+      FROM \\"lineitem\\"
+      WHERE \\"__time\\" >= 'value' AND \\"__time3\\" >= 'value3'
+      GROUP BY 1
+      ORDER BY \\"Time\\" ASC"
+    `);
   });
 
   it('remove one of two filters', () => {
@@ -1826,14 +1826,14 @@ ORDER BY "Time" ASC`)
       .removeFilter('value2')
       .toString();
     expect(tree).toMatchInlineSnapshot(`
-    "SELECT
-      TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
-      COUNT(*) AS \\"Count\\"
-    FROM \\"lineitem\\"
-    WHERE __time >= 'value'
-    GROUP BY 1
-    ORDER BY \\"Time\\" ASC"
-  `);
+      "SELECT
+        TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
+        COUNT(*) AS \\"Count\\"
+      FROM \\"lineitem\\"
+      WHERE __time >= 'value'
+      GROUP BY 1
+      ORDER BY \\"Time\\" ASC"
+    `);
   });
 
   it('remove time stamp', () => {
@@ -1847,13 +1847,13 @@ ORDER BY "Time" ASC`)
       .removeFilter('__time')
       .toString();
     expect(tree).toMatchInlineSnapshot(`
-    "SELECT
-      TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
-      COUNT(*) AS \\"Count\\"
-    FROM \\"flow0\\"
-    GROUP BY 1
-    ORDER BY \\"Time\\" ASC"
-  `);
+      "SELECT
+        TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
+        COUNT(*) AS \\"Count\\"
+      FROM \\"flow0\\"
+      GROUP BY 1
+      ORDER BY \\"Time\\" ASC"
+    `);
   });
 
   it('remove time stamp', () => {
@@ -1867,13 +1867,13 @@ ORDER BY "Time" ASC`)
       .removeFilter('__time')
       .toString();
     expect(tree).toMatchInlineSnapshot(`
-    "SELECT
-      TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
-      COUNT(*) AS \\"Count\\"
-    FROM \\"flow0\\"
-    WHERE \\"dstaddr_long\\" > 100
-    GROUP BY 1
-    ORDER BY \\"Time\\" ASC"
-  `);
+      "SELECT
+        TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
+        COUNT(*) AS \\"Count\\"
+      FROM \\"flow0\\"
+      WHERE \\"dstaddr_long\\" > 100
+      GROUP BY 1
+      ORDER BY \\"Time\\" ASC"
+    `);
   });
 });

@@ -45,12 +45,14 @@ import {
   Timestamp,
   WhereClause,
   whereFactory,
+  WithClause,
 } from '../index';
 
 import { arrayContains, getColumns } from './helpers';
 export interface SqlQueryValue {
   verb: string;
   distinct: string;
+  withClause?: WithClause;
   columns: Columns;
   fromClause: FromClause;
   whereClause?: WhereClause;
@@ -64,6 +66,7 @@ export interface SqlQueryValue {
 export class SqlQuery extends BaseAst {
   public verb: string;
   public distinct: string;
+  public withClause?: WithClause;
   public columns: Columns;
   public fromClause: FromClause;
   public whereClause?: WhereClause;
@@ -77,6 +80,7 @@ export class SqlQuery extends BaseAst {
     super('query');
     this.verb = options.verb;
     this.distinct = options.distinct;
+    this.withClause = options.withClause;
     this.fromClause = options.fromClause;
     this.columns = options.columns;
     this.whereClause = options.whereClause;
@@ -104,10 +108,11 @@ export class SqlQuery extends BaseAst {
     });
     const spacing = this.spacing;
 
-    spacing[6] = '\n';
+    spacing[7] = '\n';
     orderByClause.orderByColumn(column, direction);
     return new SqlQuery({
       columns: this.columns,
+      withClause: this.withClause,
       distinct: this.distinct,
       fromClause: this.fromClause,
       groupByClause: this.groupByClause,
@@ -158,6 +163,7 @@ export class SqlQuery extends BaseAst {
     const query = new SqlQuery({
       columns: columnsArray,
       distinct: this.distinct,
+      withClause: this.withClause,
       fromClause: this.fromClause,
       groupByClause: this.getGroupByClauseWithoutColumn(columnVal),
       havingClause: this.havingClause,
@@ -205,6 +211,7 @@ export class SqlQuery extends BaseAst {
 
     return new SqlQuery({
       columns: new Columns({ columns: columns, parens: [], spacing: columnSpacing }),
+      withClause: this.withClause,
       distinct: this.distinct,
       fromClause: this.fromClause,
       groupByClause: new GroupByClause({
@@ -247,6 +254,7 @@ export class SqlQuery extends BaseAst {
 
     return new SqlQuery({
       columns: new Columns({ columns: columns, parens: [], spacing: columnSpacing }),
+      withClause: this.withClause,
       distinct: this.distinct,
       fromClause: this.fromClause,
       groupByClause: new GroupByClause({
@@ -310,6 +318,7 @@ export class SqlQuery extends BaseAst {
 
     return new SqlQuery({
       columns: columnsFactory(columns, columnSpacing),
+      withClause: this.withClause,
       distinct: this.distinct,
       fromClause: this.fromClause,
       groupByClause: this.groupByClause,
@@ -475,13 +484,13 @@ export class SqlQuery extends BaseAst {
     // No where clause present
     if (!whereClause) {
       whereClause = whereFactory(comparisonExpression);
-      this.spacing[4] = '\n';
+      this.spacing[5] = '\n';
     } else if (whereClause && whereClause.filter instanceof OrExpression) {
       // filtered by an or clause
       whereClause = whereFactory(
         andExpressionFactory([subFactory(whereClause.filter), comparisonExpression]),
       );
-      this.spacing[4] = '\n';
+      this.spacing[5] = '\n';
     } else if (whereClause && whereClause.filter instanceof AndExpression) {
       // Multiple
       let contained = false;
@@ -522,6 +531,7 @@ export class SqlQuery extends BaseAst {
     return new SqlQuery({
       columns: this.columns,
       distinct: this.distinct,
+      withClause: this.withClause,
       fromClause: this.fromClause,
       groupByClause: this.groupByClause,
       havingClause: this.havingClause,
@@ -568,13 +578,13 @@ export class SqlQuery extends BaseAst {
     // No having clause present
     if (!havingClause) {
       havingClause = havingFactory(comparisonExpression);
-      this.spacing[6] = '\n';
+      this.spacing[7] = '\n';
     } else if (havingClause && havingClause.having instanceof OrExpression) {
       // filtered by an or clause
       havingClause = havingFactory(
         andExpressionFactory([subFactory(havingClause.having), comparisonExpression]),
       );
-      this.spacing[6] = '\n';
+      this.spacing[7] = '\n';
     } else if (havingClause && havingClause.having instanceof AndExpression) {
       // Multiple
       let contained = false;
@@ -615,6 +625,7 @@ export class SqlQuery extends BaseAst {
     return new SqlQuery({
       columns: this.columns,
       distinct: this.distinct,
+      withClause: this.withClause,
       fromClause: this.fromClause,
       groupByClause: this.groupByClause,
       havingClause: havingClause,
@@ -627,49 +638,49 @@ export class SqlQuery extends BaseAst {
   }
 
   getCurrentFilters(): string[] {
-    if (this.whereClause) {
-      if (this.whereClause.filter instanceof AndExpression) {
-        return this.whereClause.filter.ex.flatMap(expression => {
-          if (expression instanceof ComparisonExpression) {
-            const filteredColumns: string[] = [];
-            if (
-              (expression.ex instanceof StringType && expression.ex.quote === '"') ||
-              expression.ex instanceof RefExpression
-            ) {
-              filteredColumns.push(expression.ex.getBasicValue());
-            }
-            if (
-              expression.rhs &&
-              ((expression.rhs.rhs instanceof StringType && expression.rhs.rhs.quote === '"') ||
-                expression.rhs.rhs instanceof RefExpression)
-            ) {
-              filteredColumns.push(expression.rhs.rhs.getBasicValue());
-            }
-            return filteredColumns;
+    if (!this.whereClause) return [];
+    if (this.whereClause.filter instanceof AndExpression) {
+      return this.whereClause.filter.ex.flatMap(expression => {
+        if (expression instanceof ComparisonExpression) {
+          const filteredColumns: string[] = [];
+          if (
+            (expression.ex instanceof StringType && expression.ex.quote === '"') ||
+            expression.ex instanceof RefExpression
+          ) {
+            filteredColumns.push(expression.ex.getBasicValue());
           }
-          return [];
-        });
-      }
-      if (this.whereClause.filter instanceof ComparisonExpression) {
-        const filteredColumns: string[] = [];
-        if (
-          (this.whereClause.filter.ex instanceof StringType &&
-            this.whereClause.filter.ex.quote === '"') ||
-          this.whereClause.filter.ex instanceof RefExpression
-        ) {
-          filteredColumns.push(this.whereClause.filter.ex.getBasicValue());
+          if (
+            expression.rhs &&
+            ((expression.rhs.rhs instanceof StringType && expression.rhs.rhs.quote === '"') ||
+              expression.rhs.rhs instanceof RefExpression)
+          ) {
+            filteredColumns.push(expression.rhs.rhs.getBasicValue());
+          }
+          return filteredColumns;
         }
-        if (
-          this.whereClause.filter.rhs &&
-          ((this.whereClause.filter.rhs.rhs instanceof StringType &&
-            this.whereClause.filter.rhs.rhs.quote === '"') ||
-            this.whereClause.filter.rhs.rhs instanceof RefExpression)
-        ) {
-          filteredColumns.push(this.whereClause.filter.rhs.rhs.getBasicValue());
-        }
-        return filteredColumns;
-      }
+        return [];
+      });
     }
+    if (this.whereClause.filter instanceof ComparisonExpression) {
+      const filteredColumns: string[] = [];
+      if (
+        (this.whereClause.filter.ex instanceof StringType &&
+          this.whereClause.filter.ex.quote === '"') ||
+        this.whereClause.filter.ex instanceof RefExpression
+      ) {
+        filteredColumns.push(this.whereClause.filter.ex.getBasicValue());
+      }
+      if (
+        this.whereClause.filter.rhs &&
+        ((this.whereClause.filter.rhs.rhs instanceof StringType &&
+          this.whereClause.filter.rhs.rhs.quote === '"') ||
+          this.whereClause.filter.rhs.rhs instanceof RefExpression)
+      ) {
+        filteredColumns.push(this.whereClause.filter.rhs.rhs.getBasicValue());
+      }
+      return filteredColumns;
+    }
+
     return [];
   }
 
@@ -725,6 +736,7 @@ export class SqlQuery extends BaseAst {
     return new SqlQuery({
       columns: this.columns,
       distinct: this.distinct,
+      withClause: this.withClause,
       fromClause: this.fromClause,
       groupByClause: this.groupByClause,
       havingClause: this.havingClause,
@@ -799,38 +811,41 @@ export class SqlQuery extends BaseAst {
     if (this.spacing[0]) {
       query.push(this.spacing[0]);
     }
+    if (this.withClause) {
+      query.push(this.withClause.toString() + this.spacing[1]);
+    }
     query.push(this.verb);
-    if (this.spacing[1] && this.distinct) {
+    if (this.spacing[2] && this.distinct) {
       query.push(this.spacing[1] + this.distinct);
     }
-    query.push(this.spacing[2]);
+    query.push(this.spacing[3]);
     query.push(this.columns.toString());
     if (this.fromClause) {
-      query.push(this.spacing[3]);
+      query.push(this.spacing[4]);
       query.push(this.fromClause.toString());
     }
     if (this.whereClause) {
-      query.push(this.spacing[4]);
+      query.push(this.spacing[5]);
       query.push(this.whereClause.toString());
     }
     if (this.groupByClause) {
-      query.push(this.spacing[5]);
+      query.push(this.spacing[6]);
       query.push(this.groupByClause.toString());
     }
     if (this.havingClause) {
-      query.push(this.spacing[6]);
+      query.push(this.spacing[7]);
       query.push(this.havingClause.toString());
     }
     if (this.orderByClause) {
-      query.push(this.spacing[7]);
+      query.push(this.spacing[8]);
       query.push(this.orderByClause.toString());
     }
     if (this.limitClause) {
-      query.push(this.spacing[8]);
+      query.push(this.spacing[9]);
       query.push(this.limitClause.toString());
     }
-    if (this.spacing[9]) {
-      query.push(this.spacing[9]);
+    if (this.spacing[10]) {
+      query.push(this.spacing[10]);
     }
 
     return query.join('');

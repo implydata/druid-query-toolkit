@@ -19,16 +19,16 @@ const parser = sqlParserFactory(FUNCTIONS);
 describe.skip('Playground 1', () => {
   it('basic', () => {
     expect(
-      parser(
-        `("task_id"!='index_kafka_twitter-v2_4783a5f7782897d_phfbmpeo' OR "datasource"!='flow0') And 1 + 1`,
-      ),
-    ).toEqual({});
-  });
-  it('basic', () => {
-    expect(
-      parser(
-        `("task_id"!='index_kafka_twitter_2d7ff8cb0e3dbed_jnkjiceg' AND "task_id"!='index_kafka_twitter_2d7ff8cb0e3dbed_jnkjiceg')`,
-      ).toString(),
-    ).toEqual({});
+      parser(`WITH totalSalary(Airline, total) as
+    (SELECT Airline, sum(Salary)
+    FROM Pilot
+    GROUP BY Airline),
+    airlineAverage(avgSalary) as 
+    (SELECT avg(total)
+    FROM totalSalary )
+    SELECT Airline
+    FROM totalSalary
+    WHERE totalSalary.total > airlineAverage.avgSalary;`).toString(),
+    ).toMatchInlineSnapshot();
   });
 });

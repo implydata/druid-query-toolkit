@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { RefExpression, SqlQuery, StringType } from '../..';
+import { RefExpression, SqlQuery, StringType } from '../../index';
 import { Alias } from '../alias';
 import { Parens, renderCloseParens, renderOpenParens } from '../helpers';
 

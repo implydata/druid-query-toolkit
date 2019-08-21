@@ -330,6 +330,7 @@ SqlQuery {
   "spacing": Array [
     null,
     null,
+    null,
     " ",
     "
 ",
@@ -345,6 +346,7 @@ SqlQuery {
   "type": "query",
   "verb": "SELECT",
   "whereClause": null,
+  "withClause": null,
 }
 `;
 
@@ -824,6 +826,7 @@ SqlQuery {
   "spacing": Array [
     null,
     null,
+    null,
     "
   ",
     "
@@ -839,6 +842,7 @@ SqlQuery {
   "type": "query",
   "verb": "SELECT",
   "whereClause": null,
+  "withClause": null,
 }
 `;
 
@@ -1362,6 +1366,7 @@ SqlQuery {
   "spacing": Array [
     null,
     null,
+    null,
     "
   ",
     "
@@ -1377,6 +1382,7 @@ SqlQuery {
   "type": "query",
   "verb": "SELECT",
   "whereClause": null,
+  "withClause": null,
 }
 `;
 
@@ -1593,6 +1599,7 @@ SqlQuery {
   "spacing": Array [
     null,
     null,
+    null,
     "
   ",
     "
@@ -1608,6 +1615,7 @@ SqlQuery {
   "type": "query",
   "verb": "SELECT",
   "whereClause": null,
+  "withClause": null,
 }
 `;
 
