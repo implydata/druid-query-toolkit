@@ -18,20 +18,7 @@ describe('normalizeQueryResult', () => {
   it('works for timeseries (no timestamp)', () => {
     const result = [{ timestamp: '2019-08-04T15:00:00.000Z', result: { count: 514, added: 1232 } }];
 
-    expect(normalizeQueryResult(result)).toMatchInlineSnapshot(`
-      Object {
-        "header": Array [
-          "count",
-          "added",
-        ],
-        "rows": Array [
-          Array [
-            514,
-            1232,
-          ],
-        ],
-      }
-    `);
+    expect(normalizeQueryResult(result)).toMatchInlineSnapshot();
   });
 
   it('works for timeseries (with timestamp)', () => {
@@ -40,27 +27,7 @@ describe('normalizeQueryResult', () => {
       { timestamp: '2019-08-04T16:00:00.000Z', result: { count: 15600, added: 6123934 } },
     ];
 
-    expect(normalizeQueryResult(result, true)).toMatchInlineSnapshot(`
-      Object {
-        "header": Array [
-          "timestamp",
-          "count",
-          "added",
-        ],
-        "rows": Array [
-          Array [
-            "2019-08-04T15:00:00.000Z",
-            514,
-            196263,
-          ],
-          Array [
-            "2019-08-04T16:00:00.000Z",
-            15600,
-            6123934,
-          ],
-        ],
-      }
-    `);
+    expect(normalizeQueryResult(result, true)).toMatchInlineSnapshot();
   });
 
   it('works for groupBy (no timestamp)', () => {
@@ -77,52 +44,9 @@ describe('normalizeQueryResult', () => {
       },
     ];
 
-    expect(normalizeQueryResult(result)).toMatchInlineSnapshot(`
-      Object {
-        "header": Array [
-          "added",
-          "channel",
-          "count",
-        ],
-        "rows": Array [
-          Array [
-            2976786,
-            "#en.wikipedia",
-            13524,
-          ],
-          Array [
-            304920,
-            "#ar.wikipedia",
-            2329,
-          ],
-        ],
-      }
-    `);
+    expect(normalizeQueryResult(result)).toMatchInlineSnapshot();
 
-    expect(normalizeQueryResult(result, true)).toMatchInlineSnapshot(`
-      Object {
-        "header": Array [
-          "timestamp",
-          "added",
-          "channel",
-          "count",
-        ],
-        "rows": Array [
-          Array [
-            "2019-08-04T16:05:29.000Z",
-            2976786,
-            "#en.wikipedia",
-            13524,
-          ],
-          Array [
-            "2019-08-04T16:05:29.000Z",
-            304920,
-            "#ar.wikipedia",
-            2329,
-          ],
-        ],
-      }
-    `);
+    expect(normalizeQueryResult(result, true)).toMatchInlineSnapshot();
   });
 
   it('works with topN', () => {
@@ -150,82 +74,9 @@ describe('normalizeQueryResult', () => {
       },
     ];
 
-    expect(normalizeQueryResult(result)).toMatchInlineSnapshot(`
-      Object {
-        "header": Array [
-          "channel",
-          "count",
-        ],
-        "rows": Array [
-          Array [
-            "#en.wikipedia",
-            3041,
-          ],
-          Array [
-            "#ar.wikipedia",
-            1115,
-          ],
-          Array [
-            "#en.wikipedia",
-            6066,
-          ],
-          Array [
-            "#de.wikipedia",
-            1304,
-          ],
-          Array [
-            "#en.wikipedia",
-            2995,
-          ],
-          Array [
-            "#ar.wikipedia",
-            782,
-          ],
-        ],
-      }
-    `);
+    expect(normalizeQueryResult(result)).toMatchInlineSnapshot();
 
-    expect(normalizeQueryResult(result, true)).toMatchInlineSnapshot(`
-      Object {
-        "header": Array [
-          "timestamp",
-          "channel",
-          "count",
-        ],
-        "rows": Array [
-          Array [
-            "2019-08-04T18:00:00.000Z",
-            "#en.wikipedia",
-            3041,
-          ],
-          Array [
-            "2019-08-04T18:00:00.000Z",
-            "#ar.wikipedia",
-            1115,
-          ],
-          Array [
-            "2019-08-04T19:00:00.000Z",
-            "#en.wikipedia",
-            6066,
-          ],
-          Array [
-            "2019-08-04T19:00:00.000Z",
-            "#de.wikipedia",
-            1304,
-          ],
-          Array [
-            "2019-08-04T20:00:00.000Z",
-            "#en.wikipedia",
-            2995,
-          ],
-          Array [
-            "2019-08-04T20:00:00.000Z",
-            "#ar.wikipedia",
-            782,
-          ],
-        ],
-      }
-    `);
+    expect(normalizeQueryResult(result, true)).toMatchInlineSnapshot();
   });
 
   it('works for scan(list)', () => {
@@ -242,32 +93,7 @@ describe('normalizeQueryResult', () => {
       },
     ];
 
-    expect(normalizeQueryResult(result)).toMatchInlineSnapshot(`
-      Object {
-        "header": Array [
-          "__time",
-          "added",
-          "channel",
-        ],
-        "rows": Array [
-          Object {
-            "__time": 1564887701848,
-            "added": 471,
-            "channel": "#en.wikipedia",
-          },
-          Object {
-            "__time": 1564887701883,
-            "added": 44,
-            "channel": "#en.wikipedia",
-          },
-          Object {
-            "__time": 1564887703049,
-            "added": 4996,
-            "channel": "#vi.wikipedia",
-          },
-        ],
-      }
-    `);
+    expect(normalizeQueryResult(result)).toMatchInlineSnapshot();
   });
 
   it('works for scan(compactedList)', () => {
@@ -284,32 +110,7 @@ describe('normalizeQueryResult', () => {
       },
     ];
 
-    expect(normalizeQueryResult(result)).toMatchInlineSnapshot(`
-      Object {
-        "header": Array [
-          "__time",
-          "added",
-          "channel",
-        ],
-        "rows": Array [
-          Array [
-            1564887701848,
-            471,
-            "#en.wikipedia",
-          ],
-          Array [
-            1564887701883,
-            44,
-            "#en.wikipedia",
-          ],
-          Array [
-            1564887703049,
-            4996,
-            "#vi.wikipedia",
-          ],
-        ],
-      }
-    `);
+    expect(normalizeQueryResult(result)).toMatchInlineSnapshot();
   });
 
   it('works for select', () => {
@@ -346,32 +147,7 @@ describe('normalizeQueryResult', () => {
       },
     ];
 
-    expect(normalizeQueryResult(result)).toMatchInlineSnapshot(`
-      Object {
-        "header": Array [
-          "timestamp",
-          "channel",
-          "added",
-        ],
-        "rows": Array [
-          Array [
-            "2019-01-01T00:00:00.321Z",
-            "#en.wikipedia",
-            45,
-          ],
-          Array [
-            "2019-01-01T00:00:00.381Z",
-            "#en.wikipedia",
-            0,
-          ],
-          Array [
-            "2019-01-01T00:00:00.575Z",
-            "#en.wikipedia",
-            30,
-          ],
-        ],
-      }
-    `);
+    expect(normalizeQueryResult(result)).toMatchInlineSnapshot();
   });
 
   it('works for search', () => {
@@ -403,32 +179,7 @@ describe('normalizeQueryResult', () => {
       },
     ];
 
-    expect(normalizeQueryResult(result)).toMatchInlineSnapshot(`
-      Object {
-        "header": Array [
-          "dimension",
-          "value",
-          "count",
-        ],
-        "rows": Array [
-          Array [
-            "dim1",
-            "Ke$ha",
-            3,
-          ],
-          Array [
-            "dim2",
-            "Ke$haForPresident",
-            1,
-          ],
-          Array [
-            "dim1",
-            "SomethingThatContainsKe",
-            1,
-          ],
-        ],
-      }
-    `);
+    expect(normalizeQueryResult(result)).toMatchInlineSnapshot();
   });
 
   it('works for search', () => {
@@ -460,32 +211,7 @@ describe('normalizeQueryResult', () => {
       },
     ];
 
-    expect(normalizeQueryResult(result)).toMatchInlineSnapshot(`
-      Object {
-        "header": Array [
-          "dimension",
-          "value",
-          "count",
-        ],
-        "rows": Array [
-          Array [
-            "dim1",
-            "Ke$ha",
-            3,
-          ],
-          Array [
-            "dim2",
-            "Ke$haForPresident",
-            1,
-          ],
-          Array [
-            "dim1",
-            "SomethingThatContainsKe",
-            1,
-          ],
-        ],
-      }
-    `);
+    expect(normalizeQueryResult(result)).toMatchInlineSnapshot();
   });
 
   it('works for timeBoundary', () => {
@@ -499,20 +225,7 @@ describe('normalizeQueryResult', () => {
       },
     ];
 
-    expect(normalizeQueryResult(result)).toMatchInlineSnapshot(`
-      Object {
-        "header": Array [
-          "minTime",
-          "maxTime",
-        ],
-        "rows": Array [
-          Array [
-            "2013-05-09T18:24:00.000Z",
-            "2013-05-09T18:37:00.000Z",
-          ],
-        ],
-      }
-    `);
+    expect(normalizeQueryResult(result)).toMatchInlineSnapshot();
   });
 
   it('works for dataSourceMetadata', () => {
@@ -525,18 +238,7 @@ describe('normalizeQueryResult', () => {
       },
     ];
 
-    expect(normalizeQueryResult(result)).toMatchInlineSnapshot(`
-      Object {
-        "header": Array [
-          "maxIngestedEventTime",
-        ],
-        "rows": Array [
-          Array [
-            "2013-05-09T18:24:09.007Z",
-          ],
-        ],
-      }
-    `);
+    expect(normalizeQueryResult(result)).toMatchInlineSnapshot();
   });
 
   it('works for segmentMetadata', () => {
@@ -579,43 +281,43 @@ describe('normalizeQueryResult', () => {
     ];
 
     expect(normalizeQueryResult(result)).toMatchInlineSnapshot(`
-            Object {
-              "header": Array [
-                "column",
-                "type",
-                "hasMultipleValues",
-                "size",
-                "cardinality",
-                "errorMessage",
-              ],
-              "rows": Array [
-                Array [
-                  "__time",
-                  "LONG",
-                  false,
-                  407240380,
-                  null,
-                  null,
-                ],
-                Array [
-                  "dim1",
-                  "STRING",
-                  false,
-                  100000,
-                  1944,
-                  null,
-                ],
-                Array [
-                  "metric1",
-                  "FLOAT",
-                  false,
-                  100000,
-                  null,
-                  null,
-                ],
-              ],
-            }
-        `);
+      Object {
+        "header": Array [
+          "column",
+          "type",
+          "hasMultipleValues",
+          "size",
+          "cardinality",
+          "errorMessage",
+        ],
+        "rows": Array [
+          Array [
+            "__time",
+            "LONG",
+            false,
+            407240380,
+            null,
+            null,
+          ],
+          Array [
+            "dim1",
+            "STRING",
+            false,
+            100000,
+            1944,
+            null,
+          ],
+          Array [
+            "metric1",
+            "FLOAT",
+            false,
+            100000,
+            null,
+            null,
+          ],
+        ],
+      }
+  `);
   });
 
   it('works for sql', () => {
@@ -626,22 +328,22 @@ describe('normalizeQueryResult', () => {
     ];
 
     expect(normalizeQueryResult(result, false, true)).toMatchInlineSnapshot(`
-            Object {
-              "header": Array [
-                "Time",
-                "Count",
-              ],
-              "rows": Array [
-                Array [
-                  "2019-08-04T15:00:00.000Z",
-                  910,
-                ],
-                Array [
-                  "2019-08-04T16:00:00.000Z",
-                  15600,
-                ],
-              ],
-            }
-        `);
+      Object {
+        "header": Array [
+          "Time",
+          "Count",
+        ],
+        "rows": Array [
+          Array [
+            "2019-08-04T15:00:00.000Z",
+            910,
+          ],
+          Array [
+            "2019-08-04T16:00:00.000Z",
+            15600,
+          ],
+        ],
+      }
+    `);
   });
 });
