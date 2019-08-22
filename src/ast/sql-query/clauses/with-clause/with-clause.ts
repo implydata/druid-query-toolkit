@@ -16,7 +16,7 @@ import { Columns, RefExpression, Sub } from '../../../index';
 export interface WithClauseValue {
   keyword: string;
   columns: Columns;
-  asKeyWord: string;
+  asKeyword: string;
   tableName: RefExpression;
   sub: Sub;
   spacing: string[];
@@ -25,7 +25,7 @@ export interface WithClauseValue {
 export class WithClause {
   public keyword: string;
   public columns: Columns;
-  public asKeyWord: string;
+  public asKeyword: string;
   public tableName: RefExpression;
   public sub: Sub;
   public spacing: string[];
@@ -33,7 +33,7 @@ export class WithClause {
   constructor(options: WithClauseValue) {
     this.keyword = options.keyword;
     this.columns = options.columns;
-    this.asKeyWord = options.asKeyWord;
+    this.asKeyword = options.asKeyword;
     this.tableName = options.tableName;
     this.sub = options.sub;
     this.spacing = options.spacing;
@@ -56,7 +56,9 @@ export class WithClause {
     if (this.spacing[3]) {
       stringValue.push(this.spacing[3]);
     }
-    stringValue.push(')' + this.spacing[4] + this.spacing[5] + this.sub.toString());
+    stringValue.push(
+      ')' + this.spacing[4] + this.asKeyword + this.spacing[5] + this.sub.toString(),
+    );
     return stringValue.join('');
   }
 }

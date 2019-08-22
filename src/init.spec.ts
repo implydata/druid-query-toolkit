@@ -312,7 +312,7 @@ describe('Druid Query Tests', () => {
     WHERE Table.Attr1 > temporaryTable.averageValue;`,
       ).toString(),
     ).toMatchInlineSnapshot(`
-      "WITH temporaryTable (averageValue) 
+      "WITH temporaryTable (averageValue) as
           (SELECT avg(Attr1)
           FROM Table)
           SELECT Attr1
@@ -336,11 +336,39 @@ describe('Druid Query Tests', () => {
     WHERE totalSalary.total > airlineAverage.avgSalary;`,
       ).toString(),
     ).toMatchInlineSnapshot(`
-      "WITH totalSalary(Airline, total) 
+      "WITH totalSalary(Airline, total) as
           (SELECT Airline, sum(Salary)
           FROM Pilot
           GROUP BY Airline),
-          airlineAverage(avgSalary)  
+          airlineAverage(avgSalary) as 
+          (SELECT avg(total)
+          FROM totalSalary )
+          SELECT Airline
+          FROM totalSalary
+          WHERE totalSalary.total > airlineAverage.avgSalary;"
+    `);
+  });
+
+  it('test with clause', () => {
+    expect(
+      parser(
+        `WITH totalSalary(Airline, total) as
+    (SELECT Airline, sum(Salary)
+    FROM Pilot
+    GROUP BY Airline),
+    airlineAverage(avgSalary) as 
+    (SELECT avg(total)
+    FROM totalSalary )
+    SELECT Airline
+    FROM totalSalary
+    WHERE totalSalary.total > airlineAverage.avgSalary;`,
+      ).toString(),
+    ).toMatchInlineSnapshot(`
+      "WITH totalSalary(Airline, total) as
+          (SELECT Airline, sum(Salary)
+          FROM Pilot
+          GROUP BY Airline),
+          airlineAverage(avgSalary) as 
           (SELECT avg(total)
           FROM totalSalary )
           SELECT Airline
