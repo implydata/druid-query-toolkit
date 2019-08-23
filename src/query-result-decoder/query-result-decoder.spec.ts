@@ -404,31 +404,31 @@ describe('normalizeQueryResult', () => {
     ];
 
     expect(normalizeQueryResult(result)).toMatchInlineSnapshot(`
-            Object {
-              "header": Array [
-                "dimension",
-                "value",
-                "count",
-              ],
-              "rows": Array [
-                Array [
-                  "dim1",
-                  "Ke$ha",
-                  3,
-                ],
-                Array [
-                  "dim2",
-                  "Ke$haForPresident",
-                  1,
-                ],
-                Array [
-                  "dim1",
-                  "SomethingThatContainsKe",
-                  1,
-                ],
-              ],
-            }
-        `);
+      Object {
+        "header": Array [
+          "dimension",
+          "value",
+          "count",
+        ],
+        "rows": Array [
+          Array [
+            "dim1",
+            "Ke$ha",
+            3,
+          ],
+          Array [
+            "dim2",
+            "Ke$haForPresident",
+            1,
+          ],
+          Array [
+            "dim1",
+            "SomethingThatContainsKe",
+            1,
+          ],
+        ],
+      }
+    `);
   });
 
   it('works for search', () => {
@@ -461,31 +461,31 @@ describe('normalizeQueryResult', () => {
     ];
 
     expect(normalizeQueryResult(result)).toMatchInlineSnapshot(`
-            Object {
-              "header": Array [
-                "dimension",
-                "value",
-                "count",
-              ],
-              "rows": Array [
-                Array [
-                  "dim1",
-                  "Ke$ha",
-                  3,
-                ],
-                Array [
-                  "dim2",
-                  "Ke$haForPresident",
-                  1,
-                ],
-                Array [
-                  "dim1",
-                  "SomethingThatContainsKe",
-                  1,
-                ],
-              ],
-            }
-        `);
+      Object {
+        "header": Array [
+          "dimension",
+          "value",
+          "count",
+        ],
+        "rows": Array [
+          Array [
+            "dim1",
+            "Ke$ha",
+            3,
+          ],
+          Array [
+            "dim2",
+            "Ke$haForPresident",
+            1,
+          ],
+          Array [
+            "dim1",
+            "SomethingThatContainsKe",
+            1,
+          ],
+        ],
+      }
+    `);
   });
 
   it('works for timeBoundary', () => {
@@ -500,19 +500,19 @@ describe('normalizeQueryResult', () => {
     ];
 
     expect(normalizeQueryResult(result)).toMatchInlineSnapshot(`
-            Object {
-              "header": Array [
-                "minTime",
-                "maxTime",
-              ],
-              "rows": Array [
-                Array [
-                  "2013-05-09T18:24:00.000Z",
-                  "2013-05-09T18:37:00.000Z",
-                ],
-              ],
-            }
-        `);
+      Object {
+        "header": Array [
+          "minTime",
+          "maxTime",
+        ],
+        "rows": Array [
+          Array [
+            "2013-05-09T18:24:00.000Z",
+            "2013-05-09T18:37:00.000Z",
+          ],
+        ],
+      }
+   `);
   });
 
   it('works for dataSourceMetadata', () => {
@@ -526,17 +526,17 @@ describe('normalizeQueryResult', () => {
     ];
 
     expect(normalizeQueryResult(result)).toMatchInlineSnapshot(`
-            Object {
-              "header": Array [
-                "maxIngestedEventTime",
-              ],
-              "rows": Array [
-                Array [
-                  "2013-05-09T18:24:09.007Z",
-                ],
-              ],
-            }
-        `);
+      Object {
+        "header": Array [
+          "maxIngestedEventTime",
+        ],
+        "rows": Array [
+          Array [
+            "2013-05-09T18:24:09.007Z",
+          ],
+        ],
+      }
+    `);
   });
 
   it('works for segmentMetadata', () => {
@@ -579,43 +579,43 @@ describe('normalizeQueryResult', () => {
     ];
 
     expect(normalizeQueryResult(result)).toMatchInlineSnapshot(`
-            Object {
-              "header": Array [
-                "column",
-                "type",
-                "hasMultipleValues",
-                "size",
-                "cardinality",
-                "errorMessage",
-              ],
-              "rows": Array [
-                Array [
-                  "__time",
-                  "LONG",
-                  false,
-                  407240380,
-                  null,
-                  null,
-                ],
-                Array [
-                  "dim1",
-                  "STRING",
-                  false,
-                  100000,
-                  1944,
-                  null,
-                ],
-                Array [
-                  "metric1",
-                  "FLOAT",
-                  false,
-                  100000,
-                  null,
-                  null,
-                ],
-              ],
-            }
-        `);
+      Object {
+        "header": Array [
+          "column",
+          "type",
+          "hasMultipleValues",
+          "size",
+          "cardinality",
+          "errorMessage",
+        ],
+        "rows": Array [
+          Array [
+            "__time",
+            "LONG",
+            false,
+            407240380,
+            null,
+            null,
+          ],
+          Array [
+            "dim1",
+            "STRING",
+            false,
+            100000,
+            1944,
+            null,
+          ],
+          Array [
+            "metric1",
+            "FLOAT",
+            false,
+            100000,
+            null,
+            null,
+          ],
+        ],
+      }
+    `);
   });
 
   it('works for sql', () => {
@@ -626,22 +626,22 @@ describe('normalizeQueryResult', () => {
     ];
 
     expect(normalizeQueryResult(result, false, true)).toMatchInlineSnapshot(`
-            Object {
-              "header": Array [
-                "Time",
-                "Count",
-              ],
-              "rows": Array [
-                Array [
-                  "2019-08-04T15:00:00.000Z",
-                  910,
-                ],
-                Array [
-                  "2019-08-04T16:00:00.000Z",
-                  15600,
-                ],
-              ],
-            }
-        `);
+      Object {
+        "header": Array [
+          "Time",
+          "Count",
+        ],
+        "rows": Array [
+          Array [
+            "2019-08-04T15:00:00.000Z",
+            910,
+          ],
+          Array [
+            "2019-08-04T16:00:00.000Z",
+            15600,
+          ],
+        ],
+      }
+   `);
   });
 });
