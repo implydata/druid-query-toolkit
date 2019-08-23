@@ -377,3 +377,70 @@ describe('Druid Query Tests', () => {
     `);
   });
 });
+describe('Special function tests', () => {
+  it('Test TRIM with BOTH', () => {
+    expect(
+      parser(`SELECT
+  "language",
+  TRIM(BOTH 'A' FROM "language") AS "Count", COUNT(DISTINCT "language") AS "dist_language", COUNT(*) FILTER (WHERE "language"= 'xxx') AS "language_filtered_count"
+FROM "github"
+WHERE "__time" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY AND "language" != 'TypeScript'
+GROUP BY 1
+HAVING "Count" != 37392
+ORDER BY "Count" DESC`).toString(),
+    ).toMatchInlineSnapshot(`
+      "SELECT
+        \\"language\\",
+        TRIM(BOTH 'A' FROM \\"language\\") AS \\"Count\\", COUNT(DISTINCT \\"language\\") AS \\"dist_language\\", COUNT(*) FILTER (WHERE \\"language\\"= 'xxx') AS \\"language_filtered_count\\"
+      FROM \\"github\\"
+      WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY AND \\"language\\" != 'TypeScript'
+      GROUP BY 1
+      HAVING \\"Count\\" != 37392
+      ORDER BY \\"Count\\" DESC"
+    `);
+  });
+
+  it('Test TRIM with LEADING', () => {
+    expect(
+      parser(`SELECT
+  "language",
+  TRIM(LEADING 'A' FROM "language") AS "Count", COUNT(DISTINCT "language") AS "dist_language", COUNT(*) FILTER (WHERE "language"= 'xxx') AS "language_filtered_count"
+FROM "github"
+WHERE "__time" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY AND "language" != 'TypeScript'
+GROUP BY 1
+HAVING "Count" != 37392
+ORDER BY "Count" DESC`).toString(),
+    ).toMatchInlineSnapshot(`
+      "SELECT
+        \\"language\\",
+        TRIM(LEADING 'A' FROM \\"language\\") AS \\"Count\\", COUNT(DISTINCT \\"language\\") AS \\"dist_language\\", COUNT(*) FILTER (WHERE \\"language\\"= 'xxx') AS \\"language_filtered_count\\"
+      FROM \\"github\\"
+      WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY AND \\"language\\" != 'TypeScript'
+      GROUP BY 1
+      HAVING \\"Count\\" != 37392
+      ORDER BY \\"Count\\" DESC"
+    `);
+  });
+
+  it('Test TRIM with TRAILING', () => {
+    expect(
+      parser(`SELECT
+  "language",
+  TRIM(TRAILING 'A' FROM "language") AS "Count", COUNT(DISTINCT "language") AS "dist_language", COUNT(*) FILTER (WHERE "language"= 'xxx') AS "language_filtered_count"
+FROM "github"
+WHERE "__time" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY AND "language" != 'TypeScript'
+GROUP BY 1
+HAVING "Count" != 37392
+ORDER BY "Count" DESC`).toString(),
+    ).toMatchInlineSnapshot(`
+      "SELECT
+        \\"language\\",
+        TRIM(TRAILING 'A' FROM \\"language\\") AS \\"Count\\", COUNT(DISTINCT \\"language\\") AS \\"dist_language\\", COUNT(*) FILTER (WHERE \\"language\\"= 'xxx') AS \\"language_filtered_count\\"
+      FROM \\"github\\"
+      WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY AND \\"language\\" != 'TypeScript'
+      GROUP BY 1
+      HAVING \\"Count\\" != 37392
+      ORDER BY \\"Count\\" DESC"
+    `);
+  });
+});

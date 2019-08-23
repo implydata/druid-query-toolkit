@@ -50,3 +50,4 @@ export * from './sql-query/helpers';
 export * from './sql-query/basic-expression/timestamp';
 export * from './sql-query/clauses/with-clause/with-clause';
 export * from './sql-query/clauses/with-clause/with-clauses';
+export * from './sql-query/basic-expression/function-call/special-function-inner-arguments';
