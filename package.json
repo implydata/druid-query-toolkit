@@ -62,19 +62,15 @@
     "tslib": "^1.10.0"
   },
   "devDependencies": {
-    "@jest/core": "24.5.0",
-    "@types/jest": "^24.0.17",
+    "@jest/core": "24.9.0",
+    "@types/jest": "^24.0.18",
     "awesome-code-style": "^1.4.3",
-    "core-js": "^3.1.4",
-    "husky": "^3.0.2",
-    "jest": "24.5.0",
-    "jest-cli": "24.5.0",
-    "jest-resolve-dependencies": "24.5.0",
-    "jest-runtime": "24.5.0",
-    "jest-snapshot": "24.5.0",
+    "core-js": "^3.2.1",
+    "husky": "^3.0.4",
+    "jest": "^24.9.0",
     "pegjs": "^0.10.0",
     "ts-jest": "^24.0.2",
-    "tslint": "^5.18.0",
+    "tslint": "^5.19.0",
     "typescript": "^3.5.3"
   }
 }

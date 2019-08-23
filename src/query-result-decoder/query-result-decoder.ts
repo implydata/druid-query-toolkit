@@ -50,13 +50,13 @@ function fromObjectArray(array: Record<string, any>[], ignoreFirstEvent?: boolea
 }
 
 export function normalizeQueryResult(
-  result: unknown,
+  data: unknown,
   includeTimestampIfExists?: boolean,
   firstRowHeader?: boolean,
 ): HeaderRows {
-  if (typeof result === 'string') {
+  if (typeof data === 'string') {
     try {
-      result = result
+      data = data
         .trim()
         .split('\n')
         .map(line => JSON.parse(line));
@@ -65,20 +65,20 @@ export function normalizeQueryResult(
     }
   }
 
-  if (Array.isArray(result)) {
-    const firstRow = result[0];
+  if (Array.isArray(data)) {
+    const firstRow = data[0];
     if (!firstRow) return { header: [], rows: [] };
 
     if (Array.isArray(firstRow)) {
       if (firstRowHeader) {
         return {
           header: firstRow,
-          rows: result.slice(1),
+          rows: data.slice(1),
         };
       } else {
         return {
           header: firstRow.map((_d, i) => String(i)),
-          rows: result,
+          rows: data,
         };
       }
     }
@@ -91,6 +91,15 @@ export function normalizeQueryResult(
       const firstRowResult = firstRow.result;
 
       if (isObject(firstRowResult)) {
+        // bySegment like
+        if (Array.isArray(firstRowResult.results)) {
+          return normalizeQueryResult(
+            data.flatMap(d => d.result.results),
+            includeTimestampIfExists,
+            firstRowHeader,
+          );
+        }
+
         // select like
         if (
           isObject(firstRowResult.pagingIdentifiers) &&
@@ -104,7 +113,7 @@ export function normalizeQueryResult(
           );
           return {
             header: selectHeader,
-            rows: result.flatMap(r =>
+            rows: data.flatMap(r =>
               r.result.events.map((r: { event: Record<string, any> }) =>
                 selectHeader.map(h => r.event[h]),
               ),
@@ -116,7 +125,7 @@ export function normalizeQueryResult(
         const header = Object.keys(firstRowResult);
         return {
           header: includeTimestampIfExists ? ['timestamp'].concat(header) : header,
-          rows: result.map((r: Record<string, any>) => {
+          rows: data.map((r: Record<string, any>) => {
             const { timestamp, result } = r;
             const rest = header.map(h => result[h]);
             return includeTimestampIfExists ? [timestamp].concat(rest) : rest;
@@ -126,12 +135,12 @@ export function normalizeQueryResult(
 
       // topN like
       if (Array.isArray(firstRowResult)) {
-        const firstSubRow = result.find(r => r.result[0]);
+        const firstSubRow = data.find(r => r.result[0]);
         if (!firstSubRow) return { header: [], rows: [] };
         const header = Object.keys(firstSubRow.result[0]);
         return {
           header: includeTimestampIfExists ? ['timestamp'].concat(header) : header,
-          rows: result.flatMap((r: Record<string, any>) => {
+          rows: data.flatMap((r: Record<string, any>) => {
             const { timestamp, result } = r;
             return result.map((subResult: Record<string, any>) => {
               const rest = header.map(h => subResult[h]);
@@ -147,7 +156,7 @@ export function normalizeQueryResult(
       const header = Object.keys(firstRow.event);
       return {
         header: includeTimestampIfExists ? ['timestamp'].concat(header) : header,
-        rows: result.map((r: Record<string, any>) => {
+        rows: data.map((r: Record<string, any>) => {
           const { timestamp, event } = r;
           const rest = header.map(h => event[h]);
           return includeTimestampIfExists ? [timestamp].concat(rest) : rest;
@@ -158,7 +167,7 @@ export function normalizeQueryResult(
     // scan like
     if (Array.isArray(firstRow.columns) && Array.isArray(firstRow.events)) {
       const header: string[] = firstRow.columns;
-      const firstSubRow = result.find(r => r.events[0]);
+      const firstSubRow = data.find(r => r.events[0]);
       if (!firstSubRow) return { header, rows: [] };
       const firstSubRowEvents = Object.keys(firstSubRow.events[0]);
 
@@ -166,7 +175,7 @@ export function normalizeQueryResult(
       if (Array.isArray(firstSubRowEvents)) {
         return {
           header,
-          rows: result.flatMap(({ events }) => events),
+          rows: data.flatMap(({ events }) => events),
         };
       }
 
@@ -174,7 +183,7 @@ export function normalizeQueryResult(
       if (Array.isArray(firstSubRowEvents)) {
         return {
           header,
-          rows: result.flatMap(({ events }) => header.map(h => events[h])),
+          rows: data.flatMap(({ events }) => header.map(h => events[h])),
         };
       }
 
@@ -183,14 +192,14 @@ export function normalizeQueryResult(
 
     // segmentMetadata like
     if (typeof firstRow.id === 'string' && isObject(firstRow.columns)) {
-      const flatArray = result.flatMap(({ columns }) =>
+      const flatArray = data.flatMap(({ columns }) =>
         Object.keys(columns).map(k => Object.assign({ column: k }, columns[k])),
       );
       return fromObjectArray(flatArray);
     }
 
     // sql object mode like
-    return fromObjectArray(result, firstRowHeader);
+    return fromObjectArray(data, firstRowHeader);
   }
 
   throw new Error('unrecognizable query return shape, not an array');
