@@ -512,7 +512,7 @@ describe('normalizeQueryResult', () => {
           ],
         ],
       }
-  `);
+    `);
   });
 
   it('works for dataSourceMetadata', () => {
@@ -642,6 +642,6 @@ describe('normalizeQueryResult', () => {
           ],
         ],
       }
-  `);
+    `);
   });
 });
