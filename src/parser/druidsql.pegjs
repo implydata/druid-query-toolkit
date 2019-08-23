@@ -571,12 +571,47 @@ Function
         spacing:[spacing0,(distinct? distinct[1] : ''), spacing1, (filterClause ? filterClause[0] : null)]
        });
     }
+    /
+    fn:(TrimToken)
+       OpenParen
+       spacing0:_?
+       value: SpecialFunction
+       spacing1:_?
+       CloseParen
+       filterClause:(_ FilterClause)?
+        {
+          return new Function({
+            parens : [],
+            fn: fn,
+            value: value,
+            spacing:[spacing0, spacing1, (filterClause ? filterClause[0] : null)],
+            filterClause: filterClause ? filterClause[1] : null,
+           });
+        }
     /open: (OpenParen _?)
     ex:Function
     close: (_? CloseParen)
     {
      return ex.addParen(open,close);
     }
+
+SpecialFunction
+  = keyWord: (BothToken/TrailingToken/LeadingToken)
+  spacing0: _
+  chars: (String/RefExpression)
+  spacing1: _
+  fromKeyWord: FromToken
+  spacing2: _
+  ex: OrExpression
+  {
+    return new SpecialFunctionInnerArguments({
+       keyWord: keyWord,
+       chars: chars,
+       fromKeyWord: fromKeyWord,
+       ex: ex,
+       spacing: [spacing0, spacing1, spacing2]
+    });
+  }
 
 FilterClause
   = keyword: FilterToken
@@ -895,3 +930,8 @@ IntervalToken = keyword:"INTERVAL"i { return keyword}
 DayToken = keyword:"DAY"i { return keyword}
 TimestampToken = keyword:"TIMESTAMP"i { return keyword}
 WithToken = keyword:"WITH"i { return keyword}
+TrimToken = keyword:"TRIM"i { return keyword}
+BothToken = keyword:"BOTH"i { return keyword}
+TrailingToken = keyword:"TRAILING"i { return keyword}
+LeadingToken = keyword:"LEADING"i { return keyword}
+

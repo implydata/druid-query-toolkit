@@ -48,6 +48,7 @@ var Interval = ast.Interval;
 var Timestamp = ast.Timestamp;
 var WithClause = ast.WithClause;
 var WithClauses = ast.WithClauses;
+var SpecialFunctionInnerArguments = ast.SpecialFunctionInnerArguments;
 
 function sqlParserFactory(functions) {
 var p =

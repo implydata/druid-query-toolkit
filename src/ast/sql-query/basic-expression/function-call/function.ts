@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { FilterClause, OrExpression } from '../../../index';
+import { FilterClause, OrExpression, SpecialFunctionInnerArguments } from '../../../index';
 import { Parens } from '../../helpers';
 
 export interface FunctionValue {
@@ -24,16 +24,26 @@ export interface FunctionValue {
   filterClause?: FilterClause;
 }
 
+export interface SpecialFunctionValue {
+  parens: Parens[];
+  fn: string;
+  value: SpecialFunctionInnerArguments;
+  spacing: string[];
+  distinct?: string;
+  filterClause?: FilterClause;
+  argumentSpacing: string[];
+}
+
 export class Function {
   public parens: Parens[];
   public fn: any;
   public value: any[];
   public spacing: string[];
-  public distinct?: any;
+  public distinct?: string;
   public filterClause?: FilterClause;
   public argumentSpacing: string[];
 
-  constructor(options: FunctionValue) {
+  constructor(options: FunctionValue | SpecialFunctionValue) {
     this.parens = options.parens;
     this.fn = options.fn;
     this.value = options.value;
@@ -49,15 +59,19 @@ export class Function {
       val.push(paren.open[0] + (paren.open[1] ? paren.open[1] : ''));
     });
     val.push(this.fn + '(' + (this.spacing[0] ? this.spacing[0] : ''));
-    if (this.distinct) {
-      val.push(this.distinct + this.spacing[1]);
-    }
-    this.value.map((value, index: number) => {
-      val.push(value instanceof OrExpression ? value.toString() : value);
-      if (index < this.value.length - 1 && this.argumentSpacing[index]) {
-        val.push(',' + this.argumentSpacing[index]);
+    if (this.value instanceof SpecialFunctionInnerArguments) {
+      val.push(this.value.toString());
+    } else {
+      if (this.distinct) {
+        val.push(this.distinct + this.spacing[1]);
       }
-    });
+      this.value.map((value, index: number) => {
+        val.push(value instanceof OrExpression ? value.toString() : value);
+        if (index < this.value.length - 1 && this.argumentSpacing[index]) {
+          val.push(',' + this.argumentSpacing[index]);
+        }
+      });
+    }
     val.push((this.spacing[2] ? this.spacing[2] : '') + ')');
     if (this.filterClause) {
       val.push(this.spacing[3] + this.filterClause.toString());

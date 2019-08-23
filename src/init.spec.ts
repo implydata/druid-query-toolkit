@@ -263,20 +263,20 @@ describe('Druid Query Tests', () => {
           'GROUP BY 1 \n;',
       ).toString(),
     ).toMatchInlineSnapshot(`
-      " 
-      SELECT
-        datasource,
-        COUNT(*) FILTER (WHERE (is_published = 1 AND is_overshadowed = 0) OR is_realtime = 1) AS num_segments,
-        COUNT(*) FILTER (WHERE is_available = 1 AND ((is_published = 1 AND is_overshadowed = 0) OR is_realtime = 1)) AS num_available_segments,
-        COUNT(*) FILTER (WHERE is_published = 1 AND is_overshadowed = 0 AND is_available = 0) AS num_segments_to_load,
-        COUNT(*) FILTER (WHERE is_available = 1 AND NOT ((is_published = 1 AND is_overshadowed = 0) OR is_realtime = 1)) AS num_segments_to_drop,
-        SUM(\\"size\\") FILTER (WHERE (is_published = 1 AND is_overshadowed = 0) OR is_realtime = 1) AS size,
-        SUM(\\"size\\" * \\"num_replicas\\") FILTER (WHERE (is_published = 1 AND is_overshadowed = 0) OR is_realtime = 1) AS replicated_size,
-        SUM(\\"num_rows\\") FILTER (WHERE (is_published = 1 AND is_overshadowed = 0) OR is_realtime = 1) AS num_rows
-      FROM sys.segments
-      GROUP BY 1 
-      ;"
-    `);
+                                    " 
+                                    SELECT
+                                      datasource,
+                                      COUNT(*) FILTER (WHERE (is_published = 1 AND is_overshadowed = 0) OR is_realtime = 1) AS num_segments,
+                                      COUNT(*) FILTER (WHERE is_available = 1 AND ((is_published = 1 AND is_overshadowed = 0) OR is_realtime = 1)) AS num_available_segments,
+                                      COUNT(*) FILTER (WHERE is_published = 1 AND is_overshadowed = 0 AND is_available = 0) AS num_segments_to_load,
+                                      COUNT(*) FILTER (WHERE is_available = 1 AND NOT ((is_published = 1 AND is_overshadowed = 0) OR is_realtime = 1)) AS num_segments_to_drop,
+                                      SUM(\\"size\\") FILTER (WHERE (is_published = 1 AND is_overshadowed = 0) OR is_realtime = 1) AS size,
+                                      SUM(\\"size\\" * \\"num_replicas\\") FILTER (WHERE (is_published = 1 AND is_overshadowed = 0) OR is_realtime = 1) AS replicated_size,
+                                      SUM(\\"num_rows\\") FILTER (WHERE (is_published = 1 AND is_overshadowed = 0) OR is_realtime = 1) AS num_rows
+                                    FROM sys.segments
+                                    GROUP BY 1 
+                                    ;"
+                        `);
   });
 
   it('parsers the default data sources query to string with spaces', () => {
@@ -291,14 +291,14 @@ describe('Druid Query Tests', () => {
           'ORDER BY "Time" ASC',
       ).toString(),
     ).toMatchInlineSnapshot(`
-      "SELECT
-        \\"comments\\", TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
-        COUNT(*) AS \\"Count\\", SUM(\\"comments\\") AS \\"sum_comments\\"
-      FROM \\"github\\"
-      WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY AND \\"commits\\" > 100
-      GROUP BY 1,2
-      ORDER BY \\"Time\\" ASC"
-    `);
+                                    "SELECT
+                                      \\"comments\\", TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
+                                      COUNT(*) AS \\"Count\\", SUM(\\"comments\\") AS \\"sum_comments\\"
+                                    FROM \\"github\\"
+                                    WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY AND \\"commits\\" > 100
+                                    GROUP BY 1,2
+                                    ORDER BY \\"Time\\" ASC"
+                        `);
   });
 
   it('test with clause', () => {
@@ -312,13 +312,13 @@ describe('Druid Query Tests', () => {
     WHERE Table.Attr1 > temporaryTable.averageValue;`,
       ).toString(),
     ).toMatchInlineSnapshot(`
-      "WITH temporaryTable (averageValue) as
-          (SELECT avg(Attr1)
-          FROM Table)
-          SELECT Attr1
-          FROM Table
-          WHERE Table.Attr1 > temporaryTable.averageValue;"
-    `);
+                                    "WITH temporaryTable (averageValue) as
+                                        (SELECT avg(Attr1)
+                                        FROM Table)
+                                        SELECT Attr1
+                                        FROM Table
+                                        WHERE Table.Attr1 > temporaryTable.averageValue;"
+                        `);
   });
 
   it('test with clause', () => {
@@ -336,17 +336,17 @@ describe('Druid Query Tests', () => {
     WHERE totalSalary.total > airlineAverage.avgSalary;`,
       ).toString(),
     ).toMatchInlineSnapshot(`
-      "WITH totalSalary(Airline, total) as
-          (SELECT Airline, sum(Salary)
-          FROM Pilot
-          GROUP BY Airline),
-          airlineAverage(avgSalary) as 
-          (SELECT avg(total)
-          FROM totalSalary )
-          SELECT Airline
-          FROM totalSalary
-          WHERE totalSalary.total > airlineAverage.avgSalary;"
-    `);
+                                    "WITH totalSalary(Airline, total) as
+                                        (SELECT Airline, sum(Salary)
+                                        FROM Pilot
+                                        GROUP BY Airline),
+                                        airlineAverage(avgSalary) as 
+                                        (SELECT avg(total)
+                                        FROM totalSalary )
+                                        SELECT Airline
+                                        FROM totalSalary
+                                        WHERE totalSalary.total > airlineAverage.avgSalary;"
+                        `);
   });
 
   it('test with clause', () => {
@@ -364,16 +364,83 @@ describe('Druid Query Tests', () => {
     WHERE totalSalary.total > airlineAverage.avgSalary;`,
       ).toString(),
     ).toMatchInlineSnapshot(`
-      "WITH totalSalary(Airline, total) as
-          (SELECT Airline, sum(Salary)
-          FROM Pilot
-          GROUP BY Airline),
-          airlineAverage(avgSalary) as 
-          (SELECT avg(total)
-          FROM totalSalary )
-          SELECT Airline
-          FROM totalSalary
-          WHERE totalSalary.total > airlineAverage.avgSalary;"
+                                    "WITH totalSalary(Airline, total) as
+                                        (SELECT Airline, sum(Salary)
+                                        FROM Pilot
+                                        GROUP BY Airline),
+                                        airlineAverage(avgSalary) as 
+                                        (SELECT avg(total)
+                                        FROM totalSalary )
+                                        SELECT Airline
+                                        FROM totalSalary
+                                        WHERE totalSalary.total > airlineAverage.avgSalary;"
+                        `);
+  });
+});
+describe('Special function tests', () => {
+  it('Test TRIM with BOTH', () => {
+    expect(
+      parser(`SELECT
+  "language",
+  TRIM(BOTH 'A' FROM "language") AS "Count", COUNT(DISTINCT "language") AS "dist_language", COUNT(*) FILTER (WHERE "language"= 'xxx') AS "language_filtered_count"
+FROM "github"
+WHERE "__time" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY AND "language" != 'TypeScript'
+GROUP BY 1
+HAVING "Count" != 37392
+ORDER BY "Count" DESC`).toString(),
+    ).toMatchInlineSnapshot(`
+      "SELECT
+        \\"language\\",
+        TRIM(BOTH 'A' FROM \\"language\\") AS \\"Count\\", COUNT(DISTINCT \\"language\\") AS \\"dist_language\\", COUNT(*) FILTER (WHERE \\"language\\"= 'xxx') AS \\"language_filtered_count\\"
+      FROM \\"github\\"
+      WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY AND \\"language\\" != 'TypeScript'
+      GROUP BY 1
+      HAVING \\"Count\\" != 37392
+      ORDER BY \\"Count\\" DESC"
+    `);
+  });
+
+  it('Test TRIM with LEADING', () => {
+    expect(
+      parser(`SELECT
+  "language",
+  TRIM(LEADING 'A' FROM "language") AS "Count", COUNT(DISTINCT "language") AS "dist_language", COUNT(*) FILTER (WHERE "language"= 'xxx') AS "language_filtered_count"
+FROM "github"
+WHERE "__time" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY AND "language" != 'TypeScript'
+GROUP BY 1
+HAVING "Count" != 37392
+ORDER BY "Count" DESC`).toString(),
+    ).toMatchInlineSnapshot(`
+            "SELECT
+              \\"language\\",
+              TRIM(LEADING 'A' FROM \\"language\\") AS \\"Count\\", COUNT(DISTINCT \\"language\\") AS \\"dist_language\\", COUNT(*) FILTER (WHERE \\"language\\"= 'xxx') AS \\"language_filtered_count\\"
+            FROM \\"github\\"
+            WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY AND \\"language\\" != 'TypeScript'
+            GROUP BY 1
+            HAVING \\"Count\\" != 37392
+            ORDER BY \\"Count\\" DESC"
+        `);
+  });
+
+  it('Test TRIM with TRAILING', () => {
+    expect(
+      parser(`SELECT
+  "language",
+  TRIM(TRAILING 'A' FROM "language") AS "Count", COUNT(DISTINCT "language") AS "dist_language", COUNT(*) FILTER (WHERE "language"= 'xxx') AS "language_filtered_count"
+FROM "github"
+WHERE "__time" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY AND "language" != 'TypeScript'
+GROUP BY 1
+HAVING "Count" != 37392
+ORDER BY "Count" DESC`).toString(),
+    ).toMatchInlineSnapshot(`
+      "SELECT
+        \\"language\\",
+        TRIM(TRAILING 'A' FROM \\"language\\") AS \\"Count\\", COUNT(DISTINCT \\"language\\") AS \\"dist_language\\", COUNT(*) FILTER (WHERE \\"language\\"= 'xxx') AS \\"language_filtered_count\\"
+      FROM \\"github\\"
+      WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY AND \\"language\\" != 'TypeScript'
+      GROUP BY 1
+      HAVING \\"Count\\" != 37392
+      ORDER BY \\"Count\\" DESC"
     `);
   });
 });

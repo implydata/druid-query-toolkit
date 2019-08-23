@@ -18,17 +18,8 @@ const parser = sqlParserFactory(FUNCTIONS);
 
 describe.skip('Playground', () => {
   it('basic', () => {
-    expect(
-      parser(`WITH totalSalary(Airline, total) as
-    (SELECT Airline, sum(Salary)
-    FROM Pilot
-    GROUP BY Airline),
-    airlineAverage(avgSalary) as 
-    (SELECT avg(total)
-    FROM totalSalary )
-    SELECT Airline
-    FROM totalSalary
-    WHERE totalSalary.total > airlineAverage.avgSalary;`).toString(),
-    ).toMatchInlineSnapshot();
+    expect(parser(`TRIM( TRAILING 'M' FROM 'MADAM')`).toString()).toMatchInlineSnapshot(
+      `"TRIM( TRAILING 'M' undefined 'MADAM')"`,
+    );
   });
 });
