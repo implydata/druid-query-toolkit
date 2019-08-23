@@ -575,7 +575,7 @@ Function
     fn:(TrimToken)
        OpenParen
        spacing0:_?
-       value: SpecialFunction
+       value: SpecialFunctionInnerArguments
        spacing1:_?
        CloseParen
        filterClause:(_ FilterClause)?
@@ -595,7 +595,7 @@ Function
      return ex.addParen(open,close);
     }
 
-SpecialFunction
+SpecialFunctionInnerArguments
   = keyWord: (BothToken/TrailingToken/LeadingToken)
   spacing0: _
   chars: (String/RefExpression)
