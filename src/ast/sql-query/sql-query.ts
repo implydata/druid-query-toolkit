@@ -49,6 +49,7 @@ import {
 } from '../index';
 
 import { arrayContains, getColumns } from './helpers';
+
 export interface SqlQueryValue {
   verb: string;
   distinct: string;
@@ -137,7 +138,7 @@ export class SqlQuery extends BaseAst {
     const columns: Column[] = [];
     const spacing: string[] = [];
 
-    this.columns.columns.map((column, index) => {
+    this.columns.columns.forEach((column, index) => {
       if (column.getAlias()) {
         const alias = column.getAlias();
         if (alias) {
@@ -160,7 +161,8 @@ export class SqlQuery extends BaseAst {
       spacing: spacing,
       parens: this.columns.parens,
     });
-    const query = new SqlQuery({
+
+    return new SqlQuery({
       columns: columnsArray,
       distinct: this.distinct,
       withClause: this.withClause,
@@ -173,7 +175,10 @@ export class SqlQuery extends BaseAst {
       verb: this.verb,
       whereClause: this.whereClause,
     });
-    return query;
+  }
+
+  hasGroupBy(): boolean {
+    return Boolean(this.groupByClause);
   }
 
   addFunctionToGroupBy(
@@ -345,7 +350,7 @@ export class SqlQuery extends BaseAst {
     const orderByArray: OrderByPart[] = [];
     const spacing = [this.orderByClause.spacing[0], this.orderByClause.spacing[1]];
 
-    orderByClause.orderBy.map((filter, index) => {
+    orderByClause.orderBy.forEach((filter, index) => {
       if (filter.orderBy.getBasicValue() !== columnVal && this.orderByClause) {
         orderByArray.push(filter);
         spacing.push(this.orderByClause.spacing[2 + index]);
@@ -357,7 +362,7 @@ export class SqlQuery extends BaseAst {
       return orderByClause;
     }
 
-    return undefined;
+    return;
   }
 
   getGroupByClauseWithoutColumn(columnVal: string): GroupByClause | undefined {
@@ -377,7 +382,7 @@ export class SqlQuery extends BaseAst {
     if (this.groupByClause.groupBy.length > 1) {
       const newGroupByColumns: any[] = [];
 
-      groupByColumns.map((groupByColumn, index) => {
+      groupByColumns.forEach((groupByColumn, index) => {
         // if grouping column is a number and the column to be removed is less than that column decrease the value of the grouping column by 1
         if (this.getColumnsArray().indexOf(columnVal) + 1 < Number(groupByColumn)) {
           newGroupByColumns.push(new NumberType(Number(groupByColumn) - 1));
@@ -395,6 +400,7 @@ export class SqlQuery extends BaseAst {
           }
         }
       });
+
       groupByClause = new GroupByClause({
         groupBy: newGroupByColumns,
         groupKeyword: this.groupByClause.groupKeyword,
@@ -660,6 +666,7 @@ export class SqlQuery extends BaseAst {
 
   getCurrentFilters(): string[] {
     if (!this.whereClause) return [];
+
     if (this.whereClause.filter instanceof AndExpression) {
       return this.whereClause.filter.ex.flatMap(expression => {
         if (expression instanceof ComparisonExpression) {
@@ -682,6 +689,7 @@ export class SqlQuery extends BaseAst {
         return [];
       });
     }
+
     if (this.whereClause.filter instanceof ComparisonExpression) {
       const filteredColumns: string[] = [];
       if (
@@ -703,6 +711,10 @@ export class SqlQuery extends BaseAst {
     }
 
     return [];
+  }
+
+  hasFilterForColumn(column: string): boolean {
+    return this.getCurrentFilters().includes(column);
   }
 
   removeFilter(column: string): SqlQuery {
@@ -754,6 +766,7 @@ export class SqlQuery extends BaseAst {
         }
       }
     }
+
     return new SqlQuery({
       columns: this.columns,
       distinct: this.distinct,
@@ -794,9 +807,10 @@ export class SqlQuery extends BaseAst {
     if (!this.groupByClause) {
       return;
     }
+
     const aggregateColumns: string[] = [];
     const groupByColumns = this.groupByClause.groupBy.map(part => part.getBasicValue());
-    this.columns.columns.map((column, index) => {
+    this.columns.columns.forEach((column, index) => {
       index = index + 1;
       if (column.getAlias()) {
         const alias = column.getAlias();
@@ -820,6 +834,7 @@ export class SqlQuery extends BaseAst {
         aggregateColumns.push(column.getBasicValue());
       }
     });
+
     return aggregateColumns;
   }
 
