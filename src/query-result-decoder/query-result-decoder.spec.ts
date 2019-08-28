@@ -63,7 +63,7 @@ describe('normalizeQueryResult', () => {
     `);
   });
 
-  it('works for groupBy (no timestamp)', () => {
+  it('works for groupBy', () => {
     const result = [
       {
         version: 'v1',
@@ -119,6 +119,50 @@ describe('normalizeQueryResult', () => {
             304920,
             "#ar.wikipedia",
             2329,
+          ],
+        ],
+      }
+    `);
+  });
+
+  it('works for groupBy bySegment', () => {
+    const result = [
+      {
+        timestamp: '2016-06-27T00:00:00.000Z',
+        result: {
+          results: [
+            {
+              version: 'v1',
+              timestamp: '-146136543-09-08T08:23:32.096Z',
+              event: { d0: '#ar.wikipedia', a0: 335 },
+            },
+            {
+              version: 'v1',
+              timestamp: '-146136543-09-08T08:23:32.096Z',
+              event: { d0: '#be.wikipedia', a0: 15 },
+            },
+          ],
+          segment:
+            'wikipedia-demo2_2016-06-27T00:00:00.000Z_2016-06-28T00:00:00.000Z_2019-05-31T22:42:18.707Z',
+          interval: '2016-06-27T00:00:00.000Z/2016-06-28T00:00:00.000Z',
+        },
+      },
+    ];
+
+    expect(normalizeQueryResult(result)).toMatchInlineSnapshot(`
+      Object {
+        "header": Array [
+          "d0",
+          "a0",
+        ],
+        "rows": Array [
+          Array [
+            "#ar.wikipedia",
+            335,
+          ],
+          Array [
+            "#be.wikipedia",
+            15,
           ],
         ],
       }
@@ -222,6 +266,75 @@ describe('normalizeQueryResult', () => {
             "2019-08-04T20:00:00.000Z",
             "#ar.wikipedia",
             782,
+          ],
+        ],
+      }
+    `);
+  });
+
+  it('works with topN (bySegment)', () => {
+    const result = [
+      {
+        timestamp: '2019-08-22T02:00:00.000Z',
+        result: {
+          results: [{ timestamp: '2019-08-22T02:59:20.000Z', result: [] }],
+          segment:
+            'wikiticker_2019-08-22T02:00:00.000Z_2019-08-22T03:00:00.000Z_2019-08-22T02:00:00.391Z',
+          interval: '2019-08-22T02:59:20.000Z/2019-08-22T03:00:00.000Z',
+        },
+      },
+      {
+        timestamp: '2019-08-22T02:00:00.000Z',
+        result: {
+          results: [
+            {
+              timestamp: '2019-08-22T02:59:20.000Z',
+              result: [{ d0: '#en.wikipedia', a0: 42 }, { d0: '#es.wikipedia', a0: 7 }],
+            },
+          ],
+          segment:
+            'wikiticker_2019-08-22T02:00:00.000Z_2019-08-22T03:00:00.000Z_2019-08-22T02:00:00.391Z_1',
+          interval: '2019-08-22T02:59:20.000Z/2019-08-22T03:00:00.000Z',
+        },
+      },
+      {
+        timestamp: '2019-08-23T02:00:00.000Z',
+        result: {
+          results: [
+            {
+              timestamp: '2019-08-23T02:00:00.464Z',
+              result: [{ d0: '#en.wikipedia', a0: 2736 }],
+            },
+          ],
+          segment:
+            'wikiticker_2019-08-23T02:00:00.000Z_2019-08-23T03:00:00.000Z_2019-08-23T02:00:00.473Z',
+          interval: '2019-08-23T02:00:00.000Z/2019-08-23T03:00:00.000Z',
+        },
+      },
+    ];
+
+    expect(normalizeQueryResult(result, true)).toMatchInlineSnapshot(`
+      Object {
+        "header": Array [
+          "timestamp",
+          "d0",
+          "a0",
+        ],
+        "rows": Array [
+          Array [
+            "2019-08-22T02:59:20.000Z",
+            "#en.wikipedia",
+            42,
+          ],
+          Array [
+            "2019-08-22T02:59:20.000Z",
+            "#es.wikipedia",
+            7,
+          ],
+          Array [
+            "2019-08-23T02:00:00.464Z",
+            "#en.wikipedia",
+            2736,
           ],
         ],
       }

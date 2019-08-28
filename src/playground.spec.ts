@@ -11,12 +11,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 import { sqlParserFactory } from './parser/druidsql';
 import { FUNCTIONS } from './test-utils';
 
 const parser = sqlParserFactory(FUNCTIONS);
 
-describe.skip('Playground', () => {
+describe.skip('Playground 1', () => {
   it('basic', () => {
     expect(parser(`TRIM( TRAILING 'M' FROM 'MADAM')`).toString()).toMatchInlineSnapshot(
       `"TRIM( TRAILING 'M' undefined 'MADAM')"`,
