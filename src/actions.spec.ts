@@ -451,6 +451,39 @@ ORDER BY "rank" DESC, "created_time" DESC`)
     `);
   });
 
+  it('renders remove Column', () => {
+    const tree = parser(`SELECT
+  datasource,
+  COUNT(*) AS num_segments,
+  SUM(is_available) AS num_available_segments,
+  SUM("size") AS size,
+  SUM("num_rows") AS num_rows,
+  CASE WHEN "status" = 'RUNNING' THEN
+  (CASE WHEN "runner_status" = 'RUNNING' THEN 4 WHEN "runner_status" = 'PENDING' THEN 3 ELSE 2 END)
+  ELSE 1 END AS "rank"
+FROM sys.segments
+WHERE "size" = '12'
+GROUP BY 1,2
+ORDER BY "rank" DESC, "created_time" DESC`)
+      .excludeColumn('num_segments')
+      .toString();
+
+    expect(tree).toMatchInlineSnapshot(`
+      "SELECT
+        datasource,
+        SUM(is_available) AS num_available_segments,
+        SUM(\\"size\\") AS size,
+        SUM(\\"num_rows\\") AS num_rows,
+        CASE WHEN \\"status\\" = 'RUNNING' THEN
+        (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
+        ELSE 1 END AS \\"rank\\"
+      FROM sys.segments
+      WHERE \\"size\\" = '12'
+      GROUP BY 1
+      ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
+    `);
+  });
+
   it('renders orderBy', () => {
     const tree = parser(`SELECT
   datasource,
@@ -1939,6 +1972,147 @@ ORDER BY "Time" ASC`)
       WHERE \\"dstaddr_long\\" > 100 AND TIMESTAMP '2019-7-1 13:00:00' <= __time AND __time < TIMESTAMP '2019-7-1 14:00:00'
       GROUP BY 1
       ORDER BY \\"Time\\" ASC"
+    `);
+  });
+});
+
+describe('Remove from Having', () => {
+  it('Remove column in HAVING', () => {
+    expect(
+      parser(`SELECT
+  "language",
+  TRIM(TRAILING 'A' FROM "language") AS "Count", COUNT(DISTINCT "language") AS "dist_language", COUNT(*) FILTER (WHERE "language"= 'xxx') AS "language_filtered_count"
+FROM "github"
+WHERE "__time" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY AND "language" != 'TypeScript'
+GROUP BY 1
+HAVING "Count" != 37392
+ORDER BY "Count" DESC`)
+        .excludeColumn('Count')
+        .toString(),
+    ).toMatchInlineSnapshot(`
+      "SELECT
+        \\"language\\",
+        COUNT(DISTINCT \\"language\\") AS \\"dist_language\\", COUNT(*) FILTER (WHERE \\"language\\"= 'xxx') AS \\"language_filtered_count\\"
+      FROM \\"github\\"
+      WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY AND \\"language\\" != 'TypeScript'
+      GROUP BY 1"
+    `);
+  });
+
+  it('Remove column in HAVING, multiple having filters', () => {
+    expect(
+      parser(`SELECT
+  "language",
+  TRIM(TRAILING 'A' FROM "language") AS "Count", COUNT(DISTINCT "language") AS "dist_language", COUNT(*) FILTER (WHERE "language"= 'xxx') AS "language_filtered_count"
+FROM "github"
+WHERE "__time" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY AND "language" != 'TypeScript'
+GROUP BY 1
+HAVING "Count" != 37392 AND "dist_language" != 37392
+ORDER BY "Count" DESC`)
+        .excludeColumn('Count')
+        .toString(),
+    ).toMatchInlineSnapshot(`
+      "SELECT
+        \\"language\\",
+        COUNT(DISTINCT \\"language\\") AS \\"dist_language\\", COUNT(*) FILTER (WHERE \\"language\\"= 'xxx') AS \\"language_filtered_count\\"
+      FROM \\"github\\"
+      WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY AND \\"language\\" != 'TypeScript'
+      GROUP BY 1
+      HAVING \\"dist_language\\" != 37392"
+    `);
+  });
+
+  it('Remove column in HAVING, OR expression', () => {
+    expect(
+      parser(`SELECT
+  "language",
+  TRIM(TRAILING 'A' FROM "language") AS "Count", COUNT(DISTINCT "language") AS "dist_language", COUNT(*) FILTER (WHERE "language"= 'xxx') AS "language_filtered_count"
+FROM "github"
+WHERE "Count" != 37392 OR "dist_language" != 37392
+GROUP BY 1
+HAVING "Count" != 37392 OR "dist_language" != 37392 AND "Count" != 37392 
+ORDER BY "Count" DESC`)
+        .excludeColumn('Count')
+        .toString(),
+    ).toMatchInlineSnapshot(`
+      "SELECT
+        \\"language\\",
+        COUNT(DISTINCT \\"language\\") AS \\"dist_language\\", COUNT(*) FILTER (WHERE \\"language\\"= 'xxx') AS \\"language_filtered_count\\"
+      FROM \\"github\\"
+      WHERE \\"Count\\" != 37392 OR \\"dist_language\\" != 37392
+      GROUP BY 1
+      HAVING \\"dist_language\\" != 37392"
+    `);
+  });
+
+  it('Remove column in HAVING, OR expression', () => {
+    expect(
+      parser(`SELECT
+  "language",
+  TRIM(TRAILING 'A' FROM "language") AS "Count", COUNT(DISTINCT "language") AS "dist_language", COUNT(*) FILTER (WHERE "language"= 'xxx') AS "language_filtered_count"
+FROM "github"
+WHERE "Count" != 37392 OR "dist_language" != 37392
+GROUP BY 1
+HAVING "github" != 37392 OR "dist_language" != 37392 AND "Count" != 37392 
+ORDER BY "Count" DESC`)
+        .excludeColumn('Count')
+        .toString(),
+    ).toMatchInlineSnapshot(`
+      "SELECT
+        \\"language\\",
+        COUNT(DISTINCT \\"language\\") AS \\"dist_language\\", COUNT(*) FILTER (WHERE \\"language\\"= 'xxx') AS \\"language_filtered_count\\"
+      FROM \\"github\\"
+      WHERE \\"Count\\" != 37392 OR \\"dist_language\\" != 37392
+      GROUP BY 1
+      HAVING \\"github\\" != 37392 OR \\"dist_language\\" != 37392"
+    `);
+  });
+
+  it('Remove column in WHERE, OR expression', () => {
+    expect(
+      parser(`SELECT
+  "language",
+  TRIM(TRAILING 'A' FROM "language") AS "Count", COUNT(DISTINCT "language") AS "dist_language", COUNT(*) FILTER (WHERE "language"= 'xxx') AS "language_filtered_count"
+FROM "github"
+WHERE "Count" != 37392 OR "dist_language" != 37392
+GROUP BY 1
+HAVING "github" != 37392 OR "dist_language" != 37392 AND "Count" != 37392 
+ORDER BY "Count" DESC`)
+        .removeFilter('Count')
+        .toString(),
+    ).toMatchInlineSnapshot(`
+      "SELECT
+        \\"language\\",
+        TRIM(TRAILING 'A' FROM \\"language\\") AS \\"Count\\", COUNT(DISTINCT \\"language\\") AS \\"dist_language\\", COUNT(*) FILTER (WHERE \\"language\\"= 'xxx') AS \\"language_filtered_count\\"
+      FROM \\"github\\"
+      WHERE \\"dist_language\\" != 37392
+      GROUP BY 1
+      HAVING \\"github\\" != 37392 OR \\"dist_language\\" != 37392 AND \\"Count\\" != 37392 
+      ORDER BY \\"Count\\" DESC"
+    `);
+  });
+
+  it('Remove column in WHERE, OR expression', () => {
+    expect(
+      parser(`SELECT
+  "language",
+  TRIM(TRAILING 'A' FROM "language") AS "Count", COUNT(DISTINCT "language") AS "dist_language", COUNT(*) FILTER (WHERE "language"= 'xxx') AS "language_filtered_count"
+FROM "github"
+WHERE "Count" != 37392 OR "dist_language" != 37392 AND "Count" != 37392 
+GROUP BY 1
+HAVING "github" != 37392 OR "dist_language" != 37392 AND "Count" != 37392 
+ORDER BY "Count" DESC`)
+        .removeFilter('dist_language')
+        .toString(),
+    ).toMatchInlineSnapshot(`
+      "SELECT
+        \\"language\\",
+        TRIM(TRAILING 'A' FROM \\"language\\") AS \\"Count\\", COUNT(DISTINCT \\"language\\") AS \\"dist_language\\", COUNT(*) FILTER (WHERE \\"language\\"= 'xxx') AS \\"language_filtered_count\\"
+      FROM \\"github\\"
+      WHERE \\"Count\\" != 37392 OR \\"Count\\" != 37392 
+      GROUP BY 1
+      HAVING \\"github\\" != 37392 OR \\"dist_language\\" != 37392 AND \\"Count\\" != 37392 
+      ORDER BY \\"Count\\" DESC"
     `);
   });
 });

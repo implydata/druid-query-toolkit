@@ -168,7 +168,7 @@ export class SqlQuery extends BaseAst {
       withClause: this.withClause,
       fromClause: this.fromClause,
       groupByClause: this.getGroupByClauseWithoutColumn(columnVal),
-      havingClause: this.havingClause,
+      havingClause: this.getHavingFilterWithoutColumn(columnVal),
       limitClause: this.limitClause,
       orderByClause: this.getOrderByClauseWithoutColumn(columnVal),
       spacing: this.spacing,
@@ -430,6 +430,18 @@ export class SqlQuery extends BaseAst {
     }
 
     return groupByClause;
+  }
+
+  getHavingClauseWithoutColumn(columnVal: string): HavingClause | undefined {
+    // If selecting from a sub query apply actions to sub query
+    if (this.fromClause) {
+      if (this.fromClause.fc instanceof SqlQuery) {
+        return this.fromClause.fc.getHavingClauseWithoutColumn(columnVal);
+      }
+    }
+
+    if (!this.havingClause) return;
+    return;
   }
 
   replaceFrom(from: RefExpression) {
@@ -713,57 +725,109 @@ export class SqlQuery extends BaseAst {
     return [];
   }
 
+  removeFromAndExpression(parentExpression: AndExpression, column: string) {
+    return parentExpression.ex.filter(expression => {
+      if (expression instanceof ComparisonExpression) {
+        if (expression.ex) {
+          if (
+            expression.rhs &&
+            (expression.rhs.rhs instanceof StringType ||
+              expression.rhs.rhs instanceof RefExpression) &&
+            expression.rhs.rhs.getBasicValue() === column
+          ) {
+            return;
+          } else if (
+            (expression.ex instanceof StringType || expression.ex instanceof RefExpression) &&
+            expression.ex.getBasicValue() === column
+          ) {
+            return;
+          }
+        }
+      }
+      return expression;
+    });
+  }
+
+  removeFromComparisonExpression(parentExpression: ComparisonExpression, column: string) {
+    if (
+      (parentExpression.ex instanceof StringType || parentExpression.ex instanceof RefExpression) &&
+      parentExpression.ex.getBasicValue() === column
+    ) {
+      return true;
+    } else if (
+      parentExpression.rhs &&
+      (parentExpression.rhs.rhs instanceof StringType ||
+        parentExpression.rhs.rhs instanceof RefExpression) &&
+      parentExpression.rhs.rhs.getBasicValue() === column
+    ) {
+      return true;
+    }
+    return false;
+  }
+
+  getHavingFilterWithoutColumn(column: string): HavingClause | undefined {
+    let havingClauseEx = this.havingClause;
+    if (!havingClauseEx) return;
+    if (havingClauseEx.having) {
+      if (havingClauseEx.having instanceof OrExpression) {
+        havingClauseEx.having.ex = havingClauseEx.having.ex.filter(expression => {
+          if (expression instanceof AndExpression) {
+            expression.ex = this.removeFromAndExpression(expression, column);
+            if (!expression.ex.length) return false;
+            return true;
+          } else if (expression instanceof ComparisonExpression) {
+            if (!this.removeFromComparisonExpression(expression, column)) {
+              return true;
+            }
+          }
+          return false;
+        });
+      }
+      if (havingClauseEx.having instanceof AndExpression) {
+        havingClauseEx.having.ex = this.removeFromAndExpression(havingClauseEx.having, column);
+        if (!havingClauseEx.having.ex.length) {
+          havingClauseEx = undefined;
+        }
+      } else if (havingClauseEx.having instanceof ComparisonExpression) {
+        havingClauseEx = this.removeFromComparisonExpression(havingClauseEx.having, column)
+          ? undefined
+          : havingClauseEx;
+      }
+    }
+    return havingClauseEx;
+  }
+
   hasFilterForColumn(column: string): boolean {
     return this.getCurrentFilters().includes(column);
   }
 
   removeFilter(column: string): SqlQuery {
     let whereClauseEx = this.whereClause;
-    if (this.whereClause && whereClauseEx && whereClauseEx.filter) {
-      if (
-        this.whereClause.filter instanceof AndExpression &&
-        whereClauseEx.filter instanceof AndExpression
-      ) {
-        whereClauseEx.filter.ex = this.whereClause.filter.ex.filter(expression => {
-          if (expression instanceof ComparisonExpression) {
-            if (expression.ex) {
-              if (
-                expression.rhs &&
-                (expression.rhs.rhs instanceof StringType ||
-                  expression.rhs.rhs instanceof RefExpression) &&
-                expression.rhs.rhs.getBasicValue() === column
-              ) {
-                return;
-              } else if (
-                (expression.ex instanceof StringType || expression.ex instanceof RefExpression) &&
-                expression.ex.getBasicValue() === column
-              ) {
-                return;
-              }
+    if (!whereClauseEx) return this;
+    if (whereClauseEx.filter) {
+      if (whereClauseEx.filter instanceof OrExpression) {
+        whereClauseEx.filter.ex = whereClauseEx.filter.ex.filter(expression => {
+          if (expression instanceof AndExpression) {
+            expression.ex = this.removeFromAndExpression(expression, column);
+            if (!expression.ex.length) return false;
+            return true;
+          } else if (expression instanceof ComparisonExpression) {
+            if (!this.removeFromComparisonExpression(expression, column)) {
+              return true;
             }
           }
-          return expression;
+          return false;
         });
+      }
+      if (whereClauseEx.filter instanceof AndExpression) {
+        whereClauseEx.filter.ex = this.removeFromAndExpression(whereClauseEx.filter, column);
         if (!whereClauseEx.filter.ex.length) {
           whereClauseEx = undefined;
         }
-      }
-      if (this.whereClause.filter instanceof ComparisonExpression) {
-        if (
-          (this.whereClause.filter.ex instanceof StringType ||
-            this.whereClause.filter.ex instanceof RefExpression) &&
-          this.whereClause.filter.ex.getBasicValue() === column
-        ) {
-          whereClauseEx = undefined;
-        }
-        if (
-          this.whereClause.filter.rhs &&
-          (this.whereClause.filter.rhs.rhs instanceof StringType ||
-            this.whereClause.filter.rhs.rhs instanceof RefExpression) &&
-          this.whereClause.filter.rhs.rhs.getBasicValue() === column
-        ) {
-          whereClauseEx = undefined;
-        }
+      } else if (whereClauseEx.filter instanceof ComparisonExpression) {
+        whereClauseEx = this.removeFromComparisonExpression(whereClauseEx.filter, column)
+          ? undefined
+          : whereClauseEx;
       }
     }
 
