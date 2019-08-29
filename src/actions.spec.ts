@@ -63,10 +63,10 @@ LIMIT 25`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          "SELECT \\"segment_id\\", \\"datasource\\", \\"end\\", \\"size\\", \\"version\\", \\"partition_num\\", \\"num_replicas\\", \\"num_rows\\", \\"is_published\\", \\"is_available\\", \\"is_realtime\\", \\"is_overshadowed\\", \\"payload\\"
-                                                                                          FROM sys.segments
-                                                                                          LIMIT 25"
-                                                            `);
+      "SELECT \\"segment_id\\", \\"datasource\\", \\"end\\", \\"size\\", \\"version\\", \\"partition_num\\", \\"num_replicas\\", \\"num_rows\\", \\"is_published\\", \\"is_available\\", \\"is_realtime\\", \\"is_overshadowed\\", \\"payload\\"
+      FROM sys.segments
+      LIMIT 25"
+    `);
   });
 
   it('renders orderBy', () => {
@@ -78,11 +78,11 @@ LIMIT 25`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          "SELECT \\"segment_id\\", \\"datasource\\", \\"start\\", \\"end\\", \\"size\\", \\"version\\", \\"partition_num\\", \\"num_replicas\\", \\"num_rows\\", \\"is_published\\", \\"is_available\\", \\"is_realtime\\", \\"is_overshadowed\\", \\"payload\\"
-                                                                                          FROM sys.segments
-                                                                                          ORDER BY \\"datasource\\" DESC
-                                                                                          LIMIT 25"
-                                                            `);
+      "SELECT \\"segment_id\\", \\"datasource\\", \\"start\\", \\"end\\", \\"size\\", \\"version\\", \\"partition_num\\", \\"num_replicas\\", \\"num_rows\\", \\"is_published\\", \\"is_available\\", \\"is_realtime\\", \\"is_overshadowed\\", \\"payload\\"
+      FROM sys.segments
+      ORDER BY \\"datasource\\" DESC
+      LIMIT 25"
+    `);
   });
 
   it('renders exclude row', () => {
@@ -94,12 +94,12 @@ LIMIT 25`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          "SELECT \\"segment_id\\", \\"datasource\\", \\"start\\", \\"end\\", \\"size\\", \\"version\\", \\"partition_num\\", \\"num_replicas\\", \\"num_rows\\", \\"is_published\\", \\"is_available\\", \\"is_realtime\\", \\"is_overshadowed\\", \\"payload\\"
-                                                                                          FROM sys.segments
-                                                                                          WHERE \\"datasource\\" != 'github'
-                                                                                          ORDER BY \\"start\\" DESC
-                                                                                          LIMIT 25"
-                                                            `);
+      "SELECT \\"segment_id\\", \\"datasource\\", \\"start\\", \\"end\\", \\"size\\", \\"version\\", \\"partition_num\\", \\"num_replicas\\", \\"num_rows\\", \\"is_published\\", \\"is_available\\", \\"is_realtime\\", \\"is_overshadowed\\", \\"payload\\"
+      FROM sys.segments
+      WHERE \\"datasource\\" != 'github'
+      ORDER BY \\"start\\" DESC
+      LIMIT 25"
+    `);
   });
 
   it('renders getSorted', () => {
@@ -109,13 +109,13 @@ ORDER BY "start" DESC
 LIMIT 25`).getSorted();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          Array [
-                                                                                            Object {
-                                                                                              "desc": true,
-                                                                                              "id": "start",
-                                                                                            },
-                                                                                          ]
-                                                            `);
+      Array [
+        Object {
+          "desc": true,
+          "id": "start",
+        },
+      ]
+    `);
   });
 
   it('renders getSchema', () => {
@@ -148,23 +148,23 @@ FROM sys.segments
 ORDER BY "start" DESC
 LIMIT 25`).getColumnsArray();
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          Array [
-                                                                                            "segment_id",
-                                                                                            "datasource",
-                                                                                            "start",
-                                                                                            "end",
-                                                                                            "size",
-                                                                                            "version",
-                                                                                            "partition_num",
-                                                                                            "num_replicas",
-                                                                                            "num_rows",
-                                                                                            "is_published",
-                                                                                            "is_available",
-                                                                                            "is_realtime",
-                                                                                            "is_overshadowed",
-                                                                                            "payload",
-                                                                                          ]
-                                                            `);
+      Array [
+        "segment_id",
+        "datasource",
+        "start",
+        "end",
+        "size",
+        "version",
+        "partition_num",
+        "num_replicas",
+        "num_rows",
+        "is_published",
+        "is_available",
+        "is_realtime",
+        "is_overshadowed",
+        "payload",
+      ]
+    `);
   });
 
   it('renders toString', () => {
@@ -174,11 +174,11 @@ ORDER BY "start" DESC
 LIMIT 25`).toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          "SELECT \\"segment_id\\", \\"datasource\\", \\"start\\", \\"end\\", \\"size\\", \\"version\\", \\"partition_num\\", \\"num_replicas\\", \\"num_rows\\", \\"is_published\\", \\"is_available\\", \\"is_realtime\\", \\"is_overshadowed\\", \\"payload\\"
-                                                                                          FROM sys.segments
-                                                                                          ORDER BY \\"start\\" DESC
-                                                                                          LIMIT 25"
-                                                            `);
+      "SELECT \\"segment_id\\", \\"datasource\\", \\"start\\", \\"end\\", \\"size\\", \\"version\\", \\"partition_num\\", \\"num_replicas\\", \\"num_rows\\", \\"is_published\\", \\"is_available\\", \\"is_realtime\\", \\"is_overshadowed\\", \\"payload\\"
+      FROM sys.segments
+      ORDER BY \\"start\\" DESC
+      LIMIT 25"
+    `);
   });
 });
 
@@ -200,18 +200,18 @@ ORDER BY "rank" DESC, "created_time" DESC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          "SELECT
-                                                                                            COUNT(*) AS num_segments,
-                                                                                            SUM(is_available) AS num_available_segments,
-                                                                                            SUM(\\"size\\") AS size,
-                                                                                            SUM(\\"num_rows\\") AS num_rows,
-                                                                                            CASE WHEN \\"status\\" = 'RUNNING' THEN
-                                                                                            (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
-                                                                                            ELSE 1 END AS \\"rank\\"
-                                                                                          FROM sys.segments
-                                                                                          GROUP BY 1
-                                                                                          ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
-                                                            `);
+      "SELECT
+        COUNT(*) AS num_segments,
+        SUM(is_available) AS num_available_segments,
+        SUM(\\"size\\") AS size,
+        SUM(\\"num_rows\\") AS num_rows,
+        CASE WHEN \\"status\\" = 'RUNNING' THEN
+        (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
+        ELSE 1 END AS \\"rank\\"
+      FROM sys.segments
+      GROUP BY 1
+      ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
+    `);
   });
 
   it('renders orderBy', () => {
@@ -231,19 +231,19 @@ ORDER BY "rank" DESC, "created_time" DESC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          "SELECT
-                                                                                            datasource,
-                                                                                            COUNT(*) AS num_segments,
-                                                                                            SUM(is_available) AS num_available_segments,
-                                                                                            SUM(\\"size\\") AS size,
-                                                                                            SUM(\\"num_rows\\") AS num_rows,
-                                                                                            CASE WHEN \\"status\\" = 'RUNNING' THEN
-                                                                                            (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
-                                                                                            ELSE 1 END AS \\"rank\\"
-                                                                                          FROM sys.segments
-                                                                                          GROUP BY 1,2
-                                                                                          ORDER BY \\"datasource\\" DESC"
-                                                            `);
+      "SELECT
+        datasource,
+        COUNT(*) AS num_segments,
+        SUM(is_available) AS num_available_segments,
+        SUM(\\"size\\") AS size,
+        SUM(\\"num_rows\\") AS num_rows,
+        CASE WHEN \\"status\\" = 'RUNNING' THEN
+        (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
+        ELSE 1 END AS \\"rank\\"
+      FROM sys.segments
+      GROUP BY 1,2
+      ORDER BY \\"datasource\\" DESC"
+    `);
   });
 
   it('renders exclude row', () => {
@@ -263,20 +263,20 @@ ORDER BY "rank" DESC, "created_time" DESC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          "SELECT
-                                                                                            datasource,
-                                                                                            COUNT(*) AS num_segments,
-                                                                                            SUM(is_available) AS num_available_segments,
-                                                                                            SUM(\\"size\\") AS size,
-                                                                                            SUM(\\"num_rows\\") AS num_rows,
-                                                                                            CASE WHEN \\"status\\" = 'RUNNING' THEN
-                                                                                            (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
-                                                                                            ELSE 1 END AS \\"rank\\"
-                                                                                          FROM sys.segments
-                                                                                          WHERE \\"datasource\\" != 'rowvalue'
-                                                                                          GROUP BY 1,2
-                                                                                          ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
-                                                            `);
+      "SELECT
+        datasource,
+        COUNT(*) AS num_segments,
+        SUM(is_available) AS num_available_segments,
+        SUM(\\"size\\") AS size,
+        SUM(\\"num_rows\\") AS num_rows,
+        CASE WHEN \\"status\\" = 'RUNNING' THEN
+        (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
+        ELSE 1 END AS \\"rank\\"
+      FROM sys.segments
+      WHERE \\"datasource\\" != 'rowvalue'
+      GROUP BY 1,2
+      ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
+    `);
   });
 
   it('renders getSorted', () => {
@@ -293,17 +293,17 @@ FROM sys.segments
 GROUP BY 1,2
 ORDER BY "rank" DESC, "created_time" DESC`).getSorted();
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          Array [
-                                                                                            Object {
-                                                                                              "desc": true,
-                                                                                              "id": "rank",
-                                                                                            },
-                                                                                            Object {
-                                                                                              "desc": true,
-                                                                                              "id": "created_time",
-                                                                                            },
-                                                                                          ]
-                                                            `);
+      Array [
+        Object {
+          "desc": true,
+          "id": "rank",
+        },
+        Object {
+          "desc": true,
+          "id": "created_time",
+        },
+      ]
+    `);
   });
 
   it('renders getSchema', () => {
@@ -352,13 +352,13 @@ FROM sys.segments
 GROUP BY 1,2
 ORDER BY "rank" DESC, "created_time" DESC`).getAggregateColumns();
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          Array [
-                                                                                            "num_available_segments",
-                                                                                            "size",
-                                                                                            "num_rows",
-                                                                                            "rank",
-                                                                                          ]
-                                                            `);
+      Array [
+        "num_available_segments",
+        "size",
+        "num_rows",
+        "rank",
+      ]
+    `);
   });
 
   it('renders getColumnsArray', () => {
@@ -375,15 +375,15 @@ FROM sys.segments
 GROUP BY 1,2
 ORDER BY "rank" DESC, "created_time" DESC`).getColumnsArray();
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          Array [
-                                                                                            "datasource",
-                                                                                            "num_segments",
-                                                                                            "num_available_segments",
-                                                                                            "size",
-                                                                                            "num_rows",
-                                                                                            "rank",
-                                                                                          ]
-                                                            `);
+      Array [
+        "datasource",
+        "num_segments",
+        "num_available_segments",
+        "size",
+        "num_rows",
+        "rank",
+      ]
+    `);
   });
 
   it('renders toString', () => {
@@ -401,19 +401,19 @@ GROUP BY 1,2
 ORDER BY "rank" DESC, "created_time" DESC`).toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          "SELECT
-                                                                                            datasource,
-                                                                                            COUNT(*) AS num_segments,
-                                                                                            SUM(is_available) AS num_available_segments,
-                                                                                            SUM(\\"size\\") AS size,
-                                                                                            SUM(\\"num_rows\\") AS num_rows,
-                                                                                            CASE WHEN \\"status\\" = 'RUNNING' THEN
-                                                                                            (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
-                                                                                            ELSE 1 END AS \\"rank\\"
-                                                                                          FROM sys.segments
-                                                                                          GROUP BY 1,2
-                                                                                          ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
-                                                            `);
+      "SELECT
+        datasource,
+        COUNT(*) AS num_segments,
+        SUM(is_available) AS num_available_segments,
+        SUM(\\"size\\") AS size,
+        SUM(\\"num_rows\\") AS num_rows,
+        CASE WHEN \\"status\\" = 'RUNNING' THEN
+        (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
+        ELSE 1 END AS \\"rank\\"
+      FROM sys.segments
+      GROUP BY 1,2
+      ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
+    `);
   });
 });
 
@@ -436,19 +436,19 @@ ORDER BY "rank" DESC, "created_time" DESC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          "SELECT
-                                                                                            COUNT(*) AS num_segments,
-                                                                                            SUM(is_available) AS num_available_segments,
-                                                                                            SUM(\\"size\\") AS size,
-                                                                                            SUM(\\"num_rows\\") AS num_rows,
-                                                                                            CASE WHEN \\"status\\" = 'RUNNING' THEN
-                                                                                            (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
-                                                                                            ELSE 1 END AS \\"rank\\"
-                                                                                          FROM sys.segments
-                                                                                          WHERE \\"size\\" = '12'
-                                                                                          GROUP BY 1
-                                                                                          ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
-                                                            `);
+      "SELECT
+        COUNT(*) AS num_segments,
+        SUM(is_available) AS num_available_segments,
+        SUM(\\"size\\") AS size,
+        SUM(\\"num_rows\\") AS num_rows,
+        CASE WHEN \\"status\\" = 'RUNNING' THEN
+        (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
+        ELSE 1 END AS \\"rank\\"
+      FROM sys.segments
+      WHERE \\"size\\" = '12'
+      GROUP BY 1
+      ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
+    `);
   });
 
   it('renders remove Column', () => {
@@ -469,19 +469,19 @@ ORDER BY "rank" DESC, "created_time" DESC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                    "SELECT
-                                                                                      datasource,
-                                                                                      SUM(is_available) AS num_available_segments,
-                                                                                      SUM(\\"size\\") AS size,
-                                                                                      SUM(\\"num_rows\\") AS num_rows,
-                                                                                      CASE WHEN \\"status\\" = 'RUNNING' THEN
-                                                                                      (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
-                                                                                      ELSE 1 END AS \\"rank\\"
-                                                                                    FROM sys.segments
-                                                                                    WHERE \\"size\\" = '12'
-                                                                                    GROUP BY 1
-                                                                                    ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
-                                                        `);
+      "SELECT
+        datasource,
+        SUM(is_available) AS num_available_segments,
+        SUM(\\"size\\") AS size,
+        SUM(\\"num_rows\\") AS num_rows,
+        CASE WHEN \\"status\\" = 'RUNNING' THEN
+        (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
+        ELSE 1 END AS \\"rank\\"
+      FROM sys.segments
+      WHERE \\"size\\" = '12'
+      GROUP BY 1
+      ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
+    `);
   });
 
   it('renders orderBy', () => {
@@ -502,20 +502,20 @@ ORDER BY "rank" DESC, "created_time" DESC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          "SELECT
-                                                                                            datasource,
-                                                                                            COUNT(*) AS num_segments,
-                                                                                            SUM(is_available) AS num_available_segments,
-                                                                                            SUM(\\"size\\") AS size,
-                                                                                            SUM(\\"num_rows\\") AS num_rows,
-                                                                                            CASE WHEN \\"status\\" = 'RUNNING' THEN
-                                                                                            (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
-                                                                                            ELSE 1 END AS \\"rank\\"
-                                                                                          FROM sys.segments
-                                                                                          WHERE \\"size\\" = '12'
-                                                                                          GROUP BY 1,2
-                                                                                          ORDER BY \\"datasource\\" DESC"
-                                                            `);
+      "SELECT
+        datasource,
+        COUNT(*) AS num_segments,
+        SUM(is_available) AS num_available_segments,
+        SUM(\\"size\\") AS size,
+        SUM(\\"num_rows\\") AS num_rows,
+        CASE WHEN \\"status\\" = 'RUNNING' THEN
+        (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
+        ELSE 1 END AS \\"rank\\"
+      FROM sys.segments
+      WHERE \\"size\\" = '12'
+      GROUP BY 1,2
+      ORDER BY \\"datasource\\" DESC"
+    `);
   });
 
   it('renders exclude row', () => {
@@ -536,20 +536,20 @@ ORDER BY "rank" DESC, "created_time" DESC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          "SELECT
-                                                                                            datasource,
-                                                                                            COUNT(*) AS num_segments,
-                                                                                            SUM(is_available) AS num_available_segments,
-                                                                                            SUM(\\"size\\") AS size,
-                                                                                            SUM(\\"num_rows\\") AS num_rows,
-                                                                                            CASE WHEN \\"status\\" = 'RUNNING' THEN
-                                                                                            (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
-                                                                                            ELSE 1 END AS \\"rank\\"
-                                                                                          FROM sys.segments
-                                                                                          WHERE \\"size\\" = '12' AND \\"datasource\\" != 'rowvalue'
-                                                                                          GROUP BY 1,2
-                                                                                          ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
-                                                            `);
+      "SELECT
+        datasource,
+        COUNT(*) AS num_segments,
+        SUM(is_available) AS num_available_segments,
+        SUM(\\"size\\") AS size,
+        SUM(\\"num_rows\\") AS num_rows,
+        CASE WHEN \\"status\\" = 'RUNNING' THEN
+        (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
+        ELSE 1 END AS \\"rank\\"
+      FROM sys.segments
+      WHERE \\"size\\" = '12' AND \\"datasource\\" != 'rowvalue'
+      GROUP BY 1,2
+      ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
+    `);
   });
 
   it('renders getSorted', () => {
@@ -567,17 +567,17 @@ WHERE "size" = '12'
 GROUP BY 1,2
 ORDER BY "rank" DESC, "created_time" DESC`).getSorted();
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          Array [
-                                                                                            Object {
-                                                                                              "desc": true,
-                                                                                              "id": "rank",
-                                                                                            },
-                                                                                            Object {
-                                                                                              "desc": true,
-                                                                                              "id": "created_time",
-                                                                                            },
-                                                                                          ]
-                                                            `);
+      Array [
+        Object {
+          "desc": true,
+          "id": "rank",
+        },
+        Object {
+          "desc": true,
+          "id": "created_time",
+        },
+      ]
+    `);
   });
 
   it('renders getSchema', () => {
@@ -629,13 +629,13 @@ WHERE "size" = '12'
 GROUP BY 1,2
 ORDER BY "rank" DESC, "created_time" DESC`).getAggregateColumns();
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          Array [
-                                                                                            "num_available_segments",
-                                                                                            "size",
-                                                                                            "num_rows",
-                                                                                            "rank",
-                                                                                          ]
-                                                            `);
+      Array [
+        "num_available_segments",
+        "size",
+        "num_rows",
+        "rank",
+      ]
+    `);
   });
 
   it('renders getColumnsArray', () => {
@@ -653,15 +653,15 @@ WHERE "size" = '12'
 GROUP BY 1,2
 ORDER BY "rank" DESC, "created_time" DESC`).getColumnsArray();
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          Array [
-                                                                                            "datasource",
-                                                                                            "num_segments",
-                                                                                            "num_available_segments",
-                                                                                            "size",
-                                                                                            "num_rows",
-                                                                                            "rank",
-                                                                                          ]
-                                                            `);
+      Array [
+        "datasource",
+        "num_segments",
+        "num_available_segments",
+        "size",
+        "num_rows",
+        "rank",
+      ]
+    `);
   });
 
   it('renders toString', () => {
@@ -680,20 +680,20 @@ GROUP BY 1,2
 ORDER BY "rank" DESC, "created_time" DESC`).toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          "SELECT
-                                                                                            datasource,
-                                                                                            COUNT(*) AS num_segments,
-                                                                                            SUM(is_available) AS num_available_segments,
-                                                                                            SUM(\\"size\\") AS size,
-                                                                                            SUM(\\"num_rows\\") AS num_rows,
-                                                                                            CASE WHEN \\"status\\" = 'RUNNING' THEN
-                                                                                            (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
-                                                                                            ELSE 1 END AS \\"rank\\"
-                                                                                          FROM sys.segments
-                                                                                          WHERE \\"size\\" = '12'
-                                                                                          GROUP BY 1,2
-                                                                                          ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
-                                                            `);
+      "SELECT
+        datasource,
+        COUNT(*) AS num_segments,
+        SUM(is_available) AS num_available_segments,
+        SUM(\\"size\\") AS size,
+        SUM(\\"num_rows\\") AS num_rows,
+        CASE WHEN \\"status\\" = 'RUNNING' THEN
+        (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
+        ELSE 1 END AS \\"rank\\"
+      FROM sys.segments
+      WHERE \\"size\\" = '12'
+      GROUP BY 1,2
+      ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
+    `);
   });
 });
 
@@ -716,19 +716,19 @@ ORDER BY "rank" DESC, "created_time" DESC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          "SELECT
-                                                                                            COUNT(*) AS num_segments,
-                                                                                            SUM(is_available) AS num_available_segments,
-                                                                                            SUM(\\"size\\") AS size,
-                                                                                            SUM(\\"num_rows\\") AS num_rows,
-                                                                                            CASE WHEN \\"status\\" = 'RUNNING' THEN
-                                                                                            (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
-                                                                                            ELSE 1 END AS \\"rank\\"
-                                                                                          FROM sys.segments
-                                                                                          WHERE \\"size\\" = '12'
-                                                                                          GROUP BY 1
-                                                                                          ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
-                                                            `);
+      "SELECT
+        COUNT(*) AS num_segments,
+        SUM(is_available) AS num_available_segments,
+        SUM(\\"size\\") AS size,
+        SUM(\\"num_rows\\") AS num_rows,
+        CASE WHEN \\"status\\" = 'RUNNING' THEN
+        (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
+        ELSE 1 END AS \\"rank\\"
+      FROM sys.segments
+      WHERE \\"size\\" = '12'
+      GROUP BY 1
+      ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
+    `);
   });
 
   it('renders remove second of 2 columns', () => {
@@ -749,19 +749,19 @@ ORDER BY "rank" DESC, "created_time" DESC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          "SELECT
-                                                                                            datasource,
-                                                                                            SUM(is_available) AS num_available_segments,
-                                                                                            SUM(\\"size\\") AS size,
-                                                                                            SUM(\\"num_rows\\") AS num_rows,
-                                                                                            CASE WHEN \\"status\\" = 'RUNNING' THEN
-                                                                                            (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
-                                                                                            ELSE 1 END AS \\"rank\\"
-                                                                                          FROM sys.segments
-                                                                                          WHERE \\"size\\" = '12'
-                                                                                          GROUP BY 1
-                                                                                          ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
-                                                            `);
+      "SELECT
+        datasource,
+        SUM(is_available) AS num_available_segments,
+        SUM(\\"size\\") AS size,
+        SUM(\\"num_rows\\") AS num_rows,
+        CASE WHEN \\"status\\" = 'RUNNING' THEN
+        (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
+        ELSE 1 END AS \\"rank\\"
+      FROM sys.segments
+      WHERE \\"size\\" = '12'
+      GROUP BY 1
+      ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
+    `);
   });
 
   it('renders remove first of 2 named columns', () => {
@@ -782,19 +782,19 @@ ORDER BY "rank" DESC, "created_time" DESC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          "SELECT
-                                                                                            COUNT(*) AS num_segments,
-                                                                                            SUM(is_available) AS num_available_segments,
-                                                                                            SUM(\\"size\\") AS size,
-                                                                                            SUM(\\"num_rows\\") AS num_rows,
-                                                                                            CASE WHEN \\"status\\" = 'RUNNING' THEN
-                                                                                            (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
-                                                                                            ELSE 1 END AS \\"rank\\"
-                                                                                          FROM sys.segments
-                                                                                          WHERE \\"size\\" = '12'
-                                                                                          GROUP BY num_segments
-                                                                                          ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
-                                                            `);
+      "SELECT
+        COUNT(*) AS num_segments,
+        SUM(is_available) AS num_available_segments,
+        SUM(\\"size\\") AS size,
+        SUM(\\"num_rows\\") AS num_rows,
+        CASE WHEN \\"status\\" = 'RUNNING' THEN
+        (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
+        ELSE 1 END AS \\"rank\\"
+      FROM sys.segments
+      WHERE \\"size\\" = '12'
+      GROUP BY num_segments
+      ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
+    `);
   });
 
   it('renders remove second of 2 named columns', () => {
@@ -815,19 +815,19 @@ ORDER BY "rank" DESC, "created_time" DESC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          "SELECT
-                                                                                            datasource,
-                                                                                            SUM(is_available) AS num_available_segments,
-                                                                                            SUM(\\"size\\") AS size,
-                                                                                            SUM(\\"num_rows\\") AS num_rows,
-                                                                                            CASE WHEN \\"status\\" = 'RUNNING' THEN
-                                                                                            (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
-                                                                                            ELSE 1 END AS \\"rank\\"
-                                                                                          FROM sys.segments
-                                                                                          WHERE \\"size\\" = '12'
-                                                                                          GROUP BY datasource
-                                                                                          ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
-                                                            `);
+      "SELECT
+        datasource,
+        SUM(is_available) AS num_available_segments,
+        SUM(\\"size\\") AS size,
+        SUM(\\"num_rows\\") AS num_rows,
+        CASE WHEN \\"status\\" = 'RUNNING' THEN
+        (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
+        ELSE 1 END AS \\"rank\\"
+      FROM sys.segments
+      WHERE \\"size\\" = '12'
+      GROUP BY datasource
+      ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
+    `);
   });
 
   it('renders remove second of 1 of 1 columns', () => {
@@ -848,18 +848,18 @@ ORDER BY "rank" DESC, "created_time" DESC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          "SELECT
-                                                                                            COUNT(*) AS num_segments,
-                                                                                            SUM(is_available) AS num_available_segments,
-                                                                                            SUM(\\"size\\") AS size,
-                                                                                            SUM(\\"num_rows\\") AS num_rows,
-                                                                                            CASE WHEN \\"status\\" = 'RUNNING' THEN
-                                                                                            (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
-                                                                                            ELSE 1 END AS \\"rank\\"
-                                                                                          FROM sys.segments
-                                                                                          WHERE \\"size\\" = '12'
-                                                                                          ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
-                                                            `);
+      "SELECT
+        COUNT(*) AS num_segments,
+        SUM(is_available) AS num_available_segments,
+        SUM(\\"size\\") AS size,
+        SUM(\\"num_rows\\") AS num_rows,
+        CASE WHEN \\"status\\" = 'RUNNING' THEN
+        (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
+        ELSE 1 END AS \\"rank\\"
+      FROM sys.segments
+      WHERE \\"size\\" = '12'
+      ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
+    `);
   });
 
   it('renders remove second of 1 of 1 columns by index', () => {
@@ -880,18 +880,18 @@ ORDER BY "rank" DESC, "created_time" DESC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          "SELECT
-                                                                                            COUNT(*) AS num_segments,
-                                                                                            SUM(is_available) AS num_available_segments,
-                                                                                            SUM(\\"size\\") AS size,
-                                                                                            SUM(\\"num_rows\\") AS num_rows,
-                                                                                            CASE WHEN \\"status\\" = 'RUNNING' THEN
-                                                                                            (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
-                                                                                            ELSE 1 END AS \\"rank\\"
-                                                                                          FROM sys.segments
-                                                                                          WHERE \\"size\\" = '12'
-                                                                                          ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
-                                                            `);
+      "SELECT
+        COUNT(*) AS num_segments,
+        SUM(is_available) AS num_available_segments,
+        SUM(\\"size\\") AS size,
+        SUM(\\"num_rows\\") AS num_rows,
+        CASE WHEN \\"status\\" = 'RUNNING' THEN
+        (CASE WHEN \\"runner_status\\" = 'RUNNING' THEN 4 WHEN \\"runner_status\\" = 'PENDING' THEN 3 ELSE 2 END)
+        ELSE 1 END AS \\"rank\\"
+      FROM sys.segments
+      WHERE \\"size\\" = '12'
+      ORDER BY \\"rank\\" DESC, \\"created_time\\" DESC"
+    `);
   });
 
   it('test basicIdentifierEscape', () => {
@@ -921,12 +921,12 @@ LIMIT 25`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          "SELECT \\"segment_id\\", \\"datasource\\", \\"start\\", \\"end\\", \\"size\\", \\"version\\", \\"partition_num\\", \\"num_replicas\\", \\"num_rows\\", \\"is_published\\", \\"is_available\\", \\"is_realtime\\", \\"is_overshadowed\\", \\"payload\\"
-                                                                                          FROM sys.segments
-                                                                                          WHERE \\"datasource\\" != 1
-                                                                                          ORDER BY \\"start\\" DESC
-                                                                                          LIMIT 25"
-                                                            `);
+      "SELECT \\"segment_id\\", \\"datasource\\", \\"start\\", \\"end\\", \\"size\\", \\"version\\", \\"partition_num\\", \\"num_replicas\\", \\"num_rows\\", \\"is_published\\", \\"is_available\\", \\"is_realtime\\", \\"is_overshadowed\\", \\"payload\\"
+      FROM sys.segments
+      WHERE \\"datasource\\" != 1
+      ORDER BY \\"start\\" DESC
+      LIMIT 25"
+    `);
   });
 
   it('renders filter row with number', () => {
@@ -942,13 +942,13 @@ ORDER BY "Count" DESC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          "SELECT
-                                                                                            \\"cityName\\",
-                                                                                            SUM(added) AS \\"Added\\"
-                                                                                          FROM \\"wikiticker\\"
-                                                                                          WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY
-                                                                                          GROUP BY 1"
-                                                            `);
+      "SELECT
+        \\"cityName\\",
+        SUM(added) AS \\"Added\\"
+      FROM \\"wikiticker\\"
+      WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY
+      GROUP BY 1"
+    `);
   });
 
   it('renders filter aggregate row', () => {
@@ -964,16 +964,16 @@ ORDER BY "Count" DESC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          "SELECT
-                                                                                            \\"cityName\\",
-                                                                                            COUNT(*) AS \\"Count\\",
-                                                                                            SUM(added) AS \\"Added\\"
-                                                                                          FROM \\"wikiticker\\"
-                                                                                          WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY
-                                                                                          GROUP BY 1
-                                                                                          HAVING \\"Count\\" != 'value'
-                                                                                          ORDER BY \\"Count\\" DESC"
-                                                            `);
+      "SELECT
+        \\"cityName\\",
+        COUNT(*) AS \\"Count\\",
+        SUM(added) AS \\"Added\\"
+      FROM \\"wikiticker\\"
+      WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY
+      GROUP BY 1
+      HAVING \\"Count\\" != 'value'
+      ORDER BY \\"Count\\" DESC"
+    `);
   });
 
   it('renders filter aggregate row', () => {
@@ -989,16 +989,16 @@ ORDER BY "Count" DESC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          "SELECT
-                                                                                            \\"cityName\\",
-                                                                                            COUNT(*) AS \\"Count\\",
-                                                                                            SUM(added) AS \\"Added\\"
-                                                                                          FROM \\"wikiticker\\"
-                                                                                          WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY
-                                                                                          GROUP BY 1
-                                                                                          HAVING \\"Count\\" != 'value'
-                                                                                          ORDER BY \\"Count\\" DESC"
-                                                            `);
+      "SELECT
+        \\"cityName\\",
+        COUNT(*) AS \\"Count\\",
+        SUM(added) AS \\"Added\\"
+      FROM \\"wikiticker\\"
+      WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY
+      GROUP BY 1
+      HAVING \\"Count\\" != 'value'
+      ORDER BY \\"Count\\" DESC"
+    `);
   });
 
   it('renders  add to group by ', () => {
@@ -1014,15 +1014,15 @@ ORDER BY "Count" DESC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          "SELECT
-                                                                                            \\"testValue\\", \\"cityName\\",
-                                                                                            COUNT(*) AS \\"Count\\",
-                                                                                            SUM(added) AS \\"Added\\"
-                                                                                          FROM \\"wikiticker\\"
-                                                                                          WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY
-                                                                                          GROUP BY 1,2
-                                                                                          ORDER BY \\"Count\\" DESC"
-                                                            `);
+      "SELECT
+        \\"testValue\\", \\"cityName\\",
+        COUNT(*) AS \\"Count\\",
+        SUM(added) AS \\"Added\\"
+      FROM \\"wikiticker\\"
+      WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY
+      GROUP BY 1,2
+      ORDER BY \\"Count\\" DESC"
+    `);
   });
 
   it('renders add to group by for a second time ', () => {
@@ -1039,16 +1039,16 @@ ORDER BY "Count" DESC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          "SELECT
-                                                                                              \\"testValue\\", \\"somevalue\\",
-                                                                                            \\"cityName\\",
-                                                                                            COUNT(*) AS \\"Count\\",
-                                                                                            SUM(added) AS \\"Added\\"
-                                                                                          FROM \\"wikiticker\\"
-                                                                                          WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY
-                                                                                          GROUP BY 1,2,3
-                                                                                          ORDER BY \\"Count\\" DESC"
-                                                            `);
+      "SELECT
+          \\"testValue\\", \\"somevalue\\",
+        \\"cityName\\",
+        COUNT(*) AS \\"Count\\",
+        SUM(added) AS \\"Added\\"
+      FROM \\"wikiticker\\"
+      WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY
+      GROUP BY 1,2,3
+      ORDER BY \\"Count\\" DESC"
+    `);
   });
 
   it('renders  add to group by out of order', () => {
@@ -1064,15 +1064,15 @@ ORDER BY "Count" DESC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          "SELECT
-                                                                                            \\"testValue\\", COUNT(*) AS \\"Count\\",
-                                                                                              \\"cityName\\",
-                                                                                            SUM(added) AS \\"Added\\"
-                                                                                          FROM \\"wikiticker\\"
-                                                                                          WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY
-                                                                                          GROUP BY 1,3
-                                                                                          ORDER BY \\"Count\\" DESC"
-                                                            `);
+      "SELECT
+        \\"testValue\\", COUNT(*) AS \\"Count\\",
+          \\"cityName\\",
+        SUM(added) AS \\"Added\\"
+      FROM \\"wikiticker\\"
+      WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY
+      GROUP BY 1,3
+      ORDER BY \\"Count\\" DESC"
+    `);
   });
 
   it('renders  add to group by out of no groupby, Should not change', () => {
@@ -1087,14 +1087,14 @@ ORDER BY "Count" DESC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          "SELECT
-                                                                                            COUNT(*) AS \\"Count\\",
-                                                                                              \\"cityName\\",
-                                                                                            SUM(added) AS \\"Added\\"
-                                                                                          FROM \\"wikiticker\\"
-                                                                                          WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY
-                                                                                          ORDER BY \\"Count\\" DESC"
-                                                            `);
+      "SELECT
+        COUNT(*) AS \\"Count\\",
+          \\"cityName\\",
+        SUM(added) AS \\"Added\\"
+      FROM \\"wikiticker\\"
+      WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY
+      ORDER BY \\"Count\\" DESC"
+    `);
   });
 
   it('renders  add aggregate column', () => {
@@ -1110,15 +1110,15 @@ ORDER BY "Count" DESC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          "SELECT
-                                                                                            \\"cityName\\",
-                                                                                            COUNT(*) AS \\"Count\\",
-                                                                                            SUM(added) AS \\"Added\\", SUM(\\"testValue\\")
-                                                                                          FROM \\"wikiticker\\"
-                                                                                          WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY
-                                                                                          GROUP BY 1
-                                                                                          ORDER BY \\"Count\\" DESC"
-                                                            `);
+      "SELECT
+        \\"cityName\\",
+        COUNT(*) AS \\"Count\\",
+        SUM(added) AS \\"Added\\", SUM(\\"testValue\\")
+      FROM \\"wikiticker\\"
+      WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY
+      GROUP BY 1
+      ORDER BY \\"Count\\" DESC"
+    `);
   });
 
   it('renders  add function to Groupby', () => {
@@ -1134,15 +1134,15 @@ ORDER BY "Count" DESC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          "SELECT
-                                                                                            TRUNCATE(added, 1), \\"cityName\\",
-                                                                                            COUNT(*) AS \\"Count\\",
-                                                                                            SUM(added) AS \\"Added\\"
-                                                                                          FROM \\"wikiticker\\"
-                                                                                          WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY
-                                                                                          GROUP BY 1,2
-                                                                                          ORDER BY \\"Count\\" DESC"
-                                                            `);
+      "SELECT
+        TRUNCATE(added, 1), \\"cityName\\",
+        COUNT(*) AS \\"Count\\",
+        SUM(added) AS \\"Added\\"
+      FROM \\"wikiticker\\"
+      WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY
+      GROUP BY 1,2
+      ORDER BY \\"Count\\" DESC"
+    `);
   });
 
   it('renders filter by additive ex', () => {
@@ -1180,15 +1180,15 @@ ORDER BY "Count" DESC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          "SELECT
-                                                                                            \\"cityName\\",
-                                                                                            COUNT(*) AS \\"Count\\",
-                                                                                            SUM(added) AS \\"Added\\"
-                                                                                          FROM \\"wikiticker\\"
-                                                                                          WHERE \\"CURRENT_TIMESTAMP - INTERVAL '1' HOUR\\" >= 'columnName'
-                                                                                          GROUP BY 1
-                                                                                          ORDER BY \\"Count\\" DESC"
-                                                            `);
+      "SELECT
+        \\"cityName\\",
+        COUNT(*) AS \\"Count\\",
+        SUM(added) AS \\"Added\\"
+      FROM \\"wikiticker\\"
+      WHERE \\"CURRENT_TIMESTAMP - INTERVAL '1' HOUR\\" >= 'columnName'
+      GROUP BY 1
+      ORDER BY \\"Count\\" DESC"
+    `);
   });
   it('renders filter by additive ex', () => {
     const tree = parser(`SELECT
@@ -1214,14 +1214,14 @@ ORDER BY "Count" DESC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          "SELECT
-                                                                                            \\"cityName\\",
-                                                                                            COUNT(*) AS \\"Count\\",
-                                                                                            SUM(added) AS \\"Added\\", MIN(\\"columnName\\") AS \\"min___time\\"
-                                                                                          FROM \\"wikiticker\\"
-                                                                                          GROUP BY 1
-                                                                                          ORDER BY \\"Count\\" DESC"
-                                                            `);
+      "SELECT
+        \\"cityName\\",
+        COUNT(*) AS \\"Count\\",
+        SUM(added) AS \\"Added\\", MIN(\\"columnName\\") AS \\"min___time\\"
+      FROM \\"wikiticker\\"
+      GROUP BY 1
+      ORDER BY \\"Count\\" DESC"
+    `);
   });
   it('renders filter by additive ex', () => {
     const tree = parser(`SELECT
@@ -1248,14 +1248,14 @@ ORDER BY "Count" DESC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          "SELECT
-                                                                                              \\"cityName\\",
-                                                                                              COUNT(*) AS \\"Count\\",
-                                                                                              SUM(added) AS \\"Added\\", MIN(DISTINCT \\"columnName\\") AS \\"min___time\\"
-                                                                                            FROM \\"wikiticker\\"
-                                                                                            GROUP BY 1
-                                                                                            ORDER BY \\"Count\\" DESC"
-                                                            `);
+      "SELECT
+          \\"cityName\\",
+          COUNT(*) AS \\"Count\\",
+          SUM(added) AS \\"Added\\", MIN(DISTINCT \\"columnName\\") AS \\"min___time\\"
+        FROM \\"wikiticker\\"
+        GROUP BY 1
+        ORDER BY \\"Count\\" DESC"
+    `);
   });
   it('renders filter by additive ex', () => {
     const tree = parser(`SELECT
@@ -1293,14 +1293,14 @@ ORDER BY "Count" DESC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          "SELECT
-                                                                                              \\"cityName\\",
-                                                                                              COUNT(*) AS \\"Count\\",
-                                                                                              SUM(added) AS \\"Added\\", COUNT(\\"*\\") FILTER (WHERE \\"test\\" = 'xxx')
-                                                                                            FROM \\"wikiticker\\"
-                                                                                            GROUP BY 1
-                                                                                            ORDER BY \\"Count\\" DESC"
-                                                            `);
+      "SELECT
+          \\"cityName\\",
+          COUNT(*) AS \\"Count\\",
+          SUM(added) AS \\"Added\\", COUNT(\\"*\\") FILTER (WHERE \\"test\\" = 'xxx')
+        FROM \\"wikiticker\\"
+        GROUP BY 1
+        ORDER BY \\"Count\\" DESC"
+    `);
   });
 
   it('renders filter by additive ex', () => {
@@ -1317,15 +1317,15 @@ ORDER BY "Count" DESC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          "SELECT
-                                                                                              \\"cityName\\",
-                                                                                              COUNT(*) AS \\"Count\\",
-                                                                                              SUM(added) AS \\"Added\\"
-                                                                                          FROM \\"wikiticker\\"
-                                                                                          WHERE \\"CURRENT_TIMESTAMP - INTERVAL '1' HOUR\\" >= 'columnName' AND TIMESTAMP '2018-08-8' >= 'name' AND \\"name\\" >= TIMESTAMP '2018-08-8'
-                                                                                          GROUP BY 1
-                                                                                          ORDER BY \\"Count\\" DESC"
-                                                            `);
+      "SELECT
+          \\"cityName\\",
+          COUNT(*) AS \\"Count\\",
+          SUM(added) AS \\"Added\\"
+      FROM \\"wikiticker\\"
+      WHERE \\"CURRENT_TIMESTAMP - INTERVAL '1' HOUR\\" >= 'columnName' AND TIMESTAMP '2018-08-8' >= 'name' AND \\"name\\" >= TIMESTAMP '2018-08-8'
+      GROUP BY 1
+      ORDER BY \\"Count\\" DESC"
+    `);
   });
 
   it('test applying actions to inner query', () => {
@@ -1343,17 +1343,17 @@ ORDER BY "Count" DESC;)`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          "
-                                                                                              SELECT * FROM (
-                                                                                              SELECT
-                                                                                              \\"cityName\\",
-                                                                                              COUNT(*) AS \\"Count\\",
-                                                                                              SUM(added) AS \\"Added\\"
-                                                                                          FROM \\"wikiticker\\"
-                                                                                          WHERE \\"CURRENT_TIMESTAMP - INTERVAL '1' HOUR\\" >= 'columnName' AND TIMESTAMP '2018-08-8' >= 'name'
-                                                                                          GROUP BY 1
-                                                                                          ORDER BY \\"Count\\" DESC;)"
-                                                            `);
+      "
+          SELECT * FROM (
+          SELECT
+          \\"cityName\\",
+          COUNT(*) AS \\"Count\\",
+          SUM(added) AS \\"Added\\"
+      FROM \\"wikiticker\\"
+      WHERE \\"CURRENT_TIMESTAMP - INTERVAL '1' HOUR\\" >= 'columnName' AND TIMESTAMP '2018-08-8' >= 'name'
+      GROUP BY 1
+      ORDER BY \\"Count\\" DESC;)"
+    `);
   });
 
   it('renders filter by additive ex', () => {
@@ -1369,15 +1369,15 @@ ORDER BY "Count" DESC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          "SELECT
-                                                                                              \\"cityName\\",
-                                                                                              COUNT(*) AS \\"Count\\",
-                                                                                              SUM(added) AS \\"Added\\"
-                                                                                          FROM \\"wikiticker\\"
-                                                                                          WHERE TIMESTAMP '2018-08-8' >= 'name' AND \\"name\\" >= TIMESTAMP '2018-08-8'
-                                                                                          GROUP BY 1
-                                                                                          ORDER BY \\"Count\\" DESC"
-                                                            `);
+      "SELECT
+          \\"cityName\\",
+          COUNT(*) AS \\"Count\\",
+          SUM(added) AS \\"Added\\"
+      FROM \\"wikiticker\\"
+      WHERE TIMESTAMP '2018-08-8' >= 'name' AND \\"name\\" >= TIMESTAMP '2018-08-8'
+      GROUP BY 1
+      ORDER BY \\"Count\\" DESC"
+    `);
   });
 
   it('renders filter by additive ex', () => {
@@ -1390,14 +1390,14 @@ GROUP BY 1,2
 ORDER BY "Time" ASC`).toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          "SELECT
-                                                                                            SUBSTRING(\\"org\\", 1, 2), TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
-                                                                                            COUNT(*) AS \\"Count\\"
-                                                                                          FROM \\"github\\"
-                                                                                          WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY
-                                                                                          GROUP BY 1,2
-                                                                                          ORDER BY \\"Time\\" ASC"
-                                                            `);
+      "SELECT
+        SUBSTRING(\\"org\\", 1, 2), TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
+        COUNT(*) AS \\"Count\\"
+      FROM \\"github\\"
+      WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY
+      GROUP BY 1,2
+      ORDER BY \\"Time\\" ASC"
+    `);
   });
 
   it('renders filter by additive ex', () => {
@@ -1417,14 +1417,14 @@ ORDER BY "Time" ASC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          "SELECT
-                                                                                            SUBSTRING(\\"test\\", 0, 2) AS \\"__test-substring\\", TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
-                                                                                            COUNT(*) AS \\"Count\\"
-                                                                                          FROM \\"lineitem\\"
-                                                                                          WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY
-                                                                                          GROUP BY 1,2
-                                                                                          ORDER BY \\"Time\\" ASC"
-                                                            `);
+      "SELECT
+        SUBSTRING(\\"test\\", 0, 2) AS \\"__test-substring\\", TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
+        COUNT(*) AS \\"Count\\"
+      FROM \\"lineitem\\"
+      WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY
+      GROUP BY 1,2
+      ORDER BY \\"Time\\" ASC"
+    `);
   });
 });
 
@@ -1439,10 +1439,10 @@ GROUP BY 1
 ORDER BY "Time" ASC`).getCurrentFilters();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          Array [
-                                                                                            "__time",
-                                                                                          ]
-                                                            `);
+      Array [
+        "__time",
+      ]
+    `);
   });
 
   it('get simple current filter with expression', () => {
@@ -1455,10 +1455,10 @@ GROUP BY 1
 ORDER BY "Time" ASC`).getCurrentFilters();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          Array [
-                                                                                            "__time",
-                                                                                          ]
-                                                            `);
+      Array [
+        "__time",
+      ]
+    `);
   });
 
   it('get simple current filter with backwards expression', () => {
@@ -1471,10 +1471,10 @@ GROUP BY 1
 ORDER BY "Time" ASC`).getCurrentFilters();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          Array [
-                                                                                            "__time",
-                                                                                          ]
-                                                            `);
+      Array [
+        "__time",
+      ]
+    `);
   });
 
   it('get current filter with multiple simple expressions', () => {
@@ -1487,12 +1487,12 @@ GROUP BY 1
 ORDER BY "Time" ASC`).getCurrentFilters();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          Array [
-                                                                                            "__time",
-                                                                                            "__time2",
-                                                                                            "__time3",
-                                                                                          ]
-                                                            `);
+      Array [
+        "__time",
+        "__time2",
+        "__time3",
+      ]
+    `);
   });
 
   it('get current filter with multiple expressions', () => {
@@ -1505,12 +1505,12 @@ GROUP BY 1
 ORDER BY "Time" ASC`).getCurrentFilters();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          Array [
-                                                                                            "__time",
-                                                                                            "__time",
-                                                                                            "__time3",
-                                                                                          ]
-                                                            `);
+      Array [
+        "__time",
+        "__time",
+        "__time3",
+      ]
+    `);
   });
 
   it('remove current filter with single simple expression', () => {
@@ -1525,13 +1525,13 @@ ORDER BY "Time" ASC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          "SELECT
-                                                                                            TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
-                                                                                            COUNT(*) AS \\"Count\\"
-                                                                                          FROM \\"lineitem\\" 
-                                                                                          GROUP BY 1
-                                                                                          ORDER BY \\"Time\\" ASC"
-                                                            `);
+      "SELECT
+        TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
+        COUNT(*) AS \\"Count\\"
+      FROM \\"lineitem\\" 
+      GROUP BY 1
+      ORDER BY \\"Time\\" ASC"
+    `);
   });
 
   it('remove current filter with backwards simple expression', () => {
@@ -1546,13 +1546,13 @@ ORDER BY "Time" ASC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          "SELECT
-                                                                                            TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
-                                                                                            COUNT(*) AS \\"Count\\"
-                                                                                          FROM \\"lineitem\\" 
-                                                                                          GROUP BY 1
-                                                                                          ORDER BY \\"Time\\" ASC"
-                                                            `);
+      "SELECT
+        TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
+        COUNT(*) AS \\"Count\\"
+      FROM \\"lineitem\\" 
+      GROUP BY 1
+      ORDER BY \\"Time\\" ASC"
+    `);
   });
 
   it('remove current filter with no matching expression', () => {
@@ -1567,14 +1567,14 @@ ORDER BY "Time" ASC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          "SELECT
-                                                                                            TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
-                                                                                            COUNT(*) AS \\"Count\\"
-                                                                                          FROM \\"lineitem\\"
-                                                                                          WHERE \\"value\\" >= 'value' 
-                                                                                          GROUP BY 1
-                                                                                          ORDER BY \\"Time\\" ASC"
-                                                            `);
+      "SELECT
+        TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
+        COUNT(*) AS \\"Count\\"
+      FROM \\"lineitem\\"
+      WHERE \\"value\\" >= 'value' 
+      GROUP BY 1
+      ORDER BY \\"Time\\" ASC"
+    `);
   });
 
   it('remove current filter with multiple simple & backwards expressions', () => {
@@ -1588,14 +1588,14 @@ ORDER BY "Time" ASC`)
       .removeFilter('value2')
       .toString();
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          "SELECT
-                                                                                            TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
-                                                                                            COUNT(*) AS \\"Count\\"
-                                                                                          FROM \\"lineitem\\"
-                                                                                          WHERE \\"__time\\" >= 'value' AND \\"__time3\\" >= 'value3' 
-                                                                                          GROUP BY 1
-                                                                                          ORDER BY \\"Time\\" ASC"
-                                                            `);
+      "SELECT
+        TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
+        COUNT(*) AS \\"Count\\"
+      FROM \\"lineitem\\"
+      WHERE \\"__time\\" >= 'value' AND \\"__time3\\" >= 'value3' 
+      GROUP BY 1
+      ORDER BY \\"Time\\" ASC"
+    `);
   });
 
   it('remove one of two filters', () => {
@@ -1609,14 +1609,14 @@ ORDER BY "Time" ASC`)
       .removeFilter('value2')
       .toString();
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          "SELECT
-                                                                                            TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
-                                                                                            COUNT(*) AS \\"Count\\"
-                                                                                          FROM \\"lineitem\\"
-                                                                                          WHERE \\"__time\\" >= 'value'
-                                                                                          GROUP BY 1
-                                                                                          ORDER BY \\"Time\\" ASC"
-                                                            `);
+      "SELECT
+        TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
+        COUNT(*) AS \\"Count\\"
+      FROM \\"lineitem\\"
+      WHERE \\"__time\\" >= 'value'
+      GROUP BY 1
+      ORDER BY \\"Time\\" ASC"
+    `);
   });
 
   it('remove time stamp', () => {
@@ -1630,13 +1630,13 @@ ORDER BY "Time" ASC`)
       .removeFilter('__time')
       .toString();
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          "SELECT
-                                                                                            TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
-                                                                                            COUNT(*) AS \\"Count\\"
-                                                                                          FROM \\"flow0\\"
-                                                                                          GROUP BY 1
-                                                                                          ORDER BY \\"Time\\" ASC"
-                                                            `);
+      "SELECT
+        TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
+        COUNT(*) AS \\"Count\\"
+      FROM \\"flow0\\"
+      GROUP BY 1
+      ORDER BY \\"Time\\" ASC"
+    `);
   });
 
   it('remove time stamp', () => {
@@ -1650,14 +1650,14 @@ ORDER BY "Time" ASC`)
       .removeFilter('__time')
       .toString();
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          "SELECT
-                                                                                            TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
-                                                                                            COUNT(*) AS \\"Count\\"
-                                                                                          FROM \\"flow0\\"
-                                                                                          WHERE \\"dstaddr_long\\" > 100
-                                                                                          GROUP BY 1
-                                                                                          ORDER BY \\"Time\\" ASC"
-                                                            `);
+      "SELECT
+        TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
+        COUNT(*) AS \\"Count\\"
+      FROM \\"flow0\\"
+      WHERE \\"dstaddr_long\\" > 100
+      GROUP BY 1
+      ORDER BY \\"Time\\" ASC"
+    `);
   });
 
   it('remove whereClause', () => {
@@ -1671,13 +1671,13 @@ ORDER BY "Time" ASC`)
       .removeFilter('__time')
       .toString();
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          "SELECT
-                                                                                            TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
-                                                                                            COUNT(*) AS \\"Count\\"
-                                                                                          FROM \\"flow0\\" 
-                                                                                          GROUP BY 1
-                                                                                          ORDER BY \\"Time\\" ASC"
-                                                            `);
+      "SELECT
+        TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
+        COUNT(*) AS \\"Count\\"
+      FROM \\"flow0\\" 
+      GROUP BY 1
+      ORDER BY \\"Time\\" ASC"
+    `);
   });
 
   it('get simple current filter', () => {
@@ -1690,10 +1690,10 @@ GROUP BY 1
 ORDER BY "Time" ASC`).getCurrentFilters();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          Array [
-                                                                                            "__time",
-                                                                                          ]
-                                                            `);
+      Array [
+        "__time",
+      ]
+    `);
   });
 
   it('get simple current filter with expression', () => {
@@ -1706,10 +1706,10 @@ GROUP BY 1
 ORDER BY "Time" ASC`).getCurrentFilters();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          Array [
-                                                                                            "__time",
-                                                                                          ]
-                                                            `);
+      Array [
+        "__time",
+      ]
+    `);
   });
 
   it('get simple current filter with backwards expression', () => {
@@ -1722,10 +1722,10 @@ GROUP BY 1
 ORDER BY "Time" ASC`).getCurrentFilters();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          Array [
-                                                                                            "__time",
-                                                                                          ]
-                                                            `);
+      Array [
+        "__time",
+      ]
+    `);
   });
 
   it('get current filter with multiple simple expressions', () => {
@@ -1738,12 +1738,12 @@ GROUP BY 1
 ORDER BY "Time" ASC`).getCurrentFilters();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          Array [
-                                                                                            "__time",
-                                                                                            "__time2",
-                                                                                            "__timeThree",
-                                                                                          ]
-                                                            `);
+      Array [
+        "__time",
+        "__time2",
+        "__timeThree",
+      ]
+    `);
   });
 
   it('get current filter with multiple expressions', () => {
@@ -1756,12 +1756,12 @@ GROUP BY 1
 ORDER BY "Time" ASC`).getCurrentFilters();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          Array [
-                                                                                            "__time",
-                                                                                            "__time",
-                                                                                            "__timeThree",
-                                                                                          ]
-                                                            `);
+      Array [
+        "__time",
+        "__time",
+        "__timeThree",
+      ]
+    `);
   });
 
   it('remove current filter with single simple expression', () => {
@@ -1776,13 +1776,13 @@ ORDER BY "Time" ASC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          "SELECT
-                                                                                            TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
-                                                                                            COUNT(*) AS \\"Count\\"
-                                                                                          FROM \\"lineitem\\" 
-                                                                                          GROUP BY 1
-                                                                                          ORDER BY \\"Time\\" ASC"
-                                                            `);
+      "SELECT
+        TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
+        COUNT(*) AS \\"Count\\"
+      FROM \\"lineitem\\" 
+      GROUP BY 1
+      ORDER BY \\"Time\\" ASC"
+    `);
   });
 
   it('remove current filter with backwards simple expression', () => {
@@ -1797,13 +1797,13 @@ ORDER BY "Time" ASC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          "SELECT
-                                                                                            TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
-                                                                                            COUNT(*) AS \\"Count\\"
-                                                                                          FROM \\"lineitem\\"
-                                                                                          GROUP BY 1
-                                                                                          ORDER BY \\"Time\\" ASC"
-                                                            `);
+      "SELECT
+        TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
+        COUNT(*) AS \\"Count\\"
+      FROM \\"lineitem\\"
+      GROUP BY 1
+      ORDER BY \\"Time\\" ASC"
+    `);
   });
 
   it('remove current filter with no matching expression', () => {
@@ -1818,14 +1818,14 @@ ORDER BY "Time" ASC`)
       .toString();
 
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          "SELECT
-                                                                                            TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
-                                                                                            COUNT(*) AS \\"Count\\"
-                                                                                          FROM \\"lineitem\\"
-                                                                                          WHERE \\"value\\" >= 'value'
-                                                                                          GROUP BY 1
-                                                                                          ORDER BY \\"Time\\" ASC"
-                                                            `);
+      "SELECT
+        TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
+        COUNT(*) AS \\"Count\\"
+      FROM \\"lineitem\\"
+      WHERE \\"value\\" >= 'value'
+      GROUP BY 1
+      ORDER BY \\"Time\\" ASC"
+    `);
   });
 
   it('remove current filter with multiple simple & backwards expressions', () => {
@@ -1839,14 +1839,14 @@ ORDER BY "Time" ASC`)
       .removeFilter('valueTwo')
       .toString();
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          "SELECT
-                                                                                            TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
-                                                                                            COUNT(*) AS \\"Count\\"
-                                                                                          FROM \\"lineitem\\"
-                                                                                          WHERE \\"__time\\" >= 'value' AND \\"__time3\\" >= 'value3'
-                                                                                          GROUP BY 1
-                                                                                          ORDER BY \\"Time\\" ASC"
-                                                            `);
+      "SELECT
+        TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
+        COUNT(*) AS \\"Count\\"
+      FROM \\"lineitem\\"
+      WHERE \\"__time\\" >= 'value' AND \\"__time3\\" >= 'value3'
+      GROUP BY 1
+      ORDER BY \\"Time\\" ASC"
+    `);
   });
 
   it('remove one of two filters', () => {
@@ -1860,14 +1860,14 @@ ORDER BY "Time" ASC`)
       .removeFilter('value2')
       .toString();
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          "SELECT
-                                                                                            TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
-                                                                                            COUNT(*) AS \\"Count\\"
-                                                                                          FROM \\"lineitem\\"
-                                                                                          WHERE __time >= 'value'
-                                                                                          GROUP BY 1
-                                                                                          ORDER BY \\"Time\\" ASC"
-                                                            `);
+      "SELECT
+        TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
+        COUNT(*) AS \\"Count\\"
+      FROM \\"lineitem\\"
+      WHERE __time >= 'value'
+      GROUP BY 1
+      ORDER BY \\"Time\\" ASC"
+    `);
   });
 
   it('remove time stamp', () => {
@@ -1881,13 +1881,13 @@ ORDER BY "Time" ASC`)
       .removeFilter('__time')
       .toString();
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          "SELECT
-                                                                                            TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
-                                                                                            COUNT(*) AS \\"Count\\"
-                                                                                          FROM \\"flow0\\"
-                                                                                          GROUP BY 1
-                                                                                          ORDER BY \\"Time\\" ASC"
-                                                            `);
+      "SELECT
+        TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
+        COUNT(*) AS \\"Count\\"
+      FROM \\"flow0\\"
+      GROUP BY 1
+      ORDER BY \\"Time\\" ASC"
+    `);
   });
 
   it('remove time stamp', () => {
@@ -1901,14 +1901,14 @@ ORDER BY "Time" ASC`)
       .removeFilter('__time')
       .toString();
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          "SELECT
-                                                                                            TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
-                                                                                            COUNT(*) AS \\"Count\\"
-                                                                                          FROM \\"flow0\\"
-                                                                                          WHERE \\"dstaddr_long\\" > 100
-                                                                                          GROUP BY 1
-                                                                                          ORDER BY \\"Time\\" ASC"
-                                                            `);
+      "SELECT
+        TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
+        COUNT(*) AS \\"Count\\"
+      FROM \\"flow0\\"
+      WHERE \\"dstaddr_long\\" > 100
+      GROUP BY 1
+      ORDER BY \\"Time\\" ASC"
+    `);
   });
 });
 describe('Replace from', () => {
@@ -1923,14 +1923,14 @@ ORDER BY "Time" ASC`)
       .replaceFrom(refExpressionFactory('test'))
       .toString();
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          "SELECT
-                                                                                            TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
-                                                                                            COUNT(*) AS \\"Count\\"
-                                                                                          FROM test
-                                                                                          WHERE \\"dstaddr_long\\" > 100 AND TIMESTAMP '2019-7-1 13:00:00' <= __time AND __time < TIMESTAMP '2019-7-1 14:00:00'
-                                                                                          GROUP BY 1
-                                                                                          ORDER BY \\"Time\\" ASC"
-                                                            `);
+      "SELECT
+        TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
+        COUNT(*) AS \\"Count\\"
+      FROM test
+      WHERE \\"dstaddr_long\\" > 100 AND TIMESTAMP '2019-7-1 13:00:00' <= __time AND __time < TIMESTAMP '2019-7-1 14:00:00'
+      GROUP BY 1
+      ORDER BY \\"Time\\" ASC"
+    `);
   });
 
   it('replace with namespace', () => {
@@ -1944,14 +1944,14 @@ ORDER BY "Time" ASC`)
       .replaceFrom(refExpressionFactory('test', 'test'))
       .toString();
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          "SELECT
-                                                                                            TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
-                                                                                            COUNT(*) AS \\"Count\\"
-                                                                                          FROM test.test
-                                                                                          WHERE \\"dstaddr_long\\" > 100 AND TIMESTAMP '2019-7-1 13:00:00' <= __time AND __time < TIMESTAMP '2019-7-1 14:00:00'
-                                                                                          GROUP BY 1
-                                                                                          ORDER BY \\"Time\\" ASC"
-                                                            `);
+      "SELECT
+        TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
+        COUNT(*) AS \\"Count\\"
+      FROM test.test
+      WHERE \\"dstaddr_long\\" > 100 AND TIMESTAMP '2019-7-1 13:00:00' <= __time AND __time < TIMESTAMP '2019-7-1 14:00:00'
+      GROUP BY 1
+      ORDER BY \\"Time\\" ASC"
+    `);
   });
 
   it('replace with quotes', () => {
@@ -1965,14 +1965,14 @@ ORDER BY "Time" ASC`)
       .replaceFrom(refExpressionFactory(stringFactory('test', '"')))
       .toString();
     expect(tree).toMatchInlineSnapshot(`
-                                                                                          "SELECT
-                                                                                            TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
-                                                                                            COUNT(*) AS \\"Count\\"
-                                                                                          FROM \\"test\\"
-                                                                                          WHERE \\"dstaddr_long\\" > 100 AND TIMESTAMP '2019-7-1 13:00:00' <= __time AND __time < TIMESTAMP '2019-7-1 14:00:00'
-                                                                                          GROUP BY 1
-                                                                                          ORDER BY \\"Time\\" ASC"
-                                                            `);
+      "SELECT
+        TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
+        COUNT(*) AS \\"Count\\"
+      FROM \\"test\\"
+      WHERE \\"dstaddr_long\\" > 100 AND TIMESTAMP '2019-7-1 13:00:00' <= __time AND __time < TIMESTAMP '2019-7-1 14:00:00'
+      GROUP BY 1
+      ORDER BY \\"Time\\" ASC"
+    `);
   });
 });
 
@@ -1989,13 +1989,13 @@ ORDER BY "Count" DESC`)
       .excludeColumn('Count')
       .toString(),
   ).toMatchInlineSnapshot(`
-                                                "SELECT
-                                                  \\"language\\",
-                                                  COUNT(DISTINCT \\"language\\") AS \\"dist_language\\", COUNT(*) FILTER (WHERE \\"language\\"= 'xxx') AS \\"language_filtered_count\\"
-                                                FROM \\"github\\"
-                                                WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY AND \\"language\\" != 'TypeScript'
-                                                GROUP BY 1"
-                        `);
+    "SELECT
+      \\"language\\",
+      COUNT(DISTINCT \\"language\\") AS \\"dist_language\\", COUNT(*) FILTER (WHERE \\"language\\"= 'xxx') AS \\"language_filtered_count\\"
+    FROM \\"github\\"
+    WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY AND \\"language\\" != 'TypeScript'
+    GROUP BY 1"
+  `);
 });
 
 it('Remove column in HAVING, multiple having filters', () => {
@@ -2011,14 +2011,14 @@ ORDER BY "Count" DESC`)
       .excludeColumn('Count')
       .toString(),
   ).toMatchInlineSnapshot(`
-                                        "SELECT
-                                          \\"language\\",
-                                          COUNT(DISTINCT \\"language\\") AS \\"dist_language\\", COUNT(*) FILTER (WHERE \\"language\\"= 'xxx') AS \\"language_filtered_count\\"
-                                        FROM \\"github\\"
-                                        WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY AND \\"language\\" != 'TypeScript'
-                                        GROUP BY 1
-                                        HAVING \\"dist_language\\" != 37392"
-                    `);
+    "SELECT
+      \\"language\\",
+      COUNT(DISTINCT \\"language\\") AS \\"dist_language\\", COUNT(*) FILTER (WHERE \\"language\\"= 'xxx') AS \\"language_filtered_count\\"
+    FROM \\"github\\"
+    WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY AND \\"language\\" != 'TypeScript'
+    GROUP BY 1
+    HAVING \\"dist_language\\" != 37392"
+  `);
 });
 
 it('Remove column in HAVING, OR expression', () => {
@@ -2034,14 +2034,14 @@ ORDER BY "Count" DESC`)
       .excludeColumn('Count')
       .toString(),
   ).toMatchInlineSnapshot(`
-        "SELECT
-          \\"language\\",
-          COUNT(DISTINCT \\"language\\") AS \\"dist_language\\", COUNT(*) FILTER (WHERE \\"language\\"= 'xxx') AS \\"language_filtered_count\\"
-        FROM \\"github\\"
-        WHERE \\"Count\\" != 37392 OR \\"dist_language\\" != 37392
-        GROUP BY 1
-        HAVING \\"dist_language\\" != 37392"
-    `);
+    "SELECT
+      \\"language\\",
+      COUNT(DISTINCT \\"language\\") AS \\"dist_language\\", COUNT(*) FILTER (WHERE \\"language\\"= 'xxx') AS \\"language_filtered_count\\"
+    FROM \\"github\\"
+    WHERE \\"Count\\" != 37392 OR \\"dist_language\\" != 37392
+    GROUP BY 1
+    HAVING \\"dist_language\\" != 37392"
+  `);
 });
 
 it('Remove column in HAVING, OR expression', () => {
