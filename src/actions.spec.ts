@@ -1976,9 +1976,10 @@ ORDER BY "Time" ASC`)
   });
 });
 
-it('Remove column in HAVING', () => {
-  expect(
-    parser(`SELECT
+describe('Remove from Having', () => {
+  it('Remove column in HAVING', () => {
+    expect(
+      parser(`SELECT
   "language",
   TRIM(TRAILING 'A' FROM "language") AS "Count", COUNT(DISTINCT "language") AS "dist_language", COUNT(*) FILTER (WHERE "language"= 'xxx') AS "language_filtered_count"
 FROM "github"
@@ -1986,21 +1987,21 @@ WHERE "__time" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY AND "language" != 'TypeSc
 GROUP BY 1
 HAVING "Count" != 37392
 ORDER BY "Count" DESC`)
-      .excludeColumn('Count')
-      .toString(),
-  ).toMatchInlineSnapshot(`
-    "SELECT
-      \\"language\\",
-      COUNT(DISTINCT \\"language\\") AS \\"dist_language\\", COUNT(*) FILTER (WHERE \\"language\\"= 'xxx') AS \\"language_filtered_count\\"
-    FROM \\"github\\"
-    WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY AND \\"language\\" != 'TypeScript'
-    GROUP BY 1"
-  `);
-});
+        .excludeColumn('Count')
+        .toString(),
+    ).toMatchInlineSnapshot(`
+      "SELECT
+        \\"language\\",
+        COUNT(DISTINCT \\"language\\") AS \\"dist_language\\", COUNT(*) FILTER (WHERE \\"language\\"= 'xxx') AS \\"language_filtered_count\\"
+      FROM \\"github\\"
+      WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY AND \\"language\\" != 'TypeScript'
+      GROUP BY 1"
+    `);
+  });
 
-it('Remove column in HAVING, multiple having filters', () => {
-  expect(
-    parser(`SELECT
+  it('Remove column in HAVING, multiple having filters', () => {
+    expect(
+      parser(`SELECT
   "language",
   TRIM(TRAILING 'A' FROM "language") AS "Count", COUNT(DISTINCT "language") AS "dist_language", COUNT(*) FILTER (WHERE "language"= 'xxx') AS "language_filtered_count"
 FROM "github"
@@ -2008,22 +2009,22 @@ WHERE "__time" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY AND "language" != 'TypeSc
 GROUP BY 1
 HAVING "Count" != 37392 AND "dist_language" != 37392
 ORDER BY "Count" DESC`)
-      .excludeColumn('Count')
-      .toString(),
-  ).toMatchInlineSnapshot(`
-    "SELECT
-      \\"language\\",
-      COUNT(DISTINCT \\"language\\") AS \\"dist_language\\", COUNT(*) FILTER (WHERE \\"language\\"= 'xxx') AS \\"language_filtered_count\\"
-    FROM \\"github\\"
-    WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY AND \\"language\\" != 'TypeScript'
-    GROUP BY 1
-    HAVING \\"dist_language\\" != 37392"
-  `);
-});
+        .excludeColumn('Count')
+        .toString(),
+    ).toMatchInlineSnapshot(`
+      "SELECT
+        \\"language\\",
+        COUNT(DISTINCT \\"language\\") AS \\"dist_language\\", COUNT(*) FILTER (WHERE \\"language\\"= 'xxx') AS \\"language_filtered_count\\"
+      FROM \\"github\\"
+      WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY AND \\"language\\" != 'TypeScript'
+      GROUP BY 1
+      HAVING \\"dist_language\\" != 37392"
+    `);
+  });
 
-it('Remove column in HAVING, OR expression', () => {
-  expect(
-    parser(`SELECT
+  it('Remove column in HAVING, OR expression', () => {
+    expect(
+      parser(`SELECT
   "language",
   TRIM(TRAILING 'A' FROM "language") AS "Count", COUNT(DISTINCT "language") AS "dist_language", COUNT(*) FILTER (WHERE "language"= 'xxx') AS "language_filtered_count"
 FROM "github"
@@ -2031,22 +2032,22 @@ WHERE "Count" != 37392 OR "dist_language" != 37392
 GROUP BY 1
 HAVING "Count" != 37392 OR "dist_language" != 37392 AND "Count" != 37392 
 ORDER BY "Count" DESC`)
-      .excludeColumn('Count')
-      .toString(),
-  ).toMatchInlineSnapshot(`
-    "SELECT
-      \\"language\\",
-      COUNT(DISTINCT \\"language\\") AS \\"dist_language\\", COUNT(*) FILTER (WHERE \\"language\\"= 'xxx') AS \\"language_filtered_count\\"
-    FROM \\"github\\"
-    WHERE \\"Count\\" != 37392 OR \\"dist_language\\" != 37392
-    GROUP BY 1
-    HAVING \\"dist_language\\" != 37392"
-  `);
-});
+        .excludeColumn('Count')
+        .toString(),
+    ).toMatchInlineSnapshot(`
+      "SELECT
+        \\"language\\",
+        COUNT(DISTINCT \\"language\\") AS \\"dist_language\\", COUNT(*) FILTER (WHERE \\"language\\"= 'xxx') AS \\"language_filtered_count\\"
+      FROM \\"github\\"
+      WHERE \\"Count\\" != 37392 OR \\"dist_language\\" != 37392
+      GROUP BY 1
+      HAVING \\"dist_language\\" != 37392"
+    `);
+  });
 
-it('Remove column in HAVING, OR expression', () => {
-  expect(
-    parser(`SELECT
+  it('Remove column in HAVING, OR expression', () => {
+    expect(
+      parser(`SELECT
   "language",
   TRIM(TRAILING 'A' FROM "language") AS "Count", COUNT(DISTINCT "language") AS "dist_language", COUNT(*) FILTER (WHERE "language"= 'xxx') AS "language_filtered_count"
 FROM "github"
@@ -2054,15 +2055,64 @@ WHERE "Count" != 37392 OR "dist_language" != 37392
 GROUP BY 1
 HAVING "github" != 37392 OR "dist_language" != 37392 AND "Count" != 37392 
 ORDER BY "Count" DESC`)
-      .excludeColumn('Count')
-      .toString(),
-  ).toMatchInlineSnapshot(`
-    "SELECT
-      \\"language\\",
-      COUNT(DISTINCT \\"language\\") AS \\"dist_language\\", COUNT(*) FILTER (WHERE \\"language\\"= 'xxx') AS \\"language_filtered_count\\"
-    FROM \\"github\\"
-    WHERE \\"Count\\" != 37392 OR \\"dist_language\\" != 37392
-    GROUP BY 1
-    HAVING \\"github\\" != 37392 OR \\"dist_language\\" != 37392"
-  `);
+        .excludeColumn('Count')
+        .toString(),
+    ).toMatchInlineSnapshot(`
+      "SELECT
+        \\"language\\",
+        COUNT(DISTINCT \\"language\\") AS \\"dist_language\\", COUNT(*) FILTER (WHERE \\"language\\"= 'xxx') AS \\"language_filtered_count\\"
+      FROM \\"github\\"
+      WHERE \\"Count\\" != 37392 OR \\"dist_language\\" != 37392
+      GROUP BY 1
+      HAVING \\"github\\" != 37392 OR \\"dist_language\\" != 37392"
+    `);
+  });
+
+  it('Remove column in WHERE, OR expression', () => {
+    expect(
+      parser(`SELECT
+  "language",
+  TRIM(TRAILING 'A' FROM "language") AS "Count", COUNT(DISTINCT "language") AS "dist_language", COUNT(*) FILTER (WHERE "language"= 'xxx') AS "language_filtered_count"
+FROM "github"
+WHERE "Count" != 37392 OR "dist_language" != 37392
+GROUP BY 1
+HAVING "github" != 37392 OR "dist_language" != 37392 AND "Count" != 37392 
+ORDER BY "Count" DESC`)
+        .removeFilter('Count')
+        .toString(),
+    ).toMatchInlineSnapshot(`
+      "SELECT
+        \\"language\\",
+        TRIM(TRAILING 'A' FROM \\"language\\") AS \\"Count\\", COUNT(DISTINCT \\"language\\") AS \\"dist_language\\", COUNT(*) FILTER (WHERE \\"language\\"= 'xxx') AS \\"language_filtered_count\\"
+      FROM \\"github\\"
+      WHERE \\"dist_language\\" != 37392
+      GROUP BY 1
+      HAVING \\"github\\" != 37392 OR \\"dist_language\\" != 37392 AND \\"Count\\" != 37392 
+      ORDER BY \\"Count\\" DESC"
+    `);
+  });
+
+  it('Remove column in WHERE, OR expression', () => {
+    expect(
+      parser(`SELECT
+  "language",
+  TRIM(TRAILING 'A' FROM "language") AS "Count", COUNT(DISTINCT "language") AS "dist_language", COUNT(*) FILTER (WHERE "language"= 'xxx') AS "language_filtered_count"
+FROM "github"
+WHERE "Count" != 37392 OR "dist_language" != 37392 AND "Count" != 37392 
+GROUP BY 1
+HAVING "github" != 37392 OR "dist_language" != 37392 AND "Count" != 37392 
+ORDER BY "Count" DESC`)
+        .removeFilter('dist_language')
+        .toString(),
+    ).toMatchInlineSnapshot(`
+      "SELECT
+        \\"language\\",
+        TRIM(TRAILING 'A' FROM \\"language\\") AS \\"Count\\", COUNT(DISTINCT \\"language\\") AS \\"dist_language\\", COUNT(*) FILTER (WHERE \\"language\\"= 'xxx') AS \\"language_filtered_count\\"
+      FROM \\"github\\"
+      WHERE \\"Count\\" != 37392 OR \\"Count\\" != 37392 
+      GROUP BY 1
+      HAVING \\"github\\" != 37392 OR \\"dist_language\\" != 37392 AND \\"Count\\" != 37392 
+      ORDER BY \\"Count\\" DESC"
+    `);
+  });
 });
