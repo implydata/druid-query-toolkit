@@ -317,7 +317,7 @@ export class SqlQuery extends BaseAst {
       if (columnName !== groupByColumn) {
         if (this.getColumnsArray().indexOf(columnName) + 1 < Number(groupByColumn)) {
           newGroupBy.push(Number(groupByColumn - 1));
-        } else if (this.getColumnsArray().indexOf(columnName) + 1 > Number(groupByColumn)) {
+        } else if (this.getColumnsArray().indexOf(columnName) + 1 !== Number(groupByColumn)) {
           newGroupBy.push(groupByColumn);
         }
       }

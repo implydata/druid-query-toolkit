@@ -1096,7 +1096,97 @@ ORDER BY "Count" DESC`)
       ORDER BY \\"Count\\" DESC"
     `);
   });
+  it('remove first column in group by', () => {
+    const tree = parser(`SELECT
+  "page", "count", "user",
+  COUNT(*) AS "Count"
+FROM "wikipedia"
+GROUP BY 1,2,3
+ORDER BY "Count" DESC`)
+      .removeGroupBy('page')
+      .toString();
 
+    expect(tree).toMatchInlineSnapshot(`
+      "SELECT
+        \\"count\\", \\"user\\", COUNT(*) AS \\"Count\\"
+      FROM \\"wikipedia\\"
+      GROUP BY 1,2
+      ORDER BY \\"Count\\" DESC"
+    `);
+  });
+
+  it('remove second column in group by', () => {
+    const tree = parser(`SELECT
+  "page", "count", "user",
+  COUNT(*) AS "Count"
+FROM "wikipedia"
+GROUP BY 1,2,3
+ORDER BY "Count" DESC`)
+      .removeGroupBy('count')
+      .toString();
+
+    expect(tree).toMatchInlineSnapshot(`
+      "SELECT
+        \\"page\\", \\"user\\", COUNT(*) AS \\"Count\\"
+      FROM \\"wikipedia\\"
+      GROUP BY 1,2
+      ORDER BY \\"Count\\" DESC"
+    `);
+  });
+  it('remove third column in group by', () => {
+    const tree = parser(`SELECT
+  "page", "count", "user",
+  COUNT(*) AS "Count"
+FROM "wikipedia"
+GROUP BY 1,2,3
+ORDER BY "Count" DESC`)
+      .removeGroupBy('user')
+      .toString();
+
+    expect(tree).toMatchInlineSnapshot(`
+      "SELECT
+        \\"page\\", \\"count\\", COUNT(*) AS \\"Count\\"
+      FROM \\"wikipedia\\"
+      GROUP BY 1,2
+      ORDER BY \\"Count\\" DESC"
+    `);
+  });
+  it('remove string column in group by mixed with names and indexes', () => {
+    const tree = parser(`SELECT
+  "page", "count", "user",
+  COUNT(*) AS "Count"
+FROM "wikipedia"
+GROUP BY 1,count,3
+ORDER BY "Count" DESC`)
+      .removeGroupBy('count')
+      .toString();
+
+    expect(tree).toMatchInlineSnapshot(`
+      "SELECT
+        \\"page\\", \\"user\\", COUNT(*) AS \\"Count\\"
+      FROM \\"wikipedia\\"
+      GROUP BY 1,2
+      ORDER BY \\"Count\\" DESC"
+    `);
+  });
+  it('remove index column in group by mixed with names and indexes', () => {
+    const tree = parser(`SELECT
+  "page", "count", "user",
+  COUNT(*) AS "Count"
+FROM "wikipedia"
+GROUP BY 1,count,3
+ORDER BY "Count" DESC`)
+      .removeGroupBy('user')
+      .toString();
+
+    expect(tree).toMatchInlineSnapshot(`
+      "SELECT
+        \\"page\\", \\"count\\", COUNT(*) AS \\"Count\\"
+      FROM \\"wikipedia\\"
+      GROUP BY 1,count
+      ORDER BY \\"Count\\" DESC"
+    `);
+  });
   it('renders  add aggregate column', () => {
     const tree = parser(`SELECT
   "cityName",
