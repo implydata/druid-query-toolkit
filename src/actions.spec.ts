@@ -1187,6 +1187,23 @@ ORDER BY "Count" DESC`)
       ORDER BY \\"Count\\" DESC"
     `);
   });
+  it('remove only column in group by', () => {
+    const tree = parser(`SELECT
+  "page",
+  COUNT(*) AS "Count"
+FROM "wikipedia"
+GROUP BY 1
+ORDER BY "Count" DESC`)
+      .removeGroupBy('page')
+      .toString();
+
+    expect(tree).toMatchInlineSnapshot(`
+      "SELECT
+        COUNT(*) AS \\"Count\\"
+      FROM \\"wikipedia\\"
+      ORDER BY \\"Count\\" DESC"
+    `);
+  });
   it('renders  add aggregate column', () => {
     const tree = parser(`SELECT
   "cityName",

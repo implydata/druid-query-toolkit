@@ -327,12 +327,15 @@ export class SqlQuery extends BaseAst {
       withClause: this.withClause,
       distinct: this.distinct,
       fromClause: this.fromClause,
-      groupByClause: new GroupByClause({
-        groupKeyword: this.groupByClause.groupKeyword,
-        byKeyword: this.groupByClause.byKeyword,
-        groupBy: newGroupBy,
-        spacing: this.groupByClause.spacing,
-      }),
+      groupByClause:
+        newGroupBy.length > 0
+          ? new GroupByClause({
+              groupKeyword: this.groupByClause.groupKeyword,
+              byKeyword: this.groupByClause.byKeyword,
+              groupBy: newGroupBy,
+              spacing: this.groupByClause.spacing,
+            })
+          : undefined,
       havingClause: this.havingClause,
       limitClause: this.limitClause,
       orderByClause: this.orderByClause,
