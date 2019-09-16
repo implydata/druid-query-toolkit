@@ -1096,6 +1096,21 @@ ORDER BY "Count" DESC`)
       ORDER BY \\"Count\\" DESC"
     `);
   });
+
+  it('get current group by columns', () => {
+    const tree = parser(`SELECT
+  "countryIsoCode", COUNT(*) AS "Count", "cityName", SUM(sum_added) AS "Added"
+FROM "wikipedia"
+GROUP BY 1,"cityName"
+ORDER BY "Count" DESC`).getGroupByColumns();
+
+    expect(tree).toMatchInlineSnapshot(`
+      Array [
+        "countryIsoCode",
+        "cityName",
+      ]
+    `);
+  });
   it('remove first column in group by', () => {
     const tree = parser(`SELECT
   "page", "count", "user",
