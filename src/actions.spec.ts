@@ -1204,6 +1204,23 @@ ORDER BY "Count" DESC`)
       ORDER BY \\"Count\\" DESC"
     `);
   });
+  it('remove column in group by mixed with non group by columns', () => {
+    const tree = parser(`SELECT
+  "countryIsoCode", COUNT(*) AS "Count", "cityName", SUM(sum_added) AS "Added"
+FROM "wikipedia"
+GROUP BY 1,3
+ORDER BY "Count" DESC`)
+      .removeGroupBy('countryIsoCode')
+      .toString();
+
+    expect(tree).toMatchInlineSnapshot(`
+      "SELECT
+        COUNT(*) AS \\"Count\\", \\"cityName\\", SUM(sum_added) AS \\"Added\\"
+      FROM \\"wikipedia\\"
+      GROUP BY 2
+      ORDER BY \\"Count\\" DESC"
+    `);
+  });
   it('renders  add aggregate column', () => {
     const tree = parser(`SELECT
   "cityName",
