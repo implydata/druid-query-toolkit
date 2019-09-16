@@ -243,7 +243,7 @@ export class SqlQuery extends BaseAst {
       }
     }
 
-    if (!this.groupByClause) {
+    if (!this.groupByClause || this.hasGroupByForColumn(columnName)) {
       return this;
     }
 
