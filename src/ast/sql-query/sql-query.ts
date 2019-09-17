@@ -325,27 +325,6 @@ export class SqlQuery extends BaseAst {
         } else if (this.groupByClause) newGroupBy.push(this.groupByClause.groupBy[index]);
       }
     });
-    // if (groupByColumns.lastIndexOf(columnName) === -1) {
-    //   // if the column is an index
-    //   groupByColumns.forEach(groupByColumn => {
-    //     if (indexOfColumn + 1 < Number(groupByColumn)) {
-    //       newGroupBy.push(Number(groupByColumn - 1));
-    //     } else if (indexOfColumn + 1 !== Number(groupByColumn)) {
-    //       newGroupBy.push(groupByColumn);
-    //     }
-    //   });
-    // } else {
-    //   groupByColumns.forEach(groupByColumn => {
-    //     if (groupByColumns.lastIndexOf(columnName) + 1 < Number(groupByColumn)) {
-    //       newGroupBy.push(Number(groupByColumn - 1));
-    //     } else if (
-    //       groupByColumns.lastIndexOf(columnName) + 1 !== groupByColumn &&
-    //       groupByColumn !== columnName
-    //     ) {
-    //       newGroupBy.push(groupByColumn);
-    //     }
-    //   });
-    // }
 
     return new SqlQuery({
       columns: new Columns({ columns: newColumns, parens: [], spacing: columnSpacing }),
