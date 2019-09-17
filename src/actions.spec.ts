@@ -1261,6 +1261,42 @@ ORDER BY "Count" DESC`)
     `);
   });
 
+  it('remove most recent column in group by when it occurs multiple times and it is grouped by name', () => {
+    const parsedQuery = parser(`SELECT
+  "user", "countryIsoCode", "user", COUNT(*) AS "Count"
+FROM "wikipedia"
+GROUP BY 1,2,user
+ORDER BY "Count" DESC`)
+      .removeGroupBy('user')
+      .toString();
+
+    expect(parsedQuery).toMatchInlineSnapshot(`
+      "SELECT
+        \\"user\\", \\"countryIsoCode\\", COUNT(*) AS \\"Count\\"
+      FROM \\"wikipedia\\"
+      GROUP BY 1,2
+      ORDER BY \\"Count\\" DESC"
+    `);
+  });
+
+  it('remove most recent column in group by when it occurs multiple times and it is an index', () => {
+    const parsedQuery = parser(`SELECT
+  "user", "countryIsoCode", "user", COUNT(*) AS "Count"
+FROM "wikipedia"
+GROUP BY user,2,3
+ORDER BY "Count" DESC`)
+      .removeGroupBy('user')
+      .toString();
+
+    expect(parsedQuery).toMatchInlineSnapshot(`
+      "SELECT
+        \\"user\\", \\"countryIsoCode\\", COUNT(*) AS \\"Count\\"
+      FROM \\"wikipedia\\"
+      GROUP BY user,2
+      ORDER BY \\"Count\\" DESC"
+    `);
+  });
+
   it('remove column in group by mixed with non group by columns', () => {
     const parsedQuery = parser(`SELECT
   "countryIsoCode", COUNT(*) AS "Count", "cityName", SUM(sum_added) AS "Added"
