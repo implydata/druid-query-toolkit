@@ -1051,6 +1051,24 @@ ORDER BY "Count" DESC`)
     `);
   });
 
+  it('renders add to group by for a column already inside group by clause', () => {
+    const tree = parser(`SELECT
+  "user", "count", COUNT(*) AS "Count"
+FROM "wikipedia"
+GROUP BY 1,2
+ORDER BY "Count" DESC`)
+      .addToGroupBy('user')
+      .toString();
+
+    expect(tree).toMatchInlineSnapshot(`
+      "SELECT
+        \\"user\\", \\"user\\", \\"count\\", COUNT(*) AS \\"Count\\"
+      FROM \\"wikipedia\\"
+      GROUP BY 1,2,3
+      ORDER BY \\"Count\\" DESC"
+    `);
+  });
+
   it('renders  add to group by out of order', () => {
     const tree = parser(`SELECT
   COUNT(*) AS "Count",
@@ -1098,21 +1116,22 @@ ORDER BY "Count" DESC`)
   });
 
   it('get current group by columns', () => {
-    const tree = parser(`SELECT
+    const groupByColumns = parser(`SELECT
   "countryIsoCode", COUNT(*) AS "Count", "cityName", SUM(sum_added) AS "Added"
 FROM "wikipedia"
 GROUP BY 1,"cityName"
 ORDER BY "Count" DESC`).getGroupByColumns();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(groupByColumns).toMatchInlineSnapshot(`
       Array [
         "countryIsoCode",
         "cityName",
       ]
     `);
   });
+
   it('remove first column in group by', () => {
-    const tree = parser(`SELECT
+    const parsedQuery = parser(`SELECT
   "page", "count", "user",
   COUNT(*) AS "Count"
 FROM "wikipedia"
@@ -1121,7 +1140,7 @@ ORDER BY "Count" DESC`)
       .removeGroupBy('page')
       .toString();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(parsedQuery).toMatchInlineSnapshot(`
       "SELECT
         \\"count\\", \\"user\\", COUNT(*) AS \\"Count\\"
       FROM \\"wikipedia\\"
@@ -1131,7 +1150,7 @@ ORDER BY "Count" DESC`)
   });
 
   it('remove second column in group by', () => {
-    const tree = parser(`SELECT
+    const parsedQuery = parser(`SELECT
   "page", "count", "user",
   COUNT(*) AS "Count"
 FROM "wikipedia"
@@ -1140,7 +1159,7 @@ ORDER BY "Count" DESC`)
       .removeGroupBy('count')
       .toString();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(parsedQuery).toMatchInlineSnapshot(`
       "SELECT
         \\"page\\", \\"user\\", COUNT(*) AS \\"Count\\"
       FROM \\"wikipedia\\"
@@ -1148,8 +1167,9 @@ ORDER BY "Count" DESC`)
       ORDER BY \\"Count\\" DESC"
     `);
   });
+
   it('remove third column in group by', () => {
-    const tree = parser(`SELECT
+    const parsedQuery = parser(`SELECT
   "page", "count", "user",
   COUNT(*) AS "Count"
 FROM "wikipedia"
@@ -1158,7 +1178,7 @@ ORDER BY "Count" DESC`)
       .removeGroupBy('user')
       .toString();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(parsedQuery).toMatchInlineSnapshot(`
       "SELECT
         \\"page\\", \\"count\\", COUNT(*) AS \\"Count\\"
       FROM \\"wikipedia\\"
@@ -1166,8 +1186,9 @@ ORDER BY "Count" DESC`)
       ORDER BY \\"Count\\" DESC"
     `);
   });
+
   it('remove string column in group by mixed with names and indexes', () => {
-    const tree = parser(`SELECT
+    const parsedQuery = parser(`SELECT
   "page", "count", "user",
   COUNT(*) AS "Count"
 FROM "wikipedia"
@@ -1176,7 +1197,7 @@ ORDER BY "Count" DESC`)
       .removeGroupBy('count')
       .toString();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(parsedQuery).toMatchInlineSnapshot(`
       "SELECT
         \\"page\\", \\"user\\", COUNT(*) AS \\"Count\\"
       FROM \\"wikipedia\\"
@@ -1184,8 +1205,9 @@ ORDER BY "Count" DESC`)
       ORDER BY \\"Count\\" DESC"
     `);
   });
+
   it('remove index column in group by mixed with names and indexes', () => {
-    const tree = parser(`SELECT
+    const parsedQuery = parser(`SELECT
   "page", "count", "user",
   COUNT(*) AS "Count"
 FROM "wikipedia"
@@ -1194,7 +1216,7 @@ ORDER BY "Count" DESC`)
       .removeGroupBy('user')
       .toString();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(parsedQuery).toMatchInlineSnapshot(`
       "SELECT
         \\"page\\", \\"count\\", COUNT(*) AS \\"Count\\"
       FROM \\"wikipedia\\"
@@ -1202,8 +1224,9 @@ ORDER BY "Count" DESC`)
       ORDER BY \\"Count\\" DESC"
     `);
   });
+
   it('remove only column in group by', () => {
-    const tree = parser(`SELECT
+    const parsedQuery = parser(`SELECT
   "page",
   COUNT(*) AS "Count"
 FROM "wikipedia"
@@ -1212,15 +1235,34 @@ ORDER BY "Count" DESC`)
       .removeGroupBy('page')
       .toString();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(parsedQuery).toMatchInlineSnapshot(`
       "SELECT
         COUNT(*) AS \\"Count\\"
       FROM \\"wikipedia\\"
       ORDER BY \\"Count\\" DESC"
     `);
   });
+
+  it('remove most recent column in group by when it occurs multiple times', () => {
+    const parsedQuery = parser(`SELECT
+  "user", "countryIsoCode", "user", COUNT(*) AS "Count"
+FROM "wikipedia"
+GROUP BY 1,2,3
+ORDER BY "Count" DESC`)
+      .removeGroupBy('user')
+      .toString();
+
+    expect(parsedQuery).toMatchInlineSnapshot(`
+      "SELECT
+        \\"user\\", \\"countryIsoCode\\", COUNT(*) AS \\"Count\\"
+      FROM \\"wikipedia\\"
+      GROUP BY 1,2
+      ORDER BY \\"Count\\" DESC"
+    `);
+  });
+
   it('remove column in group by mixed with non group by columns', () => {
-    const tree = parser(`SELECT
+    const parsedQuery = parser(`SELECT
   "countryIsoCode", COUNT(*) AS "Count", "cityName", SUM(sum_added) AS "Added"
 FROM "wikipedia"
 GROUP BY 1,3
@@ -1228,7 +1270,7 @@ ORDER BY "Count" DESC`)
       .removeGroupBy('countryIsoCode')
       .toString();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(parsedQuery).toMatchInlineSnapshot(`
       "SELECT
         COUNT(*) AS \\"Count\\", \\"cityName\\", SUM(sum_added) AS \\"Added\\"
       FROM \\"wikipedia\\"
@@ -1236,6 +1278,7 @@ ORDER BY "Count" DESC`)
       ORDER BY \\"Count\\" DESC"
     `);
   });
+
   it('renders  add aggregate column', () => {
     const tree = parser(`SELECT
   "cityName",

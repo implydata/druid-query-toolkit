@@ -243,7 +243,7 @@ export class SqlQuery extends BaseAst {
       }
     }
 
-    if (!this.groupByClause || this.hasGroupByForColumn(columnName)) {
+    if (!this.groupByClause) {
       return this;
     }
 
@@ -289,10 +289,9 @@ export class SqlQuery extends BaseAst {
     const groupByColumnNames: string[] = [];
     const groupByColumns = this.groupByClause.groupBy.map(part => part.getBasicValue());
     this.columns.columns.forEach((column, index) => {
-      index = index + 1;
       if (
         arrayContains(column.getBasicValue(), groupByColumns) ||
-        arrayContains(String(index), groupByColumns)
+        arrayContains(String(index + 1), groupByColumns)
       ) {
         groupByColumnNames.push(column.getBasicValue());
       }
@@ -300,28 +299,43 @@ export class SqlQuery extends BaseAst {
 
     return groupByColumnNames;
   }
+
   removeGroupBy(columnName: string): SqlQuery {
     if (!this.groupByClause) return this;
     const newColumns: Column[] = [];
     const columnSpacing = this.columns.spacing;
+    const columns = this.columns.columns;
+    const indexOfColumn = this.getColumnsArray().lastIndexOf(columnName);
 
     // Remove column from select
-    this.columns.columns.forEach(column => {
-      if (column.getBasicValue() !== columnName) newColumns.push(column);
+    columns.forEach((column, index) => {
+      if (indexOfColumn !== index) newColumns.push(column);
     });
 
     // Remove column from group by
     const groupByColumns = this.groupByClause.groupBy.map(part => part.getBasicValue());
     const newGroupBy: any[] = [];
-    groupByColumns.forEach(groupByColumn => {
-      if (columnName !== groupByColumn) {
-        if (this.getColumnsArray().indexOf(columnName) + 1 < Number(groupByColumn)) {
+
+    if (groupByColumns.lastIndexOf(columnName) === -1) {
+      groupByColumns.forEach(groupByColumn => {
+        if (indexOfColumn + 1 < Number(groupByColumn)) {
           newGroupBy.push(Number(groupByColumn - 1));
-        } else if (this.getColumnsArray().indexOf(columnName) + 1 !== Number(groupByColumn)) {
+        } else if (indexOfColumn + 1 !== Number(groupByColumn)) {
           newGroupBy.push(groupByColumn);
         }
-      }
-    });
+      });
+    } else {
+      groupByColumns.forEach(groupByColumn => {
+        if (groupByColumns.lastIndexOf(columnName) + 1 < Number(groupByColumn)) {
+          newGroupBy.push(Number(groupByColumn - 1));
+        } else if (
+          groupByColumns.lastIndexOf(columnName) + 1 !== groupByColumn &&
+          groupByColumn !== columnName
+        ) {
+          newGroupBy.push(groupByColumn);
+        }
+      });
+    }
     return new SqlQuery({
       columns: new Columns({ columns: newColumns, parens: [], spacing: columnSpacing }),
       withClause: this.withClause,
@@ -344,6 +358,7 @@ export class SqlQuery extends BaseAst {
       whereClause: this.whereClause,
     });
   }
+
   addAggregateColumn(
     columnName: string | RefExpression,
     functionName: string,
