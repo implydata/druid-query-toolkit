@@ -17,7 +17,7 @@ import { FUNCTIONS } from './test-utils';
 
 const parser = sqlParserFactory(FUNCTIONS);
 
-describe('Playground 1', () => {
+describe.skip('Playground 1', () => {
   it('remove first column in group by', () => {
     const tree = parser(`SELECT
   "page", "count", "user",
