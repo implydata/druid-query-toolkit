@@ -518,6 +518,21 @@ ORDER BY "rank" DESC, "created_time" DESC`)
     `);
   });
 
+  it('ensures commas are prevalent to separate arguments in a function', () => {
+    const modifiedQuery = parser(`select TIME_EXTRACT(__time,'HOUR') AS _hour_of_day, COUNT(1) AS _count
+FROM wikipedia 
+GROUP BY 1`)
+      .orderBy('_hour_of_day', 'DESC')
+      .toString();
+
+    expect(modifiedQuery).toMatchInlineSnapshot(`
+      "SELECT TIME_EXTRACT(__time,'HOUR') AS _hour_of_day, COUNT(1) AS _count
+      FROM wikipedia 
+      GROUP BY 1
+      ORDER BY \\"_hour_of_day\\" DESC"
+    `);
+  });
+
   it('renders exclude row', () => {
     const modifiedQuery = parser(`SELECT
   datasource,

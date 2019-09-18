@@ -67,8 +67,9 @@ export class Function {
       }
       this.value.map((value, index: number) => {
         val.push(value instanceof OrExpression ? value.toString() : value);
-        if (index < this.value.length - 1 && this.argumentSpacing[index]) {
-          val.push(',' + this.argumentSpacing[index]);
+        if (index < this.value.length - 1) {
+          val.push(',');
+          val.push(this.argumentSpacing[index] !== null ? this.argumentSpacing[index] : '');
         }
       });
     }
