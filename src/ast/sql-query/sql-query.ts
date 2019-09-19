@@ -277,6 +277,78 @@ export class SqlQuery extends BaseAst {
     });
   }
 
+  hasGroupByForColumn(column: string): boolean {
+    return this.getGroupByColumns().includes(column);
+  }
+
+  getGroupByColumns(): string[] {
+    if (!this.groupByClause) {
+      return [];
+    }
+
+    const groupByColumnNames: string[] = [];
+    const groupByColumns = this.groupByClause.groupBy.map(part => part.getBasicValue());
+    this.columns.columns.forEach((column, index) => {
+      if (
+        arrayContains(column.getBasicValue(), groupByColumns) ||
+        arrayContains(String(index + 1), groupByColumns)
+      ) {
+        groupByColumnNames.push(column.getBasicValue());
+      }
+    });
+
+    return groupByColumnNames;
+  }
+
+  removeGroupBy(columnName: string): SqlQuery {
+    if (!this.groupByClause) return this;
+    const newColumns: Column[] = [];
+    const columnSpacing = this.columns.spacing;
+    const columns = this.columns.columns;
+    const indexOfColumn = this.getColumnsArray().lastIndexOf(columnName);
+
+    // Remove column from select
+    columns.forEach((column, index) => {
+      if (indexOfColumn !== index) newColumns.push(column);
+    });
+
+    // Remove column from group by
+    const groupByColumns = this.groupByClause.groupBy.map(part => part.getBasicValue());
+    const groupByColumnNames = this.getGroupByColumns();
+    const indexToRemove = groupByColumnNames.lastIndexOf(columnName);
+    const newGroupBy: any[] = [];
+
+    groupByColumns.forEach((groupByColumn, index) => {
+      if (index !== indexToRemove) {
+        if (indexToRemove + 1 < Number(groupByColumn)) {
+          newGroupBy.push(Number(groupByColumn - 1));
+        } else if (this.groupByClause) newGroupBy.push(this.groupByClause.groupBy[index]);
+      }
+    });
+
+    return new SqlQuery({
+      columns: new Columns({ columns: newColumns, parens: [], spacing: columnSpacing }),
+      withClause: this.withClause,
+      distinct: this.distinct,
+      fromClause: this.fromClause,
+      groupByClause:
+        newGroupBy.length > 0
+          ? new GroupByClause({
+              groupKeyword: this.groupByClause.groupKeyword,
+              byKeyword: this.groupByClause.byKeyword,
+              groupBy: newGroupBy,
+              spacing: this.groupByClause.spacing,
+            })
+          : undefined,
+      havingClause: this.havingClause,
+      limitClause: this.limitClause,
+      orderByClause: this.orderByClause,
+      spacing: this.spacing,
+      verb: this.verb,
+      whereClause: this.whereClause,
+    });
+  }
+
   addAggregateColumn(
     columnName: string | RefExpression,
     functionName: string,

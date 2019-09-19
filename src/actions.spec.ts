@@ -55,14 +55,14 @@ const parser = sqlParserFactory(FUNCTIONS);
 
 describe('Ast action for segments test', () => {
   it('renders remove Column', () => {
-    const tree = parser(`SELECT "segment_id", "datasource", "start", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed", "payload"
+    const modifiedQuery = parser(`SELECT "segment_id", "datasource", "start", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed", "payload"
 FROM sys.segments
 ORDER BY "start" DESC
 LIMIT 25`)
       .excludeColumn('start')
       .toString();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       "SELECT \\"segment_id\\", \\"datasource\\", \\"end\\", \\"size\\", \\"version\\", \\"partition_num\\", \\"num_replicas\\", \\"num_rows\\", \\"is_published\\", \\"is_available\\", \\"is_realtime\\", \\"is_overshadowed\\", \\"payload\\"
       FROM sys.segments
       LIMIT 25"
@@ -70,14 +70,14 @@ LIMIT 25`)
   });
 
   it('renders orderBy', () => {
-    const tree = parser(`SELECT "segment_id", "datasource", "start", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed", "payload"
+    const modifiedQuery = parser(`SELECT "segment_id", "datasource", "start", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed", "payload"
 FROM sys.segments
 ORDER BY "start" DESC
 LIMIT 25`)
       .orderBy('datasource', 'DESC')
       .toString();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       "SELECT \\"segment_id\\", \\"datasource\\", \\"start\\", \\"end\\", \\"size\\", \\"version\\", \\"partition_num\\", \\"num_replicas\\", \\"num_rows\\", \\"is_published\\", \\"is_available\\", \\"is_realtime\\", \\"is_overshadowed\\", \\"payload\\"
       FROM sys.segments
       ORDER BY \\"datasource\\" DESC
@@ -86,14 +86,14 @@ LIMIT 25`)
   });
 
   it('renders exclude row', () => {
-    const tree = parser(`SELECT "segment_id", "datasource", "start", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed", "payload"
+    const modifiedQuery = parser(`SELECT "segment_id", "datasource", "start", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed", "payload"
 FROM sys.segments
 ORDER BY "start" DESC
 LIMIT 25`)
       .filterRow('datasource', 'github', '!=')
       .toString();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       "SELECT \\"segment_id\\", \\"datasource\\", \\"start\\", \\"end\\", \\"size\\", \\"version\\", \\"partition_num\\", \\"num_replicas\\", \\"num_rows\\", \\"is_published\\", \\"is_available\\", \\"is_realtime\\", \\"is_overshadowed\\", \\"payload\\"
       FROM sys.segments
       WHERE \\"datasource\\" != 'github'
@@ -103,12 +103,12 @@ LIMIT 25`)
   });
 
   it('renders getSorted', () => {
-    const tree = parser(`SELECT "segment_id", "datasource", "start", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed", "payload"
+    const modifiedQuery = parser(`SELECT "segment_id", "datasource", "start", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed", "payload"
 FROM sys.segments
 ORDER BY "start" DESC
 LIMIT 25`).getSorted();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       Array [
         Object {
           "desc": true,
@@ -119,35 +119,35 @@ LIMIT 25`).getSorted();
   });
 
   it('renders getSchema', () => {
-    const tree = parser(`SELECT "segment_id", "datasource", "start", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed", "payload"
+    const modifiedQuery = parser(`SELECT "segment_id", "datasource", "start", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed", "payload"
 FROM sys.segments
 ORDER BY "start" DESC
 LIMIT 25`).getSchema();
-    expect(tree).toMatchInlineSnapshot(`"sys"`);
+    expect(modifiedQuery).toMatchInlineSnapshot(`"sys"`);
   });
 
   it('renders getTableName', () => {
-    const tree = parser(`SELECT "segment_id", "datasource", "start", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed", "payload"
+    const modifiedQuery = parser(`SELECT "segment_id", "datasource", "start", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed", "payload"
 FROM sys.segments
 ORDER BY "start" DESC
 LIMIT 25`).getTableName();
-    expect(tree).toMatchInlineSnapshot(`"segments"`);
+    expect(modifiedQuery).toMatchInlineSnapshot(`"segments"`);
   });
 
   it('renders getAggregateColumns', () => {
-    const tree = parser(`SELECT "segment_id", "datasource", "start", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed", "payload"
+    const modifiedQuery = parser(`SELECT "segment_id", "datasource", "start", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed", "payload"
 FROM sys.segments
 ORDER BY "start" DESC
 LIMIT 25`).getAggregateColumns();
-    expect(tree).toMatchInlineSnapshot(`undefined`);
+    expect(modifiedQuery).toMatchInlineSnapshot(`undefined`);
   });
 
   it('renders getColumnsArray', () => {
-    const tree = parser(`SELECT "segment_id", "datasource", "start", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed", "payload"
+    const modifiedQuery = parser(`SELECT "segment_id", "datasource", "start", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed", "payload"
 FROM sys.segments
 ORDER BY "start" DESC
 LIMIT 25`).getColumnsArray();
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       Array [
         "segment_id",
         "datasource",
@@ -168,12 +168,12 @@ LIMIT 25`).getColumnsArray();
   });
 
   it('renders toString', () => {
-    const tree = parser(`SELECT "segment_id", "datasource", "start", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed", "payload"
+    const modifiedQuery = parser(`SELECT "segment_id", "datasource", "start", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed", "payload"
 FROM sys.segments
 ORDER BY "start" DESC
 LIMIT 25`).toString();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       "SELECT \\"segment_id\\", \\"datasource\\", \\"start\\", \\"end\\", \\"size\\", \\"version\\", \\"partition_num\\", \\"num_replicas\\", \\"num_rows\\", \\"is_published\\", \\"is_available\\", \\"is_realtime\\", \\"is_overshadowed\\", \\"payload\\"
       FROM sys.segments
       ORDER BY \\"start\\" DESC
@@ -184,7 +184,7 @@ LIMIT 25`).toString();
 
 describe('Ast for full query action tests', () => {
   it('renders remove Column', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   datasource,
   COUNT(*) AS num_segments,
   SUM(is_available) AS num_available_segments,
@@ -199,7 +199,7 @@ ORDER BY "rank" DESC, "created_time" DESC`)
       .excludeColumn('datasource')
       .toString();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       "SELECT
         COUNT(*) AS num_segments,
         SUM(is_available) AS num_available_segments,
@@ -215,7 +215,7 @@ ORDER BY "rank" DESC, "created_time" DESC`)
   });
 
   it('renders orderBy', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   datasource,
   COUNT(*) AS num_segments,
   SUM(is_available) AS num_available_segments,
@@ -230,7 +230,7 @@ ORDER BY "rank" DESC, "created_time" DESC`)
       .orderBy('datasource', 'DESC')
       .toString();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       "SELECT
         datasource,
         COUNT(*) AS num_segments,
@@ -247,7 +247,7 @@ ORDER BY "rank" DESC, "created_time" DESC`)
   });
 
   it('renders exclude row', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   datasource,
   COUNT(*) AS num_segments,
   SUM(is_available) AS num_available_segments,
@@ -262,7 +262,7 @@ ORDER BY "rank" DESC, "created_time" DESC`)
       .filterRow('datasource', 'rowvalue', '!=')
       .toString();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       "SELECT
         datasource,
         COUNT(*) AS num_segments,
@@ -280,7 +280,7 @@ ORDER BY "rank" DESC, "created_time" DESC`)
   });
 
   it('renders getSorted', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   datasource,
   COUNT(*) AS num_segments,
   SUM(is_available) AS num_available_segments,
@@ -292,7 +292,7 @@ ORDER BY "rank" DESC, "created_time" DESC`)
 FROM sys.segments
 GROUP BY 1,2
 ORDER BY "rank" DESC, "created_time" DESC`).getSorted();
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       Array [
         Object {
           "desc": true,
@@ -307,7 +307,7 @@ ORDER BY "rank" DESC, "created_time" DESC`).getSorted();
   });
 
   it('renders getSchema', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   datasource,
   COUNT(*) AS num_segments,
   SUM(is_available) AS num_available_segments,
@@ -319,11 +319,11 @@ ORDER BY "rank" DESC, "created_time" DESC`).getSorted();
 FROM sys.segments
 GROUP BY 1,2
 ORDER BY "rank" DESC, "created_time" DESC`).getSchema();
-    expect(tree).toMatchInlineSnapshot(`"sys"`);
+    expect(modifiedQuery).toMatchInlineSnapshot(`"sys"`);
   });
 
   it('renders getTableName', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   datasource,
   COUNT(*) AS num_segments,
   SUM(is_available) AS num_available_segments,
@@ -335,11 +335,11 @@ ORDER BY "rank" DESC, "created_time" DESC`).getSchema();
 FROM sys.segments
 GROUP BY 1,2
 ORDER BY "rank" DESC, "created_time" DESC`).getTableName();
-    expect(tree).toMatchInlineSnapshot(`"segments"`);
+    expect(modifiedQuery).toMatchInlineSnapshot(`"segments"`);
   });
 
   it('renders getAggregateColumns', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   datasource,
   COUNT(*) AS num_segments,
   SUM(is_available) AS num_available_segments,
@@ -351,7 +351,7 @@ ORDER BY "rank" DESC, "created_time" DESC`).getTableName();
 FROM sys.segments
 GROUP BY 1,2
 ORDER BY "rank" DESC, "created_time" DESC`).getAggregateColumns();
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       Array [
         "num_available_segments",
         "size",
@@ -362,7 +362,7 @@ ORDER BY "rank" DESC, "created_time" DESC`).getAggregateColumns();
   });
 
   it('renders getColumnsArray', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   datasource,
   COUNT(*) AS num_segments,
   SUM(is_available) AS num_available_segments,
@@ -374,7 +374,7 @@ ORDER BY "rank" DESC, "created_time" DESC`).getAggregateColumns();
 FROM sys.segments
 GROUP BY 1,2
 ORDER BY "rank" DESC, "created_time" DESC`).getColumnsArray();
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       Array [
         "datasource",
         "num_segments",
@@ -387,7 +387,7 @@ ORDER BY "rank" DESC, "created_time" DESC`).getColumnsArray();
   });
 
   it('renders toString', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   datasource,
   COUNT(*) AS num_segments,
   SUM(is_available) AS num_available_segments,
@@ -400,7 +400,7 @@ FROM sys.segments
 GROUP BY 1,2
 ORDER BY "rank" DESC, "created_time" DESC`).toString();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       "SELECT
         datasource,
         COUNT(*) AS num_segments,
@@ -419,7 +419,7 @@ ORDER BY "rank" DESC, "created_time" DESC`).toString();
 
 describe('Ast for full query including whereClause action tests', () => {
   it('renders remove Column', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   datasource,
   COUNT(*) AS num_segments,
   SUM(is_available) AS num_available_segments,
@@ -435,7 +435,7 @@ ORDER BY "rank" DESC, "created_time" DESC`)
       .excludeColumn('datasource')
       .toString();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       "SELECT
         COUNT(*) AS num_segments,
         SUM(is_available) AS num_available_segments,
@@ -452,7 +452,7 @@ ORDER BY "rank" DESC, "created_time" DESC`)
   });
 
   it('renders remove Column', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   datasource,
   COUNT(*) AS num_segments,
   SUM(is_available) AS num_available_segments,
@@ -468,7 +468,7 @@ ORDER BY "rank" DESC, "created_time" DESC`)
       .excludeColumn('num_segments')
       .toString();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       "SELECT
         datasource,
         SUM(is_available) AS num_available_segments,
@@ -485,7 +485,7 @@ ORDER BY "rank" DESC, "created_time" DESC`)
   });
 
   it('renders orderBy', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   datasource,
   COUNT(*) AS num_segments,
   SUM(is_available) AS num_available_segments,
@@ -501,7 +501,7 @@ ORDER BY "rank" DESC, "created_time" DESC`)
       .orderBy('datasource', 'DESC')
       .toString();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       "SELECT
         datasource,
         COUNT(*) AS num_segments,
@@ -518,8 +518,23 @@ ORDER BY "rank" DESC, "created_time" DESC`)
     `);
   });
 
+  it('ensures commas are prevalent to separate arguments in a function', () => {
+    const modifiedQuery = parser(`select TIME_EXTRACT(__time,'HOUR') AS _hour_of_day, COUNT(1) AS _count
+FROM wikipedia 
+GROUP BY 1`)
+      .orderBy('_hour_of_day', 'DESC')
+      .toString();
+
+    expect(modifiedQuery).toMatchInlineSnapshot(`
+      "SELECT TIME_EXTRACT(__time,'HOUR') AS _hour_of_day, COUNT(1) AS _count
+      FROM wikipedia 
+      GROUP BY 1
+      ORDER BY \\"_hour_of_day\\" DESC"
+    `);
+  });
+
   it('renders exclude row', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   datasource,
   COUNT(*) AS num_segments,
   SUM(is_available) AS num_available_segments,
@@ -535,7 +550,7 @@ ORDER BY "rank" DESC, "created_time" DESC`)
       .filterRow('datasource', 'rowvalue', '!=')
       .toString();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       "SELECT
         datasource,
         COUNT(*) AS num_segments,
@@ -553,7 +568,7 @@ ORDER BY "rank" DESC, "created_time" DESC`)
   });
 
   it('renders getSorted', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   datasource,
   COUNT(*) AS num_segments,
   SUM(is_available) AS num_available_segments,
@@ -566,7 +581,7 @@ FROM sys.segments
 WHERE "size" = '12'
 GROUP BY 1,2
 ORDER BY "rank" DESC, "created_time" DESC`).getSorted();
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       Array [
         Object {
           "desc": true,
@@ -581,7 +596,7 @@ ORDER BY "rank" DESC, "created_time" DESC`).getSorted();
   });
 
   it('renders getSchema', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   datasource,
   COUNT(*) AS num_segments,
   SUM(is_available) AS num_available_segments,
@@ -594,11 +609,11 @@ FROM sys.segments
 WHERE "size" = '12'
 GROUP BY 1,2
 ORDER BY "rank" DESC, "created_time" DESC`).getSchema();
-    expect(tree).toMatchInlineSnapshot(`"sys"`);
+    expect(modifiedQuery).toMatchInlineSnapshot(`"sys"`);
   });
 
   it('renders getTableName', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   datasource,
   COUNT(*) AS num_segments,
   SUM(is_available) AS num_available_segments,
@@ -611,11 +626,11 @@ FROM sys.segments
 WHERE "size" = '12'
 GROUP BY 1,2
 ORDER BY "rank" DESC, "created_time" DESC`).getTableName();
-    expect(tree).toMatchInlineSnapshot(`"segments"`);
+    expect(modifiedQuery).toMatchInlineSnapshot(`"segments"`);
   });
 
   it('renders getAggregateColumns', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   datasource,
   COUNT(*) AS num_segments,
   SUM(is_available) AS num_available_segments,
@@ -628,7 +643,7 @@ FROM sys.segments
 WHERE "size" = '12'
 GROUP BY 1,2
 ORDER BY "rank" DESC, "created_time" DESC`).getAggregateColumns();
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       Array [
         "num_available_segments",
         "size",
@@ -639,7 +654,7 @@ ORDER BY "rank" DESC, "created_time" DESC`).getAggregateColumns();
   });
 
   it('renders getColumnsArray', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   datasource,
   COUNT(*) AS num_segments,
   SUM(is_available) AS num_available_segments,
@@ -652,7 +667,7 @@ FROM sys.segments
 WHERE "size" = '12'
 GROUP BY 1,2
 ORDER BY "rank" DESC, "created_time" DESC`).getColumnsArray();
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       Array [
         "datasource",
         "num_segments",
@@ -665,7 +680,7 @@ ORDER BY "rank" DESC, "created_time" DESC`).getColumnsArray();
   });
 
   it('renders toString', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   datasource,
   COUNT(*) AS num_segments,
   SUM(is_available) AS num_available_segments,
@@ -679,7 +694,7 @@ WHERE "size" = '12'
 GROUP BY 1,2
 ORDER BY "rank" DESC, "created_time" DESC`).toString();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       "SELECT
         datasource,
         COUNT(*) AS num_segments,
@@ -699,7 +714,7 @@ ORDER BY "rank" DESC, "created_time" DESC`).toString();
 
 describe('Test how remove effect groupBy', () => {
   it('renders remove first of 2 columns', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   datasource,
   COUNT(*) AS num_segments,
   SUM(is_available) AS num_available_segments,
@@ -715,7 +730,7 @@ ORDER BY "rank" DESC, "created_time" DESC`)
       .excludeColumn('datasource')
       .toString();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       "SELECT
         COUNT(*) AS num_segments,
         SUM(is_available) AS num_available_segments,
@@ -732,7 +747,7 @@ ORDER BY "rank" DESC, "created_time" DESC`)
   });
 
   it('renders remove second of 2 columns', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   datasource,
   COUNT(*) AS num_segments,
   SUM(is_available) AS num_available_segments,
@@ -748,7 +763,7 @@ ORDER BY "rank" DESC, "created_time" DESC`)
       .excludeColumn('num_segments')
       .toString();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       "SELECT
         datasource,
         SUM(is_available) AS num_available_segments,
@@ -765,7 +780,7 @@ ORDER BY "rank" DESC, "created_time" DESC`)
   });
 
   it('renders remove first of 2 named columns', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   datasource,
   COUNT(*) AS num_segments,
   SUM(is_available) AS num_available_segments,
@@ -781,7 +796,7 @@ ORDER BY "rank" DESC, "created_time" DESC`)
       .excludeColumn('datasource')
       .toString();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       "SELECT
         COUNT(*) AS num_segments,
         SUM(is_available) AS num_available_segments,
@@ -798,7 +813,7 @@ ORDER BY "rank" DESC, "created_time" DESC`)
   });
 
   it('renders remove second of 2 named columns', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   datasource,
   COUNT(*) AS num_segments,
   SUM(is_available) AS num_available_segments,
@@ -814,7 +829,7 @@ ORDER BY "rank" DESC, "created_time" DESC`)
       .excludeColumn('num_segments')
       .toString();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       "SELECT
         datasource,
         SUM(is_available) AS num_available_segments,
@@ -831,7 +846,7 @@ ORDER BY "rank" DESC, "created_time" DESC`)
   });
 
   it('renders remove second of 1 of 1 columns', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   datasource,
   COUNT(*) AS num_segments,
   SUM(is_available) AS num_available_segments,
@@ -847,7 +862,7 @@ ORDER BY "rank" DESC, "created_time" DESC`)
       .excludeColumn('datasource')
       .toString();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       "SELECT
         COUNT(*) AS num_segments,
         SUM(is_available) AS num_available_segments,
@@ -863,7 +878,7 @@ ORDER BY "rank" DESC, "created_time" DESC`)
   });
 
   it('renders remove second of 1 of 1 columns by index', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   datasource,
   COUNT(*) AS num_segments,
   SUM(is_available) AS num_available_segments,
@@ -879,7 +894,7 @@ ORDER BY "rank" DESC, "created_time" DESC`)
       .excludeColumn('datasource')
       .toString();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       "SELECT
         COUNT(*) AS num_segments,
         SUM(is_available) AS num_available_segments,
@@ -895,32 +910,32 @@ ORDER BY "rank" DESC, "created_time" DESC`)
   });
 
   it('test basicIdentifierEscape', () => {
-    const tree = basicIdentifierEscape('header');
+    const modifiedQuery = basicIdentifierEscape('header');
 
-    expect(tree).toMatchInlineSnapshot(`"\\"header\\""`);
+    expect(modifiedQuery).toMatchInlineSnapshot(`"\\"header\\""`);
   });
 
   it('test basicLiteralEscape with string', () => {
-    const tree = basicLiteralEscape('row');
+    const modifiedQuery = basicLiteralEscape('row');
 
-    expect(tree).toMatchInlineSnapshot(`"'row'"`);
+    expect(modifiedQuery).toMatchInlineSnapshot(`"'row'"`);
   });
 
   it('test basicLiteralEscape with number', () => {
-    const tree = basicLiteralEscape(1);
+    const modifiedQuery = basicLiteralEscape(1);
 
-    expect(tree).toMatchInlineSnapshot(`"1"`);
+    expect(modifiedQuery).toMatchInlineSnapshot(`"1"`);
   });
 
   it('renders filter row with number', () => {
-    const tree = parser(`SELECT "segment_id", "datasource", "start", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed", "payload"
+    const modifiedQuery = parser(`SELECT "segment_id", "datasource", "start", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed", "payload"
 FROM sys.segments
 ORDER BY "start" DESC
 LIMIT 25`)
       .filterRow('datasource', 1, '!=')
       .toString();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       "SELECT \\"segment_id\\", \\"datasource\\", \\"start\\", \\"end\\", \\"size\\", \\"version\\", \\"partition_num\\", \\"num_replicas\\", \\"num_rows\\", \\"is_published\\", \\"is_available\\", \\"is_realtime\\", \\"is_overshadowed\\", \\"payload\\"
       FROM sys.segments
       WHERE \\"datasource\\" != 1
@@ -930,7 +945,7 @@ LIMIT 25`)
   });
 
   it('renders filter row with number', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   "cityName",
   COUNT(*) AS "Count",
   SUM(added) AS "Added"
@@ -941,7 +956,7 @@ ORDER BY "Count" DESC`)
       .excludeColumn('Count')
       .toString();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       "SELECT
         \\"cityName\\",
         SUM(added) AS \\"Added\\"
@@ -952,7 +967,7 @@ ORDER BY "Count" DESC`)
   });
 
   it('renders filter aggregate row', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   "cityName",
   COUNT(*) AS "Count",
   SUM(added) AS "Added"
@@ -963,7 +978,7 @@ ORDER BY "Count" DESC`)
       .filterRow('Count', 'value', '!=')
       .toString();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       "SELECT
         \\"cityName\\",
         COUNT(*) AS \\"Count\\",
@@ -977,7 +992,7 @@ ORDER BY "Count" DESC`)
   });
 
   it('renders filter aggregate row', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   "cityName",
   COUNT(*) AS "Count",
   SUM(added) AS "Added"
@@ -988,7 +1003,7 @@ ORDER BY "Count" DESC`)
       .filterRow('Count', 'value', '!=')
       .toString();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       "SELECT
         \\"cityName\\",
         COUNT(*) AS \\"Count\\",
@@ -1002,7 +1017,7 @@ ORDER BY "Count" DESC`)
   });
 
   it('renders  add to group by ', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   "cityName",
   COUNT(*) AS "Count",
   SUM(added) AS "Added"
@@ -1013,7 +1028,7 @@ ORDER BY "Count" DESC`)
       .addToGroupBy('testValue')
       .toString();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       "SELECT
         \\"testValue\\", \\"cityName\\",
         COUNT(*) AS \\"Count\\",
@@ -1026,7 +1041,7 @@ ORDER BY "Count" DESC`)
   });
 
   it('renders add to group by for a second time ', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
     "somevalue",
   "cityName",
   COUNT(*) AS "Count",
@@ -1038,7 +1053,7 @@ ORDER BY "Count" DESC`)
       .addToGroupBy('testValue')
       .toString();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       "SELECT
           \\"testValue\\", \\"somevalue\\",
         \\"cityName\\",
@@ -1051,8 +1066,26 @@ ORDER BY "Count" DESC`)
     `);
   });
 
+  it('renders add to group by for a column already inside group by clause', () => {
+    const modifiedQuery = parser(`SELECT
+  "user", "count", COUNT(*) AS "Count"
+FROM "wikipedia"
+GROUP BY 1,2
+ORDER BY "Count" DESC`)
+      .addToGroupBy('user')
+      .toString();
+
+    expect(modifiedQuery).toMatchInlineSnapshot(`
+      "SELECT
+        \\"user\\", \\"user\\", \\"count\\", COUNT(*) AS \\"Count\\"
+      FROM \\"wikipedia\\"
+      GROUP BY 1,2,3
+      ORDER BY \\"Count\\" DESC"
+    `);
+  });
+
   it('renders  add to group by out of order', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   COUNT(*) AS "Count",
     "cityName",
   SUM(added) AS "Added"
@@ -1063,7 +1096,7 @@ ORDER BY "Count" DESC`)
       .addToGroupBy('testValue')
       .toString();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       "SELECT
         \\"testValue\\", COUNT(*) AS \\"Count\\",
           \\"cityName\\",
@@ -1076,7 +1109,7 @@ ORDER BY "Count" DESC`)
   });
 
   it('renders  add to group by out of no groupby, Should not change', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   COUNT(*) AS "Count",
     "cityName",
   SUM(added) AS "Added"
@@ -1086,7 +1119,7 @@ ORDER BY "Count" DESC`)
       .addToGroupBy('testValue')
       .toString();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       "SELECT
         COUNT(*) AS \\"Count\\",
           \\"cityName\\",
@@ -1097,8 +1130,208 @@ ORDER BY "Count" DESC`)
     `);
   });
 
+  it('get current group by columns', () => {
+    const groupByColumns = parser(`SELECT
+  "countryIsoCode", COUNT(*) AS "Count", "cityName", SUM(sum_added) AS "Added"
+FROM "wikipedia"
+GROUP BY 1,"cityName"
+ORDER BY "Count" DESC`).getGroupByColumns();
+
+    expect(groupByColumns).toMatchInlineSnapshot(`
+      Array [
+        "countryIsoCode",
+        "cityName",
+      ]
+    `);
+  });
+
+  it('remove first column in group by', () => {
+    const modifiedQuery = parser(`SELECT
+  "page", "count", "user",
+  COUNT(*) AS "Count"
+FROM "wikipedia"
+GROUP BY 1,2,3
+ORDER BY "Count" DESC`)
+      .removeGroupBy('page')
+      .toString();
+
+    expect(modifiedQuery).toMatchInlineSnapshot(`
+      "SELECT
+        \\"count\\", \\"user\\", COUNT(*) AS \\"Count\\"
+      FROM \\"wikipedia\\"
+      GROUP BY 1,2
+      ORDER BY \\"Count\\" DESC"
+    `);
+  });
+
+  it('remove second column in group by', () => {
+    const modifiedQuery = parser(`SELECT
+  "page", "count", "user",
+  COUNT(*) AS "Count"
+FROM "wikipedia"
+GROUP BY 1,2,3
+ORDER BY "Count" DESC`)
+      .removeGroupBy('count')
+      .toString();
+
+    expect(modifiedQuery).toMatchInlineSnapshot(`
+      "SELECT
+        \\"page\\", \\"user\\", COUNT(*) AS \\"Count\\"
+      FROM \\"wikipedia\\"
+      GROUP BY 1,2
+      ORDER BY \\"Count\\" DESC"
+    `);
+  });
+
+  it('remove third column in group by', () => {
+    const modifiedQuery = parser(`SELECT
+  "page", "count", "user",
+  COUNT(*) AS "Count"
+FROM "wikipedia"
+GROUP BY 1,2,3
+ORDER BY "Count" DESC`)
+      .removeGroupBy('user')
+      .toString();
+
+    expect(modifiedQuery).toMatchInlineSnapshot(`
+      "SELECT
+        \\"page\\", \\"count\\", COUNT(*) AS \\"Count\\"
+      FROM \\"wikipedia\\"
+      GROUP BY 1,2
+      ORDER BY \\"Count\\" DESC"
+    `);
+  });
+
+  it('remove string column in group by mixed with names and indexes', () => {
+    const modifiedQuery = parser(`SELECT
+  "page", "count", "user",
+  COUNT(*) AS "Count"
+FROM "wikipedia"
+GROUP BY 1,count,3
+ORDER BY "Count" DESC`)
+      .removeGroupBy('count')
+      .toString();
+
+    expect(modifiedQuery).toMatchInlineSnapshot(`
+      "SELECT
+        \\"page\\", \\"user\\", COUNT(*) AS \\"Count\\"
+      FROM \\"wikipedia\\"
+      GROUP BY 1,2
+      ORDER BY \\"Count\\" DESC"
+    `);
+  });
+
+  it('remove index column in group by mixed with names and indexes', () => {
+    const modifiedQuery = parser(`SELECT
+  "page", "count", "user",
+  COUNT(*) AS "Count"
+FROM "wikipedia"
+GROUP BY 1,count,3
+ORDER BY "Count" DESC`)
+      .removeGroupBy('user')
+      .toString();
+
+    expect(modifiedQuery).toMatchInlineSnapshot(`
+      "SELECT
+        \\"page\\", \\"count\\", COUNT(*) AS \\"Count\\"
+      FROM \\"wikipedia\\"
+      GROUP BY 1,count
+      ORDER BY \\"Count\\" DESC"
+    `);
+  });
+
+  it('remove only column in group by', () => {
+    const modifiedQuery = parser(`SELECT
+  "page",
+  COUNT(*) AS "Count"
+FROM "wikipedia"
+GROUP BY 1
+ORDER BY "Count" DESC`)
+      .removeGroupBy('page')
+      .toString();
+
+    expect(modifiedQuery).toMatchInlineSnapshot(`
+      "SELECT
+        COUNT(*) AS \\"Count\\"
+      FROM \\"wikipedia\\"
+      ORDER BY \\"Count\\" DESC"
+    `);
+  });
+
+  it('remove most recent column in group by when it occurs multiple times', () => {
+    const modifiedQuery = parser(`SELECT
+  "user", "countryIsoCode", "user", COUNT(*) AS "Count"
+FROM "wikipedia"
+GROUP BY 1,2,3
+ORDER BY "Count" DESC`)
+      .removeGroupBy('user')
+      .toString();
+
+    expect(modifiedQuery).toMatchInlineSnapshot(`
+      "SELECT
+        \\"user\\", \\"countryIsoCode\\", COUNT(*) AS \\"Count\\"
+      FROM \\"wikipedia\\"
+      GROUP BY 1,2
+      ORDER BY \\"Count\\" DESC"
+    `);
+  });
+
+  it('remove most recent column in group by when it occurs multiple times and it is grouped by name', () => {
+    const modifiedQuery = parser(`SELECT
+  "user", "countryIsoCode", "user", COUNT(*) AS "Count"
+FROM "wikipedia"
+GROUP BY 1,2,user
+ORDER BY "Count" DESC`)
+      .removeGroupBy('user')
+      .toString();
+
+    expect(modifiedQuery).toMatchInlineSnapshot(`
+      "SELECT
+        \\"user\\", \\"countryIsoCode\\", COUNT(*) AS \\"Count\\"
+      FROM \\"wikipedia\\"
+      GROUP BY 1,2
+      ORDER BY \\"Count\\" DESC"
+    `);
+  });
+
+  it('remove most recent column in group by when it occurs multiple times and it is an index', () => {
+    const modifiedQuery = parser(`SELECT
+  "user", "countryIsoCode", "user", COUNT(*) AS "Count"
+FROM "wikipedia"
+GROUP BY user,2,3
+ORDER BY "Count" DESC`)
+      .removeGroupBy('user')
+      .toString();
+
+    expect(modifiedQuery).toMatchInlineSnapshot(`
+      "SELECT
+        \\"user\\", \\"countryIsoCode\\", COUNT(*) AS \\"Count\\"
+      FROM \\"wikipedia\\"
+      GROUP BY user,2
+      ORDER BY \\"Count\\" DESC"
+    `);
+  });
+
+  it('remove column in group by mixed with non group by columns', () => {
+    const modifiedQuery = parser(`SELECT
+  "countryIsoCode", COUNT(*) AS "Count", "cityName", SUM(sum_added) AS "Added"
+FROM "wikipedia"
+GROUP BY 1,3
+ORDER BY "Count" DESC`)
+      .removeGroupBy('countryIsoCode')
+      .toString();
+
+    expect(modifiedQuery).toMatchInlineSnapshot(`
+      "SELECT
+        COUNT(*) AS \\"Count\\", \\"cityName\\", SUM(sum_added) AS \\"Added\\"
+      FROM \\"wikipedia\\"
+      GROUP BY 2
+      ORDER BY \\"Count\\" DESC"
+    `);
+  });
+
   it('renders  add aggregate column', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   "cityName",
   COUNT(*) AS "Count",
   SUM(added) AS "Added"
@@ -1109,7 +1342,7 @@ ORDER BY "Count" DESC`)
       .addAggregateColumn('testValue', 'SUM')
       .toString();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       "SELECT
         \\"cityName\\",
         COUNT(*) AS \\"Count\\",
@@ -1122,7 +1355,7 @@ ORDER BY "Count" DESC`)
   });
 
   it('renders  add function to Groupby', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   "cityName",
   COUNT(*) AS "Count",
   SUM(added) AS "Added"
@@ -1133,7 +1366,7 @@ ORDER BY "Count" DESC`)
       .addFunctionToGroupBy('TRUNCATE', [' ', ' '], ['added', 1])
       .toString();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       "SELECT
         TRUNCATE(added, 1), \\"cityName\\",
         COUNT(*) AS \\"Count\\",
@@ -1169,7 +1402,7 @@ ORDER BY "Count" DESC`)
       spacing: [' ', ' '],
     });
 
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   "cityName",
   COUNT(*) AS "Count",
   SUM(added) AS "Added"
@@ -1179,7 +1412,7 @@ ORDER BY "Count" DESC`)
       .filterRow(additiveExpression, 'columnName', '>=')
       .toString();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       "SELECT
         \\"cityName\\",
         COUNT(*) AS \\"Count\\",
@@ -1191,7 +1424,7 @@ ORDER BY "Count" DESC`)
     `);
   });
   it('renders filter by additive ex', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   "cityName",
   COUNT(*) AS "Count",
   SUM(added) AS "Added"
@@ -1213,7 +1446,7 @@ ORDER BY "Count" DESC`)
       )
       .toString();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       "SELECT
         \\"cityName\\",
         COUNT(*) AS \\"Count\\",
@@ -1224,7 +1457,7 @@ ORDER BY "Count" DESC`)
     `);
   });
   it('renders filter by additive ex', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
     "cityName",
     COUNT(*) AS "Count",
     SUM(added) AS "Added"
@@ -1247,7 +1480,7 @@ ORDER BY "Count" DESC`)
       )
       .toString();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       "SELECT
           \\"cityName\\",
           COUNT(*) AS \\"Count\\",
@@ -1258,7 +1491,7 @@ ORDER BY "Count" DESC`)
     `);
   });
   it('renders filter by additive ex', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
     "cityName",
     COUNT(*) AS "Count",
     SUM(added) AS "Added"
@@ -1292,7 +1525,7 @@ ORDER BY "Count" DESC`)
       )
       .toString();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       "SELECT
           \\"cityName\\",
           COUNT(*) AS \\"Count\\",
@@ -1304,7 +1537,7 @@ ORDER BY "Count" DESC`)
   });
 
   it('renders filter by additive ex', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
     "cityName",
     COUNT(*) AS "Count",
     SUM(added) AS "Added"
@@ -1316,7 +1549,7 @@ ORDER BY "Count" DESC`)
       .filterRow('name', timestampFactory('2018-08-8'), '>=')
       .toString();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       "SELECT
           \\"cityName\\",
           COUNT(*) AS \\"Count\\",
@@ -1329,7 +1562,7 @@ ORDER BY "Count" DESC`)
   });
 
   it('test applying actions to inner query', () => {
-    const tree = parser(`
+    const modifiedQuery = parser(`
     SELECT * FROM (
     SELECT
     "cityName",
@@ -1342,7 +1575,7 @@ ORDER BY "Count" DESC;)`)
       .filterRow(timestampFactory('2018-08-8'), 'name', '>=')
       .toString();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       "
           SELECT * FROM (
           SELECT
@@ -1357,7 +1590,7 @@ ORDER BY "Count" DESC;)`)
   });
 
   it('renders filter by additive ex', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
     "cityName",
     COUNT(*) AS "Count",
     SUM(added) AS "Added"
@@ -1368,7 +1601,7 @@ ORDER BY "Count" DESC`)
       .filterRow('name', timestampFactory('2018-08-8'), '>=')
       .toString();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       "SELECT
           \\"cityName\\",
           COUNT(*) AS \\"Count\\",
@@ -1381,7 +1614,7 @@ ORDER BY "Count" DESC`)
   });
 
   it('renders filter by additive ex', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   SUBSTRING("org", 1, 2), TIME_FLOOR("__time", 'PT1H') AS "Time",
   COUNT(*) AS "Count"
 FROM "github"
@@ -1389,7 +1622,7 @@ WHERE "__time" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY
 GROUP BY 1,2
 ORDER BY "Time" ASC`).toString();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       "SELECT
         SUBSTRING(\\"org\\", 1, 2), TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
         COUNT(*) AS \\"Count\\"
@@ -1401,7 +1634,7 @@ ORDER BY "Time" ASC`).toString();
   });
 
   it('renders filter by additive ex', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   TIME_FLOOR("__time", 'PT1H') AS "Time",
   COUNT(*) AS "Count"
 FROM "lineitem"
@@ -1416,7 +1649,7 @@ ORDER BY "Time" ASC`)
       )
       .toString();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       "SELECT
         SUBSTRING(\\"test\\", 0, 2) AS \\"__test-substring\\", TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
         COUNT(*) AS \\"Count\\"
@@ -1430,7 +1663,7 @@ ORDER BY "Time" ASC`)
 
 describe('Test getting current filters and removing specific filters', () => {
   it('get simple current filter', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   TIME_FLOOR("__time", 'PT1H') AS "Time",
   COUNT(*) AS "Count"
 FROM "lineitem"
@@ -1438,7 +1671,7 @@ WHERE "__time" >= 'value'
 GROUP BY 1
 ORDER BY "Time" ASC`).getCurrentFilters();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       Array [
         "__time",
       ]
@@ -1446,7 +1679,7 @@ ORDER BY "Time" ASC`).getCurrentFilters();
   });
 
   it('get simple current filter with expression', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   TIME_FLOOR("__time", 'PT1H') AS "Time",
   COUNT(*) AS "Count"
 FROM "lineitem"
@@ -1454,7 +1687,7 @@ WHERE "__time" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY
 GROUP BY 1
 ORDER BY "Time" ASC`).getCurrentFilters();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       Array [
         "__time",
       ]
@@ -1462,7 +1695,7 @@ ORDER BY "Time" ASC`).getCurrentFilters();
   });
 
   it('get simple current filter with backwards expression', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   TIME_FLOOR("__time", 'PT1H') AS "Time",
   COUNT(*) AS "Count"
 FROM "lineitem"
@@ -1470,7 +1703,7 @@ WHERE CURRENT_TIMESTAMP - INTERVAL '1' DAY >= "__time"
 GROUP BY 1
 ORDER BY "Time" ASC`).getCurrentFilters();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       Array [
         "__time",
       ]
@@ -1478,7 +1711,7 @@ ORDER BY "Time" ASC`).getCurrentFilters();
   });
 
   it('get current filter with multiple simple expressions', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   TIME_FLOOR("__time", 'PT1H') AS "Time",
   COUNT(*) AS "Count"
 FROM "lineitem"
@@ -1486,7 +1719,7 @@ WHERE "__time" >= 'value' AND "__time2" >= 'value2' AND "__time3" >= 'value3'
 GROUP BY 1
 ORDER BY "Time" ASC`).getCurrentFilters();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       Array [
         "__time",
         "__time2",
@@ -1496,7 +1729,7 @@ ORDER BY "Time" ASC`).getCurrentFilters();
   });
 
   it('get current filter with multiple expressions', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   TIME_FLOOR("__time", 'PT1H') AS "Time",
   COUNT(*) AS "Count"
 FROM "lineitem"
@@ -1504,7 +1737,7 @@ WHERE "__time" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY AND CURRENT_TIMESTAMP - I
 GROUP BY 1
 ORDER BY "Time" ASC`).getCurrentFilters();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       Array [
         "__time",
         "__time",
@@ -1514,7 +1747,7 @@ ORDER BY "Time" ASC`).getCurrentFilters();
   });
 
   it('remove current filter with single simple expression', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   TIME_FLOOR("__time", 'PT1H') AS "Time",
   COUNT(*) AS "Count"
 FROM "lineitem"
@@ -1524,7 +1757,7 @@ ORDER BY "Time" ASC`)
       .removeFilter('__time')
       .toString();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       "SELECT
         TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
         COUNT(*) AS \\"Count\\"
@@ -1535,7 +1768,7 @@ ORDER BY "Time" ASC`)
   });
 
   it('remove current filter with backwards simple expression', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   TIME_FLOOR("__time", 'PT1H') AS "Time",
   COUNT(*) AS "Count"
 FROM "lineitem"
@@ -1545,7 +1778,7 @@ ORDER BY "Time" ASC`)
       .removeFilter('__time')
       .toString();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       "SELECT
         TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
         COUNT(*) AS \\"Count\\"
@@ -1556,7 +1789,7 @@ ORDER BY "Time" ASC`)
   });
 
   it('remove current filter with no matching expression', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   TIME_FLOOR("__time", 'PT1H') AS "Time",
   COUNT(*) AS "Count"
 FROM "lineitem"
@@ -1566,7 +1799,7 @@ ORDER BY "Time" ASC`)
       .removeFilter('__time')
       .toString();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       "SELECT
         TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
         COUNT(*) AS \\"Count\\"
@@ -1578,7 +1811,7 @@ ORDER BY "Time" ASC`)
   });
 
   it('remove current filter with multiple simple & backwards expressions', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   TIME_FLOOR("__time", 'PT1H') AS "Time",
   COUNT(*) AS "Count"
 FROM "lineitem"
@@ -1587,7 +1820,7 @@ GROUP BY 1
 ORDER BY "Time" ASC`)
       .removeFilter('value2')
       .toString();
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       "SELECT
         TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
         COUNT(*) AS \\"Count\\"
@@ -1599,7 +1832,7 @@ ORDER BY "Time" ASC`)
   });
 
   it('remove one of two filters', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   TIME_FLOOR("__time", 'PT1H') AS "Time",
   COUNT(*) AS "Count"
 FROM "lineitem"
@@ -1608,7 +1841,7 @@ GROUP BY 1
 ORDER BY "Time" ASC`)
       .removeFilter('value2')
       .toString();
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       "SELECT
         TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
         COUNT(*) AS \\"Count\\"
@@ -1620,7 +1853,7 @@ ORDER BY "Time" ASC`)
   });
 
   it('remove time stamp', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   TIME_FLOOR("__time", 'PT1H') AS "Time",
   COUNT(*) AS "Count"
 FROM "flow0"
@@ -1629,7 +1862,7 @@ GROUP BY 1
 ORDER BY "Time" ASC`)
       .removeFilter('__time')
       .toString();
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       "SELECT
         TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
         COUNT(*) AS \\"Count\\"
@@ -1640,7 +1873,7 @@ ORDER BY "Time" ASC`)
   });
 
   it('remove time stamp', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   TIME_FLOOR("__time", 'PT1H') AS "Time",
   COUNT(*) AS "Count"
 FROM "flow0"
@@ -1649,7 +1882,7 @@ GROUP BY 1
 ORDER BY "Time" ASC`)
       .removeFilter('__time')
       .toString();
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       "SELECT
         TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
         COUNT(*) AS \\"Count\\"
@@ -1661,7 +1894,7 @@ ORDER BY "Time" ASC`)
   });
 
   it('remove whereClause', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   TIME_FLOOR("__time", 'PT1H') AS "Time",
   COUNT(*) AS "Count"
 FROM "flow0"
@@ -1670,7 +1903,7 @@ GROUP BY 1
 ORDER BY "Time" ASC`)
       .removeFilter('__time')
       .toString();
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       "SELECT
         TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
         COUNT(*) AS \\"Count\\"
@@ -1681,7 +1914,7 @@ ORDER BY "Time" ASC`)
   });
 
   it('get simple current filter', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   TIME_FLOOR("__time", 'PT1H') AS "Time",
   COUNT(*) AS "Count"
 FROM "lineitem"
@@ -1689,7 +1922,7 @@ WHERE __time >= 'value'
 GROUP BY 1
 ORDER BY "Time" ASC`).getCurrentFilters();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       Array [
         "__time",
       ]
@@ -1697,7 +1930,7 @@ ORDER BY "Time" ASC`).getCurrentFilters();
   });
 
   it('get simple current filter with expression', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   TIME_FLOOR("__time", 'PT1H') AS "Time",
   COUNT(*) AS "Count"
 FROM "lineitem"
@@ -1705,7 +1938,7 @@ WHERE __time >= CURRENT_TIMESTAMP - INTERVAL '1' DAY
 GROUP BY 1
 ORDER BY "Time" ASC`).getCurrentFilters();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       Array [
         "__time",
       ]
@@ -1713,7 +1946,7 @@ ORDER BY "Time" ASC`).getCurrentFilters();
   });
 
   it('get simple current filter with backwards expression', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   TIME_FLOOR("__time", 'PT1H') AS "Time",
   COUNT(*) AS "Count"
 FROM "lineitem"
@@ -1721,7 +1954,7 @@ WHERE CURRENT_TIMESTAMP - INTERVAL '1' DAY >= __time
 GROUP BY 1
 ORDER BY "Time" ASC`).getCurrentFilters();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       Array [
         "__time",
       ]
@@ -1729,7 +1962,7 @@ ORDER BY "Time" ASC`).getCurrentFilters();
   });
 
   it('get current filter with multiple simple expressions', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   TIME_FLOOR("__time", 'PT1H') AS "Time",
   COUNT(*) AS "Count"
 FROM "lineitem"
@@ -1737,7 +1970,7 @@ WHERE "__time" >= 'value' AND "__time2" >= 'value2' AND __timeThree >= 'value3'
 GROUP BY 1
 ORDER BY "Time" ASC`).getCurrentFilters();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       Array [
         "__time",
         "__time2",
@@ -1747,7 +1980,7 @@ ORDER BY "Time" ASC`).getCurrentFilters();
   });
 
   it('get current filter with multiple expressions', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   TIME_FLOOR("__time", 'PT1H') AS "Time",
   COUNT(*) AS "Count"
 FROM "lineitem"
@@ -1755,7 +1988,7 @@ WHERE __time >= CURRENT_TIMESTAMP - INTERVAL '1' DAY AND CURRENT_TIMESTAMP - INT
 GROUP BY 1
 ORDER BY "Time" ASC`).getCurrentFilters();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       Array [
         "__time",
         "__time",
@@ -1765,7 +1998,7 @@ ORDER BY "Time" ASC`).getCurrentFilters();
   });
 
   it('remove current filter with single simple expression', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   TIME_FLOOR("__time", 'PT1H') AS "Time",
   COUNT(*) AS "Count"
 FROM "lineitem"
@@ -1775,7 +2008,7 @@ ORDER BY "Time" ASC`)
       .removeFilter('__time')
       .toString();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       "SELECT
         TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
         COUNT(*) AS \\"Count\\"
@@ -1786,7 +2019,7 @@ ORDER BY "Time" ASC`)
   });
 
   it('remove current filter with backwards simple expression', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   TIME_FLOOR("__time", 'PT1H') AS "Time",
   COUNT(*) AS "Count"
 FROM "lineitem"
@@ -1796,7 +2029,7 @@ ORDER BY "Time" ASC`)
       .removeFilter('__time')
       .toString();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       "SELECT
         TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
         COUNT(*) AS \\"Count\\"
@@ -1807,7 +2040,7 @@ ORDER BY "Time" ASC`)
   });
 
   it('remove current filter with no matching expression', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   TIME_FLOOR("__time", 'PT1H') AS "Time",
   COUNT(*) AS "Count"
 FROM "lineitem"
@@ -1817,7 +2050,7 @@ ORDER BY "Time" ASC`)
       .removeFilter('__time')
       .toString();
 
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       "SELECT
         TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
         COUNT(*) AS \\"Count\\"
@@ -1829,7 +2062,7 @@ ORDER BY "Time" ASC`)
   });
 
   it('remove current filter with multiple simple & backwards expressions', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   TIME_FLOOR("__time", 'PT1H') AS "Time",
   COUNT(*) AS "Count"
 FROM "lineitem"
@@ -1838,7 +2071,7 @@ GROUP BY 1
 ORDER BY "Time" ASC`)
       .removeFilter('valueTwo')
       .toString();
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       "SELECT
         TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
         COUNT(*) AS \\"Count\\"
@@ -1850,7 +2083,7 @@ ORDER BY "Time" ASC`)
   });
 
   it('remove one of two filters', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   TIME_FLOOR("__time", 'PT1H') AS "Time",
   COUNT(*) AS "Count"
 FROM "lineitem"
@@ -1859,7 +2092,7 @@ GROUP BY 1
 ORDER BY "Time" ASC`)
       .removeFilter('value2')
       .toString();
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       "SELECT
         TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
         COUNT(*) AS \\"Count\\"
@@ -1871,7 +2104,7 @@ ORDER BY "Time" ASC`)
   });
 
   it('remove time stamp', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   TIME_FLOOR("__time", 'PT1H') AS "Time",
   COUNT(*) AS "Count"
 FROM "flow0"
@@ -1880,7 +2113,7 @@ GROUP BY 1
 ORDER BY "Time" ASC`)
       .removeFilter('__time')
       .toString();
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       "SELECT
         TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
         COUNT(*) AS \\"Count\\"
@@ -1891,7 +2124,7 @@ ORDER BY "Time" ASC`)
   });
 
   it('remove time stamp', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   TIME_FLOOR("__time", 'PT1H') AS "Time",
   COUNT(*) AS "Count"
 FROM "flow0"
@@ -1900,7 +2133,7 @@ GROUP BY 1
 ORDER BY "Time" ASC`)
       .removeFilter('__time')
       .toString();
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       "SELECT
         TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
         COUNT(*) AS \\"Count\\"
@@ -1913,7 +2146,7 @@ ORDER BY "Time" ASC`)
 });
 describe('Replace from', () => {
   it('replace with no namespace', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   TIME_FLOOR("__time", 'PT1H') AS "Time",
   COUNT(*) AS "Count"
 FROM "flow0"
@@ -1922,7 +2155,7 @@ GROUP BY 1
 ORDER BY "Time" ASC`)
       .replaceFrom(refExpressionFactory('test'))
       .toString();
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       "SELECT
         TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
         COUNT(*) AS \\"Count\\"
@@ -1934,7 +2167,7 @@ ORDER BY "Time" ASC`)
   });
 
   it('replace with namespace', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   TIME_FLOOR("__time", 'PT1H') AS "Time",
   COUNT(*) AS "Count"
 FROM "flow0"
@@ -1943,7 +2176,7 @@ GROUP BY 1
 ORDER BY "Time" ASC`)
       .replaceFrom(refExpressionFactory('test', 'test'))
       .toString();
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       "SELECT
         TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
         COUNT(*) AS \\"Count\\"
@@ -1955,7 +2188,7 @@ ORDER BY "Time" ASC`)
   });
 
   it('replace with quotes', () => {
-    const tree = parser(`SELECT
+    const modifiedQuery = parser(`SELECT
   TIME_FLOOR("__time", 'PT1H') AS "Time",
   COUNT(*) AS "Count"
 FROM "flow0"
@@ -1964,7 +2197,7 @@ GROUP BY 1
 ORDER BY "Time" ASC`)
       .replaceFrom(refExpressionFactory(stringFactory('test', '"')))
       .toString();
-    expect(tree).toMatchInlineSnapshot(`
+    expect(modifiedQuery).toMatchInlineSnapshot(`
       "SELECT
         TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
         COUNT(*) AS \\"Count\\"

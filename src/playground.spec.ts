@@ -18,9 +18,22 @@ import { FUNCTIONS } from './test-utils';
 const parser = sqlParserFactory(FUNCTIONS);
 
 describe.skip('Playground 1', () => {
-  it('basic', () => {
-    expect(parser(`TRIM( TRAILING 'M' FROM 'MADAM')`).toString()).toMatchInlineSnapshot(
-      `"TRIM( TRAILING 'M' undefined 'MADAM')"`,
-    );
+  it('remove first column in group by', () => {
+    const tree = parser(`SELECT
+  "page", "count", "user",
+  COUNT(*) AS "Count"
+FROM "wikipedia"
+GROUP BY 1,2,3
+ORDER BY "Count" DESC`)
+      .removeGroupBy('page')
+      .toString();
+
+    expect(tree).toMatchInlineSnapshot(`
+      "SELECT
+        \\"count\\", \\"user\\", COUNT(*) AS \\"Count\\"
+      FROM \\"wikipedia\\"
+      GROUP BY 1,2
+      ORDER BY \\"Count\\" DESC"
+    `);
   });
 });
