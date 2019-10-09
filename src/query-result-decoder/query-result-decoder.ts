@@ -169,7 +169,7 @@ export function normalizeQueryResult(
       const header: string[] = firstRow.columns;
       const firstSubRow = data.find(r => r.events[0]);
       if (!firstSubRow) return { header, rows: [] };
-      const firstSubRowEvents = Object.keys(firstSubRow.events[0]);
+      const firstSubRowEvents = firstSubRow.events[0];
 
       // scan compactedList like
       if (Array.isArray(firstSubRowEvents)) {
@@ -180,10 +180,10 @@ export function normalizeQueryResult(
       }
 
       // scan list like
-      if (Array.isArray(firstSubRowEvents)) {
+      if (isObject(firstSubRowEvents)) {
         return {
           header,
-          rows: data.flatMap(({ events }) => header.map(h => events[h])),
+          rows: data.flatMap(({ events }) => events.map((event: any) => header.map(h => event[h]))),
         };
       }
 

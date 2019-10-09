@@ -363,21 +363,21 @@ describe('normalizeQueryResult', () => {
           "channel",
         ],
         "rows": Array [
-          Object {
-            "__time": 1564887701848,
-            "added": 471,
-            "channel": "#en.wikipedia",
-          },
-          Object {
-            "__time": 1564887701883,
-            "added": 44,
-            "channel": "#en.wikipedia",
-          },
-          Object {
-            "__time": 1564887703049,
-            "added": 4996,
-            "channel": "#vi.wikipedia",
-          },
+          Array [
+            1564887701848,
+            471,
+            "#en.wikipedia",
+          ],
+          Array [
+            1564887701883,
+            44,
+            "#en.wikipedia",
+          ],
+          Array [
+            1564887703049,
+            4996,
+            "#vi.wikipedia",
+          ],
         ],
       }
     `);
