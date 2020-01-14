@@ -47,9 +47,4 @@
     caseValue.map(caseValue => {caseValue[1].spacing = makeListMap(caseValue[0], caseValue[1].spacing)});
     return makeListMapEmpty(caseValue);
   }
-
-  functions = functions || ["COUNT", "FILTER",
-    "SUM","MIN", "MAX","AVG","APPROX_COUNT_DISTINCT",
-    "APPROX_COUNT_DISTINCT_DS_HLL", "APPROX_COUNT_DISTINCT_DS_THETA",
-    "APPROX_QUANTILE", "APPROX_QUANTILE_DS", "APPROX_QUANTILE_FIXED_BUCKETS"];
 }

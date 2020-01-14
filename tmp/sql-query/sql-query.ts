@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { BaseAst } from '../base-ast';
+import { SqlBase } from '../sql-base';
 import {
   AdditiveExpression,
   Alias,
@@ -64,7 +64,7 @@ export interface SqlQueryValue {
   spacing: string[];
 }
 
-export class SqlQuery extends BaseAst {
+export class SqlQuery extends SqlBase {
   public verb: string;
   public distinct: string;
   public withClause?: WithClause;

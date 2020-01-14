@@ -11,25 +11,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {
-  AdditiveExpression,
-  Alias,
-  aliasFactory,
-  ComparisonExpression,
-  ComparisonExpressionRhs,
-  FilterClause,
-  Interval,
-  RefExpression,
-  refExpressionFactory,
-  StringType,
-  timestampFactory,
-  WhereClause,
-} from './ast';
-import { basicIdentifierEscape, basicLiteralEscape, stringFactory } from './ast/sql-query/helpers';
-import { sqlParserFactory } from './parser/druidsql';
-import { FUNCTIONS } from './test-utils';
 
-const parser = sqlParserFactory(FUNCTIONS);
+// import { sqlParserFactory } from './parser/druidsql';
+
+// const parser = sqlParserFactory();
 
 // describe('Expression Tests', () => {
 //   it('parsers a basic math expression', () => {
@@ -52,6 +37,8 @@ const parser = sqlParserFactory(FUNCTIONS);
 //     expect(parser('\'column\' = "value"')).toMatchSnapshot();
 //   });
 // });
+
+/*
 
 describe('Ast action for segments test', () => {
   it('renders remove Column', () => {
@@ -2349,3 +2336,4 @@ ORDER BY "Count" DESC`)
     `);
   });
 });
+*/

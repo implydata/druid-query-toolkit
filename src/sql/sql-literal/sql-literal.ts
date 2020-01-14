@@ -12,12 +12,25 @@
  * limitations under the License.
  */
 
-export abstract class BaseAst {
-  public type: string;
+import { SqlBase, SqlBaseValue } from '../sql-base';
 
-  constructor(type: string) {
-    this.type = type;
+export interface SqlLiteralValue extends SqlBaseValue {
+  value: string | number;
+  stringValue?: string;
+}
+
+export class SqlLiteral extends SqlBase {
+  public value: string | number;
+  public stringValue?: string;
+
+  constructor(options: SqlLiteralValue) {
+    super(options, 'literal');
+    this.value = options.value;
+    this.stringValue = options.stringValue;
   }
 
-  abstract toString(indent?: string): string;
+  public toRawString(): string {
+    return this.stringValue || String(this.value);
+  }
 }
+SqlBase.register('literal', SqlLiteral);

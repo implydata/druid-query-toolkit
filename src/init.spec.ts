@@ -11,10 +11,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { sqlParserFactory } from './parser/druidsql';
-import { FUNCTIONS } from './test-utils';
 
-const parser = sqlParserFactory(FUNCTIONS);
+/*
+import { sqlParserFactory } from './parser/druidsql';
+
+const parser = sqlParserFactory();
 
 // describe('Expression Tests', () => {
 //   it('parsers a basic math expression', () => {
@@ -444,3 +445,4 @@ ORDER BY "Count" DESC`).toString(),
     `);
   });
 });
+*/

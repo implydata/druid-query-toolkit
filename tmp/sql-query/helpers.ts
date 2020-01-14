@@ -54,11 +54,6 @@ export function renderCloseParens(parens: Parens[]): string {
   return val.join('');
 }
 
-export interface Parens {
-  open: string[];
-  close: string[];
-}
-
 export function arrayContains(StringValue?: string, arrayValue?: string[]) {
   if (!arrayValue || !StringValue) {
     return false;
