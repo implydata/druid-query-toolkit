@@ -13,8 +13,9 @@
  */
 
 import { sqlParserFactory } from './parser/druidsql';
+import { FUNCTIONS } from './test-utils';
 
-const parser = sqlParserFactory();
+const parser = sqlParserFactory(FUNCTIONS);
 
 describe('Parser', () => {
   describe('ref', () => {
@@ -75,9 +76,9 @@ describe('Parser', () => {
             "postDot": " ",
             "preDot": " ",
           },
-          "name": undefined,
-          "namespace": undefined,
-          "namespaceQuotes": undefined,
+          "name": "channel",
+          "namespace": "lol",
+          "namespaceQuotes": "\\"",
           "parens": Array [
             Object {
               "leftSpacing": " ",
@@ -88,10 +89,11 @@ describe('Parser', () => {
               "rightSpacing": "   ",
             },
           ],
-          "quotes": undefined,
+          "quotes": "",
           "type": "ref",
         }
       `);
+      expect(parser(sql).toRawString()).toMatchInlineSnapshot(`"\\"lol\\" . channel"`);
     });
   });
 

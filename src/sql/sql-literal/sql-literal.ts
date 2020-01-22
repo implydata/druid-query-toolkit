@@ -20,6 +20,10 @@ export interface SqlLiteralValue extends SqlBaseValue {
 }
 
 export class SqlLiteral extends SqlBase {
+  static wrapInQuotes(thing: string, quote: string): string {
+    return `${quote}${thing}${quote}`;
+  }
+
   public value: string | number;
   public stringValue?: string;
 
@@ -30,7 +34,9 @@ export class SqlLiteral extends SqlBase {
   }
 
   public toRawString(): string {
-    return this.stringValue || String(this.value);
+    return typeof this.value === 'string'
+      ? SqlLiteral.wrapInQuotes(this.value, "'")
+      : String(this.value);
   }
 }
 SqlBase.register('literal', SqlLiteral);

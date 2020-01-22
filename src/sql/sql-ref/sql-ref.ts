@@ -17,8 +17,8 @@ import { SqlBase, SqlBaseValue } from '../sql-base';
 export interface SqlRefValue extends SqlBaseValue {
   name: string;
   quotes: string;
-  namespace: string;
-  namespaceQuotes: string;
+  namespace?: string;
+  namespaceQuotes?: string;
 }
 
 export class SqlRef extends SqlBase {
@@ -39,6 +39,18 @@ export class SqlRef extends SqlBase {
     this.namespaceQuotes = options.namespaceQuotes;
   }
 
+  public valueOf() {
+    const value: SqlRefValue = {
+      type: this.type,
+      name: this.name,
+      namespace: this.namespace,
+      namespaceQuotes: this.namespaceQuotes,
+      quotes: this.quotes,
+    };
+    if (this.innerSpacing) value.innerSpacing = this.innerSpacing;
+    if (this.parens) value.parens = this.parens;
+    return value;
+  }
   public toRawString(): string {
     let str = SqlRef.wrapInQuotes(this.name, this.quotes);
     if (this.namespace) {

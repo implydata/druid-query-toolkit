@@ -13,22 +13,37 @@
  */
 
 import { sqlParserFactory } from './parser/druidsql';
+import { FUNCTIONS } from './test-utils';
 
-const parser = sqlParserFactory();
+const parser = sqlParserFactory(FUNCTIONS);
 
 describe('test', () => {
   it('quotes', () => {
-    const sql = `"page"`;
+    const sql = `( SUM(A) )`;
 
     expect(parser(sql)).toMatchInlineSnapshot(`
-        SqlRef {
+      Function {
+        "argument": SqlRef {
           "innerSpacing": Object {},
-          "name": "page",
+          "name": "A",
           "namespace": undefined,
           "namespaceQuotes": undefined,
-          "quotes": "\\"",
+          "quotes": "",
           "type": "ref",
-        }
-      `);
+        },
+        "fn": "SUM",
+        "leftSpace": "",
+        "parens": Array [
+          Object {
+            "leftSpacing": " ",
+            "rightSpacing": " ",
+          },
+        ],
+        "rightSpace": "",
+        "type": "function",
+      }
+    `);
+
+    expect(parser(sql).toString()).toMatchInlineSnapshot(`"( SUM(A) )"`);
   });
 });

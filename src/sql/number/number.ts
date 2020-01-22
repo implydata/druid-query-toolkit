@@ -14,55 +14,37 @@
 
 import { SqlBase, SqlBaseValue } from '../sql-base';
 
-export interface SqlRefValue extends SqlBaseValue {
-  name: string;
-  quotes: string;
-  namespace?: string;
-  namespaceQuotes?: string;
+export interface NumberValue extends SqlBaseValue {
+  stringValue: string;
+  value: number;
 }
 
-export class SqlRef extends SqlBase {
+export class Number extends SqlBase {
   static wrapInQuotes(thing: string, quote: string): string {
     return `${quote}${thing}${quote}`;
   }
 
-  public name: string;
-  public quotes: string;
-  public namespace?: string;
-  public namespaceQuotes?: string;
+  public stringValue: string;
+  public value: number;
 
-  constructor(options: SqlRefValue) {
-    super(options, 'ref');
-    this.name = options.name;
-    this.quotes = options.quotes;
-    this.namespace = options.namespace;
-    this.namespaceQuotes = options.namespaceQuotes;
+  constructor(options: NumberValue) {
+    super(options, 'number');
+    this.stringValue = options.stringValue;
+    this.value = options.value;
   }
 
   public valueOf() {
-    const value: SqlRefValue = {
+    const value: NumberValue = {
       type: this.type,
-      name: this.name,
-      namespace: this.namespace,
-      namespaceQuotes: this.namespaceQuotes,
-      quotes: this.quotes,
+      value: this.value,
+      stringValue: this.stringValue,
     };
     if (this.innerSpacing) value.innerSpacing = this.innerSpacing;
     if (this.parens) value.parens = this.parens;
     return value;
   }
   public toRawString(): string {
-    let str = SqlRef.wrapInQuotes(this.name, this.quotes);
-    if (this.namespace) {
-      str = [
-        SqlRef.wrapInQuotes(this.namespace, this.namespaceQuotes || ''),
-        this.getInnerSpace('preDot'),
-        '.',
-        this.getInnerSpace('postDot'),
-        str,
-      ].join('');
-    }
-    return str;
+    return this.stringValue;
   }
 }
-SqlBase.register('ref', SqlRef);
+SqlBase.register('number', Number);

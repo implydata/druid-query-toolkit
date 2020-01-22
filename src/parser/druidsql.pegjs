@@ -2,66 +2,119 @@ Start = Sql
 
 //
 
-Sql
-  = SqlRef
+Sql = Expression
+  / SqlRef
   / SqlLiteral
   / SqlInParens
 
+// ------------------------------
 
-/* ToDo: ...
-Expression
-  = OrExpression
+Expression = OrExpression
 
-OrExpression = head:AndExpression tail:(_ OrToken _ AndExpression)*
+OrExpression = head:AndExpression tail: (_ OrToken _ (OrExpression/AndExpression))?
   {
-    let ex = makeListMap1(head, tail);
-    if (ex.length > 1) {
-      return new OrExpression({
-        parens: [],
-        ex: makeListMap1(head, tail),
-        spacing: makeListMapEmpty0Joined(tail)
-      });
-    } else {
-      return head;
-    }
-  }
-
-
-AndExpression = head:NotExpression tail:(_ AndToken _ NotExpression)*
-  {
-    let ex = makeListMap1(head, tail);
-    if(ex.length >1 )
-    {
-      return new AndExpression({
-        parens: [],
-        ex: ex,
-        spacing: makeListMapEmpty0Joined(tail)
-      });
-    } else {
-      return head;
-    }
-  }
-
-
-NotExpression = not:(NotToken _)? ex:ComparisonExpression
-  {
-    if (!not) return ex;
-    return new NotExpression({
-      keyword: not ? not[0] : null,
-      ex: ex,
-      spacing: not ? [not[1]] : null
+  	if (!tail) return head
+    return new sql.Expression ({
+      operator:tail[1],
+      left: head,
+      leftSpace: tail[0],
+      right: tail[3],
+      rightSpace: tail[2]
     });
   }
 
-*/
+AndExpression = head:NotExpression tail:(_ AndToken _ (AndExpression/NotExpression))?
+  {
+  	if (!tail) return head
+    return new sql.Expression ({
+    	operator:tail[1],
+      left: head,
+      leftSpace: tail[0],
+      right: tail[3],
+      rightSpace: tail[2]
+    });
+  }
+
+NotExpression = tail:(NotToken _ (NotExpression/ComparisonExpression))
+  {
+    return new sql.Expression ({
+      operator:tail[0],
+      right: tail[2],
+      rightSpace: tail[1]
+    });
+  }
+  /ComparisonExpression
+
+ComparisonExpression = head:AdditiveExpression tail:((_ ComparisonOperator _ (ComparisonExpression/AdditiveExpression))/(_ BetweenToken _ (AndExpression/ComparisonExpression)))?
+  {
+  	if (!tail) return head
+    return new sql.Expression ({
+    	operator:tail[1],
+      left: head,
+      leftSpace: tail[0],
+      right: tail[3],
+      rightSpace: tail[2]
+    });
+  }
+
+AdditiveExpression = head:MultiplicativeExpression tail:(_ AdditiveOperator _ (AdditiveExpression/MultiplicativeExpression))?
+  {
+  	if (!tail) return head
+    return new sql.Expression ({
+      operator:tail[1],
+      left: head,
+      leftSpace: tail[0],
+      right: tail[3],
+      rightSpace: tail[2]
+    });
+  }
+
+MultiplicativeExpression = head:BaseType tail:(_ MultiplicativeOperator _ (MultiplicativeExpression/BaseType))?
+  {
+  	if (!tail) return head
+    return new sql.Expression ({
+      operator:tail[1],
+      left: head,
+      leftSpace: tail[0],
+      right: tail[3],
+      rightSpace: tail[2]
+    });
+}
+
+
+BaseType =
+Function
+/SqlLiteral
+/SqlRef
+/SqlInParens
+
+// ------------------------------
+
+Function = fn: Functions OpenParen leftSpacing:_? argument:Expression rightSpacing: _? CloseParen
+{
+  return new sql.Function({
+    fn: fn.name,
+    leftSpacing: leftSpacing,
+    argument: argument,
+    rightSpacing: rightSpacing,
+  });
+}
+
+Functions =
+	Function: UnquotedRefPart &{
+   	if (functions.includes(Function.name.toUpperCase())) {
+    	return true
+    }
+  }
+  {
+  return Function;
+  }
 
 
 SqlInParens = OpenParen leftSpacing:_? ex:Sql rightSpacing:_? CloseParen
   {
     return ex.addParens(leftSpacing, rightSpacing);
   }
-
-// ------------------------------
 
 SqlLiteral = lit:(Number / SingleQuotedString)
   {
@@ -70,10 +123,10 @@ SqlLiteral = lit:(Number / SingleQuotedString)
 
 Number = n:$([0-9]+)
   {
-    return {
+    return new sql.Number({
       value: Number(n),
       stringValue: n
-    };
+    });
   }
 
 SingleQuotedString = ['] name:$([^']*) [']
@@ -88,7 +141,7 @@ SingleQuotedString = ['] name:$([^']*) [']
 
 SqlRef = namespaceBits:(RefPart _? "." _?)? main:RefPart
   {
-    return new sql.SqlRef({
+    return new sql .SqlRef({
       name: main.name,
       quotes: main.quotes,
       namespace: deepGet(namespaceBits, '0.name'),
@@ -125,7 +178,28 @@ _ "whitespace" =
   spacing: $([ \t\n\r]+)
 
 OpenParen "("
-  = "("
+ = "("
 
 CloseParen ")"
-  = ")"
+= ")"
+
+ComparisonOperator =
+ '='
+/'<>'
+/'>='
+/'<='
+/'<'
+/'>'
+
+AdditiveOperator =
+'+'
+/'-'
+
+MultiplicativeOperator=
+'*'
+/'/'
+
+OrToken = 'OR'i
+AndToken = 'AND'i
+NotToken = 'NOT'i
+BetweenToken = 'BETWEEN'i

@@ -14,55 +14,55 @@
 
 import { SqlBase, SqlBaseValue } from '../sql-base';
 
-export interface SqlRefValue extends SqlBaseValue {
-  name: string;
-  quotes: string;
-  namespace?: string;
-  namespaceQuotes?: string;
+export interface ExpressionValue extends SqlBaseValue {
+  operator: string;
+  left: Expression | undefined;
+  leftSpace?: string;
+  right: Expression;
+  rightSpace?: string;
 }
 
-export class SqlRef extends SqlBase {
+export class Expression extends SqlBase {
   static wrapInQuotes(thing: string, quote: string): string {
     return `${quote}${thing}${quote}`;
   }
 
-  public name: string;
-  public quotes: string;
-  public namespace?: string;
-  public namespaceQuotes?: string;
+  public operator: string;
+  public left: Expression | undefined;
+  public leftSpace?: string;
+  public right: Expression;
+  public rightSpace?: string;
 
-  constructor(options: SqlRefValue) {
-    super(options, 'ref');
-    this.name = options.name;
-    this.quotes = options.quotes;
-    this.namespace = options.namespace;
-    this.namespaceQuotes = options.namespaceQuotes;
+  constructor(options: ExpressionValue) {
+    super(options, 'expression');
+    this.operator = options.operator;
+    this.left = options.left;
+    this.leftSpace = options.leftSpace || '';
+    this.right = options.right;
+    this.rightSpace = options.rightSpace || '';
   }
 
   public valueOf() {
-    const value: SqlRefValue = {
+    const value: ExpressionValue = {
       type: this.type,
-      name: this.name,
-      namespace: this.namespace,
-      namespaceQuotes: this.namespaceQuotes,
-      quotes: this.quotes,
+      operator: this.operator,
+      left: this.left,
+      leftSpace: this.leftSpace,
+      right: this.right,
+      rightSpace: this.rightSpace,
     };
     if (this.innerSpacing) value.innerSpacing = this.innerSpacing;
     if (this.parens) value.parens = this.parens;
     return value;
   }
+
   public toRawString(): string {
-    let str = SqlRef.wrapInQuotes(this.name, this.quotes);
-    if (this.namespace) {
-      str = [
-        SqlRef.wrapInQuotes(this.namespace, this.namespaceQuotes || ''),
-        this.getInnerSpace('preDot'),
-        '.',
-        this.getInnerSpace('postDot'),
-        str,
-      ].join('');
+    let rawString = this.operator + this.rightSpace + this.right.toString();
+    if (this.left) {
+      rawString = this.left.toString() + this.leftSpace + rawString;
     }
-    return str;
+    return rawString;
   }
 }
-SqlBase.register('ref', SqlRef);
+
+SqlBase.register('expression', Expression);

@@ -15,3 +15,6 @@
 export * from './sql-base';
 export * from './sql-ref/sql-ref';
 export * from './sql-literal/sql-literal';
+export * from './expression/expression';
+export * from './number/number';
+export * from './function/function';
