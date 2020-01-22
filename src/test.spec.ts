@@ -12,26 +12,23 @@
  * limitations under the License.
  */
 
-import { AdditiveExpression } from '../../..';
+import { sqlParserFactory } from './parser/druidsql';
 
-export interface InExpressionValue {
-  keyword: string;
-  list: AdditiveExpression;
-  spacing: string[];
-}
+const parser = sqlParserFactory();
 
-export class InExpression {
-  public keyword: string;
-  public list: AdditiveExpression;
-  public spacing: string[];
+describe('test', () => {
+  it('quotes', () => {
+    const sql = `"page"`;
 
-  constructor(options: InExpression) {
-    this.keyword = options.keyword;
-    this.list = options.list;
-    this.spacing = options.spacing;
-  }
-
-  toString() {
-    return this.keyword + this.spacing[0] + this.list.toString();
-  }
-}
+    expect(parser(sql)).toMatchInlineSnapshot(`
+        SqlRef {
+          "innerSpacing": Object {},
+          "name": "page",
+          "namespace": undefined,
+          "namespaceQuotes": undefined,
+          "quotes": "\\"",
+          "type": "ref",
+        }
+      `);
+  });
+});
