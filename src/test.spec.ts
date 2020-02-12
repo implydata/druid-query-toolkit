@@ -17,33 +17,32 @@ import { FUNCTIONS } from './test-utils';
 
 const parser = sqlParserFactory(FUNCTIONS);
 
-describe('test', () => {
+describe.skip('test', () => {
   it('quotes', () => {
-    const sql = `( SUM(A) )`;
+    const sql = `SUM ( A  )`;
 
+    expect(parser(sql).toString()).toMatchInlineSnapshot(`"SUM ( A )"`);
     expect(parser(sql)).toMatchInlineSnapshot(`
       Function {
-        "argument": SqlRef {
-          "innerSpacing": Object {},
-          "name": "A",
-          "namespace": undefined,
-          "namespaceQuotes": undefined,
-          "quotes": "",
-          "type": "ref",
-        },
-        "fn": "SUM",
-        "leftSpace": "",
-        "parens": Array [
-          Object {
-            "leftSpacing": " ",
-            "rightSpacing": " ",
+        "arguments": Array [
+          SqlRef {
+            "innerSpacing": Object {},
+            "name": "A",
+            "namespace": undefined,
+            "namespaceQuotes": undefined,
+            "quotes": "",
+            "type": "ref",
           },
         ],
-        "rightSpace": "",
+        "functionName": "SUM",
+        "innerSpacing": Object {
+          "postLeftParensSpace": " ",
+          "postNameSpace": " ",
+          "preRightParensSpace": " ",
+        },
+        "separators": undefined,
         "type": "function",
       }
     `);
-
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"( SUM(A) )"`);
   });
 });

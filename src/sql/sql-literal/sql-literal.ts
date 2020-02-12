@@ -15,7 +15,7 @@
 import { SqlBase, SqlBaseValue } from '../sql-base';
 
 export interface SqlLiteralValue extends SqlBaseValue {
-  value: string | number;
+  value?: string | number;
   stringValue?: string;
 }
 
@@ -24,7 +24,7 @@ export class SqlLiteral extends SqlBase {
     return `${quote}${thing}${quote}`;
   }
 
-  public value: string | number;
+  public value?: string | number;
   public stringValue?: string;
 
   constructor(options: SqlLiteralValue) {
@@ -33,10 +33,22 @@ export class SqlLiteral extends SqlBase {
     this.stringValue = options.stringValue;
   }
 
+  public valueOf() {
+    const value: SqlLiteralValue = super.valueOf();
+    value.value = this.value;
+    value.stringValue = this.stringValue;
+    return value;
+  }
+
   public toRawString(): string {
-    return typeof this.value === 'string'
-      ? SqlLiteral.wrapInQuotes(this.value, "'")
-      : String(this.value);
+    if (!this.stringValue) {
+      throw new Error('Could not make raw string');
+    }
+
+    if (typeof this.value === 'string') {
+      return SqlLiteral.wrapInQuotes(this.value, `'`);
+    }
+    return this.stringValue;
   }
 }
 SqlBase.register('literal', SqlLiteral);

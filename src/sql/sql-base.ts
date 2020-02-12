@@ -52,14 +52,12 @@ export abstract class SqlBase {
   }
 
   public type: string;
-  public innerSpacing?: Record<string, string>;
+  public innerSpacing: Record<string, string>;
   public parens?: Parens[];
 
   constructor(options: SqlBaseValue, typeOverride: string) {
     this.type = typeOverride || options.type;
-    if (options.innerSpacing) {
-      this.innerSpacing = SqlBase.cleanObject(options.innerSpacing);
-    }
+    this.innerSpacing = SqlBase.cleanObject(options.innerSpacing) || {};
     if (options.parens) {
       this.parens = options.parens;
     }

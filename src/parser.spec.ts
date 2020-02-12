@@ -89,7 +89,7 @@ describe('Parser', () => {
               "rightSpacing": "   ",
             },
           ],
-          "quotes": "",
+          "quotes": undefined,
           "type": "ref",
         }
       `);
@@ -103,6 +103,7 @@ describe('Parser', () => {
 
       expect(parser(sql)).toMatchInlineSnapshot(`
         SqlLiteral {
+          "innerSpacing": Object {},
           "stringValue": "12345",
           "type": "literal",
           "value": 12345,
@@ -115,6 +116,7 @@ describe('Parser', () => {
 
       expect(parser(sql)).toMatchInlineSnapshot(`
         SqlLiteral {
+          "innerSpacing": Object {},
           "stringValue": "hello",
           "type": "literal",
           "value": "hello",
