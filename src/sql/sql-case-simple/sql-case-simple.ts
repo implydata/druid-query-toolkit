@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { WhenThen } from '..';
+import { WhenThenUnit } from '..';
 import { SqlBase, SqlBaseValue } from '../sql-base';
 
 export interface SqlCaseSimpleValue extends SqlBaseValue {
@@ -21,7 +21,7 @@ export interface SqlCaseSimpleValue extends SqlBaseValue {
   elseKeyword?: string;
   elseExpression?: string;
   endKeyword?: string;
-  whenThenUnits?: WhenThen[];
+  whenThenUnits?: WhenThenUnit[];
   postWhenThenUnits?: string[];
 }
 
@@ -35,7 +35,7 @@ export class SqlCaseSimple extends SqlBase {
   public elseKeyword?: string;
   public elseExpression?: string;
   public endKeyword?: string;
-  public whenThenUnits: WhenThen[];
+  public whenThenUnits: WhenThenUnit[];
   public postWhenThenUnits?: string[];
 
   constructor(options: SqlCaseSimpleValue) {
@@ -89,7 +89,7 @@ export class SqlCaseSimple extends SqlBase {
     return rawString + this.innerSpacing.preEnd + this.endKeyword;
   }
 
-  public whenThenToString(unit?: WhenThen): string {
+  public whenThenToString(unit?: WhenThenUnit): string {
     if (!unit) {
       return '';
     }

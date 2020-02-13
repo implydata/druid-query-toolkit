@@ -14,7 +14,7 @@
 
 import { SqlBase, SqlBaseValue } from '../sql-base';
 
-export interface WhenThen {
+export interface WhenThenUnit {
   whenKeyword: string;
   postWhen: string;
   whenExpression: SqlBase;
@@ -26,7 +26,7 @@ export interface WhenThen {
 
 export interface SqlCaseSearchedValue extends SqlBaseValue {
   caseKeyword?: string;
-  whenThenUnits?: WhenThen[];
+  whenThenUnits?: WhenThenUnit[];
   elseKeyword?: string;
   elseExpression?: string;
   endKeyword?: string;
@@ -39,7 +39,7 @@ export class SqlCaseSearched extends SqlBase {
   }
 
   public caseKeyword?: string;
-  public whenThenUnits: WhenThen[];
+  public whenThenUnits: WhenThenUnit[];
   public elseKeyword?: string;
   public elseExpression?: string;
   public endKeyword?: string;
@@ -89,7 +89,7 @@ export class SqlCaseSearched extends SqlBase {
     return rawString + this.innerSpacing.preEnd + this.endKeyword;
   }
 
-  public whenThenToString(unit?: WhenThen): string {
+  public whenThenToString(unit?: WhenThenUnit): string {
     if (!unit) {
       return '';
     }
