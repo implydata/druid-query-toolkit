@@ -17,29 +17,36 @@ import { SqlBase, SqlBaseValue } from '../sql-base';
 
 export interface SqlQueryValue extends SqlBaseValue {
   explainKeyword?: string;
+
   withKeyword?: string;
   withUnits?: WithUnit[];
   withSeparators?: Separator[];
-  AsKeyword?: string;
-  withQuery?: SqlQuery;
+
   selectKeyword?: string;
   selectDecorator?: string;
   selectValues?: SqlBase[];
   selectSeparators?: Separator[];
+
   fromKeyword?: string;
   table?: SqlAliasRef;
+
   whereKeyword?: string;
   whereExpression?: SqlBase;
+
   groupByKeyword?: string;
   groupByExpression?: SqlBase[];
   groupByExpressionSeparators?: Separator[];
+
   havingKeyword?: string;
   havingExpression?: SqlBase;
+
   orderByKeyword?: string;
   orderByUnits?: OrderByUnit[];
   orderBySeparators?: Separator[];
+
   limitKeyword?: string;
   limitValue?: SqlLiteral;
+
   unionKeyword?: string;
   unionQuery?: SqlQuery;
 }
@@ -62,15 +69,15 @@ export interface OrderByUnit {
   postExpression: string;
   direction: 'ASC' | 'DESC';
 }
+
 export class SqlQuery extends SqlBase {
   public explainKeyword?: string;
   public withKeyword?: string;
   public withUnits?: WithUnit[];
   public withSeparators?: Separator[];
-  public AsKeyword?: string;
   public selectKeyword?: string;
   public selectDecorator?: string;
-  public selectValues: SqlBase[];
+  public selectValues?: SqlBase[];
   public selectSeparators?: Separator[];
   public fromKeyword?: string;
   public table?: SqlAliasRef;
@@ -101,6 +108,7 @@ export class SqlQuery extends SqlBase {
         ')' +
         unit.postWithColumns;
     }
+
     rawString += unit.AsKeyword + unit.postAs + unit.withQuery.toString();
     return rawString;
   }
@@ -112,7 +120,6 @@ export class SqlQuery extends SqlBase {
     this.withKeyword = options.withKeyword;
     this.withUnits = options.withUnits;
     this.withSeparators = options.withSeparators;
-    this.AsKeyword = options.AsKeyword;
     this.selectKeyword = options.selectKeyword;
     this.selectDecorator = options.selectDecorator;
     this.selectValues = options.selectValues || [];
@@ -141,7 +148,6 @@ export class SqlQuery extends SqlBase {
     value.withKeyword = this.withKeyword;
     value.withUnits = this.withUnits;
     value.withSeparators = this.withSeparators;
-    value.AsKeyword = this.AsKeyword;
     value.selectKeyword = this.selectKeyword;
     value.selectDecorator = this.selectDecorator;
     value.selectValues = this.selectValues;
@@ -167,9 +173,12 @@ export class SqlQuery extends SqlBase {
   public toRawString(): string {
     let rawString = this.innerSpacing.preQuery;
 
+    // Explain clause
     if (this.explainKeyword) {
       rawString += this.explainKeyword + this.innerSpacing.postExplain;
     }
+
+    // With clause
     if (this.withKeyword && this.withUnits) {
       rawString +=
         this.withKeyword +
@@ -181,18 +190,23 @@ export class SqlQuery extends SqlBase {
         ) +
         this.innerSpacing.postWithQuery;
     }
-    rawString += this.selectKeyword + this.innerSpacing.postSelect;
-    if (this.selectDecorator) {
-      rawString += this.selectDecorator + this.innerSpacing.postSelectDecorator;
+
+    // Select and From clause
+    if (this.selectValues) {
+      rawString += this.selectKeyword + this.innerSpacing.postSelect;
+      if (this.selectDecorator) {
+        rawString += this.selectDecorator + this.innerSpacing.postSelectDecorator;
+      }
+
+      rawString +=
+        Separator.spacilator(this.selectValues, this.selectSeparators) +
+        this.innerSpacing.postSelectValues +
+        this.fromKeyword +
+        this.innerSpacing.postFrom +
+        this.table;
     }
 
-    rawString +=
-      Separator.spacilator(this.selectValues, this.selectSeparators) +
-      this.innerSpacing.postSelectValues +
-      this.fromKeyword +
-      this.innerSpacing.postFrom +
-      this.table;
-
+    // Where Clause
     if (this.whereKeyword && this.whereExpression) {
       rawString +=
         this.innerSpacing.preWhereKeyword +
@@ -201,6 +215,7 @@ export class SqlQuery extends SqlBase {
         this.whereExpression.toString();
     }
 
+    // GroupBy Clause
     if (this.groupByKeyword && this.groupByExpression) {
       rawString +=
         this.innerSpacing.preGroupByKeyword +
@@ -209,6 +224,7 @@ export class SqlQuery extends SqlBase {
         Separator.spacilator(this.groupByExpression, this.groupByExpressionSeparators);
     }
 
+    // Having Clause
     if (this.havingKeyword && this.havingExpression) {
       rawString +=
         this.innerSpacing.preHavingKeyword +
@@ -217,6 +233,7 @@ export class SqlQuery extends SqlBase {
         this.havingExpression.toString();
     }
 
+    // Order By Clause
     if (this.orderByKeyword && this.orderByUnits) {
       rawString +=
         this.innerSpacing.preOrderByKeyword +
@@ -229,6 +246,7 @@ export class SqlQuery extends SqlBase {
         );
     }
 
+    // Limit Clause
     if (this.limitKeyword && this.limitValue) {
       rawString +=
         this.innerSpacing.preLimitKeyword +
@@ -237,6 +255,7 @@ export class SqlQuery extends SqlBase {
         this.limitValue;
     }
 
+    // Union Clause
     if (this.unionKeyword && this.unionQuery) {
       rawString +=
         this.innerSpacing.preUnionKeyword +

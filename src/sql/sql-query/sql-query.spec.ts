@@ -24,7 +24,6 @@ describe('simple expressions', () => {
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "AsKeyword": undefined,
         "explainKeyword": "",
         "fromKeyword": "from",
         "groupByExpression": undefined,
@@ -94,7 +93,6 @@ describe('simple expressions', () => {
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "AsKeyword": undefined,
         "explainKeyword": "",
         "fromKeyword": "from",
         "groupByExpression": undefined,
@@ -170,7 +168,6 @@ describe('simple expressions', () => {
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "AsKeyword": undefined,
         "explainKeyword": "",
         "fromKeyword": "from",
         "groupByExpression": undefined,
@@ -289,7 +286,6 @@ FROM sys.segments`;
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "AsKeyword": undefined,
         "explainKeyword": "",
         "fromKeyword": "FROM",
         "groupByExpression": undefined,
@@ -720,7 +716,6 @@ FROM sys.segments`;
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "AsKeyword": undefined,
         "explainKeyword": "",
         "fromKeyword": "FROM",
         "groupByExpression": undefined,
@@ -891,7 +886,6 @@ FROM sys.segments`;
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "AsKeyword": undefined,
         "explainKeyword": "Explain plan for",
         "fromKeyword": "from",
         "groupByExpression": undefined,
@@ -969,7 +963,6 @@ FROM sys.segments`;
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "AsKeyword": undefined,
         "explainKeyword": "",
         "fromKeyword": "from",
         "groupByExpression": undefined,
@@ -1039,7 +1032,6 @@ FROM sys.segments`;
             "preRightParen": "",
             "withColumns": undefined,
             "withQuery": SqlQuery {
-              "AsKeyword": undefined,
               "explainKeyword": "",
               "fromKeyword": "FROM",
               "groupByExpression": undefined,
@@ -1131,7 +1123,6 @@ describe('expressions with where clause', () => {
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "AsKeyword": undefined,
         "explainKeyword": "",
         "fromKeyword": "from",
         "groupByExpression": undefined,
@@ -1231,7 +1222,6 @@ describe('expressions with where clause', () => {
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "AsKeyword": undefined,
         "explainKeyword": "",
         "fromKeyword": "FROM",
         "groupByExpression": undefined,
@@ -1331,7 +1321,6 @@ describe('expressions with where clause', () => {
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "AsKeyword": undefined,
         "explainKeyword": "",
         "fromKeyword": "FROM",
         "groupByExpression": undefined,
@@ -1515,7 +1504,6 @@ describe('expressions with group by clause', () => {
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "AsKeyword": undefined,
         "explainKeyword": "",
         "fromKeyword": "from",
         "groupByExpression": Array [
@@ -1595,7 +1583,6 @@ describe('expressions with group by clause', () => {
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "AsKeyword": undefined,
         "explainKeyword": "",
         "fromKeyword": "from",
         "groupByExpression": Array [
@@ -1677,7 +1664,6 @@ describe('expressions with group by clause', () => {
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "AsKeyword": undefined,
         "explainKeyword": "",
         "fromKeyword": "from",
         "groupByExpression": Array [
@@ -1779,7 +1765,6 @@ describe('expressions with having clause', () => {
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "AsKeyword": undefined,
         "explainKeyword": "",
         "fromKeyword": "from",
         "groupByExpression": undefined,
@@ -1879,7 +1864,6 @@ describe('expressions with having clause', () => {
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "AsKeyword": undefined,
         "explainKeyword": "",
         "fromKeyword": "FROM",
         "groupByExpression": undefined,
@@ -1979,7 +1963,6 @@ describe('expressions with having clause', () => {
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "AsKeyword": undefined,
         "explainKeyword": "",
         "fromKeyword": "FROM",
         "groupByExpression": undefined,
@@ -2163,7 +2146,6 @@ describe('expressions with order by clause', () => {
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "AsKeyword": undefined,
         "explainKeyword": "",
         "fromKeyword": "from",
         "groupByExpression": undefined,
@@ -2248,7 +2230,6 @@ describe('expressions with order by clause', () => {
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "AsKeyword": undefined,
         "explainKeyword": "",
         "fromKeyword": "from",
         "groupByExpression": undefined,
@@ -2335,7 +2316,6 @@ describe('expressions with order by clause', () => {
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "AsKeyword": undefined,
         "explainKeyword": "",
         "fromKeyword": "from",
         "groupByExpression": undefined,
@@ -2420,7 +2400,6 @@ describe('expressions with order by clause', () => {
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "AsKeyword": undefined,
         "explainKeyword": "",
         "fromKeyword": "from",
         "groupByExpression": undefined,
@@ -2521,7 +2500,6 @@ describe('expressions with order by clause', () => {
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "AsKeyword": undefined,
         "explainKeyword": "",
         "fromKeyword": "from",
         "groupByExpression": undefined,
@@ -2624,7 +2602,6 @@ describe('expressions with order by clause', () => {
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "AsKeyword": undefined,
         "explainKeyword": "",
         "fromKeyword": "from",
         "groupByExpression": undefined,
@@ -2741,7 +2718,6 @@ describe('expressions with limit clause', () => {
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "AsKeyword": undefined,
         "explainKeyword": "",
         "fromKeyword": "from",
         "groupByExpression": undefined,
@@ -2820,7 +2796,6 @@ describe('expressions with union clause', () => {
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "AsKeyword": undefined,
         "explainKeyword": "",
         "fromKeyword": "from",
         "groupByExpression": undefined,
@@ -2875,7 +2850,6 @@ describe('expressions with union clause', () => {
         "type": "query",
         "unionKeyword": "union all",
         "unionQuery": SqlQuery {
-          "AsKeyword": undefined,
           "explainKeyword": "",
           "fromKeyword": "from",
           "groupByExpression": undefined,

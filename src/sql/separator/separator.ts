@@ -25,6 +25,8 @@ export class Separator {
   public right?: string;
   public separator: string;
 
+  // Interface Spacilator is used to re string the pattern:
+  // Interface separator interface
   static interfaceSpacilator<t>(
     expressions: t[],
     toString: (expression: t) => string,
@@ -32,11 +34,8 @@ export class Separator {
   ): string {
     if (!separators) {
       return toString(expressions[0]);
-    }
-
-    if (expressions.length - separators.length !== 1) {
-      console.log(expressions.length - separators.length);
-      return '';
+    } else if (expressions.length - separators.length !== 1) {
+      throw new Error('invalid expression or separator length');
     }
 
     let most = separators
@@ -47,12 +46,12 @@ export class Separator {
     return most;
   }
 
+  // Spacilator is used to restring the pattern:
+  // SqlBase separator SqlBase
   static spacilator(expressions: SqlBase[], separators?: Separator[]): string {
     if (!separators) {
       return expressions[0].toString();
-    }
-
-    if (expressions.length - separators.length !== 1) {
+    } else if (expressions.length - separators.length !== 1) {
       throw new Error('invalid expression or separator length');
     }
 

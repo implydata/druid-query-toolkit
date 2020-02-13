@@ -10,21 +10,21 @@ Sql = SqlQuery
 
 // ------------------------------
 
-SqlQuery =
-preQuery:_?
-explainKeyword:(ExplainToken _)?
-withClause:(WithClause _)?
-select:SelectClause
-postSelectValues:_
-from:FromClause
-where:(_ WhereClause)?
-groupBy:(_ GroupByClause)?
-having:(_ HavingClause)?
-orderBy:(_ OrderByClause)?
-limit:(_ LimitClause)?
-union:(_ UnionClause)?
-postQuery:EndOfQuery?
-
+SqlQuery
+  =
+  preQuery:_?
+  explainKeyword:(ExplainToken _)?
+  withClause:(WithClause _)?
+  select:SelectClause
+  postSelectValues:_
+  from:FromClause
+  where:(_ WhereClause)?
+  groupBy:(_ GroupByClause)?
+  having:(_ HavingClause)?
+  orderBy:(_ OrderByClause)?
+  limit:(_ LimitClause)?
+  union:(_ UnionClause)?
+  postQuery:EndOfQuery?
 {
   return new sql.SqlQuery({
     explainKeyword: explainKeyword ? explainKeyword[0]: '',
@@ -117,13 +117,14 @@ WithClause
 }
 
 
-WithUnit =
-withTableName:Expression
-postWithTable:_?
-columns: (WithColumns _)?
-AsKeyword:AsToken
-postAs:_
-withQuery:SqlInParens
+WithUnit
+  =
+  withTableName:Expression
+  postWithTable:_?
+  columns: (WithColumns _)?
+  AsKeyword:AsToken
+  postAs:_
+  withQuery:SqlInParens
 {
   return {
     withTableName: withTableName,
@@ -142,14 +143,15 @@ withQuery:SqlInParens
 WithColumns = '(' postLeftParen:_? withColumnsHead:BaseType withColumnsTail:(Comma BaseType)* preRightParen:_? ')'
 {
   return {
-  postLeftParen: postLeftParen || '',
-  withColumns: withColumnsHead ?  makeListMap1(withColumnsHead,withColumnsTail) : withColumnsHead,
-  withSeparators: makeListMapEmpty(withColumnsTail),
-  preRightParen: preRightParen || ''
+    postLeftParen: postLeftParen || '',
+    withColumns: withColumnsHead ?  makeListMap1(withColumnsHead,withColumnsTail) : withColumnsHead,
+    withSeparators: makeListMapEmpty(withColumnsTail),
+    preRightParen: preRightParen || ''
   }
 }
 
-SelectClause = selectKeyword:SelectToken postSelect:_ selectDecorator:((AllToken/DistinctToken) _)? selectValuesHead:(Alias/Expression)  selectValuesTail:(Comma (Alias/Expression))*{
+SelectClause = selectKeyword:SelectToken postSelect:_ selectDecorator:((AllToken/DistinctToken) _)? selectValuesHead:(Alias/Expression)  selectValuesTail:(Comma (Alias/Expression))*
+{
   return {
      selectKeyword: selectKeyword,
      postSelect: postSelect,
@@ -207,7 +209,8 @@ OrderByClause = orderByKeyword:OrderToken postOrderByKeyword:_ orderByUnitsHead:
   }
 }
 
-OrderByPart = expression:Expression  direction:(_ ('ASC'/'DESC'i))? {
+OrderByPart = expression:Expression  direction:(_ ('ASC'/'DESC'i))?
+{
   return {
     expression: expression,
     postExpression: direction ? direction[0] : '',
@@ -232,9 +235,11 @@ UnionClause = unionKeyword:UnionToken postUnionKeyword:_ unionQuery:SqlQuery
     unionQuery: unionQuery
   }
 }
+
 // ------------------------------
 
-Alias = column:Expression postColumn:_ asKeyword:AsToken postAs:_ alias:SqlRef{
+Alias = column:Expression postColumn:_ asKeyword:AsToken postAs:_ alias:SqlRef
+{
   return new sql.SqlAliasRef({
     column: column,
     postColumn: postColumn,
@@ -246,7 +251,6 @@ Alias = column:Expression postColumn:_ asKeyword:AsToken postAs:_ alias:SqlRef{
 
 
 Expression = CaseExpression/OrExpression
-
 
 OrExpression = head:AndExpression tail:(_ OrToken _ (AndExpression))*
   {
@@ -450,86 +454,85 @@ Filter = filterKeyword:FilterToken postFilterKeyword:_? OpenParen postLeftParen:
 }
 
 Functions = Function:UnquotedRefPart
-  &{
-    if (functions.includes(Function.name.toUpperCase())) {
-      return true;
-    }
+&{
+  if (functions.includes(Function.name.toUpperCase())) {
+    return true;
   }
-  {
+}
+{
   return Function;
-  }
+}
 
 Comma = left:_? ',' right:_
-  {
-    return new sql.Separator({
-      left: left,
-      right: right,
-      separator: ','
-    });
-  }
+{
+  return new sql.Separator({
+    left: left,
+    right: right,
+    separator: ','
+  });
+}
 
 SqlInParens = OpenParen leftSpacing:_? ex:Sql rightSpacing:_? CloseParen
-  {
-    return ex.addParens(leftSpacing, rightSpacing);
-  }
+{
+  return ex.addParens(leftSpacing, rightSpacing);
+}
 
 SqlLiteral = lit:(Number / SingleQuotedString)
-  {
-    return new sql.SqlLiteral(lit);
-  }
+{
+  return new sql.SqlLiteral(lit);
+}
 / SqlInParens
 
 Number = n:$([0-9]+)
-  {
-   return {
-        value: parseInt(n, 10),
-        stringValue: n
-      };
-  }
+{
+ return {
+      value: parseInt(n, 10),
+      stringValue: n
+    };
+}
 
 SingleQuotedString = ['] name:$([^']*) [']
-  {
-    return {
-      value: name,
-      stringValue: name
-    };
-  }
+{
+  return {
+    value: name,
+    stringValue: name
+  };
+}
 
 // ------------------------------
 
 SqlRef = namespaceBits:(RefPart _? "." _?)? main:RefPart
-  {
-    return new sql .SqlRef({
-      name: main.name,
-      quotes: main.quotes,
-      namespace: deepGet(namespaceBits, '0.name'),
-      namespaceQuotes: deepGet(namespaceBits, '0.quotes'),
-      innerSpacing: {
-        preDot: deepGet(namespaceBits, '1'),
-        postDot: deepGet(namespaceBits, '3'),
-      }
-    });
-  }
- / SqlInParens
+{
+  return new sql .SqlRef({
+    name: main.name,
+    quotes: main.quotes,
+    namespace: deepGet(namespaceBits, '0.name'),
+    namespaceQuotes: deepGet(namespaceBits, '0.quotes'),
+    innerSpacing: {
+      preDot: deepGet(namespaceBits, '1'),
+      postDot: deepGet(namespaceBits, '3'),
+    }
+  });
+}
+/SqlInParens
 
 RefPart = QuotedRefPart / UnquotedRefPart
 
 QuotedRefPart = ["] name:$([^"]+) ["]
-  {
-    return {
-      name: name,
-      quotes: '"'
-    }
+{
+  return {
+    name: name,
+    quotes: '"'
   }
+}
 
 UnquotedRefPart = name:$([a-z_\-:*/]i [a-z0-9_\-:*/]i*)
-  !{ return name === 'user'; /* ToDo */ }
-  {
-    return {
-      name: name,
-      quotes: ''
-    }
+{
+  return {
+    name: name,
+    quotes: ''
   }
+}
 
 // -----------------------------------
 
