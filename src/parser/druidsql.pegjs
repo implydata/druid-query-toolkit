@@ -40,7 +40,8 @@ SqlQuery
     selectValues: select.selectValues,
 
     fromKeyword: from.fromKeyword,
-    table: from.table,
+    tables: from.tables,
+    tableSeparators: from.tableSeparators,
 
     whereKeyword: where ? where[1].whereKeyword : undefined ,
     whereExpression: where ? where[1].whereExpression : undefined,
@@ -162,12 +163,13 @@ SelectClause = selectKeyword:SelectToken postSelect:_ selectDecorator:((AllToken
   }
 }
 
-FromClause = fromKeyword:FromToken postFrom:_ table:SqlRef
+FromClause = fromKeyword:FromToken postFrom:_ tableHead:(Alias/SqlRef) tableTail:(Comma (Alias/SqlRef))*
 {
   return {
     fromKeyword: fromKeyword,
     postFrom: postFrom,
-    table: table
+    tables: tableTail ? makeListMap1(tableHead, tableTail): [tableHead],
+    tableSeparators: tableTail ? makeListMapEmpty0(tableTail) : undefined
   }
 }
 
@@ -185,8 +187,8 @@ GroupByClause = groupByKeyword:GroupByToken postGroupByKeyword:_  groupByExpress
   return {
     groupByKeyword: groupByKeyword,
     postGroupByKeyword: postGroupByKeyword,
-    groupByExpression: groupByExpressionHead ? makeListMap1(groupByExpressionHead,groupByExpressionTail) : [groupByExpressionHead],
-    groupByExpressionSeparators: makeListMapEmpty0(groupByExpressionTail),
+    groupByExpression: groupByExpressionTail ? makeListMap1(groupByExpressionHead,groupByExpressionTail) : [groupByExpressionHead],
+    groupByExpressionSeparators: groupByExpressionTail ?  makeListMapEmpty0(groupByExpressionTail) : undefined,
   }
 }
 

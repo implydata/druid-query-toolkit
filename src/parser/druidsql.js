@@ -163,7 +163,8 @@ var p =
             selectValues: select.selectValues,
 
             fromKeyword: from.fromKeyword,
-            table: from.table,
+            tables: from.tables,
+            tableSeparators: from.tableSeparators,
 
             whereKeyword: where ? where[1].whereKeyword : undefined ,
             whereExpression: where ? where[1].whereExpression : undefined,
@@ -267,11 +268,12 @@ var p =
              selectSeparators: makeListMapEmpty0(selectValuesTail),
           }
         },
-        peg$c9 = function(fromKeyword, postFrom, table) {
+        peg$c9 = function(fromKeyword, postFrom, tableHead, tableTail) {
           return {
             fromKeyword: fromKeyword,
             postFrom: postFrom,
-            table: table
+            tables: tableTail ? makeListMap1(tableHead, tableTail): [tableHead],
+            tableSeparators: tableTail ? makeListMapEmpty0(tableTail) : undefined
           }
         },
         peg$c10 = function(whereKeyword, postWhereKeyword, whereExpression) {
@@ -285,8 +287,8 @@ var p =
           return {
             groupByKeyword: groupByKeyword,
             postGroupByKeyword: postGroupByKeyword,
-            groupByExpression: groupByExpressionHead ? makeListMap1(groupByExpressionHead,groupByExpressionTail) : [groupByExpressionHead],
-            groupByExpressionSeparators: makeListMapEmpty0(groupByExpressionTail),
+            groupByExpression: groupByExpressionTail ? makeListMap1(groupByExpressionHead,groupByExpressionTail) : [groupByExpressionHead],
+            groupByExpressionSeparators: groupByExpressionTail ?  makeListMapEmpty0(groupByExpressionTail) : undefined,
           }
         },
         peg$c12 = function(havingKeyword, postHavingKeyword, havingExpression) {
@@ -1360,18 +1362,66 @@ var p =
     }
 
     function peg$parseFromClause() {
-      var s0, s1, s2, s3;
+      var s0, s1, s2, s3, s4, s5, s6, s7;
 
       s0 = peg$currPos;
       s1 = peg$parseFromToken();
       if (s1 !== peg$FAILED) {
         s2 = peg$parse_();
         if (s2 !== peg$FAILED) {
-          s3 = peg$parseSqlRef();
+          s3 = peg$parseAlias();
+          if (s3 === peg$FAILED) {
+            s3 = peg$parseSqlRef();
+          }
           if (s3 !== peg$FAILED) {
-            peg$savedPos = s0;
-            s1 = peg$c9(s1, s2, s3);
-            s0 = s1;
+            s4 = [];
+            s5 = peg$currPos;
+            s6 = peg$parseComma();
+            if (s6 !== peg$FAILED) {
+              s7 = peg$parseAlias();
+              if (s7 === peg$FAILED) {
+                s7 = peg$parseSqlRef();
+              }
+              if (s7 !== peg$FAILED) {
+                s6 = [s6, s7];
+                s5 = s6;
+              } else {
+                peg$currPos = s5;
+                s5 = peg$FAILED;
+              }
+            } else {
+              peg$currPos = s5;
+              s5 = peg$FAILED;
+            }
+            while (s5 !== peg$FAILED) {
+              s4.push(s5);
+              s5 = peg$currPos;
+              s6 = peg$parseComma();
+              if (s6 !== peg$FAILED) {
+                s7 = peg$parseAlias();
+                if (s7 === peg$FAILED) {
+                  s7 = peg$parseSqlRef();
+                }
+                if (s7 !== peg$FAILED) {
+                  s6 = [s6, s7];
+                  s5 = s6;
+                } else {
+                  peg$currPos = s5;
+                  s5 = peg$FAILED;
+                }
+              } else {
+                peg$currPos = s5;
+                s5 = peg$FAILED;
+              }
+            }
+            if (s4 !== peg$FAILED) {
+              peg$savedPos = s0;
+              s1 = peg$c9(s1, s2, s3, s4);
+              s0 = s1;
+            } else {
+              peg$currPos = s0;
+              s0 = peg$FAILED;
+            }
           } else {
             peg$currPos = s0;
             s0 = peg$FAILED;

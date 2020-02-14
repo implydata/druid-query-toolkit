@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { Separator, SqlAliasRef, SqlLiteral } from '../index';
+import { Separator, SqlAliasRef, SqlLiteral, SqlRef } from '../index';
 import { SqlBase, SqlBaseValue } from '../sql-base';
 
 export interface SqlQueryValue extends SqlBaseValue {
@@ -28,7 +28,8 @@ export interface SqlQueryValue extends SqlBaseValue {
   selectSeparators?: Separator[];
 
   fromKeyword?: string;
-  table?: SqlAliasRef;
+  tables?: (SqlAliasRef | SqlRef)[];
+  tableSeparators?: [];
 
   whereKeyword?: string;
   whereExpression?: SqlBase;
@@ -80,7 +81,8 @@ export class SqlQuery extends SqlBase {
   public selectValues?: SqlBase[];
   public selectSeparators?: Separator[];
   public fromKeyword?: string;
-  public table?: SqlAliasRef;
+  public tables?: (SqlAliasRef | SqlRef)[];
+  public tableSeparators?: [];
   public whereKeyword?: string;
   public whereExpression?: SqlBase;
   public groupByKeyword?: string;
@@ -125,7 +127,8 @@ export class SqlQuery extends SqlBase {
     this.selectValues = options.selectValues || [];
     this.selectSeparators = options.selectSeparators;
     this.fromKeyword = options.fromKeyword;
-    this.table = options.table;
+    this.tables = options.tables;
+    this.tableSeparators = options.tableSeparators;
     this.whereKeyword = options.whereKeyword;
     this.whereExpression = options.whereExpression;
     this.groupByKeyword = options.groupByKeyword;
@@ -153,7 +156,8 @@ export class SqlQuery extends SqlBase {
     value.selectValues = this.selectValues;
     value.selectSeparators = this.selectSeparators;
     value.fromKeyword = this.fromKeyword;
-    value.table = this.table;
+    value.tables = this.tables;
+    value.tableSeparators = this.tableSeparators;
     value.whereKeyword = this.whereKeyword;
     value.whereExpression = this.whereExpression;
     value.groupByKeyword = this.groupByKeyword;
@@ -192,7 +196,7 @@ export class SqlQuery extends SqlBase {
     }
 
     // Select and From clause
-    if (this.selectValues) {
+    if (this.selectValues && this.tables) {
       rawString += this.selectKeyword + this.innerSpacing.postSelect;
       if (this.selectDecorator) {
         rawString += this.selectDecorator + this.innerSpacing.postSelectDecorator;
@@ -203,7 +207,7 @@ export class SqlQuery extends SqlBase {
         this.innerSpacing.postSelectValues +
         this.fromKeyword +
         this.innerSpacing.postFrom +
-        this.table;
+        Separator.spacilator(this.tables, this.tableSeparators);
     }
 
     // Where Clause
@@ -265,6 +269,32 @@ export class SqlQuery extends SqlBase {
     }
 
     return rawString + this.innerSpacing.postQuery;
+  }
+
+  getTableNames() {
+    // returns an array of table names
+    if (!this.tables) return;
+    return this.tables.map(table => {
+      if (table instanceof SqlRef) {
+        return table.name;
+      } else if (table.alias) {
+        return table.alias.name;
+      }
+      return;
+    });
+  }
+
+  getSchema(): string | undefined {
+    if (!this.tables) return;
+    const table = this.tables[0];
+
+    if (table instanceof SqlRef) {
+      return table.name;
+    } else if (table.alias) {
+      return table.alias.name;
+    }
+
+    return;
   }
 }
 
