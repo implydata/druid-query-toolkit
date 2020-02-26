@@ -1915,3 +1915,200 @@ describe('Brackets', () => {
     expect(parser(sql).toString()).toMatchInlineSnapshot(`"NOT NOT (A + b) OR c"`);
   });
 });
+
+describe('remove function', () => {
+  it('remove from single expression type flat', () => {
+    const sql = `A OR B`;
+
+    expect(
+      parser(sql)
+        .removeColumn('A')
+        .toString(),
+    ).toMatchInlineSnapshot(`"B"`);
+  });
+  it('remove from single expression type multiple', () => {
+    const sql = `A OR B OR C`;
+
+    expect(
+      parser(sql)
+        .removeColumn('A')
+        .toString(),
+    ).toMatchInlineSnapshot(`"B OR C"`);
+  });
+  it('remove from single expression type multiple', () => {
+    const sql = `A OR B OR C`;
+
+    expect(
+      parser(sql)
+        .removeColumn('C')
+        .toString(),
+    ).toMatchInlineSnapshot(`"A OR B"`);
+  });
+  it('remove from single expression type multiple nested', () => {
+    const sql = `A AND D OR B OR C`;
+
+    expect(
+      parser(sql)
+        .removeColumn('A')
+        .toString(),
+    ).toMatchInlineSnapshot(`"D OR B OR C"`);
+  });
+  it('remove nested comparison expression', () => {
+    const sql = `A > 1 AND D OR B OR C`;
+
+    expect(
+      parser(sql)
+        .removeColumn('A')
+        .toString(),
+    ).toMatchInlineSnapshot(`"D OR B OR C"`);
+  });
+});
+
+describe('contains', () => {
+  it('nested expression contains string', () => {
+    const sql = `A > 1 AND D OR B OR C`;
+
+    expect(parser(sql).containsColumn('A')).toMatchInlineSnapshot(`true`);
+  });
+  it('nested expression with brackets contains string', () => {
+    const sql = `(A + B ) > 1 AND D OR B OR C`;
+
+    expect(parser(sql).containsColumn('A')).toMatchInlineSnapshot(`true`);
+  });
+  it('nested expression with brackets contains string', () => {
+    const sql = `(D + B ) > 1 AND D OR B OR C`;
+
+    expect(parser(sql).containsColumn('A')).toMatchInlineSnapshot(`false`);
+  });
+});
+
+describe('getSqlRefs', () => {
+  it('Only multi expressions', () => {
+    const sql = `A > 1 AND D OR B OR C`;
+
+    expect(parser(sql).getSqlRefs('A')).toMatchInlineSnapshot(`
+      Array [
+        SqlRef {
+          "innerSpacing": Object {},
+          "name": "A",
+          "namespace": undefined,
+          "namespaceQuotes": undefined,
+          "quotes": "",
+          "type": "ref",
+        },
+        SqlRef {
+          "innerSpacing": Object {},
+          "name": "D",
+          "namespace": undefined,
+          "namespaceQuotes": undefined,
+          "quotes": "",
+          "type": "ref",
+        },
+        SqlRef {
+          "innerSpacing": Object {},
+          "name": "B",
+          "namespace": undefined,
+          "namespaceQuotes": undefined,
+          "quotes": "",
+          "type": "ref",
+        },
+        SqlRef {
+          "innerSpacing": Object {},
+          "name": "C",
+          "namespace": undefined,
+          "namespaceQuotes": undefined,
+          "quotes": "",
+          "type": "ref",
+        },
+      ]
+    `);
+  });
+  it('includes unary expressions', () => {
+    const sql = `A > 1 AND D OR B OR Not C`;
+
+    expect(parser(sql).getSqlRefs('A')).toMatchInlineSnapshot(`
+      Array [
+        SqlRef {
+          "innerSpacing": Object {},
+          "name": "A",
+          "namespace": undefined,
+          "namespaceQuotes": undefined,
+          "quotes": "",
+          "type": "ref",
+        },
+        SqlRef {
+          "innerSpacing": Object {},
+          "name": "D",
+          "namespace": undefined,
+          "namespaceQuotes": undefined,
+          "quotes": "",
+          "type": "ref",
+        },
+        SqlRef {
+          "innerSpacing": Object {},
+          "name": "B",
+          "namespace": undefined,
+          "namespaceQuotes": undefined,
+          "quotes": "",
+          "type": "ref",
+        },
+        SqlRef {
+          "innerSpacing": Object {},
+          "name": "C",
+          "namespace": undefined,
+          "namespaceQuotes": undefined,
+          "quotes": "",
+          "type": "ref",
+        },
+      ]
+    `);
+  });
+  it('includes unary expressions and nested Multi Expressions', () => {
+    const sql = `A > 1 AND D OR B OR Not (C Or E)`;
+
+    expect(parser(sql).getSqlRefs('A')).toMatchInlineSnapshot(`
+      Array [
+        SqlRef {
+          "innerSpacing": Object {},
+          "name": "A",
+          "namespace": undefined,
+          "namespaceQuotes": undefined,
+          "quotes": "",
+          "type": "ref",
+        },
+        SqlRef {
+          "innerSpacing": Object {},
+          "name": "D",
+          "namespace": undefined,
+          "namespaceQuotes": undefined,
+          "quotes": "",
+          "type": "ref",
+        },
+        SqlRef {
+          "innerSpacing": Object {},
+          "name": "B",
+          "namespace": undefined,
+          "namespaceQuotes": undefined,
+          "quotes": "",
+          "type": "ref",
+        },
+        SqlRef {
+          "innerSpacing": Object {},
+          "name": "C",
+          "namespace": undefined,
+          "namespaceQuotes": undefined,
+          "quotes": "",
+          "type": "ref",
+        },
+        SqlRef {
+          "innerSpacing": Object {},
+          "name": "E",
+          "namespace": undefined,
+          "namespaceQuotes": undefined,
+          "quotes": "",
+          "type": "ref",
+        },
+      ]
+    `);
+  });
+});

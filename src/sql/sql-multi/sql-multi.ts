@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { Separator } from '../index';
+import { Separator, SqlRef, SqlUnary } from '../index';
 import { SqlBase, SqlBaseValue } from '../sql-base';
 
 export interface SqlMultiValue extends SqlBaseValue {
@@ -22,17 +22,28 @@ export interface SqlMultiValue extends SqlBaseValue {
 }
 
 export class SqlMulti extends SqlBase {
+  static type = 'multi';
+
+  static sqlMultiFactory(separator: string, argumentsArray: SqlBase[]) {
+    return new SqlMulti({
+      arguments: argumentsArray,
+      separators: Separator.fillBetween([], arguments.length, Separator.bothSeparator(separator)),
+      expressionType: separator,
+      type: SqlMulti.type,
+    } as SqlMultiValue);
+  }
+
   static wrapInQuotes(thing: string, quote: string): string {
     return `${quote}${thing}${quote}`;
   }
 
   public expressionType?: string;
   public separators?: Separator[];
-  public arguments?: SqlBase[];
+  public arguments: SqlBase[];
 
   constructor(options: SqlMultiValue) {
-    super(options, 'multi');
-    this.arguments = options.arguments;
+    super(options, SqlMulti.type);
+    this.arguments = options.arguments || [];
     this.separators = options.separators;
     this.expressionType = options.expressionType;
   }
@@ -51,6 +62,82 @@ export class SqlMulti extends SqlBase {
     }
     return Separator.spacilator(this.arguments, this.separators);
   }
+
+  public isType(type: string) {
+    return type === this.expressionType;
+  }
+
+  public containsColumn(column: string): boolean {
+    const value = this.valueOf();
+    if (!value.arguments) throw Error('expression has no arguments');
+    return !!value.arguments.filter(
+      arg =>
+        SqlRef.equalsString(arg, column) || (arg instanceof SqlMulti && arg.containsColumn(column)),
+    ).length;
+  }
+
+  public removeColumn(column: string) {
+    const value = this.valueOf();
+    if (!value.arguments) throw Error('expression has no arguments');
+
+    const filteredList = Separator.filterStringFromList(column, value.arguments, value.separators);
+    value.separators = filteredList ? filteredList.separators : undefined;
+    value.arguments = filteredList ? filteredList.values : undefined;
+
+    return value.arguments && value.arguments.length ? new SqlMulti(value) : undefined;
+  }
+
+  public getSqlRefs(): SqlRef[] {
+    return this.arguments.flatMap(argument => {
+      if (argument instanceof SqlRef) return [argument];
+      if (argument instanceof SqlMulti || argument instanceof SqlUnary) {
+        return argument.getSqlRefs();
+      }
+      return [];
+    });
+    return [];
+  }
+
+  addOrReplaceColumn(column: string, filter: SqlMulti | SqlUnary): SqlMulti | SqlUnary {
+    const value = this.valueOf();
+    const currentFilter = new SqlMulti(value);
+    if (!value.arguments) return currentFilter;
+
+    switch (value.expressionType) {
+      case 'AND':
+        value.arguments = value.arguments.map(argument => {
+          if (
+            (argument instanceof SqlMulti || argument instanceof SqlMulti) &&
+            argument.containsColumn(column)
+          ) {
+            return filter;
+          } else {
+            return argument;
+          }
+        });
+        value.arguments.concat([filter]);
+        value.separators = Separator.fillBetween(
+          value.separators || [],
+          value.arguments.length,
+          Separator.bothSeparator('AND'),
+        );
+        return new SqlMulti(value);
+
+      case 'OR':
+        value.arguments = value.arguments.map(argument => {
+          if (argument instanceof SqlMulti || argument instanceof SqlMulti) {
+            return argument.addOrReplaceColumn(column, filter);
+          } else {
+            return argument;
+          }
+        });
+        return SqlMulti.sqlMultiFactory('AND', [currentFilter.addParens('', ''), filter]);
+
+      default:
+        if (currentFilter.containsColumn(column)) return filter;
+        return SqlMulti.sqlMultiFactory('AND', [currentFilter, filter]);
+    }
+  }
 }
 
-SqlBase.register('multi', SqlMulti);
+SqlBase.register(SqlMulti.type, SqlMulti);

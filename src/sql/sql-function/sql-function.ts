@@ -36,8 +36,42 @@ export class SqlFunction extends SqlBase {
   public whereKeyword?: string;
   public whereExpression?: SqlBase;
 
+  static type = 'function';
+
+  static sqlFunctionFactory(
+    functionName: string,
+    argumentArray: SqlBase[],
+    separators?: Separator[],
+    filter?: SqlBase,
+  ) {
+    const innerSpacing = {
+      postName: '',
+      preRightParen: '',
+      postLeftParen: '',
+      preFilter: filter ? ' ' : '',
+      postFilterKeyword: filter ? ' ' : '',
+      postFilterLeftParen: filter ? ' ' : '',
+      postWhereKeyword: filter ? ' ' : '',
+      preFilterRightParen: filter ? ' ' : '',
+    };
+    return new SqlFunction({
+      type: SqlFunction.type,
+      functionName: functionName,
+      arguments: argumentArray,
+      separators: Separator.fillBetween(
+        separators || [],
+        argumentArray.length,
+        Separator.rightSeparator(','),
+      ),
+      innerSpacing: innerSpacing,
+      filterKeyword: filter ? 'FILTER' : undefined,
+      whereKeyword: filter ? 'where' : undefined,
+      whereExpression: filter,
+    } as SqlFunctionValue);
+  }
+
   constructor(options: SqlFunctionValue) {
-    super(options, 'function');
+    super(options, SqlFunction.type);
     this.functionName = options.functionName;
     this.arguments = options.arguments;
     this.separators = options.separators;
@@ -85,4 +119,4 @@ export class SqlFunction extends SqlBase {
   }
 }
 
-SqlBase.register('function', SqlFunction);
+SqlBase.register(SqlFunction.type, SqlFunction);

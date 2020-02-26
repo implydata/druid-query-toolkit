@@ -12,14 +12,17 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlBaseValue } from '../index';
+import { SqlBase, SqlBaseValue, SqlMulti, SqlRef } from '../index';
 
 export interface UnaryExpressionValue extends SqlBaseValue {
   keyword?: string;
   argument?: SqlBase;
   expressionType?: string;
 }
+
 export class SqlUnary extends SqlBase {
+  static type = 'unaryExpression';
+
   static wrapInQuotes(thing: string, quote: string): string {
     return `${quote}${thing}${quote}`;
   }
@@ -29,7 +32,7 @@ export class SqlUnary extends SqlBase {
   public argument?: SqlBase;
 
   constructor(options: UnaryExpressionValue) {
-    super(options, 'unaryExpression');
+    super(options, SqlUnary.type);
     this.expressionType = options.expressionType;
     this.keyword = options.keyword;
     this.argument = options.argument;
@@ -49,6 +52,46 @@ export class SqlUnary extends SqlBase {
     }
     return this.keyword + this.innerSpacing.postKeyword + this.argument.toString();
   }
+
+  public isType(type: string) {
+    return type === this.type && this instanceof SqlUnary;
+  }
+
+  public removeColumn(_column: string) {
+    const value = this.valueOf();
+    // if (value.argument instanceof SqlRef && value.argument.name === column) {
+    //   // do nothing
+    // }
+    // if (value.argument instanceof SqlMulti || value.argument instanceof SqlUnary) {
+    //   // value.argument = value.argument.removeColumn(column);
+    // }
+    return new SqlUnary(value);
+  }
+
+  public getSqlRefs(): SqlRef[] {
+    if (this.argument instanceof SqlRef) return [this.argument];
+    if (this.argument instanceof SqlMulti || this.argument instanceof SqlUnary) {
+      return this.argument.getSqlRefs();
+    }
+    return [];
+  }
+
+  public containsColumn(column: string): boolean {
+    const value = this.valueOf();
+    if (!value.argument) throw Error('expression has no arguments');
+    return (
+      SqlRef.equalsString(value.argument, column) ||
+      (value.argument instanceof SqlMulti && value.argument.containsColumn(column))
+    );
+  }
+
+  addOrReplaceColumn(column: string, filter: SqlUnary | SqlMulti): SqlUnary | SqlMulti {
+    const value = this.valueOf();
+    const currentFilter = new SqlMulti(value);
+
+    if (currentFilter.containsColumn(column)) return filter;
+    return currentFilter;
+  }
 }
 
-SqlBase.register('unaryExpression', SqlUnary);
+SqlBase.register(SqlUnary.type, SqlUnary);

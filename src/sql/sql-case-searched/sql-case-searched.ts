@@ -34,6 +34,8 @@ export interface SqlCaseSearchedValue extends SqlBaseValue {
 }
 
 export class SqlCaseSearched extends SqlBase {
+  static type = 'caseSearched';
+
   static wrapInQuotes(thing: string, quote: string): string {
     return `${quote}${thing}${quote}`;
   }
@@ -46,7 +48,7 @@ export class SqlCaseSearched extends SqlBase {
   public postWhenThenUnits?: string[];
 
   constructor(options: SqlCaseSearchedValue) {
-    super(options, 'caseSearched');
+    super(options, SqlCaseSearched.type);
     this.caseKeyword = options.caseKeyword;
     this.whenThenUnits = options.whenThenUnits || [];
     this.elseKeyword = options.elseKeyword;
@@ -105,4 +107,4 @@ export class SqlCaseSearched extends SqlBase {
   }
 }
 
-SqlBase.register('caseSearched', SqlCaseSearched);
+SqlBase.register(SqlCaseSearched.type, SqlCaseSearched);

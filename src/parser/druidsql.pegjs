@@ -112,8 +112,8 @@ WithClause
   return {
     withKeyword: withKeyword,
     postWith: postWith,
-    withUnits: withUnitsTail ? makeListMap1(withUnitsHead, withUnitsTail) : [withUnitsHead],
-    withSeparators: withUnitsTail ? makeListMapEmpty0(withUnitsTail): undefined,
+    withUnits: withUnitsTail ? makeListMap(withUnitsTail, 1, withUnitsHead) : [withUnitsHead],
+    withSeparators: withUnitsTail ? makeListMap(withUnitsTail, 0): undefined,
   }
 }
 
@@ -145,8 +145,8 @@ WithColumns = '(' postLeftParen:_? withColumnsHead:BaseType withColumnsTail:(Com
 {
   return {
     postLeftParen: postLeftParen || '',
-    withColumns: withColumnsHead ?  makeListMap1(withColumnsHead,withColumnsTail) : withColumnsHead,
-    withSeparators: makeListMapEmpty(withColumnsTail),
+    withColumns: withColumnsHead ?  makeListMap(withColumnsTail, 1, withColumnsHead) : withColumnsHead,
+    withSeparators: makeListMap(withColumnsTail, 1),
     preRightParen: preRightParen || ''
   }
 }
@@ -158,8 +158,8 @@ SelectClause = selectKeyword:SelectToken postSelect:_ selectDecorator:((AllToken
      postSelect: postSelect,
      selectDecorator: selectDecorator? selectDecorator[0] : '',
      postSelectDecorator: selectDecorator? selectDecorator[1] : '',
-     selectValues: [selectValuesHead] ? makeListMap1(selectValuesHead,selectValuesTail) : [selectValuesHead],
-     selectSeparators: makeListMapEmpty0(selectValuesTail),
+     selectValues: [selectValuesHead] ? makeListMap(selectValuesTail, 1, selectValuesHead) : [selectValuesHead],
+     selectSeparators: makeListMap(selectValuesTail,0),
   }
 }
 
@@ -168,8 +168,8 @@ FromClause = fromKeyword:FromToken postFrom:_ tableHead:(Alias/SqlRef) tableTail
   return {
     fromKeyword: fromKeyword,
     postFrom: postFrom,
-    tables: tableTail ? makeListMap1(tableHead, tableTail): [tableHead],
-    tableSeparators: tableTail ? makeListMapEmpty0(tableTail) : undefined
+    tables: tableTail ? makeListMap(tableTail, 1, tableHead): [tableHead],
+    tableSeparators: tableTail ? makeListMap(tableTail, 0) : undefined
   }
 }
 
@@ -187,8 +187,8 @@ GroupByClause = groupByKeyword:GroupByToken postGroupByKeyword:_  groupByExpress
   return {
     groupByKeyword: groupByKeyword,
     postGroupByKeyword: postGroupByKeyword,
-    groupByExpression: groupByExpressionTail ? makeListMap1(groupByExpressionHead,groupByExpressionTail) : [groupByExpressionHead],
-    groupByExpressionSeparators: groupByExpressionTail ?  makeListMapEmpty0(groupByExpressionTail) : undefined,
+    groupByExpression: groupByExpressionTail ? makeListMap(groupByExpressionTail, 1, groupByExpressionHead) : [groupByExpressionHead],
+    groupByExpressionSeparators: groupByExpressionTail ?  makeListMap(groupByExpressionTail, 0) : undefined,
   }
 }
 
@@ -206,8 +206,8 @@ OrderByClause = orderByKeyword:OrderToken postOrderByKeyword:_ orderByUnitsHead:
   return {
     orderByKeyword: orderByKeyword,
     postOrderByKeyword: postOrderByKeyword,
-    orderByUnits: orderByUnitsHead ? makeListMap1(orderByUnitsHead,orderByUnitsTail) : [orderByUnitsHead],
-    orderBySeparators: makeListMapEmpty0(orderByUnitsTail),
+    orderByUnits: orderByUnitsHead ? makeListMap(orderByUnitsTail, 1, orderByUnitsHead) : [orderByUnitsHead],
+    orderBySeparators: makeListMap(orderByUnitsTail, 0),
   }
 }
 
@@ -259,7 +259,7 @@ OrExpression = head:AndExpression tail:(_ OrToken _ (AndExpression))*
     if (!tail.length) return head
     return new sql.SqlMulti ({
       expressionType: 'OR',
-      arguments: makeListMap3(head,tail),
+      arguments: makeListMap(tail, 3, head),
       separators: makeSeparatorsList(tail).map(keyword =>{ return new sql.Separator(keyword)}),
     });
   }
@@ -269,7 +269,7 @@ AndExpression = head:NotExpression tail:(_ AndToken _ (NotExpression))*
     if (!tail.length) return head
     return new sql.SqlMulti ({
       expressionType: 'AND',
-      arguments: makeListMap3(head,tail),
+      arguments: makeListMap(tail, 3, head),
       separators: makeSeparatorsList(tail).map(keyword =>{ return new sql.Separator(keyword)}),
     });
   }
@@ -292,7 +292,7 @@ ComparisonExpression = head:AdditionExpression tail:((_ ComparisonOperator _ (Co
     if (!tail.length) return head
     return new sql.SqlMulti ({
       expressionType: 'Comparison',
-      arguments: makeListMap3(head,tail),
+      arguments: makeListMap(tail, 3, head),
       separators: makeSeparatorsList(tail).map(keyword =>{ return new sql.Separator(keyword)}),
     });
   }
@@ -302,7 +302,7 @@ AdditionExpression = head:SubtractionExpression tail:(_ '+' _ (SubtractionExpres
     if (!tail.length) return head
     return new sql.SqlMulti ({
       expressionType: 'Additive',
-      arguments: makeListMap3(head,tail),
+      arguments: makeListMap(tail, 3, head),
       separators: makeSeparatorsList(tail).map(keyword =>{ return new sql.Separator(keyword)}),
     });
   }
@@ -313,7 +313,7 @@ SubtractionExpression = head:MultiplicationExpression tail:(_ '-' _ (Multiplicat
     if (!tail.length) return head
     return new sql.SqlMulti ({
       expressionType: 'Additive',
-      arguments: makeListMap3(head,tail),
+      arguments: makeListMap(tail, 3, head),
       separators: makeSeparatorsList(tail).map(keyword =>{ return new sql.Separator(keyword)}),
     });
   }
@@ -323,7 +323,7 @@ MultiplicationExpression = head:DivisionExpression tail:(_ '*' _ (Multiplication
     if (!tail.length) return head
     return new sql.SqlMulti ({
       expressionType: 'Multiplicative',
-      arguments: makeListMap3(head,tail),
+      arguments: makeListMap(tail, 3, head),
       separators: makeSeparatorsList(tail).map(keyword =>{ return new sql.Separator(keyword)}),
     });
   }
@@ -333,13 +333,15 @@ DivisionExpression = head:BaseType tail:(_ '/' _ (DivisionExpression/BaseType))*
     if (!tail.length) return head
       return new sql.SqlMulti ({
       expressionType: 'Multiplicative',
-      arguments: makeListMap3(head,tail),
+      arguments: makeListMap(tail, 3, head),
       separators: makeSeparatorsList(tail).map(keyword =>{ return new sql.Separator(keyword)}),
     });
   }
 
 BaseType
   = Function
+  / Interval
+  / TimeStamp
   / SqlLiteral
   / SqlRef
   / SqlInParens
@@ -359,8 +361,8 @@ SearchedCaseExpression
   {
     return new sql.SqlCaseSearched({
       caseKeyword: caseKeyword,
-      whenThenUnits: whenThenUnitsTail ? makeListMap1(whenThenUnitsHead,whenThenUnitsTail) : [whenThenUnitsHead],
-      postWhenThenUnits: whenThenUnitsTail ?  makeListMapEmpty0(whenThenUnitsTail) : [],
+      whenThenUnits: whenThenUnitsTail ? makeListMap(whenThenUnitsTail, 1, whenThenUnitsHead) : [whenThenUnitsHead],
+      postWhenThenUnits: whenThenUnitsTail ?  makeListMap(whenThenUnitsTail, 0) : [],
       elseKeyword: elseValue ? elseValue[1] : undefined,
       elseExpression: elseValue ? elseValue[3] : undefined,
       endKeyword: endKeyword,
@@ -388,11 +390,11 @@ SimpleCaseExpression
     return new sql.SqlCaseSimple({
       caseKeyword: caseKeyword,
       caseExpression: caseExpression,
-      whenThenUnits: whenThenUnitsTail ? makeListMap1(whenThenUnitsHead,whenThenUnitsTail) : [whenThenUnitsHead],
+      whenThenUnits: whenThenUnitsTail ? makeListMap(whenThenUnitsTail, 1, whenThenUnitsHead) : [whenThenUnitsHead],
       elseKeyword: elseValue ? elseValue[1] : undefined,
       elseExpression: elseValue ? elseValue[3] : undefined,
       endKeyword: endKeyword,
-      postWhenThenUnits: whenThenUnitsTail ?  makeListMapEmpty0(whenThenUnitsTail) : [],
+      postWhenThenUnits: whenThenUnitsTail ?  makeListMap(whenThenUnitsTail, 0) : [],
       innerSpacing: {
         postCase: postCase,
         postCaseExpression: postCaseExpression,
@@ -420,12 +422,45 @@ WhenThenPair = whenKeyword:WhenToken postWhen:_ whenExpression:Expression postWh
 
 // ------------------------------
 
+Interval=  intervalKeyword:IntervalToken postIntervalKeyword:_ intervalValue:BaseType postIntervalValue: _ unitKeyword:Unit
+  {
+    return new sql.SqlInterval({
+      intervalKeyword:intervalKeyword,
+      intervalValue:intervalValue,
+      unitKeyword : unitKeyword,
+      innerSpacing: {
+        postIntervalKeyword: postIntervalKeyword,
+        postIntervalValue:postIntervalValue
+      }
+    });
+  }
+
+Unit =
+  'DAY'i /
+  'HOUR'i/
+  'MINUTE'i/
+  'MONTH'i/
+  'QUARTER'i/
+  'WEEK'i/
+  'YEAR'i/
+  'SECOND'i
+
+TimeStamp = timestampKeyword: TimestampToken postTimestampKeyword: _ timestampValue: SqlLiteral {
+  return new sql.SqlTimestamp({
+    timestampKeyword: timestampKeyword,
+    timestampValue: timestampValue,
+    innerSpacing: {
+    postTimestampKeyword: postTimestampKeyword,
+    }
+  })
+}
+
 Function = functionName:Functions postName:_? OpenParen postLeftParen:_? argumentHead:Expression argumentTail:(Comma Expression)* preRightParen:_? CloseParen filter:(_ Filter)?
   {
     return new sql.SqlFunction({
       functionName: functionName.name,
-      arguments: argumentTail ? makeListMap1(argumentHead,argumentTail) : [argumentHead],
-      separators: makeListMapEmpty(argumentTail),
+      arguments: argumentTail ? makeListMap(argumentTail, 1, argumentHead) : [argumentHead],
+      separators: makeListMap(argumentTail, 0),
       filterKeyword: filter ? filter[1].filterKeyword : undefined,
       whereKeyword: filter ? filter[1].whereKeyword : undefined,
       whereExpression: filter ? filter[1].whereExpression : undefined,
@@ -528,7 +563,7 @@ QuotedRefPart = ["] name:$([^"]+) ["]
   }
 }
 
-UnquotedRefPart = name:$([a-z_\-:*/]i [a-z0-9_\-:*/]i*)
+UnquotedRefPart = name:$([a-z_\-:*%/]i [a-z0-9_\-:*%/]i*)
 {
   return {
     name: name,
@@ -557,6 +592,7 @@ ComparisonOperator
   /'<='
   /'<'
   /'>'
+  /'LIKE'i
 
 AdditiveOperator
   ='+'
@@ -590,3 +626,5 @@ AsToken = 'AS'i
 ExplainToken = $('EXPLAIN'i _ 'PLAN'i _ 'FOR'i)
 WithToken = 'WITH'i
 FilterToken= 'FILTER'i
+IntervalToken = 'INTERVAL'i
+TimestampToken = 'TIMESTAMP'i

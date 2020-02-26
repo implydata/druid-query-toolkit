@@ -12,7 +12,15 @@
  * limitations under the License.
  */
 
-import { Separator, SqlAliasRef, SqlLiteral, SqlRef } from '../index';
+import {
+  Separator,
+  SqlAliasRef,
+  SqlFunction,
+  SqlLiteral,
+  SqlMulti,
+  SqlRef,
+  SqlUnary,
+} from '../index';
 import { SqlBase, SqlBaseValue } from '../sql-base';
 
 export interface SqlQueryValue extends SqlBaseValue {
@@ -32,14 +40,14 @@ export interface SqlQueryValue extends SqlBaseValue {
   tableSeparators?: [];
 
   whereKeyword?: string;
-  whereExpression?: SqlBase;
+  whereExpression?: SqlMulti | SqlUnary;
 
   groupByKeyword?: string;
   groupByExpression?: SqlBase[];
   groupByExpressionSeparators?: Separator[];
 
   havingKeyword?: string;
-  havingExpression?: SqlBase;
+  havingExpression?: SqlMulti | SqlUnary;
 
   orderByKeyword?: string;
   orderByUnits?: OrderByUnit[];
@@ -68,7 +76,7 @@ export interface WithUnit {
 export interface OrderByUnit {
   expression: SqlBase;
   postExpression: string;
-  direction: 'ASC' | 'DESC';
+  direction?: 'ASC' | 'DESC';
 }
 
 export class SqlQuery extends SqlBase {
@@ -84,12 +92,12 @@ export class SqlQuery extends SqlBase {
   public tables?: (SqlAliasRef | SqlRef)[];
   public tableSeparators?: [];
   public whereKeyword?: string;
-  public whereExpression?: SqlBase;
+  public whereExpression?: SqlMulti | SqlUnary;
   public groupByKeyword?: string;
   public groupByExpression?: SqlBase[];
   public groupByExpressionSeparators?: Separator[];
   public havingKeyword?: string;
-  public havingExpression?: SqlBase;
+  public havingExpression?: SqlMulti | SqlUnary;
   public orderByKeyword?: string;
   public orderByUnits?: OrderByUnit[];
   public orderBySeparators?: Separator[];
@@ -97,6 +105,8 @@ export class SqlQuery extends SqlBase {
   public limitValue?: SqlLiteral;
   public unionKeyword?: string;
   public unionQuery?: SqlQuery;
+
+  static type = 'query';
 
   static withUnitToString(unit: WithUnit): string {
     let rawString = unit.withTableName.toString() + unit.postWithTable;
@@ -116,7 +126,7 @@ export class SqlQuery extends SqlBase {
   }
 
   constructor(options: SqlQueryValue) {
-    super(options, 'query');
+    super(options, SqlQuery.type);
 
     this.explainKeyword = options.explainKeyword;
     this.withKeyword = options.withKeyword;
@@ -167,6 +177,7 @@ export class SqlQuery extends SqlBase {
     value.havingExpression = this.havingExpression;
     value.orderByKeyword = this.orderByKeyword;
     value.orderByUnits = this.orderByUnits;
+    value.orderBySeparators = this.orderBySeparators;
     value.limitKeyword = this.limitKeyword;
     value.limitValue = this.limitValue;
     value.unionKeyword = this.unionKeyword;
@@ -175,105 +186,116 @@ export class SqlQuery extends SqlBase {
   }
 
   public toRawString(): string {
-    let rawString = this.innerSpacing.preQuery;
+    const rawStringParts: string[] = [this.innerSpacing.preQuery];
 
     // Explain clause
     if (this.explainKeyword) {
-      rawString += this.explainKeyword + this.innerSpacing.postExplain;
+      rawStringParts.push(this.explainKeyword, this.innerSpacing.postExplain);
     }
 
     // With clause
     if (this.withKeyword && this.withUnits) {
-      rawString +=
-        this.withKeyword +
-        this.innerSpacing.postWith +
-        Separator.interfaceSpacilator<WithUnit>(
+      rawStringParts.push(
+        this.withKeyword,
+        this.innerSpacing.postWith,
+        Separator.customSpacilator<WithUnit>(
           this.withUnits,
           SqlQuery.withUnitToString,
           this.withSeparators,
-        ) +
-        this.innerSpacing.postWithQuery;
+        ),
+        this.innerSpacing.postWithQuery,
+      );
     }
 
     // Select and From clause
-    if (this.selectValues && this.tables) {
-      rawString += this.selectKeyword + this.innerSpacing.postSelect;
+    if (this.selectKeyword && this.selectValues && this.tables && this.fromKeyword) {
+      rawStringParts.push(this.selectKeyword, this.innerSpacing.postSelect);
       if (this.selectDecorator) {
-        rawString += this.selectDecorator + this.innerSpacing.postSelectDecorator;
+        rawStringParts.push(this.selectDecorator, this.innerSpacing.postSelectDecorato);
       }
 
-      rawString +=
-        Separator.spacilator(this.selectValues, this.selectSeparators) +
-        this.innerSpacing.postSelectValues +
-        this.fromKeyword +
-        this.innerSpacing.postFrom +
-        Separator.spacilator(this.tables, this.tableSeparators);
+      rawStringParts.push(
+        Separator.spacilator(this.selectValues, this.selectSeparators),
+        this.innerSpacing.postSelectValues,
+        this.fromKeyword,
+        this.innerSpacing.postFrom,
+        Separator.spacilator(this.tables, this.tableSeparators),
+      );
     }
 
     // Where Clause
     if (this.whereKeyword && this.whereExpression) {
-      rawString +=
-        this.innerSpacing.preWhereKeyword +
-        this.whereKeyword +
-        this.innerSpacing.postWhereKeyword +
-        this.whereExpression.toString();
+      rawStringParts.push(
+        this.innerSpacing.preWhereKeyword,
+        this.whereKeyword,
+        this.innerSpacing.postWhereKeyword,
+        this.whereExpression.toString(),
+      );
     }
 
     // GroupBy Clause
     if (this.groupByKeyword && this.groupByExpression) {
-      rawString +=
-        this.innerSpacing.preGroupByKeyword +
-        this.groupByKeyword +
-        this.innerSpacing.postGroupByKeyword +
-        Separator.spacilator(this.groupByExpression, this.groupByExpressionSeparators);
+      rawStringParts.push(
+        this.innerSpacing.preGroupByKeyword,
+        this.groupByKeyword,
+        this.innerSpacing.postGroupByKeyword,
+        Separator.spacilator(this.groupByExpression, this.groupByExpressionSeparators),
+      );
     }
 
     // Having Clause
     if (this.havingKeyword && this.havingExpression) {
-      rawString +=
-        this.innerSpacing.preHavingKeyword +
-        this.havingKeyword +
-        this.innerSpacing.postHavingKeyword +
-        this.havingExpression.toString();
+      rawStringParts.push(
+        this.innerSpacing.preHavingKeyword,
+        this.havingKeyword,
+        this.innerSpacing.postHavingKeyword,
+        this.havingExpression.toString(),
+      );
     }
 
     // Order By Clause
     if (this.orderByKeyword && this.orderByUnits) {
-      rawString +=
-        this.innerSpacing.preOrderByKeyword +
-        this.orderByKeyword +
-        this.innerSpacing.postOrderByKeyword +
-        Separator.interfaceSpacilator<OrderByUnit>(
+      rawStringParts.push(
+        this.innerSpacing.preOrderByKeyword,
+        this.orderByKeyword,
+        this.innerSpacing.postOrderByKeyword,
+        Separator.customSpacilator<OrderByUnit>(
           this.orderByUnits,
           unit => [unit.expression.toString(), unit.postExpression, unit.direction].join(''),
           this.orderBySeparators,
-        );
+        ),
+      );
     }
 
     // Limit Clause
     if (this.limitKeyword && this.limitValue) {
-      rawString +=
-        this.innerSpacing.preLimitKeyword +
-        this.limitKeyword +
-        this.innerSpacing.postLimitKeyword +
-        this.limitValue;
+      rawStringParts.push(
+        this.innerSpacing.preLimitKeyword,
+        this.limitKeyword,
+        this.innerSpacing.postLimitKeyword,
+        this.limitValue.toString(),
+      );
     }
 
     // Union Clause
     if (this.unionKeyword && this.unionQuery) {
-      rawString +=
-        this.innerSpacing.preUnionKeyword +
-        this.unionKeyword +
-        this.innerSpacing.postUnionKeyword +
-        this.unionQuery.toString();
+      rawStringParts.push(
+        this.innerSpacing.preUnionKeyword,
+        this.unionKeyword,
+        this.innerSpacing.postUnionKeyword,
+        this.unionQuery.toString(),
+      );
     }
 
-    return rawString + this.innerSpacing.postQuery;
+    rawStringParts.push(this.innerSpacing.postQuery);
+    return rawStringParts.join('');
   }
 
-  getTableNames() {
-    // returns an array of table names
+  // todo what should we do with many tables ??
+  getTableName() {
+    // returns the first table name
     if (!this.tables) return;
+
     return this.tables.map(table => {
       if (table instanceof SqlRef) {
         return table.name;
@@ -281,21 +303,393 @@ export class SqlQuery extends SqlBase {
         return table.alias.name;
       }
       return;
+    })[0];
+  }
+
+  // todo same vibe
+  getSchema() {
+    // returns the first table namespace
+
+    if (!this.tables) return;
+    return this.tables.map(table => {
+      if (table instanceof SqlRef) {
+        return table.namespace;
+      } else if (table.alias) {
+        return table.alias.namespace;
+      }
+      return;
+    })[0];
+  }
+
+  getSorted() {
+    if (!this.orderByUnits) return;
+
+    const columns = this.getColumns();
+    return this.orderByUnits.map(unit => {
+      let id = '';
+      if (unit.expression instanceof SqlLiteral && typeof unit.expression.value === 'number') {
+        id = columns[unit.expression.value - 1] || '';
+      } else if (unit.expression instanceof SqlRef) {
+        id = unit.expression.name;
+      }
+      return {
+        // if the order by contains a number instead of a column name get the proper column name
+        id: id,
+        // if direction undefined it should sort by desc:true
+        desc: unit.direction !== 'ASC',
+      };
     });
   }
 
-  getSchema(): string | undefined {
-    if (!this.tables) return;
-    const table = this.tables[0];
-
-    if (table instanceof SqlRef) {
-      return table.name;
-    } else if (table.alias) {
-      return table.alias.name;
+  orderBy(column: string, direction: 'ASC' | 'DESC' | undefined) {
+    const orderByUnit = {
+      expression: SqlRef.fromNameWithDoubleQuotes(column),
+      postExpression: direction ? ' ' : '',
+      direction: direction,
+    };
+    const value = this.valueOf();
+    const index = this.getColumns().indexOf(column);
+    value.orderByUnits = value.orderByUnits || [];
+    if (
+      value.orderByUnits.filter(
+        unit =>
+          (unit.expression instanceof SqlLiteral && unit.expression.value === index) ||
+          SqlRef.equalsString(unit.expression, column),
+      ).length
+    ) {
+      value.orderByUnits = value.orderByUnits.map(unit => {
+        if (
+          (unit.expression instanceof SqlLiteral && unit.expression.value === index) ||
+          SqlRef.equalsString(unit.expression, column)
+        ) {
+          return orderByUnit;
+        } else {
+          return unit;
+        }
+      });
+    } else {
+      value.orderByUnits = (value.orderByUnits || []).concat([orderByUnit]);
     }
 
-    return;
+    value.orderByKeyword = value.orderByKeyword || 'ORDER BY';
+    value.innerSpacing.postOrderByKeyword = value.innerSpacing.postOrderByKeyword || ' ';
+    value.innerSpacing.preOrderByKeyword = value.innerSpacing.preOrderByKeyword || `\n`;
+    value.orderBySeparators = Separator.fillBetween(
+      value.orderBySeparators || [],
+      (value.orderByUnits || []).length,
+      Separator.rightSeparator(','),
+    );
+
+    return new SqlQuery(value);
+  }
+
+  removeFilter(column: string): SqlQuery {
+    let value = this.valueOf();
+    if (this.whereExpression) {
+      value = this.removeFromWhere(column) || value;
+    }
+    if (this.havingExpression) {
+      value = this.removeFromHaving(column) || value;
+    }
+
+    return new SqlQuery(value);
+  }
+
+  removeFromSelect(column: string) {
+    const value = this.valueOf();
+    // todo length is 1 safe state
+    if (!value.selectValues) return;
+
+    const index = this.getColumns().indexOf(column);
+    const filteredList = Separator.filterStringFromList(
+      column,
+      value.selectValues,
+      value.selectSeparators,
+    );
+    if (value.orderByUnits) {
+      value.orderByUnits = value.orderByUnits.map(unit => {
+        if (unit instanceof SqlLiteral && typeof unit.value === 'number' && unit.value > index) {
+          unit.value += -1;
+        }
+        return unit;
+      });
+    }
+
+    if (value.orderByUnits) {
+      value.orderByUnits = value.orderByUnits.map(unit => {
+        if (
+          unit.expression instanceof SqlLiteral &&
+          typeof unit.expression.value === 'number' &&
+          unit.expression.value > index
+        ) {
+          unit.expression.value += -1;
+        }
+        return unit;
+      });
+    }
+    value.selectSeparators = filteredList ? filteredList.separators : undefined;
+    value.selectValues = filteredList ? filteredList.values : undefined;
+
+    return new SqlQuery(value);
+  }
+
+  removeFromWhere(column: string) {
+    const value = this.valueOf();
+    if (!value.whereExpression) return;
+
+    if (
+      value.whereExpression.isType('Comparison') &&
+      value.whereExpression.containsColumn(column)
+    ) {
+      value.whereExpression = undefined;
+      value.whereKeyword = undefined;
+      value.innerSpacing.preWhereKeyord = '';
+      value.innerSpacing.postWhereKeyword = '';
+    } else {
+      value.whereExpression = value.whereExpression.removeColumn(column);
+    }
+
+    return new SqlQuery(value);
+  }
+
+  removeFromHaving(column: string) {
+    const value = this.valueOf();
+    if (!value.havingExpression) return;
+
+    if (
+      value.havingExpression.isType('Comparison') &&
+      value.havingExpression.containsColumn(column)
+    ) {
+      value.havingExpression = undefined;
+      value.havingKeyword = undefined;
+      value.innerSpacing.preHavingKeyord = '';
+      value.innerSpacing.postHavingKeyword = '';
+    } else {
+      value.havingExpression = value.havingExpression.removeColumn(column);
+    }
+
+    return new SqlQuery(value);
+  }
+
+  removeFromOrderBy(column: string) {
+    const value = this.valueOf();
+    const index = this.getColumns().indexOf(column) + 1;
+    if (!value.orderByUnits) return new SqlQuery(value);
+
+    const filteredUnitsList = Separator.filterStringFromInterfaceList<OrderByUnit>(
+      value.orderByUnits,
+      unit => {
+        return (
+          SqlRef.equalsString(unit.expression, column) ||
+          SqlLiteral.equalsLiteral(unit.expression, index)
+        );
+      },
+      value.orderBySeparators,
+    );
+
+    value.orderByUnits = filteredUnitsList.units;
+    value.orderBySeparators = filteredUnitsList.separators;
+
+    if (!value.orderByUnits) {
+      value.orderByKeyword = undefined;
+      value.innerSpacing.preOrderByKeyword = '';
+      value.innerSpacing.postOrderByKeywordv = '';
+    }
+    return new SqlQuery(value);
+  }
+
+  removeFromGroupBy(column: string): SqlQuery {
+    const value = this.valueOf();
+    const index = this.getColumns().indexOf(column) + 1;
+    if (!value.groupByExpression) return new SqlQuery(value);
+
+    const filteredUnitsList = Separator.filterStringFromInterfaceList<SqlBase>(
+      value.groupByExpression,
+      unit => {
+        return SqlRef.equalsString(unit, column) || SqlLiteral.equalsLiteral(unit, index);
+      },
+      value.groupByExpressionSeparators,
+    );
+
+    value.groupByExpression = filteredUnitsList.units;
+    value.groupByExpressionSeparators = filteredUnitsList.separators;
+
+    if (!value.groupByExpression) {
+      value.groupByKeyword = undefined;
+      value.innerSpacing.preGroupByKeyword = '';
+      value.innerSpacing.postGroupByKeyword = '';
+    }
+    return new SqlQuery(value);
+  }
+
+  getAggregateColumns(): string[] {
+    if (!this.groupByExpression) return [];
+    const columns = this.getColumns();
+    const aggregateColumns = this.groupByExpression.map(column => {
+      if (column instanceof SqlRef) {
+        return column.name;
+      } else if (typeof column === 'number') {
+        return columns[column - 1] || '';
+      } else if (column instanceof SqlLiteral && typeof column.value === 'number') {
+        return columns[column.value - 1] || '';
+      } else {
+        return '';
+      }
+    });
+    return aggregateColumns;
+  }
+
+  getCurrentFilters() {
+    let filterSqlRefs: SqlRef[] = [];
+
+    if (this.havingExpression) {
+      filterSqlRefs = filterSqlRefs.concat(this.havingExpression.getSqlRefs());
+    }
+    if (this.whereExpression) {
+      filterSqlRefs = filterSqlRefs.concat(this.whereExpression.getSqlRefs());
+    }
+
+    return filterSqlRefs.map(sqlRef => sqlRef.name);
+  }
+
+  addWhereFilter(
+    column: string | SqlRef | SqlAliasRef,
+    operator: string,
+    filterValue: SqlBase | string | number,
+  ) {
+    const value = this.valueOf();
+    const filterExpression = value.whereExpression;
+
+    // create new  filter to be added
+    const filter: SqlMulti = new SqlMulti({
+      arguments: [
+        typeof column === 'string' ? SqlRef.fromNameWithDoubleQuotes(column) : column,
+        filterValue instanceof SqlBase ? filterValue : SqlLiteral.fromInput(filterValue),
+      ],
+      separators: [Separator.bothSeparator(operator)],
+    } as SqlMulti);
+
+    // If a filter  exists for this column replace it other wise add it with an and expression
+    value.whereExpression = filterExpression
+      ? filterExpression.addOrReplaceColumn(SqlBase.getColumnName(column), filter)
+      : filter;
+
+    value.whereKeyword = value.whereKeyword || 'WHERE';
+    value.innerSpacing.preWhereKeyword = value.innerSpacing.preWhereKeyword || '\n';
+    value.innerSpacing.postWhereKeyword = value.innerSpacing.postWhereKeyword || ' ';
+    return new SqlQuery(value);
+  }
+
+  addHavingFilter(
+    column: string | SqlRef | SqlAliasRef,
+    operator: string,
+    filterValue: SqlBase | string | number,
+  ) {
+    const value = this.valueOf();
+    const filterExpression = value.havingExpression;
+
+    // create new  filter to be added
+    const filter: SqlMulti = new SqlMulti({
+      arguments: [
+        typeof column === 'string' ? SqlRef.fromNameWithDoubleQuotes(column) : column,
+        filterValue instanceof SqlBase ? filterValue : SqlLiteral.fromInput(filterValue),
+      ],
+      separators: [Separator.bothSeparator(operator)],
+    } as SqlMulti);
+
+    // If a filter  exists for this column replace it other wise add it with an and expression
+    value.havingExpression = filterExpression
+      ? filterExpression.addOrReplaceColumn(SqlBase.getColumnName(column), filter)
+      : filter;
+
+    value.havingKeyword = value.havingKeyword || 'HAVING';
+    value.innerSpacing.preHavingKeyword = value.innerSpacing.prehavingKeyword || '\n';
+    value.innerSpacing.postHavingKeyword = value.innerSpacing.postHavingKeyword || ' ';
+    return new SqlQuery(value);
+  }
+
+  addFunctionToGroupBy(columns: SqlBase[], functionName: string, alias: string, filter?: SqlBase) {
+    let value = new SqlQuery(this.valueOf());
+    value = value.addAggregateColumn(columns, functionName, alias, filter);
+    return value.addLastColumnToGroupBy();
+  }
+
+  addColumnToGroupBy(column: string) {
+    let value = new SqlQuery(this.valueOf());
+    value = value.addColumn(SqlRef.fromNameWithDoubleQuotes(column));
+    return value.addLastColumnToGroupBy();
+  }
+
+  addLastColumnToGroupBy() {
+    const value = this.valueOf();
+
+    value.groupByExpression = (value.groupByExpression || []).concat([
+      SqlLiteral.fromInput(value.selectValues ? value.selectValues.length : 1),
+    ]);
+    value.groupByKeyword = value.groupByKeyword || 'GROUP BY';
+    value.groupByExpressionSeparators = this.groupByExpression
+      ? Separator.fillBetween(
+          value.groupByExpressionSeparators || [],
+          value.groupByExpression.length,
+          Separator.rightSeparator(','),
+        )
+      : undefined;
+    value.innerSpacing.postGroupByKeyword = value.innerSpacing.postGroupByKeyword || ' ';
+    value.innerSpacing.preGroupByKeyword = value.innerSpacing.preGroupByKeyword || `\n`;
+
+    return new SqlQuery(value);
+  }
+
+  addColumn(column: SqlBase) {
+    const value = this.valueOf();
+    if (!value.selectValues) return new SqlQuery(value);
+
+    value.selectValues = value.selectValues.concat([column]);
+    value.selectSeparators = (value.selectSeparators || []).concat(Separator.rightSeparator(','));
+    return new SqlQuery(value);
+  }
+
+  addAggregateColumn(columns: SqlBase[], functionName: string, alias: string, filter?: SqlBase) {
+    const selectValue = SqlAliasRef.aliasfactory(
+      SqlFunction.sqlFunctionFactory(functionName, columns, [], filter),
+      alias,
+    );
+
+    return this.addColumn(selectValue);
+  }
+
+  getColumns() {
+    // returns an array of the string name of all columns in the select clause
+    if (!this.selectValues) return [];
+
+    return this.selectValues.map(column => {
+      if (column instanceof SqlRef) {
+        return column.name;
+      } else if (column instanceof SqlAliasRef && column.alias) {
+        return column.alias.name;
+      }
+      return;
+    });
+  }
+
+  hasGroupByColumn(column: string) {
+    const value = this.valueOf();
+    const index = this.getColumns().indexOf(column);
+    if (!value.groupByExpression) return false;
+    return !!value.groupByExpression.filter(
+      expr =>
+        (expr instanceof SqlRef && expr.name === column) ||
+        (expr instanceof SqlLiteral && expr.value === index),
+    ).length;
+  }
+
+  replaceFrom(table: string) {
+    const value = this.valueOf();
+
+    value.tables = [SqlRef.fromName(table)];
+    value.tableSeparators = [];
+    return new SqlQuery(value);
   }
 }
 
-SqlBase.register('query', SqlQuery);
+SqlBase.register(SqlQuery.type, SqlQuery);

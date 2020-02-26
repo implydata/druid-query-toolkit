@@ -26,6 +26,8 @@ export interface SqlCaseSimpleValue extends SqlBaseValue {
 }
 
 export class SqlCaseSimple extends SqlBase {
+  static type = 'caseSimple';
+
   static wrapInQuotes(thing: string, quote: string): string {
     return `${quote}${thing}${quote}`;
   }
@@ -39,7 +41,7 @@ export class SqlCaseSimple extends SqlBase {
   public postWhenThenUnits?: string[];
 
   constructor(options: SqlCaseSimpleValue) {
-    super(options, 'caseSimple');
+    super(options, SqlCaseSimple.type);
     this.caseKeyword = options.caseKeyword;
     this.caseExpression = options.caseExpression;
     this.elseKeyword = options.elseKeyword;
@@ -105,4 +107,4 @@ export class SqlCaseSimple extends SqlBase {
   }
 }
 
-SqlBase.register('caseSimple', SqlCaseSimple);
+SqlBase.register(SqlCaseSimple.type, SqlCaseSimple);
