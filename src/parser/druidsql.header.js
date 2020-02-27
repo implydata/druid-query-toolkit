@@ -10,8 +10,8 @@
 
   function makeSeparatorsList(tail) {
     return (tail.map(t =>  { return {
-      right: t[0],
-      left: t[2],
+      left: t[0],
+      right: t[2],
       separator: t[1],
     } ;}));
   }

@@ -5,6 +5,7 @@
 .idea/pivot*.iml
 .idea/vcs.xml
 .idea/workspace.xml
+.idea/codeStyles
 
 /node_modules/
 /build/

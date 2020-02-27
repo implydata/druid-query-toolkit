@@ -23,5 +23,5 @@ export * from './sql-case-simple/sql-case-simple';
 export * from './sql-case-searched/sql-case-searched';
 export * from './sql-query/sql-query';
 export * from './sql-alias-ref/sql-alias-ref';
-export * from './sql-interval/sql-Interval';
+export * from './sql-interval/sql-interval';
 export * from './sql-timeStamp/sql-timestamp';

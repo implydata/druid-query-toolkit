@@ -40,4 +40,50 @@ describe('Intervals', () => {
       }
     `);
   });
+
+  it('YEAR TO MONTH interval', () => {
+    const sql = `INTERVAL '1-2' YEAR TO MONTH`;
+
+    expect(parser(sql).toString()).toMatchInlineSnapshot(`"INTERVAL '1-2' YEAR TO MONTH"`);
+    expect(parser(sql)).toMatchInlineSnapshot(`
+      SqlInterval {
+        "innerSpacing": Object {
+          "postIntervalKeyword": " ",
+          "postIntervalValue": " ",
+        },
+        "intervalKeyword": "INTERVAL",
+        "intervalValue": SqlLiteral {
+          "innerSpacing": Object {},
+          "stringValue": "1-2",
+          "type": "literal",
+          "value": "1-2",
+        },
+        "type": "interval",
+        "unitKeyword": "YEAR TO MONTH",
+      }
+    `);
+  });
+
+  it('YEAR TO MONTH interval', () => {
+    const sql = `INTERVAL '1-2' YEAR_MONTH`;
+
+    expect(parser(sql).toString()).toMatchInlineSnapshot(`"INTERVAL '1-2' YEAR_MONTH"`);
+    expect(parser(sql)).toMatchInlineSnapshot(`
+      SqlInterval {
+        "innerSpacing": Object {
+          "postIntervalKeyword": " ",
+          "postIntervalValue": " ",
+        },
+        "intervalKeyword": "INTERVAL",
+        "intervalValue": SqlLiteral {
+          "innerSpacing": Object {},
+          "stringValue": "1-2",
+          "type": "literal",
+          "value": "1-2",
+        },
+        "type": "interval",
+        "unitKeyword": "YEAR_MONTH",
+      }
+    `);
+  });
 });

@@ -220,8 +220,8 @@ describe('OR expression', () => {
         "innerSpacing": Object {},
         "separators": Array [
           Separator {
-            "left": " ",
-            "right": "   ",
+            "left": "   ",
+            "right": " ",
             "separator": "OR",
           },
         ],
@@ -259,8 +259,8 @@ describe('OR expression', () => {
         ],
         "separators": Array [
           Separator {
-            "left": " ",
-            "right": "   ",
+            "left": "   ",
+            "right": " ",
             "separator": "OR",
           },
         ],
@@ -2109,6 +2109,57 @@ describe('getSqlRefs', () => {
           "type": "ref",
         },
       ]
+    `);
+  });
+  it('Concat function', () => {
+    const sql = `A || B || C`;
+
+    expect(parser(sql).toString()).toMatchInlineSnapshot(`"A || B || C"`);
+
+    expect(parser(sql)).toMatchInlineSnapshot(`
+      SqlMulti {
+        "arguments": Array [
+          SqlRef {
+            "innerSpacing": Object {},
+            "name": "A",
+            "namespace": undefined,
+            "namespaceQuotes": undefined,
+            "quotes": "",
+            "type": "ref",
+          },
+          SqlRef {
+            "innerSpacing": Object {},
+            "name": "B",
+            "namespace": undefined,
+            "namespaceQuotes": undefined,
+            "quotes": "",
+            "type": "ref",
+          },
+          SqlRef {
+            "innerSpacing": Object {},
+            "name": "C",
+            "namespace": undefined,
+            "namespaceQuotes": undefined,
+            "quotes": "",
+            "type": "ref",
+          },
+        ],
+        "expressionType": "Concat",
+        "innerSpacing": Object {},
+        "separators": Array [
+          Separator {
+            "left": " ",
+            "right": " ",
+            "separator": "||",
+          },
+          Separator {
+            "left": " ",
+            "right": " ",
+            "separator": "||",
+          },
+        ],
+        "type": "multi",
+      }
     `);
   });
 });

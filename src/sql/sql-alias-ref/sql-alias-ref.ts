@@ -19,7 +19,6 @@ export interface SqlAliasRefValue extends SqlBaseValue {
   column: SqlBase;
   postColumn?: string;
   asKeyword: string;
-  postAs?: string;
   alias: SqlRef;
 }
 
@@ -27,26 +26,28 @@ export class SqlAliasRef extends SqlBase {
   public column: SqlBase;
   public postColumn?: string;
   public asKeyword: string;
-  public postAs?: string;
   public alias: SqlRef;
 
   static type = 'alias-ref';
 
-  static aliasfactory(column: SqlBase, alias: string) {
+  static sqlAliasFactory(column: SqlBase, alias: string) {
     return new SqlAliasRef({
+      type: SqlAliasRef.type,
       column: column,
       postColumn: ' ',
       asKeyword: 'AS',
-      postAs: ' ',
       alias: SqlRef.fromNameWithDoubleQuotes(alias),
-    } as SqlAliasRef);
+      innerSpacing: {
+        postAs: ' ',
+      },
+    } as SqlAliasRefValue);
   }
+
   constructor(options: SqlAliasRefValue) {
     super(options, SqlAliasRef.type);
     this.column = options.column;
     this.postColumn = options.postColumn;
     this.asKeyword = options.asKeyword;
-    this.postAs = options.postAs;
     this.alias = options.alias;
   }
 
@@ -55,7 +56,6 @@ export class SqlAliasRef extends SqlBase {
     value.column = this.column;
     value.postColumn = this.postColumn;
     value.asKeyword = this.asKeyword;
-    value.postAs = this.postAs;
     value.alias = this.alias;
     return value as SqlAliasRefValue;
   }
@@ -63,7 +63,11 @@ export class SqlAliasRef extends SqlBase {
   public toRawString(): string {
     if (!this.column) throw Error('not a valid alias');
     return (
-      this.column + (this.postColumn || ' ') + this.asKeyword + this.postAs + this.alias.toString()
+      this.column +
+      (this.postColumn || ' ') +
+      this.asKeyword +
+      (this.innerSpacing.postAs || '') +
+      this.alias.toString()
     );
   }
 }

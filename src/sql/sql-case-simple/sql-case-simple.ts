@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { WhenThenUnit } from '..';
+import { SqlCaseSearched, WhenThenUnit } from '..';
 import { SqlBase, SqlBaseValue } from '../sql-base';
 
 export interface SqlCaseSimpleValue extends SqlBaseValue {
@@ -76,11 +76,12 @@ export class SqlCaseSimple extends SqlBase {
         rawString +=
           this.postWhenThenUnits
             .flatMap((space, i) => {
-              return [this.whenThenToString(this.whenThenUnits[i]), space];
+              return [SqlCaseSearched.whenThenToString(this.whenThenUnits[i]), space];
             })
-            .join('') + this.whenThenToString(this.whenThenUnits[this.whenThenUnits.length - 1]);
+            .join('') +
+          SqlCaseSearched.whenThenToString(this.whenThenUnits[this.whenThenUnits.length - 1]);
       } else {
-        rawString += this.whenThenToString(this.whenThenUnits[0]);
+        rawString += SqlCaseSearched.whenThenToString(this.whenThenUnits[0]);
       }
     }
 
@@ -89,21 +90,6 @@ export class SqlCaseSimple extends SqlBase {
       rawString = rawString + this.elseKeyword + this.innerSpacing.postElse + this.elseExpression;
     }
     return rawString + this.innerSpacing.preEnd + this.endKeyword;
-  }
-
-  public whenThenToString(unit?: WhenThenUnit): string {
-    if (!unit) {
-      return '';
-    }
-    return [
-      unit.whenKeyword,
-      unit.postWhen,
-      unit.whenExpression.toString(),
-      unit.postWhenExpression,
-      unit.thenKeyword,
-      unit.postThen,
-      unit.thenExpression,
-    ].join('');
   }
 }
 

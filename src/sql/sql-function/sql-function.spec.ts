@@ -34,9 +34,11 @@ describe('Functions', () => {
             "type": "ref",
           },
         ],
+        "decorator": undefined,
         "filterKeyword": undefined,
         "functionName": "SUM",
         "innerSpacing": Object {
+          "postDecorator": "",
           "postFilterKeyword": "",
           "postFilterLeftParen": "",
           "postLeftParen": "",
@@ -70,9 +72,11 @@ describe('Functions', () => {
             "type": "ref",
           },
         ],
+        "decorator": undefined,
         "filterKeyword": undefined,
         "functionName": "SUM",
         "innerSpacing": Object {
+          "postDecorator": "",
           "postFilterKeyword": "",
           "postFilterLeftParen": "",
           "postLeftParen": "",
@@ -170,9 +174,11 @@ describe('Functions', () => {
             "type": "multi",
           },
         ],
+        "decorator": undefined,
         "filterKeyword": undefined,
         "functionName": "SUM",
         "innerSpacing": Object {
+          "postDecorator": "",
           "postFilterKeyword": "",
           "postFilterLeftParen": "",
           "postLeftParen": " ",
@@ -206,9 +212,11 @@ describe('Functions', () => {
             "type": "ref",
           },
         ],
+        "decorator": undefined,
         "filterKeyword": undefined,
         "functionName": "SUM",
         "innerSpacing": Object {
+          "postDecorator": "",
           "postFilterKeyword": "",
           "postFilterLeftParen": "",
           "postLeftParen": " ",
@@ -244,9 +252,11 @@ describe('Functions', () => {
                 "type": "ref",
               },
             ],
+            "decorator": undefined,
             "filterKeyword": undefined,
             "functionName": "Sum",
             "innerSpacing": Object {
+              "postDecorator": "",
               "postFilterKeyword": "",
               "postFilterLeftParen": "",
               "postLeftParen": "",
@@ -274,9 +284,11 @@ describe('Functions', () => {
                     "type": "ref",
                   },
                 ],
+                "decorator": undefined,
                 "filterKeyword": undefined,
                 "functionName": "SUM",
                 "innerSpacing": Object {
+                  "postDecorator": "",
                   "postFilterKeyword": "",
                   "postFilterLeftParen": "",
                   "postLeftParen": "",
@@ -304,9 +316,11 @@ describe('Functions', () => {
                         "type": "ref",
                       },
                     ],
+                    "decorator": undefined,
                     "filterKeyword": undefined,
                     "functionName": "SUM",
                     "innerSpacing": Object {
+                      "postDecorator": "",
                       "postFilterKeyword": "",
                       "postFilterLeftParen": "",
                       "postLeftParen": "",
@@ -382,9 +396,11 @@ describe('Functions', () => {
             "type": "ref",
           },
         ],
+        "decorator": undefined,
         "filterKeyword": "Filter",
         "functionName": "Sum",
         "innerSpacing": Object {
+          "postDecorator": "",
           "postFilterKeyword": " ",
           "postFilterLeftParen": "",
           "postLeftParen": "",
@@ -427,5 +443,23 @@ describe('Functions', () => {
         "whereKeyword": "WHERE",
       }
     `);
+  });
+
+  it('Function with decorator and expression', () => {
+    const sql = `Count(Distinct 1 + 2 AND 3 + 2)`;
+
+    expect(parser(sql).toString()).toMatchInlineSnapshot(`"Count(Distinct 1 + 2 AND 3 + 2)"`);
+  });
+
+  it('Function with decorator and extra space', () => {
+    const sql = `Count( Distinct 1 + 2 AND 3 + 2)`;
+
+    expect(parser(sql).toString()).toMatchInlineSnapshot(`"Count( Distinct 1 + 2 AND 3 + 2)"`);
+  });
+
+  it('Trim function', () => {
+    const sql = `Trim( Both A and B FROM D)`;
+
+    expect(parser(sql).toString()).toMatchInlineSnapshot(`"Trim( Both A and B FROM D)"`);
   });
 });

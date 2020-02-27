@@ -21,6 +21,7 @@ import { SqlBase, SqlBaseValue } from '../sql-base';
 
 export interface SqlFunctionValue extends SqlBaseValue {
   functionName?: string;
+  decorator?: string;
   arguments?: SqlBase[];
   separators?: Separator[];
   filterKeyword?: string;
@@ -30,6 +31,7 @@ export interface SqlFunctionValue extends SqlBaseValue {
 
 export class SqlFunction extends SqlBase {
   public functionName?: string;
+  public decorator?: string;
   public arguments?: SqlBase[];
   public separators?: Separator[];
   public filterKeyword?: string;
@@ -73,6 +75,7 @@ export class SqlFunction extends SqlBase {
   constructor(options: SqlFunctionValue) {
     super(options, SqlFunction.type);
     this.functionName = options.functionName;
+    this.decorator = options.decorator;
     this.arguments = options.arguments;
     this.separators = options.separators;
     this.filterKeyword = options.filterKeyword;
@@ -83,6 +86,7 @@ export class SqlFunction extends SqlBase {
   public valueOf() {
     const value: SqlFunctionValue = super.valueOf();
     value.functionName = this.functionName;
+    value.decorator = this.decorator;
     value.arguments = this.arguments;
     value.separators = this.separators;
     value.filterKeyword = this.filterKeyword;
@@ -94,6 +98,9 @@ export class SqlFunction extends SqlBase {
   public toRawString(): string {
     let rawString =
       this.functionName + this.innerSpacing.postName + '(' + this.innerSpacing.postLeftParen;
+    if (this.decorator) {
+      rawString += this.decorator + this.innerSpacing.postDecorator;
+    }
     if (this.arguments && this.arguments.length > 1 && this.separators) {
       rawString = rawString + Separator.spacilator(this.arguments, this.separators);
     } else if (this.arguments) {

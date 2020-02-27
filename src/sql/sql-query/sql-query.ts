@@ -32,7 +32,7 @@ export interface SqlQueryValue extends SqlBaseValue {
 
   selectKeyword?: string;
   selectDecorator?: string;
-  selectValues?: SqlBase[];
+  selectValues: SqlBase[];
   selectSeparators?: Separator[];
 
   fromKeyword?: string;
@@ -156,7 +156,7 @@ export class SqlQuery extends SqlBase {
   }
 
   public valueOf() {
-    const value: SqlQueryValue = super.valueOf();
+    const value: any = super.valueOf();
     value.explainKeyword = this.explainKeyword;
     value.withKeyword = this.withKeyword;
     value.withUnits = this.withUnits;
@@ -182,7 +182,7 @@ export class SqlQuery extends SqlBase {
     value.limitValue = this.limitValue;
     value.unionKeyword = this.unionKeyword;
     value.unionQuery = this.unionQuery;
-    return value;
+    return value as SqlQueryValue;
   }
 
   public toRawString(): string {
@@ -291,7 +291,6 @@ export class SqlQuery extends SqlBase {
     return rawStringParts.join('');
   }
 
-  // todo what should we do with many tables ??
   getTableName() {
     // returns the first table name
     if (!this.tables) return;
@@ -306,10 +305,8 @@ export class SqlQuery extends SqlBase {
     })[0];
   }
 
-  // todo same vibe
   getSchema() {
     // returns the first table namespace
-
     if (!this.tables) return;
     return this.tables.map(table => {
       if (table instanceof SqlRef) {
@@ -341,6 +338,25 @@ export class SqlQuery extends SqlBase {
     });
   }
 
+  getOrderByColumns(): string[] {
+    if (!this.groupByExpression) return [];
+    const columns = this.getColumns();
+    const aggregateColumns = this.groupByExpression.map(column => {
+      if (column instanceof SqlRef) {
+        return column.name;
+      } else if (typeof column === 'number') {
+        return columns[column - 1] || '';
+      } else if (column instanceof SqlLiteral && typeof column.value === 'number') {
+        return columns[column.value - 1] || '';
+      } else {
+        return '';
+      }
+    });
+    return this.getColumns().filter(
+      column => column && !aggregateColumns.includes(column),
+    ) as string[];
+  }
+
   orderBy(column: string, direction: 'ASC' | 'DESC' | undefined) {
     const orderByUnit = {
       expression: SqlRef.fromNameWithDoubleQuotes(column),
@@ -350,10 +366,12 @@ export class SqlQuery extends SqlBase {
     const value = this.valueOf();
     const index = this.getColumns().indexOf(column);
     value.orderByUnits = value.orderByUnits || [];
+
+    // If already in the orderby
     if (
       value.orderByUnits.filter(
         unit =>
-          (unit.expression instanceof SqlLiteral && unit.expression.value === index) ||
+          SqlLiteral.equalsLiteral(unit.expression, index) ||
           SqlRef.equalsString(unit.expression, column),
       ).length
     ) {
@@ -384,7 +402,7 @@ export class SqlQuery extends SqlBase {
   }
 
   removeFilter(column: string): SqlQuery {
-    let value = this.valueOf();
+    let value = new SqlQuery(this.valueOf());
     if (this.whereExpression) {
       value = this.removeFromWhere(column) || value;
     }
@@ -392,20 +410,19 @@ export class SqlQuery extends SqlBase {
       value = this.removeFromHaving(column) || value;
     }
 
-    return new SqlQuery(value);
+    return value;
   }
 
+  // todo fix groupBy indexes
   removeFromSelect(column: string) {
     const value = this.valueOf();
-    // todo length is 1 safe state
-    if (!value.selectValues) return;
-
     const index = this.getColumns().indexOf(column);
     const filteredList = Separator.filterStringFromList(
       column,
       value.selectValues,
       value.selectSeparators,
     );
+
     if (value.orderByUnits) {
       value.orderByUnits = value.orderByUnits.map(unit => {
         if (unit instanceof SqlLiteral && typeof unit.value === 'number' && unit.value > index) {
@@ -428,12 +445,13 @@ export class SqlQuery extends SqlBase {
       });
     }
     value.selectSeparators = filteredList ? filteredList.separators : undefined;
-    value.selectValues = filteredList ? filteredList.values : undefined;
+    value.selectValues = filteredList ? filteredList.values : value.selectValues;
 
     return new SqlQuery(value);
   }
 
   removeFromWhere(column: string) {
+    // Removes all filters on the specified column from the where clause
     const value = this.valueOf();
     if (!value.whereExpression) return;
 
@@ -453,6 +471,7 @@ export class SqlQuery extends SqlBase {
   }
 
   removeFromHaving(column: string) {
+    // Removes all filters on the specified column from the having clause
     const value = this.valueOf();
     if (!value.havingExpression) return;
 
@@ -472,6 +491,7 @@ export class SqlQuery extends SqlBase {
   }
 
   removeFromOrderBy(column: string) {
+    // Removes and order by unit from the order by clause
     const value = this.valueOf();
     const index = this.getColumns().indexOf(column) + 1;
     if (!value.orderByUnits) return new SqlQuery(value);
@@ -499,6 +519,7 @@ export class SqlQuery extends SqlBase {
   }
 
   removeFromGroupBy(column: string): SqlQuery {
+    // Removes a column from the group by clause
     const value = this.valueOf();
     const index = this.getColumns().indexOf(column) + 1;
     if (!value.groupByExpression) return new SqlQuery(value);
@@ -536,7 +557,9 @@ export class SqlQuery extends SqlBase {
         return '';
       }
     });
-    return aggregateColumns;
+    return this.getColumns().filter(
+      column => column && !aggregateColumns.includes(column),
+    ) as string[];
   }
 
   getCurrentFilters() {
@@ -609,22 +632,26 @@ export class SqlQuery extends SqlBase {
   }
 
   addFunctionToGroupBy(columns: SqlBase[], functionName: string, alias: string, filter?: SqlBase) {
+    // adds a function to the group by clause with alias then adds the column to the group by clause using the index
     let value = new SqlQuery(this.valueOf());
     value = value.addAggregateColumn(columns, functionName, alias, filter);
     return value.addLastColumnToGroupBy();
   }
 
   addColumnToGroupBy(column: string) {
+    // Adds a column with no alias to the group by clause
+    // column is added to the select clause then the index is added to group by clause
     let value = new SqlQuery(this.valueOf());
     value = value.addColumn(SqlRef.fromNameWithDoubleQuotes(column));
     return value.addLastColumnToGroupBy();
   }
 
   addLastColumnToGroupBy() {
+    // Adds the last column in the select clause to the group by clause via its index
     const value = this.valueOf();
 
     value.groupByExpression = (value.groupByExpression || []).concat([
-      SqlLiteral.fromInput(value.selectValues ? value.selectValues.length : 1),
+      SqlLiteral.fromInput(value.selectValues.length),
     ]);
     value.groupByKeyword = value.groupByKeyword || 'GROUP BY';
     value.groupByExpressionSeparators = this.groupByExpression
@@ -650,7 +677,8 @@ export class SqlQuery extends SqlBase {
   }
 
   addAggregateColumn(columns: SqlBase[], functionName: string, alias: string, filter?: SqlBase) {
-    const selectValue = SqlAliasRef.aliasfactory(
+    // Adds an aggregate column to the select
+    const selectValue = SqlAliasRef.sqlAliasFactory(
       SqlFunction.sqlFunctionFactory(functionName, columns, [], filter),
       alias,
     );
@@ -665,7 +693,7 @@ export class SqlQuery extends SqlBase {
     return this.selectValues.map(column => {
       if (column instanceof SqlRef) {
         return column.name;
-      } else if (column instanceof SqlAliasRef && column.alias) {
+      } else if (column instanceof SqlAliasRef) {
         return column.alias.name;
       }
       return;
@@ -673,13 +701,12 @@ export class SqlQuery extends SqlBase {
   }
 
   hasGroupByColumn(column: string) {
+    // Checks to see if a column is in the group byy clause either by name or index
     const value = this.valueOf();
     const index = this.getColumns().indexOf(column);
     if (!value.groupByExpression) return false;
     return !!value.groupByExpression.filter(
-      expr =>
-        (expr instanceof SqlRef && expr.name === column) ||
-        (expr instanceof SqlLiteral && expr.value === index),
+      expr => SqlRef.equalsString(expr, column) || SqlLiteral.equalsLiteral(expr, index),
     ).length;
   }
 

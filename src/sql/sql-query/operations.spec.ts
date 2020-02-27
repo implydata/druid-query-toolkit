@@ -39,7 +39,7 @@ describe('getTableName Tests', () => {
     ).toMatchInlineSnapshot(`"Name"`);
   });
 
-  it('getTableName with muiltple tables', () => {
+  it('getTableName with multiple tables', () => {
     expect(
       parser(`SELECT *
   FROM sys."github" as test, sys.name`).getTableName(),
@@ -139,7 +139,7 @@ describe('order by Test', () => {
     ).toMatchInlineSnapshot(`
       "SELECT *
         FROM sys.\\"github\\"
-      ORDER BY column DESC"
+      ORDER BY \\"column\\" DESC"
     `);
   });
   it('add to order by clause', () => {
@@ -150,7 +150,7 @@ describe('order by Test', () => {
         .toString(),
     ).toMatchInlineSnapshot(`
       "SELECT *
-        FROM sys.\\"github\\" ORDER BY column, columnTwo DESC"
+        FROM sys.\\"github\\" ORDER BY column, \\"columnTwo\\" DESC"
     `);
   });
   it('order by with out direction', () => {
@@ -161,7 +161,7 @@ describe('order by Test', () => {
         .toString(),
     ).toMatchInlineSnapshot(`
       "SELECT *
-        FROM sys.\\"github\\" ORDER BY column, columnTwo ASC, columnThree"
+        FROM sys.\\"github\\" ORDER BY column, columnTwo ASC, \\"columnThree\\""
     `);
   });
 });
@@ -458,7 +458,8 @@ describe('getAggregateColumns', () => {
   Group By column2`;
     expect(parser(sql).getAggregateColumns()).toMatchInlineSnapshot(`
       Array [
-        "column2",
+        "column",
+        "aggregated",
       ]
     `);
   });
@@ -468,9 +469,7 @@ describe('getAggregateColumns', () => {
   Group By column2,  1, 3`;
     expect(parser(sql).getAggregateColumns()).toMatchInlineSnapshot(`
       Array [
-        "column2",
-        "column",
-        "column2",
+        "aggregated",
       ]
     `);
   });
@@ -533,7 +532,7 @@ describe('addAggregateColumn', () => {
   });
 });
 
-describe('adToGroupBy', () => {
+describe('addToGroupBy', () => {
   it('no existing column', () => {
     const sql = 'select column1 from table';
 

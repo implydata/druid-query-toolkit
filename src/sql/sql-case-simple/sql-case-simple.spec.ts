@@ -47,9 +47,9 @@ describe('Case expression', () => {
         "type": "caseSimple",
         "whenThenUnits": Array [
           Object {
-            "postThen": " ",
-            "postWhen": " ",
-            "postWhenExpression": " ",
+            "postThenSpace": " ",
+            "postWhenExpressionSpace": " ",
+            "postWhenSpace": " ",
             "thenExpression": SqlRef {
               "innerSpacing": Object {},
               "name": "C",
@@ -110,9 +110,9 @@ describe('Case expression', () => {
         "type": "caseSimple",
         "whenThenUnits": Array [
           Object {
-            "postThen": " ",
-            "postWhen": " ",
-            "postWhenExpression": " ",
+            "postThenSpace": " ",
+            "postWhenExpressionSpace": " ",
+            "postWhenSpace": " ",
             "thenExpression": SqlRef {
               "innerSpacing": Object {},
               "name": "C",
@@ -166,9 +166,9 @@ describe('Case expression', () => {
         "type": "caseSimple",
         "whenThenUnits": Array [
           Object {
-            "postThen": " ",
-            "postWhen": "     ",
-            "postWhenExpression": " ",
+            "postThenSpace": " ",
+            "postWhenExpressionSpace": " ",
+            "postWhenSpace": "     ",
             "thenExpression": SqlRef {
               "innerSpacing": Object {},
               "name": "C",
@@ -228,9 +228,9 @@ describe('Case expression', () => {
         "type": "caseSimple",
         "whenThenUnits": Array [
           Object {
-            "postThen": " ",
-            "postWhen": " ",
-            "postWhenExpression": " ",
+            "postThenSpace": " ",
+            "postWhenExpressionSpace": " ",
+            "postWhenSpace": " ",
             "thenExpression": SqlRef {
               "innerSpacing": Object {},
               "name": "C",
@@ -290,9 +290,9 @@ describe('Case expression', () => {
         "type": "caseSimple",
         "whenThenUnits": Array [
           Object {
-            "postThen": " ",
-            "postWhen": "   ",
-            "postWhenExpression": " ",
+            "postThenSpace": " ",
+            "postWhenExpressionSpace": " ",
+            "postWhenSpace": "   ",
             "thenExpression": SqlRef {
               "innerSpacing": Object {},
               "name": "C",
@@ -354,9 +354,9 @@ describe('Case expression', () => {
         "type": "caseSimple",
         "whenThenUnits": Array [
           Object {
-            "postThen": " ",
-            "postWhen": "  ",
-            "postWhenExpression": " ",
+            "postThenSpace": " ",
+            "postWhenExpressionSpace": " ",
+            "postWhenSpace": "  ",
             "thenExpression": SqlMulti {
               "arguments": Array [
                 SqlRef {

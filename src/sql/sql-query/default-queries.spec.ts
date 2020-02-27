@@ -307,28 +307,28 @@ describe('Druid Query Tests', () => {
       ORDER BY \\"rank\\" DESC, \\"server\\" DESC"
     `);
   });
-  //
-  // it('parsers segments query with concat', () => {
-  //   expect(
-  //     parser(
-  //       'SELECT\n' +
-  //         '  ("start" || \'/\' || "end") AS "interval",\n' +
-  //         '  "segment_id", "datasource", "start", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed", "payload"\n' +
-  //         'FROM sys.segments\n' +
-  //         'WHERE\n' +
-  //         ' ("start" || \'/\' || "end") IN (SELECT "start" || \'/\' || "end" FROM sys.segments GROUP BY 1 LIMIT 25)\n' +
-  //         'ORDER BY "start" DESC\n' +
-  //         'LIMIT 25000',
-  //     ).toString(),
-  //   ).toMatchSnapshot();
-  // });
 
-  //   it('parsers segments query with concat', () => {
-  //     expect(
-  //       parser(`SELECT "start" || ' / ' || "end" FROM sys.segments GROUP BY 1,2`).toString(),
-  //     ).toMatchSnapshot();
-  //   });
-  //
+  it('parsers segments query with concat', () => {
+    expect(
+      parser(
+        'SELECT\n' +
+          '  ("start" || \'/\' || "end") AS "interval",\n' +
+          '  "segment_id", "datasource", "start", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed", "payload"\n' +
+          'FROM sys.segments\n' +
+          'WHERE\n' +
+          ' ("start" || \'/\' || "end") IN (SELECT "start" || \'/\' || "end" FROM sys.segments GROUP BY 1 LIMIT 25)\n' +
+          'ORDER BY "start" DESC\n' +
+          'LIMIT 25000',
+      ).toString(),
+    ).toMatchSnapshot();
+  });
+
+  it('parsers segments query with concat', () => {
+    expect(
+      parser(`SELECT "start" || ' / ' || "end" FROM sys.segments GROUP BY 1,2`).toString(),
+    ).toMatchSnapshot();
+  });
+
   it('parsers the default data sources query to string with spaces', () => {
     expect(
       parser(
@@ -359,28 +359,27 @@ describe('Druid Query Tests', () => {
     `);
   });
 
-  // it('parsers the default data sources query to string with spaces', () => {
-  //   expect(
-  //     parser(
-  //       `SELECT` +
-  //         '  "comments",\n' +
-  //         '  COUNT(*) AS "Count", SUM("comments") AS "sum_comments"\n' +
-  //         'FROM "github"\n' +
-  //         'WHERE "__time" >= CURRENT_TIMESTAMP - INTERVAL \'1\' DAY AND "commits" > 100\n' +
-  //         'GROUP BY 1,2\n' +
-  //         'ORDER BY "Time" ASC',
-  //     ).toString(),
-  //   ).toMatchInlineSnapshot(`
-  //       "SELECT
-  //         \\"comments\\", TIME_FLOOR(\\"__time\\", 'PT1H') AS \\"Time\\",
-  //         COUNT(*) AS \\"Count\\", SUM(\\"comments\\") AS \\"sum_comments\\"
-  //       FROM \\"github\\"
-  //       WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY AND \\"commits\\" > 100
-  //       GROUP BY 1,2
-  //       ORDER BY \\"Time\\" ASC"
-  //     `);
-  // });
-  //
+  it('parsers the default data sources query to string with spaces', () => {
+    expect(
+      parser(
+        `SELECT` +
+          '  "comments",\n' +
+          '  COUNT(*) AS "Count", SUM("comments") AS "sum_comments"\n' +
+          'FROM "github"\n' +
+          'WHERE "__time" >= CURRENT_TIMESTAMP - INTERVAL \'1\' DAY AND "commits" > 100\n' +
+          'GROUP BY 1, 2\n' +
+          'ORDER BY "Time" ASC',
+      ).toString(),
+    ).toMatchInlineSnapshot(`
+      "SELECT  \\"comments\\",
+        COUNT(*) AS \\"Count\\", SUM(\\"comments\\") AS \\"sum_comments\\"
+      FROM \\"github\\"
+      WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY AND \\"commits\\" > 100
+      GROUP BY 1, 2
+      ORDER BY \\"Time\\" ASC"
+    `);
+  });
+
   it('test with clause', () => {
     expect(
       parser(
@@ -457,70 +456,71 @@ describe('Druid Query Tests', () => {
     `);
   });
 });
+
 describe('Special function tests', () => {
-  // it('Test TRIM with BOTH', () => {
-  //   expect(
-  //     parser(`SELECT
-  //   "language",
-  //   TRIM(BOTH 'A' FROM "language") AS "Count", COUNT(DISTINCT "language") AS "dist_language", COUNT(*) FILTER (WHERE "language"= 'xxx') AS "language_filtered_count"
-  // FROM "github"
-  // WHERE "__time" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY AND "language" != 'TypeScript'
-  // GROUP BY 1
-  // HAVING "Count" != 37392
-  // ORDER BY "Count" DESC`).toString(),
-  //   ).toMatchInlineSnapshot(`
-  //       "SELECT
-  //         \\"language\\",
-  //         TRIM(BOTH 'A' FROM \\"language\\") AS \\"Count\\", COUNT(DISTINCT \\"language\\") AS \\"dist_language\\", COUNT(*) FILTER (WHERE \\"language\\"= 'xxx') AS \\"language_filtered_count\\"
-  //       FROM \\"github\\"
-  //       WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY AND \\"language\\" != 'TypeScript'
-  //       GROUP BY 1
-  //       HAVING \\"Count\\" != 37392
-  //       ORDER BY \\"Count\\" DESC"
-  //     `);
-  // });
-  //
-  //   it('Test TRIM with LEADING', () => {
-  //     expect(
-  //       parser(`SELECT
-  //   "language",
-  //   TRIM(LEADING 'A' FROM "language") AS "Count", COUNT(DISTINCT "language") AS "dist_language", COUNT(*) FILTER (WHERE "language"= 'xxx') AS "language_filtered_count"
-  // FROM "github"
-  // WHERE "__time" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY AND "language" != 'TypeScript'
-  // GROUP BY 1
-  // HAVING "Count" != 37392
-  // ORDER BY "Count" DESC`).toString(),
-  //     ).toMatchInlineSnapshot(`
-  //       "SELECT
-  //         \\"language\\",
-  //         TRIM(LEADING 'A' FROM \\"language\\") AS \\"Count\\", COUNT(DISTINCT \\"language\\") AS \\"dist_language\\", COUNT(*) FILTER (WHERE \\"language\\"= 'xxx') AS \\"language_filtered_count\\"
-  //       FROM \\"github\\"
-  //       WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY AND \\"language\\" != 'TypeScript'
-  //       GROUP BY 1
-  //       HAVING \\"Count\\" != 37392
-  //       ORDER BY \\"Count\\" DESC"
-  //     `);
-  //   });
-  //
-  //   it('Test TRIM with TRAILING', () => {
-  //     expect(
-  //       parser(`SELECT
-  //   "language",
-  //   TRIM(TRAILING 'A' FROM "language") AS "Count", COUNT(DISTINCT "language") AS "dist_language", COUNT(*) FILTER (WHERE "language"= 'xxx') AS "language_filtered_count"
-  // FROM "github"
-  // WHERE "__time" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY AND "language" != 'TypeScript'
-  // GROUP BY 1
-  // HAVING "Count" != 37392
-  // ORDER BY "Count" DESC`).toString(),
-  //     ).toMatchInlineSnapshot(`
-  //       "SELECT
-  //         \\"language\\",
-  //         TRIM(TRAILING 'A' FROM \\"language\\") AS \\"Count\\", COUNT(DISTINCT \\"language\\") AS \\"dist_language\\", COUNT(*) FILTER (WHERE \\"language\\"= 'xxx') AS \\"language_filtered_count\\"
-  //       FROM \\"github\\"
-  //       WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY AND \\"language\\" != 'TypeScript'
-  //       GROUP BY 1
-  //       HAVING \\"Count\\" != 37392
-  //       ORDER BY \\"Count\\" DESC"
-  //     `);
-  //   });
+  it('Test TRIM with BOTH', () => {
+    expect(
+      parser(`SELECT
+    "language",
+    TRIM(BOTH 'A' FROM "language") AS "Count"
+  FROM "github"
+  WHERE "__time" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY AND "language" != 'TypeScript'
+  GROUP BY 1
+  HAVING "Count" != 37392
+  ORDER BY "Count" DESC`).toString(),
+    ).toMatchInlineSnapshot(`
+      "SELECT
+          \\"language\\",
+          TRIM(BOTH 'A' FROM \\"language\\") AS \\"Count\\"
+        FROM \\"github\\"
+        WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY AND \\"language\\" != 'TypeScript'
+        GROUP BY 1
+        HAVING \\"Count\\" != 37392
+        ORDER BY \\"Count\\" DESC"
+    `);
+  });
+
+  it('Test TRIM with LEADING', () => {
+    expect(
+      parser(`SELECT
+    "language",
+    TRIM(LEADING 'A' FROM "language") AS "Count", COUNT(DISTINCT "language") AS "dist_language", COUNT(*) FILTER (WHERE "language"= 'xxx') AS "language_filtered_count"
+  FROM "github"
+  WHERE "__time" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY AND "language" != 'TypeScript'
+  GROUP BY 1
+  HAVING "Count" != 37392
+  ORDER BY "Count" DESC`).toString(),
+    ).toMatchInlineSnapshot(`
+      "SELECT
+          \\"language\\",
+          TRIM(LEADING 'A' FROM \\"language\\") AS \\"Count\\", COUNT(DISTINCT \\"language\\") AS \\"dist_language\\", COUNT(*) FILTER (WHERE \\"language\\"= 'xxx') AS \\"language_filtered_count\\"
+        FROM \\"github\\"
+        WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY AND \\"language\\" != 'TypeScript'
+        GROUP BY 1
+        HAVING \\"Count\\" != 37392
+        ORDER BY \\"Count\\" DESC"
+    `);
+  });
+
+  it('Test TRIM with TRAILING', () => {
+    expect(
+      parser(`SELECT
+    "language",
+    TRIM(TRAILING 'A' FROM "language") AS "Count", COUNT(DISTINCT "language") AS "dist_language", COUNT(*) FILTER (WHERE "language"= 'xxx') AS "language_filtered_count"
+  FROM "github"
+  WHERE "__time" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY AND "language" != 'TypeScript'
+  GROUP BY 1
+  HAVING "Count" != 37392
+  ORDER BY "Count" DESC`).toString(),
+    ).toMatchInlineSnapshot(`
+      "SELECT
+          \\"language\\",
+          TRIM(TRAILING 'A' FROM \\"language\\") AS \\"Count\\", COUNT(DISTINCT \\"language\\") AS \\"dist_language\\", COUNT(*) FILTER (WHERE \\"language\\"= 'xxx') AS \\"language_filtered_count\\"
+        FROM \\"github\\"
+        WHERE \\"__time\\" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY AND \\"language\\" != 'TypeScript'
+        GROUP BY 1
+        HAVING \\"Count\\" != 37392
+        ORDER BY \\"Count\\" DESC"
+    `);
+  });
 });
