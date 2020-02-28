@@ -33,10 +33,6 @@ export class SqlMulti extends SqlBase {
     } as SqlMultiValue);
   }
 
-  static wrapInQuotes(thing: string, quote: string): string {
-    return `${quote}${thing}${quote}`;
-  }
-
   public expressionType?: string;
   public separators?: Separator[];
   public arguments: SqlBase[];

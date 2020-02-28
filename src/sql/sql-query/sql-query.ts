@@ -576,7 +576,7 @@ export class SqlQuery extends SqlBase {
   }
 
   addWhereFilter(
-    column: string | SqlRef | SqlAliasRef,
+    column: string | SqlBase,
     operator: string,
     filterValue: SqlBase | string | number,
   ) {
@@ -604,7 +604,7 @@ export class SqlQuery extends SqlBase {
   }
 
   addHavingFilter(
-    column: string | SqlRef | SqlAliasRef,
+    column: string | SqlBase,
     operator: string,
     filterValue: SqlBase | string | number,
   ) {

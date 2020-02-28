@@ -28,10 +28,6 @@ export interface SqlCaseSimpleValue extends SqlBaseValue {
 export class SqlCaseSimple extends SqlBase {
   static type = 'caseSimple';
 
-  static wrapInQuotes(thing: string, quote: string): string {
-    return `${quote}${thing}${quote}`;
-  }
-
   public caseKeyword?: string;
   public caseExpression?: SqlBase;
   public elseKeyword?: string;
