@@ -24,6 +24,7 @@ SqlQuery
   orderBy:(_ OrderByClause)?
   limit:(_ LimitClause)?
   union:(_ UnionClause)?
+  postQueryAnnotatedComments: (PureWhiteSpace AnnotatedComment+)?
   postQuery:EndOfQuery?
 {
   return new sql.SqlQuery({
@@ -60,9 +61,10 @@ SqlQuery
     limitKeyword: limit ? limit[1].limitKeyword: undefined,
     limitValue: limit ? limit[1].limitValue : undefined,
 
-
     unionKeyword: union ? union[1].unionKeyword : undefined,
     unionQuery: union ?  union[1].unionQuery : undefined,
+
+    postQueryAnnotatedComments: postQueryAnnotatedComments ? postQueryAnnotatedComments[1] : undefined,
 
     innerSpacing: {
       preQuery: preQuery || '',
@@ -96,6 +98,8 @@ SqlQuery
 
       preUnionKeyword: union ? union[0] : '',
       postUnionKeyword: union ? union[1].postUnionKeyword : '',
+
+      preQueryAnnotatedComments: postQueryAnnotatedComments ? postQueryAnnotatedComments[0] : '',
 
       postQuery: postQuery || ''
     }
@@ -211,7 +215,7 @@ OrderByClause = orderByKeyword:OrderToken postOrderByKeyword:_ orderByUnitsHead:
   }
 }
 
-OrderByPart = expression:Expression  direction:(_ ('ASC'/'DESC'i))?
+OrderByPart = expression:(SqlRef/SqlLiteral)  direction:(_ ('ASC'/'DESC'i))?
 {
   return {
     expression: expression,
@@ -596,10 +600,27 @@ UnquotedRefPart = name:$([a-z_\-:*%/]i [a-z0-9_\-:*%/]i*)
 
 // -----------------------------------
 
+AnnotatedComment = '--:' postCommentSignifier: PureWhiteSpace? key:String postKey:PureWhiteSpace? "=" postEquals:PureWhiteSpace? value:String postValue: PureWhiteSpace?
+{ return new sql.AnnotatedComment(
+  {
+    innerSpacing: {
+      postCommentSignifier:  postCommentSignifier,
+        postKey: postKey,
+        postEquals: postEquals,
+        postValue: postValue
+    },
+    key: key,
+    value: value
+  });
+}
+
+String = $([a-z0-9_\-:*%/]i+)
+
 _ =
   $(([ \t\n\r]* "--" ([ \t\r]+/UnquotedRefPart)* [\n] [ \t\r]*)+)
-  / spacing: $([ \t\n\r]+)
+  / PureWhiteSpace
 
+PureWhiteSpace = spacing: $([ \t\n\r]+)
 
 __ "optional whitespace" = _ / ''
 

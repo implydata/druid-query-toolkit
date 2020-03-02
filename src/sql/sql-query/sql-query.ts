@@ -13,6 +13,7 @@
  */
 
 import {
+  AnnotatedComment,
   Separator,
   SqlAliasRef,
   SqlFunction,
@@ -58,6 +59,8 @@ export interface SqlQueryValue extends SqlBaseValue {
 
   unionKeyword?: string;
   unionQuery?: SqlQuery;
+
+  postQueryAnnotatedComments?: AnnotatedComment[];
 }
 
 export interface WithUnit {
@@ -105,6 +108,7 @@ export class SqlQuery extends SqlBase {
   public limitValue?: SqlLiteral;
   public unionKeyword?: string;
   public unionQuery?: SqlQuery;
+  public postQueryAnnotatedComments?: AnnotatedComment[];
 
   static type = 'query';
 
@@ -153,6 +157,7 @@ export class SqlQuery extends SqlBase {
     this.limitValue = options.limitValue;
     this.unionKeyword = options.unionKeyword;
     this.unionQuery = options.unionQuery;
+    this.postQueryAnnotatedComments = options.postQueryAnnotatedComments;
   }
 
   public valueOf() {
@@ -182,6 +187,7 @@ export class SqlQuery extends SqlBase {
     value.limitValue = this.limitValue;
     value.unionKeyword = this.unionKeyword;
     value.unionQuery = this.unionQuery;
+    value.postQueryAnnotatedComments = this.postQueryAnnotatedComments;
     return value as SqlQueryValue;
   }
 
@@ -284,6 +290,14 @@ export class SqlQuery extends SqlBase {
         this.unionKeyword,
         this.innerSpacing.postUnionKeyword,
         this.unionQuery.toString(),
+      );
+    }
+
+    // Post Query Annotated Comments
+    if (this.postQueryAnnotatedComments) {
+      rawStringParts.push(
+        this.innerSpacing.preQueryAnnotatedComments,
+        this.postQueryAnnotatedComments.map(comment => comment.toString()).join(''),
       );
     }
 
