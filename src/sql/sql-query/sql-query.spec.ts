@@ -3022,3 +3022,117 @@ describe('expressions with union clause', () => {
     `);
   });
 });
+
+describe('Queries with comments', () => {
+  it('single comment', () => {
+    const sql = `Select -- some comment 
+  column from table`;
+
+    expect(parser(sql).toString()).toMatchInlineSnapshot(`
+      "Select -- some comment 
+        column from table"
+    `);
+
+    expect(parser(sql)).toMatchInlineSnapshot(`
+      SqlQuery {
+        "explainKeyword": "",
+        "fromKeyword": "from",
+        "groupByExpression": undefined,
+        "groupByExpressionSeparators": undefined,
+        "groupByKeyword": undefined,
+        "havingExpression": undefined,
+        "havingKeyword": undefined,
+        "innerSpacing": Object {
+          "postExplain": "",
+          "postFrom": " ",
+          "postLimitKeyword": "",
+          "postQuery": "",
+          "postSelect": " -- some comment 
+        ",
+          "postSelectDecorator": "",
+          "postSelectValues": " ",
+          "postUnionKeyword": "",
+          "postWith": "",
+          "postWithQuery": "",
+          "preGroupByKeyword": "",
+          "preHavingKeyword": "",
+          "preLimitKeyword": "",
+          "preQuery": "",
+          "preUnionKeyword": "",
+          "preWhereKeyword": "",
+        },
+        "limitKeyword": undefined,
+        "limitValue": undefined,
+        "orderByKeyword": undefined,
+        "orderBySeparators": undefined,
+        "orderByUnits": undefined,
+        "selectDecorator": "",
+        "selectKeyword": "Select",
+        "selectSeparators": Array [],
+        "selectValues": Array [
+          SqlRef {
+            "innerSpacing": Object {},
+            "name": "column",
+            "namespace": undefined,
+            "namespaceQuotes": undefined,
+            "quotes": "",
+            "type": "ref",
+          },
+        ],
+        "tableSeparators": Array [],
+        "tables": Array [
+          SqlRef {
+            "innerSpacing": Object {},
+            "name": "table",
+            "namespace": undefined,
+            "namespaceQuotes": undefined,
+            "quotes": "",
+            "type": "ref",
+          },
+        ],
+        "type": "query",
+        "unionKeyword": undefined,
+        "unionQuery": undefined,
+        "whereExpression": undefined,
+        "whereKeyword": undefined,
+        "withKeyword": undefined,
+        "withSeparators": undefined,
+        "withUnits": undefined,
+      }
+    `);
+  });
+
+  it('two comments', () => {
+    const sql = `Select --some comment
+    --some comment
+  column from table`;
+
+    expect(parser(sql).toString()).toMatchInlineSnapshot(`
+      "Select --some comment
+          --some comment
+        column from table"
+    `);
+  });
+
+  it('comment on new line', () => {
+    const sql = `Select
+    -- some comment
+  column from table`;
+
+    expect(parser(sql).toString()).toMatchInlineSnapshot(`
+      "Select
+          -- some comment
+        column from table"
+    `);
+  });
+
+  it('comment with no space', () => {
+    const sql = `Select --some comment
+  column from table`;
+
+    expect(parser(sql).toString()).toMatchInlineSnapshot(`
+      "Select --some comment
+        column from table"
+    `);
+  });
+});

@@ -596,8 +596,10 @@ UnquotedRefPart = name:$([a-z_\-:*%/]i [a-z0-9_\-:*%/]i*)
 
 // -----------------------------------
 
-_ "whitespace" =
-  spacing: $([ \t\n\r]+)
+_ =
+  $(([ \t\n\r]* "--" ([ \t\r]+/UnquotedRefPart)* [\n] [ \t\r]*)+)
+  / spacing: $([ \t\n\r]+)
+
 
 __ "optional whitespace" = _ / ''
 
