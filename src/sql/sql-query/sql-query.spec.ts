@@ -3126,6 +3126,18 @@ describe('Queries with comments', () => {
     `);
   });
 
+  it('comment containing hyphens', () => {
+    const sql = `Select
+    -- some--comment
+  column from table`;
+
+    expect(parser(sql).toString()).toMatchInlineSnapshot(`
+      "Select
+          -- some--comment
+        column from table"
+    `);
+  });
+
   it('comment with no space', () => {
     const sql = `Select --some comment
   column from table`;
