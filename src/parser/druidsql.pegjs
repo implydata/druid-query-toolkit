@@ -18,13 +18,14 @@ SqlQuery
   select:SelectClause
   postSelectValues:_
   from:FromClause
+  postSelectAnnotatedComments: AnnotatedComment*
   where:(_ WhereClause)?
   groupBy:(_ GroupByClause)?
   having:(_ HavingClause)?
   orderBy:(_ OrderByClause)?
   limit:(_ LimitClause)?
   union:(_ UnionClause)?
-  postQueryAnnotatedComments: (PureWhiteSpace AnnotatedComment+)?
+  postQueryAnnotatedComments: AnnotatedComment*
   postQuery:EndOfQuery?
 {
   return new sql.SqlQuery({
@@ -43,6 +44,8 @@ SqlQuery
     fromKeyword: from.fromKeyword,
     tables: from.tables,
     tableSeparators: from.tableSeparators,
+
+    postSelectAnnotatedComments: postSelectAnnotatedComments,
 
     whereKeyword: where ? where[1].whereKeyword : undefined ,
     whereExpression: where ? where[1].whereExpression : undefined,
@@ -64,7 +67,7 @@ SqlQuery
     unionKeyword: union ? union[1].unionKeyword : undefined,
     unionQuery: union ?  union[1].unionQuery : undefined,
 
-    postQueryAnnotatedComments: postQueryAnnotatedComments ? postQueryAnnotatedComments[1] : undefined,
+    postQueryAnnotatedComments: postQueryAnnotatedComments,
 
     innerSpacing: {
       preQuery: preQuery || '',
@@ -89,7 +92,6 @@ SqlQuery
       preHavingKeyword: having ? having[0] : '',
       postHavingKeyword: having ? having[1].postHavingKeyword : undefined,
 
-
       preOrderByKeyword: orderBy ? orderBy[0] : undefined,
       postOrderByKeyword: orderBy ? orderBy[1].postOrderByKeyword : undefined,
 
@@ -98,8 +100,6 @@ SqlQuery
 
       preUnionKeyword: union ? union[0] : '',
       postUnionKeyword: union ? union[1].postUnionKeyword : '',
-
-      preQueryAnnotatedComments: postQueryAnnotatedComments ? postQueryAnnotatedComments[0] : '',
 
       postQuery: postQuery || ''
     }
@@ -600,14 +600,14 @@ UnquotedRefPart = name:$([a-z_\-:*%/]i [a-z0-9_\-:*%/]i*)
 
 // -----------------------------------
 
-AnnotatedComment = '--:' postCommentSignifier: PureWhiteSpace? key:String postKey:PureWhiteSpace? "=" postEquals:PureWhiteSpace? value:String postValue: PureWhiteSpace?
+AnnotatedComment = preAnnotatedComment:PureWhiteSpace '--:' postCommentSignifier: PureWhiteSpace? key:String postKey:PureWhiteSpace? "=" postEquals:PureWhiteSpace? value:String
 { return new sql.AnnotatedComment(
   {
     innerSpacing: {
       postCommentSignifier:  postCommentSignifier,
         postKey: postKey,
         postEquals: postEquals,
-        postValue: postValue
+        preAnnotatedComment: preAnnotatedComment
     },
     key: key,
     value: value

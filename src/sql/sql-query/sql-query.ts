@@ -40,6 +40,8 @@ export interface SqlQueryValue extends SqlBaseValue {
   tables?: (SqlAliasRef | SqlRef)[];
   tableSeparators?: [];
 
+  postSelectAnnotatedComments?: AnnotatedComment[];
+
   whereKeyword?: string;
   whereExpression?: SqlMulti | SqlUnary;
 
@@ -94,6 +96,7 @@ export class SqlQuery extends SqlBase {
   public fromKeyword?: string;
   public tables?: (SqlAliasRef | SqlRef)[];
   public tableSeparators?: [];
+  public postSelectAnnotatedComments?: AnnotatedComment[];
   public whereKeyword?: string;
   public whereExpression?: SqlMulti | SqlUnary;
   public groupByKeyword?: string;
@@ -143,6 +146,7 @@ export class SqlQuery extends SqlBase {
     this.fromKeyword = options.fromKeyword;
     this.tables = options.tables;
     this.tableSeparators = options.tableSeparators;
+    this.postSelectAnnotatedComments = options.postSelectAnnotatedComments;
     this.whereKeyword = options.whereKeyword;
     this.whereExpression = options.whereExpression;
     this.groupByKeyword = options.groupByKeyword;
@@ -171,6 +175,7 @@ export class SqlQuery extends SqlBase {
     value.selectValues = this.selectValues;
     value.selectSeparators = this.selectSeparators;
     value.fromKeyword = this.fromKeyword;
+    value.postSelectAnnotatedComments = this.postSelectAnnotatedComments;
     value.tables = this.tables;
     value.tableSeparators = this.tableSeparators;
     value.whereKeyword = this.whereKeyword;
@@ -226,6 +231,14 @@ export class SqlQuery extends SqlBase {
         this.fromKeyword,
         this.innerSpacing.postFrom,
         Separator.spacilator(this.tables, this.tableSeparators),
+      );
+    }
+
+    // Post select annotated comments
+    if (this.postSelectAnnotatedComments) {
+      rawStringParts.push(
+        this.innerSpacing.preSelectAnnotatedComments,
+        this.postSelectAnnotatedComments.map(comment => comment.toString()).join(''),
       );
     }
 

@@ -31,6 +31,7 @@ export class AnnotatedComment {
 
   public toString() {
     return [
+      this.innerSpacing.preAnnotatedComment,
       '--:',
       this.innerSpacing.postCommentSignifier,
       this.key,
