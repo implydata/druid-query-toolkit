@@ -12,6 +12,9 @@
  * limitations under the License.
  */
 
-export * from './parser/druidsql';
-export * from './sql';
-export * from './query-result-decoder/query-result-decoder';
+export function basicLiteralEscape(literalValue?: string | number): string {
+  return typeof literalValue === 'number' ? `${literalValue}` : `'${literalValue}'`;
+}
+export function basicIdentifierEscape(identifierValue?: string): string {
+  return `"${identifierValue}"`;
+}

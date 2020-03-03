@@ -31,7 +31,7 @@
   "scripts": {
     "pretest": "npm run compile",
     "test": "npm run tslint && jest",
-    "playground": "node script/compile-peg.js && jest src/playground.spec.ts",
+    "playground": "node script/compile-peg.js && jest src/parser.spec.ts",
     "compile": "rm -rf build/ && node script/compile-peg.js && tsc && npm run cp-parser",
     "cp-parser": "cp -r src/parser build/parser",
     "tslint": "./node_modules/.bin/tslint -c tslint.json --project tsconfig.json --formatters-dir ./node_modules/awesome-code-style/formatter 'src/**/*.ts?(x)'",
@@ -63,14 +63,14 @@
   },
   "devDependencies": {
     "@jest/core": "24.9.0",
-    "@types/jest": "^24.0.18",
+    "@types/jest": "^24.0.23",
     "awesome-code-style": "^1.4.3",
-    "core-js": "^3.2.1",
-    "husky": "^3.0.4",
+    "core-js": "^3.5.0",
+    "husky": "^3.1.0",
     "jest": "^24.9.0",
     "pegjs": "^0.10.0",
-    "ts-jest": "^24.0.2",
-    "tslint": "^5.19.0",
-    "typescript": "^3.5.3"
+    "ts-jest": "^24.2.0",
+    "tslint": "^5.20.1",
+    "typescript": "^3.7.3"
   }
 }
