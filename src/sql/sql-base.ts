@@ -12,6 +12,8 @@
  * limitations under the License.
  */
 
+import { SqlAliasRef, SqlRef } from '../index';
+
 export interface Parens {
   leftSpacing: string;
   rightSpacing: string;
@@ -19,7 +21,7 @@ export interface Parens {
 
 export interface SqlBaseValue {
   type: string;
-  innerSpacing?: Record<string, string>;
+  innerSpacing: Record<string, string>;
   parens?: Parens[];
 }
 
@@ -32,6 +34,16 @@ export abstract class SqlBase {
       if (typeof v === 'string') cleanObj[k] = v;
     }
     return cleanObj;
+  }
+
+  static getColumnName(column: string | SqlBase): string {
+    if (typeof column === 'string') return column;
+    if (column instanceof SqlRef) return column.name;
+    if (column instanceof SqlAliasRef) {
+      // @ts-ignore
+      return column.alias.name;
+    }
+    return '';
   }
 
   static classMap: Record<string, typeof SqlBase> = {};
@@ -52,21 +64,19 @@ export abstract class SqlBase {
   }
 
   public type: string;
-  public innerSpacing?: Record<string, string>;
+  public innerSpacing: Record<string, string>;
   public parens?: Parens[];
 
   constructor(options: SqlBaseValue, typeOverride: string) {
     this.type = typeOverride || options.type;
-    if (options.innerSpacing) {
-      this.innerSpacing = SqlBase.cleanObject(options.innerSpacing);
-    }
+    this.innerSpacing = SqlBase.cleanObject(options.innerSpacing) || {};
     if (options.parens) {
       this.parens = options.parens;
     }
   }
 
   public valueOf() {
-    const value: SqlBaseValue = { type: this.type };
+    const value: SqlBaseValue = { type: this.type, innerSpacing: this.innerSpacing };
     if (this.innerSpacing) value.innerSpacing = this.innerSpacing;
     if (this.parens) value.parens = this.parens;
     return value;
