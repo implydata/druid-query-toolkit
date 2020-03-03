@@ -244,13 +244,6 @@ export class SqlQuery extends SqlBase {
       );
     }
 
-    console.log(
-      !!this.joinKeyword,
-      !!this.joinType,
-      !!this.joinTable,
-      !!this.onKeyword,
-      !!this.onExpression,
-    );
     // Join Clause
     if (
       this.joinKeyword &&
