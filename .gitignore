@@ -10,3 +10,4 @@
 /node_modules/
 /build/
 /src/parser/druidsql.js
+/src/parser/.DS_Store
