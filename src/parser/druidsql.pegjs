@@ -597,13 +597,13 @@ UnquotedRefPart = name:$([a-z_\-:*%/]i [a-z0-9_\-:*%/]i*)
 // -----------------------------------
 
 _ =
-  $(([ \t\n\r]* "--" ([ \t\r]+/UnquotedRefPart)* [\n] [ \t\r]*)+)
+  $(([ \t\n\r]* "--" [^\n]* ([\n] [ \t\n\r]*)?)+)
   / spacing: $([ \t\n\r]+)
 
 
 __ "optional whitespace" = _ / ''
 
-EndOfQuery = $([ \t\n\r;]+)
+EndOfQuery = $((_/';')+)
 
 OpenParen "("
  = "("

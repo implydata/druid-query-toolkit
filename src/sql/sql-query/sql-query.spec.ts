@@ -3147,4 +3147,37 @@ describe('Queries with comments', () => {
         column from table"
     `);
   });
+  it('comment with non english', () => {
+    const sql = `Select --Здравствуйте
+  column from table`;
+
+    expect(parser(sql).toString()).toMatchInlineSnapshot(`
+      "Select --Здравствуйте
+        column from table"
+    `);
+  });
+  it('comment at end of query', () => {
+    const sql = `Select 
+  column from table
+  -- comment`;
+
+    expect(parser(sql).toString()).toMatchInlineSnapshot(`
+      "Select 
+        column from table
+        -- comment"
+    `);
+  });
+  it('comment with unary negative', () => {
+    const sql = `Select 
+  column from table
+  -- comment
+  order by -1`;
+
+    expect(parser(sql).toString()).toMatchInlineSnapshot(`
+      "Select 
+        column from table
+        -- comment
+        order by -1"
+    `);
+  });
 });
