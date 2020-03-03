@@ -215,7 +215,7 @@ OrderByClause = orderByKeyword:OrderToken postOrderByKeyword:_ orderByUnitsHead:
   }
 }
 
-OrderByPart = expression:(SqlRef/SqlLiteral)  direction:(_ ('ASC'/'DESC'i))?
+OrderByPart = expression:Expression  direction:(_ ('ASC'/'DESC'i))?
 {
   return {
     expression: expression,
@@ -314,13 +314,13 @@ AdditionExpression = head:SubtractionExpression tail:(__ '+' __ (SubtractionExpr
   }
 
 
-SubtractionExpression = head:MultiplicationExpression tail:(__ '-' __ (MultiplicationExpression))*
+SubtractionExpression = head:MultiplicationExpression tail:(__ '-' (!'-') __ (MultiplicationExpression))*
   {
     if (!tail.length) return head
     return new sql.SqlMulti ({
       expressionType: 'Additive',
-      arguments: makeListMap(tail, 3, head),
-      separators: makeSeparatorsList(tail).map(keyword =>{ return new sql.Separator(keyword)}),
+      arguments: makeListMap(tail, 4, head),
+      separators: makeEscapedSeparatorsList(tail).map(keyword =>{ return new sql.Separator(keyword)}),
     });
   }
 

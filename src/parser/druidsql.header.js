@@ -16,6 +16,14 @@
     } ;}));
   }
 
+  function makeEscapedSeparatorsList(tail) {
+    return (tail.map(t =>  { return {
+      left: t[0],
+      right: t[3],
+      separator: t[1],
+    } ;}));
+  }
+
   functions = functions || ["COUNT", "FILTER",
     "SUM","MIN", "MAX","AVG","APPROX_COUNT_DISTINCT",
     "APPROX_COUNT_DISTINCT_DS_HLL", "APPROX_COUNT_DISTINCT_DS_THETA",
