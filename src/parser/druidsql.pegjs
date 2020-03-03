@@ -18,14 +18,14 @@ SqlQuery
   select:SelectClause
   postSelectValues:_
   from:FromClause
-  postSelectAnnotatedComments: AnnotatedComment*
+  postSelectAnnotation: Annotation*
   where:(_ WhereClause)?
   groupBy:(_ GroupByClause)?
   having:(_ HavingClause)?
   orderBy:(_ OrderByClause)?
   limit:(_ LimitClause)?
   union:(_ UnionClause)?
-  postQueryAnnotatedComments: AnnotatedComment*
+  postQueryAnnotation: Annotation*
   postQuery:EndOfQuery?
 {
   return new sql.SqlQuery({
@@ -45,7 +45,7 @@ SqlQuery
     tables: from.tables,
     tableSeparators: from.tableSeparators,
 
-    postSelectAnnotatedComments: postSelectAnnotatedComments,
+    postSelectAnnotation: postSelectAnnotation,
 
     whereKeyword: where ? where[1].whereKeyword : undefined ,
     whereExpression: where ? where[1].whereExpression : undefined,
@@ -67,7 +67,7 @@ SqlQuery
     unionKeyword: union ? union[1].unionKeyword : undefined,
     unionQuery: union ?  union[1].unionQuery : undefined,
 
-    postQueryAnnotatedComments: postQueryAnnotatedComments,
+    postQueryAnnotation: postQueryAnnotation,
 
     innerSpacing: {
       preQuery: preQuery || '',
@@ -600,14 +600,14 @@ UnquotedRefPart = name:$([a-z_\-:*%/]i [a-z0-9_\-:*%/]i*)
 
 // -----------------------------------
 
-AnnotatedComment = preAnnotatedComment:PureWhiteSpace '--:' postCommentSignifier: PureWhiteSpace? key:String postKey:PureWhiteSpace? "=" postEquals:PureWhiteSpace? value:String
-{ return new sql.AnnotatedComment(
+Annotation = preAnnotation:___ '--:' postAnnotationSignifier: ___? key:String postKey:___? "=" postEquals:___? value:String
+{ return new sql.Annotation(
   {
     innerSpacing: {
-      postCommentSignifier:  postCommentSignifier,
-        postKey: postKey,
-        postEquals: postEquals,
-        preAnnotatedComment: preAnnotatedComment
+      preAnnotation:  preAnnotation,
+      postKey: postKey,
+      postEquals: postEquals,
+      preAnnotation: preAnnotation
     },
     key: key,
     value: value
@@ -618,13 +618,13 @@ String = $([a-z0-9_\-:*%/]i+)
 
 _ =
   $(([ \t\n\r]* "--" ([ \t\r]+/UnquotedRefPart)* [\n] [ \t\r]*)+)
-  / PureWhiteSpace
+  / ___
 
-PureWhiteSpace = spacing: $([ \t\n\r]+)
+___ = spacing: $([ \t\n\r]+)
 
 __ "optional whitespace" = _ / ''
 
-EndOfQuery = $([ \t\n\r;]+)
+EndOfQuery = $((_/';')+)
 
 OpenParen "("
  = "("

@@ -25,4 +25,4 @@ export * from './sql-query/sql-query';
 export * from './sql-alias-ref/sql-alias-ref';
 export * from './sql-interval/sql-interval';
 export * from './sql-timeStamp/sql-timestamp';
-export * from './annotatedComment/annotated-comment';
+export * from './annotation/annotation';

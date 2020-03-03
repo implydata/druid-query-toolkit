@@ -12,18 +12,18 @@
  * limitations under the License.
  */
 
-export interface AnnotatedCommentValue {
+export interface AnnotationValue {
   innerSpacing: Record<string, string>;
   key: string;
   value: string;
 }
 
-export class AnnotatedComment {
+export class Annotation {
   public innerSpacing: Record<string, string>;
   public key: string;
   public value: string;
 
-  constructor(options: AnnotatedCommentValue) {
+  constructor(options: AnnotationValue) {
     this.innerSpacing = options.innerSpacing;
     this.key = options.key;
     this.value = options.value;
@@ -31,9 +31,9 @@ export class AnnotatedComment {
 
   public toString() {
     return [
-      this.innerSpacing.preAnnotatedComment,
+      this.innerSpacing.preAnnotation,
       '--:',
-      this.innerSpacing.postCommentSignifier,
+      this.innerSpacing.postAnnotationSignifier,
       this.key,
       this.innerSpacing.postKey,
       '=',

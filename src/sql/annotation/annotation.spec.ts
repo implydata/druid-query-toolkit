@@ -71,20 +71,8 @@ describe('Queries with annotated comments post query', () => {
             "postExpression": "",
           },
         ],
-        "postQueryAnnotatedComments": Array [
-          AnnotatedComment {
-            "innerSpacing": Object {
-              "postCommentSignifier": " ",
-              "postEquals": " ",
-              "postKey": " ",
-              "preAnnotatedComment": "
-          ",
-            },
-            "key": "valueName",
-            "value": "value",
-          },
-        ],
-        "postSelectAnnotatedComments": Array [],
+        "postQueryAnnotatedComments": undefined,
+        "postSelectAnnotatedComments": undefined,
         "selectDecorator": "",
         "selectKeyword": "Select",
         "selectSeparators": Array [
@@ -149,8 +137,7 @@ describe('Queries with annotated comments post query', () => {
 
     expect(parser(sql).toString()).toMatchInlineSnapshot(`
       "Select column, column1, column2 from table 
-          order by column
-          --: valueName = value"
+          order by column"
     `);
   });
 
@@ -207,20 +194,8 @@ describe('Queries with annotated comments post query', () => {
             "postExpression": "",
           },
         ],
-        "postQueryAnnotatedComments": Array [
-          AnnotatedComment {
-            "innerSpacing": Object {
-              "postCommentSignifier": " ",
-              "postEquals": " ",
-              "postKey": " ",
-              "preAnnotatedComment": "
-          ",
-            },
-            "key": "valueName",
-            "value": "value",
-          },
-        ],
-        "postSelectAnnotatedComments": Array [],
+        "postQueryAnnotatedComments": undefined,
+        "postSelectAnnotatedComments": undefined,
         "selectDecorator": "",
         "selectKeyword": "Select",
         "selectSeparators": Array [
@@ -285,8 +260,7 @@ describe('Queries with annotated comments post query', () => {
 
     expect(parser(sql).toString()).toMatchInlineSnapshot(`
       "Select column, column1, column2 from table 
-          order by column
-          --: valueName = value"
+          order by column"
     `);
   });
 
@@ -344,31 +318,8 @@ describe('Queries with annotated comments post query', () => {
             "postExpression": "",
           },
         ],
-        "postQueryAnnotatedComments": Array [
-          AnnotatedComment {
-            "innerSpacing": Object {
-              "postCommentSignifier": " ",
-              "postEquals": " ",
-              "postKey": " ",
-              "preAnnotatedComment": "
-          ",
-            },
-            "key": "valueName",
-            "value": "value",
-          },
-          AnnotatedComment {
-            "innerSpacing": Object {
-              "postCommentSignifier": null,
-              "postEquals": " ",
-              "postKey": " ",
-              "preAnnotatedComment": "
-          ",
-            },
-            "key": "valueName",
-            "value": "value",
-          },
-        ],
-        "postSelectAnnotatedComments": Array [],
+        "postQueryAnnotatedComments": undefined,
+        "postSelectAnnotatedComments": undefined,
         "selectDecorator": "",
         "selectKeyword": "Select",
         "selectSeparators": Array [
@@ -433,9 +384,7 @@ describe('Queries with annotated comments post query', () => {
 
     expect(parser(sql).toString()).toMatchInlineSnapshot(`
       "Select column, column1, column2 from table 
-          order by column
-          --: valueName = value
-          --:valueName = value"
+          order by column"
     `);
   });
 });
@@ -494,20 +443,8 @@ describe('Queries with annotated comments post select', () => {
             "postExpression": "",
           },
         ],
-        "postQueryAnnotatedComments": Array [],
-        "postSelectAnnotatedComments": Array [
-          AnnotatedComment {
-            "innerSpacing": Object {
-              "postCommentSignifier": " ",
-              "postEquals": " ",
-              "postKey": " ",
-              "preAnnotatedComment": "
-          ",
-            },
-            "key": "valueName",
-            "value": "value",
-          },
-        ],
+        "postQueryAnnotatedComments": undefined,
+        "postSelectAnnotatedComments": undefined,
         "selectDecorator": "",
         "selectKeyword": "Select",
         "selectSeparators": Array [
@@ -572,7 +509,6 @@ describe('Queries with annotated comments post select', () => {
 
     expect(parser(sql).toString()).toMatchInlineSnapshot(`
       "Select column, column1, column2 from table
-          --: valueName = value
           order by column"
     `);
   });
@@ -630,20 +566,8 @@ describe('Queries with annotated comments post select', () => {
             "postExpression": "",
           },
         ],
-        "postQueryAnnotatedComments": Array [
-          AnnotatedComment {
-            "innerSpacing": Object {
-              "postCommentSignifier": " ",
-              "postEquals": " ",
-              "postKey": " ",
-              "preAnnotatedComment": "
-          ",
-            },
-            "key": "valueName",
-            "value": "value",
-          },
-        ],
-        "postSelectAnnotatedComments": Array [],
+        "postQueryAnnotatedComments": undefined,
+        "postSelectAnnotatedComments": undefined,
         "selectDecorator": "",
         "selectKeyword": "Select",
         "selectSeparators": Array [
@@ -708,8 +632,7 @@ describe('Queries with annotated comments post select', () => {
 
     expect(parser(sql).toString()).toMatchInlineSnapshot(`
       "Select column, column1, column2 from table
-          order by column
-          --: valueName = value"
+          order by column"
     `);
   });
 
@@ -767,31 +690,8 @@ describe('Queries with annotated comments post select', () => {
             "postExpression": "",
           },
         ],
-        "postQueryAnnotatedComments": Array [],
-        "postSelectAnnotatedComments": Array [
-          AnnotatedComment {
-            "innerSpacing": Object {
-              "postCommentSignifier": " ",
-              "postEquals": " ",
-              "postKey": " ",
-              "preAnnotatedComment": "
-          ",
-            },
-            "key": "valueName",
-            "value": "value",
-          },
-          AnnotatedComment {
-            "innerSpacing": Object {
-              "postCommentSignifier": null,
-              "postEquals": " ",
-              "postKey": " ",
-              "preAnnotatedComment": "
-          ",
-            },
-            "key": "valueName",
-            "value": "value",
-          },
-        ],
+        "postQueryAnnotatedComments": undefined,
+        "postSelectAnnotatedComments": undefined,
         "selectDecorator": "",
         "selectKeyword": "Select",
         "selectSeparators": Array [
@@ -856,8 +756,6 @@ describe('Queries with annotated comments post select', () => {
 
     expect(parser(sql).toString()).toMatchInlineSnapshot(`
       "Select column, column1, column2 from table
-          --: valueName = value
-          --:valueName = value
           order by column"
     `);
   });
@@ -871,10 +769,8 @@ describe('Queries with annotated comments post select and post query', () => {
     --: valueName = value`;
 
     expect(parser(sql).toString()).toMatchInlineSnapshot(`
-      "Select column, column1, column2 from table 
-          --: valueName = value
-          order by column
-          --: valueName = value"
+      "Select column, column1, column2 from table
+          order by column"
     `);
   });
 });

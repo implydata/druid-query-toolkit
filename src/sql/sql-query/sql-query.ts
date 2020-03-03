@@ -13,7 +13,7 @@
  */
 
 import {
-  AnnotatedComment,
+  Annotation,
   Separator,
   SqlAliasRef,
   SqlFunction,
@@ -40,7 +40,7 @@ export interface SqlQueryValue extends SqlBaseValue {
   tables?: (SqlAliasRef | SqlRef)[];
   tableSeparators?: [];
 
-  postSelectAnnotatedComments?: AnnotatedComment[];
+  postSelectAnnotatedComments?: Annotation[];
 
   whereKeyword?: string;
   whereExpression?: SqlMulti | SqlUnary;
@@ -62,7 +62,7 @@ export interface SqlQueryValue extends SqlBaseValue {
   unionKeyword?: string;
   unionQuery?: SqlQuery;
 
-  postQueryAnnotatedComments?: AnnotatedComment[];
+  postQueryAnnotatedComments?: Annotation[];
 }
 
 export interface WithUnit {
@@ -96,7 +96,7 @@ export class SqlQuery extends SqlBase {
   public fromKeyword?: string;
   public tables?: (SqlAliasRef | SqlRef)[];
   public tableSeparators?: [];
-  public postSelectAnnotatedComments?: AnnotatedComment[];
+  public postSelectAnnotatedComments?: Annotation[];
   public whereKeyword?: string;
   public whereExpression?: SqlMulti | SqlUnary;
   public groupByKeyword?: string;
@@ -111,7 +111,7 @@ export class SqlQuery extends SqlBase {
   public limitValue?: SqlLiteral;
   public unionKeyword?: string;
   public unionQuery?: SqlQuery;
-  public postQueryAnnotatedComments?: AnnotatedComment[];
+  public postQueryAnnotatedComments?: Annotation[];
 
   static type = 'query';
 
