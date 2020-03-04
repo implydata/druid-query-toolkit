@@ -3080,10 +3080,7 @@ describe('Queries with comments', () => {
     const sql = `Select -- some comment 
   column from table`;
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`
-      "Select -- some comment 
-        column from table"
-    `);
+    expect(parser(sql).toString()).toMatch(sql);
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlQuery {
@@ -3161,11 +3158,7 @@ describe('Queries with comments', () => {
     --some comment
   column from table`;
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`
-      "Select --some comment
-          --some comment
-        column from table"
-    `);
+    expect(parser(sql).toString()).toMatch(sql);
   });
 
   it('comment on new line', () => {
@@ -3173,33 +3166,43 @@ describe('Queries with comments', () => {
     -- some comment
   column from table`;
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`
-      "Select
-          -- some comment
-        column from table"
-    `);
+    expect(parser(sql).toString()).toMatch(sql);
   });
 
   it('comment containing hyphens', () => {
     const sql = `Select
     -- some--comment
-  column from table`;
+    column from table`;
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`
-      "Select
-          -- some--comment
-        column from table"
-    `);
+    expect(parser(sql).toString()).toMatch(sql);
   });
 
   it('comment with no space', () => {
     const sql = `Select --some comment
   column from table`;
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`
-      "Select --some comment
-        column from table"
-    `);
+    expect(parser(sql).toString()).toMatch(sql);
+  });
+  it('comment with non english', () => {
+    const sql = `Select --Здравствуйте
+  column from table`;
+
+    expect(parser(sql).toString()).toMatch(sql);
+  });
+  it('comment at end of query', () => {
+    const sql = `Select 
+  column from table
+  -- comment`;
+
+    expect(parser(sql).toString()).toMatch(sql);
+  });
+  it('comment with unary negative', () => {
+    const sql = `Select 
+  column from table
+  -- comment
+  order by -1`;
+
+    expect(parser(sql).toString()).toMatch(sql);
   });
 });
 

@@ -617,10 +617,10 @@ Annotation = preAnnotation:___ '--:' postAnnotationSignifier: ___? key:String po
 String = $([a-z0-9_\-:*%/]i+)
 
 _ =
-  $(([ \t\n\r]* "--" ([ \t\r]+/UnquotedRefPart)* [\n] [ \t\r]*)+)
-  / ___
+  $(([ \t\n\r]* "--" [^\n]* ([\n] [ \t\n\r]*)?)+)
+  / spacing: $([ \t\n\r]+)
 
-___ = spacing: $([ \t\n\r]+)
+___ "pure whitespace" = spacing: $([ \t\n\r]+)
 
 __ "optional whitespace" = _ / ''
 
