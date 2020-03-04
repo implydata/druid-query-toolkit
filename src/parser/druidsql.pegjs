@@ -18,7 +18,6 @@ SqlQuery
   select:SelectClause
   postSelectValues:_
   from:FromClause
-  postSelectAnnotation: Annotation*
   where:(_ WhereClause)?
   groupBy:(_ GroupByClause)?
   having:(_ HavingClause)?
@@ -40,12 +39,11 @@ SqlQuery
     selectDecorator: select.selectDecorator,
     selectSeparators: select.selectSeparators,
     selectValues: select.selectValues,
+    selectAnnotations: select.selectAnnotations,
 
     fromKeyword: from.fromKeyword,
     tables: from.tables,
     tableSeparators: from.tableSeparators,
-
-    postSelectAnnotation: postSelectAnnotation,
 
     whereKeyword: where ? where[1].whereKeyword : undefined ,
     whereExpression: where ? where[1].whereExpression : undefined,
@@ -155,15 +153,16 @@ WithColumns = '(' postLeftParen:_? withColumnsHead:BaseType withColumnsTail:(Com
   }
 }
 
-SelectClause = selectKeyword:SelectToken postSelect:_ selectDecorator:((AllToken/DistinctToken) _)? selectValuesHead:(Alias/Expression)  selectValuesTail:(Comma (Alias/Expression))*
+SelectClause = selectKeyword:SelectToken postSelect:_ selectDecorator:((AllToken/DistinctToken) _)? selectValuesHead:(Alias/Expression) annotationsHead:Annotation?  selectValuesTail:(Comma (Alias/Expression) Annotation?)*
 {
   return {
      selectKeyword: selectKeyword,
      postSelect: postSelect,
      selectDecorator: selectDecorator? selectDecorator[0] : '',
      postSelectDecorator: selectDecorator? selectDecorator[1] : '',
-     selectValues: [selectValuesHead] ? makeListMap(selectValuesTail, 1, selectValuesHead) : [selectValuesHead],
+     selectValues: selectValuesTail ? makeListMap(selectValuesTail, 1, selectValuesHead) : [selectValuesHead],
      selectSeparators: makeListMap(selectValuesTail,0),
+     selectAnnotations: selectValuesTail ?  makeListMap(selectValuesTail, 2, annotationsHead) : [annotationsHead],
   }
 }
 
@@ -605,6 +604,7 @@ Annotation = preAnnotation:___ '--:' postAnnotationSignifier: ___? key:String po
   {
     innerSpacing: {
       preAnnotation:  preAnnotation,
+      postAnnotationSignifier: postAnnotationSignifier,
       postKey: postKey,
       postEquals: postEquals,
       preAnnotation: preAnnotation
@@ -617,7 +617,7 @@ Annotation = preAnnotation:___ '--:' postAnnotationSignifier: ___? key:String po
 String = $([a-z0-9_\-:*%/]i+)
 
 _ =
-  $(([ \t\n\r]* "--" [^\n]* ([\n] [ \t\n\r]*)?)+)
+  $(([ \t\n\r]* "--" !':' [^\n]* ([\n] [ \t\n\r]*)?)+)
   / spacing: $([ \t\n\r]+)
 
 ___ "pure whitespace" = spacing: $([ \t\n\r]+)

@@ -19,9 +19,11 @@ const parser = sqlParserFactory(FUNCTIONS);
 
 describe('Queries with annotated comments post query', () => {
   it('single annotated comment', () => {
-    const sql = `Select column, column1, column2 from table 
-    order by column
-    --: valueName = value`;
+    const sql = `Select column --: valueName = value
+    , column1 --: valueName = value
+    , column2 
+    from table 
+    order by column`;
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlQuery {
@@ -40,7 +42,8 @@ describe('Queries with annotated comments post query', () => {
           "postQuery": "",
           "postSelect": " ",
           "postSelectDecorator": "",
-          "postSelectValues": " ",
+          "postSelectValues": " 
+          ",
           "postUnionKeyword": "",
           "postWith": "",
           "postWithQuery": "",
@@ -71,18 +74,42 @@ describe('Queries with annotated comments post query', () => {
             "postExpression": "",
           },
         ],
-        "postQueryAnnotatedComments": undefined,
-        "postSelectAnnotatedComments": undefined,
+        "postQueryAnnotation": Array [],
+        "selectAnnotations": Array [
+          Annotation {
+            "innerSpacing": Object {
+              "postAnnotationSignifier": " ",
+              "postEquals": " ",
+              "postKey": " ",
+              "preAnnotation": " ",
+            },
+            "key": "valueName",
+            "value": "value",
+          },
+          Annotation {
+            "innerSpacing": Object {
+              "postAnnotationSignifier": " ",
+              "postEquals": " ",
+              "postKey": " ",
+              "preAnnotation": " ",
+            },
+            "key": "valueName",
+            "value": "value",
+          },
+          null,
+        ],
         "selectDecorator": "",
         "selectKeyword": "Select",
         "selectSeparators": Array [
           Separator {
-            "left": "",
+            "left": "
+          ",
             "right": " ",
             "separator": ",",
           },
           Separator {
-            "left": "",
+            "left": "
+          ",
             "right": " ",
             "separator": ",",
           },
@@ -135,14 +162,11 @@ describe('Queries with annotated comments post query', () => {
       }
     `);
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`
-      "Select column, column1, column2 from table 
-          order by column"
-    `);
+    expect(parser(sql).toString()).toMatch(sql);
   });
 
   it('single annotated comment', () => {
-    const sql = `Select column, column1, column2 from table 
+    const sql = `Select column, column1, column2 from table
     order by column
     --: valueName = value`;
 
@@ -170,7 +194,7 @@ describe('Queries with annotated comments post query', () => {
           "preGroupByKeyword": "",
           "preHavingKeyword": "",
           "preLimitKeyword": "",
-          "preOrderByKeyword": " 
+          "preOrderByKeyword": "
           ",
           "preQuery": "",
           "preUnionKeyword": "",
@@ -194,8 +218,24 @@ describe('Queries with annotated comments post query', () => {
             "postExpression": "",
           },
         ],
-        "postQueryAnnotatedComments": undefined,
-        "postSelectAnnotatedComments": undefined,
+        "postQueryAnnotation": Array [
+          Annotation {
+            "innerSpacing": Object {
+              "postAnnotationSignifier": " ",
+              "postEquals": " ",
+              "postKey": " ",
+              "preAnnotation": "
+          ",
+            },
+            "key": "valueName",
+            "value": "value",
+          },
+        ],
+        "selectAnnotations": Array [
+          null,
+          null,
+          null,
+        ],
         "selectDecorator": "",
         "selectKeyword": "Select",
         "selectSeparators": Array [
@@ -259,13 +299,14 @@ describe('Queries with annotated comments post query', () => {
     `);
 
     expect(parser(sql).toString()).toMatchInlineSnapshot(`
-      "Select column, column1, column2 from table 
-          order by column"
+      "Select column, column1, column2 from table
+          order by column
+          --: valueName = value"
     `);
   });
 
   it('double annotated comment no spacing', () => {
-    const sql = `Select column, column1, column2 from table 
+    const sql = `Select column, column1, column2 from table
     order by column
     --: valueName = value
     --:valueName = value`;
@@ -294,7 +335,7 @@ describe('Queries with annotated comments post query', () => {
           "preGroupByKeyword": "",
           "preHavingKeyword": "",
           "preLimitKeyword": "",
-          "preOrderByKeyword": " 
+          "preOrderByKeyword": "
           ",
           "preQuery": "",
           "preUnionKeyword": "",
@@ -318,8 +359,35 @@ describe('Queries with annotated comments post query', () => {
             "postExpression": "",
           },
         ],
-        "postQueryAnnotatedComments": undefined,
-        "postSelectAnnotatedComments": undefined,
+        "postQueryAnnotation": Array [
+          Annotation {
+            "innerSpacing": Object {
+              "postAnnotationSignifier": " ",
+              "postEquals": " ",
+              "postKey": " ",
+              "preAnnotation": "
+          ",
+            },
+            "key": "valueName",
+            "value": "value",
+          },
+          Annotation {
+            "innerSpacing": Object {
+              "postAnnotationSignifier": null,
+              "postEquals": " ",
+              "postKey": " ",
+              "preAnnotation": "
+          ",
+            },
+            "key": "valueName",
+            "value": "value",
+          },
+        ],
+        "selectAnnotations": Array [
+          null,
+          null,
+          null,
+        ],
         "selectDecorator": "",
         "selectKeyword": "Select",
         "selectSeparators": Array [
@@ -382,17 +450,14 @@ describe('Queries with annotated comments post query', () => {
       }
     `);
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`
-      "Select column, column1, column2 from table 
-          order by column"
-    `);
+    expect(parser(sql).toString()).toMatch(sql);
   });
 });
 
 describe('Queries with annotated comments post select', () => {
   it('single annotated comment', () => {
-    const sql = `Select column, column1, column2 from table
-    --: valueName = value
+    const sql = `Select column, column1, column2 --: valueName = value
+    from table
     order by column`;
 
     expect(parser(sql)).toMatchInlineSnapshot(`
@@ -412,7 +477,8 @@ describe('Queries with annotated comments post select', () => {
           "postQuery": "",
           "postSelect": " ",
           "postSelectDecorator": "",
-          "postSelectValues": " ",
+          "postSelectValues": "
+          ",
           "postUnionKeyword": "",
           "postWith": "",
           "postWithQuery": "",
@@ -443,8 +509,21 @@ describe('Queries with annotated comments post select', () => {
             "postExpression": "",
           },
         ],
-        "postQueryAnnotatedComments": undefined,
-        "postSelectAnnotatedComments": undefined,
+        "postQueryAnnotation": Array [],
+        "selectAnnotations": Array [
+          null,
+          null,
+          Annotation {
+            "innerSpacing": Object {
+              "postAnnotationSignifier": " ",
+              "postEquals": " ",
+              "postKey": " ",
+              "preAnnotation": " ",
+            },
+            "key": "valueName",
+            "value": "value",
+          },
+        ],
         "selectDecorator": "",
         "selectKeyword": "Select",
         "selectSeparators": Array [
@@ -507,270 +586,155 @@ describe('Queries with annotated comments post select', () => {
       }
     `);
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`
-      "Select column, column1, column2 from table
-          order by column"
-    `);
-  });
-
-  it('single annotated comment', () => {
-    const sql = `Select column, column1, column2 from table
-    order by column
-    --: valueName = value`;
-
-    expect(parser(sql)).toMatchInlineSnapshot(`
-      SqlQuery {
-        "explainKeyword": "",
-        "fromKeyword": "from",
-        "groupByExpression": undefined,
-        "groupByExpressionSeparators": undefined,
-        "groupByKeyword": undefined,
-        "havingExpression": undefined,
-        "havingKeyword": undefined,
-        "innerSpacing": Object {
-          "postExplain": "",
-          "postFrom": " ",
-          "postLimitKeyword": "",
-          "postOrderByKeyword": " ",
-          "postQuery": "",
-          "postSelect": " ",
-          "postSelectDecorator": "",
-          "postSelectValues": " ",
-          "postUnionKeyword": "",
-          "postWith": "",
-          "postWithQuery": "",
-          "preGroupByKeyword": "",
-          "preHavingKeyword": "",
-          "preLimitKeyword": "",
-          "preOrderByKeyword": "
-          ",
-          "preQuery": "",
-          "preUnionKeyword": "",
-          "preWhereKeyword": "",
-        },
-        "limitKeyword": undefined,
-        "limitValue": undefined,
-        "orderByKeyword": "order by",
-        "orderBySeparators": Array [],
-        "orderByUnits": Array [
-          Object {
-            "direction": "",
-            "expression": SqlRef {
-              "innerSpacing": Object {},
-              "name": "column",
-              "namespace": undefined,
-              "namespaceQuotes": undefined,
-              "quotes": "",
-              "type": "ref",
-            },
-            "postExpression": "",
-          },
-        ],
-        "postQueryAnnotatedComments": undefined,
-        "postSelectAnnotatedComments": undefined,
-        "selectDecorator": "",
-        "selectKeyword": "Select",
-        "selectSeparators": Array [
-          Separator {
-            "left": "",
-            "right": " ",
-            "separator": ",",
-          },
-          Separator {
-            "left": "",
-            "right": " ",
-            "separator": ",",
-          },
-        ],
-        "selectValues": Array [
-          SqlRef {
-            "innerSpacing": Object {},
-            "name": "column",
-            "namespace": undefined,
-            "namespaceQuotes": undefined,
-            "quotes": "",
-            "type": "ref",
-          },
-          SqlRef {
-            "innerSpacing": Object {},
-            "name": "column1",
-            "namespace": undefined,
-            "namespaceQuotes": undefined,
-            "quotes": "",
-            "type": "ref",
-          },
-          SqlRef {
-            "innerSpacing": Object {},
-            "name": "column2",
-            "namespace": undefined,
-            "namespaceQuotes": undefined,
-            "quotes": "",
-            "type": "ref",
-          },
-        ],
-        "tableSeparators": Array [],
-        "tables": Array [
-          SqlRef {
-            "innerSpacing": Object {},
-            "name": "table",
-            "namespace": undefined,
-            "namespaceQuotes": undefined,
-            "quotes": "",
-            "type": "ref",
-          },
-        ],
-        "type": "query",
-        "unionKeyword": undefined,
-        "unionQuery": undefined,
-        "whereExpression": undefined,
-        "whereKeyword": undefined,
-        "withKeyword": undefined,
-        "withSeparators": undefined,
-        "withUnits": undefined,
-      }
-    `);
-
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`
-      "Select column, column1, column2 from table
-          order by column"
-    `);
-  });
-
-  it('single annotated comment no spacing', () => {
-    const sql = `Select column, column1, column2 from table
-    --: valueName = value
-    --:valueName = value
-    order by column`;
-
-    expect(parser(sql)).toMatchInlineSnapshot(`
-      SqlQuery {
-        "explainKeyword": "",
-        "fromKeyword": "from",
-        "groupByExpression": undefined,
-        "groupByExpressionSeparators": undefined,
-        "groupByKeyword": undefined,
-        "havingExpression": undefined,
-        "havingKeyword": undefined,
-        "innerSpacing": Object {
-          "postExplain": "",
-          "postFrom": " ",
-          "postLimitKeyword": "",
-          "postOrderByKeyword": " ",
-          "postQuery": "",
-          "postSelect": " ",
-          "postSelectDecorator": "",
-          "postSelectValues": " ",
-          "postUnionKeyword": "",
-          "postWith": "",
-          "postWithQuery": "",
-          "preGroupByKeyword": "",
-          "preHavingKeyword": "",
-          "preLimitKeyword": "",
-          "preOrderByKeyword": "
-          ",
-          "preQuery": "",
-          "preUnionKeyword": "",
-          "preWhereKeyword": "",
-        },
-        "limitKeyword": undefined,
-        "limitValue": undefined,
-        "orderByKeyword": "order by",
-        "orderBySeparators": Array [],
-        "orderByUnits": Array [
-          Object {
-            "direction": "",
-            "expression": SqlRef {
-              "innerSpacing": Object {},
-              "name": "column",
-              "namespace": undefined,
-              "namespaceQuotes": undefined,
-              "quotes": "",
-              "type": "ref",
-            },
-            "postExpression": "",
-          },
-        ],
-        "postQueryAnnotatedComments": undefined,
-        "postSelectAnnotatedComments": undefined,
-        "selectDecorator": "",
-        "selectKeyword": "Select",
-        "selectSeparators": Array [
-          Separator {
-            "left": "",
-            "right": " ",
-            "separator": ",",
-          },
-          Separator {
-            "left": "",
-            "right": " ",
-            "separator": ",",
-          },
-        ],
-        "selectValues": Array [
-          SqlRef {
-            "innerSpacing": Object {},
-            "name": "column",
-            "namespace": undefined,
-            "namespaceQuotes": undefined,
-            "quotes": "",
-            "type": "ref",
-          },
-          SqlRef {
-            "innerSpacing": Object {},
-            "name": "column1",
-            "namespace": undefined,
-            "namespaceQuotes": undefined,
-            "quotes": "",
-            "type": "ref",
-          },
-          SqlRef {
-            "innerSpacing": Object {},
-            "name": "column2",
-            "namespace": undefined,
-            "namespaceQuotes": undefined,
-            "quotes": "",
-            "type": "ref",
-          },
-        ],
-        "tableSeparators": Array [],
-        "tables": Array [
-          SqlRef {
-            "innerSpacing": Object {},
-            "name": "table",
-            "namespace": undefined,
-            "namespaceQuotes": undefined,
-            "quotes": "",
-            "type": "ref",
-          },
-        ],
-        "type": "query",
-        "unionKeyword": undefined,
-        "unionQuery": undefined,
-        "whereExpression": undefined,
-        "whereKeyword": undefined,
-        "withKeyword": undefined,
-        "withSeparators": undefined,
-        "withUnits": undefined,
-      }
-    `);
-
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`
-      "Select column, column1, column2 from table
-          order by column"
-    `);
+    expect(parser(sql).toString()).toMatch(sql);
   });
 });
 
 describe('Queries with annotated comments post select and post query', () => {
-  it('single annotated comment comment', () => {
-    const sql = `Select column, column1, column2 from table 
-    --: valueName = value
+  it('single annotated comment', () => {
+    const sql = `Select column, column1, column2 --: valueName = value 
+    from table
     order by column
     --: valueName = value`;
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`
-      "Select column, column1, column2 from table
-          order by column"
+    expect(parser(sql).toString()).toMatch(sql);
+
+    expect(parser(sql)).toMatchInlineSnapshot(`
+      SqlQuery {
+        "explainKeyword": "",
+        "fromKeyword": "from",
+        "groupByExpression": undefined,
+        "groupByExpressionSeparators": undefined,
+        "groupByKeyword": undefined,
+        "havingExpression": undefined,
+        "havingKeyword": undefined,
+        "innerSpacing": Object {
+          "postExplain": "",
+          "postFrom": " ",
+          "postLimitKeyword": "",
+          "postOrderByKeyword": " ",
+          "postQuery": "",
+          "postSelect": " ",
+          "postSelectDecorator": "",
+          "postSelectValues": " 
+          ",
+          "postUnionKeyword": "",
+          "postWith": "",
+          "postWithQuery": "",
+          "preGroupByKeyword": "",
+          "preHavingKeyword": "",
+          "preLimitKeyword": "",
+          "preOrderByKeyword": "
+          ",
+          "preQuery": "",
+          "preUnionKeyword": "",
+          "preWhereKeyword": "",
+        },
+        "limitKeyword": undefined,
+        "limitValue": undefined,
+        "orderByKeyword": "order by",
+        "orderBySeparators": Array [],
+        "orderByUnits": Array [
+          Object {
+            "direction": "",
+            "expression": SqlRef {
+              "innerSpacing": Object {},
+              "name": "column",
+              "namespace": undefined,
+              "namespaceQuotes": undefined,
+              "quotes": "",
+              "type": "ref",
+            },
+            "postExpression": "",
+          },
+        ],
+        "postQueryAnnotation": Array [
+          Annotation {
+            "innerSpacing": Object {
+              "postAnnotationSignifier": " ",
+              "postEquals": " ",
+              "postKey": " ",
+              "preAnnotation": "
+          ",
+            },
+            "key": "valueName",
+            "value": "value",
+          },
+        ],
+        "selectAnnotations": Array [
+          null,
+          null,
+          Annotation {
+            "innerSpacing": Object {
+              "postAnnotationSignifier": " ",
+              "postEquals": " ",
+              "postKey": " ",
+              "preAnnotation": " ",
+            },
+            "key": "valueName",
+            "value": "value",
+          },
+        ],
+        "selectDecorator": "",
+        "selectKeyword": "Select",
+        "selectSeparators": Array [
+          Separator {
+            "left": "",
+            "right": " ",
+            "separator": ",",
+          },
+          Separator {
+            "left": "",
+            "right": " ",
+            "separator": ",",
+          },
+        ],
+        "selectValues": Array [
+          SqlRef {
+            "innerSpacing": Object {},
+            "name": "column",
+            "namespace": undefined,
+            "namespaceQuotes": undefined,
+            "quotes": "",
+            "type": "ref",
+          },
+          SqlRef {
+            "innerSpacing": Object {},
+            "name": "column1",
+            "namespace": undefined,
+            "namespaceQuotes": undefined,
+            "quotes": "",
+            "type": "ref",
+          },
+          SqlRef {
+            "innerSpacing": Object {},
+            "name": "column2",
+            "namespace": undefined,
+            "namespaceQuotes": undefined,
+            "quotes": "",
+            "type": "ref",
+          },
+        ],
+        "tableSeparators": Array [],
+        "tables": Array [
+          SqlRef {
+            "innerSpacing": Object {},
+            "name": "table",
+            "namespace": undefined,
+            "namespaceQuotes": undefined,
+            "quotes": "",
+            "type": "ref",
+          },
+        ],
+        "type": "query",
+        "unionKeyword": undefined,
+        "unionQuery": undefined,
+        "whereExpression": undefined,
+        "whereKeyword": undefined,
+        "withKeyword": undefined,
+        "withSeparators": undefined,
+        "withUnits": undefined,
+      }
     `);
   });
 });

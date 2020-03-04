@@ -40,7 +40,7 @@ export interface SqlQueryValue extends SqlBaseValue {
   tables?: (SqlAliasRef | SqlRef)[];
   tableSeparators?: [];
 
-  postSelectAnnotatedComments?: Annotation[];
+  selectAnnotations?: Annotation[];
 
   whereKeyword?: string;
   whereExpression?: SqlMulti | SqlUnary;
@@ -62,7 +62,7 @@ export interface SqlQueryValue extends SqlBaseValue {
   unionKeyword?: string;
   unionQuery?: SqlQuery;
 
-  postQueryAnnotatedComments?: Annotation[];
+  postQueryAnnotation?: Annotation[];
 }
 
 export interface WithUnit {
@@ -96,7 +96,7 @@ export class SqlQuery extends SqlBase {
   public fromKeyword?: string;
   public tables?: (SqlAliasRef | SqlRef)[];
   public tableSeparators?: [];
-  public postSelectAnnotatedComments?: Annotation[];
+  public selectAnnotations?: Annotation[];
   public whereKeyword?: string;
   public whereExpression?: SqlMulti | SqlUnary;
   public groupByKeyword?: string;
@@ -111,7 +111,7 @@ export class SqlQuery extends SqlBase {
   public limitValue?: SqlLiteral;
   public unionKeyword?: string;
   public unionQuery?: SqlQuery;
-  public postQueryAnnotatedComments?: Annotation[];
+  public postQueryAnnotation?: Annotation[];
 
   static type = 'query';
 
@@ -146,7 +146,7 @@ export class SqlQuery extends SqlBase {
     this.fromKeyword = options.fromKeyword;
     this.tables = options.tables;
     this.tableSeparators = options.tableSeparators;
-    this.postSelectAnnotatedComments = options.postSelectAnnotatedComments;
+    this.selectAnnotations = options.selectAnnotations;
     this.whereKeyword = options.whereKeyword;
     this.whereExpression = options.whereExpression;
     this.groupByKeyword = options.groupByKeyword;
@@ -161,7 +161,7 @@ export class SqlQuery extends SqlBase {
     this.limitValue = options.limitValue;
     this.unionKeyword = options.unionKeyword;
     this.unionQuery = options.unionQuery;
-    this.postQueryAnnotatedComments = options.postQueryAnnotatedComments;
+    this.postQueryAnnotation = options.postQueryAnnotation;
   }
 
   public valueOf() {
@@ -175,7 +175,7 @@ export class SqlQuery extends SqlBase {
     value.selectValues = this.selectValues;
     value.selectSeparators = this.selectSeparators;
     value.fromKeyword = this.fromKeyword;
-    value.postSelectAnnotatedComments = this.postSelectAnnotatedComments;
+    value.selectAnnotations = this.selectAnnotations;
     value.tables = this.tables;
     value.tableSeparators = this.tableSeparators;
     value.whereKeyword = this.whereKeyword;
@@ -192,7 +192,7 @@ export class SqlQuery extends SqlBase {
     value.limitValue = this.limitValue;
     value.unionKeyword = this.unionKeyword;
     value.unionQuery = this.unionQuery;
-    value.postQueryAnnotatedComments = this.postQueryAnnotatedComments;
+    value.postQueryAnnotation = this.postQueryAnnotation;
     return value as SqlQueryValue;
   }
 
@@ -219,26 +219,35 @@ export class SqlQuery extends SqlBase {
     }
 
     // Select and From clause
-    if (this.selectKeyword && this.selectValues && this.tables && this.fromKeyword) {
+    if (
+      this.selectKeyword &&
+      this.selectValues &&
+      this.tables &&
+      this.fromKeyword &&
+      this.selectAnnotations
+    ) {
       rawStringParts.push(this.selectKeyword, this.innerSpacing.postSelect);
       if (this.selectDecorator) {
         rawStringParts.push(this.selectDecorator, this.innerSpacing.postSelectDecorato);
       }
 
       rawStringParts.push(
-        Separator.spacilator(this.selectValues, this.selectSeparators),
+        Separator.customSpacilator<any>(
+          this.selectValues.map((column, i) => {
+            return {
+              column: column,
+              comment: this.selectAnnotations ? this.selectAnnotations[i] : '',
+            };
+          }),
+          column => {
+            return column.column.toString() + (column.comment || '').toString();
+          },
+          this.selectSeparators,
+        ),
         this.innerSpacing.postSelectValues,
         this.fromKeyword,
         this.innerSpacing.postFrom,
         Separator.spacilator(this.tables, this.tableSeparators),
-      );
-    }
-
-    // Post select annotated comments
-    if (this.postSelectAnnotatedComments) {
-      rawStringParts.push(
-        this.innerSpacing.preSelectAnnotatedComments,
-        this.postSelectAnnotatedComments.map(comment => comment.toString()).join(''),
       );
     }
 
@@ -307,10 +316,10 @@ export class SqlQuery extends SqlBase {
     }
 
     // Post Query Annotated Comments
-    if (this.postQueryAnnotatedComments) {
+    if (this.postQueryAnnotation) {
       rawStringParts.push(
         this.innerSpacing.preQueryAnnotatedComments,
-        this.postQueryAnnotatedComments.map(comment => comment.toString()).join(''),
+        this.postQueryAnnotation.map(comment => comment.toString()).join(''),
       );
     }
 

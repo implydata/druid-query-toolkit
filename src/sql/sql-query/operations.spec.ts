@@ -550,6 +550,138 @@ describe('addToGroupBy', () => {
     const sql = `select column1, min(column1) AS aliasName from table 
       GROUP BY 2`;
 
+    expect(parser(sql)).toMatchInlineSnapshot(`
+      SqlQuery {
+        "explainKeyword": "",
+        "fromKeyword": "from",
+        "groupByExpression": Array [
+          SqlLiteral {
+            "innerSpacing": Object {},
+            "stringValue": "2",
+            "type": "literal",
+            "value": 2,
+          },
+        ],
+        "groupByExpressionSeparators": Array [],
+        "groupByKeyword": "GROUP BY",
+        "havingExpression": undefined,
+        "havingKeyword": undefined,
+        "innerSpacing": Object {
+          "postExplain": "",
+          "postFrom": " ",
+          "postGroupByKeyword": " ",
+          "postLimitKeyword": "",
+          "postQuery": "",
+          "postSelect": " ",
+          "postSelectDecorator": "",
+          "postSelectValues": " ",
+          "postUnionKeyword": "",
+          "postWith": "",
+          "postWithQuery": "",
+          "preGroupByKeyword": " 
+            ",
+          "preHavingKeyword": "",
+          "preLimitKeyword": "",
+          "preQuery": "",
+          "preUnionKeyword": "",
+          "preWhereKeyword": "",
+        },
+        "limitKeyword": undefined,
+        "limitValue": undefined,
+        "orderByKeyword": undefined,
+        "orderBySeparators": undefined,
+        "orderByUnits": undefined,
+        "postQueryAnnotation": Array [],
+        "selectAnnotations": Array [
+          null,
+          null,
+        ],
+        "selectDecorator": "",
+        "selectKeyword": "select",
+        "selectSeparators": Array [
+          Separator {
+            "left": "",
+            "right": " ",
+            "separator": ",",
+          },
+        ],
+        "selectValues": Array [
+          SqlRef {
+            "innerSpacing": Object {},
+            "name": "column1",
+            "namespace": undefined,
+            "namespaceQuotes": undefined,
+            "quotes": "",
+            "type": "ref",
+          },
+          SqlAliasRef {
+            "alias": SqlRef {
+              "innerSpacing": Object {},
+              "name": "aliasName",
+              "namespace": undefined,
+              "namespaceQuotes": undefined,
+              "quotes": "",
+              "type": "ref",
+            },
+            "asKeyword": "AS",
+            "column": SqlFunction {
+              "arguments": Array [
+                SqlRef {
+                  "innerSpacing": Object {},
+                  "name": "column1",
+                  "namespace": undefined,
+                  "namespaceQuotes": undefined,
+                  "quotes": "",
+                  "type": "ref",
+                },
+              ],
+              "decorator": undefined,
+              "filterKeyword": undefined,
+              "functionName": "min",
+              "innerSpacing": Object {
+                "postDecorator": "",
+                "postFilterKeyword": "",
+                "postFilterLeftParen": "",
+                "postLeftParen": "",
+                "postName": "",
+                "postWhereKeyword": "",
+                "preFilter": "",
+                "preFilterRightParen": "",
+                "preRightParen": "",
+              },
+              "separators": Array [],
+              "type": "function",
+              "whereExpression": undefined,
+              "whereKeyword": undefined,
+            },
+            "innerSpacing": Object {
+              "postAs": " ",
+            },
+            "postColumn": " ",
+            "type": "alias-ref",
+          },
+        ],
+        "tableSeparators": Array [],
+        "tables": Array [
+          SqlRef {
+            "innerSpacing": Object {},
+            "name": "table",
+            "namespace": undefined,
+            "namespaceQuotes": undefined,
+            "quotes": "",
+            "type": "ref",
+          },
+        ],
+        "type": "query",
+        "unionKeyword": undefined,
+        "unionQuery": undefined,
+        "whereExpression": undefined,
+        "whereKeyword": undefined,
+        "withKeyword": undefined,
+        "withSeparators": undefined,
+        "withUnits": undefined,
+      }
+    `);
     expect(
       parser(sql)
         .addFunctionToGroupBy([SqlRef.fromName('column2')], 'max', 'MaxColumn')
