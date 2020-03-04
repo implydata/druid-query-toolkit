@@ -86,10 +86,10 @@ SqlQuery
       postFrom: from.postFrom,
 
       preJoin: join ? join[0] : '',
-      postJoinType: join ? join[1].postJoinType : '',
-      postJoinKeyword: join ? join[1].postJoinKeyword : '',
-      postJoinTable: join ? join[1].postJoinTable : '',
-      postOn: join ? join[1].postOn : '',
+      postJoinType: join ? join[1].postJoinTypeSpacing : '',
+      postJoinKeyword: join ? join[1].postJoinKeywordSpacing : '',
+      postJoinTable: join ? join[1].postJoinTableSpacing : '',
+      postOn: join ? join[1].postOnSpacing : '',
 
       preWhereKeyword: where ? where[0] : '',
       postWhereKeyword: where ? where[1].postWhereKeyword : undefined,
@@ -185,17 +185,17 @@ FromClause = fromKeyword:FromToken postFrom:_ tableHead:(Alias/SqlRef) tableTail
   }
 }
 
-JoinClause = joinType:JoinType postJoinType:_ joinKeyword:JoinToken postJoinKeyword:_? table:(Alias/SqlRef) postJoinTable:_  onKeyword:OnToken postOn:_? onExpression:Expression
+JoinClause = joinType:JoinType postJoinTypeSpacing:_ joinKeyword:JoinToken postJoinKeywordSpacing:_? table:(Alias/SqlRef) postJoinTableSpacing:_  onKeyword:OnToken postOnSpacing:_? onExpression:Expression
 {
   return {
     joinType: joinType,
-    postJoinType: postJoinType,
+    postJoinTypeSpacing: postJoinTypeSpacing,
     joinKeyword: joinKeyword,
-    postJoinKeyword: postJoinKeyword,
+    postJoinKeywordSpacing: postJoinKeywordSpacing,
     table: table,
-    postJoinTable: postJoinTable,
+    postJoinTableSpacing: postJoinTableSpacing,
     onKeyword: onKeyword,
-    postOn: postOn,
+    postOnSpacing: postOnSpacing,
     onExpression: onExpression
   }
 }
