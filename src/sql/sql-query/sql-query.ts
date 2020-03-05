@@ -39,6 +39,12 @@ export interface SqlQueryValue extends SqlBaseValue {
   tables?: (SqlAliasRef | SqlRef)[];
   tableSeparators?: [];
 
+  joinType?: string;
+  joinKeyword?: string;
+  joinTable?: SqlRef;
+  onKeyword?: string;
+  onExpression?: SqlBase;
+
   whereKeyword?: string;
   whereExpression?: SqlMulti | SqlUnary;
 
@@ -89,6 +95,11 @@ export class SqlQuery extends SqlBase {
   public selectValues?: SqlBase[];
   public selectSeparators?: Separator[];
   public fromKeyword?: string;
+  public joinType?: string;
+  public joinKeyword?: string;
+  public joinTable?: SqlRef;
+  public onKeyword?: string;
+  public onExpression?: SqlBase;
   public tables?: (SqlAliasRef | SqlRef)[];
   public tableSeparators?: [];
   public whereKeyword?: string;
@@ -137,6 +148,11 @@ export class SqlQuery extends SqlBase {
     this.selectValues = options.selectValues || [];
     this.selectSeparators = options.selectSeparators;
     this.fromKeyword = options.fromKeyword;
+    this.joinType = options.joinType;
+    this.joinKeyword = options.joinKeyword;
+    this.joinTable = options.joinTable;
+    this.onKeyword = options.onKeyword;
+    this.onExpression = options.onExpression;
     this.tables = options.tables;
     this.tableSeparators = options.tableSeparators;
     this.whereKeyword = options.whereKeyword;
@@ -166,6 +182,11 @@ export class SqlQuery extends SqlBase {
     value.selectValues = this.selectValues;
     value.selectSeparators = this.selectSeparators;
     value.fromKeyword = this.fromKeyword;
+    value.joinType = this.joinType;
+    value.joinKeyword = this.joinKeyword;
+    value.joinTable = this.joinTable;
+    value.onKeyword = this.onKeyword;
+    value.onExpression = this.onExpression;
     value.tables = this.tables;
     value.tableSeparators = this.tableSeparators;
     value.whereKeyword = this.whereKeyword;
@@ -220,6 +241,28 @@ export class SqlQuery extends SqlBase {
         this.fromKeyword,
         this.innerSpacing.postFrom,
         Separator.spacilator(this.tables, this.tableSeparators),
+      );
+    }
+
+    // Join Clause
+    if (
+      this.joinKeyword &&
+      this.joinType &&
+      this.joinTable &&
+      this.onKeyword &&
+      this.onExpression
+    ) {
+      rawStringParts.push(
+        this.innerSpacing.preJoin,
+        this.joinType,
+        this.innerSpacing.postJoinType,
+        this.joinKeyword,
+        this.innerSpacing.postJoinKeyword,
+        this.joinTable.toString(),
+        this.innerSpacing.postJoinTable,
+        this.onKeyword,
+        this.innerSpacing.postOn,
+        this.onExpression.toString(),
       );
     }
 

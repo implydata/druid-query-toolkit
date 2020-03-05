@@ -18,6 +18,7 @@ SqlQuery
   select:SelectClause
   postSelectValues:_
   from:FromClause
+  join:(_ JoinClause)?
   where:(_ WhereClause)?
   groupBy:(_ GroupByClause)?
   having:(_ HavingClause)?
@@ -42,6 +43,12 @@ SqlQuery
     fromKeyword: from.fromKeyword,
     tables: from.tables,
     tableSeparators: from.tableSeparators,
+
+    joinType: join ? join[1].joinType: undefined,
+    joinKeyword: join ? join[1].joinKeyword : undefined,
+    joinTable: join ? join[1].table : undefined,
+    onKeyword: join ? join[1].onKeyword : undefined,
+    onExpression: join ? join[1].onExpression : undefined,
 
     whereKeyword: where ? where[1].whereKeyword : undefined ,
     whereExpression: where ? where[1].whereExpression : undefined,
@@ -78,6 +85,12 @@ SqlQuery
 
       postFrom: from.postFrom,
 
+      preJoin: join ? join[0] : '',
+      postJoinType: join ? join[1].postJoinTypeSpacing : '',
+      postJoinKeyword: join ? join[1].postJoinKeywordSpacing : '',
+      postJoinTable: join ? join[1].postJoinTableSpacing : '',
+      postOn: join ? join[1].postOnSpacing : '',
+
       preWhereKeyword: where ? where[0] : '',
       postWhereKeyword: where ? where[1].postWhereKeyword : undefined,
 
@@ -86,7 +99,6 @@ SqlQuery
 
       preHavingKeyword: having ? having[0] : '',
       postHavingKeyword: having ? having[1].postHavingKeyword : undefined,
-
 
       preOrderByKeyword: orderBy ? orderBy[0] : undefined,
       postOrderByKeyword: orderBy ? orderBy[1].postOrderByKeyword : undefined,
@@ -170,6 +182,21 @@ FromClause = fromKeyword:FromToken postFrom:_ tableHead:(Alias/SqlRef) tableTail
     postFrom: postFrom,
     tables: tableTail ? makeListMap(tableTail, 1, tableHead): [tableHead],
     tableSeparators: tableTail ? makeListMap(tableTail, 0) : undefined
+  }
+}
+
+JoinClause = joinType:JoinType postJoinTypeSpacing:_ joinKeyword:JoinToken postJoinKeywordSpacing:_? table:(Alias/SqlRef) postJoinTableSpacing:_  onKeyword:OnToken postOnSpacing:_? onExpression:Expression
+{
+  return {
+    joinType: joinType,
+    postJoinTypeSpacing: postJoinTypeSpacing,
+    joinKeyword: joinKeyword,
+    postJoinKeywordSpacing: postJoinKeywordSpacing,
+    table: table,
+    postJoinTableSpacing: postJoinTableSpacing,
+    onKeyword: onKeyword,
+    postOnSpacing: postOnSpacing,
+    onExpression: onExpression
   }
 }
 
@@ -637,6 +664,13 @@ Decorator =
   /'TRAILING'i
   /'DISTINCT'i
 
+JoinType =
+    'LEFT'i
+    /'RIGHT'i
+    /'INNER'i
+    /$('FULL'i _ 'OUTER'i)
+    /'FULL'i
+
 OrToken = 'OR'i
 AndToken = 'AND'i
 NotToken = 'NOT'i
@@ -663,3 +697,6 @@ WithToken = 'WITH'i
 FilterToken= 'FILTER'i
 IntervalToken = 'INTERVAL'i
 TimestampToken = 'TIMESTAMP'i
+OnToken = 'ON'i
+JoinToken = 'JOIN'i
+
