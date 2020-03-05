@@ -36,12 +36,13 @@ export interface SqlQueryValue extends SqlBaseValue {
   selectValues: SqlBase[];
   selectSeparators?: Separator[];
 
-  fromKeyword?: string;2
+  fromKeyword?: string;
+
   tables?: (SqlAliasRef | SqlRef)[];
   tableSeparators?: [];
 
   selectAnnotations?: Annotation[];
- 
+
   joinType?: string;
   joinKeyword?: string;
   joinTable?: SqlRef;
