@@ -711,31 +711,11 @@ export class SqlQuery extends SqlBase {
     return new SqlQuery(value);
   }
 
-  addFunctionToGroupBy(
-    columns: SqlBase[],
-    functionName: string,
-    alias: string,
-    filter?: SqlBase,
-    decorator?: string,
-  ) {
-    // adds a function to the group by clause with alias then adds the column to the group by clause using the index
-    const value = this.valueOf();
-
-    const selectValue = SqlAliasRef.sqlAliasFactory(
-      SqlFunction.sqlFunctionFactory(functionName, columns, [], filter, decorator),
-      alias,
-    );
-
-    value.selectValues = ([selectValue] as SqlBase[]).concat(value.selectValues || []);
-    value.selectSeparators = (value.selectSeparators || []).concat(Separator.rightSeparator(','));
-    return new SqlQuery(value).addFirstColumnToGroupBy();
-  }
-
-  addColumnToGroupBy(column: string) {
+  addToGroupBy(column: SqlBase) {
     // Adds a column with no alias to the group by clause
     // column is added to the select clause then the index is added to group by clause
     let value = new SqlQuery(this.valueOf());
-    value = value.addColumn(SqlRef.fromNameWithDoubleQuotes(column));
+    value = value.addColumn(column);
     return value.addFirstColumnToGroupBy();
   }
 

@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { sqlParserFactory, SqlRef } from '../..';
+import { SqlAliasRef, SqlFunction, sqlParserFactory, SqlRef } from '../..';
 import { FUNCTIONS } from '../../test-utils';
 
 const parser = sqlParserFactory(FUNCTIONS);
@@ -548,7 +548,7 @@ describe('addToGroupBy', () => {
 
     expect(
       parser(sql)
-        .addColumnToGroupBy('column')
+        .addToGroupBy(SqlRef.fromNameWithDoubleQuotes('column'))
         .toString(),
     ).toMatchInlineSnapshot(`
       "select \\"column\\", Count(*) from table
@@ -561,7 +561,12 @@ describe('addToGroupBy', () => {
 
     expect(
       parser(sql)
-        .addFunctionToGroupBy([SqlRef.fromName('column1')], 'min', 'MinColumn')
+        .addToGroupBy(
+          SqlAliasRef.sqlAliasFactory(
+            SqlFunction.sqlFunctionFactory('min', [SqlRef.fromName('column1')]),
+            'MinColumn',
+          ),
+        )
         .toString(),
     ).toMatchInlineSnapshot(`
       "select min(column1) AS \\"MinColumn\\", column1 from table
@@ -717,7 +722,12 @@ describe('addToGroupBy', () => {
     `);
     expect(
       parser(sql)
-        .addFunctionToGroupBy([SqlRef.fromName('column2')], 'max', 'MaxColumn')
+        .addToGroupBy(
+          SqlAliasRef.sqlAliasFactory(
+            SqlFunction.sqlFunctionFactory('max', [SqlRef.fromName('column2')]),
+            'MaxColumn',
+          ),
+        )
         .toString(),
     ).toMatchInlineSnapshot(`
       "select max(column2) AS \\"MaxColumn\\", column1, min(column1) AS aliasName from table 
