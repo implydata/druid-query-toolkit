@@ -564,8 +564,8 @@ describe('addToGroupBy', () => {
         .addFunctionToGroupBy([SqlRef.fromName('column1')], 'min', 'MinColumn')
         .toString(),
     ).toMatchInlineSnapshot(`
-      "select column1, min(column1) AS \\"MinColumn\\" from table
-      GROUP BY 2"
+      "select min(column1) AS \\"MinColumn\\", column1 from table
+      GROUP BY 1"
     `);
   });
 
@@ -720,8 +720,8 @@ describe('addToGroupBy', () => {
         .addFunctionToGroupBy([SqlRef.fromName('column2')], 'max', 'MaxColumn')
         .toString(),
     ).toMatchInlineSnapshot(`
-      "select column1, min(column1) AS aliasName, max(column2) AS \\"MaxColumn\\" from table 
-            GROUP BY 2, 3"
+      "select max(column2) AS \\"MaxColumn\\", column1, min(column1) AS aliasName from table 
+            GROUP BY 1, 3"
     `);
   });
 });

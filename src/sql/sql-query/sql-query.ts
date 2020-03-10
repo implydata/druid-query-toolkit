@@ -719,9 +719,16 @@ export class SqlQuery extends SqlBase {
     decorator?: string,
   ) {
     // adds a function to the group by clause with alias then adds the column to the group by clause using the index
-    let value = new SqlQuery(this.valueOf());
-    value = value.addAggregateColumn(columns, functionName, alias, filter, decorator);
-    return value.addLastColumnToGroupBy();
+    const value = this.valueOf();
+
+    const selectValue = SqlAliasRef.sqlAliasFactory(
+      SqlFunction.sqlFunctionFactory(functionName, columns, [], filter, decorator),
+      alias,
+    );
+
+    value.selectValues = ([selectValue] as SqlBase[]).concat(value.selectValues || []);
+    value.selectSeparators = (value.selectSeparators || []).concat(Separator.rightSeparator(','));
+    return new SqlQuery(value).addFirstColumnToGroupBy();
   }
 
   addColumnToGroupBy(column: string) {
