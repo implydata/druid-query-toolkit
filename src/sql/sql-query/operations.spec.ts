@@ -530,9 +530,32 @@ describe('addAggregateColumn', () => {
         .toString(),
     ).toMatchInlineSnapshot(`"select column1, min(column2) AS \\"alias\\" from table"`);
   });
+
+  it('function with decorator', () => {
+    const sql = 'select column1 from table';
+
+    expect(
+      parser(sql)
+        .addAggregateColumn([SqlRef.fromName('column2')], 'min', 'alias', undefined, 'DISTINCT')
+        .toString(),
+    ).toMatchInlineSnapshot(`"select column1, min(DISTINCT column2) AS \\"alias\\" from table"`);
+  });
 });
 
 describe('addToGroupBy', () => {
+  it('add simple column to group by', () => {
+    const sql = 'select Count(*) from table';
+
+    expect(
+      parser(sql)
+        .addColumnToGroupBy('column')
+        .toString(),
+    ).toMatchInlineSnapshot(`
+      "select \\"column\\", Count(*) from table
+      GROUP BY 1"
+    `);
+  });
+
   it('no existing column', () => {
     const sql = 'select column1 from table';
 
