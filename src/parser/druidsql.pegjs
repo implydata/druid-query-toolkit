@@ -25,6 +25,7 @@ SqlQuery
   orderBy:(_ OrderByClause)?
   limit:(_ LimitClause)?
   union:(_ UnionClause)?
+  postQueryAnnotation: Annotation*
   postQuery:EndOfQuery?
 {
   return new sql.SqlQuery({
@@ -39,6 +40,7 @@ SqlQuery
     selectDecorator: select.selectDecorator,
     selectSeparators: select.selectSeparators,
     selectValues: select.selectValues,
+    selectAnnotations: select.selectAnnotations,
 
     fromKeyword: from.fromKeyword,
     tables: from.tables,
@@ -67,9 +69,10 @@ SqlQuery
     limitKeyword: limit ? limit[1].limitKeyword: undefined,
     limitValue: limit ? limit[1].limitValue : undefined,
 
-
     unionKeyword: union ? union[1].unionKeyword : undefined,
     unionQuery: union ?  union[1].unionQuery : undefined,
+
+    postQueryAnnotation: postQueryAnnotation,
 
     innerSpacing: {
       preQuery: preQuery || '',
@@ -163,15 +166,16 @@ WithColumns = '(' postLeftParen:_? withColumnsHead:BaseType withColumnsTail:(Com
   }
 }
 
-SelectClause = selectKeyword:SelectToken postSelect:_ selectDecorator:((AllToken/DistinctToken) _)? selectValuesHead:(Alias/Expression)  selectValuesTail:(Comma (Alias/Expression))*
+SelectClause = selectKeyword:SelectToken postSelect:_ selectDecorator:((AllToken/DistinctToken) _)? selectValuesHead:(Alias/Expression) annotationsHead:Annotation?  selectValuesTail:(Comma (Alias/Expression) Annotation?)*
 {
   return {
      selectKeyword: selectKeyword,
      postSelect: postSelect,
      selectDecorator: selectDecorator? selectDecorator[0] : '',
      postSelectDecorator: selectDecorator? selectDecorator[1] : '',
-     selectValues: [selectValuesHead] ? makeListMap(selectValuesTail, 1, selectValuesHead) : [selectValuesHead],
+     selectValues: selectValuesTail ? makeListMap(selectValuesTail, 1, selectValuesHead) : [selectValuesHead],
      selectSeparators: makeListMap(selectValuesTail,0),
+     selectAnnotations: selectValuesTail ?  makeListMap(selectValuesTail, 2, annotationsHead) : [annotationsHead],
   }
 }
 
@@ -337,13 +341,13 @@ AdditionExpression = head:SubtractionExpression tail:(__ '+' __ (SubtractionExpr
   }
 
 
-SubtractionExpression = head:MultiplicationExpression tail:(__ '-' __ (MultiplicationExpression))*
+SubtractionExpression = head:MultiplicationExpression tail:(__ '-' (!'-') __ (MultiplicationExpression))*
   {
     if (!tail.length) return head
     return new sql.SqlMulti ({
       expressionType: 'Additive',
-      arguments: makeListMap(tail, 3, head),
-      separators: makeSeparatorsList(tail).map(keyword =>{ return new sql.Separator(keyword)}),
+      arguments: makeListMap(tail, 4, head),
+      separators: makeEscapedSeparatorsList(tail).map(keyword =>{ return new sql.Separator(keyword)}),
     });
   }
 
@@ -623,10 +627,28 @@ UnquotedRefPart = name:$([a-z_\-:*%/]i [a-z0-9_\-:*%/]i*)
 
 // -----------------------------------
 
+Annotation = preAnnotation:___ '--:' postAnnotationSignifier: ___? key:String postKey:___? "=" postEquals:___? value:String
+{ return new sql.Annotation(
+  {
+    innerSpacing: {
+      preAnnotation:  preAnnotation,
+      postAnnotationSignifier: postAnnotationSignifier,
+      postKey: postKey,
+      postEquals: postEquals,
+      preAnnotation: preAnnotation
+    },
+    key: key,
+    value: value
+  });
+}
+
+String = $([a-z0-9_\-:*%/]i+)
+
 _ =
-  $(([ \t\n\r]* "--" [^\n]* ([\n] [ \t\n\r]*)?)+)
+  $(([ \t\n\r]* "--" !':' [^\n]* ([\n] [ \t\n\r]*)?)+)
   / spacing: $([ \t\n\r]+)
 
+___ "pure whitespace" = spacing: $([ \t\n\r]+)
 
 __ "optional whitespace" = _ / ''
 

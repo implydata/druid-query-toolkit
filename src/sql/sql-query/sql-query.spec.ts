@@ -69,6 +69,10 @@ describe('simple expressions', () => {
         "orderByKeyword": undefined,
         "orderBySeparators": undefined,
         "orderByUnits": undefined,
+        "postQueryAnnotation": Array [],
+        "selectAnnotations": Array [
+          null,
+        ],
         "selectDecorator": "",
         "selectKeyword": "Select",
         "selectSeparators": Array [],
@@ -157,6 +161,10 @@ describe('simple expressions', () => {
             "rightSpacing": "",
           },
         ],
+        "postQueryAnnotation": Array [],
+        "selectAnnotations": Array [
+          null,
+        ],
         "selectDecorator": "",
         "selectKeyword": "Select",
         "selectSeparators": Array [],
@@ -239,6 +247,10 @@ describe('simple expressions', () => {
         "orderByKeyword": undefined,
         "orderBySeparators": undefined,
         "orderByUnits": undefined,
+        "postQueryAnnotation": Array [],
+        "selectAnnotations": Array [
+          null,
+        ],
         "selectDecorator": "",
         "selectKeyword": "Select",
         "selectSeparators": Array [],
@@ -375,6 +387,14 @@ FROM sys.segments`;
         "orderByKeyword": undefined,
         "orderBySeparators": undefined,
         "orderByUnits": undefined,
+        "postQueryAnnotation": Array [],
+        "selectAnnotations": Array [
+          null,
+          null,
+          null,
+          null,
+          null,
+        ],
         "selectDecorator": "",
         "selectKeyword": "SELECT",
         "selectSeparators": Array [
@@ -834,6 +854,12 @@ FROM sys.segments`;
         "orderByKeyword": undefined,
         "orderBySeparators": undefined,
         "orderByUnits": undefined,
+        "postQueryAnnotation": Array [],
+        "selectAnnotations": Array [
+          null,
+          null,
+          null,
+        ],
         "selectDecorator": "",
         "selectKeyword": "SELECT",
         "selectSeparators": Array [
@@ -1021,6 +1047,10 @@ FROM sys.segments`;
         "orderByKeyword": undefined,
         "orderBySeparators": undefined,
         "orderByUnits": undefined,
+        "postQueryAnnotation": Array [],
+        "selectAnnotations": Array [
+          null,
+        ],
         "selectDecorator": "",
         "selectKeyword": "Select",
         "selectSeparators": Array [],
@@ -1112,6 +1142,10 @@ FROM sys.segments`;
         "orderByKeyword": undefined,
         "orderBySeparators": undefined,
         "orderByUnits": undefined,
+        "postQueryAnnotation": Array [],
+        "selectAnnotations": Array [
+          null,
+        ],
         "selectDecorator": "",
         "selectKeyword": "Select",
         "selectSeparators": Array [],
@@ -1200,6 +1234,10 @@ FROM sys.segments`;
         ",
                   "rightSpacing": "",
                 },
+              ],
+              "postQueryAnnotation": Array [],
+              "selectAnnotations": Array [
+                null,
               ],
               "selectDecorator": "",
               "selectKeyword": "SELECT",
@@ -1298,6 +1336,10 @@ describe('expressions with where clause', () => {
         "orderByKeyword": undefined,
         "orderBySeparators": undefined,
         "orderByUnits": undefined,
+        "postQueryAnnotation": Array [],
+        "selectAnnotations": Array [
+          null,
+        ],
         "selectDecorator": "",
         "selectKeyword": "Select",
         "selectSeparators": Array [],
@@ -1410,6 +1452,10 @@ describe('expressions with where clause', () => {
         "orderByKeyword": undefined,
         "orderBySeparators": undefined,
         "orderByUnits": undefined,
+        "postQueryAnnotation": Array [],
+        "selectAnnotations": Array [
+          null,
+        ],
         "selectDecorator": "",
         "selectKeyword": "SELECT",
         "selectSeparators": Array [],
@@ -1522,6 +1568,10 @@ describe('expressions with where clause', () => {
         "orderByKeyword": undefined,
         "orderBySeparators": undefined,
         "orderByUnits": undefined,
+        "postQueryAnnotation": Array [],
+        "selectAnnotations": Array [
+          null,
+        ],
         "selectDecorator": "",
         "selectKeyword": "SELECT",
         "selectSeparators": Array [],
@@ -1727,6 +1777,10 @@ describe('expressions with group by clause', () => {
         "orderByKeyword": undefined,
         "orderBySeparators": undefined,
         "orderByUnits": undefined,
+        "postQueryAnnotation": Array [],
+        "selectAnnotations": Array [
+          null,
+        ],
         "selectDecorator": "",
         "selectKeyword": "Select",
         "selectSeparators": Array [],
@@ -1819,6 +1873,10 @@ describe('expressions with group by clause', () => {
         "orderByKeyword": undefined,
         "orderBySeparators": undefined,
         "orderByUnits": undefined,
+        "postQueryAnnotation": Array [],
+        "selectAnnotations": Array [
+          null,
+        ],
         "selectDecorator": "",
         "selectKeyword": "Select",
         "selectSeparators": Array [],
@@ -1933,6 +1991,10 @@ describe('expressions with group by clause', () => {
             "rightSpacing": "",
           },
         ],
+        "postQueryAnnotation": Array [],
+        "selectAnnotations": Array [
+          null,
+        ],
         "selectDecorator": "",
         "selectKeyword": "Select",
         "selectSeparators": Array [],
@@ -2045,6 +2107,10 @@ describe('expressions with having clause', () => {
         "orderByKeyword": undefined,
         "orderBySeparators": undefined,
         "orderByUnits": undefined,
+        "postQueryAnnotation": Array [],
+        "selectAnnotations": Array [
+          null,
+        ],
         "selectDecorator": "",
         "selectKeyword": "Select",
         "selectSeparators": Array [],
@@ -2157,6 +2223,10 @@ describe('expressions with having clause', () => {
         "orderByKeyword": undefined,
         "orderBySeparators": undefined,
         "orderByUnits": undefined,
+        "postQueryAnnotation": Array [],
+        "selectAnnotations": Array [
+          null,
+        ],
         "selectDecorator": "",
         "selectKeyword": "SELECT",
         "selectSeparators": Array [],
@@ -2353,6 +2423,10 @@ describe('expressions with having clause', () => {
         "orderByKeyword": undefined,
         "orderBySeparators": undefined,
         "orderByUnits": undefined,
+        "postQueryAnnotation": Array [],
+        "selectAnnotations": Array [
+          null,
+        ],
         "selectDecorator": "",
         "selectKeyword": "SELECT",
         "selectSeparators": Array [],
@@ -2449,6 +2523,10 @@ describe('expressions with order by clause', () => {
             },
             "postExpression": "",
           },
+        ],
+        "postQueryAnnotation": Array [],
+        "selectAnnotations": Array [
+          null,
         ],
         "selectDecorator": "",
         "selectKeyword": "Select",
@@ -2549,6 +2627,10 @@ describe('expressions with order by clause', () => {
             "postExpression": "",
           },
         ],
+        "postQueryAnnotation": Array [],
+        "selectAnnotations": Array [
+          null,
+        ],
         "selectDecorator": "",
         "selectKeyword": "Select",
         "selectSeparators": Array [],
@@ -2645,6 +2727,10 @@ describe('expressions with order by clause', () => {
             },
             "postExpression": " ",
           },
+        ],
+        "postQueryAnnotation": Array [],
+        "selectAnnotations": Array [
+          null,
         ],
         "selectDecorator": "",
         "selectKeyword": "Select",
@@ -2744,6 +2830,11 @@ describe('expressions with order by clause', () => {
             },
             "postExpression": " ",
           },
+        ],
+        "postQueryAnnotation": Array [],
+        "selectAnnotations": Array [
+          null,
+          null,
         ],
         "selectDecorator": "",
         "selectKeyword": "Select",
@@ -2874,6 +2965,10 @@ describe('expressions with order by clause', () => {
             "postExpression": "",
           },
         ],
+        "postQueryAnnotation": Array [],
+        "selectAnnotations": Array [
+          null,
+        ],
         "selectDecorator": "",
         "selectKeyword": "Select",
         "selectSeparators": Array [],
@@ -2989,6 +3084,11 @@ describe('expressions with order by clause', () => {
             "postExpression": " ",
           },
         ],
+        "postQueryAnnotation": Array [],
+        "selectAnnotations": Array [
+          null,
+          null,
+        ],
         "selectDecorator": "",
         "selectKeyword": "Select",
         "selectSeparators": Array [
@@ -3092,6 +3192,10 @@ describe('expressions with limit clause', () => {
         "orderByKeyword": undefined,
         "orderBySeparators": undefined,
         "orderByUnits": undefined,
+        "postQueryAnnotation": Array [],
+        "selectAnnotations": Array [
+          null,
+        ],
         "selectDecorator": "",
         "selectKeyword": "Select",
         "selectSeparators": Array [],
@@ -3178,6 +3282,10 @@ describe('expressions with union clause', () => {
         "orderByKeyword": undefined,
         "orderBySeparators": undefined,
         "orderByUnits": undefined,
+        "postQueryAnnotation": Array [],
+        "selectAnnotations": Array [
+          null,
+        ],
         "selectDecorator": "",
         "selectKeyword": "Select",
         "selectSeparators": Array [],
@@ -3245,6 +3353,10 @@ describe('expressions with union clause', () => {
           "orderByKeyword": undefined,
           "orderBySeparators": undefined,
           "orderByUnits": undefined,
+          "postQueryAnnotation": Array [],
+          "selectAnnotations": Array [
+            null,
+          ],
           "selectDecorator": "",
           "selectKeyword": "select",
           "selectSeparators": Array [],
@@ -3374,6 +3486,10 @@ describe('Test Join Clause', () => {
         "orderByKeyword": undefined,
         "orderBySeparators": undefined,
         "orderByUnits": undefined,
+        "postQueryAnnotation": Array [],
+        "selectAnnotations": Array [
+          null,
+        ],
         "selectDecorator": "",
         "selectKeyword": "Select",
         "selectSeparators": Array [],
@@ -3495,6 +3611,10 @@ describe('Test Join Clause', () => {
         "orderByKeyword": undefined,
         "orderBySeparators": undefined,
         "orderByUnits": undefined,
+        "postQueryAnnotation": Array [],
+        "selectAnnotations": Array [
+          null,
+        ],
         "selectDecorator": "",
         "selectKeyword": "Select",
         "selectSeparators": Array [],
@@ -3616,6 +3736,10 @@ describe('Test Join Clause', () => {
         "orderByKeyword": undefined,
         "orderBySeparators": undefined,
         "orderByUnits": undefined,
+        "postQueryAnnotation": Array [],
+        "selectAnnotations": Array [
+          null,
+        ],
         "selectDecorator": "",
         "selectKeyword": "Select",
         "selectSeparators": Array [],
@@ -3737,6 +3861,10 @@ describe('Test Join Clause', () => {
         "orderByKeyword": undefined,
         "orderBySeparators": undefined,
         "orderByUnits": undefined,
+        "postQueryAnnotation": Array [],
+        "selectAnnotations": Array [
+          null,
+        ],
         "selectDecorator": "",
         "selectKeyword": "Select",
         "selectSeparators": Array [],
@@ -3858,6 +3986,10 @@ describe('Test Join Clause', () => {
         "orderByKeyword": undefined,
         "orderBySeparators": undefined,
         "orderByUnits": undefined,
+        "postQueryAnnotation": Array [],
+        "selectAnnotations": Array [
+          null,
+        ],
         "selectDecorator": "",
         "selectKeyword": "Select",
         "selectSeparators": Array [],
@@ -3945,6 +4077,10 @@ describe('Queries with comments', () => {
         "orderByKeyword": undefined,
         "orderBySeparators": undefined,
         "orderByUnits": undefined,
+        "postQueryAnnotation": Array [],
+        "selectAnnotations": Array [
+          null,
+        ],
         "selectDecorator": "",
         "selectKeyword": "Select",
         "selectSeparators": Array [],
@@ -4031,5 +4167,19 @@ describe('Queries with comments', () => {
   order by -1`;
 
     expect(parser(sql).toString()).toMatch(sql);
+  });
+});
+
+describe('Queries with annotated comments', () => {
+  it('single comment', () => {
+    const sql = `Select column, column1, column2 from table 
+    order by column
+    --: valueName = value`;
+
+    expect(parser(sql).toString()).toMatchInlineSnapshot(`
+      "Select column, column1, column2 from table 
+          order by column
+          --: valueName = value"
+    `);
   });
 });

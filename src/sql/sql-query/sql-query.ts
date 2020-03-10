@@ -13,6 +13,7 @@
  */
 
 import {
+  Annotation,
   Separator,
   SqlAliasRef,
   SqlFunction,
@@ -36,8 +37,11 @@ export interface SqlQueryValue extends SqlBaseValue {
   selectSeparators?: Separator[];
 
   fromKeyword?: string;
+
   tables?: (SqlAliasRef | SqlRef)[];
   tableSeparators?: [];
+
+  selectAnnotations?: Annotation[];
 
   joinType?: string;
   joinKeyword?: string;
@@ -64,6 +68,8 @@ export interface SqlQueryValue extends SqlBaseValue {
 
   unionKeyword?: string;
   unionQuery?: SqlQuery;
+
+  postQueryAnnotation?: Annotation[];
 }
 
 export interface WithUnit {
@@ -102,6 +108,7 @@ export class SqlQuery extends SqlBase {
   public onExpression?: SqlBase;
   public tables?: (SqlAliasRef | SqlRef)[];
   public tableSeparators?: [];
+  public selectAnnotations?: Annotation[];
   public whereKeyword?: string;
   public whereExpression?: SqlMulti | SqlUnary;
   public groupByKeyword?: string;
@@ -116,6 +123,7 @@ export class SqlQuery extends SqlBase {
   public limitValue?: SqlLiteral;
   public unionKeyword?: string;
   public unionQuery?: SqlQuery;
+  public postQueryAnnotation?: Annotation[];
 
   static type = 'query';
 
@@ -155,6 +163,7 @@ export class SqlQuery extends SqlBase {
     this.onExpression = options.onExpression;
     this.tables = options.tables;
     this.tableSeparators = options.tableSeparators;
+    this.selectAnnotations = options.selectAnnotations;
     this.whereKeyword = options.whereKeyword;
     this.whereExpression = options.whereExpression;
     this.groupByKeyword = options.groupByKeyword;
@@ -169,6 +178,7 @@ export class SqlQuery extends SqlBase {
     this.limitValue = options.limitValue;
     this.unionKeyword = options.unionKeyword;
     this.unionQuery = options.unionQuery;
+    this.postQueryAnnotation = options.postQueryAnnotation;
   }
 
   public valueOf() {
@@ -182,6 +192,7 @@ export class SqlQuery extends SqlBase {
     value.selectValues = this.selectValues;
     value.selectSeparators = this.selectSeparators;
     value.fromKeyword = this.fromKeyword;
+    value.selectAnnotations = this.selectAnnotations;
     value.joinType = this.joinType;
     value.joinKeyword = this.joinKeyword;
     value.joinTable = this.joinTable;
@@ -203,6 +214,7 @@ export class SqlQuery extends SqlBase {
     value.limitValue = this.limitValue;
     value.unionKeyword = this.unionKeyword;
     value.unionQuery = this.unionQuery;
+    value.postQueryAnnotation = this.postQueryAnnotation;
     return value as SqlQueryValue;
   }
 
@@ -229,14 +241,31 @@ export class SqlQuery extends SqlBase {
     }
 
     // Select and From clause
-    if (this.selectKeyword && this.selectValues && this.tables && this.fromKeyword) {
+    if (
+      this.selectKeyword &&
+      this.selectValues &&
+      this.tables &&
+      this.fromKeyword &&
+      this.selectAnnotations
+    ) {
       rawStringParts.push(this.selectKeyword, this.innerSpacing.postSelect);
       if (this.selectDecorator) {
         rawStringParts.push(this.selectDecorator, this.innerSpacing.postSelectDecorato);
       }
 
       rawStringParts.push(
-        Separator.spacilator(this.selectValues, this.selectSeparators),
+        Separator.customSpacilator<any>(
+          this.selectValues.map((column, i) => {
+            return {
+              column: column,
+              comment: this.selectAnnotations ? this.selectAnnotations[i] : '',
+            };
+          }),
+          column => {
+            return column.column.toString() + (column.comment || '').toString();
+          },
+          this.selectSeparators,
+        ),
         this.innerSpacing.postSelectValues,
         this.fromKeyword,
         this.innerSpacing.postFrom,
@@ -327,6 +356,14 @@ export class SqlQuery extends SqlBase {
         this.unionKeyword,
         this.innerSpacing.postUnionKeyword,
         this.unionQuery.toString(),
+      );
+    }
+
+    // Post Query Annotated Comments
+    if (this.postQueryAnnotation) {
+      rawStringParts.push(
+        this.innerSpacing.preQueryAnnotatedComments,
+        this.postQueryAnnotation.map(comment => comment.toString()).join(''),
       );
     }
 
