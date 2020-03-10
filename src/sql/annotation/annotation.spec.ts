@@ -403,7 +403,7 @@ describe('Queries with annotated comments post query', () => {
           },
           Annotation {
             "innerSpacing": Object {
-              "postAnnotationSignifier": null,
+              "postAnnotationSignifier": "",
               "postEquals": " ",
               "postKey": " ",
               "preAnnotation": "
