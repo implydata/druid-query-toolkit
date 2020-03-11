@@ -444,7 +444,7 @@ export class SqlQuery extends SqlBase {
       direction: direction,
     };
     const value = this.valueOf();
-    const index = this.getColumns().indexOf(column);
+    const index = this.getColumns().indexOf(column) + 1;
     value.orderByUnits = value.orderByUnits || [];
 
     // If already in the orderby
@@ -479,6 +479,18 @@ export class SqlQuery extends SqlBase {
     );
 
     return new SqlQuery(value);
+  }
+
+  remove(column: string) {
+    const value = new SqlQuery(this.valueOf());
+
+    return value
+      .removeFromSelect(column)
+      .removeFilter(column)
+      .removeFromGroupBy(column)
+      .removeFromWhere(column)
+      .removeFromHaving(column)
+      .removeFromOrderBy(column);
   }
 
   removeFilter(column: string): SqlQuery {
@@ -533,7 +545,7 @@ export class SqlQuery extends SqlBase {
   removeFromWhere(column: string) {
     // Removes all filters on the specified column from the where clause
     const value = this.valueOf();
-    if (!value.whereExpression) return;
+    if (!value.whereExpression) return new SqlQuery(value);
 
     if (
       value.whereExpression.isType('Comparison') &&
@@ -553,7 +565,7 @@ export class SqlQuery extends SqlBase {
   removeFromHaving(column: string) {
     // Removes all filters on the specified column from the having clause
     const value = this.valueOf();
-    if (!value.havingExpression) return;
+    if (!value.havingExpression) return new SqlQuery(value);
 
     if (
       value.havingExpression.isType('Comparison') &&
@@ -606,9 +618,7 @@ export class SqlQuery extends SqlBase {
 
     const filteredUnitsList = Separator.filterStringFromInterfaceList<SqlBase>(
       value.groupByExpression,
-      unit => {
-        return SqlRef.equalsString(unit, column) || SqlLiteral.equalsLiteral(unit, index);
-      },
+      unit => !SqlRef.equalsString(unit, column) || !SqlLiteral.equalsLiteral(unit, index),
       value.groupByExpressionSeparators,
     );
 
