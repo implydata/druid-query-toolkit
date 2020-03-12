@@ -275,7 +275,7 @@ Alias = column:Expression postColumn:_ asKeyword:AsToken postAs:_ alias:SqlRef
 {
   return new sql.SqlAliasRef({
     column: column,
-    postColumn: postColumn,
+    postColumn: postColumn || '',
     asKeyword: asKeyword,
     alias: alias,
     innerSpacing : {
@@ -510,7 +510,7 @@ Function = functionName:Functions postName:_? OpenParen postLeftParen:_? decorat
       whereExpression: filter ? filter[1].whereExpression : undefined,
       innerSpacing: {
         postName: postName ? postName : '',
-        postDecorator: decorator ? decorator[1] : '',
+        postDecorator: decorator ? decorator[1] || '' : '',
         postLeftParen: postLeftParen ? postLeftParen : '',
         preRightParen: preRightParen ? preRightParen : '',
         preFilter: filter && filter[0] ? filter[0] : '',
@@ -627,7 +627,7 @@ UnquotedRefPart = name:$([a-z_\-:*%/]i [a-z0-9_\-:*%/]i*)
 
 // -----------------------------------
 
-Annotation = preAnnotation:___ '--:' postAnnotationSignifier: ___? key:String postKey:___? "=" postEquals:___? value:String
+Annotation = preAnnotation:___ '--:' postAnnotationSignifier: ___? key:$([a-z0-9_\-:*%/]i+) postKey:___? "=" postEquals:___? value:$([a-z0-9_\-:*%/]i+)
 { return new sql.Annotation(
   {
     innerSpacing: {
@@ -642,17 +642,17 @@ Annotation = preAnnotation:___ '--:' postAnnotationSignifier: ___? key:String po
   });
 }
 
-String = $([a-z0-9_\-:*%/]i+)
+IdentifierPart = [a-z_]i
 
 _ =
-  $(([ \t\n\r]* "--" !':' [^\n]* ([\n] [ \t\n\r]*)?)+)
-  / spacing: $([ \t\n\r]+)
+  spacing: ($(([ \t\n\r]* "--" !':' [^\n]* ([\n] [ \t\n\r]*)?)+)
+  / $([ \t\n\r]+))?
 
-___ "pure whitespace" = spacing: $([ \t\n\r]+)
+___ "pure whitespace" = spacing: $([ \t\n\r]*)
 
 __ "optional whitespace" = _ / ''
 
-EndOfQuery = $((_/';')+)
+EndOfQuery = $(_ ';'? _)
 
 OpenParen "("
  = "("
@@ -693,32 +693,32 @@ JoinType =
     /$('FULL'i _ 'OUTER'i)
     /'FULL'i
 
-OrToken = 'OR'i
-AndToken = 'AND'i
-NotToken = 'NOT'i
-BetweenToken = 'BETWEEN'i
-SelectToken = 'SELECT'i
-AllToken = 'ALL'i
-DistinctToken = 'DISTINCT'i
-FromToken = 'FROM'i
-WhereToken ='WHERE'i
-GroupByToken = $('GROUP'i _ 'BY'i)
-ByToken = 'BY'i
-HavingToken ='HAVING'i
-OrderToken = $('ORDER'i _ 'BY'i)
-LimitToken = 'LIMIT'i
-UnionToken = $('UNION'i _ 'All'i)
-CaseToken = 'CASE'i
-WhenToken = 'WHEN'i
-ThenToken = 'THEN'i
-ElseToken = 'ELSE'i
-EndToken = 'END'i
-AsToken = 'AS'i
-ExplainToken = $('EXPLAIN'i _ 'PLAN'i _ 'FOR'i)
-WithToken = 'WITH'i
-FilterToken= 'FILTER'i
-IntervalToken = 'INTERVAL'i
-TimestampToken = 'TIMESTAMP'i
-OnToken = 'ON'i
-JoinToken = 'JOIN'i
+OrToken = $('OR'i !IdentifierPart)
+AndToken = $('AND'i !IdentifierPart)
+NotToken = $('NOT'i !IdentifierPart)
+BetweenToken = $('BETWEEN'i !IdentifierPart)
+SelectToken = $('SELECT'i !IdentifierPart)
+AllToken = $('ALL'i !IdentifierPart)
+DistinctToken = $('DISTINCT'i !IdentifierPart)
+FromToken = $('FROM'i !IdentifierPart)
+WhereToken = $('WHERE'i !IdentifierPart)
+GroupByToken = $('GROUP'i !IdentifierPart  _ 'BY'i !IdentifierPart)
+ByToken = $('BY'i !IdentifierPart)
+HavingToken = $('HAVING'i !IdentifierPart)
+OrderToken = $('ORDER'i !IdentifierPart _ 'BY'i !IdentifierPart)
+LimitToken = $('LIMIT'i !IdentifierPart)
+UnionToken = $('UNION'i !IdentifierPart  _ 'All'i !IdentifierPart)
+CaseToken = $('CASE'i !IdentifierPart)
+WhenToken = $('WHEN'i !IdentifierPart)
+ThenToken = $('THEN'i !IdentifierPart)
+ElseToken = $('ELSE'i !IdentifierPart)
+EndToken = $('END'i !IdentifierPart)
+AsToken = $('AS'i !IdentifierPart)
+ExplainToken = $('EXPLAIN'i !IdentifierPart  _ 'PLAN'i !IdentifierPart  _ 'FOR'i !IdentifierPart)
+WithToken = $('WITH'i !IdentifierPart)
+FilterToken= $('FILTER'i !IdentifierPart)
+IntervalToken = $('INTERVAL'i !IdentifierPart)
+TimestampToken = $('TIMESTAMP'i !IdentifierPart)
+OnToken = $('ON'i !IdentifierPart)
+JoinToken = $('JOIN'i !IdentifierPart)
 

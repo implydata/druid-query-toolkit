@@ -64,7 +64,7 @@ export class SqlAliasRef extends SqlBase {
     if (!this.column) throw Error('not a valid alias');
     return (
       this.column +
-      (this.postColumn || ' ') +
+      (this.postColumn || '') +
       this.asKeyword +
       (this.innerSpacing.postAs || '') +
       this.alias.toString()
