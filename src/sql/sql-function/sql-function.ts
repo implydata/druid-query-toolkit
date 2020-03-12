@@ -45,11 +45,13 @@ export class SqlFunction extends SqlBase {
     argumentArray: SqlBase[],
     separators?: Separator[],
     filter?: SqlBase,
+    decorator?: string,
   ) {
     const innerSpacing = {
       postName: '',
       preRightParen: '',
       postLeftParen: '',
+      postDecorator: decorator ? ' ' : '',
       preFilter: filter ? ' ' : '',
       postFilterKeyword: filter ? ' ' : '',
       postFilterLeftParen: filter ? ' ' : '',
@@ -58,6 +60,7 @@ export class SqlFunction extends SqlBase {
     };
     return new SqlFunction({
       type: SqlFunction.type,
+      decorator: decorator,
       functionName: functionName,
       arguments: argumentArray,
       separators: Separator.fillBetween(

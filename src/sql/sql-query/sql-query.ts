@@ -711,19 +711,12 @@ export class SqlQuery extends SqlBase {
     return new SqlQuery(value);
   }
 
-  addFunctionToGroupBy(columns: SqlBase[], functionName: string, alias: string, filter?: SqlBase) {
-    // adds a function to the group by clause with alias then adds the column to the group by clause using the index
-    let value = new SqlQuery(this.valueOf());
-    value = value.addAggregateColumn(columns, functionName, alias, filter);
-    return value.addLastColumnToGroupBy();
-  }
-
-  addColumnToGroupBy(column: string) {
+  addToGroupBy(column: SqlBase) {
     // Adds a column with no alias to the group by clause
     // column is added to the select clause then the index is added to group by clause
     let value = new SqlQuery(this.valueOf());
-    value = value.addColumn(SqlRef.fromNameWithDoubleQuotes(column));
-    return value.addLastColumnToGroupBy();
+    value = value.addColumn(column);
+    return value.addFirstColumnToGroupBy();
   }
 
   addLastColumnToGroupBy() {
@@ -747,23 +740,60 @@ export class SqlQuery extends SqlBase {
     return new SqlQuery(value);
   }
 
+  addFirstColumnToGroupBy() {
+    // Adds the last column in the select clause to the group by clause via its index
+    const value = this.valueOf();
+
+    value.groupByExpression = [SqlLiteral.fromInput(1)].concat(
+      (value.groupByExpression || []).map(column => {
+        if (column instanceof SqlLiteral && typeof column.value === 'number') {
+          column.value += 1;
+          column.stringValue = `${column.value}`;
+        }
+        return column;
+      }),
+    );
+    value.groupByKeyword = value.groupByKeyword || 'GROUP BY';
+    value.groupByExpressionSeparators = this.groupByExpression
+      ? Separator.fillBetween(
+          value.groupByExpressionSeparators || [],
+          value.groupByExpression.length,
+          Separator.rightSeparator(','),
+        )
+      : undefined;
+    value.innerSpacing.postGroupByKeyword = value.innerSpacing.postGroupByKeyword || ' ';
+    value.innerSpacing.preGroupByKeyword = value.innerSpacing.preGroupByKeyword || `\n`;
+
+    return new SqlQuery(value);
+  }
+
   addColumn(column: SqlBase) {
     const value = this.valueOf();
     if (!value.selectValues) return new SqlQuery(value);
 
-    value.selectValues = value.selectValues.concat([column]);
+    value.selectValues = [column].concat(value.selectValues);
     value.selectSeparators = (value.selectSeparators || []).concat(Separator.rightSeparator(','));
     return new SqlQuery(value);
   }
 
-  addAggregateColumn(columns: SqlBase[], functionName: string, alias: string, filter?: SqlBase) {
+  addAggregateColumn(
+    columns: SqlBase[],
+    functionName: string,
+    alias: string,
+    filter?: SqlBase,
+    decorator?: string,
+  ) {
     // Adds an aggregate column to the select
+    const value = this.valueOf();
+
     const selectValue = SqlAliasRef.sqlAliasFactory(
-      SqlFunction.sqlFunctionFactory(functionName, columns, [], filter),
+      SqlFunction.sqlFunctionFactory(functionName, columns, [], filter, decorator),
       alias,
     );
 
-    return this.addColumn(selectValue);
+    value.selectValues = value.selectValues.concat([selectValue]);
+    value.selectSeparators = (value.selectSeparators || []).concat(Separator.rightSeparator(','));
+    return new SqlQuery(value);
   }
 
   getColumns() {

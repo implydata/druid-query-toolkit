@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { sqlParserFactory, SqlRef } from '../..';
+import { SqlAliasRef, SqlFunction, sqlParserFactory, SqlRef } from '../..';
 import { FUNCTIONS } from '../../test-utils';
 
 const parser = sqlParserFactory(FUNCTIONS);
@@ -530,19 +530,47 @@ describe('addAggregateColumn', () => {
         .toString(),
     ).toMatchInlineSnapshot(`"select column1, min(column2) AS \\"alias\\" from table"`);
   });
+
+  it('function with decorator', () => {
+    const sql = 'select column1 from table';
+
+    expect(
+      parser(sql)
+        .addAggregateColumn([SqlRef.fromName('column2')], 'min', 'alias', undefined, 'DISTINCT')
+        .toString(),
+    ).toMatchInlineSnapshot(`"select column1, min(DISTINCT column2) AS \\"alias\\" from table"`);
+  });
 });
 
 describe('addToGroupBy', () => {
+  it('add simple column to group by', () => {
+    const sql = 'select Count(*) from table';
+
+    expect(
+      parser(sql)
+        .addToGroupBy(SqlRef.fromNameWithDoubleQuotes('column'))
+        .toString(),
+    ).toMatchInlineSnapshot(`
+      "select \\"column\\", Count(*) from table
+      GROUP BY 1"
+    `);
+  });
+
   it('no existing column', () => {
     const sql = 'select column1 from table';
 
     expect(
       parser(sql)
-        .addFunctionToGroupBy([SqlRef.fromName('column1')], 'min', 'MinColumn')
+        .addToGroupBy(
+          SqlAliasRef.sqlAliasFactory(
+            SqlFunction.sqlFunctionFactory('min', [SqlRef.fromName('column1')]),
+            'MinColumn',
+          ),
+        )
         .toString(),
     ).toMatchInlineSnapshot(`
-      "select column1, min(column1) AS \\"MinColumn\\" from table
-      GROUP BY 2"
+      "select min(column1) AS \\"MinColumn\\", column1 from table
+      GROUP BY 1"
     `);
   });
 
@@ -694,11 +722,16 @@ describe('addToGroupBy', () => {
     `);
     expect(
       parser(sql)
-        .addFunctionToGroupBy([SqlRef.fromName('column2')], 'max', 'MaxColumn')
+        .addToGroupBy(
+          SqlAliasRef.sqlAliasFactory(
+            SqlFunction.sqlFunctionFactory('max', [SqlRef.fromName('column2')]),
+            'MaxColumn',
+          ),
+        )
         .toString(),
     ).toMatchInlineSnapshot(`
-      "select column1, min(column1) AS aliasName, max(column2) AS \\"MaxColumn\\" from table 
-            GROUP BY 2, 3"
+      "select max(column2) AS \\"MaxColumn\\", column1, min(column1) AS aliasName from table 
+            GROUP BY 1, 3"
     `);
   });
 });
