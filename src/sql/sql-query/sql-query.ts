@@ -444,7 +444,7 @@ export class SqlQuery extends SqlBase {
       direction: direction,
     };
     const value = this.valueOf();
-    const index = this.getColumns().indexOf(column);
+    const index = this.getColumns().indexOf(column) + 1;
     value.orderByUnits = value.orderByUnits || [];
 
     // If already in the orderby
@@ -479,6 +479,18 @@ export class SqlQuery extends SqlBase {
     );
 
     return new SqlQuery(value);
+  }
+
+  remove(column: string) {
+    const value = new SqlQuery(this.valueOf());
+
+    return value
+      .removeFromSelect(column)
+      .removeFilter(column)
+      .removeFromGroupBy(column)
+      .removeFromWhere(column)
+      .removeFromHaving(column)
+      .removeFromOrderBy(column);
   }
 
   removeFilter(column: string): SqlQuery {
@@ -533,7 +545,7 @@ export class SqlQuery extends SqlBase {
   removeFromWhere(column: string) {
     // Removes all filters on the specified column from the where clause
     const value = this.valueOf();
-    if (!value.whereExpression) return;
+    if (!value.whereExpression) return this;
 
     if (
       value.whereExpression.isType('Comparison') &&
@@ -553,7 +565,7 @@ export class SqlQuery extends SqlBase {
   removeFromHaving(column: string) {
     // Removes all filters on the specified column from the having clause
     const value = this.valueOf();
-    if (!value.havingExpression) return;
+    if (!value.havingExpression) return this;
 
     if (
       value.havingExpression.isType('Comparison') &&
@@ -574,7 +586,7 @@ export class SqlQuery extends SqlBase {
     // Removes and order by unit from the order by clause
     const value = this.valueOf();
     const index = this.getColumns().indexOf(column) + 1;
-    if (!value.orderByUnits) return new SqlQuery(value);
+    if (!value.orderByUnits) return this;
 
     const filteredUnitsList = Separator.filterStringFromInterfaceList<OrderByUnit>(
       value.orderByUnits,
@@ -602,13 +614,11 @@ export class SqlQuery extends SqlBase {
     // Removes a column from the group by clause
     const value = this.valueOf();
     const index = this.getColumns().indexOf(column) + 1;
-    if (!value.groupByExpression) return new SqlQuery(value);
+    if (!value.groupByExpression) return this;
 
     const filteredUnitsList = Separator.filterStringFromInterfaceList<SqlBase>(
       value.groupByExpression,
-      unit => {
-        return SqlRef.equalsString(unit, column) || SqlLiteral.equalsLiteral(unit, index);
-      },
+      unit => SqlRef.equalsString(unit, column) || SqlLiteral.equalsLiteral(unit, index),
       value.groupByExpressionSeparators,
     );
 
@@ -769,7 +779,7 @@ export class SqlQuery extends SqlBase {
 
   addColumn(column: SqlBase) {
     const value = this.valueOf();
-    if (!value.selectValues) return new SqlQuery(value);
+    if (!value.selectValues) return this;
 
     value.selectValues = [column].concat(value.selectValues);
     value.selectSeparators = (value.selectSeparators || []).concat(Separator.rightSeparator(','));
