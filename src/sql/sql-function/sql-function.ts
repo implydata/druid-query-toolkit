@@ -21,8 +21,8 @@ import { SqlBase, SqlBaseValue } from '../sql-base';
 
 export interface SqlFunctionValue extends SqlBaseValue {
   functionName?: string;
-  decorator?: string;
   arguments?: SqlBase[];
+  decorator?: string;
   separators?: Separator[];
   filterKeyword?: string;
   whereKeyword?: string;
@@ -31,8 +31,8 @@ export interface SqlFunctionValue extends SqlBaseValue {
 
 export class SqlFunction extends SqlBase {
   public functionName?: string;
-  public decorator?: string;
   public arguments?: SqlBase[];
+  public decorator?: string;
   public separators?: Separator[];
   public filterKeyword?: string;
   public whereKeyword?: string;
