@@ -25,7 +25,8 @@ describe('simple expressions', () => {
 
   it('Simple select', () => {
     const sql = `Select * from table`;
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"Select * from table"`);
+
+    expect(parser(sql).toString()).toMatch(sql);
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlQuery {
@@ -111,7 +112,8 @@ describe('simple expressions', () => {
 
   it('Simple select in brackets', () => {
     const sql = `(Select * from table)`;
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"(Select * from table)"`);
+
+    expect(parser(sql).toString()).toMatch(sql);
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlQuery {
@@ -203,7 +205,8 @@ describe('simple expressions', () => {
 
   it('Simple select, columns with aliases', () => {
     const sql = `Select Sum(*) As sums from table`;
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"Select Sum(*) As sums from table"`);
+
+    expect(parser(sql).toString()).toMatch(sql);
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlQuery {
@@ -333,15 +336,8 @@ describe('simple expressions', () => {
     CASE WHEN SUM(num_rows) = 0 THEN 0 ELSE SUM("num_rows") END AS avg_num_rows,
     COUNT(*) AS num_segments
 FROM sys.segments`;
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`
-      "SELECT
-          datasource,
-          SUM(\\"size\\") AS total_size,
-          CASE WHEN SUM(\\"size\\") = 0 THEN 0 ELSE SUM(\\"size\\")  END AS avg_size,
-          CASE WHEN SUM(num_rows) = 0 THEN 0 ELSE SUM(\\"num_rows\\") END AS avg_num_rows,
-          COUNT(*) AS num_segments
-      FROM sys.segments"
-    `);
+
+    expect(parser(sql).toString()).toMatch(sql);
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlQuery {
@@ -802,13 +798,8 @@ FROM sys.segments`;
     SUM("size") AS total_size,
     COUNT(*) AS num_segments
 FROM sys.segments`;
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`
-      "SELECT
-          datasource,
-          SUM(\\"size\\") AS total_size,
-          COUNT(*) AS num_segments
-      FROM sys.segments"
-    `);
+
+    expect(parser(sql).toString()).toMatch(sql);
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlQuery {
@@ -1003,7 +994,8 @@ FROM sys.segments`;
 
   it('Simple select with Explain', () => {
     const sql = `Explain plan for Select * from table`;
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"Explain plan for Select * from table"`);
+
+    expect(parser(sql).toString()).toMatch(sql);
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlQuery {
@@ -1092,12 +1084,8 @@ FROM sys.segments`;
   SELECT deptno
   FROM   emp)
     Select * from table`;
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`
-      "WITH dept_count AS (
-        SELECT deptno
-        FROM   emp)
-          Select * from table"
-    `);
+
+    expect(parser(sql).toString()).toMatch(sql);
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlQuery {
@@ -4176,17 +4164,15 @@ describe('Queries with annotated comments', () => {
     order by column
     --: valueName = value`;
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`
-      "Select column, column1, column2 from table 
-          order by column
-          --: valueName = value"
-    `);
+    expect(parser(sql).toString()).toMatch(sql);
   });
 });
 
 describe('No spacing', () => {
   it('Expression with no spacing', () => {
     const sql = `SELECT"channel",COUNT(*)AS"Count",COUNT(DISTINCT"cityName")AS"dist_cityName"FROM"wiki"GROUP BY"channel"ORDER BY"Count"DESC`;
+
+    expect(parser(sql).toString()).toMatch(sql);
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": "",
@@ -4386,6 +4372,5 @@ describe('No spacing', () => {
         "withUnits": undefined,
       }
     `);
-    expect(parser(sql).toString()).toMatch(sql);
   });
 });
