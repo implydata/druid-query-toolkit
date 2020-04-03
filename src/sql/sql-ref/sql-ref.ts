@@ -24,8 +24,18 @@ export interface SqlRefValue extends SqlBaseValue {
 export class SqlRef extends SqlBase {
   static type = 'ref';
 
-  static fromName(name: string | SqlRef, namespace?: string) {
-    return new SqlRef({ name: name, namespace: namespace } as SqlRefValue);
+  static fromName(
+    name: string | SqlRef,
+    namespace?: string,
+    quotes?: string,
+    namespaceQuotes?: string,
+  ) {
+    return new SqlRef({
+      name: name,
+      namespace: namespace,
+      quotes: quotes,
+      namespaceQuotes: namespaceQuotes,
+    } as SqlRefValue);
   }
   static fromNameWithDoubleQuotes(name: string) {
     return new SqlRef({ name: name, quotes: '"' } as SqlRefValue);
@@ -39,6 +49,7 @@ export class SqlRef extends SqlBase {
     return (
       expression instanceof SqlRef &&
       (expression.name === stringValue ||
+        expression.namespace === stringValue ||
         (expression.name instanceof SqlRef && SqlRef.equalsString(expression.name, stringValue)))
     );
   }

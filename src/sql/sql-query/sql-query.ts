@@ -377,9 +377,9 @@ export class SqlQuery extends SqlBase {
 
     return this.tables.map(table => {
       if (table instanceof SqlRef) {
-        return table.name;
-      } else if (table.alias) {
-        return table.alias.name;
+        return table.name.toString();
+      } else if (table.alias && table.alias.name) {
+        return table.alias.name.toString();
       }
       return;
     })[0];
@@ -838,7 +838,7 @@ export class SqlQuery extends SqlBase {
     return new SqlQuery(value);
   }
 
-  addJoin(type: 'Left' | 'Inner', joinTable: SqlRef, onExpression: SqlMulti) {
+  addJoin(type: 'LEFT' | 'INNER', joinTable: SqlRef, onExpression: SqlMulti) {
     const value = this.valueOf();
     value.joinType = type;
     value.joinKeyword = 'JOIN';
