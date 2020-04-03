@@ -76,5 +76,9 @@ export class SqlRef extends SqlBase {
     }
     return str;
   }
+  public getName(): string {
+    if (this.name instanceof SqlRef) return this.name.getName();
+    return name;
+  }
 }
 SqlBase.register(SqlRef.type, SqlRef);
