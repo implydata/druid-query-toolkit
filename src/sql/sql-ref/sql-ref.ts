@@ -15,7 +15,7 @@
 import { SqlBase, SqlBaseValue } from '../sql-base';
 
 export interface SqlRefValue extends SqlBaseValue {
-  name: string;
+  name: string | SqlRef;
   quotes?: string;
   namespace?: string;
   namespaceQuotes?: string;
@@ -24,10 +24,9 @@ export interface SqlRefValue extends SqlBaseValue {
 export class SqlRef extends SqlBase {
   static type = 'ref';
 
-  static fromName(name: string) {
-    return new SqlRef({ name: name } as SqlRefValue);
+  static fromName(name: string | SqlRef, namespace?: string) {
+    return new SqlRef({ name: name, namespace: namespace } as SqlRefValue);
   }
-
   static fromNameWithDoubleQuotes(name: string) {
     return new SqlRef({ name: name, quotes: '"' } as SqlRefValue);
   }
@@ -36,11 +35,15 @@ export class SqlRef extends SqlBase {
     return `${quote}${thing}${quote}`;
   }
 
-  static equalsString(expression: SqlBase, stringValue: string) {
-    return expression instanceof SqlRef && expression.name === stringValue;
+  static equalsString(expression: SqlBase, stringValue: string): boolean {
+    return (
+      expression instanceof SqlRef &&
+      (expression.name === stringValue ||
+        (expression.name instanceof SqlRef && SqlRef.equalsString(expression.name, stringValue)))
+    );
   }
 
-  public name: string;
+  public name: string | SqlRef;
   public quotes?: string;
   public namespace?: string;
   public namespaceQuotes?: string;
@@ -61,7 +64,7 @@ export class SqlRef extends SqlBase {
     return value as SqlRefValue;
   }
   public toRawString(): string {
-    let str = SqlRef.wrapInQuotes(this.name, this.quotes || '');
+    let str = SqlRef.wrapInQuotes(this.name.toString(), this.quotes || '');
     if (this.namespace) {
       str = [
         SqlRef.wrapInQuotes(this.namespace, this.namespaceQuotes || ''),
