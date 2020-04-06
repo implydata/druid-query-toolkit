@@ -592,7 +592,7 @@ SingleQuotedString = ['] name:$([^']*) [']
 
 // ------------------------------
 
-SqlRef = namespaceBits:(RefPart _? "." _?)? main:RefPart
+SqlRef = namespaceBits:((RefPart) _? "." _?)? main:RefPart !"."
 {
   return new sql .SqlRef({
     name: main.name,
@@ -605,6 +605,19 @@ SqlRef = namespaceBits:(RefPart _? "." _?)? main:RefPart
     }
   });
 }
+/namespaceBits:((RefPart) _? "." _?) main:SqlRef
+ {
+  return new sql .SqlRef({
+    name: main,
+    quotes: main.quotes,
+    namespace: deepGet(namespaceBits, '0.name'),
+    namespaceQuotes: deepGet(namespaceBits, '0.quotes'),
+    innerSpacing: {
+      preDot: deepGet(namespaceBits, '1'),
+      postDot: deepGet(namespaceBits, '3'),
+    }
+  });
+ }
 /SqlInParens
 
 RefPart = QuotedRefPart / UnquotedRefPart

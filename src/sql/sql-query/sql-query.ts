@@ -377,9 +377,9 @@ export class SqlQuery extends SqlBase {
 
     return this.tables.map(table => {
       if (table instanceof SqlRef) {
-        return table.name;
-      } else if (table.alias) {
-        return table.alias.name;
+        return table.name.toString();
+      } else if (table.alias && table.alias.name) {
+        return table.alias.name.toString();
       }
       return;
     })[0];
@@ -405,9 +405,9 @@ export class SqlQuery extends SqlBase {
     return this.orderByUnits.map(unit => {
       let id = '';
       if (unit.expression instanceof SqlLiteral && typeof unit.expression.value === 'number') {
-        id = columns[unit.expression.value - 1] || '';
+        id = (columns[unit.expression.value - 1] || '').toString();
       } else if (unit.expression instanceof SqlRef) {
-        id = unit.expression.name;
+        id = unit.expression.name.toString();
       }
       return {
         // if the order by contains a number instead of a column name get the proper column name
@@ -837,6 +837,39 @@ export class SqlQuery extends SqlBase {
     value.tableSeparators = [];
     return new SqlQuery(value);
   }
-}
 
+  addJoin(type: 'LEFT' | 'INNER', joinTable: SqlRef, onExpression: SqlMulti) {
+    const value = this.valueOf();
+    value.joinType = type;
+    value.joinKeyword = 'JOIN';
+    value.joinTable = joinTable;
+    value.onKeyword = 'ON';
+    value.onExpression = onExpression;
+    value.innerSpacing = Object.assign({}, value.innerSpacing, {
+      preJoin: `\n`,
+      postJoinType: ' ',
+      postJoinKeyword: ' ',
+      postJoinTable: ' ',
+      postOn: ' ',
+    });
+    return new SqlQuery(value);
+  }
+
+  removeJoin() {
+    const value = this.valueOf();
+    value.joinType = undefined;
+    value.joinKeyword = undefined;
+    value.joinTable = undefined;
+    value.onKeyword = undefined;
+    value.onExpression = undefined;
+    value.innerSpacing = Object.assign({}, value.innerSpacing, {
+      preJoin: ``,
+      postJoinType: '',
+      postJoinKeyword: '',
+      postJoinTable: '',
+      postOn: '',
+    });
+    return new SqlQuery(value);
+  }
+}
 SqlBase.register(SqlQuery.type, SqlQuery);
