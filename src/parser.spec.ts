@@ -24,11 +24,13 @@ describe('Parser', () => {
 
       expect(parser(sql)).toMatchInlineSnapshot(`
         SqlRef {
+          "column": "page",
           "innerSpacing": Object {},
-          "name": "page",
           "namespace": undefined,
           "namespaceQuotes": undefined,
           "quotes": "\\"",
+          "table": undefined,
+          "tableQuotes": undefined,
           "type": "ref",
         }
       `);
@@ -39,11 +41,13 @@ describe('Parser', () => {
 
       expect(parser(sql)).toMatchInlineSnapshot(`
         SqlRef {
+          "column": "channel",
           "innerSpacing": Object {},
-          "name": "channel",
           "namespace": undefined,
           "namespaceQuotes": undefined,
           "quotes": "",
+          "table": undefined,
+          "tableQuotes": undefined,
           "type": "ref",
         }
       `);
@@ -54,14 +58,16 @@ describe('Parser', () => {
 
       expect(parser(sql)).toMatchInlineSnapshot(`
         SqlRef {
+          "column": "channel",
           "innerSpacing": Object {
-            "postDot": " ",
-            "preDot": " ",
+            "postTableDot": " ",
+            "preTableDot": " ",
           },
-          "name": "channel",
-          "namespace": "lol",
-          "namespaceQuotes": "\\"",
+          "namespace": undefined,
+          "namespaceQuotes": undefined,
           "quotes": "",
+          "table": "lol",
+          "tableQuotes": "\\"",
           "type": "ref",
         }
       `);
@@ -72,13 +78,13 @@ describe('Parser', () => {
 
       expect(parser(sql)).toMatchInlineSnapshot(`
         SqlRef {
+          "column": "channel",
           "innerSpacing": Object {
-            "postDot": " ",
-            "preDot": " ",
+            "postTableDot": " ",
+            "preTableDot": " ",
           },
-          "name": "channel",
-          "namespace": "lol",
-          "namespaceQuotes": "\\"",
+          "namespace": undefined,
+          "namespaceQuotes": undefined,
           "parens": Array [
             Object {
               "leftSpacing": " ",
@@ -89,7 +95,9 @@ describe('Parser', () => {
               "rightSpacing": "   ",
             },
           ],
-          "quotes": undefined,
+          "quotes": "",
+          "table": "lol",
+          "tableQuotes": "\\"",
           "type": "ref",
         }
       `);

@@ -184,7 +184,7 @@ FromClause = fromKeyword:FromToken postFrom:_ tableHead:(Alias/SqlRef) tableTail
   return {
     fromKeyword: fromKeyword,
     postFrom: postFrom,
-    tables: tableTail ? makeListMap(tableTail, 1, tableHead): [tableHead],
+    tables: tableTail ? makeListMap(tableTail, 1, tableHead).map(table => table.upgrade()): [tableHead.upgrade()],
     tableSeparators: tableTail ? makeListMap(tableTail, 0) : undefined
   }
 }
@@ -592,31 +592,35 @@ SingleQuotedString = ['] name:$([^']*) [']
 
 // ------------------------------
 
-SqlRef = namespaceBits:((RefPart) _? "." _?)? main:RefPart !"."
+SqlRef = tableBits:((RefPart) _? "." _?)? column:RefPart !"."
 {
   return new sql .SqlRef({
-    name: main.name,
-    quotes: main.quotes,
-    namespace: deepGet(namespaceBits, '0.name'),
-    namespaceQuotes: deepGet(namespaceBits, '0.quotes'),
+    column: column.name,
+    quotes: column.quotes,
+    table: deepGet(tableBits, '0.name'),
+    tableQuotes: deepGet(tableBits, '0.quotes'),
     innerSpacing: {
-      preDot: deepGet(namespaceBits, '1'),
-      postDot: deepGet(namespaceBits, '3'),
+      preTableDot: deepGet(tableBits, '1'),
+      postTableDot: deepGet(tableBits, '3'),
     }
   });
 }
-/namespaceBits:((RefPart) _? "." _?) main:SqlRef
+/ namespaceBits:((RefPart) _? "." _?) tableBits:((RefPart) _? "." _?) column:RefPart !"."
  {
-  return new sql .SqlRef({
-    name: main,
-    quotes: main.quotes,
-    namespace: deepGet(namespaceBits, '0.name'),
-    namespaceQuotes: deepGet(namespaceBits, '0.quotes'),
-    innerSpacing: {
-      preDot: deepGet(namespaceBits, '1'),
-      postDot: deepGet(namespaceBits, '3'),
-    }
-  });
+   return new sql .SqlRef({
+     column: column.name,
+     quotes: column.quotes,
+     table: deepGet(tableBits, '0.name'),
+     tableQuotes: deepGet(tableBits, '0.quotes'),
+     namespace: deepGet(namespaceBits, '0.name'),
+     namespaceQuotes: deepGet(namespaceBits, '0.quotes'),
+     innerSpacing: {
+       preTableDot: deepGet(tableBits, '1'),
+       posTabletDot: deepGet(tableBits, '3'),
+       preNamespaceDot: deepGet(namespaceBits, '1'),
+       postNamespaceDot: deepGet(namespaceBits, '3'),
+     }
+   });
  }
 /SqlInParens
 

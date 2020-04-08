@@ -36,7 +36,7 @@ export class SqlAliasRef extends SqlBase {
       column: column,
       postColumn: ' ',
       asKeyword: 'AS',
-      alias: SqlRef.fromNameWithDoubleQuotes(alias),
+      alias: SqlRef.fromStringWithDoubleQuotes(alias),
       innerSpacing: {
         postAs: ' ',
       },
@@ -49,6 +49,12 @@ export class SqlAliasRef extends SqlBase {
     this.postColumn = options.postColumn;
     this.asKeyword = options.asKeyword;
     this.alias = options.alias;
+  }
+
+  public upgrade() {
+    const value = this.valueOf();
+    value.alias = value.alias.upgrade();
+    return new SqlAliasRef(value);
   }
 
   public valueOf() {

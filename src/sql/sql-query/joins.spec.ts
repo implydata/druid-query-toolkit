@@ -35,10 +35,10 @@ describe('Add Join', () => {
       parser(`SELECT countryName from wikipedia`)
         .addJoin(
           'LEFT',
-          SqlRef.fromName('country', 'lookup'),
+          SqlRef.fromString('country', 'lookup'),
           SqlMulti.sqlMultiFactory('=', [
-            SqlRef.fromName(SqlRef.fromName('v', 'country'), 'lookup'),
-            SqlRef.fromName('countryName', 'wikipedia'),
+            SqlRef.fromString('v', 'country', 'lookup'),
+            SqlRef.fromString('countryName', 'wikipedia'),
           ]),
         )
         .toString(),
@@ -52,10 +52,10 @@ describe('Add Join', () => {
       parser(`SELECT countryName from wikipedia`)
         .addJoin(
           'INNER',
-          SqlRef.fromName('country', 'lookup'),
+          SqlRef.fromString('country', 'lookup'),
           SqlMulti.sqlMultiFactory('=', [
-            SqlRef.fromName(SqlRef.fromName('v', 'country'), 'lookup'),
-            SqlRef.fromName('countryName', 'wikipedia'),
+            SqlRef.fromString('v', 'country', 'lookup'),
+            SqlRef.fromString('countryName', 'wikipedia'),
           ]),
         )
         .toString(),

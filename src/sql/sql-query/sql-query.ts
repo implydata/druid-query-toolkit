@@ -377,9 +377,9 @@ export class SqlQuery extends SqlBase {
 
     return this.tables.map(table => {
       if (table instanceof SqlRef) {
-        return table.name.toString();
-      } else if (table.alias && table.alias.name) {
-        return table.alias.name.toString();
+        return table.table;
+      } else if (table.alias && table.alias.table) {
+        return table.alias.table;
       }
       return;
     })[0];
@@ -406,8 +406,8 @@ export class SqlQuery extends SqlBase {
       let id = '';
       if (unit.expression instanceof SqlLiteral && typeof unit.expression.value === 'number') {
         id = (columns[unit.expression.value - 1] || '').toString();
-      } else if (unit.expression instanceof SqlRef) {
-        id = unit.expression.name.toString();
+      } else if (unit.expression instanceof SqlRef && unit.expression.column) {
+        id = unit.expression.column;
       }
       return {
         // if the order by contains a number instead of a column name get the proper column name
@@ -423,7 +423,7 @@ export class SqlQuery extends SqlBase {
     const columns = this.getColumns();
     const aggregateColumns = this.groupByExpression.map(column => {
       if (column instanceof SqlRef) {
-        return column.name;
+        return column.column;
       } else if (typeof column === 'number') {
         return columns[column - 1] || '';
       } else if (column instanceof SqlLiteral && typeof column.value === 'number') {
@@ -439,7 +439,7 @@ export class SqlQuery extends SqlBase {
 
   orderBy(column: string, direction: 'ASC' | 'DESC' | undefined) {
     const orderByUnit = {
-      expression: SqlRef.fromNameWithDoubleQuotes(column),
+      expression: SqlRef.fromStringWithDoubleQuotes(column),
       postExpression: direction ? ' ' : '',
       direction: direction,
     };
@@ -638,7 +638,7 @@ export class SqlQuery extends SqlBase {
     const columns = this.getColumns();
     const aggregateColumns = this.groupByExpression.map(column => {
       if (column instanceof SqlRef) {
-        return column.name;
+        return column.column;
       } else if (typeof column === 'number') {
         return columns[column - 1] || '';
       } else if (column instanceof SqlLiteral && typeof column.value === 'number') {
@@ -662,7 +662,7 @@ export class SqlQuery extends SqlBase {
       filterSqlRefs = filterSqlRefs.concat(this.whereExpression.getSqlRefs());
     }
 
-    return filterSqlRefs.map(sqlRef => sqlRef.name);
+    return filterSqlRefs.map(sqlRef => sqlRef.column);
   }
 
   addWhereFilter(
@@ -676,7 +676,7 @@ export class SqlQuery extends SqlBase {
     // create new  filter to be added
     const filter: SqlMulti = new SqlMulti({
       arguments: [
-        typeof column === 'string' ? SqlRef.fromNameWithDoubleQuotes(column) : column,
+        typeof column === 'string' ? SqlRef.fromStringWithDoubleQuotes(column) : column,
         filterValue instanceof SqlBase ? filterValue : SqlLiteral.fromInput(filterValue),
       ],
       separators: [Separator.bothSeparator(operator)],
@@ -704,7 +704,7 @@ export class SqlQuery extends SqlBase {
     // create new  filter to be added
     const filter: SqlMulti = new SqlMulti({
       arguments: [
-        typeof column === 'string' ? SqlRef.fromNameWithDoubleQuotes(column) : column,
+        typeof column === 'string' ? SqlRef.fromStringWithDoubleQuotes(column) : column,
         filterValue instanceof SqlBase ? filterValue : SqlLiteral.fromInput(filterValue),
       ],
       separators: [Separator.bothSeparator(operator)],
@@ -812,9 +812,9 @@ export class SqlQuery extends SqlBase {
 
     return this.selectValues.map(column => {
       if (column instanceof SqlRef) {
-        return column.name;
+        return column.column;
       } else if (column instanceof SqlAliasRef) {
-        return column.alias.name;
+        return column.alias.column;
       }
       return;
     });
@@ -833,7 +833,7 @@ export class SqlQuery extends SqlBase {
   replaceFrom(table: string) {
     const value = this.valueOf();
 
-    value.tables = [SqlRef.fromName(table)];
+    value.tables = [SqlRef.fromString(table)];
     value.tableSeparators = [];
     return new SqlQuery(value);
   }

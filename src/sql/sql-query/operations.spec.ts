@@ -370,7 +370,7 @@ describe('remove functions', () => {
     ).toMatchInlineSnapshot(`
       "SELECT column, column1, column2
         FROM sys.\\"github\\"
-        Order By column, 2 ASC"
+        Order By 2 ASC"
     `);
   });
   it('remove column not in order by', () => {
@@ -526,7 +526,7 @@ describe('addAggregateColumn', () => {
 
     expect(
       parser(sql)
-        .addAggregateColumn([SqlRef.fromName('column2')], 'min', 'alias')
+        .addAggregateColumn([SqlRef.fromString('column2')], 'min', 'alias')
         .toString(),
     ).toMatchInlineSnapshot(`"select column1, min(column2) AS \\"alias\\" from table"`);
   });
@@ -536,7 +536,7 @@ describe('addAggregateColumn', () => {
 
     expect(
       parser(sql)
-        .addAggregateColumn([SqlRef.fromName('column2')], 'min', 'alias', undefined, 'DISTINCT')
+        .addAggregateColumn([SqlRef.fromString('column2')], 'min', 'alias', undefined, 'DISTINCT')
         .toString(),
     ).toMatchInlineSnapshot(`"select column1, min(DISTINCT column2) AS \\"alias\\" from table"`);
   });
@@ -548,7 +548,7 @@ describe('addToGroupBy', () => {
 
     expect(
       parser(sql)
-        .addToGroupBy(SqlRef.fromNameWithDoubleQuotes('column'))
+        .addToGroupBy(SqlRef.fromStringWithDoubleQuotes('column'))
         .toString(),
     ).toMatchInlineSnapshot(`
       "select \\"column\\", Count(*) from table
@@ -563,7 +563,7 @@ describe('addToGroupBy', () => {
       parser(sql)
         .addToGroupBy(
           SqlAliasRef.sqlAliasFactory(
-            SqlFunction.sqlFunctionFactory('min', [SqlRef.fromName('column1')]),
+            SqlFunction.sqlFunctionFactory('min', [SqlRef.fromString('column1')]),
             'MinColumn',
           ),
         )
@@ -645,31 +645,37 @@ describe('addToGroupBy', () => {
         ],
         "selectValues": Array [
           SqlRef {
+            "column": "column1",
             "innerSpacing": Object {},
-            "name": "column1",
             "namespace": undefined,
             "namespaceQuotes": undefined,
             "quotes": "",
+            "table": undefined,
+            "tableQuotes": undefined,
             "type": "ref",
           },
           SqlAliasRef {
             "alias": SqlRef {
+              "column": "aliasName",
               "innerSpacing": Object {},
-              "name": "aliasName",
               "namespace": undefined,
               "namespaceQuotes": undefined,
               "quotes": "",
+              "table": undefined,
+              "tableQuotes": undefined,
               "type": "ref",
             },
             "asKeyword": "AS",
             "column": SqlFunction {
               "arguments": Array [
                 SqlRef {
+                  "column": "column1",
                   "innerSpacing": Object {},
-                  "name": "column1",
                   "namespace": undefined,
                   "namespaceQuotes": undefined,
                   "quotes": "",
+                  "table": undefined,
+                  "tableQuotes": undefined,
                   "type": "ref",
                 },
               ],
@@ -702,11 +708,16 @@ describe('addToGroupBy', () => {
         "tableSeparators": Array [],
         "tables": Array [
           SqlRef {
-            "innerSpacing": Object {},
-            "name": "table",
+            "column": undefined,
+            "innerSpacing": Object {
+              "postTable": "",
+              "preTable": "",
+            },
             "namespace": undefined,
             "namespaceQuotes": undefined,
-            "quotes": "",
+            "quotes": undefined,
+            "table": "table",
+            "tableQuotes": "",
             "type": "ref",
           },
         ],
@@ -724,7 +735,7 @@ describe('addToGroupBy', () => {
       parser(sql)
         .addToGroupBy(
           SqlAliasRef.sqlAliasFactory(
-            SqlFunction.sqlFunctionFactory('max', [SqlRef.fromName('column2')]),
+            SqlFunction.sqlFunctionFactory('max', [SqlRef.fromString('column2')]),
             'MaxColumn',
           ),
         )
