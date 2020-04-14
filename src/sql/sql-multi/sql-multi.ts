@@ -94,17 +94,18 @@ export class SqlMulti extends SqlBase {
     return [];
   }
 
-  addOrReplaceColumn(column: string, filter: SqlMulti | SqlUnary): SqlMulti | SqlUnary {
+  addOrReplaceColumn(column: string | SqlRef, filter: SqlMulti | SqlUnary): SqlMulti | SqlUnary {
     const value = this.valueOf();
     const currentFilter = new SqlMulti(value);
     if (!value.arguments) return currentFilter;
-
+    const columnString = typeof column === 'string' ? column : column.column;
     switch (value.expressionType) {
       case 'AND':
         value.arguments = value.arguments.map(argument => {
           if (
+            columnString &&
             (argument instanceof SqlMulti || argument instanceof SqlMulti) &&
-            argument.containsColumn(column)
+            argument.containsColumn(columnString)
           ) {
             return filter;
           } else {
@@ -130,7 +131,9 @@ export class SqlMulti extends SqlBase {
         return SqlMulti.sqlMultiFactory('AND', [currentFilter.addParens('', ''), filter]);
 
       default:
-        if (currentFilter.containsColumn(column)) return filter;
+        if (columnString && currentFilter.containsColumn(columnString)) {
+          return filter;
+        }
         return SqlMulti.sqlMultiFactory('AND', [currentFilter, filter]);
     }
   }

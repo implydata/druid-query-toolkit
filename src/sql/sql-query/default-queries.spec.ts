@@ -17,30 +17,8 @@ import { FUNCTIONS } from '../../test-utils';
 
 const parser = sqlParserFactory(FUNCTIONS);
 
-// describe('Expression Tests', () => {
-//   it('parsers a basic math expression', () => {
-//     expect(parser(`1 + 1`)).toMatchSnapshot();
-//   });
-//
-//   it('parsers an expression with all operators', () => {
-//     expect(parser(`1 + 1 / 1 * 1 - 1`)).toMatchSnapshot();
-//   });
-//
-//   it('parsers an expression with brackets', () => {
-//     expect(
-//       parser(`
-//     2 * (3 + 4)
-//     `),
-//     ).toMatchSnapshot();
-//   });
-//
-//   it('parsers an expression with string values', () => {
-//     expect(parser('\'column\' = "value"')).toMatchSnapshot();
-//   });
-// });
-
 describe('Druid Query Tests', () => {
-  it('parsers the default data sources query', () => {
+  it('parses the default data sources query', () => {
     expect(
       parser(
         'SELECT\n' +
@@ -64,7 +42,7 @@ describe('Druid Query Tests', () => {
     `);
   });
 
-  it('parsers segments query', () => {
+  it('parses segments query', () => {
     expect(
       parser(
         'SELECT "segment_id", "datasource", "start", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed", "payload"\n' +
@@ -80,7 +58,7 @@ describe('Druid Query Tests', () => {
     `);
   });
 
-  it('parsers task query', () => {
+  it('parses task query', () => {
     expect(
       parser(
         'SELECT\n' +
@@ -110,7 +88,7 @@ describe('Druid Query Tests', () => {
     `);
   });
 
-  it('parsers servers query', () => {
+  it('parses servers query', () => {
     expect(
       parser(
         'SELECT\n' +
@@ -152,7 +130,7 @@ describe('Druid Query Tests', () => {
 });
 
 describe('Druid Query Tests', () => {
-  it('parsers the default data sources query to string', () => {
+  it('parses the default data sources query to string', () => {
     expect(
       parser(
         'SELECT\n' +
@@ -182,7 +160,7 @@ describe('Druid Query Tests', () => {
     `);
   });
 
-  it('parsers segments query to string', () => {
+  it('parses segments query to string', () => {
     expect(
       parser(
         'SELECT "segment_id", "datasource", "start", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed", "payload"\n' +
@@ -198,7 +176,7 @@ describe('Druid Query Tests', () => {
     `);
   });
 
-  it('parsers task query to string', () => {
+  it('parses task query to string', () => {
     expect(
       parser(
         'SELECT\n' +
@@ -228,7 +206,7 @@ describe('Druid Query Tests', () => {
     `);
   });
 
-  it('parsers servers query to string', () => {
+  it('parses servers query to string', () => {
     expect(
       parser(
         'SELECT\n' +
@@ -268,47 +246,28 @@ describe('Druid Query Tests', () => {
     `);
   });
 
-  it('parsers servers query with columns in brackets to string', () => {
-    expect(
-      parser(
-        'SELECT\n' +
-          '  ("server"), "server_type", "tier", "host", "plaintext_port", "tls_port", "curr_size", "max_size",\n' +
-          '  (\n' +
-          '    CASE "server_type"\n' +
-          "    WHEN 'coordinator' THEN 7\n" +
-          "    WHEN 'overlord' THEN 6\n" +
-          "    WHEN 'router' THEN 5\n" +
-          "    WHEN 'broker' THEN 4\n" +
-          "    WHEN 'historical' THEN 3\n" +
-          "    WHEN 'middle_manager' THEN 2\n" +
-          "    WHEN 'peon' THEN 1\n" +
-          '    ELSE 0\n' +
-          '    END\n' +
-          '  ) AS "rank"\n' +
-          'FROM sys.servers\n' +
-          'ORDER BY "rank" DESC, "server" DESC',
-      ).toString(),
-    ).toMatchInlineSnapshot(`
-      "SELECT
-        (server), \\"server_type\\", \\"tier\\", \\"host\\", \\"plaintext_port\\", \\"tls_port\\", \\"curr_size\\", \\"max_size\\",
-        (
-          CASE \\"server_type\\"
-          WHEN 'coordinator' THEN 7
-          WHEN 'overlord' THEN 6
-          WHEN 'router' THEN 5
-          WHEN 'broker' THEN 4
-          WHEN 'historical' THEN 3
-          WHEN 'middle_manager' THEN 2
-          WHEN 'peon' THEN 1
-          ELSE 0
-          END
-        ) AS \\"rank\\"
-      FROM sys.servers
-      ORDER BY \\"rank\\" DESC, \\"server\\" DESC"
-    `);
+  it('parses servers query with columns in brackets to string', () => {
+    const sql =
+      'SELECT\n' +
+      '  ("server"), "server_type", "tier", "host", "plaintext_port", "tls_port", "curr_size", "max_size",\n' +
+      '  (\n' +
+      '    CASE "server_type"\n' +
+      "    WHEN 'coordinator' THEN 7\n" +
+      "    WHEN 'overlord' THEN 6\n" +
+      "    WHEN 'router' THEN 5\n" +
+      "    WHEN 'broker' THEN 4\n" +
+      "    WHEN 'historical' THEN 3\n" +
+      "    WHEN 'middle_manager' THEN 2\n" +
+      "    WHEN 'peon' THEN 1\n" +
+      '    ELSE 0\n' +
+      '    END\n' +
+      '  ) AS "rank"\n' +
+      'FROM sys.servers\n' +
+      'ORDER BY "rank" DESC, "server" DESC';
+    expect(parser(sql).toString()).toMatch(sql);
   });
 
-  it('parsers segments query with concat', () => {
+  it('parses segments query with concat', () => {
     expect(
       parser(
         'SELECT\n' +
@@ -323,13 +282,13 @@ describe('Druid Query Tests', () => {
     ).toMatchSnapshot();
   });
 
-  it('parsers segments query with concat', () => {
+  it('parses segments query with concat', () => {
     expect(
       parser(`SELECT "start" || ' / ' || "end" FROM sys.segments GROUP BY 1,2`).toString(),
     ).toMatchSnapshot();
   });
 
-  it('parsers the default data sources query to string with spaces', () => {
+  it('parses the default data sources query to string with spaces', () => {
     expect(
       parser(
         'SELECT\n' +
@@ -359,7 +318,7 @@ describe('Druid Query Tests', () => {
     `);
   });
 
-  it('parsers the default data sources query to string with spaces', () => {
+  it('parses the default data sources query to string with spaces', () => {
     expect(
       parser(
         `SELECT` +

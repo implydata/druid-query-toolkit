@@ -26,11 +26,13 @@ describe('Functions', () => {
       SqlFunction {
         "arguments": Array [
           SqlRef {
+            "column": "A",
             "innerSpacing": Object {},
-            "name": "A",
             "namespace": undefined,
             "namespaceQuotes": undefined,
             "quotes": "",
+            "table": undefined,
+            "tableQuotes": undefined,
             "type": "ref",
           },
         ],
@@ -64,11 +66,13 @@ describe('Functions', () => {
       SqlFunction {
         "arguments": Array [
           SqlRef {
+            "column": "A",
             "innerSpacing": Object {},
-            "name": "A",
             "namespace": undefined,
             "namespaceQuotes": undefined,
             "quotes": "",
+            "table": undefined,
+            "tableQuotes": undefined,
             "type": "ref",
           },
         ],
@@ -204,11 +208,13 @@ describe('Functions', () => {
       SqlFunction {
         "arguments": Array [
           SqlRef {
+            "column": "A",
             "innerSpacing": Object {},
-            "name": "A",
             "namespace": undefined,
             "namespaceQuotes": undefined,
             "quotes": "",
+            "table": undefined,
+            "tableQuotes": undefined,
             "type": "ref",
           },
         ],
@@ -244,11 +250,13 @@ describe('Functions', () => {
           SqlFunction {
             "arguments": Array [
               SqlRef {
+                "column": "A",
                 "innerSpacing": Object {},
-                "name": "A",
                 "namespace": undefined,
                 "namespaceQuotes": undefined,
                 "quotes": "",
+                "table": undefined,
+                "tableQuotes": undefined,
                 "type": "ref",
               },
             ],
@@ -276,11 +284,13 @@ describe('Functions', () => {
               SqlFunction {
                 "arguments": Array [
                   SqlRef {
+                    "column": "B",
                     "innerSpacing": Object {},
-                    "name": "B",
                     "namespace": undefined,
                     "namespaceQuotes": undefined,
                     "quotes": "",
+                    "table": undefined,
+                    "tableQuotes": undefined,
                     "type": "ref",
                   },
                 ],
@@ -308,11 +318,13 @@ describe('Functions', () => {
                   SqlFunction {
                     "arguments": Array [
                       SqlRef {
+                        "column": "c",
                         "innerSpacing": Object {},
-                        "name": "c",
                         "namespace": undefined,
                         "namespaceQuotes": undefined,
                         "quotes": "",
+                        "table": undefined,
+                        "tableQuotes": undefined,
                         "type": "ref",
                       },
                     ],
@@ -388,11 +400,13 @@ describe('Functions', () => {
       SqlFunction {
         "arguments": Array [
           SqlRef {
+            "column": "A",
             "innerSpacing": Object {},
-            "name": "A",
             "namespace": undefined,
             "namespaceQuotes": undefined,
             "quotes": "",
+            "table": undefined,
+            "tableQuotes": undefined,
             "type": "ref",
           },
         ],
@@ -415,11 +429,13 @@ describe('Functions', () => {
         "whereExpression": SqlMulti {
           "arguments": Array [
             SqlRef {
+              "column": "value",
               "innerSpacing": Object {},
-              "name": "value",
               "namespace": undefined,
               "namespaceQuotes": undefined,
               "quotes": "",
+              "table": undefined,
+              "tableQuotes": undefined,
               "type": "ref",
             },
             SqlLiteral {

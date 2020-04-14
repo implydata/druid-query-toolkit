@@ -15,8 +15,10 @@
 import { SqlBase, SqlBaseValue } from '../sql-base';
 
 export interface SqlRefValue extends SqlBaseValue {
-  name: string;
+  column?: string;
   quotes?: string;
+  table?: string;
+  tableQuotes?: string;
   namespace?: string;
   namespaceQuotes?: string;
 }
@@ -24,54 +26,125 @@ export interface SqlRefValue extends SqlBaseValue {
 export class SqlRef extends SqlBase {
   static type = 'ref';
 
-  static fromName(name: string) {
-    return new SqlRef({ name: name } as SqlRefValue);
+  static fromString(
+    column: string,
+    table?: string,
+    namespace?: string,
+    quotes?: string,
+    tableQuotes?: string,
+    namespaceQuotes?: string,
+  ) {
+    return new SqlRef({
+      column: column,
+      table: table,
+      namespace: namespace,
+      quotes: quotes,
+      tableQuotes: tableQuotes,
+      namespaceQuotes: namespaceQuotes,
+    } as SqlRefValue);
+  }
+  static fromStringWithDoubleQuotes(column: string) {
+    return new SqlRef({ column: column, quotes: '"' } as SqlRefValue);
   }
 
-  static fromNameWithDoubleQuotes(name: string) {
-    return new SqlRef({ name: name, quotes: '"' } as SqlRefValue);
-  }
-
-  static wrapInQuotes(thing: string, quote: string): string {
+  static wrapInQuotes(thing?: string, quote?: string): string {
+    if (!thing) return '';
     return `${quote}${thing}${quote}`;
   }
 
-  static equalsString(expression: SqlBase, stringValue: string) {
-    return expression instanceof SqlRef && expression.name === stringValue;
+  static equalsString(expression: SqlBase, stringValue: string): boolean {
+    return (
+      expression instanceof SqlRef &&
+      (expression.column === stringValue ||
+        expression.table === stringValue ||
+        expression.namespace === stringValue)
+    );
   }
 
-  public name: string;
+  public column?: string;
   public quotes?: string;
   public namespace?: string;
   public namespaceQuotes?: string;
+  public table?: string;
+  public tableQuotes?: string;
 
   constructor(options: SqlRefValue) {
     super(options, SqlRef.type);
-    this.name = options.name;
+    this.column = options.column;
     this.quotes = options.quotes;
     this.namespace = options.namespace;
     this.namespaceQuotes = options.namespaceQuotes;
+    this.table = options.table;
+    this.tableQuotes = options.tableQuotes;
   }
 
   public valueOf() {
     const value: any = super.valueOf();
-    value.name = this.name;
+    value.column = this.column;
     value.namespace = this.namespace;
+    value.table = this.table;
+    value.quotes = this.quotes;
+    value.namespaceQuotes = this.namespaceQuotes;
+    value.tableQuotes = this.tableQuotes;
     value.namespaceQuotes = this.namespaceQuotes;
     return value as SqlRefValue;
   }
+  public assemblePart(
+    main?: string,
+    quotes?: string,
+    preDotSpacing?: string,
+    dot?: string,
+    posDotSpacing?: string,
+  ) {
+    return [SqlRef.wrapInQuotes(main || '', quotes || ''), preDotSpacing, dot, posDotSpacing].join(
+      '',
+    );
+  }
   public toRawString(): string {
-    let str = SqlRef.wrapInQuotes(this.name, this.quotes || '');
-    if (this.namespace) {
-      str = [
-        SqlRef.wrapInQuotes(this.namespace, this.namespaceQuotes || ''),
-        this.getInnerSpace('preDot'),
-        '.',
-        this.getInnerSpace('postDot'),
-        str,
-      ].join('');
-    }
-    return str;
+    return [
+      this.assemblePart(
+        this.namespace,
+        this.namespaceQuotes,
+        this.innerSpacing.preNamespaceDot,
+        this.namespace && this.table ? '.' : '',
+        this.innerSpacing.postNamespaceDot,
+      ),
+      this.assemblePart(
+        this.table,
+        this.tableQuotes,
+        this.innerSpacing.preTableDot,
+        this.column && this.table ? '.' : '',
+        this.innerSpacing.postTableDot,
+      ),
+      SqlRef.wrapInQuotes(this.column || '', this.quotes || ''),
+    ].join('');
+  }
+
+  public upgrade() {
+    const value = this.valueOf();
+    if (value.namespace && value.table && value.column) return this;
+    value.namespace = value.table;
+    value.namespaceQuotes = value.tableQuotes;
+    value.innerSpacing.preNamespace = value.innerSpacing.preTable;
+    value.innerSpacing.preNamespace = value.innerSpacing.postTable;
+
+    value.table = value.column;
+    value.tableQuotes = value.quotes;
+    value.innerSpacing.postTable = '';
+    value.innerSpacing.preTable = '';
+
+    value.column = undefined;
+    value.quotes = undefined;
+
+    return new SqlRef(value);
+  }
+  public getColumn(): string {
+    if (!this.column) throw Error('Sql ref has no defined column');
+    return this.column;
+  }
+  public getTable(): string {
+    if (!this.table) throw Error('Sql ref has no defined table');
+    return this.table;
   }
 }
 SqlBase.register(SqlRef.type, SqlRef);

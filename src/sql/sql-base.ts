@@ -38,7 +38,7 @@ export abstract class SqlBase {
 
   static getColumnName(column: string | SqlBase): string {
     if (typeof column === 'string') return column;
-    if (column instanceof SqlRef) return column.name;
+    if (column instanceof SqlRef && column.column) return column.column;
     if (column instanceof SqlAliasRef) {
       // @ts-ignore
       return column.alias.name;

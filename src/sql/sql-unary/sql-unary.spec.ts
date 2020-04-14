@@ -24,11 +24,13 @@ describe('Not expression', () => {
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlUnary {
         "argument": SqlRef {
+          "column": "B",
           "innerSpacing": Object {},
-          "name": "B",
           "namespace": undefined,
           "namespaceQuotes": undefined,
           "quotes": "",
+          "table": undefined,
+          "tableQuotes": undefined,
           "type": "ref",
         },
         "expressionType": "NOT",
@@ -50,11 +52,13 @@ describe('Not expression', () => {
         "arguments": Array [
           SqlUnary {
             "argument": SqlRef {
+              "column": "A",
               "innerSpacing": Object {},
-              "name": "A",
               "namespace": undefined,
               "namespaceQuotes": undefined,
               "quotes": "",
+              "table": undefined,
+              "tableQuotes": undefined,
               "type": "ref",
             },
             "expressionType": "NOT",
@@ -66,11 +70,13 @@ describe('Not expression', () => {
           },
           SqlUnary {
             "argument": SqlRef {
+              "column": "B",
               "innerSpacing": Object {},
-              "name": "B",
               "namespace": undefined,
               "namespaceQuotes": undefined,
               "quotes": "",
+              "table": undefined,
+              "tableQuotes": undefined,
               "type": "ref",
             },
             "expressionType": "NOT",
@@ -82,11 +88,13 @@ describe('Not expression', () => {
           },
           SqlUnary {
             "argument": SqlRef {
+              "column": "C",
               "innerSpacing": Object {},
-              "name": "C",
               "namespace": undefined,
               "namespaceQuotes": undefined,
               "quotes": "",
+              "table": undefined,
+              "tableQuotes": undefined,
               "type": "ref",
             },
             "expressionType": "NOT",
@@ -125,19 +133,23 @@ describe('Not expression', () => {
         "argument": SqlMulti {
           "arguments": Array [
             SqlRef {
+              "column": "A",
               "innerSpacing": Object {},
-              "name": "A",
               "namespace": undefined,
               "namespaceQuotes": undefined,
               "quotes": "",
+              "table": undefined,
+              "tableQuotes": undefined,
               "type": "ref",
             },
             SqlRef {
+              "column": "B",
               "innerSpacing": Object {},
-              "name": "B",
               "namespace": undefined,
               "namespaceQuotes": undefined,
               "quotes": "",
+              "table": undefined,
+              "tableQuotes": undefined,
               "type": "ref",
             },
           ],
@@ -173,19 +185,23 @@ describe('Not expression', () => {
             "argument": SqlMulti {
               "arguments": Array [
                 SqlRef {
+                  "column": "A",
                   "innerSpacing": Object {},
-                  "name": "A",
                   "namespace": undefined,
                   "namespaceQuotes": undefined,
                   "quotes": "",
+                  "table": undefined,
+                  "tableQuotes": undefined,
                   "type": "ref",
                 },
                 SqlRef {
+                  "column": "B",
                   "innerSpacing": Object {},
-                  "name": "B",
                   "namespace": undefined,
                   "namespaceQuotes": undefined,
                   "quotes": "",
+                  "table": undefined,
+                  "tableQuotes": undefined,
                   "type": "ref",
                 },
               ],
@@ -211,11 +227,13 @@ describe('Not expression', () => {
             "argument": SqlMulti {
               "arguments": Array [
                 SqlRef {
+                  "column": "C",
                   "innerSpacing": Object {},
-                  "name": "C",
                   "namespace": undefined,
                   "namespaceQuotes": undefined,
                   "quotes": "",
+                  "table": undefined,
+                  "tableQuotes": undefined,
                   "type": "ref",
                 },
                 SqlLiteral {
@@ -268,19 +286,23 @@ describe('Not expression', () => {
           "argument": SqlMulti {
             "arguments": Array [
               SqlRef {
+                "column": "A",
                 "innerSpacing": Object {},
-                "name": "A",
                 "namespace": undefined,
                 "namespaceQuotes": undefined,
                 "quotes": "",
+                "table": undefined,
+                "tableQuotes": undefined,
                 "type": "ref",
               },
               SqlRef {
+                "column": "B",
                 "innerSpacing": Object {},
-                "name": "B",
                 "namespace": undefined,
                 "namespaceQuotes": undefined,
                 "quotes": "",
+                "table": undefined,
+                "tableQuotes": undefined,
                 "type": "ref",
               },
             ],
