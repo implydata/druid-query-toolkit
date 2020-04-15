@@ -196,7 +196,7 @@ JoinClause = joinType:JoinType postJoinTypeSpacing:_ joinKeyword:JoinToken postJ
     postJoinTypeSpacing: postJoinTypeSpacing,
     joinKeyword: joinKeyword,
     postJoinKeywordSpacing: postJoinKeywordSpacing,
-    table: table,
+    table: table.upgrade(),
     postJoinTableSpacing: postJoinTableSpacing,
     onKeyword: onKeyword,
     postOnSpacing: postOnSpacing,
