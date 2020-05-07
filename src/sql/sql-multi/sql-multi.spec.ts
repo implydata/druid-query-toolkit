@@ -2353,59 +2353,22 @@ describe('getSqlRefs', () => {
     `);
   });
   it('IS function', () => {
-    const sql = `REGEXP_EXTRACT("cityName", 'San') IS NULL`;
+    const sql = `X IS NULL`;
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(
-      `"REGEXP_EXTRACT(\\"cityName\\", 'San') IS NULL"`,
-    );
+    expect(parser(sql).toString()).toMatchInlineSnapshot(`"X IS NULL"`);
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
-          SqlFunction {
-            "arguments": Array [
-              SqlRef {
-                "column": "cityName",
-                "innerSpacing": Object {},
-                "namespace": undefined,
-                "namespaceQuotes": undefined,
-                "quotes": "\\"",
-                "table": undefined,
-                "tableQuotes": undefined,
-                "type": "ref",
-              },
-              SqlLiteral {
-                "innerSpacing": Object {},
-                "quotes": "'",
-                "stringValue": "San",
-                "type": "literal",
-                "value": "San",
-              },
-            ],
-            "decorator": undefined,
-            "filterKeyword": undefined,
-            "functionName": "REGEXP_EXTRACT",
-            "innerSpacing": Object {
-              "postDecorator": "",
-              "postFilterKeyword": "",
-              "postFilterLeftParen": "",
-              "postLeftParen": "",
-              "postName": "",
-              "postWhereKeyword": "",
-              "preFilter": "",
-              "preFilterRightParen": "",
-              "preRightParen": "",
-            },
-            "separators": Array [
-              Separator {
-                "left": "",
-                "right": " ",
-                "separator": ",",
-              },
-            ],
-            "type": "function",
-            "whereExpression": undefined,
-            "whereKeyword": undefined,
+          SqlRef {
+            "column": "X",
+            "innerSpacing": Object {},
+            "namespace": undefined,
+            "namespaceQuotes": undefined,
+            "quotes": "",
+            "table": undefined,
+            "tableQuotes": undefined,
+            "type": "ref",
           },
           SqlLiteral {
             "innerSpacing": Object {},

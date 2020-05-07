@@ -40,7 +40,7 @@ describe('literal', () => {
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlLiteral {
         "innerSpacing": Object {},
-        "quotes": "'",
+        "quotes": "",
         "stringValue": "1",
         "type": "literal",
         "value": 1,
@@ -61,7 +61,7 @@ describe('literal', () => {
             "rightSpacing": "",
           },
         ],
-        "quotes": "'",
+        "quotes": "",
         "stringValue": "1",
         "type": "literal",
         "value": 1,
