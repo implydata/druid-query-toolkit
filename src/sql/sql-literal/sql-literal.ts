@@ -53,7 +53,7 @@ export class SqlLiteral extends SqlBase {
   }
 
   public toRawString(): string {
-    if (!this.stringValue && !(this.stringValue === '')) {
+    if (!this.stringValue && this.stringValue !== '') {
       throw new Error('Could not make raw string');
     }
 
