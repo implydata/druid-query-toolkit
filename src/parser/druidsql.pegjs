@@ -320,7 +320,7 @@ NotExpression = keyword:NotToken postKeyword:_ argument:(NotExpression/OrExpress
   }
   /ComparisonExpression
 
-ComparisonExpression = head:AdditionExpression tail:((__ ComparisonOperator __ (ComparisonExpression/AdditionExpression))/(_ BetweenToken _ (AndExpression/ComparisonExpression)))*
+ComparisonExpression = head:AdditionExpression tail:((__ ComparisonOperator __ (ComparisonExpression/AdditionExpression))/(_ BetweenToken _ (AndExpression/ComparisonExpression))/(_ (IsNotToken/IsToken) _ (NullToken)))*
   {
     if (!tail.length) return head
     return new sql.SqlMulti ({
@@ -738,4 +738,7 @@ IntervalToken = $('INTERVAL'i !IdentifierPart)
 TimestampToken = $('TIMESTAMP'i !IdentifierPart)
 OnToken = $('ON'i !IdentifierPart)
 JoinToken = $('JOIN'i !IdentifierPart)
+IsToken = $('IS'i !IdentifierPart)
+IsNotToken = $('IS'i _ 'NOT'i !IdentifierPart)
+NullToken = $('NULL'i !IdentifierPart)
 

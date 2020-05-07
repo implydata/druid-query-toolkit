@@ -84,4 +84,17 @@ describe('literal', () => {
       }
     `);
   });
+  it('empty literal', () => {
+    const sql = `''`;
+
+    expect(parser(sql).toString()).toMatchInlineSnapshot(`"''"`);
+    expect(parser(sql)).toMatchInlineSnapshot(`
+      SqlLiteral {
+        "innerSpacing": Object {},
+        "stringValue": "",
+        "type": "literal",
+        "value": "",
+      }
+    `);
+  });
 });

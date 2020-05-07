@@ -2316,4 +2316,289 @@ describe('getSqlRefs', () => {
       }
     `);
   });
+  it('IS function', () => {
+    const sql = `REGEXP_EXTRACT("cityName", 'San') IS NULL`;
+
+    expect(parser(sql).toString()).toMatchInlineSnapshot(
+      `"REGEXP_EXTRACT(\\"cityName\\", 'San') IS NULL"`,
+    );
+
+    expect(parser(sql)).toMatchInlineSnapshot(`
+      SqlMulti {
+        "arguments": Array [
+          SqlFunction {
+            "arguments": Array [
+              SqlRef {
+                "column": "cityName",
+                "innerSpacing": Object {},
+                "namespace": undefined,
+                "namespaceQuotes": undefined,
+                "quotes": "\\"",
+                "table": undefined,
+                "tableQuotes": undefined,
+                "type": "ref",
+              },
+              SqlLiteral {
+                "innerSpacing": Object {},
+                "stringValue": "San",
+                "type": "literal",
+                "value": "San",
+              },
+            ],
+            "decorator": undefined,
+            "filterKeyword": undefined,
+            "functionName": "REGEXP_EXTRACT",
+            "innerSpacing": Object {
+              "postDecorator": "",
+              "postFilterKeyword": "",
+              "postFilterLeftParen": "",
+              "postLeftParen": "",
+              "postName": "",
+              "postWhereKeyword": "",
+              "preFilter": "",
+              "preFilterRightParen": "",
+              "preRightParen": "",
+            },
+            "separators": Array [
+              Separator {
+                "left": "",
+                "right": " ",
+                "separator": ",",
+              },
+            ],
+            "type": "function",
+            "whereExpression": undefined,
+            "whereKeyword": undefined,
+          },
+          "NULL",
+        ],
+        "expressionType": "Comparison",
+        "innerSpacing": Object {},
+        "separators": Array [
+          Separator {
+            "left": " ",
+            "right": " ",
+            "separator": "IS",
+          },
+        ],
+        "type": "multi",
+      }
+    `);
+  });
+  it('IS Not function', () => {
+    const sql = `REGEXP_EXTRACT("cityName", 'San') IS NOT NULL`;
+
+    expect(parser(sql).toString()).toMatchInlineSnapshot(
+      `"REGEXP_EXTRACT(\\"cityName\\", 'San') IS NOT NULL"`,
+    );
+
+    expect(parser(sql)).toMatchInlineSnapshot(`
+      SqlMulti {
+        "arguments": Array [
+          SqlFunction {
+            "arguments": Array [
+              SqlRef {
+                "column": "cityName",
+                "innerSpacing": Object {},
+                "namespace": undefined,
+                "namespaceQuotes": undefined,
+                "quotes": "\\"",
+                "table": undefined,
+                "tableQuotes": undefined,
+                "type": "ref",
+              },
+              SqlLiteral {
+                "innerSpacing": Object {},
+                "stringValue": "San",
+                "type": "literal",
+                "value": "San",
+              },
+            ],
+            "decorator": undefined,
+            "filterKeyword": undefined,
+            "functionName": "REGEXP_EXTRACT",
+            "innerSpacing": Object {
+              "postDecorator": "",
+              "postFilterKeyword": "",
+              "postFilterLeftParen": "",
+              "postLeftParen": "",
+              "postName": "",
+              "postWhereKeyword": "",
+              "preFilter": "",
+              "preFilterRightParen": "",
+              "preRightParen": "",
+            },
+            "separators": Array [
+              Separator {
+                "left": "",
+                "right": " ",
+                "separator": ",",
+              },
+            ],
+            "type": "function",
+            "whereExpression": undefined,
+            "whereKeyword": undefined,
+          },
+          "NULL",
+        ],
+        "expressionType": "Comparison",
+        "innerSpacing": Object {},
+        "separators": Array [
+          Separator {
+            "left": " ",
+            "right": " ",
+            "separator": "IS NOT",
+          },
+        ],
+        "type": "multi",
+      }
+    `);
+  });
+  it('Nested IS Not function', () => {
+    const sql = `REGEXP_EXTRACT("cityName", 'San') IS NOT NULL AND REGEXP_EXTRACT("cityName", 'San') <> ''`;
+
+    expect(parser(sql).toString()).toMatchInlineSnapshot(
+      `"REGEXP_EXTRACT(\\"cityName\\", 'San') IS NOT NULL AND REGEXP_EXTRACT(\\"cityName\\", 'San') <> ''"`,
+    );
+
+    expect(parser(sql)).toMatchInlineSnapshot(`
+      SqlMulti {
+        "arguments": Array [
+          SqlMulti {
+            "arguments": Array [
+              SqlFunction {
+                "arguments": Array [
+                  SqlRef {
+                    "column": "cityName",
+                    "innerSpacing": Object {},
+                    "namespace": undefined,
+                    "namespaceQuotes": undefined,
+                    "quotes": "\\"",
+                    "table": undefined,
+                    "tableQuotes": undefined,
+                    "type": "ref",
+                  },
+                  SqlLiteral {
+                    "innerSpacing": Object {},
+                    "stringValue": "San",
+                    "type": "literal",
+                    "value": "San",
+                  },
+                ],
+                "decorator": undefined,
+                "filterKeyword": undefined,
+                "functionName": "REGEXP_EXTRACT",
+                "innerSpacing": Object {
+                  "postDecorator": "",
+                  "postFilterKeyword": "",
+                  "postFilterLeftParen": "",
+                  "postLeftParen": "",
+                  "postName": "",
+                  "postWhereKeyword": "",
+                  "preFilter": "",
+                  "preFilterRightParen": "",
+                  "preRightParen": "",
+                },
+                "separators": Array [
+                  Separator {
+                    "left": "",
+                    "right": " ",
+                    "separator": ",",
+                  },
+                ],
+                "type": "function",
+                "whereExpression": undefined,
+                "whereKeyword": undefined,
+              },
+              "NULL",
+            ],
+            "expressionType": "Comparison",
+            "innerSpacing": Object {},
+            "separators": Array [
+              Separator {
+                "left": " ",
+                "right": " ",
+                "separator": "IS NOT",
+              },
+            ],
+            "type": "multi",
+          },
+          SqlMulti {
+            "arguments": Array [
+              SqlFunction {
+                "arguments": Array [
+                  SqlRef {
+                    "column": "cityName",
+                    "innerSpacing": Object {},
+                    "namespace": undefined,
+                    "namespaceQuotes": undefined,
+                    "quotes": "\\"",
+                    "table": undefined,
+                    "tableQuotes": undefined,
+                    "type": "ref",
+                  },
+                  SqlLiteral {
+                    "innerSpacing": Object {},
+                    "stringValue": "San",
+                    "type": "literal",
+                    "value": "San",
+                  },
+                ],
+                "decorator": undefined,
+                "filterKeyword": undefined,
+                "functionName": "REGEXP_EXTRACT",
+                "innerSpacing": Object {
+                  "postDecorator": "",
+                  "postFilterKeyword": "",
+                  "postFilterLeftParen": "",
+                  "postLeftParen": "",
+                  "postName": "",
+                  "postWhereKeyword": "",
+                  "preFilter": "",
+                  "preFilterRightParen": "",
+                  "preRightParen": "",
+                },
+                "separators": Array [
+                  Separator {
+                    "left": "",
+                    "right": " ",
+                    "separator": ",",
+                  },
+                ],
+                "type": "function",
+                "whereExpression": undefined,
+                "whereKeyword": undefined,
+              },
+              SqlLiteral {
+                "innerSpacing": Object {},
+                "stringValue": "",
+                "type": "literal",
+                "value": "",
+              },
+            ],
+            "expressionType": "Comparison",
+            "innerSpacing": Object {},
+            "separators": Array [
+              Separator {
+                "left": " ",
+                "right": " ",
+                "separator": "<>",
+              },
+            ],
+            "type": "multi",
+          },
+        ],
+        "expressionType": "AND",
+        "innerSpacing": Object {},
+        "separators": Array [
+          Separator {
+            "left": " ",
+            "right": " ",
+            "separator": "AND",
+          },
+        ],
+        "type": "multi",
+      }
+    `);
+  });
 });
