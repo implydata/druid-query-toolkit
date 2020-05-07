@@ -112,6 +112,7 @@ describe('Parser', () => {
       expect(parser(sql)).toMatchInlineSnapshot(`
         SqlLiteral {
           "innerSpacing": Object {},
+          "quotes": "'",
           "stringValue": "12345",
           "type": "literal",
           "value": 12345,
@@ -125,6 +126,7 @@ describe('Parser', () => {
       expect(parser(sql)).toMatchInlineSnapshot(`
         SqlLiteral {
           "innerSpacing": Object {},
+          "quotes": "'",
           "stringValue": "hello",
           "type": "literal",
           "value": "hello",

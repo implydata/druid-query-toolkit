@@ -585,6 +585,7 @@ describe('addToGroupBy', () => {
         "groupByExpression": Array [
           SqlLiteral {
             "innerSpacing": Object {},
+            "quotes": "'",
             "stringValue": "2",
             "type": "literal",
             "value": 2,

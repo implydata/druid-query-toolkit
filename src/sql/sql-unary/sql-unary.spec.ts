@@ -238,6 +238,7 @@ describe('Not expression', () => {
                 },
                 SqlLiteral {
                   "innerSpacing": Object {},
+                  "quotes": "'",
                   "stringValue": "D",
                   "type": "literal",
                   "value": "D",

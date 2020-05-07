@@ -25,6 +25,7 @@ describe('literal', () => {
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlLiteral {
         "innerSpacing": Object {},
+        "quotes": "'",
         "stringValue": "word",
         "type": "literal",
         "value": "word",
@@ -39,6 +40,7 @@ describe('literal', () => {
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlLiteral {
         "innerSpacing": Object {},
+        "quotes": "'",
         "stringValue": "1",
         "type": "literal",
         "value": 1,
@@ -59,6 +61,7 @@ describe('literal', () => {
             "rightSpacing": "",
           },
         ],
+        "quotes": "'",
         "stringValue": "1",
         "type": "literal",
         "value": 1,
@@ -78,6 +81,7 @@ describe('literal', () => {
             "rightSpacing": "",
           },
         ],
+        "quotes": "'",
         "stringValue": "word",
         "type": "literal",
         "value": "word",
@@ -91,6 +95,7 @@ describe('literal', () => {
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlLiteral {
         "innerSpacing": Object {},
+        "quotes": "'",
         "stringValue": "",
         "type": "literal",
         "value": "",
