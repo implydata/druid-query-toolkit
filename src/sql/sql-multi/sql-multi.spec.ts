@@ -2385,59 +2385,24 @@ describe('getSqlRefs', () => {
       }
     `);
   });
-  it('IS Not function', () => {
-    const sql = `REGEXP_EXTRACT("cityName", 'San') IS NOT NULL`;
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(
-      `"REGEXP_EXTRACT(\\"cityName\\", 'San') IS NOT NULL"`,
-    );
+  it('IS Not function', () => {
+    const sql = `X IS NOT NULL`;
+
+    expect(parser(sql).toString()).toMatchInlineSnapshot(`"X IS NOT NULL"`);
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
-          SqlFunction {
-            "arguments": Array [
-              SqlRef {
-                "column": "cityName",
-                "innerSpacing": Object {},
-                "namespace": undefined,
-                "namespaceQuotes": undefined,
-                "quotes": "\\"",
-                "table": undefined,
-                "tableQuotes": undefined,
-                "type": "ref",
-              },
-              SqlLiteral {
-                "innerSpacing": Object {},
-                "stringValue": "San",
-                "type": "literal",
-                "value": "San",
-              },
-            ],
-            "decorator": undefined,
-            "filterKeyword": undefined,
-            "functionName": "REGEXP_EXTRACT",
-            "innerSpacing": Object {
-              "postDecorator": "",
-              "postFilterKeyword": "",
-              "postFilterLeftParen": "",
-              "postLeftParen": "",
-              "postName": "",
-              "postWhereKeyword": "",
-              "preFilter": "",
-              "preFilterRightParen": "",
-              "preRightParen": "",
-            },
-            "separators": Array [
-              Separator {
-                "left": "",
-                "right": " ",
-                "separator": ",",
-              },
-            ],
-            "type": "function",
-            "whereExpression": undefined,
-            "whereKeyword": undefined,
+          SqlRef {
+            "column": "X",
+            "innerSpacing": Object {},
+            "namespace": undefined,
+            "namespaceQuotes": undefined,
+            "quotes": "",
+            "table": undefined,
+            "tableQuotes": undefined,
+            "type": "ref",
           },
           "NULL",
         ],
@@ -2455,60 +2420,24 @@ describe('getSqlRefs', () => {
     `);
   });
   it('Nested IS Not function', () => {
-    const sql = `REGEXP_EXTRACT("cityName", 'San') IS NOT NULL AND REGEXP_EXTRACT("cityName", 'San') <> ''`;
+    const sql = `X IS NOT NULL AND X <> ''`;
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(
-      `"REGEXP_EXTRACT(\\"cityName\\", 'San') IS NOT NULL AND REGEXP_EXTRACT(\\"cityName\\", 'San') <> ''"`,
-    );
+    expect(parser(sql).toString()).toMatchInlineSnapshot(`"X IS NOT NULL AND X <> ''"`);
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
           SqlMulti {
             "arguments": Array [
-              SqlFunction {
-                "arguments": Array [
-                  SqlRef {
-                    "column": "cityName",
-                    "innerSpacing": Object {},
-                    "namespace": undefined,
-                    "namespaceQuotes": undefined,
-                    "quotes": "\\"",
-                    "table": undefined,
-                    "tableQuotes": undefined,
-                    "type": "ref",
-                  },
-                  SqlLiteral {
-                    "innerSpacing": Object {},
-                    "stringValue": "San",
-                    "type": "literal",
-                    "value": "San",
-                  },
-                ],
-                "decorator": undefined,
-                "filterKeyword": undefined,
-                "functionName": "REGEXP_EXTRACT",
-                "innerSpacing": Object {
-                  "postDecorator": "",
-                  "postFilterKeyword": "",
-                  "postFilterLeftParen": "",
-                  "postLeftParen": "",
-                  "postName": "",
-                  "postWhereKeyword": "",
-                  "preFilter": "",
-                  "preFilterRightParen": "",
-                  "preRightParen": "",
-                },
-                "separators": Array [
-                  Separator {
-                    "left": "",
-                    "right": " ",
-                    "separator": ",",
-                  },
-                ],
-                "type": "function",
-                "whereExpression": undefined,
-                "whereKeyword": undefined,
+              SqlRef {
+                "column": "X",
+                "innerSpacing": Object {},
+                "namespace": undefined,
+                "namespaceQuotes": undefined,
+                "quotes": "",
+                "table": undefined,
+                "tableQuotes": undefined,
+                "type": "ref",
               },
               "NULL",
             ],
@@ -2525,49 +2454,15 @@ describe('getSqlRefs', () => {
           },
           SqlMulti {
             "arguments": Array [
-              SqlFunction {
-                "arguments": Array [
-                  SqlRef {
-                    "column": "cityName",
-                    "innerSpacing": Object {},
-                    "namespace": undefined,
-                    "namespaceQuotes": undefined,
-                    "quotes": "\\"",
-                    "table": undefined,
-                    "tableQuotes": undefined,
-                    "type": "ref",
-                  },
-                  SqlLiteral {
-                    "innerSpacing": Object {},
-                    "stringValue": "San",
-                    "type": "literal",
-                    "value": "San",
-                  },
-                ],
-                "decorator": undefined,
-                "filterKeyword": undefined,
-                "functionName": "REGEXP_EXTRACT",
-                "innerSpacing": Object {
-                  "postDecorator": "",
-                  "postFilterKeyword": "",
-                  "postFilterLeftParen": "",
-                  "postLeftParen": "",
-                  "postName": "",
-                  "postWhereKeyword": "",
-                  "preFilter": "",
-                  "preFilterRightParen": "",
-                  "preRightParen": "",
-                },
-                "separators": Array [
-                  Separator {
-                    "left": "",
-                    "right": " ",
-                    "separator": ",",
-                  },
-                ],
-                "type": "function",
-                "whereExpression": undefined,
-                "whereKeyword": undefined,
+              SqlRef {
+                "column": "X",
+                "innerSpacing": Object {},
+                "namespace": undefined,
+                "namespaceQuotes": undefined,
+                "quotes": "",
+                "table": undefined,
+                "tableQuotes": undefined,
+                "type": "ref",
               },
               SqlLiteral {
                 "innerSpacing": Object {},
