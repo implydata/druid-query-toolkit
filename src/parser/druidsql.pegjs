@@ -573,6 +573,7 @@ SqlLiteral = lit:(Number / SingleQuotedString )
   return new sql.SqlLiteral(lit);
 }
 / BooleanLiteral
+/ NullLiteral
 / SqlInParens
 
 NullLiteral = value: "NULL"i {
@@ -582,7 +583,6 @@ NullLiteral = value: "NULL"i {
 BooleanLiteral = value: ("TRUE"i/"FALSE"i) {
   return new sql.SqlLiteral({value: value, stringValue: value, quotes:''});
 }
-/NullLiteral
 
 Number = n:$([0-9]+)
 {
