@@ -1324,6 +1324,113 @@ describe('Math expression', () => {
     `);
     expect(parser(sql).toString()).toMatchInlineSnapshot(`"(1 + 2)"`);
   });
+
+  it('Decimal', () => {
+    const sql = `COUNT(*) * 1.0 / COUNT(*)`;
+
+    expect(parser(sql)).toMatchInlineSnapshot(`
+      SqlMulti {
+        "arguments": Array [
+          SqlFunction {
+            "arguments": Array [
+              SqlRef {
+                "column": "*",
+                "innerSpacing": Object {},
+                "namespace": undefined,
+                "namespaceQuotes": undefined,
+                "quotes": "",
+                "table": undefined,
+                "tableQuotes": undefined,
+                "type": "ref",
+              },
+            ],
+            "decorator": undefined,
+            "filterKeyword": undefined,
+            "functionName": "COUNT",
+            "innerSpacing": Object {
+              "postDecorator": "",
+              "postFilterKeyword": "",
+              "postFilterLeftParen": "",
+              "postLeftParen": "",
+              "postName": "",
+              "postWhereKeyword": "",
+              "preFilter": "",
+              "preFilterRightParen": "",
+              "preRightParen": "",
+            },
+            "separators": Array [],
+            "type": "function",
+            "whereExpression": undefined,
+            "whereKeyword": undefined,
+          },
+          SqlMulti {
+            "arguments": Array [
+              SqlLiteral {
+                "innerSpacing": Object {},
+                "quotes": "",
+                "stringValue": "1.0",
+                "type": "literal",
+                "value": 1,
+              },
+              SqlFunction {
+                "arguments": Array [
+                  SqlRef {
+                    "column": "*",
+                    "innerSpacing": Object {},
+                    "namespace": undefined,
+                    "namespaceQuotes": undefined,
+                    "quotes": "",
+                    "table": undefined,
+                    "tableQuotes": undefined,
+                    "type": "ref",
+                  },
+                ],
+                "decorator": undefined,
+                "filterKeyword": undefined,
+                "functionName": "COUNT",
+                "innerSpacing": Object {
+                  "postDecorator": "",
+                  "postFilterKeyword": "",
+                  "postFilterLeftParen": "",
+                  "postLeftParen": "",
+                  "postName": "",
+                  "postWhereKeyword": "",
+                  "preFilter": "",
+                  "preFilterRightParen": "",
+                  "preRightParen": "",
+                },
+                "separators": Array [],
+                "type": "function",
+                "whereExpression": undefined,
+                "whereKeyword": undefined,
+              },
+            ],
+            "expressionType": "Multiplicative",
+            "innerSpacing": Object {},
+            "separators": Array [
+              Separator {
+                "left": " ",
+                "right": " ",
+                "separator": "/",
+              },
+            ],
+            "type": "multi",
+          },
+        ],
+        "expressionType": "Multiplicative",
+        "innerSpacing": Object {},
+        "separators": Array [
+          Separator {
+            "left": " ",
+            "right": " ",
+            "separator": "*",
+          },
+        ],
+        "type": "multi",
+      }
+    `);
+    expect(parser(sql).toString()).toMatchInlineSnapshot(`"COUNT(*) * 1.0 / COUNT(*)"`);
+  });
 });
 
 describe('Combined expression', () => {

@@ -102,4 +102,19 @@ describe('literal', () => {
       }
     `);
   });
+
+  it('Decimal literal', () => {
+    const sql = `1.01`;
+
+    expect(parser(sql).toString()).toMatchInlineSnapshot(`"1.01"`);
+    expect(parser(sql)).toMatchInlineSnapshot(`
+      SqlLiteral {
+        "innerSpacing": Object {},
+        "quotes": "",
+        "stringValue": "1.01",
+        "type": "literal",
+        "value": 1.01,
+      }
+    `);
+  });
 });

@@ -584,7 +584,15 @@ BooleanLiteral = value: ("TRUE"i/"FALSE"i) {
   return new sql.SqlLiteral({value: value, stringValue: value, quotes:''});
 }
 
-Number = n:$([0-9]+)
+Number = n:$([0-9]+ "." [0-9]+)
+{
+return {
+     value: parseFloat(n),
+     stringValue: n,
+     quotes: ''
+   };
+}
+/n:$([0-9]+)
 {
  return {
       value: parseInt(n, 10),
