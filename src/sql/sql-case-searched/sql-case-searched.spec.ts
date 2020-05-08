@@ -465,6 +465,7 @@ describe('Case expression', () => {
         "caseKeyword": "CASE",
         "elseExpression": SqlLiteral {
           "innerSpacing": Object {},
+          "quotes": "",
           "stringValue": "2",
           "type": "literal",
           "value": 2,
@@ -487,6 +488,7 @@ describe('Case expression', () => {
             "postWhenSpace": " ",
             "thenExpression": SqlLiteral {
               "innerSpacing": Object {},
+              "quotes": "",
               "stringValue": "4",
               "type": "literal",
               "value": 4,
@@ -494,6 +496,7 @@ describe('Case expression', () => {
             "thenKeyword": "THEN",
             "whenExpression": SqlLiteral {
               "innerSpacing": Object {},
+              "quotes": "'",
               "stringValue": "RUNNING",
               "type": "literal",
               "value": "RUNNING",

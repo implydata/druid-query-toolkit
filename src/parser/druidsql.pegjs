@@ -320,7 +320,7 @@ NotExpression = keyword:NotToken postKeyword:_ argument:(NotExpression/OrExpress
   }
   /ComparisonExpression
 
-ComparisonExpression = head:AdditionExpression tail:((__ ComparisonOperator __ (ComparisonExpression/AdditionExpression))/(_ BetweenToken _ (AndExpression/ComparisonExpression)))*
+ComparisonExpression = head:AdditionExpression tail:((__ ComparisonOperator __ (ComparisonExpression/AdditionExpression))/(_ BetweenToken _ (AndExpression/ComparisonExpression))/(_ (IsNotToken/IsToken) _ (NullLiteral)))*
   {
     if (!tail.length) return head
     return new sql.SqlMulti ({
@@ -568,17 +568,28 @@ SqlInParens = OpenParen leftSpacing:_? ex:Sql rightSpacing:_? CloseParen
   return ex.addParens(leftSpacing, rightSpacing);
 }
 
-SqlLiteral = lit:(Number / SingleQuotedString)
+SqlLiteral = lit:(Number / SingleQuotedString )
 {
   return new sql.SqlLiteral(lit);
 }
+/ BooleanLiteral
+/ NullLiteral
 / SqlInParens
+
+NullLiteral = value: "NULL"i {
+    return new sql.SqlLiteral({value: value, stringValue: value, quotes:''});
+}
+
+BooleanLiteral = value: ("TRUE"i/"FALSE"i) {
+  return new sql.SqlLiteral({value: value, stringValue: value, quotes:''});
+}
 
 Number = n:$([0-9]+)
 {
  return {
       value: parseInt(n, 10),
-      stringValue: n
+      stringValue: n,
+      quotes: ''
     };
 }
 
@@ -586,7 +597,8 @@ SingleQuotedString = ['] name:$([^']*) [']
 {
   return {
     value: name,
-    stringValue: name
+    stringValue: name,
+    quotes: "'"
   };
 }
 
@@ -738,4 +750,5 @@ IntervalToken = $('INTERVAL'i !IdentifierPart)
 TimestampToken = $('TIMESTAMP'i !IdentifierPart)
 OnToken = $('ON'i !IdentifierPart)
 JoinToken = $('JOIN'i !IdentifierPart)
-
+IsToken = $('IS'i !IdentifierPart)
+IsNotToken = $('IS'i _ 'NOT'i !IdentifierPart)

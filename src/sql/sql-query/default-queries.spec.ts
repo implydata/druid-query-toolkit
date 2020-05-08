@@ -482,4 +482,22 @@ describe('Special function tests', () => {
         ORDER BY \\"Count\\" DESC"
     `);
   });
+
+  it('IS NOT NULL Where Clause', () => {
+    expect(
+      parser(`SELECT
+SUM("count") AS "TotalEdits",
+SUM("added") AS "TotalAdded"
+FROM "wikipedia"
+WHERE REGEXP_EXTRACT("cityName", 'San') IS NOT NULL AND REGEXP_EXTRACT("cityName", 'San') <> ''
+GROUP BY ''`).toString(),
+    ).toMatchInlineSnapshot(`
+      "SELECT
+      SUM(\\"count\\") AS \\"TotalEdits\\",
+      SUM(\\"added\\") AS \\"TotalAdded\\"
+      FROM \\"wikipedia\\"
+      WHERE REGEXP_EXTRACT(\\"cityName\\", 'San') IS NOT NULL AND REGEXP_EXTRACT(\\"cityName\\", 'San') <> ''
+      GROUP BY ''"
+    `);
+  });
 });

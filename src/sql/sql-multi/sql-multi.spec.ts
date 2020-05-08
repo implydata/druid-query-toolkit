@@ -67,12 +67,14 @@ describe('OR expression', () => {
         "arguments": Array [
           SqlLiteral {
             "innerSpacing": Object {},
+            "quotes": "'",
             "stringValue": "A",
             "type": "literal",
             "value": "A",
           },
           SqlLiteral {
             "innerSpacing": Object {},
+            "quotes": "'",
             "stringValue": "B",
             "type": "literal",
             "value": "B",
@@ -141,12 +143,14 @@ describe('OR expression', () => {
         "arguments": Array [
           SqlLiteral {
             "innerSpacing": Object {},
+            "quotes": "",
             "stringValue": "1",
             "type": "literal",
             "value": 1,
           },
           SqlLiteral {
             "innerSpacing": Object {},
+            "quotes": "",
             "stringValue": "2",
             "type": "literal",
             "value": 2,
@@ -174,12 +178,14 @@ describe('OR expression', () => {
         "arguments": Array [
           SqlLiteral {
             "innerSpacing": Object {},
+            "quotes": "",
             "stringValue": "1",
             "type": "literal",
             "value": 1,
           },
           SqlLiteral {
             "innerSpacing": Object {},
+            "quotes": "",
             "stringValue": "2",
             "type": "literal",
             "value": 2,
@@ -213,12 +219,14 @@ describe('OR expression', () => {
         "arguments": Array [
           SqlLiteral {
             "innerSpacing": Object {},
+            "quotes": "",
             "stringValue": "1",
             "type": "literal",
             "value": 1,
           },
           SqlLiteral {
             "innerSpacing": Object {},
+            "quotes": "",
             "stringValue": "2",
             "type": "literal",
             "value": 2,
@@ -246,12 +254,14 @@ describe('OR expression', () => {
         "arguments": Array [
           SqlLiteral {
             "innerSpacing": Object {},
+            "quotes": "",
             "stringValue": "1",
             "type": "literal",
             "value": 1,
           },
           SqlLiteral {
             "innerSpacing": Object {},
+            "quotes": "",
             "stringValue": "2",
             "type": "literal",
             "value": 2,
@@ -329,12 +339,14 @@ describe('AND expression', () => {
         "arguments": Array [
           SqlLiteral {
             "innerSpacing": Object {},
+            "quotes": "'",
             "stringValue": "A",
             "type": "literal",
             "value": "A",
           },
           SqlLiteral {
             "innerSpacing": Object {},
+            "quotes": "'",
             "stringValue": "B",
             "type": "literal",
             "value": "B",
@@ -405,12 +417,14 @@ describe('AND expression', () => {
         "arguments": Array [
           SqlLiteral {
             "innerSpacing": Object {},
+            "quotes": "",
             "stringValue": "1",
             "type": "literal",
             "value": 1,
           },
           SqlLiteral {
             "innerSpacing": Object {},
+            "quotes": "",
             "stringValue": "2",
             "type": "literal",
             "value": 2,
@@ -439,12 +453,14 @@ describe('AND expression', () => {
         "arguments": Array [
           SqlLiteral {
             "innerSpacing": Object {},
+            "quotes": "",
             "stringValue": "1",
             "type": "literal",
             "value": 1,
           },
           SqlLiteral {
             "innerSpacing": Object {},
+            "quotes": "",
             "stringValue": "2",
             "type": "literal",
             "value": 2,
@@ -523,12 +539,14 @@ describe('Comparison expression', () => {
         "arguments": Array [
           SqlLiteral {
             "innerSpacing": Object {},
+            "quotes": "'",
             "stringValue": "A",
             "type": "literal",
             "value": "A",
           },
           SqlLiteral {
             "innerSpacing": Object {},
+            "quotes": "'",
             "stringValue": "B",
             "type": "literal",
             "value": "B",
@@ -599,12 +617,14 @@ describe('Comparison expression', () => {
         "arguments": Array [
           SqlLiteral {
             "innerSpacing": Object {},
+            "quotes": "",
             "stringValue": "1",
             "type": "literal",
             "value": 1,
           },
           SqlLiteral {
             "innerSpacing": Object {},
+            "quotes": "",
             "stringValue": "2",
             "type": "literal",
             "value": 2,
@@ -633,12 +653,14 @@ describe('Comparison expression', () => {
         "arguments": Array [
           SqlLiteral {
             "innerSpacing": Object {},
+            "quotes": "",
             "stringValue": "1",
             "type": "literal",
             "value": 1,
           },
           SqlLiteral {
             "innerSpacing": Object {},
+            "quotes": "",
             "stringValue": "2",
             "type": "literal",
             "value": 2,
@@ -969,12 +991,14 @@ describe('Math expression', () => {
         "arguments": Array [
           SqlLiteral {
             "innerSpacing": Object {},
+            "quotes": "",
             "stringValue": "1",
             "type": "literal",
             "value": 1,
           },
           SqlLiteral {
             "innerSpacing": Object {},
+            "quotes": "",
             "stringValue": "2",
             "type": "literal",
             "value": 2,
@@ -1003,12 +1027,14 @@ describe('Math expression', () => {
         "arguments": Array [
           SqlLiteral {
             "innerSpacing": Object {},
+            "quotes": "",
             "stringValue": "1",
             "type": "literal",
             "value": 1,
           },
           SqlLiteral {
             "innerSpacing": Object {},
+            "quotes": "",
             "stringValue": "2",
             "type": "literal",
             "value": 2,
@@ -1037,12 +1063,14 @@ describe('Math expression', () => {
         "arguments": Array [
           SqlLiteral {
             "innerSpacing": Object {},
+            "quotes": "",
             "stringValue": "1",
             "type": "literal",
             "value": 1,
           },
           SqlLiteral {
             "innerSpacing": Object {},
+            "quotes": "",
             "stringValue": "2",
             "type": "literal",
             "value": 2,
@@ -1071,12 +1099,14 @@ describe('Math expression', () => {
         "arguments": Array [
           SqlLiteral {
             "innerSpacing": Object {},
+            "quotes": "",
             "stringValue": "1",
             "type": "literal",
             "value": 1,
           },
           SqlLiteral {
             "innerSpacing": Object {},
+            "quotes": "",
             "stringValue": "2",
             "type": "literal",
             "value": 2,
@@ -1147,12 +1177,14 @@ describe('Math expression', () => {
         "arguments": Array [
           SqlLiteral {
             "innerSpacing": Object {},
+            "quotes": "'",
             "stringValue": "A",
             "type": "literal",
             "value": "A",
           },
           SqlLiteral {
             "innerSpacing": Object {},
+            "quotes": "'",
             "stringValue": "B",
             "type": "literal",
             "value": "B",
@@ -1223,12 +1255,14 @@ describe('Math expression', () => {
         "arguments": Array [
           SqlLiteral {
             "innerSpacing": Object {},
+            "quotes": "",
             "stringValue": "1",
             "type": "literal",
             "value": 1,
           },
           SqlLiteral {
             "innerSpacing": Object {},
+            "quotes": "",
             "stringValue": "2",
             "type": "literal",
             "value": 2,
@@ -1257,12 +1291,14 @@ describe('Math expression', () => {
         "arguments": Array [
           SqlLiteral {
             "innerSpacing": Object {},
+            "quotes": "",
             "stringValue": "1",
             "type": "literal",
             "value": 1,
           },
           SqlLiteral {
             "innerSpacing": Object {},
+            "quotes": "",
             "stringValue": "2",
             "type": "literal",
             "value": 2,
@@ -2310,6 +2346,169 @@ describe('getSqlRefs', () => {
             "left": " ",
             "right": " ",
             "separator": "||",
+          },
+        ],
+        "type": "multi",
+      }
+    `);
+  });
+  it('IS function', () => {
+    const sql = `X IS NULL`;
+
+    expect(parser(sql).toString()).toMatchInlineSnapshot(`"X IS NULL"`);
+
+    expect(parser(sql)).toMatchInlineSnapshot(`
+      SqlMulti {
+        "arguments": Array [
+          SqlRef {
+            "column": "X",
+            "innerSpacing": Object {},
+            "namespace": undefined,
+            "namespaceQuotes": undefined,
+            "quotes": "",
+            "table": undefined,
+            "tableQuotes": undefined,
+            "type": "ref",
+          },
+          SqlLiteral {
+            "innerSpacing": Object {},
+            "quotes": "",
+            "stringValue": "NULL",
+            "type": "literal",
+            "value": "NULL",
+          },
+        ],
+        "expressionType": "Comparison",
+        "innerSpacing": Object {},
+        "separators": Array [
+          Separator {
+            "left": " ",
+            "right": " ",
+            "separator": "IS",
+          },
+        ],
+        "type": "multi",
+      }
+    `);
+  });
+
+  it('IS NOT function', () => {
+    const sql = `X IS NOT NULL`;
+
+    expect(parser(sql).toString()).toMatchInlineSnapshot(`"X IS NOT NULL"`);
+
+    expect(parser(sql)).toMatchInlineSnapshot(`
+      SqlMulti {
+        "arguments": Array [
+          SqlRef {
+            "column": "X",
+            "innerSpacing": Object {},
+            "namespace": undefined,
+            "namespaceQuotes": undefined,
+            "quotes": "",
+            "table": undefined,
+            "tableQuotes": undefined,
+            "type": "ref",
+          },
+          SqlLiteral {
+            "innerSpacing": Object {},
+            "quotes": "",
+            "stringValue": "NULL",
+            "type": "literal",
+            "value": "NULL",
+          },
+        ],
+        "expressionType": "Comparison",
+        "innerSpacing": Object {},
+        "separators": Array [
+          Separator {
+            "left": " ",
+            "right": " ",
+            "separator": "IS NOT",
+          },
+        ],
+        "type": "multi",
+      }
+    `);
+  });
+  it('Nested IS Not function', () => {
+    const sql = `X IS NOT NULL AND X <> ''`;
+
+    expect(parser(sql).toString()).toMatchInlineSnapshot(`"X IS NOT NULL AND X <> ''"`);
+
+    expect(parser(sql)).toMatchInlineSnapshot(`
+      SqlMulti {
+        "arguments": Array [
+          SqlMulti {
+            "arguments": Array [
+              SqlRef {
+                "column": "X",
+                "innerSpacing": Object {},
+                "namespace": undefined,
+                "namespaceQuotes": undefined,
+                "quotes": "",
+                "table": undefined,
+                "tableQuotes": undefined,
+                "type": "ref",
+              },
+              SqlLiteral {
+                "innerSpacing": Object {},
+                "quotes": "",
+                "stringValue": "NULL",
+                "type": "literal",
+                "value": "NULL",
+              },
+            ],
+            "expressionType": "Comparison",
+            "innerSpacing": Object {},
+            "separators": Array [
+              Separator {
+                "left": " ",
+                "right": " ",
+                "separator": "IS NOT",
+              },
+            ],
+            "type": "multi",
+          },
+          SqlMulti {
+            "arguments": Array [
+              SqlRef {
+                "column": "X",
+                "innerSpacing": Object {},
+                "namespace": undefined,
+                "namespaceQuotes": undefined,
+                "quotes": "",
+                "table": undefined,
+                "tableQuotes": undefined,
+                "type": "ref",
+              },
+              SqlLiteral {
+                "innerSpacing": Object {},
+                "quotes": "'",
+                "stringValue": "",
+                "type": "literal",
+                "value": "",
+              },
+            ],
+            "expressionType": "Comparison",
+            "innerSpacing": Object {},
+            "separators": Array [
+              Separator {
+                "left": " ",
+                "right": " ",
+                "separator": "<>",
+              },
+            ],
+            "type": "multi",
+          },
+        ],
+        "expressionType": "AND",
+        "innerSpacing": Object {},
+        "separators": Array [
+          Separator {
+            "left": " ",
+            "right": " ",
+            "separator": "AND",
           },
         ],
         "type": "multi",
