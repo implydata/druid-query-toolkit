@@ -821,7 +821,7 @@ export class SqlQuery extends SqlBase {
   }
 
   hasGroupByColumn(column: string) {
-    // Checks to see if a column is in the group byy clause either by name or index
+    // Checks to see if a column is in the group by clause either by name or index
     const value = this.valueOf();
     const index = this.getColumns().indexOf(column) + 1;
     if (!value.groupByExpression) return false;
