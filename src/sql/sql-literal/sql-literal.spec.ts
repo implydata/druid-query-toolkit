@@ -117,4 +117,18 @@ describe('literal', () => {
       }
     `);
   });
+  it(' Null', () => {
+    const sql = `NULL`;
+
+    expect(parser(sql).toString()).toMatchInlineSnapshot(`"NULL"`);
+    expect(parser(sql)).toMatchInlineSnapshot(`
+      SqlLiteral {
+        "innerSpacing": Object {},
+        "quotes": "",
+        "stringValue": "NULL",
+        "type": "literal",
+        "value": "NULL",
+      }
+    `);
+  });
 });
