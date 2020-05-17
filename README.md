@@ -17,7 +17,7 @@ Converts an SQL string to a SqlQuery object. SqlParserFactory takes an argument 
 ```
 import { sqlParserFactory } from './parser/druidsql';
 const parser = sqlParserFactory(FUNCTIONS);
-ast = parser(`SELECT "segment_id", "datasource", "start", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed", "payload"
+ast = parser(`SELECT "segment_id", "datasource", "start", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed"
 FROM sys.segments
 ORDER BY "start" DESC
 LIMIT 25`);
@@ -311,16 +311,6 @@ logs:
              "tableQuotes": undefined,
              "type": "ref",
            },
-           SqlRef {
-             "column": "payload",
-             "innerSpacing": Object {},
-             "namespace": undefined,
-             "namespaceQuotes": undefined,
-             "quotes": "\\"",
-             "table": undefined,
-             "tableQuotes": undefined,
-             "type": "ref",
-           },
          ],
          "tableSeparators": Array [],
          "tables": Array [
@@ -358,7 +348,7 @@ console.log(sqlString);
 ```
 logs: 
 ```
-SELECT "segment_id", "datasource", "start", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed", "payload"
+SELECT "segment_id", "datasource", "start", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed"
 FROM sys.segments
 ORDER BY "start" DESC
 LIMIT 25
@@ -376,7 +366,7 @@ console.log(orderedAst.toString());
 ```
 logs: 
 ```
-SELECT "segment_id", "datasource", "start", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed", "payload"
+SELECT "segment_id", "datasource", "start", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed"
 FROM sys.segments
 ORDER BY "end" ASC
 LIMIT 25
@@ -393,7 +383,7 @@ console.log(excludeColumnAst.toString());
 ```
 logs: 
 ```
-SELECT "segment_id", "datasource", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed", "payload"
+SELECT "segment_id", "datasource", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed"
 FROM sys.segments
 LIMIT 25
 ```
@@ -461,7 +451,6 @@ Array [
   "is_available",
   "is_realtime",
   "is_overshadowed",
-  "payload",
 ]
 ```
 

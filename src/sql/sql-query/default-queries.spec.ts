@@ -45,13 +45,13 @@ describe('Druid Query Tests', () => {
   it('parses segments query', () => {
     expect(
       parser(
-        'SELECT "segment_id", "datasource", "start", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed", "payload"\n' +
+        'SELECT "segment_id", "datasource", "start", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed"\n' +
           'FROM sys.segments\n' +
           'ORDER BY "start" DESC\n' +
           'LIMIT 50',
       ).toString(),
     ).toMatchInlineSnapshot(`
-      "SELECT \\"segment_id\\", \\"datasource\\", \\"start\\", \\"end\\", \\"size\\", \\"version\\", \\"partition_num\\", \\"num_replicas\\", \\"num_rows\\", \\"is_published\\", \\"is_available\\", \\"is_realtime\\", \\"is_overshadowed\\", \\"payload\\"
+      "SELECT \\"segment_id\\", \\"datasource\\", \\"start\\", \\"end\\", \\"size\\", \\"version\\", \\"partition_num\\", \\"num_replicas\\", \\"num_rows\\", \\"is_published\\", \\"is_available\\", \\"is_realtime\\", \\"is_overshadowed\\"
       FROM sys.segments
       ORDER BY \\"start\\" DESC
       LIMIT 50"
@@ -163,13 +163,13 @@ describe('Druid Query Tests', () => {
   it('parses segments query to string', () => {
     expect(
       parser(
-        'SELECT "segment_id", "datasource", "start", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed", "payload"\n' +
+        'SELECT "segment_id", "datasource", "start", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed"\n' +
           'FROM sys.segments\n' +
           'ORDER BY "start" DESC\n' +
           'LIMIT 50',
       ).toString(),
     ).toMatchInlineSnapshot(`
-      "SELECT \\"segment_id\\", \\"datasource\\", \\"start\\", \\"end\\", \\"size\\", \\"version\\", \\"partition_num\\", \\"num_replicas\\", \\"num_rows\\", \\"is_published\\", \\"is_available\\", \\"is_realtime\\", \\"is_overshadowed\\", \\"payload\\"
+      "SELECT \\"segment_id\\", \\"datasource\\", \\"start\\", \\"end\\", \\"size\\", \\"version\\", \\"partition_num\\", \\"num_replicas\\", \\"num_rows\\", \\"is_published\\", \\"is_available\\", \\"is_realtime\\", \\"is_overshadowed\\"
       FROM sys.segments
       ORDER BY \\"start\\" DESC
       LIMIT 50"
@@ -272,7 +272,7 @@ describe('Druid Query Tests', () => {
       parser(
         'SELECT\n' +
           '  ("start" || \'/\' || "end") AS "interval",\n' +
-          '  "segment_id", "datasource", "start", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed", "payload"\n' +
+          '  "segment_id", "datasource", "start", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed"\n' +
           'FROM sys.segments\n' +
           'WHERE\n' +
           ' ("start" || \'/\' || "end") IN (SELECT "start" || \'/\' || "end" FROM sys.segments GROUP BY 1 LIMIT 25)\n' +
