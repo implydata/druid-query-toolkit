@@ -12,10 +12,8 @@
  * limitations under the License.
  */
 
-import { sqlParserFactory } from '../../index';
+import { parseSql } from '../../index';
 import { backAndForth } from '../../test-utils';
-
-const parser = sqlParserFactory();
 
 describe('SqlRef', () => {
   it('Ref with double quotes and double quoted namespace', () => {
@@ -23,7 +21,7 @@ describe('SqlRef', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlRef {
         "column": "namespace",
         "innerSpacing": Object {},
@@ -42,7 +40,7 @@ describe('SqlRef', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlRef {
         "column": "namespace",
         "innerSpacing": Object {},
@@ -61,7 +59,7 @@ describe('SqlRef', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlRef {
         "column": "namespace",
         "innerSpacing": Object {},
@@ -80,7 +78,7 @@ describe('SqlRef', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlRef {
         "column": "test",
         "innerSpacing": Object {},
@@ -99,7 +97,7 @@ describe('SqlRef', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlRef {
         "column": "test",
         "innerSpacing": Object {},
@@ -119,12 +117,12 @@ describe('upgrades', () => {
     const sql = `"namespace"."table"`;
 
     expect(
-      parser(sql)
+      parseSql(sql)
         .upgrade()
         .toString(),
     ).toMatch(sql);
 
-    expect(parser(sql).upgrade()).toMatchInlineSnapshot(`
+    expect(parseSql(sql).upgrade()).toMatchInlineSnapshot(`
       SqlRef {
         "column": undefined,
         "innerSpacing": Object {
@@ -146,7 +144,7 @@ describe('upgrades', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": "",
         "fromKeyword": "from",

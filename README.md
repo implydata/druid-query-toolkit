@@ -15,9 +15,9 @@ Install druid-query-toolkit
 Converts an SQL string to a SqlQuery object.  
 
 ```
-import { sqlParserFactory } from './parser/druidsql';
-const parser = sqlParserFactory();
-ast = parser(`SELECT "segment_id", "datasource", "start", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed", "payload"
+import { parseSql, parseSqlQuery } from './parser/druidsql';
+
+ast = parseSqlQuery(`SELECT "segment_id", "datasource", "start", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed", "payload"
 FROM sys.segments
 ORDER BY "start" DESC
 LIMIT 25`);
@@ -159,7 +159,7 @@ Array [
 Returns an array of the string names of all the columns currently being used byy the having and where filters
     
 ```
-let query = parser(`SELECT column, SUM(column1) As aggregated, column2
+let query = parseSqlQuery(`SELECT column, SUM(column1) As aggregated, column2
                       FROM sys."github"
                       Group By column2
                       Having column > 1 AND aggregated < 100`);
@@ -182,7 +182,7 @@ Takes argument:
 - `column: SqlBase`
     
 ```
-let query = parser(`select Count(*) from table`);
+let query = parseSqlQuery(`select Count(*) from table`);
 query = query.addToGroupBy(SqlRef.fromStringWithDoubleQuotes('column');
 console.log(query.toString());
 ```
@@ -207,7 +207,7 @@ Takes arguments:
 - `decorator?: string`
     
 ```
-let query = parser(`select column1 from table`);
+let query = parseSqlQuery(`select column1 from table`);
 query = query.addAggregateColumn([SqlRef.fromString('column2')], 'min', 'alias');
 console.log(query.toString());
 ```
@@ -223,7 +223,7 @@ select column1, min(column2) AS "alias" from table
 Returns an array of the string names of all columns in the select clause.
 
 ```
-let query = parser(`SELECT column, column1, column2
+let query = parseSqlQuery(`SELECT column, column1, column2
                       FROM sys."github"`);
 query = query.getColumns();
 console.log(query.toString());
@@ -244,7 +244,7 @@ Takes argument:
 - `column: string`
 
 ```
-let query = parser(`SELECT column, column1, column2
+let query = parseSqlQuery(`SELECT column, column1, column2
                       FROM sys."github"
                       Group By column, 3`);
 query = query.hasGroupByColumn("column2");
@@ -266,7 +266,7 @@ Takes argument:
 - `table: string`
 
 ```
-let query = parser(`SELECT countryName from wikipedia`);
+let query = parseSqlQuery(`SELECT countryName from wikipedia`);
 query = query.replaceFrom("anotherTable");
 console.log(query.toString());
 ```
@@ -287,7 +287,7 @@ Takes arguments:
 - `onExpression: SqlMulti`
 
 ```
-let query = parser(`SELECT countryName from wikipedia`)
+let query = parseSqlQuery(`SELECT countryName from wikipedia`)
 query = query.addJoin(
   'LEFT',
   SqlRef.fromString('country', 'lookup'),
@@ -312,7 +312,7 @@ LEFT JOIN lookup.country ON lookup.country.v = wikipedia.countryName"
 Removes the Join clause from an SqlQuery object. 
 
 ```
-let query = parser(`SELECT countryName from wikipedia
+let query = parseSqlQuery(`SELECT countryName from wikipedia
       LEFT JOIN lookup.country ON lookup.country.v = wikipedia.countryName`);
 query = query.removeJoin();
 console.log(query.toSting());

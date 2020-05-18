@@ -12,10 +12,8 @@
  * limitations under the License.
  */
 
-import { sqlParserFactory } from '../..';
+import { parseSql } from '../..';
 import { backAndForth } from '../../test-utils';
-
-const parser = sqlParserFactory();
 
 describe('SqlLiteral', () => {
   it('Works with Null', () => {
@@ -23,7 +21,7 @@ describe('SqlLiteral', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlLiteral {
         "innerSpacing": Object {},
         "quotes": undefined,
@@ -39,7 +37,7 @@ describe('SqlLiteral', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlLiteral {
         "innerSpacing": Object {},
         "quotes": undefined,
@@ -55,7 +53,7 @@ describe('SqlLiteral', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlLiteral {
         "innerSpacing": Object {},
         "quotes": undefined,
@@ -71,7 +69,7 @@ describe('SqlLiteral', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlLiteral {
         "innerSpacing": Object {},
         "quotes": "'",
@@ -101,7 +99,7 @@ describe('SqlLiteral', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlLiteral {
         "innerSpacing": Object {},
         "quotes": undefined,
@@ -117,7 +115,7 @@ describe('SqlLiteral', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlLiteral {
         "innerSpacing": Object {},
         "parens": Array [
@@ -138,7 +136,7 @@ describe('SqlLiteral', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlLiteral {
         "innerSpacing": Object {},
         "parens": Array [
@@ -159,7 +157,7 @@ describe('SqlLiteral', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlLiteral {
         "innerSpacing": Object {},
         "quotes": "'",
@@ -175,7 +173,7 @@ describe('SqlLiteral', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlLiteral {
         "innerSpacing": Object {},
         "quotes": undefined,

@@ -308,12 +308,12 @@ AndExpression = head:NotExpression tail:(_ AndToken _ NotExpression)*
 NotExpression = keyword:NotToken postKeyword:_ argument:(NotExpression/OrExpression)
 {
   return new sql.SqlUnary({
+    expressionType: 'NOT',
     keyword: keyword,
     innerSpacing: {
       postKeyword: postKeyword
     },
-    argument: argument,
-    expressionType: 'NOT'
+    argument: argument
   });
 }
   / ComparisonExpression

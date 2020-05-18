@@ -12,10 +12,8 @@
  * limitations under the License.
  */
 
-import { sqlParserFactory } from '../../index';
+import { parseSql } from '../../index';
 import { backAndForth } from '../../test-utils';
-
-const parser = sqlParserFactory();
 
 describe('SqlQuery', () => {
   it('Simple select with single column', () => {
@@ -29,7 +27,7 @@ describe('SqlQuery', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot();
+    expect(parseSql(sql)).toMatchInlineSnapshot();
   });
 
   it('Simple select', () => {
@@ -37,7 +35,7 @@ describe('SqlQuery', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": "",
         "fromKeyword": "from",
@@ -131,7 +129,7 @@ describe('SqlQuery', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": "",
         "fromKeyword": "from",
@@ -231,7 +229,7 @@ describe('SqlQuery', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": "",
         "fromKeyword": "from",
@@ -371,7 +369,7 @@ FROM sys.segments`;
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": "",
         "fromKeyword": "FROM",
@@ -864,7 +862,7 @@ FROM sys.segments`;
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": "",
         "fromKeyword": "FROM",
@@ -1075,7 +1073,7 @@ FROM sys.segments`;
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": "Explain plan for",
         "fromKeyword": "from",
@@ -1172,7 +1170,7 @@ FROM sys.segments`;
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": "",
         "fromKeyword": "from",
@@ -1383,7 +1381,7 @@ describe('expressions with where clause', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": "",
         "fromKeyword": "from",
@@ -1505,11 +1503,11 @@ describe('expressions with where clause', () => {
 
   it('Simple select with equals', () => {
     const sql = `SELECT * FROM sys.supervisors WHERE healthy = 0`;
-    expect(parser(sql).toString()).toMatchInlineSnapshot(
+    expect(parseSql(sql).toString()).toMatchInlineSnapshot(
       `"SELECT * FROM sys.supervisors WHERE healthy = 0"`,
     );
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": "",
         "fromKeyword": "FROM",
@@ -1631,11 +1629,11 @@ describe('expressions with where clause', () => {
 
   it('Simple select with many', () => {
     const sql = `SELECT * FROM sys.supervisors WHERE healthy = 0 and column > 100 or otherColumn = 'value'`;
-    expect(parser(sql).toString()).toMatchInlineSnapshot(
+    expect(parseSql(sql).toString()).toMatchInlineSnapshot(
       `"SELECT * FROM sys.supervisors WHERE healthy = 0 and column > 100 or otherColumn = 'value'"`,
     );
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": "",
         "fromKeyword": "FROM",
@@ -1852,7 +1850,7 @@ describe('expressions with group by clause', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": "",
         "fromKeyword": "from",
@@ -1958,7 +1956,7 @@ describe('expressions with group by clause', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": "",
         "fromKeyword": "from",
@@ -2061,11 +2059,11 @@ describe('expressions with group by clause', () => {
 
   it('Simple select with multiple group by clauses in brackets', () => {
     const sql = `(Select * from table group by column, columnTwo)`;
-    expect(parser(sql).toString()).toMatchInlineSnapshot(
+    expect(parseSql(sql).toString()).toMatchInlineSnapshot(
       `"(Select * from table group by column, columnTwo)"`,
     );
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": "",
         "fromKeyword": "from",
@@ -2195,7 +2193,7 @@ describe('expressions with having clause', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": "",
         "fromKeyword": "from",
@@ -2317,11 +2315,11 @@ describe('expressions with having clause', () => {
 
   it('Simple select with equals', () => {
     const sql = `SELECT * FROM sys.supervisors HAVING healthy = 0`;
-    expect(parser(sql).toString()).toMatchInlineSnapshot(
+    expect(parseSql(sql).toString()).toMatchInlineSnapshot(
       `"SELECT * FROM sys.supervisors HAVING healthy = 0"`,
     );
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": "",
         "fromKeyword": "FROM",
@@ -2443,11 +2441,11 @@ describe('expressions with having clause', () => {
 
   it('Simple select with many', () => {
     const sql = `SELECT * FROM sys.supervisors HAVING healthy = 0 and column > 100 or otherColumn = 'value'`;
-    expect(parser(sql).toString()).toMatchInlineSnapshot(
+    expect(parseSql(sql).toString()).toMatchInlineSnapshot(
       `"SELECT * FROM sys.supervisors HAVING healthy = 0 and column > 100 or otherColumn = 'value'"`,
     );
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": "",
         "fromKeyword": "FROM",
@@ -2664,7 +2662,7 @@ describe('expressions with order by clause', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": "",
         "fromKeyword": "from",
@@ -2769,11 +2767,11 @@ describe('expressions with order by clause', () => {
 
   it('Simple select with ref order by', () => {
     const sql = `Select column from table order by column`;
-    expect(parser(sql).toString()).toMatchInlineSnapshot(
+    expect(parseSql(sql).toString()).toMatchInlineSnapshot(
       `"Select column from table order by column"`,
     );
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": "",
         "fromKeyword": "from",
@@ -2881,11 +2879,11 @@ describe('expressions with order by clause', () => {
 
   it('Simple select with number order by and direction', () => {
     const sql = `Select column from table order by 1 Asc`;
-    expect(parser(sql).toString()).toMatchInlineSnapshot(
+    expect(parseSql(sql).toString()).toMatchInlineSnapshot(
       `"Select column from table order by 1 Asc"`,
     );
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": "",
         "fromKeyword": "from",
@@ -2990,11 +2988,11 @@ describe('expressions with order by clause', () => {
 
   it('Simple select with ref order by and direction', () => {
     const sql = `Select column, columnTwo from table order by column DESC`;
-    expect(parser(sql).toString()).toMatchInlineSnapshot(
+    expect(parseSql(sql).toString()).toMatchInlineSnapshot(
       `"Select column, columnTwo from table order by column DESC"`,
     );
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": "",
         "fromKeyword": "from",
@@ -3119,11 +3117,11 @@ describe('expressions with order by clause', () => {
 
   it('Simple select ordered on multiple columns', () => {
     const sql = `Select column from table order by 1 ASC, column`;
-    expect(parser(sql).toString()).toMatchInlineSnapshot(
+    expect(parseSql(sql).toString()).toMatchInlineSnapshot(
       `"Select column from table order by 1 ASC, column"`,
     );
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": "",
         "fromKeyword": "from",
@@ -3248,11 +3246,11 @@ describe('expressions with order by clause', () => {
 
   it('Simple select ordered on multiple columns', () => {
     const sql = `Select column, columnTwo from table order by 1 ASC, column DESC`;
-    expect(parser(sql).toString()).toMatchInlineSnapshot(
+    expect(parseSql(sql).toString()).toMatchInlineSnapshot(
       `"Select column, columnTwo from table order by 1 ASC, column DESC"`,
     );
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": "",
         "fromKeyword": "from",
@@ -3399,7 +3397,7 @@ describe('expressions with limit clause', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": "",
         "fromKeyword": "from",
@@ -3498,11 +3496,11 @@ describe('expressions with limit clause', () => {
 describe('expressions with union clause', () => {
   it('Simple select with union all ', () => {
     const sql = `Select * from table union all select * from otherTable`;
-    expect(parser(sql).toString()).toMatchInlineSnapshot(
+    expect(parseSql(sql).toString()).toMatchInlineSnapshot(
       `"Select * from table union all select * from otherTable"`,
     );
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": "",
         "fromKeyword": "from",
@@ -3680,11 +3678,11 @@ describe('Test Join Clause', () => {
   it('Inner join', () => {
     const sql = 'Select * from table INNER Join anotherTable ON column = column';
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(
+    expect(parseSql(sql).toString()).toMatchInlineSnapshot(
       `"Select * from table INNER Join anotherTable ON column = column"`,
     );
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": "",
         "fromKeyword": "from",
@@ -3821,11 +3819,11 @@ describe('Test Join Clause', () => {
   it('Left join', () => {
     const sql = 'Select * from table Left Join anotherTable ON column = column';
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(
+    expect(parseSql(sql).toString()).toMatchInlineSnapshot(
       `"Select * from table Left Join anotherTable ON column = column"`,
     );
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": "",
         "fromKeyword": "from",
@@ -3962,11 +3960,11 @@ describe('Test Join Clause', () => {
   it('Right join', () => {
     const sql = 'Select * from table RIGHT Join anotherTable ON column = column';
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(
+    expect(parseSql(sql).toString()).toMatchInlineSnapshot(
       `"Select * from table RIGHT Join anotherTable ON column = column"`,
     );
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": "",
         "fromKeyword": "from",
@@ -4103,11 +4101,11 @@ describe('Test Join Clause', () => {
   it('Full join', () => {
     const sql = 'Select * from table FULL Join anotherTable ON column = column';
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(
+    expect(parseSql(sql).toString()).toMatchInlineSnapshot(
       `"Select * from table FULL Join anotherTable ON column = column"`,
     );
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": "",
         "fromKeyword": "from",
@@ -4244,11 +4242,11 @@ describe('Test Join Clause', () => {
   it('Full Outer join', () => {
     const sql = 'Select * from table FULL OUTER Join anotherTable ON column = column';
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(
+    expect(parseSql(sql).toString()).toMatchInlineSnapshot(
       `"Select * from table FULL OUTER Join anotherTable ON column = column"`,
     );
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": "",
         "fromKeyword": "from",
@@ -4390,7 +4388,7 @@ describe('Queries with comments', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": "",
         "fromKeyword": "from",
@@ -4549,7 +4547,7 @@ describe('No spacing', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": "",
         "fromKeyword": "FROM",

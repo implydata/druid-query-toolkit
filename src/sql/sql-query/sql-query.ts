@@ -437,7 +437,7 @@ export class SqlQuery extends SqlBase {
     ) as string[];
   }
 
-  orderBy(column: string, direction: 'ASC' | 'DESC' | undefined) {
+  orderBy(column: string, direction?: 'ASC' | 'DESC') {
     const orderByUnit = {
       expression: SqlRef.fromStringWithDoubleQuotes(column),
       postExpression: direction ? ' ' : '',

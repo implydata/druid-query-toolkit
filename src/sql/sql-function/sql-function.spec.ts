@@ -12,10 +12,8 @@
  * limitations under the License.
  */
 
-import { sqlParserFactory } from '../..';
+import { parseSql } from '../..';
 import { backAndForth } from '../../test-utils';
-
-const parser = sqlParserFactory();
 
 describe('SqlFunction', () => {
   it('Simple function', () => {
@@ -23,7 +21,7 @@ describe('SqlFunction', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlFunction {
         "arguments": Array [
           SqlRef {
@@ -64,7 +62,7 @@ describe('SqlFunction', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlFunction {
         "arguments": Array [
           SqlRef {
@@ -111,7 +109,7 @@ describe('SqlFunction', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlFunction {
         "arguments": Array [
           SqlMulti {
@@ -212,7 +210,7 @@ describe('SqlFunction', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlFunction {
         "arguments": Array [
           SqlRef {
@@ -253,7 +251,7 @@ describe('SqlFunction', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
           SqlFunction {
@@ -407,7 +405,7 @@ describe('SqlFunction', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlFunction {
         "arguments": Array [
           SqlRef {

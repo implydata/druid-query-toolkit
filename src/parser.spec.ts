@@ -12,16 +12,14 @@
  * limitations under the License.
  */
 
-import { sqlParserFactory } from './parser/druidsql';
-
-const parser = sqlParserFactory();
+import { parseSql } from './parser/druidsql';
 
 describe('Parser', () => {
   describe('ref', () => {
     it('quotes', () => {
       const sql = `"page"`;
 
-      expect(parser(sql)).toMatchInlineSnapshot(`
+      expect(parseSql(sql)).toMatchInlineSnapshot(`
         SqlRef {
           "column": "page",
           "innerSpacing": Object {},
@@ -38,7 +36,7 @@ describe('Parser', () => {
     it('without quotes', () => {
       const sql = `channel`;
 
-      expect(parser(sql)).toMatchInlineSnapshot(`
+      expect(parseSql(sql)).toMatchInlineSnapshot(`
         SqlRef {
           "column": "channel",
           "innerSpacing": Object {},
@@ -55,7 +53,7 @@ describe('Parser', () => {
     it('without quotes + namespace', () => {
       const sql = `"lol" . channel`;
 
-      expect(parser(sql)).toMatchInlineSnapshot(`
+      expect(parseSql(sql)).toMatchInlineSnapshot(`
         SqlRef {
           "column": "channel",
           "innerSpacing": Object {
@@ -75,7 +73,7 @@ describe('Parser', () => {
     it('without quotes + namespace + parens', () => {
       const sql = `(( "lol" . channel)   )`;
 
-      expect(parser(sql)).toMatchInlineSnapshot(`
+      expect(parseSql(sql)).toMatchInlineSnapshot(`
         SqlRef {
           "column": "channel",
           "innerSpacing": Object {
@@ -100,7 +98,7 @@ describe('Parser', () => {
           "type": "ref",
         }
       `);
-      expect(parser(sql).toRawString()).toMatchInlineSnapshot(`"\\"lol\\" . channel"`);
+      expect(parseSql(sql).toRawString()).toMatchInlineSnapshot(`"\\"lol\\" . channel"`);
     });
   });
 
@@ -108,7 +106,7 @@ describe('Parser', () => {
     it('works with number', () => {
       const sql = `12345`;
 
-      expect(parser(sql)).toMatchInlineSnapshot(`
+      expect(parseSql(sql)).toMatchInlineSnapshot(`
         SqlLiteral {
           "innerSpacing": Object {},
           "quotes": undefined,
@@ -122,7 +120,7 @@ describe('Parser', () => {
     it('works with string', () => {
       const sql = `'hello'`;
 
-      expect(parser(sql)).toMatchInlineSnapshot(`
+      expect(parseSql(sql)).toMatchInlineSnapshot(`
         SqlLiteral {
           "innerSpacing": Object {},
           "quotes": "'",
@@ -139,7 +137,7 @@ describe('Parser', () => {
   it('without quotes + namespace', () => {
     const sql = `"lol" . channel`;
 
-    expect(parser(sql)).toMatchInlineSnapshot();
+    expect(parseSql(sql)).toMatchInlineSnapshot();
   });
 
    */

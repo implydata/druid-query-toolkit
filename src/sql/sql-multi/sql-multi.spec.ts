@@ -12,16 +12,14 @@
  * limitations under the License.
  */
 
-import { sqlParserFactory } from '../../index';
+import { parseSql } from '../../index';
 import { backAndForth } from '../../test-utils';
-
-const parser = sqlParserFactory();
 
 describe('OR expression', () => {
   it('single expression with unquoted string', () => {
     const sql = `A OR B`;
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
           SqlRef {
@@ -62,7 +60,7 @@ describe('OR expression', () => {
   it('single expression with single quoted string', () => {
     const sql = `'A' OR 'B'`;
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
           SqlLiteral {
@@ -97,7 +95,7 @@ describe('OR expression', () => {
   it('single expression with double quoted string', () => {
     const sql = `"A" OR "B"`;
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
           SqlRef {
@@ -138,7 +136,7 @@ describe('OR expression', () => {
   it('single expression with numbers', () => {
     const sql = `1 OR 2`;
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
           SqlLiteral {
@@ -173,7 +171,7 @@ describe('OR expression', () => {
   it('brackets', () => {
     const sql = `(1 OR 2)`;
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
           SqlLiteral {
@@ -214,7 +212,7 @@ describe('OR expression', () => {
   it('strange spacing and brackets', () => {
     const sql = `1   OR 2`;
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
           SqlLiteral {
@@ -249,7 +247,7 @@ describe('OR expression', () => {
   it('strange spacing and brackets', () => {
     const sql = `( 1   OR 2 )`;
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
           SqlLiteral {
@@ -294,7 +292,7 @@ describe('AND expression', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
           SqlRef {
@@ -337,7 +335,7 @@ describe('AND expression', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
           SqlLiteral {
@@ -374,7 +372,7 @@ describe('AND expression', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
           SqlRef {
@@ -417,7 +415,7 @@ describe('AND expression', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
           SqlLiteral {
@@ -454,7 +452,7 @@ describe('AND expression', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
           SqlLiteral {
@@ -499,7 +497,7 @@ describe('Comparison expression', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
           SqlRef {
@@ -542,7 +540,7 @@ describe('Comparison expression', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
           SqlLiteral {
@@ -579,7 +577,7 @@ describe('Comparison expression', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
           SqlRef {
@@ -622,7 +620,7 @@ describe('Comparison expression', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
           SqlLiteral {
@@ -659,7 +657,7 @@ describe('Comparison expression', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
           SqlLiteral {
@@ -702,7 +700,7 @@ describe('Comparison expression', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
           SqlRef {
@@ -769,7 +767,7 @@ describe('Comparison expression', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
           SqlRef {
@@ -884,7 +882,7 @@ describe('Comparison expression', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
           SqlRef {
@@ -1001,7 +999,7 @@ describe('Math expression', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
           SqlLiteral {
@@ -1038,7 +1036,7 @@ describe('Math expression', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
           SqlLiteral {
@@ -1075,7 +1073,7 @@ describe('Math expression', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
           SqlLiteral {
@@ -1112,7 +1110,7 @@ describe('Math expression', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
           SqlLiteral {
@@ -1149,7 +1147,7 @@ describe('Math expression', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
           SqlRef {
@@ -1192,7 +1190,7 @@ describe('Math expression', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
           SqlLiteral {
@@ -1229,7 +1227,7 @@ describe('Math expression', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
           SqlRef {
@@ -1272,7 +1270,7 @@ describe('Math expression', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
           SqlLiteral {
@@ -1309,7 +1307,7 @@ describe('Math expression', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
           SqlLiteral {
@@ -1352,7 +1350,7 @@ describe('Math expression', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
           SqlFunction {
@@ -1462,7 +1460,7 @@ describe('Combined expression', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
           SqlRef {
@@ -1577,7 +1575,7 @@ describe('Combined expression', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
           SqlMulti {
@@ -1692,7 +1690,7 @@ describe('Combined expression', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
           SqlMulti {
@@ -1809,7 +1807,7 @@ describe('Multiple expressions', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
           SqlRef {
@@ -1867,7 +1865,7 @@ describe('Multiple expressions', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
           SqlMulti {
@@ -1973,7 +1971,7 @@ describe('Brackets', () => {
   it('Changing order of operations', () => {
     const sql = `(A AND b) OR c`;
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
           SqlMulti {
@@ -2046,7 +2044,7 @@ describe('Brackets', () => {
   it('Wrapping Expression', () => {
     const sql = `((A + b) OR c)`;
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
           SqlMulti {
@@ -2125,7 +2123,7 @@ describe('Brackets', () => {
   it('Changing order of operations', () => {
     const sql = `NOT NOT (A + b) OR c`;
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
           SqlUnary {
@@ -2217,7 +2215,7 @@ describe('remove function', () => {
     const sql = `A OR B`;
 
     expect(
-      parser(sql)
+      parseSql(sql)
         .removeColumn('A')
         .toString(),
     ).toMatchInlineSnapshot(`"B"`);
@@ -2226,7 +2224,7 @@ describe('remove function', () => {
     const sql = `A OR B OR C`;
 
     expect(
-      parser(sql)
+      parseSql(sql)
         .removeColumn('A')
         .toString(),
     ).toMatchInlineSnapshot(`"B OR C"`);
@@ -2235,7 +2233,7 @@ describe('remove function', () => {
     const sql = `A OR B OR C`;
 
     expect(
-      parser(sql)
+      parseSql(sql)
         .removeColumn('C')
         .toString(),
     ).toMatchInlineSnapshot(`"A OR B"`);
@@ -2244,7 +2242,7 @@ describe('remove function', () => {
     const sql = `A AND D OR B OR C`;
 
     expect(
-      parser(sql)
+      parseSql(sql)
         .removeColumn('A')
         .toString(),
     ).toMatchInlineSnapshot(`"D OR B OR C"`);
@@ -2253,7 +2251,7 @@ describe('remove function', () => {
     const sql = `A > 1 AND D OR B OR C`;
 
     expect(
-      parser(sql)
+      parseSql(sql)
         .removeColumn('A')
         .toString(),
     ).toMatchInlineSnapshot(`"D OR B OR C"`);
@@ -2264,17 +2262,17 @@ describe('contains', () => {
   it('nested expression contains string', () => {
     const sql = `A > 1 AND D OR B OR C`;
 
-    expect(parser(sql).containsColumn('A')).toMatchInlineSnapshot(`true`);
+    expect(parseSql(sql).containsColumn('A')).toMatchInlineSnapshot(`true`);
   });
   it('nested expression with brackets contains string', () => {
     const sql = `(A + B ) > 1 AND D OR B OR C`;
 
-    expect(parser(sql).containsColumn('A')).toMatchInlineSnapshot(`true`);
+    expect(parseSql(sql).containsColumn('A')).toMatchInlineSnapshot(`true`);
   });
   it('nested expression with brackets contains string', () => {
     const sql = `(D + B ) > 1 AND D OR B OR C`;
 
-    expect(parser(sql).containsColumn('A')).toMatchInlineSnapshot(`false`);
+    expect(parseSql(sql).containsColumn('A')).toMatchInlineSnapshot(`false`);
   });
 });
 
@@ -2282,7 +2280,7 @@ describe('getSqlRefs', () => {
   it('Only multi expressions', () => {
     const sql = `A > 1 AND D OR B OR C`;
 
-    expect(parser(sql).getSqlRefs('A')).toMatchInlineSnapshot(`
+    expect(parseSql(sql).getSqlRefs('A')).toMatchInlineSnapshot(`
       Array [
         SqlRef {
           "column": "A",
@@ -2330,7 +2328,7 @@ describe('getSqlRefs', () => {
   it('includes unary expressions', () => {
     const sql = `A > 1 AND D OR B OR Not C`;
 
-    expect(parser(sql).getSqlRefs('A')).toMatchInlineSnapshot(`
+    expect(parseSql(sql).getSqlRefs('A')).toMatchInlineSnapshot(`
       Array [
         SqlRef {
           "column": "A",
@@ -2378,7 +2376,7 @@ describe('getSqlRefs', () => {
   it('includes unary expressions and nested Multi Expressions', () => {
     const sql = `A > 1 AND D OR B OR Not (C Or E)`;
 
-    expect(parser(sql).getSqlRefs('A')).toMatchInlineSnapshot(`
+    expect(parseSql(sql).getSqlRefs('A')).toMatchInlineSnapshot(`
       Array [
         SqlRef {
           "column": "A",
@@ -2438,7 +2436,7 @@ describe('getSqlRefs', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
           SqlRef {
@@ -2495,7 +2493,7 @@ describe('getSqlRefs', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
           SqlRef {
@@ -2535,7 +2533,7 @@ describe('getSqlRefs', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
           SqlRef {
@@ -2574,7 +2572,7 @@ describe('getSqlRefs', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
           SqlMulti {

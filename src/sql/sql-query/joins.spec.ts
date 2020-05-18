@@ -12,14 +12,12 @@
  * limitations under the License.
  */
 
-import { SqlMulti, sqlParserFactory, SqlRef } from '../..';
-
-const parser = sqlParserFactory();
+import { parseSqlQuery, SqlMulti, SqlRef } from '../..';
 
 describe('parse join with lookup', () => {
   it('parsers a basic math expression', () => {
     expect(
-      parser(`SELECT countryName from wikipedia
+      parseSqlQuery(`SELECT countryName from wikipedia
 LEFT JOIN lookup.country ON lookup.country.v = wikipedia.countryName`).toString(),
     ).toMatchInlineSnapshot(`
       "SELECT countryName from wikipedia
@@ -31,7 +29,7 @@ LEFT JOIN lookup.country ON lookup.country.v = wikipedia.countryName`).toString(
 describe('Add Join', () => {
   it('Add left join', () => {
     expect(
-      parser(`SELECT countryName from wikipedia`)
+      parseSqlQuery(`SELECT countryName from wikipedia`)
         .addJoin(
           'LEFT',
           SqlRef.fromString('country', 'lookup'),
@@ -48,7 +46,7 @@ describe('Add Join', () => {
   });
   it('Add inner join', () => {
     expect(
-      parser(`SELECT countryName from wikipedia`)
+      parseSqlQuery(`SELECT countryName from wikipedia`)
         .addJoin(
           'INNER',
           SqlRef.fromString('country', 'lookup'),
@@ -68,7 +66,7 @@ describe('Add Join', () => {
 describe('Remove join', () => {
   it('Remove Join', () => {
     expect(
-      parser(`SELECT countryName from wikipedia
+      parseSqlQuery(`SELECT countryName from wikipedia
       LEFT JOIN lookup.country ON lookup.country.v = wikipedia.countryName`)
         .removeJoin()
         .toString(),
@@ -79,7 +77,7 @@ describe('Remove join', () => {
 describe('Check if column is in On expression', () => {
   it('is contained', () => {
     expect(
-      parser(`SELECT countryName from wikipedia
+      parseSqlQuery(`SELECT countryName from wikipedia
       LEFT JOIN lookup.country ON lookup.country.v = wikipedia.countryName`).onExpression.containsColumn(
         'v',
       ),
@@ -87,7 +85,7 @@ describe('Check if column is in On expression', () => {
   });
   it('is contained', () => {
     expect(
-      parser(`SELECT countryName from wikipedia
+      parseSqlQuery(`SELECT countryName from wikipedia
       LEFT JOIN lookup.country ON lookup.country.v = wikipedia.countryName`).onExpression.containsColumn(
         'countryName',
       ),
@@ -95,7 +93,7 @@ describe('Check if column is in On expression', () => {
   });
   it('is not contained', () => {
     expect(
-      parser(`SELECT countryName from wikipedia
+      parseSqlQuery(`SELECT countryName from wikipedia
       LEFT JOIN lookup.country ON lookup.country.v = wikipedia.countryName`).onExpression.containsColumn(
         'k',
       ),

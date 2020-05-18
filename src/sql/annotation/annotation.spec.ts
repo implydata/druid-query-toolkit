@@ -12,10 +12,8 @@
  * limitations under the License.
  */
 
-import { sqlParserFactory } from '../../index';
+import { parseSql } from '../../index';
 import { backAndForth } from '../../test-utils';
-
-const parser = sqlParserFactory();
 
 describe('Queries with annotated comments post query', () => {
   it('single annotated comment', () => {
@@ -27,7 +25,7 @@ describe('Queries with annotated comments post query', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": "",
         "fromKeyword": "from",
@@ -195,7 +193,7 @@ describe('Queries with annotated comments post query', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": "",
         "fromKeyword": "from",
@@ -355,7 +353,7 @@ describe('Queries with annotated comments post query', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": "",
         "fromKeyword": "from",
@@ -527,7 +525,7 @@ describe('Queries with annotated comments post select', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": "",
         "fromKeyword": "from",
@@ -687,7 +685,7 @@ describe('Queries with annotated comments post select and post query', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": "",
         "fromKeyword": "from",

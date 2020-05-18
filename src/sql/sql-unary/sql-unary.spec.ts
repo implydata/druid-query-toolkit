@@ -12,10 +12,8 @@
  * limitations under the License.
  */
 
-import { sqlParserFactory } from '../../index';
+import { parseSql } from '../../index';
 import { backAndForth } from '../../test-utils';
-
-const parser = sqlParserFactory();
 
 describe('SqlUnary', () => {
   it('single not expression', () => {
@@ -23,7 +21,7 @@ describe('SqlUnary', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlUnary {
         "argument": SqlRef {
           "column": "B",
@@ -50,7 +48,7 @@ describe('SqlUnary', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
           SqlUnary {
@@ -132,7 +130,7 @@ describe('SqlUnary', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlUnary {
         "argument": SqlMulti {
           "arguments": Array [
@@ -183,7 +181,7 @@ describe('SqlUnary', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
           SqlUnary {
@@ -287,7 +285,7 @@ describe('SqlUnary', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlUnary {
         "argument": SqlUnary {
           "argument": SqlMulti {

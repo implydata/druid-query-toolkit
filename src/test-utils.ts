@@ -12,9 +12,7 @@
  * limitations under the License.
  */
 
-import { sqlParserFactory } from '.';
-
-const parser = sqlParserFactory();
+import { parseSql } from '.';
 
 // To be used as a tag
 export function sane(_x: TemplateStringsArray) {
@@ -37,5 +35,5 @@ export function sane(_x: TemplateStringsArray) {
 }
 
 export function backAndForth(sql: string): void {
-  expect(parser(sql).toString()).toEqual(sql);
+  expect(parseSql(sql).toString()).toEqual(sql);
 }

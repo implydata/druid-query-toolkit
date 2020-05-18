@@ -12,10 +12,8 @@
  * limitations under the License.
  */
 
-import { sqlParserFactory } from '../..';
+import { parseSql } from '../..';
 import { backAndForth } from '../../test-utils';
-
-const parser = sqlParserFactory();
 
 describe('SqlTimestamp', () => {
   it('Simple timestamp', () => {
@@ -23,7 +21,7 @@ describe('SqlTimestamp', () => {
 
     backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlTimestamp {
         "innerSpacing": Object {
           "postTimestampKeyword": " ",
