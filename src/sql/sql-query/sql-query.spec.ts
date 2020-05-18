@@ -4512,12 +4512,14 @@ describe('Queries with comments', () => {
 
     backAndForth(sql);
   });
+
   it('comment with non english', () => {
     const sql = `Select --Здравствуйте
   column from table`;
 
     backAndForth(sql);
   });
+
   it('comment at end of query', () => {
     const sql = `Select 
   column from table
@@ -4525,6 +4527,7 @@ describe('Queries with comments', () => {
 
     backAndForth(sql);
   });
+
   it('comment with unary negative', () => {
     const sql = `Select 
   column from table

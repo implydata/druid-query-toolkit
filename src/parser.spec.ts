@@ -134,6 +134,7 @@ describe('Parser', () => {
 
   /*
 
+
   it('without quotes + namespace', () => {
     const sql = `"lol" . channel`;
 

@@ -131,6 +131,7 @@ describe('SqlLiteral', () => {
       }
     `);
   });
+
   it('string literal with brackets', () => {
     const sql = `('word')`;
 
@@ -152,6 +153,7 @@ describe('SqlLiteral', () => {
       }
     `);
   });
+
   it('empty literal', () => {
     const sql = `''`;
 

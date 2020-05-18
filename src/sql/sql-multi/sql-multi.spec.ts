@@ -2216,6 +2216,7 @@ describe('remove function', () => {
 
     expect((parseSql(sql) as SqlMulti).removeColumn('A')!.toString()).toMatchInlineSnapshot(`"B"`);
   });
+
   it('remove from single expression type multiple', () => {
     const sql = `A OR B OR C`;
 
@@ -2223,6 +2224,7 @@ describe('remove function', () => {
       `"B OR C"`,
     );
   });
+
   it('remove from single expression type multiple', () => {
     const sql = `A OR B OR C`;
 
@@ -2230,6 +2232,7 @@ describe('remove function', () => {
       `"A OR B"`,
     );
   });
+
   it('remove from single expression type multiple nested', () => {
     const sql = `A AND D OR B OR C`;
 
@@ -2237,6 +2240,7 @@ describe('remove function', () => {
       `"D OR B OR C"`,
     );
   });
+
   it('remove nested comparison expression', () => {
     const sql = `A > 1 AND D OR B OR C`;
 
@@ -2252,11 +2256,13 @@ describe('contains', () => {
 
     expect((parseSql(sql) as SqlMulti).containsColumn('A')).toMatchInlineSnapshot(`true`);
   });
+
   it('nested expression with brackets contains string', () => {
     const sql = `(A + B ) > 1 AND D OR B OR C`;
 
     expect((parseSql(sql) as SqlMulti).containsColumn('A')).toMatchInlineSnapshot(`true`);
   });
+
   it('nested expression with brackets contains string', () => {
     const sql = `(D + B ) > 1 AND D OR B OR C`;
 
@@ -2313,6 +2319,7 @@ describe('getSqlRefs', () => {
       ]
     `);
   });
+
   it('includes unary expressions', () => {
     const sql = `A > 1 AND D OR B OR Not C`;
 
@@ -2361,6 +2368,7 @@ describe('getSqlRefs', () => {
       ]
     `);
   });
+
   it('includes unary expressions and nested Multi Expressions', () => {
     const sql = `A > 1 AND D OR B OR Not (C Or E)`;
 

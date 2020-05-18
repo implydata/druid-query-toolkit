@@ -13,16 +13,13 @@
  */
 
 import { parseSqlQuery, SqlMulti, SqlRef } from '../..';
-import { sane } from '../../test-utils';
+import { backAndForth, sane } from '../../test-utils';
 
 describe('parse join with lookup', () => {
   it('parsers a basic math expression', () => {
-    expect(
-      parseSqlQuery(`SELECT countryName from wikipedia
-LEFT JOIN lookup.country ON lookup.country.v = wikipedia.countryName`).toString(),
-    ).toMatchInlineSnapshot(`
-      "SELECT countryName from wikipedia
-      LEFT JOIN lookup.country ON lookup.country.v = wikipedia.countryName"
+    backAndForth(sane`
+      SELECT countryName from wikipedia
+      LEFT JOIN lookup.country ON lookup.country.v = wikipedia.countryName
     `);
   });
 });
