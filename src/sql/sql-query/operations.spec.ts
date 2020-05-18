@@ -13,9 +13,8 @@
  */
 
 import { SqlAliasRef, SqlFunction, sqlParserFactory, SqlRef } from '../..';
-import { FUNCTIONS } from '../../test-utils';
 
-const parser = sqlParserFactory(FUNCTIONS);
+const parser = sqlParserFactory();
 
 describe('getTableName Tests', () => {
   it('getTableNames', () => {
@@ -84,6 +83,7 @@ describe('getSorted Test', () => {
       ]
     `);
   });
+
   it('getSorted with undefined direction', () => {
     expect(
       parser(`SELECT *
@@ -97,6 +97,7 @@ describe('getSorted Test', () => {
       ]
     `);
   });
+
   it('getSorted with multiple columns', () => {
     expect(
       parser(`SELECT *
@@ -114,6 +115,7 @@ describe('getSorted Test', () => {
       ]
     `);
   });
+
   it('getSorted with numbered column', () => {
     expect(
       parser(`SELECT column, columnTwo 
@@ -142,6 +144,7 @@ describe('order by Test', () => {
       ORDER BY \\"column\\" DESC"
     `);
   });
+
   it('add to order by clause', () => {
     expect(
       parser(`SELECT *
@@ -153,6 +156,7 @@ describe('order by Test', () => {
         FROM sys.\\"github\\" ORDER BY column, \\"columnTwo\\" DESC"
     `);
   });
+
   it('order by with out direction', () => {
     expect(
       parser(`SELECT *
@@ -179,6 +183,7 @@ describe('addWhereFilter test ', () => {
       WHERE \\"column\\" > 1"
     `);
   });
+
   it('Single Where filter value', () => {
     expect(
       parser(`SELECT *
@@ -190,6 +195,7 @@ describe('addWhereFilter test ', () => {
         FROM sys.\\"github\\" WHERE column > 1 AND \\"columnTwo\\" > 2"
     `);
   });
+
   it('OR Where filter value', () => {
     expect(
       parser(`SELECT *
@@ -201,6 +207,7 @@ describe('addWhereFilter test ', () => {
         FROM sys.\\"github\\" WHERE (column > 1 OR column < 5) AND \\"columnTwo\\" > 2"
     `);
   });
+
   it('AND Where filter value', () => {
     expect(
       parser(`SELECT *
@@ -226,6 +233,7 @@ describe('remove functions', () => {
         FROM sys.\\"github\\""
     `);
   });
+
   it('remove middle column from select', () => {
     expect(
       parser(`SELECT column, column1, column2
@@ -237,6 +245,7 @@ describe('remove functions', () => {
         FROM sys.\\"github\\""
     `);
   });
+
   it('remove end column from select', () => {
     expect(
       parser(`SELECT column, column1, column2
@@ -248,6 +257,7 @@ describe('remove functions', () => {
         FROM sys.\\"github\\""
     `);
   });
+
   it('remove column from where', () => {
     expect(
       parser(`SELECT column, column1, column2
@@ -261,6 +271,7 @@ describe('remove functions', () => {
         Where column"
     `);
   });
+
   it('remove only column from where', () => {
     expect(
       parser(`SELECT column, column1, column2
@@ -273,6 +284,7 @@ describe('remove functions', () => {
         FROM sys.\\"github\\""
     `);
   });
+
   it('remove multiple filters for the same column', () => {
     expect(
       parser(`SELECT column, column1, column2
@@ -285,6 +297,7 @@ describe('remove functions', () => {
         FROM sys.\\"github\\""
     `);
   });
+
   it('remove multiple filters for the same column', () => {
     expect(
       parser(`SELECT column, column1, column2
@@ -298,6 +311,7 @@ describe('remove functions', () => {
         Where column1 > 2"
     `);
   });
+
   it('remove only comparison expression from where', () => {
     expect(
       parser(`SELECT column, column1, column2
@@ -310,6 +324,7 @@ describe('remove functions', () => {
         FROM sys.\\"github\\""
     `);
   });
+
   it('remove only comparison expression from where', () => {
     expect(
       parser(`SELECT column, column1, column2
@@ -323,6 +338,7 @@ describe('remove functions', () => {
         Where column1 > 1"
     `);
   });
+
   it('remove only column from having', () => {
     expect(
       parser(`SELECT column, column1, column2
@@ -335,6 +351,7 @@ describe('remove functions', () => {
         FROM sys.\\"github\\""
     `);
   });
+
   it('remove only comparison expression from having', () => {
     expect(
       parser(`SELECT column, column1, column2
@@ -347,6 +364,7 @@ describe('remove functions', () => {
         FROM sys.\\"github\\""
     `);
   });
+
   it('remove only comparison expression from having', () => {
     expect(
       parser(`SELECT column, column1, column2
@@ -360,6 +378,7 @@ describe('remove functions', () => {
         Having column1 > 1"
     `);
   });
+
   it('remove one numbered column from order by', () => {
     expect(
       parser(`SELECT column, column1, column2
@@ -373,6 +392,7 @@ describe('remove functions', () => {
         Order By 2 ASC"
     `);
   });
+
   it('remove column not in order by', () => {
     expect(
       parser(`SELECT column, column1, column2
@@ -386,6 +406,7 @@ describe('remove functions', () => {
         Order By column, column1 ASC"
     `);
   });
+
   it('remove one numbered column not in order by', () => {
     expect(
       parser(`SELECT column, column1, column2
@@ -399,6 +420,7 @@ describe('remove functions', () => {
         Order By column, 3 ASC"
     `);
   });
+
   it('remove only column in order by', () => {
     expect(
       parser(`SELECT column, column1, column2
@@ -411,6 +433,7 @@ describe('remove functions', () => {
         FROM sys.\\"github\\""
     `);
   });
+
   it('remove column from group by', () => {
     expect(
       parser(`SELECT column, column1, column2
@@ -424,6 +447,7 @@ describe('remove functions', () => {
         Group By 3"
     `);
   });
+
   it('remove column as number from group by', () => {
     expect(
       parser(`SELECT column, column1, column2
@@ -437,6 +461,7 @@ describe('remove functions', () => {
         Group By column"
     `);
   });
+
   it('remove only column from group by', () => {
     expect(
       parser(`SELECT column, column1, column2
@@ -463,6 +488,7 @@ describe('getAggregateColumns', () => {
       ]
     `);
   });
+
   it('get all aggregate columns using numbers', () => {
     const sql = `SELECT column, SUM(column1) As aggregated, column2
   FROM sys."github"
@@ -489,6 +515,7 @@ describe('getCurrentFilters', () => {
       ]
     `);
   });
+
   it('get all filters, only where clause', () => {
     const sql = `SELECT column, SUM(column1) As aggregated, column2
   FROM sys."github"
@@ -502,6 +529,7 @@ describe('getCurrentFilters', () => {
       ]
     `);
   });
+
   it('get all filters, where and having clauses', () => {
     const sql = `SELECT column, SUM(column1) As aggregated, column2
   FROM sys."github"
@@ -585,7 +613,7 @@ describe('addToGroupBy', () => {
         "groupByExpression": Array [
           SqlLiteral {
             "innerSpacing": Object {},
-            "quotes": "",
+            "quotes": undefined,
             "stringValue": "2",
             "type": "literal",
             "value": 2,

@@ -13,9 +13,8 @@
  */
 
 import { sqlParserFactory } from './parser/druidsql';
-import { FUNCTIONS } from './test-utils';
 
-const parser = sqlParserFactory(FUNCTIONS);
+const parser = sqlParserFactory();
 
 describe('Parser', () => {
   describe('ref', () => {
@@ -112,7 +111,7 @@ describe('Parser', () => {
       expect(parser(sql)).toMatchInlineSnapshot(`
         SqlLiteral {
           "innerSpacing": Object {},
-          "quotes": "",
+          "quotes": undefined,
           "stringValue": "12345",
           "type": "literal",
           "value": 12345,

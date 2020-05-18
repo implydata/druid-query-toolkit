@@ -13,7 +13,7 @@ var sql = require('../sql');
 var utils = require('../utils');
 var deepGet = utils.deepGet;
 
-function sqlParserFactory(functions) {
+function sqlParserFactory() {
 var p =
 ${parser}
 

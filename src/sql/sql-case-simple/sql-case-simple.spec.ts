@@ -13,15 +13,16 @@
  */
 
 import { sqlParserFactory } from '../../index';
-import { FUNCTIONS } from '../../test-utils';
+import { backAndForth } from '../../test-utils';
 
-const parser = sqlParserFactory(FUNCTIONS);
+const parser = sqlParserFactory();
 
 describe('Case expression', () => {
   it('simple CASE Expression', () => {
     const sql = `CASE A WHEN B THEN C END`;
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"CASE A WHEN B THEN C END"`);
+    backAndForth(sql);
+
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlCaseSimple {
         "caseExpression": SqlRef {
@@ -83,7 +84,8 @@ describe('Case expression', () => {
   it('simple CASE Expression with ELSE', () => {
     const sql = `CASE A WHEN B THEN C ELSE D END`;
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"CASE A WHEN B THEN C ELSE D END"`);
+    backAndForth(sql);
+
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlCaseSimple {
         "caseExpression": SqlRef {
@@ -154,7 +156,8 @@ describe('Case expression', () => {
   it('simple CASE Expression with weird spacing', () => {
     const sql = `CASE A  WHEN     B THEN C      END`;
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"CASE A  WHEN     B THEN C      END"`);
+    backAndForth(sql);
+
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlCaseSimple {
         "caseExpression": SqlRef {
@@ -216,7 +219,8 @@ describe('Case expression', () => {
   it('simple CASE Expression with brackets', () => {
     const sql = `(CASE A WHEN B THEN C END)`;
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"(CASE A WHEN B THEN C END)"`);
+    backAndForth(sql);
+
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlCaseSimple {
         "caseExpression": SqlRef {
@@ -284,7 +288,8 @@ describe('Case expression', () => {
   it('simple CASE Expression with brackets and weird spacing', () => {
     const sql = `(   CASE   A WHEN   B THEN C END  )`;
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"(   CASE   A WHEN   B THEN C END  )"`);
+    backAndForth(sql);
+
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlCaseSimple {
         "caseExpression": SqlRef {

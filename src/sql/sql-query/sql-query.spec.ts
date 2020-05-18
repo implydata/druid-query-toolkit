@@ -13,20 +13,29 @@
  */
 
 import { sqlParserFactory } from '../../index';
-import { FUNCTIONS } from '../../test-utils';
+import { backAndForth } from '../../test-utils';
 
-const parser = sqlParserFactory(FUNCTIONS);
+const parser = sqlParserFactory();
 
-describe('simple expressions', () => {
+describe('SqlQuery', () => {
   it('Simple select with single column', () => {
     const sql = `Select notingham from table`;
-    expect(parser(sql).toString()).toMatch(sql);
+
+    backAndForth(sql);
+  });
+
+  it.skip('Simple expression', () => {
+    const sql = `Select 3`;
+
+    backAndForth(sql);
+
+    expect(parser(sql)).toMatchInlineSnapshot();
   });
 
   it('Simple select', () => {
     const sql = `Select * from table`;
 
-    expect(parser(sql).toString()).toMatch(sql);
+    backAndForth(sql);
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlQuery {
@@ -120,7 +129,7 @@ describe('simple expressions', () => {
   it('Simple select in brackets', () => {
     const sql = `(Select * from table)`;
 
-    expect(parser(sql).toString()).toMatch(sql);
+    backAndForth(sql);
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlQuery {
@@ -220,7 +229,7 @@ describe('simple expressions', () => {
   it('Simple select, columns with aliases', () => {
     const sql = `Select Sum(*) As sums from table`;
 
-    expect(parser(sql).toString()).toMatch(sql);
+    backAndForth(sql);
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlQuery {
@@ -360,7 +369,7 @@ describe('simple expressions', () => {
     COUNT(*) AS num_segments
 FROM sys.segments`;
 
-    expect(parser(sql).toString()).toMatch(sql);
+    backAndForth(sql);
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlQuery {
@@ -566,7 +575,7 @@ FROM sys.segments`;
                   "postWhenSpace": " ",
                   "thenExpression": SqlLiteral {
                     "innerSpacing": Object {},
-                    "quotes": "",
+                    "quotes": undefined,
                     "stringValue": "0",
                     "type": "literal",
                     "value": 0,
@@ -608,7 +617,7 @@ FROM sys.segments`;
                       },
                       SqlLiteral {
                         "innerSpacing": Object {},
-                        "quotes": "",
+                        "quotes": undefined,
                         "stringValue": "0",
                         "type": "literal",
                         "value": 0,
@@ -698,7 +707,7 @@ FROM sys.segments`;
                   "postWhenSpace": " ",
                   "thenExpression": SqlLiteral {
                     "innerSpacing": Object {},
-                    "quotes": "",
+                    "quotes": undefined,
                     "stringValue": "0",
                     "type": "literal",
                     "value": 0,
@@ -740,7 +749,7 @@ FROM sys.segments`;
                       },
                       SqlLiteral {
                         "innerSpacing": Object {},
-                        "quotes": "",
+                        "quotes": undefined,
                         "stringValue": "0",
                         "type": "literal",
                         "value": 0,
@@ -853,7 +862,7 @@ FROM sys.segments`;
     COUNT(*) AS num_segments
 FROM sys.segments`;
 
-    expect(parser(sql).toString()).toMatch(sql);
+    backAndForth(sql);
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlQuery {
@@ -1064,7 +1073,7 @@ FROM sys.segments`;
   it('Simple select with Explain', () => {
     const sql = `Explain plan for Select * from table`;
 
-    expect(parser(sql).toString()).toMatch(sql);
+    backAndForth(sql);
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlQuery {
@@ -1161,7 +1170,7 @@ FROM sys.segments`;
   FROM   emp)
     Select * from table`;
 
-    expect(parser(sql).toString()).toMatch(sql);
+    backAndForth(sql);
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlQuery {
@@ -1371,7 +1380,8 @@ FROM sys.segments`;
 describe('expressions with where clause', () => {
   it('Simple select with where', () => {
     const sql = `Select * from table where column > 1`;
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"Select * from table where column > 1"`);
+
+    backAndForth(sql);
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlQuery {
@@ -1468,7 +1478,7 @@ describe('expressions with where clause', () => {
             },
             SqlLiteral {
               "innerSpacing": Object {},
-              "quotes": "",
+              "quotes": undefined,
               "stringValue": "1",
               "type": "literal",
               "value": 1,
@@ -1594,7 +1604,7 @@ describe('expressions with where clause', () => {
             },
             SqlLiteral {
               "innerSpacing": Object {},
-              "quotes": "",
+              "quotes": undefined,
               "stringValue": "0",
               "type": "literal",
               "value": 0,
@@ -1724,7 +1734,7 @@ describe('expressions with where clause', () => {
                     },
                     SqlLiteral {
                       "innerSpacing": Object {},
-                      "quotes": "",
+                      "quotes": undefined,
                       "stringValue": "0",
                       "type": "literal",
                       "value": 0,
@@ -1755,7 +1765,7 @@ describe('expressions with where clause', () => {
                     },
                     SqlLiteral {
                       "innerSpacing": Object {},
-                      "quotes": "",
+                      "quotes": undefined,
                       "stringValue": "100",
                       "type": "literal",
                       "value": 100,
@@ -1839,7 +1849,8 @@ describe('expressions with where clause', () => {
 describe('expressions with group by clause', () => {
   it('Simple select with group by ', () => {
     const sql = `Select * from table group by column`;
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"Select * from table group by column"`);
+
+    backAndForth(sql);
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlQuery {
@@ -1944,7 +1955,8 @@ describe('expressions with group by clause', () => {
 
   it('Simple select with group by ', () => {
     const sql = `Select * from table group by column`;
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"Select * from table group by column"`);
+
+    backAndForth(sql);
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlQuery {
@@ -2180,7 +2192,8 @@ describe('expressions with group by clause', () => {
 describe('expressions with having clause', () => {
   it('Simple select with where', () => {
     const sql = `Select * from table having column > 1`;
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"Select * from table having column > 1"`);
+
+    backAndForth(sql);
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlQuery {
@@ -2203,7 +2216,7 @@ describe('expressions with having clause', () => {
             },
             SqlLiteral {
               "innerSpacing": Object {},
-              "quotes": "",
+              "quotes": undefined,
               "stringValue": "1",
               "type": "literal",
               "value": 1,
@@ -2329,7 +2342,7 @@ describe('expressions with having clause', () => {
             },
             SqlLiteral {
               "innerSpacing": Object {},
-              "quotes": "",
+              "quotes": undefined,
               "stringValue": "0",
               "type": "literal",
               "value": 0,
@@ -2459,7 +2472,7 @@ describe('expressions with having clause', () => {
                     },
                     SqlLiteral {
                       "innerSpacing": Object {},
-                      "quotes": "",
+                      "quotes": undefined,
                       "stringValue": "0",
                       "type": "literal",
                       "value": 0,
@@ -2490,7 +2503,7 @@ describe('expressions with having clause', () => {
                     },
                     SqlLiteral {
                       "innerSpacing": Object {},
-                      "quotes": "",
+                      "quotes": undefined,
                       "stringValue": "100",
                       "type": "literal",
                       "value": 100,
@@ -2648,7 +2661,8 @@ describe('expressions with having clause', () => {
 describe('expressions with order by clause', () => {
   it('Simple select with number order by', () => {
     const sql = `Select column from table order by 1`;
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"Select column from table order by 1"`);
+
+    backAndForth(sql);
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlQuery {
@@ -2698,7 +2712,7 @@ describe('expressions with order by clause', () => {
             "direction": "",
             "expression": SqlLiteral {
               "innerSpacing": Object {},
-              "quotes": "",
+              "quotes": undefined,
               "stringValue": "1",
               "type": "literal",
               "value": 1,
@@ -2866,9 +2880,9 @@ describe('expressions with order by clause', () => {
   });
 
   it('Simple select with number order by and direction', () => {
-    const sql = `Select column from table order by 1 ASC`;
+    const sql = `Select column from table order by 1 Asc`;
     expect(parser(sql).toString()).toMatchInlineSnapshot(
-      `"Select column from table order by 1 ASC"`,
+      `"Select column from table order by 1 Asc"`,
     );
 
     expect(parser(sql)).toMatchInlineSnapshot(`
@@ -2916,10 +2930,10 @@ describe('expressions with order by clause', () => {
         "orderBySeparators": Array [],
         "orderByUnits": Array [
           Object {
-            "direction": "ASC",
+            "direction": "Asc",
             "expression": SqlLiteral {
               "innerSpacing": Object {},
-              "quotes": "",
+              "quotes": undefined,
               "stringValue": "1",
               "type": "literal",
               "value": 1,
@@ -3163,7 +3177,7 @@ describe('expressions with order by clause', () => {
             "direction": "ASC",
             "expression": SqlLiteral {
               "innerSpacing": Object {},
-              "quotes": "",
+              "quotes": undefined,
               "stringValue": "1",
               "type": "literal",
               "value": 1,
@@ -3292,7 +3306,7 @@ describe('expressions with order by clause', () => {
             "direction": "ASC",
             "expression": SqlLiteral {
               "innerSpacing": Object {},
-              "quotes": "",
+              "quotes": undefined,
               "stringValue": "1",
               "type": "literal",
               "value": 1,
@@ -3382,7 +3396,8 @@ describe('expressions with order by clause', () => {
 describe('expressions with limit clause', () => {
   it('Simple select with limit', () => {
     const sql = `Select * from table limit 1`;
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"Select * from table limit 1"`);
+
+    backAndForth(sql);
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlQuery {
@@ -3422,7 +3437,7 @@ describe('expressions with limit clause', () => {
         "limitKeyword": "limit",
         "limitValue": SqlLiteral {
           "innerSpacing": Object {},
-          "quotes": "",
+          "quotes": undefined,
           "stringValue": "1",
           "type": "literal",
           "value": 1,
@@ -4373,7 +4388,7 @@ describe('Queries with comments', () => {
     const sql = `Select -- some comment 
   column from table`;
 
-    expect(parser(sql).toString()).toMatch(sql);
+    backAndForth(sql);
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlQuery {
@@ -4470,7 +4485,7 @@ describe('Queries with comments', () => {
     --some comment
   column from table`;
 
-    expect(parser(sql).toString()).toMatch(sql);
+    backAndForth(sql);
   });
 
   it('comment on new line', () => {
@@ -4478,7 +4493,7 @@ describe('Queries with comments', () => {
     -- some comment
   column from table`;
 
-    expect(parser(sql).toString()).toMatch(sql);
+    backAndForth(sql);
   });
 
   it('comment containing hyphens', () => {
@@ -4486,27 +4501,27 @@ describe('Queries with comments', () => {
     -- some--comment
     column from table`;
 
-    expect(parser(sql).toString()).toMatch(sql);
+    backAndForth(sql);
   });
 
   it('comment with no space', () => {
     const sql = `Select --some comment
   column from table`;
 
-    expect(parser(sql).toString()).toMatch(sql);
+    backAndForth(sql);
   });
   it('comment with non english', () => {
     const sql = `Select --Здравствуйте
   column from table`;
 
-    expect(parser(sql).toString()).toMatch(sql);
+    backAndForth(sql);
   });
   it('comment at end of query', () => {
     const sql = `Select 
   column from table
   -- comment`;
 
-    expect(parser(sql).toString()).toMatch(sql);
+    backAndForth(sql);
   });
   it('comment with unary negative', () => {
     const sql = `Select 
@@ -4514,7 +4529,7 @@ describe('Queries with comments', () => {
   -- comment
   order by -1`;
 
-    expect(parser(sql).toString()).toMatch(sql);
+    backAndForth(sql);
   });
 });
 
@@ -4524,7 +4539,7 @@ describe('Queries with annotated comments', () => {
     order by column
     --: valueName = value`;
 
-    expect(parser(sql).toString()).toMatch(sql);
+    backAndForth(sql);
   });
 });
 
@@ -4532,7 +4547,8 @@ describe('No spacing', () => {
   it('Expression with no spacing', () => {
     const sql = `SELECT"channel",COUNT(*)AS"Count",COUNT(DISTINCT"cityName")AS"dist_cityName"FROM"wiki"GROUP BY"channel"ORDER BY"Count"DESC`;
 
-    expect(parser(sql).toString()).toMatch(sql);
+    backAndForth(sql);
+
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": "",

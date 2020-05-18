@@ -13,9 +13,9 @@
  */
 
 import { sqlParserFactory } from '../../index';
-import { FUNCTIONS } from '../../test-utils';
+import { backAndForth } from '../../test-utils';
 
-const parser = sqlParserFactory(FUNCTIONS);
+const parser = sqlParserFactory();
 
 describe('Queries with annotated comments post query', () => {
   it('single annotated comment', () => {
@@ -24,6 +24,8 @@ describe('Queries with annotated comments post query', () => {
     , column2 
     from table 
     order by column`;
+
+    backAndForth(sql);
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlQuery {
@@ -184,14 +186,14 @@ describe('Queries with annotated comments post query', () => {
         "withUnits": undefined,
       }
     `);
-
-    expect(parser(sql).toString()).toMatch(sql);
   });
 
   it('single annotated comment', () => {
     const sql = `Select column, column1, column2 from table
     order by column
     --: valueName = value`;
+
+    backAndForth(sql);
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlQuery {
@@ -343,12 +345,6 @@ describe('Queries with annotated comments post query', () => {
         "withUnits": undefined,
       }
     `);
-
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`
-      "Select column, column1, column2 from table
-          order by column
-          --: valueName = value"
-    `);
   });
 
   it('double annotated comment no spacing', () => {
@@ -356,6 +352,8 @@ describe('Queries with annotated comments post query', () => {
     order by column
     --: valueName = value
     --:valueName = value`;
+
+    backAndForth(sql);
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlQuery {
@@ -518,8 +516,6 @@ describe('Queries with annotated comments post query', () => {
         "withUnits": undefined,
       }
     `);
-
-    expect(parser(sql).toString()).toMatch(sql);
   });
 });
 
@@ -528,6 +524,8 @@ describe('Queries with annotated comments post select', () => {
     const sql = `Select column, column1, column2 --: valueName = value
     from table
     order by column`;
+
+    backAndForth(sql);
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlQuery {
@@ -677,8 +675,6 @@ describe('Queries with annotated comments post select', () => {
         "withUnits": undefined,
       }
     `);
-
-    expect(parser(sql).toString()).toMatch(sql);
   });
 });
 
@@ -689,7 +685,7 @@ describe('Queries with annotated comments post select and post query', () => {
     order by column
     --: valueName = value`;
 
-    expect(parser(sql).toString()).toMatch(sql);
+    backAndForth(sql);
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlQuery {

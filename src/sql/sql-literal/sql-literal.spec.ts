@@ -13,15 +13,64 @@
  */
 
 import { sqlParserFactory } from '../..';
-import { FUNCTIONS } from '../../test-utils';
+import { backAndForth } from '../../test-utils';
 
-const parser = sqlParserFactory(FUNCTIONS);
+const parser = sqlParserFactory();
 
-describe('literal', () => {
+describe('SqlLiteral', () => {
+  it('Works with Null', () => {
+    const sql = `NULL`;
+
+    backAndForth(sql);
+
+    expect(parser(sql)).toMatchInlineSnapshot(`
+      SqlLiteral {
+        "innerSpacing": Object {},
+        "quotes": undefined,
+        "stringValue": "NULL",
+        "type": "literal",
+        "value": null,
+      }
+    `);
+  });
+
+  it('Works with True', () => {
+    const sql = `True`;
+
+    backAndForth(sql);
+
+    expect(parser(sql)).toMatchInlineSnapshot(`
+      SqlLiteral {
+        "innerSpacing": Object {},
+        "quotes": undefined,
+        "stringValue": "True",
+        "type": "literal",
+        "value": true,
+      }
+    `);
+  });
+
+  it('Works with False', () => {
+    const sql = `FalsE`;
+
+    backAndForth(sql);
+
+    expect(parser(sql)).toMatchInlineSnapshot(`
+      SqlLiteral {
+        "innerSpacing": Object {},
+        "quotes": undefined,
+        "stringValue": "FalsE",
+        "type": "literal",
+        "value": false,
+      }
+    `);
+  });
+
   it('string literal', () => {
     const sql = `'word'`;
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"'word'"`);
+    backAndForth(sql);
+
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlLiteral {
         "innerSpacing": Object {},
@@ -33,14 +82,29 @@ describe('literal', () => {
     `);
   });
 
-  it('number literal', () => {
+  it('all sorts of number literals', () => {
+    backAndForth('0');
+    backAndForth('0.0');
+    backAndForth('0.01');
+    backAndForth('1');
+    backAndForth('1.234');
+    backAndForth('+1');
+    backAndForth('-1');
+    backAndForth('5e2');
+    backAndForth('+5e+2');
+    backAndForth('-5e2');
+    backAndForth('-5e-2');
+  });
+
+  it('number literals', () => {
     const sql = `1`;
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"1"`);
+    backAndForth(sql);
+
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlLiteral {
         "innerSpacing": Object {},
-        "quotes": "",
+        "quotes": undefined,
         "stringValue": "1",
         "type": "literal",
         "value": 1,
@@ -51,7 +115,8 @@ describe('literal', () => {
   it('number literal with brackets', () => {
     const sql = `(1)`;
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"(1)"`);
+    backAndForth(sql);
+
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlLiteral {
         "innerSpacing": Object {},
@@ -61,7 +126,7 @@ describe('literal', () => {
             "rightSpacing": "",
           },
         ],
-        "quotes": "",
+        "quotes": undefined,
         "stringValue": "1",
         "type": "literal",
         "value": 1,
@@ -71,7 +136,8 @@ describe('literal', () => {
   it('string literal with brackets', () => {
     const sql = `('word')`;
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"('word')"`);
+    backAndForth(sql);
+
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlLiteral {
         "innerSpacing": Object {},
@@ -91,7 +157,8 @@ describe('literal', () => {
   it('empty literal', () => {
     const sql = `''`;
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"''"`);
+    backAndForth(sql);
+
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlLiteral {
         "innerSpacing": Object {},
@@ -106,28 +173,15 @@ describe('literal', () => {
   it('Decimal literal', () => {
     const sql = `1.01`;
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"1.01"`);
+    backAndForth(sql);
+
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlLiteral {
         "innerSpacing": Object {},
-        "quotes": "",
+        "quotes": undefined,
         "stringValue": "1.01",
         "type": "literal",
         "value": 1.01,
-      }
-    `);
-  });
-  it(' Null', () => {
-    const sql = `NULL`;
-
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"NULL"`);
-    expect(parser(sql)).toMatchInlineSnapshot(`
-      SqlLiteral {
-        "innerSpacing": Object {},
-        "quotes": "",
-        "stringValue": "NULL",
-        "type": "literal",
-        "value": "NULL",
       }
     `);
   });

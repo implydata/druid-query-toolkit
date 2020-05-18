@@ -13,15 +13,16 @@
  */
 
 import { sqlParserFactory } from '../..';
-import { FUNCTIONS } from '../../test-utils';
+import { backAndForth } from '../../test-utils';
 
-const parser = sqlParserFactory(FUNCTIONS);
+const parser = sqlParserFactory();
 
-describe('Intervals', () => {
+describe('SqlInterval', () => {
   it('Simple function', () => {
     const sql = `INTERVAL '1' DAY`;
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"INTERVAL '1' DAY"`);
+    backAndForth(sql);
+
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlInterval {
         "innerSpacing": Object {
@@ -45,7 +46,8 @@ describe('Intervals', () => {
   it('YEAR TO MONTH interval', () => {
     const sql = `INTERVAL '1-2' YEAR TO MONTH`;
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"INTERVAL '1-2' YEAR TO MONTH"`);
+    backAndForth(sql);
+
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlInterval {
         "innerSpacing": Object {
@@ -69,7 +71,8 @@ describe('Intervals', () => {
   it('YEAR TO MONTH interval', () => {
     const sql = `INTERVAL '1-2' YEAR_MONTH`;
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"INTERVAL '1-2' YEAR_MONTH"`);
+    backAndForth(sql);
+
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlInterval {
         "innerSpacing": Object {

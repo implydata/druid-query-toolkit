@@ -13,9 +13,8 @@
  */
 
 import { SqlMulti, sqlParserFactory, SqlRef } from '../..';
-import { FUNCTIONS } from '../../test-utils';
 
-const parser = sqlParserFactory(FUNCTIONS);
+const parser = sqlParserFactory();
 
 describe('parse join with lookup', () => {
   it('parsers a basic math expression', () => {

@@ -13,9 +13,9 @@
  */
 
 import { sqlParserFactory } from '../../index';
-import { FUNCTIONS } from '../../test-utils';
+import { backAndForth } from '../../test-utils';
 
-const parser = sqlParserFactory(FUNCTIONS);
+const parser = sqlParserFactory();
 
 describe('OR expression', () => {
   it('single expression with unquoted string', () => {
@@ -143,14 +143,14 @@ describe('OR expression', () => {
         "arguments": Array [
           SqlLiteral {
             "innerSpacing": Object {},
-            "quotes": "",
+            "quotes": undefined,
             "stringValue": "1",
             "type": "literal",
             "value": 1,
           },
           SqlLiteral {
             "innerSpacing": Object {},
-            "quotes": "",
+            "quotes": undefined,
             "stringValue": "2",
             "type": "literal",
             "value": 2,
@@ -178,14 +178,14 @@ describe('OR expression', () => {
         "arguments": Array [
           SqlLiteral {
             "innerSpacing": Object {},
-            "quotes": "",
+            "quotes": undefined,
             "stringValue": "1",
             "type": "literal",
             "value": 1,
           },
           SqlLiteral {
             "innerSpacing": Object {},
-            "quotes": "",
+            "quotes": undefined,
             "stringValue": "2",
             "type": "literal",
             "value": 2,
@@ -219,14 +219,14 @@ describe('OR expression', () => {
         "arguments": Array [
           SqlLiteral {
             "innerSpacing": Object {},
-            "quotes": "",
+            "quotes": undefined,
             "stringValue": "1",
             "type": "literal",
             "value": 1,
           },
           SqlLiteral {
             "innerSpacing": Object {},
-            "quotes": "",
+            "quotes": undefined,
             "stringValue": "2",
             "type": "literal",
             "value": 2,
@@ -254,14 +254,14 @@ describe('OR expression', () => {
         "arguments": Array [
           SqlLiteral {
             "innerSpacing": Object {},
-            "quotes": "",
+            "quotes": undefined,
             "stringValue": "1",
             "type": "literal",
             "value": 1,
           },
           SqlLiteral {
             "innerSpacing": Object {},
-            "quotes": "",
+            "quotes": undefined,
             "stringValue": "2",
             "type": "literal",
             "value": 2,
@@ -292,6 +292,8 @@ describe('AND expression', () => {
   it('single expression with unquoted string', () => {
     const sql = `A AND B`;
 
+    backAndForth(sql);
+
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
@@ -328,11 +330,12 @@ describe('AND expression', () => {
         "type": "multi",
       }
     `);
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"A AND B"`);
   });
 
   it('single expression with single quoted string', () => {
     const sql = `'A' AND 'B'`;
+
+    backAndForth(sql);
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlMulti {
@@ -364,11 +367,12 @@ describe('AND expression', () => {
         "type": "multi",
       }
     `);
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"'A' AND 'B'"`);
   });
 
   it('single expression with double quoted string', () => {
     const sql = `"A" AND "B"`;
+
+    backAndForth(sql);
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlMulti {
@@ -406,25 +410,26 @@ describe('AND expression', () => {
         "type": "multi",
       }
     `);
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"\\"A\\" AND \\"B\\""`);
   });
 
   it('single expression with numbers', () => {
     const sql = `1 AND 2`;
+
+    backAndForth(sql);
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
           SqlLiteral {
             "innerSpacing": Object {},
-            "quotes": "",
+            "quotes": undefined,
             "stringValue": "1",
             "type": "literal",
             "value": 1,
           },
           SqlLiteral {
             "innerSpacing": Object {},
-            "quotes": "",
+            "quotes": undefined,
             "stringValue": "2",
             "type": "literal",
             "value": 2,
@@ -442,25 +447,26 @@ describe('AND expression', () => {
         "type": "multi",
       }
     `);
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"1 AND 2"`);
   });
 
   it('brackets', () => {
     const sql = `(1 AND 2)`;
+
+    backAndForth(sql);
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
           SqlLiteral {
             "innerSpacing": Object {},
-            "quotes": "",
+            "quotes": undefined,
             "stringValue": "1",
             "type": "literal",
             "value": 1,
           },
           SqlLiteral {
             "innerSpacing": Object {},
-            "quotes": "",
+            "quotes": undefined,
             "stringValue": "2",
             "type": "literal",
             "value": 2,
@@ -484,7 +490,6 @@ describe('AND expression', () => {
         "type": "multi",
       }
     `);
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"(1 AND 2)"`);
   });
 });
 
@@ -492,6 +497,8 @@ describe('Comparison expression', () => {
   it('single expression with unquoted string', () => {
     const sql = `A > B`;
 
+    backAndForth(sql);
+
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
@@ -528,11 +535,12 @@ describe('Comparison expression', () => {
         "type": "multi",
       }
     `);
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"A > B"`);
   });
 
   it('single expression with single quoted string', () => {
     const sql = `'A' > 'B'`;
+
+    backAndForth(sql);
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlMulti {
@@ -564,11 +572,12 @@ describe('Comparison expression', () => {
         "type": "multi",
       }
     `);
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"'A' > 'B'"`);
   });
 
   it('single expression with double quoted string', () => {
     const sql = `"A" > "B"`;
+
+    backAndForth(sql);
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlMulti {
@@ -606,25 +615,26 @@ describe('Comparison expression', () => {
         "type": "multi",
       }
     `);
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"\\"A\\" > \\"B\\""`);
   });
 
   it('single expression with numbers', () => {
     const sql = `1 > 2`;
+
+    backAndForth(sql);
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
           SqlLiteral {
             "innerSpacing": Object {},
-            "quotes": "",
+            "quotes": undefined,
             "stringValue": "1",
             "type": "literal",
             "value": 1,
           },
           SqlLiteral {
             "innerSpacing": Object {},
-            "quotes": "",
+            "quotes": undefined,
             "stringValue": "2",
             "type": "literal",
             "value": 2,
@@ -642,25 +652,26 @@ describe('Comparison expression', () => {
         "type": "multi",
       }
     `);
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"1 > 2"`);
   });
 
   it('brackets', () => {
     const sql = `(1 > 2)`;
+
+    backAndForth(sql);
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
           SqlLiteral {
             "innerSpacing": Object {},
-            "quotes": "",
+            "quotes": undefined,
             "stringValue": "1",
             "type": "literal",
             "value": 1,
           },
           SqlLiteral {
             "innerSpacing": Object {},
-            "quotes": "",
+            "quotes": undefined,
             "stringValue": "2",
             "type": "literal",
             "value": 2,
@@ -684,11 +695,12 @@ describe('Comparison expression', () => {
         "type": "multi",
       }
     `);
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"(1 > 2)"`);
   });
 
   it('Between expression', () => {
     const sql = `X BETWEEN Y AND Z`;
+
+    backAndForth(sql);
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlMulti {
@@ -750,11 +762,12 @@ describe('Comparison expression', () => {
         "type": "multi",
       }
     `);
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"X BETWEEN Y AND Z"`);
   });
 
   it('Mixed Between expression', () => {
     const sql = `A OR B AND X BETWEEN Y AND Z`;
+
+    backAndForth(sql);
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlMulti {
@@ -864,11 +877,12 @@ describe('Comparison expression', () => {
         "type": "multi",
       }
     `);
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"A OR B AND X BETWEEN Y AND Z"`);
   });
 
   it('Nested Between expression', () => {
     const sql = `X BETWEEN Y AND A BETWEEN B AND C`;
+
+    backAndForth(sql);
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlMulti {
@@ -978,7 +992,6 @@ describe('Comparison expression', () => {
         "type": "multi",
       }
     `);
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"X BETWEEN Y AND A BETWEEN B AND C"`);
   });
 });
 
@@ -986,19 +999,21 @@ describe('Math expression', () => {
   it('Addition', () => {
     const sql = `1 + 2`;
 
+    backAndForth(sql);
+
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
           SqlLiteral {
             "innerSpacing": Object {},
-            "quotes": "",
+            "quotes": undefined,
             "stringValue": "1",
             "type": "literal",
             "value": 1,
           },
           SqlLiteral {
             "innerSpacing": Object {},
-            "quotes": "",
+            "quotes": undefined,
             "stringValue": "2",
             "type": "literal",
             "value": 2,
@@ -1016,25 +1031,26 @@ describe('Math expression', () => {
         "type": "multi",
       }
     `);
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"1 + 2"`);
   });
 
   it('Subtraction', () => {
     const sql = `1 - 2`;
+
+    backAndForth(sql);
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
           SqlLiteral {
             "innerSpacing": Object {},
-            "quotes": "",
+            "quotes": undefined,
             "stringValue": "1",
             "type": "literal",
             "value": 1,
           },
           SqlLiteral {
             "innerSpacing": Object {},
-            "quotes": "",
+            "quotes": undefined,
             "stringValue": "2",
             "type": "literal",
             "value": 2,
@@ -1052,25 +1068,26 @@ describe('Math expression', () => {
         "type": "multi",
       }
     `);
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"1 - 2"`);
   });
 
   it('Multiplication', () => {
     const sql = `1 * 2`;
+
+    backAndForth(sql);
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
           SqlLiteral {
             "innerSpacing": Object {},
-            "quotes": "",
+            "quotes": undefined,
             "stringValue": "1",
             "type": "literal",
             "value": 1,
           },
           SqlLiteral {
             "innerSpacing": Object {},
-            "quotes": "",
+            "quotes": undefined,
             "stringValue": "2",
             "type": "literal",
             "value": 2,
@@ -1088,25 +1105,26 @@ describe('Math expression', () => {
         "type": "multi",
       }
     `);
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"1 * 2"`);
   });
 
   it('Division', () => {
     const sql = `1 / 2`;
+
+    backAndForth(sql);
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
           SqlLiteral {
             "innerSpacing": Object {},
-            "quotes": "",
+            "quotes": undefined,
             "stringValue": "1",
             "type": "literal",
             "value": 1,
           },
           SqlLiteral {
             "innerSpacing": Object {},
-            "quotes": "",
+            "quotes": undefined,
             "stringValue": "2",
             "type": "literal",
             "value": 2,
@@ -1124,11 +1142,12 @@ describe('Math expression', () => {
         "type": "multi",
       }
     `);
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"1 / 2"`);
   });
 
   it('single expression with unquoted string', () => {
     const sql = `A + B`;
+
+    backAndForth(sql);
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlMulti {
@@ -1166,11 +1185,12 @@ describe('Math expression', () => {
         "type": "multi",
       }
     `);
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"A + B"`);
   });
 
   it('single expression with single quoted string', () => {
     const sql = `'A' + 'B'`;
+
+    backAndForth(sql);
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlMulti {
@@ -1202,11 +1222,12 @@ describe('Math expression', () => {
         "type": "multi",
       }
     `);
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"'A' + 'B'"`);
   });
 
   it('single expression with double quoted string', () => {
     const sql = `"A" + "B"`;
+
+    backAndForth(sql);
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlMulti {
@@ -1244,25 +1265,26 @@ describe('Math expression', () => {
         "type": "multi",
       }
     `);
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"\\"A\\" + \\"B\\""`);
   });
 
   it('single expression with numbers', () => {
     const sql = `1 + 2`;
+
+    backAndForth(sql);
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
           SqlLiteral {
             "innerSpacing": Object {},
-            "quotes": "",
+            "quotes": undefined,
             "stringValue": "1",
             "type": "literal",
             "value": 1,
           },
           SqlLiteral {
             "innerSpacing": Object {},
-            "quotes": "",
+            "quotes": undefined,
             "stringValue": "2",
             "type": "literal",
             "value": 2,
@@ -1280,25 +1302,26 @@ describe('Math expression', () => {
         "type": "multi",
       }
     `);
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"1 + 2"`);
   });
 
   it('brackets', () => {
     const sql = `(1 + 2)`;
+
+    backAndForth(sql);
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
           SqlLiteral {
             "innerSpacing": Object {},
-            "quotes": "",
+            "quotes": undefined,
             "stringValue": "1",
             "type": "literal",
             "value": 1,
           },
           SqlLiteral {
             "innerSpacing": Object {},
-            "quotes": "",
+            "quotes": undefined,
             "stringValue": "2",
             "type": "literal",
             "value": 2,
@@ -1322,11 +1345,12 @@ describe('Math expression', () => {
         "type": "multi",
       }
     `);
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"(1 + 2)"`);
   });
 
   it('Decimal', () => {
     const sql = `COUNT(*) * 1.0 / COUNT(*)`;
+
+    backAndForth(sql);
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlMulti {
@@ -1367,7 +1391,7 @@ describe('Math expression', () => {
             "arguments": Array [
               SqlLiteral {
                 "innerSpacing": Object {},
-                "quotes": "",
+                "quotes": undefined,
                 "stringValue": "1.0",
                 "type": "literal",
                 "value": 1,
@@ -1429,13 +1453,14 @@ describe('Math expression', () => {
         "type": "multi",
       }
     `);
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"COUNT(*) * 1.0 / COUNT(*)"`);
   });
 });
 
 describe('Combined expression', () => {
   it('Every expression', () => {
     const sql = `A OR B AND C > D + E`;
+
+    backAndForth(sql);
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlMulti {
@@ -1545,11 +1570,12 @@ describe('Combined expression', () => {
         "type": "multi",
       }
     `);
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"A OR B AND C > D + E"`);
   });
 
   it('Every expression out of order', () => {
     const sql = `A + B > C AND D OR E`;
+
+    backAndForth(sql);
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlMulti {
@@ -1659,11 +1685,12 @@ describe('Combined expression', () => {
         "type": "multi",
       }
     `);
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"A + B > C AND D OR E"`);
   });
 
   it('Every expression out of order', () => {
     const sql = `A AND B > C + D OR E`;
+
+    backAndForth(sql);
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlMulti {
@@ -1773,13 +1800,14 @@ describe('Combined expression', () => {
         "type": "multi",
       }
     `);
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"A AND B > C + D OR E"`);
   });
 });
 
 describe('Multiple expressions', () => {
   it('Multiple Or ', () => {
     const sql = `A OR B OR C`;
+
+    backAndForth(sql);
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlMulti {
@@ -1832,11 +1860,12 @@ describe('Multiple expressions', () => {
         "type": "multi",
       }
     `);
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"A OR B OR C"`);
   });
 
   it('Multiple ANDs and ORs', () => {
     const sql = `A AND B OR C AND D OR E`;
+
+    backAndForth(sql);
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlMulti {
@@ -1937,7 +1966,6 @@ describe('Multiple expressions', () => {
         "type": "multi",
       }
     `);
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"A AND B OR C AND D OR E"`);
   });
 });
 
@@ -2011,7 +2039,8 @@ describe('Brackets', () => {
         "type": "multi",
       }
     `);
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"(A AND b) OR c"`);
+
+    backAndForth(sql);
   });
 
   it('Wrapping Expression', () => {
@@ -2089,7 +2118,8 @@ describe('Brackets', () => {
         "type": "multi",
       }
     `);
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"((A + b) OR c)"`);
+
+    backAndForth(sql);
   });
 
   it('Changing order of operations', () => {
@@ -2177,7 +2207,8 @@ describe('Brackets', () => {
         "type": "multi",
       }
     `);
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"NOT NOT (A + b) OR c"`);
+
+    backAndForth(sql);
   });
 });
 
@@ -2405,7 +2436,7 @@ describe('getSqlRefs', () => {
   it('Concat function', () => {
     const sql = `A || B || C`;
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"A || B || C"`);
+    backAndForth(sql);
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlMulti {
@@ -2462,7 +2493,7 @@ describe('getSqlRefs', () => {
   it('IS function', () => {
     const sql = `X IS NULL`;
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"X IS NULL"`);
+    backAndForth(sql);
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlMulti {
@@ -2479,10 +2510,10 @@ describe('getSqlRefs', () => {
           },
           SqlLiteral {
             "innerSpacing": Object {},
-            "quotes": "",
+            "quotes": undefined,
             "stringValue": "NULL",
             "type": "literal",
-            "value": "NULL",
+            "value": null,
           },
         ],
         "expressionType": "Comparison",
@@ -2502,7 +2533,7 @@ describe('getSqlRefs', () => {
   it('IS NOT function', () => {
     const sql = `X IS NOT NULL`;
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"X IS NOT NULL"`);
+    backAndForth(sql);
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlMulti {
@@ -2519,10 +2550,10 @@ describe('getSqlRefs', () => {
           },
           SqlLiteral {
             "innerSpacing": Object {},
-            "quotes": "",
+            "quotes": undefined,
             "stringValue": "NULL",
             "type": "literal",
-            "value": "NULL",
+            "value": null,
           },
         ],
         "expressionType": "Comparison",
@@ -2541,7 +2572,7 @@ describe('getSqlRefs', () => {
   it('Nested IS Not function', () => {
     const sql = `X IS NOT NULL AND X <> ''`;
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"X IS NOT NULL AND X <> ''"`);
+    backAndForth(sql);
 
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlMulti {
@@ -2560,10 +2591,10 @@ describe('getSqlRefs', () => {
               },
               SqlLiteral {
                 "innerSpacing": Object {},
-                "quotes": "",
+                "quotes": undefined,
                 "stringValue": "NULL",
                 "type": "literal",
-                "value": "NULL",
+                "value": null,
               },
             ],
             "expressionType": "Comparison",

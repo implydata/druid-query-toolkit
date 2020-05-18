@@ -12,4 +12,4 @@
  * limitations under the License.
  */
 
-export function sqlParserFactory(functions: string[]): (druidSql: string) => any;
+export function sqlParserFactory(): (druidSql: string) => any;

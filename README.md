@@ -12,11 +12,11 @@ Install druid-query-toolkit
 
 ## SQL to AST 
 
-Converts an SQL string to a SqlQuery object. SqlParserFactory takes an argument of an array of the names of functions to be used by the parser, these are not case sensitive. The parser created by sqlParserFactory can then be used to parse strings to abstract syntax trees.  
+Converts an SQL string to a SqlQuery object.  
 
 ```
 import { sqlParserFactory } from './parser/druidsql';
-const parser = sqlParserFactory(FUNCTIONS);
+const parser = sqlParserFactory();
 ast = parser(`SELECT "segment_id", "datasource", "start", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed", "payload"
 FROM sys.segments
 ORDER BY "start" DESC

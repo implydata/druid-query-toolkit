@@ -13,15 +13,16 @@
  */
 
 import { sqlParserFactory } from '../../index';
-import { FUNCTIONS } from '../../test-utils';
+import { backAndForth } from '../../test-utils';
 
-const parser = sqlParserFactory(FUNCTIONS);
+const parser = sqlParserFactory();
 
 describe('Case expression', () => {
   it('searched CASE', () => {
     const sql = `CASE WHEN B THEN C END`;
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"CASE WHEN B THEN C END"`);
+    backAndForth(sql);
+
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlCaseSearched {
         "caseKeyword": "CASE",
@@ -72,7 +73,8 @@ describe('Case expression', () => {
   it('searched CASE with Else', () => {
     const sql = `CASE WHEN B THEN C ELSE D END`;
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"CASE WHEN B THEN C ELSE D END"`);
+    backAndForth(sql);
+
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlCaseSearched {
         "caseKeyword": "CASE",
@@ -132,7 +134,8 @@ describe('Case expression', () => {
   it('simple CASE Expression with weird spacing', () => {
     const sql = `CASE A  WHEN     B THEN C      END`;
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"CASE A  WHEN     B THEN C      END"`);
+    backAndForth(sql);
+
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlCaseSimple {
         "caseExpression": SqlRef {
@@ -194,7 +197,8 @@ describe('Case expression', () => {
   it('simple CASE Expression with brackets', () => {
     const sql = `(CASE A WHEN B THEN C END)`;
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"(CASE A WHEN B THEN C END)"`);
+    backAndForth(sql);
+
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlCaseSimple {
         "caseExpression": SqlRef {
@@ -262,7 +266,8 @@ describe('Case expression', () => {
   it('simple CASE Expression with brackets and weird spacing', () => {
     const sql = `(   CASE   A WHEN   B THEN C END  )`;
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"(   CASE   A WHEN   B THEN C END  )"`);
+    backAndForth(sql);
+
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlCaseSimple {
         "caseExpression": SqlRef {
@@ -465,7 +470,7 @@ describe('Case expression', () => {
         "caseKeyword": "CASE",
         "elseExpression": SqlLiteral {
           "innerSpacing": Object {},
-          "quotes": "",
+          "quotes": undefined,
           "stringValue": "2",
           "type": "literal",
           "value": 2,
@@ -488,7 +493,7 @@ describe('Case expression', () => {
             "postWhenSpace": " ",
             "thenExpression": SqlLiteral {
               "innerSpacing": Object {},
-              "quotes": "",
+              "quotes": undefined,
               "stringValue": "4",
               "type": "literal",
               "value": 4,

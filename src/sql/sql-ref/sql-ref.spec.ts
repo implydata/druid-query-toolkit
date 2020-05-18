@@ -13,14 +13,16 @@
  */
 
 import { sqlParserFactory } from '../../index';
-import { FUNCTIONS } from '../../test-utils';
+import { backAndForth } from '../../test-utils';
 
-const parser = sqlParserFactory(FUNCTIONS);
+const parser = sqlParserFactory();
 
-describe('sql-ref', () => {
+describe('SqlRef', () => {
   it('Ref with double quotes and double quoted namespace', () => {
     const sql = '"test"."namespace"';
-    expect(parser(sql).toString()).toMatch(sql);
+
+    backAndForth(sql);
+
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlRef {
         "column": "namespace",
@@ -37,7 +39,9 @@ describe('sql-ref', () => {
 
   it('Ref with double quotes and no quotes namespace', () => {
     const sql = '"test".namespace';
-    expect(parser(sql).toString()).toMatch(sql);
+
+    backAndForth(sql);
+
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlRef {
         "column": "namespace",
@@ -54,7 +58,9 @@ describe('sql-ref', () => {
 
   it('Ref with no quotes and namespace', () => {
     const sql = 'test.namespace';
-    expect(parser(sql).toString()).toMatch(sql);
+
+    backAndForth(sql);
+
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlRef {
         "column": "namespace",
@@ -71,7 +77,9 @@ describe('sql-ref', () => {
 
   it('Ref with no quotes and no namespace', () => {
     const sql = 'test';
-    expect(parser(sql).toString()).toMatch(sql);
+
+    backAndForth(sql);
+
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlRef {
         "column": "test",
@@ -88,7 +96,9 @@ describe('sql-ref', () => {
 
   it('Ref with double quotes and no namespace', () => {
     const sql = '"test"';
-    expect(parser(sql).toString()).toMatch(sql);
+
+    backAndForth(sql);
+
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlRef {
         "column": "test",
@@ -107,11 +117,13 @@ describe('sql-ref', () => {
 describe('upgrades', () => {
   it('Ref with double quotes upgraded', () => {
     const sql = `"namespace"."table"`;
+
     expect(
       parser(sql)
         .upgrade()
         .toString(),
     ).toMatch(sql);
+
     expect(parser(sql).upgrade()).toMatchInlineSnapshot(`
       SqlRef {
         "column": undefined,
@@ -131,7 +143,9 @@ describe('upgrades', () => {
 
   it('SqlRef in select should be upgraded', () => {
     const sql = `select table from sys.segments`;
-    expect(parser(sql).toString()).toMatch(sql);
+
+    backAndForth(sql);
+
     expect(parser(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": "",
