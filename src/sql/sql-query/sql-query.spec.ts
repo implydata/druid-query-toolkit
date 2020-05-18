@@ -1507,9 +1507,8 @@ describe('expressions with where clause', () => {
 
   it('Simple select with equals', () => {
     const sql = `SELECT * FROM sys.supervisors WHERE healthy = 0`;
-    expect(parseSql(sql).toString()).toMatchInlineSnapshot(
-      `"SELECT * FROM sys.supervisors WHERE healthy = 0"`,
-    );
+
+    backAndForth(sql);
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
@@ -1633,9 +1632,8 @@ describe('expressions with where clause', () => {
 
   it('Simple select with many', () => {
     const sql = `SELECT * FROM sys.supervisors WHERE healthy = 0 and column > 100 or otherColumn = 'value'`;
-    expect(parseSql(sql).toString()).toMatchInlineSnapshot(
-      `"SELECT * FROM sys.supervisors WHERE healthy = 0 and column > 100 or otherColumn = 'value'"`,
-    );
+
+    backAndForth(sql);
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
@@ -2063,9 +2061,8 @@ describe('expressions with group by clause', () => {
 
   it('Simple select with multiple group by clauses in brackets', () => {
     const sql = `(Select * from table group by column, columnTwo)`;
-    expect(parseSql(sql).toString()).toMatchInlineSnapshot(
-      `"(Select * from table group by column, columnTwo)"`,
-    );
+
+    backAndForth(sql);
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
@@ -2319,9 +2316,8 @@ describe('expressions with having clause', () => {
 
   it('Simple select with equals', () => {
     const sql = `SELECT * FROM sys.supervisors HAVING healthy = 0`;
-    expect(parseSql(sql).toString()).toMatchInlineSnapshot(
-      `"SELECT * FROM sys.supervisors HAVING healthy = 0"`,
-    );
+
+    backAndForth(sql);
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
@@ -2445,9 +2441,8 @@ describe('expressions with having clause', () => {
 
   it('Simple select with many', () => {
     const sql = `SELECT * FROM sys.supervisors HAVING healthy = 0 and column > 100 or otherColumn = 'value'`;
-    expect(parseSql(sql).toString()).toMatchInlineSnapshot(
-      `"SELECT * FROM sys.supervisors HAVING healthy = 0 and column > 100 or otherColumn = 'value'"`,
-    );
+
+    backAndForth(sql);
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
@@ -2771,9 +2766,8 @@ describe('expressions with order by clause', () => {
 
   it('Simple select with ref order by', () => {
     const sql = `Select column from table order by column`;
-    expect(parseSql(sql).toString()).toMatchInlineSnapshot(
-      `"Select column from table order by column"`,
-    );
+
+    backAndForth(sql);
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
@@ -2883,9 +2877,8 @@ describe('expressions with order by clause', () => {
 
   it('Simple select with number order by and direction', () => {
     const sql = `Select column from table order by 1 Asc`;
-    expect(parseSql(sql).toString()).toMatchInlineSnapshot(
-      `"Select column from table order by 1 Asc"`,
-    );
+
+    backAndForth(sql);
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
@@ -2992,9 +2985,8 @@ describe('expressions with order by clause', () => {
 
   it('Simple select with ref order by and direction', () => {
     const sql = `Select column, columnTwo from table order by column DESC`;
-    expect(parseSql(sql).toString()).toMatchInlineSnapshot(
-      `"Select column, columnTwo from table order by column DESC"`,
-    );
+
+    backAndForth(sql);
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
@@ -3121,9 +3113,8 @@ describe('expressions with order by clause', () => {
 
   it('Simple select ordered on multiple columns', () => {
     const sql = `Select column from table order by 1 ASC, column`;
-    expect(parseSql(sql).toString()).toMatchInlineSnapshot(
-      `"Select column from table order by 1 ASC, column"`,
-    );
+
+    backAndForth(sql);
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
@@ -3250,9 +3241,8 @@ describe('expressions with order by clause', () => {
 
   it('Simple select ordered on multiple columns', () => {
     const sql = `Select column, columnTwo from table order by 1 ASC, column DESC`;
-    expect(parseSql(sql).toString()).toMatchInlineSnapshot(
-      `"Select column, columnTwo from table order by 1 ASC, column DESC"`,
-    );
+
+    backAndForth(sql);
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
@@ -3500,9 +3490,8 @@ describe('expressions with limit clause', () => {
 describe('expressions with union clause', () => {
   it('Simple select with union all ', () => {
     const sql = `Select * from table union all select * from otherTable`;
-    expect(parseSql(sql).toString()).toMatchInlineSnapshot(
-      `"Select * from table union all select * from otherTable"`,
-    );
+
+    backAndForth(sql);
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
@@ -3682,9 +3671,7 @@ describe('Test Join Clause', () => {
   it('Inner join', () => {
     const sql = 'Select * from table INNER Join anotherTable ON column = column';
 
-    expect(parseSql(sql).toString()).toMatchInlineSnapshot(
-      `"Select * from table INNER Join anotherTable ON column = column"`,
-    );
+    backAndForth(sql);
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
@@ -3823,9 +3810,7 @@ describe('Test Join Clause', () => {
   it('Left join', () => {
     const sql = 'Select * from table Left Join anotherTable ON column = column';
 
-    expect(parseSql(sql).toString()).toMatchInlineSnapshot(
-      `"Select * from table Left Join anotherTable ON column = column"`,
-    );
+    backAndForth(sql);
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
@@ -3964,9 +3949,7 @@ describe('Test Join Clause', () => {
   it('Right join', () => {
     const sql = 'Select * from table RIGHT Join anotherTable ON column = column';
 
-    expect(parseSql(sql).toString()).toMatchInlineSnapshot(
-      `"Select * from table RIGHT Join anotherTable ON column = column"`,
-    );
+    backAndForth(sql);
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
@@ -4105,9 +4088,7 @@ describe('Test Join Clause', () => {
   it('Full join', () => {
     const sql = 'Select * from table FULL Join anotherTable ON column = column';
 
-    expect(parseSql(sql).toString()).toMatchInlineSnapshot(
-      `"Select * from table FULL Join anotherTable ON column = column"`,
-    );
+    backAndForth(sql);
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
@@ -4246,9 +4227,7 @@ describe('Test Join Clause', () => {
   it('Full Outer join', () => {
     const sql = 'Select * from table FULL OUTER Join anotherTable ON column = column';
 
-    expect(parseSql(sql).toString()).toMatchInlineSnapshot(
-      `"Select * from table FULL OUTER Join anotherTable ON column = column"`,
-    );
+    backAndForth(sql);
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {

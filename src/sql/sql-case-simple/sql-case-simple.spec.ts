@@ -355,9 +355,8 @@ describe('Case expression', () => {
   it('simple CASE Expression with complex expressions', () => {
     const sql = `(   CASE   A WHEN  B AND B THEN C OR C END  )`;
 
-    expect(parseSql(sql).toString()).toMatchInlineSnapshot(
-      `"(   CASE   A WHEN  B AND B THEN C OR C END  )"`,
-    );
+    backAndForth(sql);
+
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlCaseSimple {
         "caseExpression": SqlRef {
