@@ -12,7 +12,7 @@ const wrappedParser = `
 var sql = require('../sql');
 var utils = require('../utils');
 var deepGet = utils.deepGet;
-var SqlBase = sql.SqlBase;
+var SqlQuery = sql.SqlQuery;
 
 var p =
 ${parser}
@@ -23,7 +23,7 @@ function parseSql(input) {
 
 function parseSqlQuery(input) {
   var ast = parseSql(input);
-  if (!(ast instanceof SqlBase)) return;
+  if (!(ast instanceof SqlQuery)) return;
   return ast;
 }
 
