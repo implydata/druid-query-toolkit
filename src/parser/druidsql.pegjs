@@ -31,10 +31,10 @@ SqlQuery =
   return new sql.SqlQuery({
     explainKeyword: explainKeyword ? explainKeyword[0]: '',
 
-    withKeyword: withClause ?  withClause[0].withKeyword : undefined,
-    postWith: withClause ?  withClause[0].postWith : undefined,
-    withUnits: withClause ?  withClause[0].withUnits : undefined,
-    withSeparators: withClause ?  withClause[0].withSeparators : undefined,
+    withKeyword: withClause ? withClause[0].withKeyword : undefined,
+    postWith: withClause ? withClause[0].postWith : undefined,
+    withUnits: withClause ? withClause[0].withUnits : undefined,
+    withSeparators: withClause ? withClause[0].withSeparators : undefined,
 
     selectKeyword: select.selectKeyword,
     selectDecorator: select.selectDecorator,
@@ -70,7 +70,7 @@ SqlQuery =
     limitValue: limit ? limit[1].limitValue : undefined,
 
     unionKeyword: union ? union[1].unionKeyword : undefined,
-    unionQuery: union ?  union[1].unionQuery : undefined,
+    unionQuery: union ? union[1].unionQuery : undefined,
 
     postQueryAnnotation: postQueryAnnotation,
 
@@ -158,7 +158,7 @@ WithColumns = OpenParen postLeftParen:_? withColumnsHead:BaseType withColumnsTai
 {
   return {
     postLeftParen: postLeftParen || '',
-    withColumns: withColumnsHead ?  makeListMap(withColumnsTail, 1, withColumnsHead) : withColumnsHead,
+    withColumns: withColumnsHead ? makeListMap(withColumnsTail, 1, withColumnsHead) : withColumnsHead,
     withSeparators: makeListMap(withColumnsTail, 1),
     preRightParen: preRightParen || ''
   }
@@ -167,13 +167,13 @@ WithColumns = OpenParen postLeftParen:_? withColumnsHead:BaseType withColumnsTai
 SelectClause = selectKeyword:SelectToken postSelect:_ selectDecorator:((AllToken / DistinctToken) _)? selectValuesHead:(Alias/Expression) annotationsHead:Annotation? selectValuesTail:(Comma (Alias/Expression) Annotation?)*
 {
   return {
-     selectKeyword: selectKeyword,
-     postSelect: postSelect,
-     selectDecorator: selectDecorator? selectDecorator[0] : '',
-     postSelectDecorator: selectDecorator? selectDecorator[1] : '',
-     selectValues: selectValuesTail ? makeListMap(selectValuesTail, 1, selectValuesHead) : [selectValuesHead],
-     selectSeparators: makeListMap(selectValuesTail,0),
-     selectAnnotations: selectValuesTail ?  makeListMap(selectValuesTail, 2, annotationsHead) : [annotationsHead],
+    selectKeyword: selectKeyword,
+    postSelect: postSelect,
+    selectDecorator: selectDecorator ? selectDecorator[0] : '',
+    postSelectDecorator: selectDecorator ? selectDecorator[1] : '',
+    selectValues: selectValuesTail ? makeListMap(selectValuesTail, 1, selectValuesHead) : [selectValuesHead],
+    selectSeparators: makeListMap(selectValuesTail,0),
+    selectAnnotations: selectValuesTail ? makeListMap(selectValuesTail, 2, annotationsHead) : [annotationsHead],
   }
 }
 
@@ -217,7 +217,7 @@ GroupByClause = groupByKeyword:GroupByToken postGroupByKeyword:_  groupByExpress
     groupByKeyword: groupByKeyword,
     postGroupByKeyword: postGroupByKeyword,
     groupByExpression: groupByExpressionTail ? makeListMap(groupByExpressionTail, 1, groupByExpressionHead) : [groupByExpressionHead],
-    groupByExpressionSeparators: groupByExpressionTail ?  makeListMap(groupByExpressionTail, 0) : undefined,
+    groupByExpressionSeparators: groupByExpressionTail ? makeListMap(groupByExpressionTail, 0) : undefined,
   }
 }
 
@@ -316,9 +316,9 @@ NotExpression = keyword:NotToken postKeyword:_ argument:(NotExpression/OrExpress
     expressionType: 'NOT'
   });
 }
-  /ComparisonExpression
+  / ComparisonExpression
 
-ComparisonExpression = head:AdditionExpression tail:((__ ComparisonOperator __ (ComparisonExpression/AdditionExpression))/(_ BetweenToken _ (AndExpression/ComparisonExpression))/(_ (IsNotToken/IsToken) _ (NullLiteral)))*
+ComparisonExpression = head:AdditionExpression tail:((__ ComparisonOperator __ (ComparisonExpression/AdditionExpression))/(_ BetweenToken _ (AndExpression/ComparisonExpression))/(_ (IsNotToken/IsToken) _ NullLiteral))*
 {
   if (!tail.length) return head
   return new sql.SqlMulti({
@@ -338,7 +338,7 @@ AdditionExpression = head:SubtractionExpression tail:(__ '+' __ SubtractionExpre
   });
 }
 
-SubtractionExpression = head:MultiplicationExpression tail:(__ '-' (!'-') __ (MultiplicationExpression))*
+SubtractionExpression = head:MultiplicationExpression tail:(__ '-' (!'-') __ MultiplicationExpression)*
 {
   if (!tail.length) return head
   return new sql.SqlMulti({
@@ -358,17 +358,17 @@ MultiplicationExpression = head:DivisionExpression tail:(__ '*' __ (Multiplicati
   });
 }
 
-DivisionExpression = head:ConcatExpression tail:(__ '/' __ (DivisionExpression/ConcatExpression))*
+DivisionExpression = head:ConcatExpression tail:(__ '/' __ (DivisionExpression / ConcatExpression))*
 {
   if (!tail.length) return head
-    return new sql.SqlMulti({
+  return new sql.SqlMulti({
     expressionType: 'Multiplicative',
     arguments: makeListMap(tail, 3, head),
     separators: makeSeparatorsList(tail),
   });
 }
 
-ConcatExpression = head:BaseType tail:(__ '||' __ (BaseType))*
+ConcatExpression = head:BaseType tail:(__ '||' __ BaseType)*
 {
   if (!tail.length) return head
   return new sql.SqlMulti({
@@ -402,7 +402,7 @@ SearchedCaseExpression
   return new sql.SqlCaseSearched({
     caseKeyword: caseKeyword,
     whenThenUnits: whenThenUnitsTail ? makeListMap(whenThenUnitsTail, 1, whenThenUnitsHead) : [whenThenUnitsHead],
-    postWhenThenUnitSpaces: whenThenUnitsTail ?  makeListMap(whenThenUnitsTail, 0) : [],
+    postWhenThenUnitSpaces: whenThenUnitsTail ? makeListMap(whenThenUnitsTail, 0) : [],
     elseKeyword: elseValue ? elseValue[1] : undefined,
     elseExpression: elseValue ? elseValue[3] : undefined,
     endKeyword: endKeyword,
@@ -433,7 +433,7 @@ SimpleCaseExpression =
     elseKeyword: elseValue ? elseValue[1] : undefined,
     elseExpression: elseValue ? elseValue[3] : undefined,
     endKeyword: endKeyword,
-    postWhenThenUnits: whenThenUnitsTail ?  makeListMap(whenThenUnitsTail, 0) : [],
+    postWhenThenUnits: whenThenUnitsTail ? makeListMap(whenThenUnitsTail, 0) : [],
     innerSpacing: {
       postCase: postCase,
       postCaseExpression: postCaseExpression,
@@ -474,15 +474,15 @@ Interval = intervalKeyword:IntervalToken postIntervalKeyword:_ intervalValue:Bas
   });
 }
 
-Unit =
-  'DAY'i
-  /'HOUR'i
-  /'MINUTE'i
-  /'MONTH'i
-  /'QUARTER'i
-  /'WEEK'i
-  /'YEAR'i
-  /'SECOND'i
+Unit
+  = 'DAY'i
+  / 'HOUR'i
+  / 'MINUTE'i
+  / 'MONTH'i
+  / 'QUARTER'i
+  / 'WEEK'i
+  / 'YEAR'i
+  / 'SECOND'i
 
 TimeStamp = timestampKeyword: TimestampToken postTimestampKeyword: _ timestampValue: SqlLiteral
 {
@@ -490,19 +490,19 @@ TimeStamp = timestampKeyword: TimestampToken postTimestampKeyword: _ timestampVa
     timestampKeyword: timestampKeyword,
     timestampValue: timestampValue,
     innerSpacing: {
-    postTimestampKeyword: postTimestampKeyword,
+      postTimestampKeyword: postTimestampKeyword,
     }
   })
 }
 
 Function =
-  functionName:Functions
+  functionName:UnquotedRefPart
   postName:_?
   OpenParen
   postLeftParen:_?
   decorator:(FunctionDecorator _)?
-  argumentHead:(Expression)
-  argumentTail:((Comma/From) (Expression))*
+  argumentHead:Expression
+  argumentTail:((Comma/From) Expression)*
   preRightParen:_?
   CloseParen
   filter:(_ Filter)?
@@ -540,11 +540,6 @@ Filter = filterKeyword:FilterToken postFilterKeyword:_? OpenParen postLeftParen:
     whereExpression: filterExpression.whereExpression,
     preFilterRightParen: preRightParen || '',
   }
-}
-
-Functions = fn:UnquotedRefPart
-{
-  return fn;
 }
 
 Comma = left:_? ',' right:_?
