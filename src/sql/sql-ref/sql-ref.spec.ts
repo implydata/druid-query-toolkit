@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { parseSql } from '../../index';
+import { parseSql, SqlRef } from '../../index';
 import { backAndForth } from '../../test-utils';
 
 describe('SqlRef', () => {
@@ -116,13 +116,9 @@ describe('upgrades', () => {
   it('Ref with double quotes upgraded', () => {
     const sql = `"namespace"."table"`;
 
-    expect(
-      parseSql(sql)
-        .upgrade()
-        .toString(),
-    ).toMatch(sql);
+    expect((parseSql(sql) as SqlRef).upgrade().toString()).toEqual(sql);
 
-    expect(parseSql(sql).upgrade()).toMatchInlineSnapshot(`
+    expect((parseSql(sql) as SqlRef).upgrade()).toMatchInlineSnapshot(`
       SqlRef {
         "column": undefined,
         "innerSpacing": Object {

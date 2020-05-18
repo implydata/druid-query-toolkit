@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { parseSql } from '../../index';
+import { parseSql, SqlMulti } from '../../index';
 import { backAndForth } from '../../test-utils';
 
 describe('OR expression', () => {
@@ -2214,47 +2214,35 @@ describe('remove function', () => {
   it('remove from single expression type flat', () => {
     const sql = `A OR B`;
 
-    expect(
-      parseSql(sql)
-        .removeColumn('A')
-        .toString(),
-    ).toMatchInlineSnapshot(`"B"`);
+    expect((parseSql(sql) as SqlMulti).removeColumn('A')!.toString()).toMatchInlineSnapshot(`"B"`);
   });
   it('remove from single expression type multiple', () => {
     const sql = `A OR B OR C`;
 
-    expect(
-      parseSql(sql)
-        .removeColumn('A')
-        .toString(),
-    ).toMatchInlineSnapshot(`"B OR C"`);
+    expect((parseSql(sql) as SqlMulti).removeColumn('A')!.toString()).toMatchInlineSnapshot(
+      `"B OR C"`,
+    );
   });
   it('remove from single expression type multiple', () => {
     const sql = `A OR B OR C`;
 
-    expect(
-      parseSql(sql)
-        .removeColumn('C')
-        .toString(),
-    ).toMatchInlineSnapshot(`"A OR B"`);
+    expect((parseSql(sql) as SqlMulti).removeColumn('C')!.toString()).toMatchInlineSnapshot(
+      `"A OR B"`,
+    );
   });
   it('remove from single expression type multiple nested', () => {
     const sql = `A AND D OR B OR C`;
 
-    expect(
-      parseSql(sql)
-        .removeColumn('A')
-        .toString(),
-    ).toMatchInlineSnapshot(`"D OR B OR C"`);
+    expect((parseSql(sql) as SqlMulti).removeColumn('A')!.toString()).toMatchInlineSnapshot(
+      `"D OR B OR C"`,
+    );
   });
   it('remove nested comparison expression', () => {
     const sql = `A > 1 AND D OR B OR C`;
 
-    expect(
-      parseSql(sql)
-        .removeColumn('A')
-        .toString(),
-    ).toMatchInlineSnapshot(`"D OR B OR C"`);
+    expect((parseSql(sql) as SqlMulti).removeColumn('A')!.toString()).toMatchInlineSnapshot(
+      `"D OR B OR C"`,
+    );
   });
 });
 
@@ -2262,17 +2250,17 @@ describe('contains', () => {
   it('nested expression contains string', () => {
     const sql = `A > 1 AND D OR B OR C`;
 
-    expect(parseSql(sql).containsColumn('A')).toMatchInlineSnapshot(`true`);
+    expect((parseSql(sql) as SqlMulti).containsColumn('A')).toMatchInlineSnapshot(`true`);
   });
   it('nested expression with brackets contains string', () => {
     const sql = `(A + B ) > 1 AND D OR B OR C`;
 
-    expect(parseSql(sql).containsColumn('A')).toMatchInlineSnapshot(`true`);
+    expect((parseSql(sql) as SqlMulti).containsColumn('A')).toMatchInlineSnapshot(`true`);
   });
   it('nested expression with brackets contains string', () => {
     const sql = `(D + B ) > 1 AND D OR B OR C`;
 
-    expect(parseSql(sql).containsColumn('A')).toMatchInlineSnapshot(`false`);
+    expect((parseSql(sql) as SqlMulti).containsColumn('A')).toMatchInlineSnapshot(`false`);
   });
 });
 
@@ -2280,7 +2268,7 @@ describe('getSqlRefs', () => {
   it('Only multi expressions', () => {
     const sql = `A > 1 AND D OR B OR C`;
 
-    expect(parseSql(sql).getSqlRefs('A')).toMatchInlineSnapshot(`
+    expect((parseSql(sql) as SqlMulti).getSqlRefs()).toMatchInlineSnapshot(`
       Array [
         SqlRef {
           "column": "A",
@@ -2328,7 +2316,7 @@ describe('getSqlRefs', () => {
   it('includes unary expressions', () => {
     const sql = `A > 1 AND D OR B OR Not C`;
 
-    expect(parseSql(sql).getSqlRefs('A')).toMatchInlineSnapshot(`
+    expect((parseSql(sql) as SqlMulti).getSqlRefs()).toMatchInlineSnapshot(`
       Array [
         SqlRef {
           "column": "A",
@@ -2376,7 +2364,7 @@ describe('getSqlRefs', () => {
   it('includes unary expressions and nested Multi Expressions', () => {
     const sql = `A > 1 AND D OR B OR Not (C Or E)`;
 
-    expect(parseSql(sql).getSqlRefs('A')).toMatchInlineSnapshot(`
+    expect((parseSql(sql) as SqlMulti).getSqlRefs()).toMatchInlineSnapshot(`
       Array [
         SqlRef {
           "column": "A",
@@ -2431,6 +2419,7 @@ describe('getSqlRefs', () => {
       ]
     `);
   });
+
   it('Concat function', () => {
     const sql = `A || B || C`;
 
@@ -2488,6 +2477,7 @@ describe('getSqlRefs', () => {
       }
     `);
   });
+
   it('IS function', () => {
     const sql = `X IS NULL`;
 
@@ -2567,6 +2557,7 @@ describe('getSqlRefs', () => {
       }
     `);
   });
+
   it('Nested IS Not function', () => {
     const sql = `X IS NOT NULL AND X <> ''`;
 

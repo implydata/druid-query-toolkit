@@ -382,7 +382,7 @@ describe('remove functions', () => {
       parseSqlQuery(`SELECT column, column1, column2
   FROM sys."github"
   Order By column, 2 ASC`)
-        .removeFromOrderBy()
+        .removeFromOrderBy('column')
         .toString(),
     ).toMatchInlineSnapshot(`
       "SELECT column, column1, column2
@@ -479,7 +479,7 @@ describe('getAggregateColumns', () => {
     const sql = `SELECT column, SUM(column1) As aggregated, column2
   FROM sys."github"
   Group By column2`;
-    expect(parseSql(sql).getAggregateColumns()).toMatchInlineSnapshot(`
+    expect(parseSqlQuery(sql).getAggregateColumns()).toMatchInlineSnapshot(`
       Array [
         "column",
         "aggregated",
@@ -491,7 +491,7 @@ describe('getAggregateColumns', () => {
     const sql = `SELECT column, SUM(column1) As aggregated, column2
   FROM sys."github"
   Group By column2,  1, 3`;
-    expect(parseSql(sql).getAggregateColumns()).toMatchInlineSnapshot(`
+    expect(parseSqlQuery(sql).getAggregateColumns()).toMatchInlineSnapshot(`
       Array [
         "aggregated",
       ]
@@ -506,7 +506,7 @@ describe('getCurrentFilters', () => {
   Group By column2
   Having column > 1 AND aggregated < 100
 `;
-    expect(parseSql(sql).getCurrentFilters()).toMatchInlineSnapshot(`
+    expect(parseSqlQuery(sql).getCurrentFilters()).toMatchInlineSnapshot(`
       Array [
         "column",
         "aggregated",
@@ -520,7 +520,7 @@ describe('getCurrentFilters', () => {
   Where column > 1 AND aggregated < 100
   Group By column2
 `;
-    expect(parseSql(sql).getCurrentFilters()).toMatchInlineSnapshot(`
+    expect(parseSqlQuery(sql).getCurrentFilters()).toMatchInlineSnapshot(`
       Array [
         "column",
         "aggregated",
@@ -535,7 +535,7 @@ describe('getCurrentFilters', () => {
   Group By column2
   Having column3 > 1 AND column4 < 100
 `;
-    expect(parseSql(sql).getCurrentFilters()).toMatchInlineSnapshot(`
+    expect(parseSqlQuery(sql).getCurrentFilters()).toMatchInlineSnapshot(`
       Array [
         "column3",
         "column4",
@@ -551,7 +551,7 @@ describe('addAggregateColumn', () => {
     const sql = 'select column1 from table';
 
     expect(
-      parseSql(sql)
+      parseSqlQuery(sql)
         .addAggregateColumn([SqlRef.fromString('column2')], 'min', 'alias')
         .toString(),
     ).toMatchInlineSnapshot(`"select column1, min(column2) AS \\"alias\\" from table"`);
@@ -561,7 +561,7 @@ describe('addAggregateColumn', () => {
     const sql = 'select column1 from table';
 
     expect(
-      parseSql(sql)
+      parseSqlQuery(sql)
         .addAggregateColumn([SqlRef.fromString('column2')], 'min', 'alias', undefined, 'DISTINCT')
         .toString(),
     ).toMatchInlineSnapshot(`"select column1, min(DISTINCT column2) AS \\"alias\\" from table"`);
@@ -573,7 +573,7 @@ describe('addToGroupBy', () => {
     const sql = 'select Count(*) from table';
 
     expect(
-      parseSql(sql)
+      parseSqlQuery(sql)
         .addToGroupBy(SqlRef.fromStringWithDoubleQuotes('column'))
         .toString(),
     ).toMatchInlineSnapshot(`
@@ -586,7 +586,7 @@ describe('addToGroupBy', () => {
     const sql = 'select column1 from table';
 
     expect(
-      parseSql(sql)
+      parseSqlQuery(sql)
         .addToGroupBy(
           SqlAliasRef.sqlAliasFactory(
             SqlFunction.sqlFunctionFactory('min', [SqlRef.fromString('column1')]),
@@ -759,7 +759,7 @@ describe('addToGroupBy', () => {
       }
     `);
     expect(
-      parseSql(sql)
+      parseSqlQuery(sql)
         .addToGroupBy(
           SqlAliasRef.sqlAliasFactory(
             SqlFunction.sqlFunctionFactory('max', [SqlRef.fromString('column2')]),

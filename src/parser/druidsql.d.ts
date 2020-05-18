@@ -12,10 +12,7 @@
  * limitations under the License.
  */
 
-// import { SqlBase, SqlQuery } from '../sql';
-//
-// export function parseSql(input: string): SqlBase;
-// export function parseSqlQuery(input: string): SqlQuery;
+import { SqlBase, SqlQuery } from '../sql';
 
-export function parseSql(input: string): any;
-export function parseSqlQuery(input: string): any;
+export function parseSql(input: string): SqlBase;
+export function parseSqlQuery(input: string): SqlQuery;

@@ -825,9 +825,9 @@ export class SqlQuery extends SqlBase {
     const value = this.valueOf();
     const index = this.getColumns().indexOf(column) + 1;
     if (!value.groupByExpression) return false;
-    return !!value.groupByExpression.filter(
+    return value.groupByExpression.some(
       expr => SqlRef.equalsString(expr, column) || SqlLiteral.equalsLiteral(expr, index),
-    ).length;
+    );
   }
 
   replaceFrom(table: string) {
