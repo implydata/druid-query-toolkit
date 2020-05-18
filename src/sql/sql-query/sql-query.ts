@@ -838,9 +838,9 @@ export class SqlQuery extends SqlBase {
     return new SqlQuery(value);
   }
 
-  addJoin(type: 'LEFT' | 'INNER', joinTable: SqlRef, onExpression: SqlMulti) {
+  addJoin(joinType: 'LEFT' | 'INNER', joinTable: SqlRef, onExpression: SqlMulti) {
     const value = this.valueOf();
-    value.joinType = type;
+    value.joinType = joinType;
     value.joinKeyword = 'JOIN';
     value.joinTable = joinTable;
     value.onKeyword = 'ON';
