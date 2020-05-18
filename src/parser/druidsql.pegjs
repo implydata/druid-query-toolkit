@@ -570,20 +570,12 @@ SqlInParens = OpenParen leftSpacing:_? ex:Sql rightSpacing:_? CloseParen
   return ex.addParens(leftSpacing, rightSpacing);
 }
 
-SqlLiteral = lit:(Number / SingleQuotedString)
+SqlLiteral = lit:(NullToken / TrueToken / FalseToken / Number / SingleQuotedString)
 {
   return new sql.SqlLiteral(lit);
 }
-/ BooleanLiteral
-/ NullLiteral
-/ SqlInParens
 
 NullLiteral = v:NullToken
-{
-  return new sql.SqlLiteral(v);
-}
-
-BooleanLiteral = v:(TrueToken / FalseToken)
 {
   return new sql.SqlLiteral(v);
 }
@@ -694,7 +686,7 @@ Annotation = preAnnotation:___ '--:' postAnnotationSignifier: ___? key:$([a-z0-9
 IdentifierPart = [a-z_]i
 
 _ =
-  spacing: ($(([ \t\n\r]* "--" !':' [^\n]* ([\n] [ \t\n\r]*)?)+)
+  spacing:($(([ \t\n\r]* "--" !':' [^\n]* ([\n] [ \t\n\r]*)?)+)
   / $([ \t\n\r]+))?
 
 ___ "pure whitespace" = spacing: $([ \t\n\r]*)
