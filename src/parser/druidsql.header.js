@@ -8,23 +8,22 @@
     return head.concat(tail.map(function(t) { return t[index] }));
   }
 
-  function makeSeparatorsList(tail) {
-    return (tail.map(function (t) {
-      return new sql.Separator({
-        left: t[0],
-        right: t[2],
-        separator: t[1],
-      });
-    }));
+  function maybeMakeMulti(expressionType, head, tail) {
+    if (!tail.length) return head;
+    return new sql.SqlMulti({
+      expressionType: expressionType,
+      arguments: makeListMap(tail, 3, head),
+      separators: makeSeparatorsList(tail),
+    });
   }
 
-  function makeEscapedSeparatorsList(tail) {
-    return (tail.map(function(t) {
+  function makeSeparatorsList(tail) {
+    return tail.map(function (t) {
       return new sql.Separator({
         left: t[0],
-        right: t[3],
         separator: t[1],
+        right: t[2],
       });
-    }));
+    });
   }
 }

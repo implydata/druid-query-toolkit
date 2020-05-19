@@ -298,22 +298,12 @@ Expression = CaseExpression / OrExpression
 
 OrExpression = head:AndExpression tail:(_ OrToken _ AndExpression)*
 {
-  if (!tail.length) return head
-  return new sql.SqlMulti({
-    expressionType: 'OR',
-    arguments: makeListMap(tail, 3, head),
-    separators: makeSeparatorsList(tail),
-  });
+  return maybeMakeMulti('OR', head, tail);
 }
 
 AndExpression = head:NotExpression tail:(_ AndToken _ NotExpression)*
 {
-  if (!tail.length) return head
-  return new sql.SqlMulti({
-    expressionType: 'AND',
-    arguments: makeListMap(tail, 3, head),
-    separators: makeSeparatorsList(tail),
-  });
+  return maybeMakeMulti('AND', head, tail);
 }
 
 NotExpression = keyword:NotToken postKeyword:_ argument:NotExpression
@@ -331,52 +321,27 @@ NotExpression = keyword:NotToken postKeyword:_ argument:NotExpression
 
 ComparisonExpression = head:AdditionExpression tail:((__ ComparisonOperator __ (ComparisonExpression/AdditionExpression))/(_ BetweenToken _ (AndExpression/ComparisonExpression))/(_ (IsNotToken/IsToken) _ NullLiteral))*
 {
-  if (!tail.length) return head
-  return new sql.SqlMulti({
-    expressionType: 'Comparison',
-    arguments: makeListMap(tail, 3, head),
-    separators: makeSeparatorsList(tail),
-  });
+  return maybeMakeMulti('Comparison', head, tail);
 }
 
 AdditionExpression = head:SubtractionExpression tail:(__ '+' __ SubtractionExpression)*
 {
-  if (!tail.length) return head
-  return new sql.SqlMulti({
-    expressionType: 'Additive',
-    arguments: makeListMap(tail, 3, head),
-    separators: makeSeparatorsList(tail),
-  });
+  return maybeMakeMulti('Additive', head, tail);
 }
 
-SubtractionExpression = head:MultiplicationExpression tail:(__ '-' (!'-') __ MultiplicationExpression)*
+SubtractionExpression = head:MultiplicationExpression tail:(__ $('-' !'-') __ MultiplicationExpression)*
 {
-  if (!tail.length) return head
-  return new sql.SqlMulti({
-    expressionType: 'Additive',
-    arguments: makeListMap(tail, 4, head),
-    separators: makeEscapedSeparatorsList(tail),
-  });
+  return maybeMakeMulti('Additive', head, tail);
 }
 
 MultiplicationExpression = head:DivisionExpression tail:(__ '*' __ DivisionExpression)*
 {
-  if (!tail.length) return head
-  return new sql.SqlMulti({
-    expressionType: 'Multiplicative',
-    arguments: makeListMap(tail, 3, head),
-    separators: makeSeparatorsList(tail),
-  });
+  return maybeMakeMulti('Multiplicative', head, tail);
 }
 
 DivisionExpression = head:UnaryExpression tail:(__ '/' __ UnaryExpression)*
 {
-  if (!tail.length) return head
-  return new sql.SqlMulti({
-    expressionType: 'Multiplicative',
-    arguments: makeListMap(tail, 3, head),
-    separators: makeSeparatorsList(tail),
-  });
+  return maybeMakeMulti('Multiplicative', head, tail);
 }
 
 // !Number is to make sure that -3 parses as a number and not as -(3)
@@ -395,18 +360,13 @@ UnaryExpression = keyword:[+-] postKeyword:__ !Number argument:ConcatExpression
 
 ConcatExpression = head:BaseType tail:(__ '||' __ BaseType)*
 {
-  if (!tail.length) return head
-  return new sql.SqlMulti({
-    expressionType: 'Concat',
-    arguments: makeListMap(tail, 3, head),
-    separators: makeSeparatorsList(tail),
-  });
+  return maybeMakeMulti('Concat', head, tail);
 }
 
 BaseType
   = Function
   / Interval
-  / TimeStamp
+  / Timestamp
   / SqlLiteral
   / SqlRef
   / SqlInParens
@@ -509,7 +469,7 @@ Unit
   / 'YEAR'i
   / 'SECOND'i
 
-TimeStamp = timestampKeyword: TimestampToken postTimestampKeyword: _ timestampValue: SqlLiteral
+Timestamp = timestampKeyword: TimestampToken postTimestampKeyword: _ timestampValue: SqlLiteral
 {
   return new sql.SqlTimestamp({
     timestampKeyword: timestampKeyword,
