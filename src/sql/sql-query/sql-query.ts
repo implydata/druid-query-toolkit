@@ -85,10 +85,12 @@ export interface WithUnit {
   withQuery: SqlQuery;
 }
 
+export type Direction = 'ASC' | 'DESC';
+
 export interface OrderByUnit {
   expression: SqlBase;
   postExpression: string;
-  direction?: 'ASC' | 'DESC';
+  direction?: Direction;
 }
 
 export class SqlQuery extends SqlBase {
@@ -98,7 +100,7 @@ export class SqlQuery extends SqlBase {
   public withSeparators?: Separator[];
   public selectKeyword?: string;
   public selectDecorator?: string;
-  public selectValues?: SqlBase[];
+  public selectValues: SqlBase[];
   public selectSeparators?: Separator[];
   public fromKeyword?: string;
   public joinType?: string;
@@ -181,8 +183,8 @@ export class SqlQuery extends SqlBase {
     this.postQueryAnnotation = options.postQueryAnnotation;
   }
 
-  public valueOf() {
-    const value: any = super.valueOf();
+  public valueOf(): SqlQueryValue {
+    const value = super.valueOf() as SqlQueryValue;
     value.explainKeyword = this.explainKeyword;
     value.withKeyword = this.withKeyword;
     value.withUnits = this.withUnits;
@@ -215,7 +217,7 @@ export class SqlQuery extends SqlBase {
     value.unionKeyword = this.unionKeyword;
     value.unionQuery = this.unionQuery;
     value.postQueryAnnotation = this.postQueryAnnotation;
-    return value as SqlQueryValue;
+    return value;
   }
 
   public toRawString(): string {
@@ -240,14 +242,8 @@ export class SqlQuery extends SqlBase {
       );
     }
 
-    // Select and From clause
-    if (
-      this.selectKeyword &&
-      this.selectValues &&
-      this.tables &&
-      this.fromKeyword &&
-      this.selectAnnotations
-    ) {
+    // Select clause
+    if (this.selectKeyword && this.selectValues && this.selectAnnotations) {
       rawStringParts.push(this.selectKeyword, this.innerSpacing.postSelect);
       if (this.selectDecorator) {
         rawStringParts.push(this.selectDecorator, this.innerSpacing.postSelectDecorato);
@@ -267,6 +263,12 @@ export class SqlQuery extends SqlBase {
           this.selectSeparators,
         ),
         this.innerSpacing.postSelectValues,
+      );
+    }
+
+    // From clause
+    if (this.tables && this.fromKeyword) {
+      rawStringParts.push(
         this.fromKeyword,
         this.innerSpacing.postFrom,
         Separator.spacilator(this.tables, this.tableSeparators),
@@ -325,7 +327,7 @@ export class SqlQuery extends SqlBase {
       );
     }
 
-    // Order By Clause
+    // OrderBy Clause
     if (this.orderByKeyword && this.orderByUnits) {
       rawStringParts.push(
         this.innerSpacing.preOrderByKeyword,
@@ -437,7 +439,7 @@ export class SqlQuery extends SqlBase {
     ) as string[];
   }
 
-  orderBy(column: string, direction?: 'ASC' | 'DESC') {
+  orderBy(column: string, direction?: Direction) {
     const orderByUnit = {
       expression: SqlRef.fromStringWithDoubleQuotes(column),
       postExpression: direction ? ' ' : '',
@@ -447,7 +449,7 @@ export class SqlQuery extends SqlBase {
     const index = this.getColumns().indexOf(column) + 1;
     value.orderByUnits = value.orderByUnits || [];
 
-    // If already in the orderby
+    // If already in the OrderBy
     if (
       value.orderByUnits.filter(
         unit =>
@@ -482,10 +484,7 @@ export class SqlQuery extends SqlBase {
   }
 
   remove(column: string) {
-    const value = new SqlQuery(this.valueOf());
-
-    return value
-      .removeFilter(column)
+    return this.removeFilter(column)
       .removeFromGroupBy(column)
       .removeFromWhere(column)
       .removeFromHaving(column)
@@ -494,15 +493,17 @@ export class SqlQuery extends SqlBase {
   }
 
   removeFilter(column: string): SqlQuery {
-    let value = new SqlQuery(this.valueOf());
+    let ret: SqlQuery = this;
+
     if (this.whereExpression) {
-      value = this.removeFromWhere(column) || value;
-    }
-    if (this.havingExpression) {
-      value = this.removeFromHaving(column) || value;
+      ret = this.removeFromWhere(column) || ret;
     }
 
-    return value;
+    if (this.havingExpression) {
+      ret = this.removeFromHaving(column) || ret;
+    }
+
+    return ret;
   }
 
   // todo fix groupBy indexes
@@ -718,15 +719,14 @@ export class SqlQuery extends SqlBase {
     value.havingKeyword = value.havingKeyword || 'HAVING';
     value.innerSpacing.preHavingKeyword = value.innerSpacing.prehavingKeyword || '\n';
     value.innerSpacing.postHavingKeyword = value.innerSpacing.postHavingKeyword || ' ';
+
     return new SqlQuery(value);
   }
 
   addToGroupBy(column: SqlBase) {
     // Adds a column with no alias to the group by clause
     // column is added to the select clause then the index is added to group by clause
-    let value = new SqlQuery(this.valueOf());
-    value = value.addColumn(column);
-    return value.addFirstColumnToGroupBy();
+    return this.addColumn(column).addFirstColumnToGroupBy();
   }
 
   addLastColumnToGroupBy() {
@@ -863,7 +863,7 @@ export class SqlQuery extends SqlBase {
     value.onKeyword = undefined;
     value.onExpression = undefined;
     value.innerSpacing = Object.assign({}, value.innerSpacing, {
-      preJoin: ``,
+      preJoin: '',
       postJoinType: '',
       postJoinKeyword: '',
       postJoinTable: '',
