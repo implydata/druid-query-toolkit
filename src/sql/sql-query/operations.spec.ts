@@ -13,6 +13,7 @@
  */
 
 import { parseSql, parseSqlQuery, SqlAliasRef, SqlFunction, SqlRef } from '../..';
+import { sane } from '../../test-utils';
 
 describe('getTableName Tests', () => {
   it('getTableNames', () => {
@@ -476,9 +477,12 @@ describe('remove functions', () => {
 
 describe('getAggregateColumns', () => {
   it('get all aggregate columns', () => {
-    const sql = `SELECT column, SUM(column1) As aggregated, column2
-  FROM sys."github"
-  Group By column2`;
+    const sql = sane`
+      SELECT column, SUM(column1) As aggregated, column2
+      FROM sys."github"
+      Group By column2
+    `;
+
     expect(parseSqlQuery(sql).getAggregateColumns()).toMatchInlineSnapshot(`
       Array [
         "column",
@@ -488,9 +492,12 @@ describe('getAggregateColumns', () => {
   });
 
   it('get all aggregate columns using numbers', () => {
-    const sql = `SELECT column, SUM(column1) As aggregated, column2
-  FROM sys."github"
-  Group By column2,  1, 3`;
+    const sql = sane`
+      SELECT column, SUM(column1) As aggregated, column2
+      FROM sys."github"
+      Group By column2,  1, 3
+    `;
+
     expect(parseSqlQuery(sql).getAggregateColumns()).toMatchInlineSnapshot(`
       Array [
         "aggregated",
@@ -501,11 +508,13 @@ describe('getAggregateColumns', () => {
 
 describe('getCurrentFilters', () => {
   it('get all filters, only having clause', () => {
-    const sql = `SELECT column, SUM(column1) As aggregated, column2
-  FROM sys."github"
-  Group By column2
-  Having column > 1 AND aggregated < 100
-`;
+    const sql = sane`
+      SELECT column, SUM(column1) As aggregated, column2
+      FROM sys."github"
+      Group By column2
+      Having column > 1 AND aggregated < 100
+    `;
+
     expect(parseSqlQuery(sql).getCurrentFilters()).toMatchInlineSnapshot(`
       Array [
         "column",
@@ -515,11 +524,13 @@ describe('getCurrentFilters', () => {
   });
 
   it('get all filters, only where clause', () => {
-    const sql = `SELECT column, SUM(column1) As aggregated, column2
-  FROM sys."github"
-  Where column > 1 AND aggregated < 100
-  Group By column2
-`;
+    const sql = sane`
+      SELECT column, SUM(column1) As aggregated, column2
+      FROM sys."github"
+      Where column > 1 AND aggregated < 100
+      Group By column2
+    `;
+
     expect(parseSqlQuery(sql).getCurrentFilters()).toMatchInlineSnapshot(`
       Array [
         "column",
@@ -529,12 +540,14 @@ describe('getCurrentFilters', () => {
   });
 
   it('get all filters, where and having clauses', () => {
-    const sql = `SELECT column, SUM(column1) As aggregated, column2
-  FROM sys."github"
-  Where column > 1 AND aggregated < 100
-  Group By column2
-  Having column3 > 1 AND column4 < 100
-`;
+    const sql = sane`
+      SELECT column, SUM(column1) As aggregated, column2
+      FROM sys."github"
+      Where column > 1 AND aggregated < 100
+      Group By column2
+      Having column3 > 1 AND column4 < 100
+    `;
+
     expect(parseSqlQuery(sql).getCurrentFilters()).toMatchInlineSnapshot(`
       Array [
         "column3",
@@ -601,9 +614,11 @@ describe('addToGroupBy', () => {
   });
 
   it('existing columns in group by', () => {
-    const sql = `select column1, min(column1) AS aliasName
+    const sql = sane`
+      select column1, min(column1) AS aliasName
       from table 
-      GROUP BY 2`;
+      GROUP BY 2
+    `;
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
@@ -638,9 +653,9 @@ describe('addToGroupBy', () => {
           "postWith": "",
           "postWithQuery": "",
           "preFrom": "
-            ",
+      ",
           "preGroupByKeyword": " 
-            ",
+      ",
           "preHavingKeyword": "",
           "preJoin": "",
           "preLimitKeyword": "",
@@ -771,8 +786,8 @@ describe('addToGroupBy', () => {
         .toString(),
     ).toMatchInlineSnapshot(`
       "select max(column2) AS \\"MaxColumn\\", column1, min(column1) AS aliasName
-            from table 
-            GROUP BY 1, 3"
+      from table 
+      GROUP BY 1, 3"
     `);
   });
 });

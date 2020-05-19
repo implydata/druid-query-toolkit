@@ -13,7 +13,7 @@
  */
 
 import { parseSql, parseSqlQuery } from '../../index';
-import { backAndForth } from '../../test-utils';
+import { backAndForth, sane } from '../../test-utils';
 
 describe('SqlQuery', () => {
   it('parse queries only', () => {
@@ -432,13 +432,15 @@ describe('SqlQuery', () => {
   });
 
   it('Simple select, columns with aliases and case expressions', () => {
-    const sql = `SELECT
-    datasource,
-    SUM("size") AS total_size,
-    CASE WHEN SUM("size") = 0 THEN 0 ELSE SUM("size")  END AS avg_size,
-    CASE WHEN SUM(num_rows) = 0 THEN 0 ELSE SUM("num_rows") END AS avg_num_rows,
-    COUNT(*) AS num_segments
-FROM sys.segments`;
+    const sql = sane`
+      SELECT
+        datasource,
+        SUM("size") AS total_size,
+        CASE WHEN SUM("size") = 0 THEN 0 ELSE SUM("size")  END AS avg_size,
+        CASE WHEN SUM(num_rows) = 0 THEN 0 ELSE SUM("num_rows") END AS avg_num_rows,
+        COUNT(*) AS num_segments
+      FROM sys.segments
+    `;
 
     backAndForth(sql);
 
@@ -461,7 +463,7 @@ FROM sys.segments`;
           "postOn": "",
           "postQuery": "",
           "postSelect": "
-          ",
+        ",
           "postSelectDecorator": "",
           "postUnionKeyword": "",
           "postWith": "",
@@ -500,25 +502,25 @@ FROM sys.segments`;
           Separator {
             "left": "",
             "right": "
-          ",
+        ",
             "separator": ",",
           },
           Separator {
             "left": "",
             "right": "
-          ",
+        ",
             "separator": ",",
           },
           Separator {
             "left": "",
             "right": "
-          ",
+        ",
             "separator": ",",
           },
           Separator {
             "left": "",
             "right": "
-          ",
+        ",
             "separator": ",",
           },
         ],
@@ -927,11 +929,13 @@ FROM sys.segments`;
   });
 
   it('Simple select, columns with many columns and aliases', () => {
-    const sql = `SELECT
-    datasource,
-    SUM("size") AS total_size,
-    COUNT(*) AS num_segments
-FROM sys.segments`;
+    const sql = sane`
+      SELECT
+        datasource,
+        SUM("size") AS total_size,
+        COUNT(*) AS num_segments
+      FROM sys.segments
+    `;
 
     backAndForth(sql);
 
@@ -954,7 +958,7 @@ FROM sys.segments`;
           "postOn": "",
           "postQuery": "",
           "postSelect": "
-          ",
+        ",
           "postSelectDecorator": "",
           "postUnionKeyword": "",
           "postWith": "",
@@ -991,13 +995,13 @@ FROM sys.segments`;
           Separator {
             "left": "",
             "right": "
-          ",
+        ",
             "separator": ",",
           },
           Separator {
             "left": "",
             "right": "
-          ",
+        ",
             "separator": ",",
           },
         ],
@@ -1236,10 +1240,12 @@ FROM sys.segments`;
   });
 
   it('Simple select with With', () => {
-    const sql = `WITH dept_count AS (
-  SELECT deptno
-  FROM   emp)
-    Select * from table`;
+    const sql = sane`
+      WITH dept_count AS (
+        SELECT deptno
+        FROM   emp)
+      Select * from table
+    `;
 
     backAndForth(sql);
 
@@ -1266,7 +1272,7 @@ FROM sys.segments`;
           "postUnionKeyword": "",
           "postWith": " ",
           "postWithQuery": "
-          ",
+      ",
           "preFrom": " ",
           "preGroupByKeyword": "",
           "preHavingKeyword": "",
@@ -4435,8 +4441,10 @@ describe('Test Join Clause', () => {
 
 describe('Queries with comments', () => {
   it('single comment', () => {
-    const sql = `Select -- some comment 
-  column from table`;
+    const sql = sane`
+      Select -- some comment 
+      column from table
+    `;
 
     backAndForth(sql);
 
@@ -4459,7 +4467,7 @@ describe('Queries with comments', () => {
           "postOn": "",
           "postQuery": "",
           "postSelect": " -- some comment 
-        ",
+      ",
           "postSelectDecorator": "",
           "postUnionKeyword": "",
           "postWith": "",
@@ -4531,56 +4539,70 @@ describe('Queries with comments', () => {
   });
 
   it('two comments', () => {
-    const sql = `Select --some comment
-    --some comment
-  column from table`;
+    const sql = sane`
+      Select --some comment
+        --some comment
+      column from table
+    `;
 
     backAndForth(sql);
   });
 
   it('comment on new line', () => {
-    const sql = `Select
-    -- some comment
-  column from table`;
+    const sql = sane`
+      Select
+        -- some comment
+      column from table
+    `;
 
     backAndForth(sql);
   });
 
   it('comment containing hyphens', () => {
-    const sql = `Select
-    -- some--comment
-    column from table`;
+    const sql = sane`
+      Select
+        -- some--comment
+        column from table
+    `;
 
     backAndForth(sql);
   });
 
   it('comment with no space', () => {
-    const sql = `Select --some comment
-  column from table`;
+    const sql = sane`
+      Select --some comment
+      column from table
+    `;
 
     backAndForth(sql);
   });
 
   it('comment with non english', () => {
-    const sql = `Select --Здравствуйте
-  column from table`;
+    const sql = sane`
+      Select --Здравствуйте
+      column from table
+    `;
 
     backAndForth(sql);
   });
 
   it('comment at end of query', () => {
-    const sql = `Select 
-  column from table
-  -- comment`;
+    const sql = sane`
+      Select 
+      column from table
+      -- comment
+    `;
 
     backAndForth(sql);
   });
 
   it('comment with unary negative', () => {
-    const sql = `Select 
-  column from table
-  -- comment
-  order by -1`;
+    const sql = sane`
+      Select 
+      column from table
+      -- comment
+      order by -1
+    `;
 
     backAndForth(sql);
   });
@@ -4588,9 +4610,11 @@ describe('Queries with comments', () => {
 
 describe('Queries with annotated comments', () => {
   it('single comment', () => {
-    const sql = `Select column, column1, column2 from table 
-    order by column
-    --: valueName = value`;
+    const sql = sane`
+      Select column, column1, column2 from table 
+      order by column
+      --: valueName = value
+    `;
 
     backAndForth(sql);
   });

@@ -13,15 +13,17 @@
  */
 
 import { parseSql } from '../../index';
-import { backAndForth } from '../../test-utils';
+import { backAndForth, sane } from '../../test-utils';
 
 describe('Queries with annotated comments post query', () => {
   it('single annotated comment', () => {
-    const sql = `Select column --: valueName = value
-    , column1 --: valueName = value
-    , column2 
-    from table 
-    order by column`;
+    const sql = sane`
+      Select column --: valueName = value
+      , column1 --: valueName = value
+      , column2 
+      from table 
+      order by column
+    `;
 
     backAndForth(sql);
 
@@ -50,13 +52,13 @@ describe('Queries with annotated comments post query', () => {
           "postWith": "",
           "postWithQuery": "",
           "preFrom": " 
-          ",
+      ",
           "preGroupByKeyword": "",
           "preHavingKeyword": "",
           "preJoin": "",
           "preLimitKeyword": "",
           "preOrderByKeyword": " 
-          ",
+      ",
           "preQuery": "",
           "preUnionKeyword": "",
           "preWhereKeyword": "",
@@ -115,13 +117,13 @@ describe('Queries with annotated comments post query', () => {
         "selectSeparators": Array [
           Separator {
             "left": "
-          ",
+      ",
             "right": " ",
             "separator": ",",
           },
           Separator {
             "left": "
-          ",
+      ",
             "right": " ",
             "separator": ",",
           },
@@ -187,9 +189,11 @@ describe('Queries with annotated comments post query', () => {
   });
 
   it('single annotated comment', () => {
-    const sql = `Select column, column1, column2 from table
-    order by column
-    --: valueName = value`;
+    const sql = sane`
+      Select column, column1, column2 from table
+      order by column
+      --: valueName = value
+    `;
 
     backAndForth(sql);
 
@@ -223,7 +227,7 @@ describe('Queries with annotated comments post query', () => {
           "preJoin": "",
           "preLimitKeyword": "",
           "preOrderByKeyword": "
-          ",
+      ",
           "preQuery": "",
           "preUnionKeyword": "",
           "preWhereKeyword": "",
@@ -260,7 +264,7 @@ describe('Queries with annotated comments post query', () => {
               "postEquals": " ",
               "postKey": " ",
               "preAnnotation": "
-          ",
+      ",
             },
             "key": "valueName",
             "value": "value",
@@ -346,10 +350,12 @@ describe('Queries with annotated comments post query', () => {
   });
 
   it('double annotated comment no spacing', () => {
-    const sql = `Select column, column1, column2 from table
-    order by column
-    --: valueName = value
-    --:valueName = value`;
+    const sql = sane`
+      Select column, column1, column2 from table
+      order by column
+      --: valueName = value
+      --:valueName = value
+    `;
 
     backAndForth(sql);
 
@@ -383,7 +389,7 @@ describe('Queries with annotated comments post query', () => {
           "preJoin": "",
           "preLimitKeyword": "",
           "preOrderByKeyword": "
-          ",
+      ",
           "preQuery": "",
           "preUnionKeyword": "",
           "preWhereKeyword": "",
@@ -420,7 +426,7 @@ describe('Queries with annotated comments post query', () => {
               "postEquals": " ",
               "postKey": " ",
               "preAnnotation": "
-          ",
+      ",
             },
             "key": "valueName",
             "value": "value",
@@ -431,7 +437,7 @@ describe('Queries with annotated comments post query', () => {
               "postEquals": " ",
               "postKey": " ",
               "preAnnotation": "
-          ",
+      ",
             },
             "key": "valueName",
             "value": "value",
@@ -519,9 +525,11 @@ describe('Queries with annotated comments post query', () => {
 
 describe('Queries with annotated comments post select', () => {
   it('single annotated comment', () => {
-    const sql = `Select column, column1, column2 --: valueName = value
-    from table
-    order by column`;
+    const sql = sane`
+      Select column, column1, column2 --: valueName = value
+      from table
+      order by column
+    `;
 
     backAndForth(sql);
 
@@ -550,13 +558,13 @@ describe('Queries with annotated comments post select', () => {
           "postWith": "",
           "postWithQuery": "",
           "preFrom": "
-          ",
+      ",
           "preGroupByKeyword": "",
           "preHavingKeyword": "",
           "preJoin": "",
           "preLimitKeyword": "",
           "preOrderByKeyword": "
-          ",
+      ",
           "preQuery": "",
           "preUnionKeyword": "",
           "preWhereKeyword": "",
@@ -678,10 +686,12 @@ describe('Queries with annotated comments post select', () => {
 
 describe('Queries with annotated comments post select and post query', () => {
   it('single annotated comment', () => {
-    const sql = `Select column, column1, column2 --: valueName = value 
-    from table
-    order by column
-    --: valueName = value`;
+    const sql = sane`
+      Select column, column1, column2 --: valueName = value 
+      from table
+      order by column
+      --: valueName = value
+    `;
 
     backAndForth(sql);
 
@@ -710,13 +720,13 @@ describe('Queries with annotated comments post select and post query', () => {
           "postWith": "",
           "postWithQuery": "",
           "preFrom": " 
-          ",
+      ",
           "preGroupByKeyword": "",
           "preHavingKeyword": "",
           "preJoin": "",
           "preLimitKeyword": "",
           "preOrderByKeyword": "
-          ",
+      ",
           "preQuery": "",
           "preUnionKeyword": "",
           "preWhereKeyword": "",
@@ -753,7 +763,7 @@ describe('Queries with annotated comments post select and post query', () => {
               "postEquals": " ",
               "postKey": " ",
               "preAnnotation": "
-          ",
+      ",
             },
             "key": "valueName",
             "value": "value",
