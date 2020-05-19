@@ -375,14 +375,14 @@ BaseType
 
 CaseExpression = SearchedCaseExpression/SimpleCaseExpression
 
-SearchedCaseExpression
-  = caseKeyword:CaseToken
-    postCase:_
-    whenThenUnitsHead:WhenThenPair
-    whenThenUnitsTail:(_ WhenThenPair)*
-    elseValue:(_ ElseToken _ Expression)?
-    preEnd:_
-    endKeyword:EndToken
+SearchedCaseExpression =
+  caseKeyword:CaseToken
+  postCase:_
+  whenThenUnitsHead:WhenThenPair
+  whenThenUnitsTail:(_ WhenThenPair)*
+  elseValue:(_ ElseToken _ Expression)?
+  preEnd:_
+  endKeyword:EndToken
 {
   return new sql.SqlCaseSearched({
     caseKeyword: caseKeyword,
@@ -574,14 +574,11 @@ Number "Number" = n:$(
   };
 }
 
-Fraction
-  = $('.' Digits)
+Fraction = $('.' Digits)
 
-Digits
-  = $ Digit+
+Digits = $ Digit+
 
-Digit
-  = [0-9]
+Digit = [0-9]
 
 SingleQuotedString = ['] name:$([^']*) [']
 {
@@ -664,7 +661,7 @@ IdentifierPart = [a-z_]i
 
 _ =
   spacing:($(([ \t\n\r]* "--" !':' [^\n]* ([\n] [ \t\n\r]*)?)+)
-  / $([ \t\n\r]+))?
+/ $([ \t\n\r]+))?
 
 __ "optional whitespace" = _ / ''
 
@@ -672,44 +669,33 @@ ___ "pure whitespace" = spacing:$([ \t\n\r]*)
 
 EndOfQuery = $(_ ';'? _)
 
-OpenParen "("
- = "("
+OpenParen "(" = "("
 
-CloseParen ")"
- = ")"
+CloseParen ")" = ")"
 
-ComparisonOperator
-  = '='
-  / '<>'
-  / '>='
-  / '<='
-  / '<'
-  / '>'
-  / LikeToken
-  / InToken
-  / '!='
+ComparisonOperator =
+  '='
+/ '<>'
+/ '>='
+/ '<='
+/ '<'
+/ '>'
+/ LikeToken
+/ InToken
+/ '!='
 
-AdditiveOperator
-  = '+'
-  / '||'
-  / '-'
-
-MultiplicativeOperator
-  = '*'
-  / '/'
-
-FunctionDecorator
-  = LeadingToken
-  / BothToken
-  / TrailingToken
-  / DistinctToken
+FunctionDecorator =
+  LeadingToken
+/ BothToken
+/ TrailingToken
+/ DistinctToken
 
 JoinType =
   'LEFT'i
-  /'RIGHT'i
-  /'INNER'i
-  /$('FULL'i _ 'OUTER'i)
-  /'FULL'i
+/ 'RIGHT'i
+/ 'INNER'i
+/ $('FULL'i _ 'OUTER'i)
+/ 'FULL'i
 
 /* Tokens */
 
