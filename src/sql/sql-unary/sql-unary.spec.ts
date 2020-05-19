@@ -16,6 +16,14 @@ import { parseSql } from '../../index';
 import { backAndForth } from '../../test-utils';
 
 describe('SqlUnary', () => {
+  it.skip('minus', () => {
+    const sql = `-A`;
+
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot();
+  });
+
   it('single not expression', () => {
     const sql = `NOT B`;
 
@@ -32,6 +40,41 @@ describe('SqlUnary', () => {
           "table": undefined,
           "tableQuotes": undefined,
           "type": "ref",
+        },
+        "expressionType": "NOT",
+        "innerSpacing": Object {
+          "postKeyword": " ",
+        },
+        "keyword": "NOT",
+        "type": "unaryExpression",
+      }
+    `);
+  });
+
+  it('double not expression', () => {
+    const sql = `NOT not B`;
+
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
+      SqlUnary {
+        "argument": SqlUnary {
+          "argument": SqlRef {
+            "column": "B",
+            "innerSpacing": Object {},
+            "namespace": undefined,
+            "namespaceQuotes": undefined,
+            "quotes": "",
+            "table": undefined,
+            "tableQuotes": undefined,
+            "type": "ref",
+          },
+          "expressionType": "NOT",
+          "innerSpacing": Object {
+            "postKeyword": " ",
+          },
+          "keyword": "not",
+          "type": "unaryExpression",
         },
         "expressionType": "NOT",
         "innerSpacing": Object {

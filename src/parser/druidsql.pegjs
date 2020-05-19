@@ -282,6 +282,17 @@ Alias = column:Expression postColumn:_ asKeyword:AsToken postAs:_ alias:SqlRef
   });
 }
 
+/*
+Expressions are defined below in acceding priority order
+
+  Or (OR)
+  And (AND)
+  Not (NOT)
+  Comparison (=, <=>, <, >, <=, >=, <>, !=, IS, LIKE, BETWEEN, IN, CONTAINS, REGEXP)
+  Additive (+, -)
+  Multiplicative (*), Division (/)
+  Unary identity (+), negation (-)
+*/
 
 Expression = CaseExpression / OrExpression
 
@@ -305,7 +316,7 @@ AndExpression = head:NotExpression tail:(_ AndToken _ NotExpression)*
   });
 }
 
-NotExpression = keyword:NotToken postKeyword:_ argument:(NotExpression/OrExpression)
+NotExpression = keyword:NotToken postKeyword:_ argument:NotExpression
 {
   return new sql.SqlUnary({
     expressionType: 'NOT',
@@ -653,7 +664,7 @@ QuotedRefPart = ["] name:$([^"]+) ["]
   }
 }
 
-UnquotedRefPart = name:$([a-z_\-:*%/]i [a-z0-9_\-:*%/]i*)
+UnquotedRefPart = name:$([a-z_:*%/]i [a-z0-9_\-:*%/]i*)
 {
   return {
     name: name,
