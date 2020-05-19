@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { parseSql } from '../..';
+import { parseSql, SqlLiteral } from '../..';
 import { backAndForth } from '../../test-utils';
 
 describe('SqlLiteral', () => {
@@ -81,17 +81,27 @@ describe('SqlLiteral', () => {
   });
 
   it('all sorts of number literals', () => {
-    backAndForth('0');
-    backAndForth('0.0');
-    backAndForth('0.01');
-    backAndForth('1');
-    backAndForth('1.234');
-    backAndForth('+1');
-    backAndForth('-1');
-    backAndForth('5e2');
-    backAndForth('+5e+2');
-    backAndForth('-5e2');
-    backAndForth('-5e-2');
+    const numbersToTest = [
+      '0',
+      '0.0',
+      '0.01',
+      '.1',
+      '1',
+      '01',
+      '1.234',
+      '+1',
+      '-1',
+      '5e2',
+      '+5e+2',
+      '-5E2',
+      '-5E02',
+      '-5e-2',
+    ];
+
+    for (const num in numbersToTest) {
+      backAndForth(num);
+      expect((parseSql(num) as SqlLiteral).value).toEqual(parseFloat(num));
+    }
   });
 
   it('number literals', () => {

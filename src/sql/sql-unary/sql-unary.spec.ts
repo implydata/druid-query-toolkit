@@ -16,12 +16,29 @@ import { parseSql } from '../../index';
 import { backAndForth } from '../../test-utils';
 
 describe('SqlUnary', () => {
-  it.skip('minus', () => {
+  it('minus', () => {
     const sql = `-A`;
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot();
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
+      SqlUnary {
+        "argument": SqlRef {
+          "column": "A",
+          "innerSpacing": Object {},
+          "namespace": undefined,
+          "namespaceQuotes": undefined,
+          "quotes": "",
+          "table": undefined,
+          "tableQuotes": undefined,
+          "type": "ref",
+        },
+        "expressionType": "-",
+        "innerSpacing": Object {},
+        "keyword": "-",
+        "type": "unaryExpression",
+      }
+    `);
   });
 
   it('single not expression', () => {

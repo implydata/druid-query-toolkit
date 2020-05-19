@@ -15,9 +15,9 @@
 import { SqlBase, SqlBaseValue, SqlMulti, SqlRef } from '../index';
 
 export interface UnaryExpressionValue extends SqlBaseValue {
-  keyword?: string;
-  argument?: SqlBase;
-  expressionType?: string;
+  expressionType: string;
+  keyword: string;
+  argument: SqlBase;
 }
 
 export class SqlUnary extends SqlBase {
@@ -27,9 +27,9 @@ export class SqlUnary extends SqlBase {
     return `${quote}${thing}${quote}`;
   }
 
-  public expressionType?: string;
-  public keyword?: string;
-  public argument?: SqlBase;
+  public expressionType: string;
+  public keyword: string;
+  public argument: SqlBase;
 
   constructor(options: UnaryExpressionValue) {
     super(options, SqlUnary.type);
@@ -38,8 +38,8 @@ export class SqlUnary extends SqlBase {
     this.argument = options.argument;
   }
 
-  public valueOf() {
-    const value: UnaryExpressionValue = super.valueOf();
+  public valueOf(): UnaryExpressionValue {
+    const value = super.valueOf() as UnaryExpressionValue;
     value.expressionType = this.expressionType;
     value.keyword = this.keyword;
     value.argument = this.argument;
@@ -50,7 +50,7 @@ export class SqlUnary extends SqlBase {
     if (!this.argument) {
       throw new Error('Could not make raw string');
     }
-    return this.keyword + this.innerSpacing.postKeyword + this.argument.toString();
+    return this.keyword + (this.innerSpacing.postKeyword || '') + this.argument.toString();
   }
 
   public isType(type: string) {

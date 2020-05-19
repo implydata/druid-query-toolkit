@@ -359,7 +359,7 @@ SubtractionExpression = head:MultiplicationExpression tail:(__ '-' (!'-') __ Mul
   });
 }
 
-MultiplicationExpression = head:DivisionExpression tail:(__ '*' __ (MultiplicationExpression/BaseType))*
+MultiplicationExpression = head:DivisionExpression tail:(__ '*' __ DivisionExpression)*
 {
   if (!tail.length) return head
   return new sql.SqlMulti({
@@ -369,7 +369,7 @@ MultiplicationExpression = head:DivisionExpression tail:(__ '*' __ (Multiplicati
   });
 }
 
-DivisionExpression = head:ConcatExpression tail:(__ '/' __ (DivisionExpression / ConcatExpression))*
+DivisionExpression = head:UnaryExpression tail:(__ '/' __ UnaryExpression)*
 {
   if (!tail.length) return head
   return new sql.SqlMulti({
@@ -378,6 +378,20 @@ DivisionExpression = head:ConcatExpression tail:(__ '/' __ (DivisionExpression /
     separators: makeSeparatorsList(tail),
   });
 }
+
+// !Number is to make sure that -3 parses as a number and not as -(3)
+UnaryExpression = keyword:[+-] postKeyword:__ !Number argument:ConcatExpression
+{
+  return new sql.SqlUnary({
+    expressionType: keyword,
+    keyword: keyword,
+    innerSpacing: {
+      postKeyword: postKeyword
+    },
+    argument: argument
+  });
+}
+  / ConcatExpression
 
 ConcatExpression = head:BaseType tail:(__ '||' __ BaseType)*
 {
@@ -588,7 +602,11 @@ NullLiteral = v:NullToken
 
 /* Numbers */
 
-Number "Number" = n:$(Int Fraction? Exp?)
+Number "Number" = n:$(
+  [+-]?
+  ((Digits Fraction?) / Fraction)
+  ('e'i [+-]? Digits)?
+)
 {
   return {
     value: parseFloat(n),
@@ -596,15 +614,8 @@ Number "Number" = n:$(Int Fraction? Exp?)
   };
 }
 
-Int
-  = $([+-]? [1-9] Digits)
-  / $([+-]? Digit)
-
 Fraction
   = $('.' Digits)
-
-Exp
-  = $('e'i [+-]? Digits)
 
 Digits
   = $ Digit+
@@ -695,9 +706,9 @@ _ =
   spacing:($(([ \t\n\r]* "--" !':' [^\n]* ([\n] [ \t\n\r]*)?)+)
   / $([ \t\n\r]+))?
 
-___ "pure whitespace" = spacing: $([ \t\n\r]*)
-
 __ "optional whitespace" = _ / ''
+
+___ "pure whitespace" = spacing:$([ \t\n\r]*)
 
 EndOfQuery = $(_ ';'? _)
 
