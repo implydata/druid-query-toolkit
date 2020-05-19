@@ -262,13 +262,13 @@ export class SqlQuery extends SqlBase {
           },
           this.selectSeparators,
         ),
-        this.innerSpacing.postSelectValues,
       );
     }
 
     // From clause
     if (this.tables && this.fromKeyword) {
       rawStringParts.push(
+        this.innerSpacing.preFrom,
         this.fromKeyword,
         this.innerSpacing.postFrom,
         Separator.spacilator(this.tables, this.tableSeparators),

@@ -601,7 +601,8 @@ describe('addToGroupBy', () => {
   });
 
   it('existing columns in group by', () => {
-    const sql = `select column1, min(column1) AS aliasName from table 
+    const sql = `select column1, min(column1) AS aliasName
+      from table 
       GROUP BY 2`;
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
@@ -633,10 +634,11 @@ describe('addToGroupBy', () => {
           "postQuery": "",
           "postSelect": " ",
           "postSelectDecorator": "",
-          "postSelectValues": " ",
           "postUnionKeyword": "",
           "postWith": "",
           "postWithQuery": "",
+          "preFrom": "
+            ",
           "preGroupByKeyword": " 
             ",
           "preHavingKeyword": "",
@@ -768,7 +770,8 @@ describe('addToGroupBy', () => {
         )
         .toString(),
     ).toMatchInlineSnapshot(`
-      "select max(column2) AS \\"MaxColumn\\", column1, min(column1) AS aliasName from table 
+      "select max(column2) AS \\"MaxColumn\\", column1, min(column1) AS aliasName
+            from table 
             GROUP BY 1, 3"
     `);
   });

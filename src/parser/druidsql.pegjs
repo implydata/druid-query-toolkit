@@ -16,8 +16,7 @@ SqlQuery =
   explainKeyword:(ExplainToken _)?
   withClause:(WithClause _)?
   select:SelectClause
-  postSelectValues:_
-  from:FromClause
+  from:(_ FromClause)?
   join:(_ JoinClause)?
   where:(_ WhereClause)?
   groupBy:(_ GroupByClause)?
@@ -29,10 +28,9 @@ SqlQuery =
   postQuery:EndOfQuery?
 {
   return new sql.SqlQuery({
-    explainKeyword: explainKeyword ? explainKeyword[0]: '',
+    explainKeyword: explainKeyword ? explainKeyword[0] : '',
 
     withKeyword: withClause ? withClause[0].withKeyword : undefined,
-    postWith: withClause ? withClause[0].postWith : undefined,
     withUnits: withClause ? withClause[0].withUnits : undefined,
     withSeparators: withClause ? withClause[0].withSeparators : undefined,
 
@@ -42,24 +40,24 @@ SqlQuery =
     selectValues: select.selectValues,
     selectAnnotations: select.selectAnnotations,
 
-    fromKeyword: from.fromKeyword,
-    tables: from.tables,
-    tableSeparators: from.tableSeparators,
+    fromKeyword: from ? from[1].fromKeyword : undefined,
+    tables: from ? from[1].tables : undefined,
+    tableSeparators: from ? from[1].tableSeparators : undefined,
 
-    joinType: join ? join[1].joinType: undefined,
+    joinType: join ? join[1].joinType : undefined,
     joinKeyword: join ? join[1].joinKeyword : undefined,
     joinTable: join ? join[1].table : undefined,
     onKeyword: join ? join[1].onKeyword : undefined,
     onExpression: join ? join[1].onExpression : undefined,
 
-    whereKeyword: where ? where[1].whereKeyword : undefined ,
+    whereKeyword: where ? where[1].whereKeyword : undefined,
     whereExpression: where ? where[1].whereExpression : undefined,
 
-    groupByKeyword: groupBy ? groupBy[1].groupByKeyword : undefined ,
+    groupByKeyword: groupBy ? groupBy[1].groupByKeyword : undefined,
     groupByExpression: groupBy ? groupBy[1].groupByExpression : undefined,
     groupByExpressionSeparators: groupBy ? groupBy[1].groupByExpressionSeparators : undefined,
 
-    havingKeyword: having ? having[1].havingKeyword : undefined ,
+    havingKeyword: having ? having[1].havingKeyword : undefined,
     havingExpression: having ? having[1].havingExpression : undefined,
 
     orderByKeyword: orderBy ? orderBy[1].orderByKeyword : undefined,
@@ -79,14 +77,14 @@ SqlQuery =
 
       postExplain: explainKeyword? explainKeyword[1]: '',
 
-      postSelect: select.postSelect,
-      postSelectDecorator: select.postSelectDecorator,
-      postSelectValues: postSelectValues,
-
       postWith: withClause ? withClause[0].postWith : '',
       postWithQuery: withClause ? withClause[1] : '',
 
-      postFrom: from.postFrom,
+      postSelect: select.postSelect,
+      postSelectDecorator: select.postSelectDecorator,
+
+      preFrom: from ? from[0] : '',
+      postFrom: from ? from[1].postFrom : '',
 
       preJoin: join ? join[0] : '',
       postJoinType: join ? join[1].postJoinTypeSpacing : '',
