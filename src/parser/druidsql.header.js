@@ -8,24 +8,22 @@
     return head.concat(tail.map(function(t) { return t[index] }));
   }
 
+  function maybeMakeMulti(expressionType, head, tail) {
+    if (!tail.length) return head;
+    return new sql.SqlMulti({
+      expressionType: expressionType,
+      arguments: makeListMap(tail, 3, head),
+      separators: makeSeparatorsList(tail),
+    });
+  }
+
   function makeSeparatorsList(tail) {
-    return (tail.map(t =>  { return {
-      left: t[0],
-      right: t[2],
-      separator: t[1],
-    } ;}));
+    return tail.map(function (t) {
+      return new sql.Separator({
+        left: t[0],
+        separator: t[1],
+        right: t[2],
+      });
+    });
   }
-
-  function makeEscapedSeparatorsList(tail) {
-    return (tail.map(t =>  { return {
-      left: t[0],
-      right: t[3],
-      separator: t[1],
-    } ;}));
-  }
-
-  functions = functions || ["COUNT", "FILTER",
-    "SUM","MIN", "MAX","AVG","APPROX_COUNT_DISTINCT",
-    "APPROX_COUNT_DISTINCT_DS_HLL", "APPROX_COUNT_DISTINCT_DS_THETA",
-    "APPROX_QUANTILE", "APPROX_QUANTILE_DS", "APPROX_QUANTILE_FIXED_BUCKETS"];
 }

@@ -12,17 +12,16 @@
  * limitations under the License.
  */
 
-import { sqlParserFactory } from '../../index';
-import { FUNCTIONS } from '../../test-utils';
-
-const parser = sqlParserFactory(FUNCTIONS);
+import { parseSql } from '../../index';
+import { backAndForth } from '../../test-utils';
 
 describe('Case expression', () => {
   it('searched CASE', () => {
     const sql = `CASE WHEN B THEN C END`;
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"CASE WHEN B THEN C END"`);
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlCaseSearched {
         "caseKeyword": "CASE",
         "elseExpression": undefined,
@@ -72,8 +71,9 @@ describe('Case expression', () => {
   it('searched CASE with Else', () => {
     const sql = `CASE WHEN B THEN C ELSE D END`;
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"CASE WHEN B THEN C ELSE D END"`);
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlCaseSearched {
         "caseKeyword": "CASE",
         "elseExpression": SqlRef {
@@ -132,8 +132,9 @@ describe('Case expression', () => {
   it('simple CASE Expression with weird spacing', () => {
     const sql = `CASE A  WHEN     B THEN C      END`;
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"CASE A  WHEN     B THEN C      END"`);
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlCaseSimple {
         "caseExpression": SqlRef {
           "column": "A",
@@ -194,8 +195,9 @@ describe('Case expression', () => {
   it('simple CASE Expression with brackets', () => {
     const sql = `(CASE A WHEN B THEN C END)`;
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"(CASE A WHEN B THEN C END)"`);
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlCaseSimple {
         "caseExpression": SqlRef {
           "column": "A",
@@ -262,8 +264,9 @@ describe('Case expression', () => {
   it('simple CASE Expression with brackets and weird spacing', () => {
     const sql = `(   CASE   A WHEN   B THEN C END  )`;
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"(   CASE   A WHEN   B THEN C END  )"`);
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlCaseSimple {
         "caseExpression": SqlRef {
           "column": "A",
@@ -330,10 +333,9 @@ describe('Case expression', () => {
   it('simple CASE Expression with complex expressions', () => {
     const sql = `(   CASE   A WHEN  B AND B THEN C OR C END  )`;
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(
-      `"(   CASE   A WHEN  B AND B THEN C OR C END  )"`,
-    );
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlCaseSimple {
         "caseExpression": SqlRef {
           "column": "A",
@@ -447,10 +449,10 @@ describe('Case expression', () => {
 
   it('nested searched CASE', () => {
     const sql = 'CASE "runner_status" WHEN \'RUNNING\' THEN 4 ELSE 2 END';
-    expect(parser(sql).toString()).toMatchInlineSnapshot(
-      `"CASE \\"runner_status\\" WHEN 'RUNNING' THEN 4 ELSE 2 END"`,
-    );
-    expect(parser(sql)).toMatchInlineSnapshot(`
+
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlCaseSimple {
         "caseExpression": SqlRef {
           "column": "runner_status",
@@ -465,7 +467,7 @@ describe('Case expression', () => {
         "caseKeyword": "CASE",
         "elseExpression": SqlLiteral {
           "innerSpacing": Object {},
-          "quotes": "",
+          "quotes": undefined,
           "stringValue": "2",
           "type": "literal",
           "value": 2,
@@ -488,7 +490,7 @@ describe('Case expression', () => {
             "postWhenSpace": " ",
             "thenExpression": SqlLiteral {
               "innerSpacing": Object {},
-              "quotes": "",
+              "quotes": undefined,
               "stringValue": "4",
               "type": "literal",
               "value": 4,

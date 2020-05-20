@@ -12,22 +12,24 @@
  * limitations under the License.
  */
 
-import { sqlParserFactory } from '../../index';
-import { FUNCTIONS } from '../../test-utils';
-
-const parser = sqlParserFactory(FUNCTIONS);
+import { parseSql } from '../../index';
+import { backAndForth, sane } from '../../test-utils';
 
 describe('Queries with annotated comments post query', () => {
   it('single annotated comment', () => {
-    const sql = `Select column --: valueName = value
-    , column1 --: valueName = value
-    , column2 
-    from table 
-    order by column`;
+    const sql = sane`
+      Select column --: valueName = value
+      , column1 --: valueName = value
+      , column2 
+      from table 
+      order by column
+    `;
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "explainKeyword": "",
+        "explainKeyword": undefined,
         "fromKeyword": "from",
         "groupByExpression": undefined,
         "groupByExpressionSeparators": undefined,
@@ -35,31 +37,16 @@ describe('Queries with annotated comments post query', () => {
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
-          "postExplain": "",
           "postFrom": " ",
-          "postJoinKeyword": "",
-          "postJoinTable": "",
-          "postJoinType": "",
-          "postLimitKeyword": "",
-          "postOn": "",
           "postOrderByKeyword": " ",
           "postQuery": "",
           "postSelect": " ",
           "postSelectDecorator": "",
-          "postSelectValues": " 
-          ",
-          "postUnionKeyword": "",
-          "postWith": "",
-          "postWithQuery": "",
-          "preGroupByKeyword": "",
-          "preHavingKeyword": "",
-          "preJoin": "",
-          "preLimitKeyword": "",
+          "preFrom": " 
+      ",
           "preOrderByKeyword": " 
-          ",
+      ",
           "preQuery": "",
-          "preUnionKeyword": "",
-          "preWhereKeyword": "",
         },
         "joinKeyword": undefined,
         "joinTable": undefined,
@@ -115,13 +102,13 @@ describe('Queries with annotated comments post query', () => {
         "selectSeparators": Array [
           Separator {
             "left": "
-          ",
+      ",
             "right": " ",
             "separator": ",",
           },
           Separator {
             "left": "
-          ",
+      ",
             "right": " ",
             "separator": ",",
           },
@@ -184,18 +171,20 @@ describe('Queries with annotated comments post query', () => {
         "withUnits": undefined,
       }
     `);
-
-    expect(parser(sql).toString()).toMatch(sql);
   });
 
   it('single annotated comment', () => {
-    const sql = `Select column, column1, column2 from table
-    order by column
-    --: valueName = value`;
+    const sql = sane`
+      Select column, column1, column2 from table
+      order by column
+      --: valueName = value
+    `;
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "explainKeyword": "",
+        "explainKeyword": undefined,
         "fromKeyword": "from",
         "groupByExpression": undefined,
         "groupByExpressionSeparators": undefined,
@@ -203,30 +192,15 @@ describe('Queries with annotated comments post query', () => {
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
-          "postExplain": "",
           "postFrom": " ",
-          "postJoinKeyword": "",
-          "postJoinTable": "",
-          "postJoinType": "",
-          "postLimitKeyword": "",
-          "postOn": "",
           "postOrderByKeyword": " ",
           "postQuery": "",
           "postSelect": " ",
           "postSelectDecorator": "",
-          "postSelectValues": " ",
-          "postUnionKeyword": "",
-          "postWith": "",
-          "postWithQuery": "",
-          "preGroupByKeyword": "",
-          "preHavingKeyword": "",
-          "preJoin": "",
-          "preLimitKeyword": "",
+          "preFrom": " ",
           "preOrderByKeyword": "
-          ",
+      ",
           "preQuery": "",
-          "preUnionKeyword": "",
-          "preWhereKeyword": "",
         },
         "joinKeyword": undefined,
         "joinTable": undefined,
@@ -260,7 +234,7 @@ describe('Queries with annotated comments post query', () => {
               "postEquals": " ",
               "postKey": " ",
               "preAnnotation": "
-          ",
+      ",
             },
             "key": "valueName",
             "value": "value",
@@ -343,23 +317,21 @@ describe('Queries with annotated comments post query', () => {
         "withUnits": undefined,
       }
     `);
-
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`
-      "Select column, column1, column2 from table
-          order by column
-          --: valueName = value"
-    `);
   });
 
   it('double annotated comment no spacing', () => {
-    const sql = `Select column, column1, column2 from table
-    order by column
-    --: valueName = value
-    --:valueName = value`;
+    const sql = sane`
+      Select column, column1, column2 from table
+      order by column
+      --: valueName = value
+      --:valueName = value
+    `;
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "explainKeyword": "",
+        "explainKeyword": undefined,
         "fromKeyword": "from",
         "groupByExpression": undefined,
         "groupByExpressionSeparators": undefined,
@@ -367,30 +339,15 @@ describe('Queries with annotated comments post query', () => {
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
-          "postExplain": "",
           "postFrom": " ",
-          "postJoinKeyword": "",
-          "postJoinTable": "",
-          "postJoinType": "",
-          "postLimitKeyword": "",
-          "postOn": "",
           "postOrderByKeyword": " ",
           "postQuery": "",
           "postSelect": " ",
           "postSelectDecorator": "",
-          "postSelectValues": " ",
-          "postUnionKeyword": "",
-          "postWith": "",
-          "postWithQuery": "",
-          "preGroupByKeyword": "",
-          "preHavingKeyword": "",
-          "preJoin": "",
-          "preLimitKeyword": "",
+          "preFrom": " ",
           "preOrderByKeyword": "
-          ",
+      ",
           "preQuery": "",
-          "preUnionKeyword": "",
-          "preWhereKeyword": "",
         },
         "joinKeyword": undefined,
         "joinTable": undefined,
@@ -424,7 +381,7 @@ describe('Queries with annotated comments post query', () => {
               "postEquals": " ",
               "postKey": " ",
               "preAnnotation": "
-          ",
+      ",
             },
             "key": "valueName",
             "value": "value",
@@ -435,7 +392,7 @@ describe('Queries with annotated comments post query', () => {
               "postEquals": " ",
               "postKey": " ",
               "preAnnotation": "
-          ",
+      ",
             },
             "key": "valueName",
             "value": "value",
@@ -518,20 +475,22 @@ describe('Queries with annotated comments post query', () => {
         "withUnits": undefined,
       }
     `);
-
-    expect(parser(sql).toString()).toMatch(sql);
   });
 });
 
 describe('Queries with annotated comments post select', () => {
   it('single annotated comment', () => {
-    const sql = `Select column, column1, column2 --: valueName = value
-    from table
-    order by column`;
+    const sql = sane`
+      Select column, column1, column2 --: valueName = value
+      from table
+      order by column
+    `;
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "explainKeyword": "",
+        "explainKeyword": undefined,
         "fromKeyword": "from",
         "groupByExpression": undefined,
         "groupByExpressionSeparators": undefined,
@@ -539,31 +498,16 @@ describe('Queries with annotated comments post select', () => {
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
-          "postExplain": "",
           "postFrom": " ",
-          "postJoinKeyword": "",
-          "postJoinTable": "",
-          "postJoinType": "",
-          "postLimitKeyword": "",
-          "postOn": "",
           "postOrderByKeyword": " ",
           "postQuery": "",
           "postSelect": " ",
           "postSelectDecorator": "",
-          "postSelectValues": "
-          ",
-          "postUnionKeyword": "",
-          "postWith": "",
-          "postWithQuery": "",
-          "preGroupByKeyword": "",
-          "preHavingKeyword": "",
-          "preJoin": "",
-          "preLimitKeyword": "",
+          "preFrom": "
+      ",
           "preOrderByKeyword": "
-          ",
+      ",
           "preQuery": "",
-          "preUnionKeyword": "",
-          "preWhereKeyword": "",
         },
         "joinKeyword": undefined,
         "joinTable": undefined,
@@ -677,23 +621,23 @@ describe('Queries with annotated comments post select', () => {
         "withUnits": undefined,
       }
     `);
-
-    expect(parser(sql).toString()).toMatch(sql);
   });
 });
 
 describe('Queries with annotated comments post select and post query', () => {
   it('single annotated comment', () => {
-    const sql = `Select column, column1, column2 --: valueName = value 
-    from table
-    order by column
-    --: valueName = value`;
+    const sql = sane`
+      Select column, column1, column2 --: valueName = value 
+      from table
+      order by column
+      --: valueName = value
+    `;
 
-    expect(parser(sql).toString()).toMatch(sql);
+    backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "explainKeyword": "",
+        "explainKeyword": undefined,
         "fromKeyword": "from",
         "groupByExpression": undefined,
         "groupByExpressionSeparators": undefined,
@@ -701,31 +645,16 @@ describe('Queries with annotated comments post select and post query', () => {
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
-          "postExplain": "",
           "postFrom": " ",
-          "postJoinKeyword": "",
-          "postJoinTable": "",
-          "postJoinType": "",
-          "postLimitKeyword": "",
-          "postOn": "",
           "postOrderByKeyword": " ",
           "postQuery": "",
           "postSelect": " ",
           "postSelectDecorator": "",
-          "postSelectValues": " 
-          ",
-          "postUnionKeyword": "",
-          "postWith": "",
-          "postWithQuery": "",
-          "preGroupByKeyword": "",
-          "preHavingKeyword": "",
-          "preJoin": "",
-          "preLimitKeyword": "",
+          "preFrom": " 
+      ",
           "preOrderByKeyword": "
-          ",
+      ",
           "preQuery": "",
-          "preUnionKeyword": "",
-          "preWhereKeyword": "",
         },
         "joinKeyword": undefined,
         "joinTable": undefined,
@@ -759,7 +688,7 @@ describe('Queries with annotated comments post select and post query', () => {
               "postEquals": " ",
               "postKey": " ",
               "preAnnotation": "
-          ",
+      ",
             },
             "key": "valueName",
             "value": "value",

@@ -11,6 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 export function shallowCopy(v: any): any {
   return Array.isArray(v) ? v.slice() : Object.assign({}, v);
 }

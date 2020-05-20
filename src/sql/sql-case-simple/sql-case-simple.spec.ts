@@ -12,17 +12,16 @@
  * limitations under the License.
  */
 
-import { sqlParserFactory } from '../../index';
-import { FUNCTIONS } from '../../test-utils';
-
-const parser = sqlParserFactory(FUNCTIONS);
+import { parseSql } from '../../index';
+import { backAndForth } from '../../test-utils';
 
 describe('Case expression', () => {
   it('simple CASE Expression', () => {
     const sql = `CASE A WHEN B THEN C END`;
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"CASE A WHEN B THEN C END"`);
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlCaseSimple {
         "caseExpression": SqlRef {
           "column": "A",
@@ -83,8 +82,9 @@ describe('Case expression', () => {
   it('simple CASE Expression with ELSE', () => {
     const sql = `CASE A WHEN B THEN C ELSE D END`;
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"CASE A WHEN B THEN C ELSE D END"`);
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlCaseSimple {
         "caseExpression": SqlRef {
           "column": "A",
@@ -154,8 +154,9 @@ describe('Case expression', () => {
   it('simple CASE Expression with weird spacing', () => {
     const sql = `CASE A  WHEN     B THEN C      END`;
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"CASE A  WHEN     B THEN C      END"`);
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlCaseSimple {
         "caseExpression": SqlRef {
           "column": "A",
@@ -216,8 +217,9 @@ describe('Case expression', () => {
   it('simple CASE Expression with brackets', () => {
     const sql = `(CASE A WHEN B THEN C END)`;
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"(CASE A WHEN B THEN C END)"`);
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlCaseSimple {
         "caseExpression": SqlRef {
           "column": "A",
@@ -284,8 +286,9 @@ describe('Case expression', () => {
   it('simple CASE Expression with brackets and weird spacing', () => {
     const sql = `(   CASE   A WHEN   B THEN C END  )`;
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"(   CASE   A WHEN   B THEN C END  )"`);
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlCaseSimple {
         "caseExpression": SqlRef {
           "column": "A",
@@ -352,10 +355,9 @@ describe('Case expression', () => {
   it('simple CASE Expression with complex expressions', () => {
     const sql = `(   CASE   A WHEN  B AND B THEN C OR C END  )`;
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(
-      `"(   CASE   A WHEN  B AND B THEN C OR C END  )"`,
-    );
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlCaseSimple {
         "caseExpression": SqlRef {
           "column": "A",

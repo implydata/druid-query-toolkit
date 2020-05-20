@@ -12,16 +12,16 @@
  * limitations under the License.
  */
 
-import { sqlParserFactory } from '../../index';
-import { FUNCTIONS } from '../../test-utils';
+import { parseSql, SqlRef } from '../../index';
+import { backAndForth } from '../../test-utils';
 
-const parser = sqlParserFactory(FUNCTIONS);
-
-describe('sql-ref', () => {
+describe('SqlRef', () => {
   it('Ref with double quotes and double quoted namespace', () => {
     const sql = '"test"."namespace"';
-    expect(parser(sql).toString()).toMatch(sql);
-    expect(parser(sql)).toMatchInlineSnapshot(`
+
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlRef {
         "column": "namespace",
         "innerSpacing": Object {},
@@ -37,8 +37,10 @@ describe('sql-ref', () => {
 
   it('Ref with double quotes and no quotes namespace', () => {
     const sql = '"test".namespace';
-    expect(parser(sql).toString()).toMatch(sql);
-    expect(parser(sql)).toMatchInlineSnapshot(`
+
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlRef {
         "column": "namespace",
         "innerSpacing": Object {},
@@ -54,8 +56,10 @@ describe('sql-ref', () => {
 
   it('Ref with no quotes and namespace', () => {
     const sql = 'test.namespace';
-    expect(parser(sql).toString()).toMatch(sql);
-    expect(parser(sql)).toMatchInlineSnapshot(`
+
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlRef {
         "column": "namespace",
         "innerSpacing": Object {},
@@ -71,8 +75,10 @@ describe('sql-ref', () => {
 
   it('Ref with no quotes and no namespace', () => {
     const sql = 'test';
-    expect(parser(sql).toString()).toMatch(sql);
-    expect(parser(sql)).toMatchInlineSnapshot(`
+
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlRef {
         "column": "test",
         "innerSpacing": Object {},
@@ -88,8 +94,10 @@ describe('sql-ref', () => {
 
   it('Ref with double quotes and no namespace', () => {
     const sql = '"test"';
-    expect(parser(sql).toString()).toMatch(sql);
-    expect(parser(sql)).toMatchInlineSnapshot(`
+
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlRef {
         "column": "test",
         "innerSpacing": Object {},
@@ -107,12 +115,10 @@ describe('sql-ref', () => {
 describe('upgrades', () => {
   it('Ref with double quotes upgraded', () => {
     const sql = `"namespace"."table"`;
-    expect(
-      parser(sql)
-        .upgrade()
-        .toString(),
-    ).toMatch(sql);
-    expect(parser(sql).upgrade()).toMatchInlineSnapshot(`
+
+    expect((parseSql(sql) as SqlRef).upgrade().toString()).toEqual(sql);
+
+    expect((parseSql(sql) as SqlRef).upgrade()).toMatchInlineSnapshot(`
       SqlRef {
         "column": undefined,
         "innerSpacing": Object {
@@ -131,10 +137,12 @@ describe('upgrades', () => {
 
   it('SqlRef in select should be upgraded', () => {
     const sql = `select table from sys.segments`;
-    expect(parser(sql).toString()).toMatch(sql);
-    expect(parser(sql)).toMatchInlineSnapshot(`
+
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "explainKeyword": "",
+        "explainKeyword": undefined,
         "fromKeyword": "from",
         "groupByExpression": undefined,
         "groupByExpressionSeparators": undefined,
@@ -142,27 +150,12 @@ describe('upgrades', () => {
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
-          "postExplain": "",
           "postFrom": " ",
-          "postJoinKeyword": "",
-          "postJoinTable": "",
-          "postJoinType": "",
-          "postLimitKeyword": "",
-          "postOn": "",
           "postQuery": "",
           "postSelect": " ",
           "postSelectDecorator": "",
-          "postSelectValues": " ",
-          "postUnionKeyword": "",
-          "postWith": "",
-          "postWithQuery": "",
-          "preGroupByKeyword": "",
-          "preHavingKeyword": "",
-          "preJoin": "",
-          "preLimitKeyword": "",
+          "preFrom": " ",
           "preQuery": "",
-          "preUnionKeyword": "",
-          "preWhereKeyword": "",
         },
         "joinKeyword": undefined,
         "joinTable": undefined,

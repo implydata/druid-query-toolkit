@@ -12,36 +12,34 @@
  * limitations under the License.
  */
 
-import { SqlAliasRef, SqlFunction, sqlParserFactory, SqlRef } from '../..';
-import { FUNCTIONS } from '../../test-utils';
-
-const parser = sqlParserFactory(FUNCTIONS);
+import { parseSql, parseSqlQuery, SqlAliasRef, SqlFunction, SqlRef } from '../..';
+import { sane } from '../../test-utils';
 
 describe('getTableName Tests', () => {
   it('getTableNames', () => {
     expect(
-      parser(`SELECT *
+      parseSqlQuery(`SELECT *
   FROM "github"`).getTableName(),
     ).toMatchInlineSnapshot(`"github"`);
   });
 
   it('getTableName with nameSpace', () => {
     expect(
-      parser(`SELECT *
+      parseSqlQuery(`SELECT *
   FROM sys."github"`).getTableName(),
     ).toMatchInlineSnapshot(`"github"`);
   });
 
   it('getTableName with nameSpace and alias', () => {
     expect(
-      parser(`SELECT *
+      parseSqlQuery(`SELECT *
   FROM sys."github" as Name`).getTableName(),
     ).toMatchInlineSnapshot(`"Name"`);
   });
 
   it('getTableName with multiple tables', () => {
     expect(
-      parser(`SELECT *
+      parseSqlQuery(`SELECT *
   FROM sys."github" as test, sys.name`).getTableName(),
     ).toMatchInlineSnapshot(`"test"`);
   });
@@ -50,21 +48,21 @@ describe('getTableName Tests', () => {
 describe('getSchema Test', () => {
   it('getSchema', () => {
     expect(
-      parser(`SELECT *
+      parseSqlQuery(`SELECT *
   FROM sys."github"`).getSchema(),
     ).toMatchInlineSnapshot(`"sys"`);
   });
 
   it('getSchema from SqlRef with no nameSpace', () => {
     expect(
-      parser(`SELECT *
+      parseSqlQuery(`SELECT *
   FROM "github"`).getSchema(),
     ).toMatchInlineSnapshot(`undefined`);
   });
 
   it('getSchema from multiple tables', () => {
     expect(
-      parser(`SELECT *
+      parseSqlQuery(`SELECT *
   FROM sys."github", "table"`).getSchema(),
     ).toMatchInlineSnapshot(`"sys"`);
   });
@@ -73,7 +71,7 @@ describe('getSchema Test', () => {
 describe('getSorted Test', () => {
   it('getSorted', () => {
     expect(
-      parser(`SELECT *
+      parseSqlQuery(`SELECT *
   FROM sys."github" ORDER BY column DESC`).getSorted(),
     ).toMatchInlineSnapshot(`
       Array [
@@ -84,9 +82,10 @@ describe('getSorted Test', () => {
       ]
     `);
   });
+
   it('getSorted with undefined direction', () => {
     expect(
-      parser(`SELECT *
+      parseSqlQuery(`SELECT *
   FROM sys."github" ORDER BY column`).getSorted(),
     ).toMatchInlineSnapshot(`
       Array [
@@ -97,9 +96,10 @@ describe('getSorted Test', () => {
       ]
     `);
   });
+
   it('getSorted with multiple columns', () => {
     expect(
-      parser(`SELECT *
+      parseSqlQuery(`SELECT *
   FROM sys."github" ORDER BY column, columnTwo ASC`).getSorted(),
     ).toMatchInlineSnapshot(`
       Array [
@@ -114,9 +114,10 @@ describe('getSorted Test', () => {
       ]
     `);
   });
+
   it('getSorted with numbered column', () => {
     expect(
-      parser(`SELECT column, columnTwo 
+      parseSqlQuery(`SELECT column, columnTwo 
   FROM sys."github" ORDER BY 1 ASC`).getSorted(),
     ).toMatchInlineSnapshot(`
       Array [
@@ -132,7 +133,7 @@ describe('getSorted Test', () => {
 describe('order by Test', () => {
   it('noo order by clause', () => {
     expect(
-      parser(`SELECT *
+      parseSqlQuery(`SELECT *
   FROM sys."github"`)
         .orderBy('column', 'DESC')
         .toString(),
@@ -142,9 +143,10 @@ describe('order by Test', () => {
       ORDER BY \\"column\\" DESC"
     `);
   });
+
   it('add to order by clause', () => {
     expect(
-      parser(`SELECT *
+      parseSqlQuery(`SELECT *
   FROM sys."github" ORDER BY column`)
         .orderBy('columnTwo', 'DESC')
         .toString(),
@@ -153,9 +155,10 @@ describe('order by Test', () => {
         FROM sys.\\"github\\" ORDER BY column, \\"columnTwo\\" DESC"
     `);
   });
+
   it('order by with out direction', () => {
     expect(
-      parser(`SELECT *
+      parseSqlQuery(`SELECT *
   FROM sys."github" ORDER BY column, columnTwo ASC`)
         .orderBy('columnThree')
         .toString(),
@@ -169,7 +172,7 @@ describe('order by Test', () => {
 describe('addWhereFilter test ', () => {
   it('no Where filter', () => {
     expect(
-      parser(`SELECT *
+      parseSqlQuery(`SELECT *
   FROM sys."github"`)
         .addWhereFilter('column', '>', 1)
         .toString(),
@@ -179,9 +182,10 @@ describe('addWhereFilter test ', () => {
       WHERE \\"column\\" > 1"
     `);
   });
+
   it('Single Where filter value', () => {
     expect(
-      parser(`SELECT *
+      parseSqlQuery(`SELECT *
   FROM sys."github" WHERE column > 1`)
         .addWhereFilter('columnTwo', '>', 2)
         .toString(),
@@ -190,9 +194,10 @@ describe('addWhereFilter test ', () => {
         FROM sys.\\"github\\" WHERE column > 1 AND \\"columnTwo\\" > 2"
     `);
   });
+
   it('OR Where filter value', () => {
     expect(
-      parser(`SELECT *
+      parseSqlQuery(`SELECT *
   FROM sys."github" WHERE column > 1 OR column < 5`)
         .addWhereFilter('columnTwo', '>', 2)
         .toString(),
@@ -201,9 +206,10 @@ describe('addWhereFilter test ', () => {
         FROM sys.\\"github\\" WHERE (column > 1 OR column < 5) AND \\"columnTwo\\" > 2"
     `);
   });
+
   it('AND Where filter value', () => {
     expect(
-      parser(`SELECT *
+      parseSqlQuery(`SELECT *
         FROM sys."github" WHERE (column > 1 OR column < 5) AND columnTwo > 5`)
         .addWhereFilter('columnTwo', '>', 2)
         .toString(),
@@ -217,7 +223,7 @@ describe('addWhereFilter test ', () => {
 describe('remove functions', () => {
   it('remove first column from select', () => {
     expect(
-      parser(`SELECT column, column1
+      parseSqlQuery(`SELECT column, column1
   FROM sys."github"`)
         .removeFromSelect('column')
         .toString(),
@@ -226,9 +232,10 @@ describe('remove functions', () => {
         FROM sys.\\"github\\""
     `);
   });
+
   it('remove middle column from select', () => {
     expect(
-      parser(`SELECT column, column1, column2
+      parseSqlQuery(`SELECT column, column1, column2
   FROM sys."github"`)
         .removeFromSelect('column1')
         .toString(),
@@ -237,9 +244,10 @@ describe('remove functions', () => {
         FROM sys.\\"github\\""
     `);
   });
+
   it('remove end column from select', () => {
     expect(
-      parser(`SELECT column, column1, column2
+      parseSqlQuery(`SELECT column, column1, column2
   FROM sys."github"`)
         .removeFromSelect('column2')
         .toString(),
@@ -248,9 +256,10 @@ describe('remove functions', () => {
         FROM sys.\\"github\\""
     `);
   });
+
   it('remove column from where', () => {
     expect(
-      parser(`SELECT column, column1, column2
+      parseSqlQuery(`SELECT column, column1, column2
   FROM sys."github"
   Where column AND column2`)
         .removeFromWhere('column2')
@@ -261,9 +270,10 @@ describe('remove functions', () => {
         Where column"
     `);
   });
+
   it('remove only column from where', () => {
     expect(
-      parser(`SELECT column, column1, column2
+      parseSqlQuery(`SELECT column, column1, column2
   FROM sys."github"
   Where column2 = '1'`)
         .removeFromWhere('column2')
@@ -273,9 +283,10 @@ describe('remove functions', () => {
         FROM sys.\\"github\\""
     `);
   });
+
   it('remove multiple filters for the same column', () => {
     expect(
-      parser(`SELECT column, column1, column2
+      parseSqlQuery(`SELECT column, column1, column2
   FROM sys."github"
   Where column2 > '1' AND column2 < '1'`)
         .removeFromWhere('column2')
@@ -285,9 +296,10 @@ describe('remove functions', () => {
         FROM sys.\\"github\\""
     `);
   });
+
   it('remove multiple filters for the same column', () => {
     expect(
-      parser(`SELECT column, column1, column2
+      parseSqlQuery(`SELECT column, column1, column2
   FROM sys."github"
   Where column2 > '1' AND column1 > 2 OR column2 < '1'`)
         .removeFromWhere('column2')
@@ -298,9 +310,10 @@ describe('remove functions', () => {
         Where column1 > 2"
     `);
   });
+
   it('remove only comparison expression from where', () => {
     expect(
-      parser(`SELECT column, column1, column2
+      parseSqlQuery(`SELECT column, column1, column2
   FROM sys."github"
   Where column2 > 1`)
         .removeFromWhere('column2')
@@ -310,9 +323,10 @@ describe('remove functions', () => {
         FROM sys.\\"github\\""
     `);
   });
+
   it('remove only comparison expression from where', () => {
     expect(
-      parser(`SELECT column, column1, column2
+      parseSqlQuery(`SELECT column, column1, column2
   FROM sys."github"
   Where column2 > 1 AND column1 > 1`)
         .removeFromWhere('column2')
@@ -323,9 +337,10 @@ describe('remove functions', () => {
         Where column1 > 1"
     `);
   });
+
   it('remove only column from having', () => {
     expect(
-      parser(`SELECT column, column1, column2
+      parseSqlQuery(`SELECT column, column1, column2
   FROM sys."github"
   Having column2 > 1`)
         .removeFromHaving('column2')
@@ -335,9 +350,10 @@ describe('remove functions', () => {
         FROM sys.\\"github\\""
     `);
   });
+
   it('remove only comparison expression from having', () => {
     expect(
-      parser(`SELECT column, column1, column2
+      parseSqlQuery(`SELECT column, column1, column2
   FROM sys."github"
   Having column2 > 1`)
         .removeFromHaving('column2')
@@ -347,9 +363,10 @@ describe('remove functions', () => {
         FROM sys.\\"github\\""
     `);
   });
+
   it('remove only comparison expression from having', () => {
     expect(
-      parser(`SELECT column, column1, column2
+      parseSqlQuery(`SELECT column, column1, column2
   FROM sys."github"
   Having column2 > 1 AND column1 > 1`)
         .removeFromHaving('column2')
@@ -360,12 +377,13 @@ describe('remove functions', () => {
         Having column1 > 1"
     `);
   });
+
   it('remove one numbered column from order by', () => {
     expect(
-      parser(`SELECT column, column1, column2
+      parseSqlQuery(`SELECT column, column1, column2
   FROM sys."github"
   Order By column, 2 ASC`)
-        .removeFromOrderBy()
+        .removeFromOrderBy('column')
         .toString(),
     ).toMatchInlineSnapshot(`
       "SELECT column, column1, column2
@@ -373,9 +391,10 @@ describe('remove functions', () => {
         Order By 2 ASC"
     `);
   });
+
   it('remove column not in order by', () => {
     expect(
-      parser(`SELECT column, column1, column2
+      parseSqlQuery(`SELECT column, column1, column2
   FROM sys."github"
   Order By column, column1 ASC`)
         .removeFromOrderBy('column2')
@@ -386,9 +405,10 @@ describe('remove functions', () => {
         Order By column, column1 ASC"
     `);
   });
+
   it('remove one numbered column not in order by', () => {
     expect(
-      parser(`SELECT column, column1, column2
+      parseSqlQuery(`SELECT column, column1, column2
   FROM sys."github"
   Order By column, 3 ASC`)
         .removeFromOrderBy('column1')
@@ -399,9 +419,10 @@ describe('remove functions', () => {
         Order By column, 3 ASC"
     `);
   });
+
   it('remove only column in order by', () => {
     expect(
-      parser(`SELECT column, column1, column2
+      parseSqlQuery(`SELECT column, column1, column2
   FROM sys."github"
   Order By column1`)
         .removeFromOrderBy('column1')
@@ -411,9 +432,10 @@ describe('remove functions', () => {
         FROM sys.\\"github\\""
     `);
   });
+
   it('remove column from group by', () => {
     expect(
-      parser(`SELECT column, column1, column2
+      parseSqlQuery(`SELECT column, column1, column2
   FROM sys."github"
   Group By column, 3`)
         .removeFromGroupBy('column')
@@ -424,9 +446,10 @@ describe('remove functions', () => {
         Group By 3"
     `);
   });
+
   it('remove column as number from group by', () => {
     expect(
-      parser(`SELECT column, column1, column2
+      parseSqlQuery(`SELECT column, column1, column2
   FROM sys."github"
   Group By column, 3`)
         .removeFromGroupBy('column2')
@@ -437,9 +460,10 @@ describe('remove functions', () => {
         Group By column"
     `);
   });
+
   it('remove only column from group by', () => {
     expect(
-      parser(`SELECT column, column1, column2
+      parseSqlQuery(`SELECT column, column1, column2
   FROM sys."github"
   Group By column2`)
         .removeFromGroupBy('column2')
@@ -453,21 +477,28 @@ describe('remove functions', () => {
 
 describe('getAggregateColumns', () => {
   it('get all aggregate columns', () => {
-    const sql = `SELECT column, SUM(column1) As aggregated, column2
-  FROM sys."github"
-  Group By column2`;
-    expect(parser(sql).getAggregateColumns()).toMatchInlineSnapshot(`
+    const sql = sane`
+      SELECT column, SUM(column1) As aggregated, column2
+      FROM sys."github"
+      Group By column2
+    `;
+
+    expect(parseSqlQuery(sql).getAggregateColumns()).toMatchInlineSnapshot(`
       Array [
         "column",
         "aggregated",
       ]
     `);
   });
+
   it('get all aggregate columns using numbers', () => {
-    const sql = `SELECT column, SUM(column1) As aggregated, column2
-  FROM sys."github"
-  Group By column2,  1, 3`;
-    expect(parser(sql).getAggregateColumns()).toMatchInlineSnapshot(`
+    const sql = sane`
+      SELECT column, SUM(column1) As aggregated, column2
+      FROM sys."github"
+      Group By column2,  1, 3
+    `;
+
+    expect(parseSqlQuery(sql).getAggregateColumns()).toMatchInlineSnapshot(`
       Array [
         "aggregated",
       ]
@@ -477,39 +508,47 @@ describe('getAggregateColumns', () => {
 
 describe('getCurrentFilters', () => {
   it('get all filters, only having clause', () => {
-    const sql = `SELECT column, SUM(column1) As aggregated, column2
-  FROM sys."github"
-  Group By column2
-  Having column > 1 AND aggregated < 100
-`;
-    expect(parser(sql).getCurrentFilters()).toMatchInlineSnapshot(`
+    const sql = sane`
+      SELECT column, SUM(column1) As aggregated, column2
+      FROM sys."github"
+      Group By column2
+      Having column > 1 AND aggregated < 100
+    `;
+
+    expect(parseSqlQuery(sql).getCurrentFilters()).toMatchInlineSnapshot(`
       Array [
         "column",
         "aggregated",
       ]
     `);
   });
+
   it('get all filters, only where clause', () => {
-    const sql = `SELECT column, SUM(column1) As aggregated, column2
-  FROM sys."github"
-  Where column > 1 AND aggregated < 100
-  Group By column2
-`;
-    expect(parser(sql).getCurrentFilters()).toMatchInlineSnapshot(`
+    const sql = sane`
+      SELECT column, SUM(column1) As aggregated, column2
+      FROM sys."github"
+      Where column > 1 AND aggregated < 100
+      Group By column2
+    `;
+
+    expect(parseSqlQuery(sql).getCurrentFilters()).toMatchInlineSnapshot(`
       Array [
         "column",
         "aggregated",
       ]
     `);
   });
+
   it('get all filters, where and having clauses', () => {
-    const sql = `SELECT column, SUM(column1) As aggregated, column2
-  FROM sys."github"
-  Where column > 1 AND aggregated < 100
-  Group By column2
-  Having column3 > 1 AND column4 < 100
-`;
-    expect(parser(sql).getCurrentFilters()).toMatchInlineSnapshot(`
+    const sql = sane`
+      SELECT column, SUM(column1) As aggregated, column2
+      FROM sys."github"
+      Where column > 1 AND aggregated < 100
+      Group By column2
+      Having column3 > 1 AND column4 < 100
+    `;
+
+    expect(parseSqlQuery(sql).getCurrentFilters()).toMatchInlineSnapshot(`
       Array [
         "column3",
         "column4",
@@ -525,7 +564,7 @@ describe('addAggregateColumn', () => {
     const sql = 'select column1 from table';
 
     expect(
-      parser(sql)
+      parseSqlQuery(sql)
         .addAggregateColumn([SqlRef.fromString('column2')], 'min', 'alias')
         .toString(),
     ).toMatchInlineSnapshot(`"select column1, min(column2) AS \\"alias\\" from table"`);
@@ -535,7 +574,7 @@ describe('addAggregateColumn', () => {
     const sql = 'select column1 from table';
 
     expect(
-      parser(sql)
+      parseSqlQuery(sql)
         .addAggregateColumn([SqlRef.fromString('column2')], 'min', 'alias', undefined, 'DISTINCT')
         .toString(),
     ).toMatchInlineSnapshot(`"select column1, min(DISTINCT column2) AS \\"alias\\" from table"`);
@@ -547,7 +586,7 @@ describe('addToGroupBy', () => {
     const sql = 'select Count(*) from table';
 
     expect(
-      parser(sql)
+      parseSqlQuery(sql)
         .addToGroupBy(SqlRef.fromStringWithDoubleQuotes('column'))
         .toString(),
     ).toMatchInlineSnapshot(`
@@ -560,7 +599,7 @@ describe('addToGroupBy', () => {
     const sql = 'select column1 from table';
 
     expect(
-      parser(sql)
+      parseSqlQuery(sql)
         .addToGroupBy(
           SqlAliasRef.sqlAliasFactory(
             SqlFunction.sqlFunctionFactory('min', [SqlRef.fromString('column1')]),
@@ -575,17 +614,20 @@ describe('addToGroupBy', () => {
   });
 
   it('existing columns in group by', () => {
-    const sql = `select column1, min(column1) AS aliasName from table 
-      GROUP BY 2`;
+    const sql = sane`
+      select column1, min(column1) AS aliasName
+      from table 
+      GROUP BY 2
+    `;
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "explainKeyword": "",
+        "explainKeyword": undefined,
         "fromKeyword": "from",
         "groupByExpression": Array [
           SqlLiteral {
             "innerSpacing": Object {},
-            "quotes": "",
+            "quotes": undefined,
             "stringValue": "2",
             "type": "literal",
             "value": 2,
@@ -596,29 +638,16 @@ describe('addToGroupBy', () => {
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
-          "postExplain": "",
           "postFrom": " ",
           "postGroupByKeyword": " ",
-          "postJoinKeyword": "",
-          "postJoinTable": "",
-          "postJoinType": "",
-          "postLimitKeyword": "",
-          "postOn": "",
           "postQuery": "",
           "postSelect": " ",
           "postSelectDecorator": "",
-          "postSelectValues": " ",
-          "postUnionKeyword": "",
-          "postWith": "",
-          "postWithQuery": "",
+          "preFrom": "
+      ",
           "preGroupByKeyword": " 
-            ",
-          "preHavingKeyword": "",
-          "preJoin": "",
-          "preLimitKeyword": "",
+      ",
           "preQuery": "",
-          "preUnionKeyword": "",
-          "preWhereKeyword": "",
         },
         "joinKeyword": undefined,
         "joinTable": undefined,
@@ -733,7 +762,7 @@ describe('addToGroupBy', () => {
       }
     `);
     expect(
-      parser(sql)
+      parseSqlQuery(sql)
         .addToGroupBy(
           SqlAliasRef.sqlAliasFactory(
             SqlFunction.sqlFunctionFactory('max', [SqlRef.fromString('column2')]),
@@ -742,8 +771,9 @@ describe('addToGroupBy', () => {
         )
         .toString(),
     ).toMatchInlineSnapshot(`
-      "select max(column2) AS \\"MaxColumn\\", column1, min(column1) AS aliasName from table 
-            GROUP BY 1, 3"
+      "select max(column2) AS \\"MaxColumn\\", column1, min(column1) AS aliasName
+      from table 
+      GROUP BY 1, 3"
     `);
   });
 });

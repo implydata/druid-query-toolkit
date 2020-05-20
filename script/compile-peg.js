@@ -12,17 +12,23 @@ const wrappedParser = `
 var sql = require('../sql');
 var utils = require('../utils');
 var deepGet = utils.deepGet;
+var SqlQuery = sql.SqlQuery;
 
-function sqlParserFactory(functions) {
 var p =
 ${parser}
 
-return function(druidSqlString) {
-  return p.parse(druidSqlString);
+function parseSql(input) {
+  return p.parse(input);
 }
-};
 
-module.exports.sqlParserFactory = sqlParserFactory;
+function parseSqlQuery(input) {
+  var ast = parseSql(input);
+  if (!(ast instanceof SqlQuery)) return;
+  return ast;
+}
+
+module.exports.parseSql = parseSql;
+module.exports.parseSqlQuery = parseSqlQuery;
 `;
 
 fs.writeFileSync('./src/parser/druidsql.js', wrappedParser);

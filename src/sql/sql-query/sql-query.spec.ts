@@ -12,25 +12,88 @@
  * limitations under the License.
  */
 
-import { sqlParserFactory } from '../../index';
-import { FUNCTIONS } from '../../test-utils';
+import { parseSql, parseSqlQuery } from '../../index';
+import { backAndForth, sane } from '../../test-utils';
 
-const parser = sqlParserFactory(FUNCTIONS);
+describe('SqlQuery', () => {
+  it('parse queries only', () => {
+    expect(parseSqlQuery('a OR b')).toBeUndefined();
+  });
 
-describe('simple expressions', () => {
   it('Simple select with single column', () => {
     const sql = `Select notingham from table`;
-    expect(parser(sql).toString()).toMatch(sql);
+
+    backAndForth(sql);
+  });
+
+  it('Simple expression', () => {
+    const sql = `Select 3`;
+
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
+      SqlQuery {
+        "explainKeyword": undefined,
+        "fromKeyword": undefined,
+        "groupByExpression": undefined,
+        "groupByExpressionSeparators": undefined,
+        "groupByKeyword": undefined,
+        "havingExpression": undefined,
+        "havingKeyword": undefined,
+        "innerSpacing": Object {
+          "postQuery": "",
+          "postSelect": " ",
+          "postSelectDecorator": "",
+          "preQuery": "",
+        },
+        "joinKeyword": undefined,
+        "joinTable": undefined,
+        "joinType": undefined,
+        "limitKeyword": undefined,
+        "limitValue": undefined,
+        "onExpression": undefined,
+        "onKeyword": undefined,
+        "orderByKeyword": undefined,
+        "orderBySeparators": undefined,
+        "orderByUnits": undefined,
+        "postQueryAnnotation": Array [],
+        "selectAnnotations": Array [
+          null,
+        ],
+        "selectDecorator": "",
+        "selectKeyword": "Select",
+        "selectSeparators": Array [],
+        "selectValues": Array [
+          SqlLiteral {
+            "innerSpacing": Object {},
+            "quotes": undefined,
+            "stringValue": "3",
+            "type": "literal",
+            "value": 3,
+          },
+        ],
+        "tableSeparators": undefined,
+        "tables": undefined,
+        "type": "query",
+        "unionKeyword": undefined,
+        "unionQuery": undefined,
+        "whereExpression": undefined,
+        "whereKeyword": undefined,
+        "withKeyword": undefined,
+        "withSeparators": undefined,
+        "withUnits": undefined,
+      }
+    `);
   });
 
   it('Simple select', () => {
     const sql = `Select * from table`;
 
-    expect(parser(sql).toString()).toMatch(sql);
+    backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "explainKeyword": "",
+        "explainKeyword": undefined,
         "fromKeyword": "from",
         "groupByExpression": undefined,
         "groupByExpressionSeparators": undefined,
@@ -38,27 +101,12 @@ describe('simple expressions', () => {
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
-          "postExplain": "",
           "postFrom": " ",
-          "postJoinKeyword": "",
-          "postJoinTable": "",
-          "postJoinType": "",
-          "postLimitKeyword": "",
-          "postOn": "",
           "postQuery": "",
           "postSelect": " ",
           "postSelectDecorator": "",
-          "postSelectValues": " ",
-          "postUnionKeyword": "",
-          "postWith": "",
-          "postWithQuery": "",
-          "preGroupByKeyword": "",
-          "preHavingKeyword": "",
-          "preJoin": "",
-          "preLimitKeyword": "",
+          "preFrom": " ",
           "preQuery": "",
-          "preUnionKeyword": "",
-          "preWhereKeyword": "",
         },
         "joinKeyword": undefined,
         "joinTable": undefined,
@@ -120,11 +168,11 @@ describe('simple expressions', () => {
   it('Simple select in brackets', () => {
     const sql = `(Select * from table)`;
 
-    expect(parser(sql).toString()).toMatch(sql);
+    backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "explainKeyword": "",
+        "explainKeyword": undefined,
         "fromKeyword": "from",
         "groupByExpression": undefined,
         "groupByExpressionSeparators": undefined,
@@ -132,27 +180,12 @@ describe('simple expressions', () => {
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
-          "postExplain": "",
           "postFrom": " ",
-          "postJoinKeyword": "",
-          "postJoinTable": "",
-          "postJoinType": "",
-          "postLimitKeyword": "",
-          "postOn": "",
           "postQuery": "",
           "postSelect": " ",
           "postSelectDecorator": "",
-          "postSelectValues": " ",
-          "postUnionKeyword": "",
-          "postWith": "",
-          "postWithQuery": "",
-          "preGroupByKeyword": "",
-          "preHavingKeyword": "",
-          "preJoin": "",
-          "preLimitKeyword": "",
+          "preFrom": " ",
           "preQuery": "",
-          "preUnionKeyword": "",
-          "preWhereKeyword": "",
         },
         "joinKeyword": undefined,
         "joinTable": undefined,
@@ -220,11 +253,11 @@ describe('simple expressions', () => {
   it('Simple select, columns with aliases', () => {
     const sql = `Select Sum(*) As sums from table`;
 
-    expect(parser(sql).toString()).toMatch(sql);
+    backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "explainKeyword": "",
+        "explainKeyword": undefined,
         "fromKeyword": "from",
         "groupByExpression": undefined,
         "groupByExpressionSeparators": undefined,
@@ -232,27 +265,12 @@ describe('simple expressions', () => {
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
-          "postExplain": "",
           "postFrom": " ",
-          "postJoinKeyword": "",
-          "postJoinTable": "",
-          "postJoinType": "",
-          "postLimitKeyword": "",
-          "postOn": "",
           "postQuery": "",
           "postSelect": " ",
           "postSelectDecorator": "",
-          "postSelectValues": " ",
-          "postUnionKeyword": "",
-          "postWith": "",
-          "postWithQuery": "",
-          "preGroupByKeyword": "",
-          "preHavingKeyword": "",
-          "preJoin": "",
-          "preLimitKeyword": "",
+          "preFrom": " ",
           "preQuery": "",
-          "preUnionKeyword": "",
-          "preWhereKeyword": "",
         },
         "joinKeyword": undefined,
         "joinTable": undefined,
@@ -352,19 +370,21 @@ describe('simple expressions', () => {
   });
 
   it('Simple select, columns with aliases and case expressions', () => {
-    const sql = `SELECT
-    datasource,
-    SUM("size") AS total_size,
-    CASE WHEN SUM("size") = 0 THEN 0 ELSE SUM("size")  END AS avg_size,
-    CASE WHEN SUM(num_rows) = 0 THEN 0 ELSE SUM("num_rows") END AS avg_num_rows,
-    COUNT(*) AS num_segments
-FROM sys.segments`;
+    const sql = sane`
+      SELECT
+        datasource,
+        SUM("size") AS total_size,
+        CASE WHEN SUM("size") = 0 THEN 0 ELSE SUM("size")  END AS avg_size,
+        CASE WHEN SUM(num_rows) = 0 THEN 0 ELSE SUM("num_rows") END AS avg_num_rows,
+        COUNT(*) AS num_segments
+      FROM sys.segments
+    `;
 
-    expect(parser(sql).toString()).toMatch(sql);
+    backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "explainKeyword": "",
+        "explainKeyword": undefined,
         "fromKeyword": "FROM",
         "groupByExpression": undefined,
         "groupByExpressionSeparators": undefined,
@@ -372,29 +392,14 @@ FROM sys.segments`;
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
-          "postExplain": "",
           "postFrom": " ",
-          "postJoinKeyword": "",
-          "postJoinTable": "",
-          "postJoinType": "",
-          "postLimitKeyword": "",
-          "postOn": "",
           "postQuery": "",
           "postSelect": "
-          ",
+        ",
           "postSelectDecorator": "",
-          "postSelectValues": "
+          "preFrom": "
       ",
-          "postUnionKeyword": "",
-          "postWith": "",
-          "postWithQuery": "",
-          "preGroupByKeyword": "",
-          "preHavingKeyword": "",
-          "preJoin": "",
-          "preLimitKeyword": "",
           "preQuery": "",
-          "preUnionKeyword": "",
-          "preWhereKeyword": "",
         },
         "joinKeyword": undefined,
         "joinTable": undefined,
@@ -420,25 +425,25 @@ FROM sys.segments`;
           Separator {
             "left": "",
             "right": "
-          ",
+        ",
             "separator": ",",
           },
           Separator {
             "left": "",
             "right": "
-          ",
+        ",
             "separator": ",",
           },
           Separator {
             "left": "",
             "right": "
-          ",
+        ",
             "separator": ",",
           },
           Separator {
             "left": "",
             "right": "
-          ",
+        ",
             "separator": ",",
           },
         ],
@@ -566,7 +571,7 @@ FROM sys.segments`;
                   "postWhenSpace": " ",
                   "thenExpression": SqlLiteral {
                     "innerSpacing": Object {},
-                    "quotes": "",
+                    "quotes": undefined,
                     "stringValue": "0",
                     "type": "literal",
                     "value": 0,
@@ -608,7 +613,7 @@ FROM sys.segments`;
                       },
                       SqlLiteral {
                         "innerSpacing": Object {},
-                        "quotes": "",
+                        "quotes": undefined,
                         "stringValue": "0",
                         "type": "literal",
                         "value": 0,
@@ -698,7 +703,7 @@ FROM sys.segments`;
                   "postWhenSpace": " ",
                   "thenExpression": SqlLiteral {
                     "innerSpacing": Object {},
-                    "quotes": "",
+                    "quotes": undefined,
                     "stringValue": "0",
                     "type": "literal",
                     "value": 0,
@@ -740,7 +745,7 @@ FROM sys.segments`;
                       },
                       SqlLiteral {
                         "innerSpacing": Object {},
-                        "quotes": "",
+                        "quotes": undefined,
                         "stringValue": "0",
                         "type": "literal",
                         "value": 0,
@@ -847,17 +852,19 @@ FROM sys.segments`;
   });
 
   it('Simple select, columns with many columns and aliases', () => {
-    const sql = `SELECT
-    datasource,
-    SUM("size") AS total_size,
-    COUNT(*) AS num_segments
-FROM sys.segments`;
+    const sql = sane`
+      SELECT
+        datasource,
+        SUM("size") AS total_size,
+        COUNT(*) AS num_segments
+      FROM sys.segments
+    `;
 
-    expect(parser(sql).toString()).toMatch(sql);
+    backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "explainKeyword": "",
+        "explainKeyword": undefined,
         "fromKeyword": "FROM",
         "groupByExpression": undefined,
         "groupByExpressionSeparators": undefined,
@@ -865,29 +872,14 @@ FROM sys.segments`;
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
-          "postExplain": "",
           "postFrom": " ",
-          "postJoinKeyword": "",
-          "postJoinTable": "",
-          "postJoinType": "",
-          "postLimitKeyword": "",
-          "postOn": "",
           "postQuery": "",
           "postSelect": "
-          ",
+        ",
           "postSelectDecorator": "",
-          "postSelectValues": "
+          "preFrom": "
       ",
-          "postUnionKeyword": "",
-          "postWith": "",
-          "postWithQuery": "",
-          "preGroupByKeyword": "",
-          "preHavingKeyword": "",
-          "preJoin": "",
-          "preLimitKeyword": "",
           "preQuery": "",
-          "preUnionKeyword": "",
-          "preWhereKeyword": "",
         },
         "joinKeyword": undefined,
         "joinTable": undefined,
@@ -911,13 +903,13 @@ FROM sys.segments`;
           Separator {
             "left": "",
             "right": "
-          ",
+        ",
             "separator": ",",
           },
           Separator {
             "left": "",
             "right": "
-          ",
+        ",
             "separator": ",",
           },
         ],
@@ -1064,9 +1056,9 @@ FROM sys.segments`;
   it('Simple select with Explain', () => {
     const sql = `Explain plan for Select * from table`;
 
-    expect(parser(sql).toString()).toMatch(sql);
+    backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": "Explain plan for",
         "fromKeyword": "from",
@@ -1078,25 +1070,11 @@ FROM sys.segments`;
         "innerSpacing": Object {
           "postExplain": " ",
           "postFrom": " ",
-          "postJoinKeyword": "",
-          "postJoinTable": "",
-          "postJoinType": "",
-          "postLimitKeyword": "",
-          "postOn": "",
           "postQuery": "",
           "postSelect": " ",
           "postSelectDecorator": "",
-          "postSelectValues": " ",
-          "postUnionKeyword": "",
-          "postWith": "",
-          "postWithQuery": "",
-          "preGroupByKeyword": "",
-          "preHavingKeyword": "",
-          "preJoin": "",
-          "preLimitKeyword": "",
+          "preFrom": " ",
           "preQuery": "",
-          "preUnionKeyword": "",
-          "preWhereKeyword": "",
         },
         "joinKeyword": undefined,
         "joinTable": undefined,
@@ -1156,16 +1134,18 @@ FROM sys.segments`;
   });
 
   it('Simple select with With', () => {
-    const sql = `WITH dept_count AS (
-  SELECT deptno
-  FROM   emp)
-    Select * from table`;
+    const sql = sane`
+      WITH dept_count AS (
+        SELECT deptno
+        FROM   emp)
+      Select * from table
+    `;
 
-    expect(parser(sql).toString()).toMatch(sql);
+    backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "explainKeyword": "",
+        "explainKeyword": undefined,
         "fromKeyword": "from",
         "groupByExpression": undefined,
         "groupByExpressionSeparators": undefined,
@@ -1173,28 +1153,15 @@ FROM sys.segments`;
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
-          "postExplain": "",
           "postFrom": " ",
-          "postJoinKeyword": "",
-          "postJoinTable": "",
-          "postJoinType": "",
-          "postLimitKeyword": "",
-          "postOn": "",
           "postQuery": "",
           "postSelect": " ",
           "postSelectDecorator": "",
-          "postSelectValues": " ",
-          "postUnionKeyword": "",
           "postWith": " ",
           "postWithQuery": "
-          ",
-          "preGroupByKeyword": "",
-          "preHavingKeyword": "",
-          "preJoin": "",
-          "preLimitKeyword": "",
+      ",
+          "preFrom": " ",
           "preQuery": "",
-          "preUnionKeyword": "",
-          "preWhereKeyword": "",
         },
         "joinKeyword": undefined,
         "joinTable": undefined,
@@ -1258,7 +1225,7 @@ FROM sys.segments`;
             "preRightParen": "",
             "withColumns": undefined,
             "withQuery": SqlQuery {
-              "explainKeyword": "",
+              "explainKeyword": undefined,
               "fromKeyword": "FROM",
               "groupByExpression": undefined,
               "groupByExpressionSeparators": undefined,
@@ -1266,28 +1233,13 @@ FROM sys.segments`;
               "havingExpression": undefined,
               "havingKeyword": undefined,
               "innerSpacing": Object {
-                "postExplain": "",
                 "postFrom": "   ",
-                "postJoinKeyword": "",
-                "postJoinTable": "",
-                "postJoinType": "",
-                "postLimitKeyword": "",
-                "postOn": "",
                 "postQuery": "",
                 "postSelect": " ",
                 "postSelectDecorator": "",
-                "postSelectValues": "
+                "preFrom": "
         ",
-                "postUnionKeyword": "",
-                "postWith": "",
-                "postWithQuery": "",
-                "preGroupByKeyword": "",
-                "preHavingKeyword": "",
-                "preJoin": "",
-                "preLimitKeyword": "",
                 "preQuery": "",
-                "preUnionKeyword": "",
-                "preWhereKeyword": "",
               },
               "joinKeyword": undefined,
               "joinTable": undefined,
@@ -1371,11 +1323,12 @@ FROM sys.segments`;
 describe('expressions with where clause', () => {
   it('Simple select with where', () => {
     const sql = `Select * from table where column > 1`;
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"Select * from table where column > 1"`);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "explainKeyword": "",
+        "explainKeyword": undefined,
         "fromKeyword": "from",
         "groupByExpression": undefined,
         "groupByExpressionSeparators": undefined,
@@ -1383,27 +1336,13 @@ describe('expressions with where clause', () => {
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
-          "postExplain": "",
           "postFrom": " ",
-          "postJoinKeyword": "",
-          "postJoinTable": "",
-          "postJoinType": "",
-          "postLimitKeyword": "",
-          "postOn": "",
           "postQuery": "",
           "postSelect": " ",
           "postSelectDecorator": "",
-          "postSelectValues": " ",
-          "postUnionKeyword": "",
           "postWhereKeyword": " ",
-          "postWith": "",
-          "postWithQuery": "",
-          "preGroupByKeyword": "",
-          "preHavingKeyword": "",
-          "preJoin": "",
-          "preLimitKeyword": "",
+          "preFrom": " ",
           "preQuery": "",
-          "preUnionKeyword": "",
           "preWhereKeyword": " ",
         },
         "joinKeyword": undefined,
@@ -1468,7 +1407,7 @@ describe('expressions with where clause', () => {
             },
             SqlLiteral {
               "innerSpacing": Object {},
-              "quotes": "",
+              "quotes": undefined,
               "stringValue": "1",
               "type": "literal",
               "value": 1,
@@ -1495,13 +1434,12 @@ describe('expressions with where clause', () => {
 
   it('Simple select with equals', () => {
     const sql = `SELECT * FROM sys.supervisors WHERE healthy = 0`;
-    expect(parser(sql).toString()).toMatchInlineSnapshot(
-      `"SELECT * FROM sys.supervisors WHERE healthy = 0"`,
-    );
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "explainKeyword": "",
+        "explainKeyword": undefined,
         "fromKeyword": "FROM",
         "groupByExpression": undefined,
         "groupByExpressionSeparators": undefined,
@@ -1509,27 +1447,13 @@ describe('expressions with where clause', () => {
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
-          "postExplain": "",
           "postFrom": " ",
-          "postJoinKeyword": "",
-          "postJoinTable": "",
-          "postJoinType": "",
-          "postLimitKeyword": "",
-          "postOn": "",
           "postQuery": "",
           "postSelect": " ",
           "postSelectDecorator": "",
-          "postSelectValues": " ",
-          "postUnionKeyword": "",
           "postWhereKeyword": " ",
-          "postWith": "",
-          "postWithQuery": "",
-          "preGroupByKeyword": "",
-          "preHavingKeyword": "",
-          "preJoin": "",
-          "preLimitKeyword": "",
+          "preFrom": " ",
           "preQuery": "",
-          "preUnionKeyword": "",
           "preWhereKeyword": " ",
         },
         "joinKeyword": undefined,
@@ -1594,7 +1518,7 @@ describe('expressions with where clause', () => {
             },
             SqlLiteral {
               "innerSpacing": Object {},
-              "quotes": "",
+              "quotes": undefined,
               "stringValue": "0",
               "type": "literal",
               "value": 0,
@@ -1621,13 +1545,12 @@ describe('expressions with where clause', () => {
 
   it('Simple select with many', () => {
     const sql = `SELECT * FROM sys.supervisors WHERE healthy = 0 and column > 100 or otherColumn = 'value'`;
-    expect(parser(sql).toString()).toMatchInlineSnapshot(
-      `"SELECT * FROM sys.supervisors WHERE healthy = 0 and column > 100 or otherColumn = 'value'"`,
-    );
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "explainKeyword": "",
+        "explainKeyword": undefined,
         "fromKeyword": "FROM",
         "groupByExpression": undefined,
         "groupByExpressionSeparators": undefined,
@@ -1635,27 +1558,13 @@ describe('expressions with where clause', () => {
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
-          "postExplain": "",
           "postFrom": " ",
-          "postJoinKeyword": "",
-          "postJoinTable": "",
-          "postJoinType": "",
-          "postLimitKeyword": "",
-          "postOn": "",
           "postQuery": "",
           "postSelect": " ",
           "postSelectDecorator": "",
-          "postSelectValues": " ",
-          "postUnionKeyword": "",
           "postWhereKeyword": " ",
-          "postWith": "",
-          "postWithQuery": "",
-          "preGroupByKeyword": "",
-          "preHavingKeyword": "",
-          "preJoin": "",
-          "preLimitKeyword": "",
+          "preFrom": " ",
           "preQuery": "",
-          "preUnionKeyword": "",
           "preWhereKeyword": " ",
         },
         "joinKeyword": undefined,
@@ -1724,7 +1633,7 @@ describe('expressions with where clause', () => {
                     },
                     SqlLiteral {
                       "innerSpacing": Object {},
-                      "quotes": "",
+                      "quotes": undefined,
                       "stringValue": "0",
                       "type": "literal",
                       "value": 0,
@@ -1755,7 +1664,7 @@ describe('expressions with where clause', () => {
                     },
                     SqlLiteral {
                       "innerSpacing": Object {},
-                      "quotes": "",
+                      "quotes": undefined,
                       "stringValue": "100",
                       "type": "literal",
                       "value": 100,
@@ -1839,11 +1748,12 @@ describe('expressions with where clause', () => {
 describe('expressions with group by clause', () => {
   it('Simple select with group by ', () => {
     const sql = `Select * from table group by column`;
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"Select * from table group by column"`);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "explainKeyword": "",
+        "explainKeyword": undefined,
         "fromKeyword": "from",
         "groupByExpression": Array [
           SqlRef {
@@ -1862,28 +1772,14 @@ describe('expressions with group by clause', () => {
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
-          "postExplain": "",
           "postFrom": " ",
           "postGroupByKeyword": " ",
-          "postJoinKeyword": "",
-          "postJoinTable": "",
-          "postJoinType": "",
-          "postLimitKeyword": "",
-          "postOn": "",
           "postQuery": "",
           "postSelect": " ",
           "postSelectDecorator": "",
-          "postSelectValues": " ",
-          "postUnionKeyword": "",
-          "postWith": "",
-          "postWithQuery": "",
+          "preFrom": " ",
           "preGroupByKeyword": " ",
-          "preHavingKeyword": "",
-          "preJoin": "",
-          "preLimitKeyword": "",
           "preQuery": "",
-          "preUnionKeyword": "",
-          "preWhereKeyword": "",
         },
         "joinKeyword": undefined,
         "joinTable": undefined,
@@ -1944,11 +1840,12 @@ describe('expressions with group by clause', () => {
 
   it('Simple select with group by ', () => {
     const sql = `Select * from table group by column`;
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"Select * from table group by column"`);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "explainKeyword": "",
+        "explainKeyword": undefined,
         "fromKeyword": "from",
         "groupByExpression": Array [
           SqlRef {
@@ -1967,28 +1864,14 @@ describe('expressions with group by clause', () => {
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
-          "postExplain": "",
           "postFrom": " ",
           "postGroupByKeyword": " ",
-          "postJoinKeyword": "",
-          "postJoinTable": "",
-          "postJoinType": "",
-          "postLimitKeyword": "",
-          "postOn": "",
           "postQuery": "",
           "postSelect": " ",
           "postSelectDecorator": "",
-          "postSelectValues": " ",
-          "postUnionKeyword": "",
-          "postWith": "",
-          "postWithQuery": "",
+          "preFrom": " ",
           "preGroupByKeyword": " ",
-          "preHavingKeyword": "",
-          "preJoin": "",
-          "preLimitKeyword": "",
           "preQuery": "",
-          "preUnionKeyword": "",
-          "preWhereKeyword": "",
         },
         "joinKeyword": undefined,
         "joinTable": undefined,
@@ -2049,13 +1932,12 @@ describe('expressions with group by clause', () => {
 
   it('Simple select with multiple group by clauses in brackets', () => {
     const sql = `(Select * from table group by column, columnTwo)`;
-    expect(parser(sql).toString()).toMatchInlineSnapshot(
-      `"(Select * from table group by column, columnTwo)"`,
-    );
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "explainKeyword": "",
+        "explainKeyword": undefined,
         "fromKeyword": "from",
         "groupByExpression": Array [
           SqlRef {
@@ -2090,28 +1972,14 @@ describe('expressions with group by clause', () => {
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
-          "postExplain": "",
           "postFrom": " ",
           "postGroupByKeyword": " ",
-          "postJoinKeyword": "",
-          "postJoinTable": "",
-          "postJoinType": "",
-          "postLimitKeyword": "",
-          "postOn": "",
           "postQuery": "",
           "postSelect": " ",
           "postSelectDecorator": "",
-          "postSelectValues": " ",
-          "postUnionKeyword": "",
-          "postWith": "",
-          "postWithQuery": "",
+          "preFrom": " ",
           "preGroupByKeyword": " ",
-          "preHavingKeyword": "",
-          "preJoin": "",
-          "preLimitKeyword": "",
           "preQuery": "",
-          "preUnionKeyword": "",
-          "preWhereKeyword": "",
         },
         "joinKeyword": undefined,
         "joinTable": undefined,
@@ -2180,11 +2048,12 @@ describe('expressions with group by clause', () => {
 describe('expressions with having clause', () => {
   it('Simple select with where', () => {
     const sql = `Select * from table having column > 1`;
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"Select * from table having column > 1"`);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "explainKeyword": "",
+        "explainKeyword": undefined,
         "fromKeyword": "from",
         "groupByExpression": undefined,
         "groupByExpressionSeparators": undefined,
@@ -2203,7 +2072,7 @@ describe('expressions with having clause', () => {
             },
             SqlLiteral {
               "innerSpacing": Object {},
-              "quotes": "",
+              "quotes": undefined,
               "stringValue": "1",
               "type": "literal",
               "value": 1,
@@ -2222,28 +2091,14 @@ describe('expressions with having clause', () => {
         },
         "havingKeyword": "having",
         "innerSpacing": Object {
-          "postExplain": "",
           "postFrom": " ",
           "postHavingKeyword": " ",
-          "postJoinKeyword": "",
-          "postJoinTable": "",
-          "postJoinType": "",
-          "postLimitKeyword": "",
-          "postOn": "",
           "postQuery": "",
           "postSelect": " ",
           "postSelectDecorator": "",
-          "postSelectValues": " ",
-          "postUnionKeyword": "",
-          "postWith": "",
-          "postWithQuery": "",
-          "preGroupByKeyword": "",
+          "preFrom": " ",
           "preHavingKeyword": " ",
-          "preJoin": "",
-          "preLimitKeyword": "",
           "preQuery": "",
-          "preUnionKeyword": "",
-          "preWhereKeyword": "",
         },
         "joinKeyword": undefined,
         "joinTable": undefined,
@@ -2304,13 +2159,12 @@ describe('expressions with having clause', () => {
 
   it('Simple select with equals', () => {
     const sql = `SELECT * FROM sys.supervisors HAVING healthy = 0`;
-    expect(parser(sql).toString()).toMatchInlineSnapshot(
-      `"SELECT * FROM sys.supervisors HAVING healthy = 0"`,
-    );
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "explainKeyword": "",
+        "explainKeyword": undefined,
         "fromKeyword": "FROM",
         "groupByExpression": undefined,
         "groupByExpressionSeparators": undefined,
@@ -2329,7 +2183,7 @@ describe('expressions with having clause', () => {
             },
             SqlLiteral {
               "innerSpacing": Object {},
-              "quotes": "",
+              "quotes": undefined,
               "stringValue": "0",
               "type": "literal",
               "value": 0,
@@ -2348,28 +2202,14 @@ describe('expressions with having clause', () => {
         },
         "havingKeyword": "HAVING",
         "innerSpacing": Object {
-          "postExplain": "",
           "postFrom": " ",
           "postHavingKeyword": " ",
-          "postJoinKeyword": "",
-          "postJoinTable": "",
-          "postJoinType": "",
-          "postLimitKeyword": "",
-          "postOn": "",
           "postQuery": "",
           "postSelect": " ",
           "postSelectDecorator": "",
-          "postSelectValues": " ",
-          "postUnionKeyword": "",
-          "postWith": "",
-          "postWithQuery": "",
-          "preGroupByKeyword": "",
+          "preFrom": " ",
           "preHavingKeyword": " ",
-          "preJoin": "",
-          "preLimitKeyword": "",
           "preQuery": "",
-          "preUnionKeyword": "",
-          "preWhereKeyword": "",
         },
         "joinKeyword": undefined,
         "joinTable": undefined,
@@ -2430,13 +2270,12 @@ describe('expressions with having clause', () => {
 
   it('Simple select with many', () => {
     const sql = `SELECT * FROM sys.supervisors HAVING healthy = 0 and column > 100 or otherColumn = 'value'`;
-    expect(parser(sql).toString()).toMatchInlineSnapshot(
-      `"SELECT * FROM sys.supervisors HAVING healthy = 0 and column > 100 or otherColumn = 'value'"`,
-    );
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "explainKeyword": "",
+        "explainKeyword": undefined,
         "fromKeyword": "FROM",
         "groupByExpression": undefined,
         "groupByExpressionSeparators": undefined,
@@ -2459,7 +2298,7 @@ describe('expressions with having clause', () => {
                     },
                     SqlLiteral {
                       "innerSpacing": Object {},
-                      "quotes": "",
+                      "quotes": undefined,
                       "stringValue": "0",
                       "type": "literal",
                       "value": 0,
@@ -2490,7 +2329,7 @@ describe('expressions with having clause', () => {
                     },
                     SqlLiteral {
                       "innerSpacing": Object {},
-                      "quotes": "",
+                      "quotes": undefined,
                       "stringValue": "100",
                       "type": "literal",
                       "value": 100,
@@ -2564,28 +2403,14 @@ describe('expressions with having clause', () => {
         },
         "havingKeyword": "HAVING",
         "innerSpacing": Object {
-          "postExplain": "",
           "postFrom": " ",
           "postHavingKeyword": " ",
-          "postJoinKeyword": "",
-          "postJoinTable": "",
-          "postJoinType": "",
-          "postLimitKeyword": "",
-          "postOn": "",
           "postQuery": "",
           "postSelect": " ",
           "postSelectDecorator": "",
-          "postSelectValues": " ",
-          "postUnionKeyword": "",
-          "postWith": "",
-          "postWithQuery": "",
-          "preGroupByKeyword": "",
+          "preFrom": " ",
           "preHavingKeyword": " ",
-          "preJoin": "",
-          "preLimitKeyword": "",
           "preQuery": "",
-          "preUnionKeyword": "",
-          "preWhereKeyword": "",
         },
         "joinKeyword": undefined,
         "joinTable": undefined,
@@ -2648,11 +2473,12 @@ describe('expressions with having clause', () => {
 describe('expressions with order by clause', () => {
   it('Simple select with number order by', () => {
     const sql = `Select column from table order by 1`;
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"Select column from table order by 1"`);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "explainKeyword": "",
+        "explainKeyword": undefined,
         "fromKeyword": "from",
         "groupByExpression": undefined,
         "groupByExpressionSeparators": undefined,
@@ -2660,29 +2486,14 @@ describe('expressions with order by clause', () => {
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
-          "postExplain": "",
           "postFrom": " ",
-          "postJoinKeyword": "",
-          "postJoinTable": "",
-          "postJoinType": "",
-          "postLimitKeyword": "",
-          "postOn": "",
           "postOrderByKeyword": " ",
           "postQuery": "",
           "postSelect": " ",
           "postSelectDecorator": "",
-          "postSelectValues": " ",
-          "postUnionKeyword": "",
-          "postWith": "",
-          "postWithQuery": "",
-          "preGroupByKeyword": "",
-          "preHavingKeyword": "",
-          "preJoin": "",
-          "preLimitKeyword": "",
+          "preFrom": " ",
           "preOrderByKeyword": " ",
           "preQuery": "",
-          "preUnionKeyword": "",
-          "preWhereKeyword": "",
         },
         "joinKeyword": undefined,
         "joinTable": undefined,
@@ -2698,7 +2509,7 @@ describe('expressions with order by clause', () => {
             "direction": "",
             "expression": SqlLiteral {
               "innerSpacing": Object {},
-              "quotes": "",
+              "quotes": undefined,
               "stringValue": "1",
               "type": "literal",
               "value": 1,
@@ -2755,13 +2566,12 @@ describe('expressions with order by clause', () => {
 
   it('Simple select with ref order by', () => {
     const sql = `Select column from table order by column`;
-    expect(parser(sql).toString()).toMatchInlineSnapshot(
-      `"Select column from table order by column"`,
-    );
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "explainKeyword": "",
+        "explainKeyword": undefined,
         "fromKeyword": "from",
         "groupByExpression": undefined,
         "groupByExpressionSeparators": undefined,
@@ -2769,29 +2579,14 @@ describe('expressions with order by clause', () => {
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
-          "postExplain": "",
           "postFrom": " ",
-          "postJoinKeyword": "",
-          "postJoinTable": "",
-          "postJoinType": "",
-          "postLimitKeyword": "",
-          "postOn": "",
           "postOrderByKeyword": " ",
           "postQuery": "",
           "postSelect": " ",
           "postSelectDecorator": "",
-          "postSelectValues": " ",
-          "postUnionKeyword": "",
-          "postWith": "",
-          "postWithQuery": "",
-          "preGroupByKeyword": "",
-          "preHavingKeyword": "",
-          "preJoin": "",
-          "preLimitKeyword": "",
+          "preFrom": " ",
           "preOrderByKeyword": " ",
           "preQuery": "",
-          "preUnionKeyword": "",
-          "preWhereKeyword": "",
         },
         "joinKeyword": undefined,
         "joinTable": undefined,
@@ -2866,14 +2661,13 @@ describe('expressions with order by clause', () => {
   });
 
   it('Simple select with number order by and direction', () => {
-    const sql = `Select column from table order by 1 ASC`;
-    expect(parser(sql).toString()).toMatchInlineSnapshot(
-      `"Select column from table order by 1 ASC"`,
-    );
+    const sql = `Select column from table order by 1 Asc`;
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "explainKeyword": "",
+        "explainKeyword": undefined,
         "fromKeyword": "from",
         "groupByExpression": undefined,
         "groupByExpressionSeparators": undefined,
@@ -2881,29 +2675,14 @@ describe('expressions with order by clause', () => {
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
-          "postExplain": "",
           "postFrom": " ",
-          "postJoinKeyword": "",
-          "postJoinTable": "",
-          "postJoinType": "",
-          "postLimitKeyword": "",
-          "postOn": "",
           "postOrderByKeyword": " ",
           "postQuery": "",
           "postSelect": " ",
           "postSelectDecorator": "",
-          "postSelectValues": " ",
-          "postUnionKeyword": "",
-          "postWith": "",
-          "postWithQuery": "",
-          "preGroupByKeyword": "",
-          "preHavingKeyword": "",
-          "preJoin": "",
-          "preLimitKeyword": "",
+          "preFrom": " ",
           "preOrderByKeyword": " ",
           "preQuery": "",
-          "preUnionKeyword": "",
-          "preWhereKeyword": "",
         },
         "joinKeyword": undefined,
         "joinTable": undefined,
@@ -2916,10 +2695,10 @@ describe('expressions with order by clause', () => {
         "orderBySeparators": Array [],
         "orderByUnits": Array [
           Object {
-            "direction": "ASC",
+            "direction": "Asc",
             "expression": SqlLiteral {
               "innerSpacing": Object {},
-              "quotes": "",
+              "quotes": undefined,
               "stringValue": "1",
               "type": "literal",
               "value": 1,
@@ -2976,13 +2755,12 @@ describe('expressions with order by clause', () => {
 
   it('Simple select with ref order by and direction', () => {
     const sql = `Select column, columnTwo from table order by column DESC`;
-    expect(parser(sql).toString()).toMatchInlineSnapshot(
-      `"Select column, columnTwo from table order by column DESC"`,
-    );
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "explainKeyword": "",
+        "explainKeyword": undefined,
         "fromKeyword": "from",
         "groupByExpression": undefined,
         "groupByExpressionSeparators": undefined,
@@ -2990,29 +2768,14 @@ describe('expressions with order by clause', () => {
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
-          "postExplain": "",
           "postFrom": " ",
-          "postJoinKeyword": "",
-          "postJoinTable": "",
-          "postJoinType": "",
-          "postLimitKeyword": "",
-          "postOn": "",
           "postOrderByKeyword": " ",
           "postQuery": "",
           "postSelect": " ",
           "postSelectDecorator": "",
-          "postSelectValues": " ",
-          "postUnionKeyword": "",
-          "postWith": "",
-          "postWithQuery": "",
-          "preGroupByKeyword": "",
-          "preHavingKeyword": "",
-          "preJoin": "",
-          "preLimitKeyword": "",
+          "preFrom": " ",
           "preOrderByKeyword": " ",
           "preQuery": "",
-          "preUnionKeyword": "",
-          "preWhereKeyword": "",
         },
         "joinKeyword": undefined,
         "joinTable": undefined,
@@ -3105,13 +2868,12 @@ describe('expressions with order by clause', () => {
 
   it('Simple select ordered on multiple columns', () => {
     const sql = `Select column from table order by 1 ASC, column`;
-    expect(parser(sql).toString()).toMatchInlineSnapshot(
-      `"Select column from table order by 1 ASC, column"`,
-    );
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "explainKeyword": "",
+        "explainKeyword": undefined,
         "fromKeyword": "from",
         "groupByExpression": undefined,
         "groupByExpressionSeparators": undefined,
@@ -3119,29 +2881,14 @@ describe('expressions with order by clause', () => {
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
-          "postExplain": "",
           "postFrom": " ",
-          "postJoinKeyword": "",
-          "postJoinTable": "",
-          "postJoinType": "",
-          "postLimitKeyword": "",
-          "postOn": "",
           "postOrderByKeyword": " ",
           "postQuery": "",
           "postSelect": " ",
           "postSelectDecorator": "",
-          "postSelectValues": " ",
-          "postUnionKeyword": "",
-          "postWith": "",
-          "postWithQuery": "",
-          "preGroupByKeyword": "",
-          "preHavingKeyword": "",
-          "preJoin": "",
-          "preLimitKeyword": "",
+          "preFrom": " ",
           "preOrderByKeyword": " ",
           "preQuery": "",
-          "preUnionKeyword": "",
-          "preWhereKeyword": "",
         },
         "joinKeyword": undefined,
         "joinTable": undefined,
@@ -3163,7 +2910,7 @@ describe('expressions with order by clause', () => {
             "direction": "ASC",
             "expression": SqlLiteral {
               "innerSpacing": Object {},
-              "quotes": "",
+              "quotes": undefined,
               "stringValue": "1",
               "type": "literal",
               "value": 1,
@@ -3234,13 +2981,12 @@ describe('expressions with order by clause', () => {
 
   it('Simple select ordered on multiple columns', () => {
     const sql = `Select column, columnTwo from table order by 1 ASC, column DESC`;
-    expect(parser(sql).toString()).toMatchInlineSnapshot(
-      `"Select column, columnTwo from table order by 1 ASC, column DESC"`,
-    );
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "explainKeyword": "",
+        "explainKeyword": undefined,
         "fromKeyword": "from",
         "groupByExpression": undefined,
         "groupByExpressionSeparators": undefined,
@@ -3248,29 +2994,14 @@ describe('expressions with order by clause', () => {
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
-          "postExplain": "",
           "postFrom": " ",
-          "postJoinKeyword": "",
-          "postJoinTable": "",
-          "postJoinType": "",
-          "postLimitKeyword": "",
-          "postOn": "",
           "postOrderByKeyword": " ",
           "postQuery": "",
           "postSelect": " ",
           "postSelectDecorator": "",
-          "postSelectValues": " ",
-          "postUnionKeyword": "",
-          "postWith": "",
-          "postWithQuery": "",
-          "preGroupByKeyword": "",
-          "preHavingKeyword": "",
-          "preJoin": "",
-          "preLimitKeyword": "",
+          "preFrom": " ",
           "preOrderByKeyword": " ",
           "preQuery": "",
-          "preUnionKeyword": "",
-          "preWhereKeyword": "",
         },
         "joinKeyword": undefined,
         "joinTable": undefined,
@@ -3292,7 +3023,7 @@ describe('expressions with order by clause', () => {
             "direction": "ASC",
             "expression": SqlLiteral {
               "innerSpacing": Object {},
-              "quotes": "",
+              "quotes": undefined,
               "stringValue": "1",
               "type": "literal",
               "value": 1,
@@ -3382,11 +3113,12 @@ describe('expressions with order by clause', () => {
 describe('expressions with limit clause', () => {
   it('Simple select with limit', () => {
     const sql = `Select * from table limit 1`;
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"Select * from table limit 1"`);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "explainKeyword": "",
+        "explainKeyword": undefined,
         "fromKeyword": "from",
         "groupByExpression": undefined,
         "groupByExpressionSeparators": undefined,
@@ -3394,27 +3126,14 @@ describe('expressions with limit clause', () => {
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
-          "postExplain": "",
           "postFrom": " ",
-          "postJoinKeyword": "",
-          "postJoinTable": "",
-          "postJoinType": "",
           "postLimitKeyword": " ",
-          "postOn": "",
           "postQuery": "",
           "postSelect": " ",
           "postSelectDecorator": "",
-          "postSelectValues": " ",
-          "postUnionKeyword": "",
-          "postWith": "",
-          "postWithQuery": "",
-          "preGroupByKeyword": "",
-          "preHavingKeyword": "",
-          "preJoin": "",
+          "preFrom": " ",
           "preLimitKeyword": " ",
           "preQuery": "",
-          "preUnionKeyword": "",
-          "preWhereKeyword": "",
         },
         "joinKeyword": undefined,
         "joinTable": undefined,
@@ -3422,7 +3141,7 @@ describe('expressions with limit clause', () => {
         "limitKeyword": "limit",
         "limitValue": SqlLiteral {
           "innerSpacing": Object {},
-          "quotes": "",
+          "quotes": undefined,
           "stringValue": "1",
           "type": "literal",
           "value": 1,
@@ -3483,13 +3202,12 @@ describe('expressions with limit clause', () => {
 describe('expressions with union clause', () => {
   it('Simple select with union all ', () => {
     const sql = `Select * from table union all select * from otherTable`;
-    expect(parser(sql).toString()).toMatchInlineSnapshot(
-      `"Select * from table union all select * from otherTable"`,
-    );
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "explainKeyword": "",
+        "explainKeyword": undefined,
         "fromKeyword": "from",
         "groupByExpression": undefined,
         "groupByExpressionSeparators": undefined,
@@ -3497,27 +3215,14 @@ describe('expressions with union clause', () => {
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
-          "postExplain": "",
           "postFrom": " ",
-          "postJoinKeyword": "",
-          "postJoinTable": "",
-          "postJoinType": "",
-          "postLimitKeyword": "",
-          "postOn": "",
           "postQuery": "",
           "postSelect": " ",
           "postSelectDecorator": "",
-          "postSelectValues": " ",
           "postUnionKeyword": " ",
-          "postWith": "",
-          "postWithQuery": "",
-          "preGroupByKeyword": "",
-          "preHavingKeyword": "",
-          "preJoin": "",
-          "preLimitKeyword": "",
+          "preFrom": " ",
           "preQuery": "",
           "preUnionKeyword": " ",
-          "preWhereKeyword": "",
         },
         "joinKeyword": undefined,
         "joinTable": undefined,
@@ -3567,7 +3272,7 @@ describe('expressions with union clause', () => {
         "type": "query",
         "unionKeyword": "union all",
         "unionQuery": SqlQuery {
-          "explainKeyword": "",
+          "explainKeyword": undefined,
           "fromKeyword": "from",
           "groupByExpression": undefined,
           "groupByExpressionSeparators": undefined,
@@ -3575,27 +3280,12 @@ describe('expressions with union clause', () => {
           "havingExpression": undefined,
           "havingKeyword": undefined,
           "innerSpacing": Object {
-            "postExplain": "",
             "postFrom": " ",
-            "postJoinKeyword": "",
-            "postJoinTable": "",
-            "postJoinType": "",
-            "postLimitKeyword": "",
-            "postOn": "",
             "postQuery": "",
             "postSelect": " ",
             "postSelectDecorator": "",
-            "postSelectValues": " ",
-            "postUnionKeyword": "",
-            "postWith": "",
-            "postWithQuery": "",
-            "preGroupByKeyword": "",
-            "preHavingKeyword": "",
-            "preJoin": "",
-            "preLimitKeyword": "",
+            "preFrom": " ",
             "preQuery": "",
-            "preUnionKeyword": "",
-            "preWhereKeyword": "",
           },
           "joinKeyword": undefined,
           "joinTable": undefined,
@@ -3665,13 +3355,11 @@ describe('Test Join Clause', () => {
   it('Inner join', () => {
     const sql = 'Select * from table INNER Join anotherTable ON column = column';
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(
-      `"Select * from table INNER Join anotherTable ON column = column"`,
-    );
+    backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "explainKeyword": "",
+        "explainKeyword": undefined,
         "fromKeyword": "from",
         "groupByExpression": undefined,
         "groupByExpressionSeparators": undefined,
@@ -3679,27 +3367,17 @@ describe('Test Join Clause', () => {
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
-          "postExplain": "",
           "postFrom": " ",
           "postJoinKeyword": " ",
           "postJoinTable": " ",
           "postJoinType": " ",
-          "postLimitKeyword": "",
           "postOn": " ",
           "postQuery": "",
           "postSelect": " ",
           "postSelectDecorator": "",
-          "postSelectValues": " ",
-          "postUnionKeyword": "",
-          "postWith": "",
-          "postWithQuery": "",
-          "preGroupByKeyword": "",
-          "preHavingKeyword": "",
+          "preFrom": " ",
           "preJoin": " ",
-          "preLimitKeyword": "",
           "preQuery": "",
-          "preUnionKeyword": "",
-          "preWhereKeyword": "",
         },
         "joinKeyword": "Join",
         "joinTable": SqlRef {
@@ -3806,13 +3484,11 @@ describe('Test Join Clause', () => {
   it('Left join', () => {
     const sql = 'Select * from table Left Join anotherTable ON column = column';
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(
-      `"Select * from table Left Join anotherTable ON column = column"`,
-    );
+    backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "explainKeyword": "",
+        "explainKeyword": undefined,
         "fromKeyword": "from",
         "groupByExpression": undefined,
         "groupByExpressionSeparators": undefined,
@@ -3820,27 +3496,17 @@ describe('Test Join Clause', () => {
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
-          "postExplain": "",
           "postFrom": " ",
           "postJoinKeyword": " ",
           "postJoinTable": " ",
           "postJoinType": " ",
-          "postLimitKeyword": "",
           "postOn": " ",
           "postQuery": "",
           "postSelect": " ",
           "postSelectDecorator": "",
-          "postSelectValues": " ",
-          "postUnionKeyword": "",
-          "postWith": "",
-          "postWithQuery": "",
-          "preGroupByKeyword": "",
-          "preHavingKeyword": "",
+          "preFrom": " ",
           "preJoin": " ",
-          "preLimitKeyword": "",
           "preQuery": "",
-          "preUnionKeyword": "",
-          "preWhereKeyword": "",
         },
         "joinKeyword": "Join",
         "joinTable": SqlRef {
@@ -3947,13 +3613,11 @@ describe('Test Join Clause', () => {
   it('Right join', () => {
     const sql = 'Select * from table RIGHT Join anotherTable ON column = column';
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(
-      `"Select * from table RIGHT Join anotherTable ON column = column"`,
-    );
+    backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "explainKeyword": "",
+        "explainKeyword": undefined,
         "fromKeyword": "from",
         "groupByExpression": undefined,
         "groupByExpressionSeparators": undefined,
@@ -3961,27 +3625,17 @@ describe('Test Join Clause', () => {
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
-          "postExplain": "",
           "postFrom": " ",
           "postJoinKeyword": " ",
           "postJoinTable": " ",
           "postJoinType": " ",
-          "postLimitKeyword": "",
           "postOn": " ",
           "postQuery": "",
           "postSelect": " ",
           "postSelectDecorator": "",
-          "postSelectValues": " ",
-          "postUnionKeyword": "",
-          "postWith": "",
-          "postWithQuery": "",
-          "preGroupByKeyword": "",
-          "preHavingKeyword": "",
+          "preFrom": " ",
           "preJoin": " ",
-          "preLimitKeyword": "",
           "preQuery": "",
-          "preUnionKeyword": "",
-          "preWhereKeyword": "",
         },
         "joinKeyword": "Join",
         "joinTable": SqlRef {
@@ -4088,13 +3742,11 @@ describe('Test Join Clause', () => {
   it('Full join', () => {
     const sql = 'Select * from table FULL Join anotherTable ON column = column';
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(
-      `"Select * from table FULL Join anotherTable ON column = column"`,
-    );
+    backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "explainKeyword": "",
+        "explainKeyword": undefined,
         "fromKeyword": "from",
         "groupByExpression": undefined,
         "groupByExpressionSeparators": undefined,
@@ -4102,27 +3754,17 @@ describe('Test Join Clause', () => {
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
-          "postExplain": "",
           "postFrom": " ",
           "postJoinKeyword": " ",
           "postJoinTable": " ",
           "postJoinType": " ",
-          "postLimitKeyword": "",
           "postOn": " ",
           "postQuery": "",
           "postSelect": " ",
           "postSelectDecorator": "",
-          "postSelectValues": " ",
-          "postUnionKeyword": "",
-          "postWith": "",
-          "postWithQuery": "",
-          "preGroupByKeyword": "",
-          "preHavingKeyword": "",
+          "preFrom": " ",
           "preJoin": " ",
-          "preLimitKeyword": "",
           "preQuery": "",
-          "preUnionKeyword": "",
-          "preWhereKeyword": "",
         },
         "joinKeyword": "Join",
         "joinTable": SqlRef {
@@ -4229,13 +3871,11 @@ describe('Test Join Clause', () => {
   it('Full Outer join', () => {
     const sql = 'Select * from table FULL OUTER Join anotherTable ON column = column';
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(
-      `"Select * from table FULL OUTER Join anotherTable ON column = column"`,
-    );
+    backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "explainKeyword": "",
+        "explainKeyword": undefined,
         "fromKeyword": "from",
         "groupByExpression": undefined,
         "groupByExpressionSeparators": undefined,
@@ -4243,27 +3883,17 @@ describe('Test Join Clause', () => {
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
-          "postExplain": "",
           "postFrom": " ",
           "postJoinKeyword": " ",
           "postJoinTable": " ",
           "postJoinType": " ",
-          "postLimitKeyword": "",
           "postOn": " ",
           "postQuery": "",
           "postSelect": " ",
           "postSelectDecorator": "",
-          "postSelectValues": " ",
-          "postUnionKeyword": "",
-          "postWith": "",
-          "postWithQuery": "",
-          "preGroupByKeyword": "",
-          "preHavingKeyword": "",
+          "preFrom": " ",
           "preJoin": " ",
-          "preLimitKeyword": "",
           "preQuery": "",
-          "preUnionKeyword": "",
-          "preWhereKeyword": "",
         },
         "joinKeyword": "Join",
         "joinTable": SqlRef {
@@ -4370,14 +4000,16 @@ describe('Test Join Clause', () => {
 
 describe('Queries with comments', () => {
   it('single comment', () => {
-    const sql = `Select -- some comment 
-  column from table`;
+    const sql = sane`
+      Select -- some comment 
+      column from table
+    `;
 
-    expect(parser(sql).toString()).toMatch(sql);
+    backAndForth(sql);
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "explainKeyword": "",
+        "explainKeyword": undefined,
         "fromKeyword": "from",
         "groupByExpression": undefined,
         "groupByExpressionSeparators": undefined,
@@ -4385,28 +4017,13 @@ describe('Queries with comments', () => {
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
-          "postExplain": "",
           "postFrom": " ",
-          "postJoinKeyword": "",
-          "postJoinTable": "",
-          "postJoinType": "",
-          "postLimitKeyword": "",
-          "postOn": "",
           "postQuery": "",
           "postSelect": " -- some comment 
-        ",
+      ",
           "postSelectDecorator": "",
-          "postSelectValues": " ",
-          "postUnionKeyword": "",
-          "postWith": "",
-          "postWithQuery": "",
-          "preGroupByKeyword": "",
-          "preHavingKeyword": "",
-          "preJoin": "",
-          "preLimitKeyword": "",
+          "preFrom": " ",
           "preQuery": "",
-          "preUnionKeyword": "",
-          "preWhereKeyword": "",
         },
         "joinKeyword": undefined,
         "joinTable": undefined,
@@ -4466,65 +4083,84 @@ describe('Queries with comments', () => {
   });
 
   it('two comments', () => {
-    const sql = `Select --some comment
-    --some comment
-  column from table`;
+    const sql = sane`
+      Select --some comment
+        --some comment
+      column from table
+    `;
 
-    expect(parser(sql).toString()).toMatch(sql);
+    backAndForth(sql);
   });
 
   it('comment on new line', () => {
-    const sql = `Select
-    -- some comment
-  column from table`;
+    const sql = sane`
+      Select
+        -- some comment
+      column from table
+    `;
 
-    expect(parser(sql).toString()).toMatch(sql);
+    backAndForth(sql);
   });
 
   it('comment containing hyphens', () => {
-    const sql = `Select
-    -- some--comment
-    column from table`;
+    const sql = sane`
+      Select
+        -- some--comment
+        column from table
+    `;
 
-    expect(parser(sql).toString()).toMatch(sql);
+    backAndForth(sql);
   });
 
   it('comment with no space', () => {
-    const sql = `Select --some comment
-  column from table`;
+    const sql = sane`
+      Select --some comment
+      column from table
+    `;
 
-    expect(parser(sql).toString()).toMatch(sql);
+    backAndForth(sql);
   });
+
   it('comment with non english', () => {
-    const sql = `Select --Здравствуйте
-  column from table`;
+    const sql = sane`
+      Select --Здравствуйте
+      column from table
+    `;
 
-    expect(parser(sql).toString()).toMatch(sql);
+    backAndForth(sql);
   });
+
   it('comment at end of query', () => {
-    const sql = `Select 
-  column from table
-  -- comment`;
+    const sql = sane`
+      Select 
+      column from table
+      -- comment
+    `;
 
-    expect(parser(sql).toString()).toMatch(sql);
+    backAndForth(sql);
   });
-  it('comment with unary negative', () => {
-    const sql = `Select 
-  column from table
-  -- comment
-  order by -1`;
 
-    expect(parser(sql).toString()).toMatch(sql);
+  it('comment with unary negative', () => {
+    const sql = sane`
+      Select 
+      column from table
+      -- comment
+      order by -1
+    `;
+
+    backAndForth(sql);
   });
 });
 
 describe('Queries with annotated comments', () => {
   it('single comment', () => {
-    const sql = `Select column, column1, column2 from table 
-    order by column
-    --: valueName = value`;
+    const sql = sane`
+      Select column, column1, column2 from table 
+      order by column
+      --: valueName = value
+    `;
 
-    expect(parser(sql).toString()).toMatch(sql);
+    backAndForth(sql);
   });
 });
 
@@ -4532,10 +4168,11 @@ describe('No spacing', () => {
   it('Expression with no spacing', () => {
     const sql = `SELECT"channel",COUNT(*)AS"Count",COUNT(DISTINCT"cityName")AS"dist_cityName"FROM"wiki"GROUP BY"channel"ORDER BY"Count"DESC`;
 
-    expect(parser(sql).toString()).toMatch(sql);
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "explainKeyword": "",
+        "explainKeyword": undefined,
         "fromKeyword": "FROM",
         "groupByExpression": Array [
           SqlRef {
@@ -4554,23 +4191,9 @@ describe('No spacing', () => {
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
-          "postExplain": "",
-          "postJoinKeyword": "",
-          "postJoinTable": "",
-          "postJoinType": "",
-          "postLimitKeyword": "",
-          "postOn": "",
           "postQuery": "",
           "postSelectDecorator": "",
-          "postUnionKeyword": "",
-          "postWith": "",
-          "postWithQuery": "",
-          "preHavingKeyword": "",
-          "preJoin": "",
-          "preLimitKeyword": "",
           "preQuery": "",
-          "preUnionKeyword": "",
-          "preWhereKeyword": "",
         },
         "joinKeyword": undefined,
         "joinTable": undefined,

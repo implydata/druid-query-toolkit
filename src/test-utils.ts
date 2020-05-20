@@ -12,85 +12,28 @@
  * limitations under the License.
  */
 
-export const FUNCTIONS = [
-  'LOWER',
-  'COUNT',
-  'SUM',
-  'MIN',
-  'MAX',
-  'AVG',
-  'APPROX_COUNT_DISTINCT',
-  'APPROX_COUNT_DISTINCT_DS_HLL',
-  'APPROX_COUNT_DISTINCT_DS_THETA',
-  'APPROX_QUANTILE',
-  'APPROX_QUANTILE_DS',
-  'APPROX_QUANTILE_FIXED_BUCKETS',
-  'BLOOM_FILTER',
-  'ABS',
-  'CEIL',
-  'EXP',
-  'FLOOR',
-  'LN',
-  'LOG10',
-  'POWER',
-  'SQRT',
-  'TRUNCATE',
-  'TRUNC',
-  'ROUND',
-  'MOD',
-  'SIN',
-  'COS',
-  'TAN',
-  'COT',
-  'ASIN',
-  'ACOS',
-  'ATAN',
-  'ATAN2',
-  'DEGREES',
-  'RADIANS',
-  'CONCAT',
-  'TEXTCAT',
-  'STRING_FORMAT',
-  'LENGTH',
-  'CHAR_LENGTH',
-  'CHARACTER_LENGTH',
-  'STRLEN',
-  'LOOKUP',
-  'LOWER',
-  'PARSE_LONG',
-  'POSITION',
-  'REGEXP_EXTRACT',
-  'REPLACE',
-  'STRPOS',
-  'SUBSTRING',
-  'RIGHT',
-  'LEFT',
-  'SUBSTR',
-  'TRIM',
-  'BTRIM',
-  'LTRIM',
-  'RTRIM',
-  'UPPER',
-  'REVERSE',
-  'REPEAT',
-  'LPAD',
-  'RPAD',
-  'CURRENT_TIMESTAMP',
-  'CURRENT_DATE',
-  'DATE_TRUNC',
-  'TIME_FLOOR',
-  'TIME_SHIFT',
-  'TIME_EXTRACT',
-  'TIME_PARSE',
-  'TIME_FORMAT',
-  'MILLIS_TO_TIMESTAMP',
-  'TIMESTAMP_TO_MILLIS',
-  'EXTRACT',
-  'FLOOR',
-  'CEIL',
-  'TIMESTAMPADD',
-  'CAST',
-  'NULLIF',
-  'COALESCE',
-  'BLOOM_FILTER_TEST',
-];
+import { parseSql } from '.';
+
+// To be used as a tag
+export function sane(_x: TemplateStringsArray) {
+  const str = String.raw.apply(String, arguments as any);
+
+  const match = str.match(/^\n( *)/m);
+  if (!match) throw new Error('sane string must start with a \\n is:' + str);
+  const spaces = match[1].length;
+
+  let lines = str.split('\n');
+  lines.shift(); // Remove the first empty lines
+  lines = lines.map(line => line.substr(spaces)); // Remove indentation
+  if (lines[lines.length - 1] === '') lines.pop(); // Remove last line if empty
+
+  return lines
+    .join('\n')
+    .replace(/\\`/g, '`') // Fix \` that should be `
+    .replace(/\\\{/g, '{') // Fix \{ that should be {
+    .replace(/\\\\/g, '\\'); // Fix \\ that should be \
+}
+
+export function backAndForth(sql: string): void {
+  expect(parseSql(sql).toString()).toEqual(sql);
+}

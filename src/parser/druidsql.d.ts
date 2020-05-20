@@ -12,4 +12,7 @@
  * limitations under the License.
  */
 
-export function sqlParserFactory(functions: string[]): (druidSql: string) => any;
+import { SqlBase, SqlQuery } from '../sql';
+
+export function parseSql(input: string): SqlBase;
+export function parseSqlQuery(input: string): SqlQuery;

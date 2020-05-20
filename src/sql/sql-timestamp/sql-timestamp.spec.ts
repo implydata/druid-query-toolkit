@@ -12,17 +12,16 @@
  * limitations under the License.
  */
 
-import { sqlParserFactory } from '../..';
-import { FUNCTIONS } from '../../test-utils';
+import { parseSql } from '../..';
+import { backAndForth } from '../../test-utils';
 
-const parser = sqlParserFactory(FUNCTIONS);
-
-describe('Timestamp', () => {
+describe('SqlTimestamp', () => {
   it('Simple timestamp', () => {
     const sql = `TIMESTAMP '2020-02-25 00:00:00'`;
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"TIMESTAMP '2020-02-25 00:00:00'"`);
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlTimestamp {
         "innerSpacing": Object {
           "postTimestampKeyword": " ",

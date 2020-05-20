@@ -66,13 +66,13 @@ export class SqlMulti extends SqlBase {
   public containsColumn(column: string): boolean {
     const value = this.valueOf();
     if (!value.arguments) throw Error('expression has no arguments');
-    return !!value.arguments.filter(
+    return value.arguments.some(
       arg =>
         SqlRef.equalsString(arg, column) || (arg instanceof SqlMulti && arg.containsColumn(column)),
-    ).length;
+    );
   }
 
-  public removeColumn(column: string) {
+  public removeColumn(column: string): SqlMulti | undefined {
     const value = this.valueOf();
     if (!value.arguments) throw Error('expression has no arguments');
 
@@ -91,7 +91,6 @@ export class SqlMulti extends SqlBase {
       }
       return [];
     });
-    return [];
   }
 
   addOrReplaceColumn(column: string | SqlRef, filter: SqlMulti | SqlUnary): SqlMulti | SqlUnary {

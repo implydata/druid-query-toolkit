@@ -12,16 +12,41 @@
  * limitations under the License.
  */
 
-import { sqlParserFactory } from '../../index';
-import { FUNCTIONS } from '../../test-utils';
+import { parseSql } from '../../index';
+import { backAndForth } from '../../test-utils';
 
-const parser = sqlParserFactory(FUNCTIONS);
+describe('SqlUnary', () => {
+  it('minus', () => {
+    const sql = `-A`;
 
-describe('Not expression', () => {
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
+      SqlUnary {
+        "argument": SqlRef {
+          "column": "A",
+          "innerSpacing": Object {},
+          "namespace": undefined,
+          "namespaceQuotes": undefined,
+          "quotes": "",
+          "table": undefined,
+          "tableQuotes": undefined,
+          "type": "ref",
+        },
+        "expressionType": "-",
+        "innerSpacing": Object {},
+        "keyword": "-",
+        "type": "unaryExpression",
+      }
+    `);
+  });
+
   it('single not expression', () => {
     const sql = `NOT B`;
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlUnary {
         "argument": SqlRef {
           "column": "B",
@@ -41,13 +66,49 @@ describe('Not expression', () => {
         "type": "unaryExpression",
       }
     `);
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"NOT B"`);
+  });
+
+  it('double not expression', () => {
+    const sql = `NOT not B`;
+
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
+      SqlUnary {
+        "argument": SqlUnary {
+          "argument": SqlRef {
+            "column": "B",
+            "innerSpacing": Object {},
+            "namespace": undefined,
+            "namespaceQuotes": undefined,
+            "quotes": "",
+            "table": undefined,
+            "tableQuotes": undefined,
+            "type": "ref",
+          },
+          "expressionType": "NOT",
+          "innerSpacing": Object {
+            "postKeyword": " ",
+          },
+          "keyword": "not",
+          "type": "unaryExpression",
+        },
+        "expressionType": "NOT",
+        "innerSpacing": Object {
+          "postKeyword": " ",
+        },
+        "keyword": "NOT",
+        "type": "unaryExpression",
+      }
+    `);
   });
 
   it('multiple not expressions', () => {
     const sql = `NOT A AND NOT B AND NOT C`;
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
           SqlUnary {
@@ -122,13 +183,14 @@ describe('Not expression', () => {
         "type": "multi",
       }
     `);
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"NOT A AND NOT B AND NOT C"`);
   });
 
   it('Not containing an expression', () => {
     const sql = `NOT A > B`;
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlUnary {
         "argument": SqlMulti {
           "arguments": Array [
@@ -172,13 +234,14 @@ describe('Not expression', () => {
         "type": "unaryExpression",
       }
     `);
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"NOT A > B"`);
   });
 
   it('Multiple Not expressions containing an expression', () => {
     const sql = `NOT A > B OR Not C = 'D'`;
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
           SqlUnary {
@@ -275,13 +338,14 @@ describe('Not expression', () => {
         "type": "multi",
       }
     `);
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"NOT A > B OR Not C = 'D'"`);
   });
 
   it('Nested Not Expressions', () => {
     const sql = `NOT NOT A > B`;
 
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlUnary {
         "argument": SqlUnary {
           "argument": SqlMulti {
@@ -333,6 +397,5 @@ describe('Not expression', () => {
         "type": "unaryExpression",
       }
     `);
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"NOT NOT A > B"`);
   });
 });

@@ -12,17 +12,16 @@
  * limitations under the License.
  */
 
-import { sqlParserFactory } from '../..';
-import { FUNCTIONS } from '../../test-utils';
+import { parseSql } from '../..';
+import { backAndForth } from '../../test-utils';
 
-const parser = sqlParserFactory(FUNCTIONS);
-
-describe('Functions', () => {
+describe('SqlFunction', () => {
   it('Simple function', () => {
     const sql = `SUM(A)`;
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"SUM(A)"`);
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlFunction {
         "arguments": Array [
           SqlRef {
@@ -61,8 +60,9 @@ describe('Functions', () => {
   it('function in brackets', () => {
     const sql = `(  SUM(A))`;
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"(  SUM(A))"`);
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlFunction {
         "arguments": Array [
           SqlRef {
@@ -107,8 +107,9 @@ describe('Functions', () => {
   it('function with expression', () => {
     const sql = `SUM( 1 + 2 AND 3 + 2)`;
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"SUM( 1 + 2 AND 3 + 2)"`);
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlFunction {
         "arguments": Array [
           SqlMulti {
@@ -117,14 +118,14 @@ describe('Functions', () => {
                 "arguments": Array [
                   SqlLiteral {
                     "innerSpacing": Object {},
-                    "quotes": "",
+                    "quotes": undefined,
                     "stringValue": "1",
                     "type": "literal",
                     "value": 1,
                   },
                   SqlLiteral {
                     "innerSpacing": Object {},
-                    "quotes": "",
+                    "quotes": undefined,
                     "stringValue": "2",
                     "type": "literal",
                     "value": 2,
@@ -145,14 +146,14 @@ describe('Functions', () => {
                 "arguments": Array [
                   SqlLiteral {
                     "innerSpacing": Object {},
-                    "quotes": "",
+                    "quotes": undefined,
                     "stringValue": "3",
                     "type": "literal",
                     "value": 3,
                   },
                   SqlLiteral {
                     "innerSpacing": Object {},
-                    "quotes": "",
+                    "quotes": undefined,
                     "stringValue": "2",
                     "type": "literal",
                     "value": 2,
@@ -207,8 +208,9 @@ describe('Functions', () => {
   it('function with weird spacing ', () => {
     const sql = `SUM( A      )`;
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"SUM( A      )"`);
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlFunction {
         "arguments": Array [
           SqlRef {
@@ -247,8 +249,9 @@ describe('Functions', () => {
   it('function in expression', () => {
     const sql = `Sum(A) OR SUM(B) AND SUM(c) * 4`;
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"Sum(A) OR SUM(B) AND SUM(c) * 4"`);
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
           SqlFunction {
@@ -353,7 +356,7 @@ describe('Functions', () => {
                   },
                   SqlLiteral {
                     "innerSpacing": Object {},
-                    "quotes": "",
+                    "quotes": undefined,
                     "stringValue": "4",
                     "type": "literal",
                     "value": 4,
@@ -400,8 +403,9 @@ describe('Functions', () => {
   it('function with filter', () => {
     const sql = `Sum(A) Filter (WHERE value > 1)`;
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"Sum(A) Filter (WHERE value > 1)"`);
-    expect(parser(sql)).toMatchInlineSnapshot(`
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlFunction {
         "arguments": Array [
           SqlRef {
@@ -445,7 +449,7 @@ describe('Functions', () => {
             },
             SqlLiteral {
               "innerSpacing": Object {},
-              "quotes": "",
+              "quotes": undefined,
               "stringValue": "1",
               "type": "literal",
               "value": 1,
@@ -470,18 +474,18 @@ describe('Functions', () => {
   it('Function with decorator and expression', () => {
     const sql = `Count(Distinct 1 + 2 AND 3 + 2)`;
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"Count(Distinct 1 + 2 AND 3 + 2)"`);
+    backAndForth(sql);
   });
 
   it('Function with decorator and extra space', () => {
     const sql = `Count( Distinct 1 + 2 AND 3 + 2)`;
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"Count( Distinct 1 + 2 AND 3 + 2)"`);
+    backAndForth(sql);
   });
 
   it('Trim function', () => {
     const sql = `Trim( Both A and B FROM D)`;
 
-    expect(parser(sql).toString()).toMatchInlineSnapshot(`"Trim( Both A and B FROM D)"`);
+    backAndForth(sql);
   });
 });
