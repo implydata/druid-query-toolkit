@@ -634,7 +634,7 @@ SqlRef = tableBits:(RefPart _? "." _?)? column:RefPart !"."
   });
 }
 
-RefPart = QuotedRefPart / UnquotedRefPart
+RefPart = QuotedRefPart / UnquotedRefPart / Star
 
 QuotedRefPart = ["] name:$([^"]+) ["]
 {
@@ -644,10 +644,18 @@ QuotedRefPart = ["] name:$([^"]+) ["]
   };
 }
 
-UnquotedRefPart = name:$([a-z_:*%/]i [a-z0-9_\-:*%/]i*)
+UnquotedRefPart = name:$([a-z_]i [a-z0-9_]i*)
 {
   return {
     name: name,
+    quotes: ''
+  };
+}
+
+Star = '*'
+{
+  return {
+    name: '*',
     quotes: ''
   };
 }

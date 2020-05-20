@@ -195,4 +195,32 @@ describe('SqlLiteral', () => {
       }
     `);
   });
+
+  it('works with number', () => {
+    const sql = `12345`;
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
+        SqlLiteral {
+          "innerSpacing": Object {},
+          "quotes": undefined,
+          "stringValue": "12345",
+          "type": "literal",
+          "value": 12345,
+        }
+      `);
+  });
+
+  it('works with string', () => {
+    const sql = `'hello'`;
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
+        SqlLiteral {
+          "innerSpacing": Object {},
+          "quotes": "'",
+          "stringValue": "hello",
+          "type": "literal",
+          "value": "hello",
+        }
+      `);
+  });
 });

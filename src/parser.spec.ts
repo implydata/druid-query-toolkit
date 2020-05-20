@@ -12,134 +12,55 @@
  * limitations under the License.
  */
 
-import { parseSql } from './parser/druidsql';
+import { parseSql, parseSqlQuery } from './parser/druidsql';
 
 describe('Parser', () => {
-  describe('ref', () => {
-    it('quotes', () => {
-      const sql = `"page"`;
+  it('throws on invalid input', () => {
+    expect(() => parseSqlQuery('SELEC +')).toThrowError('Expected');
+  });
 
-      expect(parseSql(sql)).toMatchInlineSnapshot(`
-        SqlRef {
-          "column": "page",
-          "innerSpacing": Object {},
-          "namespace": undefined,
-          "namespaceQuotes": undefined,
-          "quotes": "\\"",
-          "table": undefined,
-          "tableQuotes": undefined,
-          "type": "ref",
-        }
-      `);
-    });
-
-    it('without quotes', () => {
-      const sql = `channel`;
-
-      expect(parseSql(sql)).toMatchInlineSnapshot(`
-        SqlRef {
-          "column": "channel",
-          "innerSpacing": Object {},
-          "namespace": undefined,
-          "namespaceQuotes": undefined,
-          "quotes": "",
-          "table": undefined,
-          "tableQuotes": undefined,
-          "type": "ref",
-        }
-      `);
-    });
-
-    it('without quotes + namespace', () => {
-      const sql = `"lol" . channel`;
-
-      expect(parseSql(sql)).toMatchInlineSnapshot(`
-        SqlRef {
-          "column": "channel",
-          "innerSpacing": Object {
-            "postTableDot": " ",
-            "preTableDot": " ",
+  it('parse anything', () => {
+    expect(parseSql('a OR b')).toMatchInlineSnapshot(`
+      SqlMulti {
+        "arguments": Array [
+          SqlRef {
+            "column": "a",
+            "innerSpacing": Object {},
+            "namespace": undefined,
+            "namespaceQuotes": undefined,
+            "quotes": "",
+            "table": undefined,
+            "tableQuotes": undefined,
+            "type": "ref",
           },
-          "namespace": undefined,
-          "namespaceQuotes": undefined,
-          "quotes": "",
-          "table": "lol",
-          "tableQuotes": "\\"",
-          "type": "ref",
-        }
-      `);
-    });
-
-    it('without quotes + namespace + parens', () => {
-      const sql = `(( "lol" . channel)   )`;
-
-      expect(parseSql(sql)).toMatchInlineSnapshot(`
-        SqlRef {
-          "column": "channel",
-          "innerSpacing": Object {
-            "postTableDot": " ",
-            "preTableDot": " ",
+          SqlRef {
+            "column": "b",
+            "innerSpacing": Object {},
+            "namespace": undefined,
+            "namespaceQuotes": undefined,
+            "quotes": "",
+            "table": undefined,
+            "tableQuotes": undefined,
+            "type": "ref",
           },
-          "namespace": undefined,
-          "namespaceQuotes": undefined,
-          "parens": Array [
-            Object {
-              "leftSpacing": " ",
-              "rightSpacing": "",
-            },
-            Object {
-              "leftSpacing": "",
-              "rightSpacing": "   ",
-            },
-          ],
-          "quotes": "",
-          "table": "lol",
-          "tableQuotes": "\\"",
-          "type": "ref",
-        }
-      `);
-      expect(parseSql(sql).toRawString()).toMatchInlineSnapshot(`"\\"lol\\" . channel"`);
-    });
+        ],
+        "expressionType": "OR",
+        "innerSpacing": Object {},
+        "separators": Array [
+          Separator {
+            "left": " ",
+            "right": " ",
+            "separator": "OR",
+          },
+        ],
+        "type": "multi",
+      }
+    `);
   });
 
-  describe('literal', () => {
-    it('works with number', () => {
-      const sql = `12345`;
-
-      expect(parseSql(sql)).toMatchInlineSnapshot(`
-        SqlLiteral {
-          "innerSpacing": Object {},
-          "quotes": undefined,
-          "stringValue": "12345",
-          "type": "literal",
-          "value": 12345,
-        }
-      `);
-    });
-
-    it('works with string', () => {
-      const sql = `'hello'`;
-
-      expect(parseSql(sql)).toMatchInlineSnapshot(`
-        SqlLiteral {
-          "innerSpacing": Object {},
-          "quotes": "'",
-          "stringValue": "hello",
-          "type": "literal",
-          "value": "hello",
-        }
-      `);
-    });
+  it('parse queries only', () => {
+    expect(() => parseSqlQuery('a OR b')).toThrowErrorMatchingInlineSnapshot(
+      `"Provided SQL expression was not a query"`,
+    );
   });
-
-  /*
-
-
-  it('without quotes + namespace', () => {
-    const sql = `"lol" . channel`;
-
-    expect(parseSql(sql)).toMatchInlineSnapshot();
-  });
-
-   */
 });

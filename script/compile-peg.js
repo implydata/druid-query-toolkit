@@ -23,7 +23,9 @@ function parseSql(input) {
 
 function parseSqlQuery(input) {
   var ast = parseSql(input);
-  if (!(ast instanceof SqlQuery)) return;
+  if (!(ast instanceof SqlQuery)) {
+    throw new Error('Provided SQL expression was not a query');
+  }
   return ast;
 }
 

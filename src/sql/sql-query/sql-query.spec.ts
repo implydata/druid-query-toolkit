@@ -12,14 +12,10 @@
  * limitations under the License.
  */
 
-import { parseSql, parseSqlQuery } from '../../index';
+import { parseSql } from '../../index';
 import { backAndForth, sane } from '../../test-utils';
 
 describe('SqlQuery', () => {
-  it('parse queries only', () => {
-    expect(parseSqlQuery('a OR b')).toBeUndefined();
-  });
-
   it('Simple select with single column', () => {
     const sql = `Select notingham from table`;
 
