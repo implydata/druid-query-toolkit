@@ -754,11 +754,10 @@ export class SqlQuery extends SqlBase {
     // Adds the last column in the select clause to the group by clause via its index
     const value = this.valueOf();
 
-    value.groupByExpression = [SqlLiteral.fromInput(1)].concat(
+    value.groupByExpression = [SqlLiteral.fromInput(1) as SqlBase].concat(
       (value.groupByExpression || []).map(column => {
-        if (column instanceof SqlLiteral && typeof column.value === 'number') {
-          column.value += 1;
-          column.stringValue = `${column.value}`;
+        if (column instanceof SqlLiteral) {
+          column = column.increment() || column;
         }
         return column;
       }),

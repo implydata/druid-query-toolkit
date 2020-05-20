@@ -167,7 +167,13 @@ WithColumns = OpenParen postLeftParen:_? withColumnsHead:BaseType withColumnsTai
   };
 }
 
-SelectClause = selectKeyword:SelectToken postSelect:_ selectDecorator:((AllToken / DistinctToken) _)? selectValuesHead:(Alias/Expression) annotationsHead:Annotation? selectValuesTail:(Comma (Alias/Expression) Annotation?)*
+SelectClause =
+  selectKeyword:SelectToken
+  postSelect:_
+  selectDecorator:((AllToken / DistinctToken) _)?
+  selectValuesHead:(Alias/Expression)
+  annotationsHead:Annotation?
+  selectValuesTail:(Comma (Alias/Expression) Annotation?)*
 {
   return {
     selectKeyword: selectKeyword,
@@ -331,7 +337,9 @@ NotExpression = keyword:NotToken postKeyword:_ argument:NotExpression
 }
   / ComparisonExpression
 
-ComparisonExpression = head:AdditionExpression tail:((__ ComparisonOperator __ (ComparisonExpression/AdditionExpression))/(_ BetweenToken _ (AndExpression/ComparisonExpression))/(_ (IsNotToken/IsToken) _ NullLiteral))*
+ComparisonExpression =
+  head:AdditionExpression
+  tail:((__ ComparisonOperator __ (ComparisonExpression/AdditionExpression))/(_ BetweenToken _ (AndExpression / ComparisonExpression))/(_ (IsNotToken/IsToken) _ (NullLiteral / BooleanLiteral)))*
 {
   return maybeMakeMulti('Comparison', head, tail);
 }
@@ -458,7 +466,12 @@ WhenThenPair = whenKeyword:WhenToken postWhen:_ whenExpression:Expression postWh
 
 // ------------------------------
 
-Interval = intervalKeyword:IntervalToken postIntervalKeyword:_ intervalValue:BaseType postIntervalValue: _ unitKeyword:($(Unit _ ToToken _ Unit)/$(Unit '_' Unit)/Unit)
+Interval =
+  intervalKeyword:IntervalToken
+  postIntervalKeyword:_
+  intervalValue:BaseType
+  postIntervalValue:_
+  unitKeyword:($(Unit _ ToToken _ Unit) / $(Unit '_' Unit) / Unit)
 {
   return new sql.SqlInterval({
     intervalKeyword: intervalKeyword,
@@ -562,12 +575,17 @@ SqlInParens = OpenParen leftSpacing:_? ex:Sql rightSpacing:_? CloseParen
   return ex.addParens(leftSpacing, rightSpacing);
 }
 
-SqlLiteral = lit:(NullToken / TrueToken / FalseToken / Number / SingleQuotedString)
+SqlLiteral = lit:(NullToken / TrueToken / FalseToken / Number / SingleQuotedString / UnicodeString)
 {
   return new sql.SqlLiteral(lit);
 }
 
 NullLiteral = v:NullToken
+{
+  return new sql.SqlLiteral(v);
+}
+
+BooleanLiteral = v:(TrueToken / FalseToken)
 {
   return new sql.SqlLiteral(v);
 }
@@ -592,12 +610,19 @@ Digits = $ Digit+
 
 Digit = [0-9]
 
-SingleQuotedString = ['] name:$([^']*) [']
+SingleQuotedString = "'" v:$([^']*) "'"
 {
   return {
-    value: name,
-    stringValue: name,
-    quotes: "'"
+    value: v,
+    stringValue: text()
+  };
+}
+
+UnicodeString = "U&'"i v:$([^']*) "'"
+{
+  return {
+    value: v.replace(/\\[0-9a-f]{4}/gi, function(s) { return String.fromCharCode(parseInt(s.substr(1), 16)); }),
+    stringValue: text()
   };
 }
 

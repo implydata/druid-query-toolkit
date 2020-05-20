@@ -62,7 +62,6 @@ describe('SqlQuery', () => {
         "selectValues": Array [
           SqlLiteral {
             "innerSpacing": Object {},
-            "quotes": undefined,
             "stringValue": "3",
             "type": "literal",
             "value": 3,
@@ -567,7 +566,6 @@ describe('SqlQuery', () => {
                   "postWhenSpace": " ",
                   "thenExpression": SqlLiteral {
                     "innerSpacing": Object {},
-                    "quotes": undefined,
                     "stringValue": "0",
                     "type": "literal",
                     "value": 0,
@@ -609,7 +607,6 @@ describe('SqlQuery', () => {
                       },
                       SqlLiteral {
                         "innerSpacing": Object {},
-                        "quotes": undefined,
                         "stringValue": "0",
                         "type": "literal",
                         "value": 0,
@@ -699,7 +696,6 @@ describe('SqlQuery', () => {
                   "postWhenSpace": " ",
                   "thenExpression": SqlLiteral {
                     "innerSpacing": Object {},
-                    "quotes": undefined,
                     "stringValue": "0",
                     "type": "literal",
                     "value": 0,
@@ -741,7 +737,6 @@ describe('SqlQuery', () => {
                       },
                       SqlLiteral {
                         "innerSpacing": Object {},
-                        "quotes": undefined,
                         "stringValue": "0",
                         "type": "literal",
                         "value": 0,
@@ -1403,7 +1398,6 @@ describe('expressions with where clause', () => {
             },
             SqlLiteral {
               "innerSpacing": Object {},
-              "quotes": undefined,
               "stringValue": "1",
               "type": "literal",
               "value": 1,
@@ -1514,7 +1508,6 @@ describe('expressions with where clause', () => {
             },
             SqlLiteral {
               "innerSpacing": Object {},
-              "quotes": undefined,
               "stringValue": "0",
               "type": "literal",
               "value": 0,
@@ -1629,7 +1622,6 @@ describe('expressions with where clause', () => {
                     },
                     SqlLiteral {
                       "innerSpacing": Object {},
-                      "quotes": undefined,
                       "stringValue": "0",
                       "type": "literal",
                       "value": 0,
@@ -1660,7 +1652,6 @@ describe('expressions with where clause', () => {
                     },
                     SqlLiteral {
                       "innerSpacing": Object {},
-                      "quotes": undefined,
                       "stringValue": "100",
                       "type": "literal",
                       "value": 100,
@@ -1703,8 +1694,7 @@ describe('expressions with where clause', () => {
                 },
                 SqlLiteral {
                   "innerSpacing": Object {},
-                  "quotes": "'",
-                  "stringValue": "value",
+                  "stringValue": "'value'",
                   "type": "literal",
                   "value": "value",
                 },
@@ -2068,7 +2058,6 @@ describe('expressions with having clause', () => {
             },
             SqlLiteral {
               "innerSpacing": Object {},
-              "quotes": undefined,
               "stringValue": "1",
               "type": "literal",
               "value": 1,
@@ -2179,7 +2168,6 @@ describe('expressions with having clause', () => {
             },
             SqlLiteral {
               "innerSpacing": Object {},
-              "quotes": undefined,
               "stringValue": "0",
               "type": "literal",
               "value": 0,
@@ -2294,7 +2282,6 @@ describe('expressions with having clause', () => {
                     },
                     SqlLiteral {
                       "innerSpacing": Object {},
-                      "quotes": undefined,
                       "stringValue": "0",
                       "type": "literal",
                       "value": 0,
@@ -2325,7 +2312,6 @@ describe('expressions with having clause', () => {
                     },
                     SqlLiteral {
                       "innerSpacing": Object {},
-                      "quotes": undefined,
                       "stringValue": "100",
                       "type": "literal",
                       "value": 100,
@@ -2368,8 +2354,7 @@ describe('expressions with having clause', () => {
                 },
                 SqlLiteral {
                   "innerSpacing": Object {},
-                  "quotes": "'",
-                  "stringValue": "value",
+                  "stringValue": "'value'",
                   "type": "literal",
                   "value": "value",
                 },
@@ -2505,7 +2490,6 @@ describe('expressions with order by clause', () => {
             "direction": "",
             "expression": SqlLiteral {
               "innerSpacing": Object {},
-              "quotes": undefined,
               "stringValue": "1",
               "type": "literal",
               "value": 1,
@@ -2694,7 +2678,6 @@ describe('expressions with order by clause', () => {
             "direction": "Asc",
             "expression": SqlLiteral {
               "innerSpacing": Object {},
-              "quotes": undefined,
               "stringValue": "1",
               "type": "literal",
               "value": 1,
@@ -2906,7 +2889,6 @@ describe('expressions with order by clause', () => {
             "direction": "ASC",
             "expression": SqlLiteral {
               "innerSpacing": Object {},
-              "quotes": undefined,
               "stringValue": "1",
               "type": "literal",
               "value": 1,
@@ -3019,7 +3001,6 @@ describe('expressions with order by clause', () => {
             "direction": "ASC",
             "expression": SqlLiteral {
               "innerSpacing": Object {},
-              "quotes": undefined,
               "stringValue": "1",
               "type": "literal",
               "value": 1,
@@ -3137,7 +3118,6 @@ describe('expressions with limit clause', () => {
         "limitKeyword": "limit",
         "limitValue": SqlLiteral {
           "innerSpacing": Object {},
-          "quotes": undefined,
           "stringValue": "1",
           "type": "literal",
           "value": 1,

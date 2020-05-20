@@ -324,6 +324,13 @@ logs:
 SELECT countryName from wikipedia
 ```
 
+## ToDo
+
+- Add support for `ARRAY` literal (`ARRAY ['a', 'b']`)
+- Add support for unicode strings (`U&'fo\00F6'`)
+- Add support for dynamic parameters `?`
+- Add support for `x NOT IN (subquery)`
+
 ## License 
 
 [Apache 2.0](LICENSE)

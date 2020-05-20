@@ -14,8 +14,10 @@
 
 import { SqlBase, SqlBaseValue } from '../sql-base';
 
+export type LiteralValue = null | boolean | number | string;
+
 export interface SqlLiteralValue extends SqlBaseValue {
-  value?: string | number;
+  value: LiteralValue;
   stringValue?: string;
   quotes?: string;
 }
@@ -26,11 +28,10 @@ export class SqlLiteral extends SqlBase {
     return `${quote}${thing}${quote}`;
   }
 
-  static fromInput(value: string | number): SqlLiteral {
+  static fromInput(value: LiteralValue): SqlLiteral {
     return new SqlLiteral({
       value: value,
       stringValue: typeof value === 'number' ? String(value) : value,
-      quotes: `'`,
     } as SqlLiteralValue);
   }
 
@@ -38,34 +39,39 @@ export class SqlLiteral extends SqlBase {
     return expression instanceof SqlLiteral && expression.value === value;
   }
 
-  public value?: string | number;
+  public value: LiteralValue;
   public stringValue?: string;
-  public quotes?: string;
 
   constructor(options: SqlLiteralValue) {
     super(options, SqlLiteral.type);
     this.value = options.value;
     this.stringValue = options.stringValue;
-    this.quotes = options.quotes;
   }
 
-  public valueOf() {
-    const value: SqlLiteralValue = super.valueOf();
+  public valueOf(): SqlLiteralValue {
+    const value = super.valueOf() as SqlLiteralValue;
     value.value = this.value;
     value.stringValue = this.stringValue;
-    value.quotes = this.quotes;
     return value;
   }
 
   public toRawString(): string {
-    if (!this.stringValue && this.stringValue !== '') {
-      throw new Error('Could not make raw string');
-    }
+    if (this.stringValue) return this.stringValue;
 
-    if (typeof this.value === 'string' && this.quotes) {
-      return SqlLiteral.wrapInQuotes(this.value, this.quotes);
+    if (typeof this.value === 'string') {
+      return SqlLiteral.wrapInQuotes(this.value, "'"); // ToDo: make this smarter
+    } else {
+      return String(this.value); // ToDo: make this smarter
     }
-    return this.stringValue;
+  }
+
+  public increment(): SqlLiteral | undefined {
+    if (typeof this.value !== 'number') return;
+
+    const value = this.valueOf();
+    value.value = this.value + 1;
+    delete value.stringValue;
+    return new SqlLiteral(value);
   }
 }
 SqlBase.register(SqlLiteral.type, SqlLiteral);

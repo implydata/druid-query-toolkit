@@ -30,8 +30,7 @@ describe('SqlInterval', () => {
         "intervalKeyword": "INTERVAL",
         "intervalValue": SqlLiteral {
           "innerSpacing": Object {},
-          "quotes": "'",
-          "stringValue": "1",
+          "stringValue": "'1'",
           "type": "literal",
           "value": "1",
         },
@@ -55,8 +54,7 @@ describe('SqlInterval', () => {
         "intervalKeyword": "INTERVAL",
         "intervalValue": SqlLiteral {
           "innerSpacing": Object {},
-          "quotes": "'",
-          "stringValue": "1-2",
+          "stringValue": "'1-2'",
           "type": "literal",
           "value": "1-2",
         },
@@ -80,8 +78,7 @@ describe('SqlInterval', () => {
         "intervalKeyword": "INTERVAL",
         "intervalValue": SqlLiteral {
           "innerSpacing": Object {},
-          "quotes": "'",
-          "stringValue": "1-2",
+          "stringValue": "'1-2'",
           "type": "literal",
           "value": "1-2",
         },

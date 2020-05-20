@@ -29,8 +29,7 @@ describe('SqlTimestamp', () => {
         "timestampKeyword": "TIMESTAMP",
         "timestampValue": SqlLiteral {
           "innerSpacing": Object {},
-          "quotes": "'",
-          "stringValue": "2020-02-25 00:00:00",
+          "stringValue": "'2020-02-25 00:00:00'",
           "type": "literal",
           "value": "2020-02-25 00:00:00",
         },
