@@ -223,7 +223,7 @@ WhereClause = whereKeyword:WhereToken postWhereKeyword:_ whereExpression:Express
   };
 }
 
-GroupByClause = groupByKeyword:GroupByToken postGroupByKeyword:_  groupByExpressionHead:Expression groupByExpressionTail:(Comma Expression)*
+GroupByClause = groupByKeyword:GroupByToken postGroupByKeyword:_ groupByExpressionHead:Expression groupByExpressionTail:(Comma Expression)*
 {
   return {
     groupByKeyword: groupByKeyword,
@@ -658,7 +658,7 @@ Annotation = preAnnotation:___ '--:' postAnnotationSignifier: ___? key:$([a-z0-9
 {
   return new sql.Annotation({
     innerSpacing: {
-      preAnnotation:  preAnnotation,
+      preAnnotation: preAnnotation,
       postAnnotationSignifier: postAnnotationSignifier,
       postKey: postKey,
       postEquals: postEquals,
@@ -723,11 +723,11 @@ DescToken = $('DESC'i !IdentifierPart)
 DistinctToken = $('DISTINCT'i !IdentifierPart)
 ElseToken = $('ELSE'i !IdentifierPart)
 EndToken = $('END'i !IdentifierPart)
-ExplainToken = $('EXPLAIN'i !IdentifierPart  _ 'PLAN'i !IdentifierPart  _ 'FOR'i !IdentifierPart)
+ExplainToken = $('EXPLAIN'i !IdentifierPart _ 'PLAN'i !IdentifierPart _ 'FOR'i !IdentifierPart)
 FalseToken = s:$('FALSE'i !IdentifierPart) { return { value: false, stringValue: s }; }
 FilterToken= $('FILTER'i !IdentifierPart)
 FromToken = $('FROM'i !IdentifierPart)
-GroupByToken = $('GROUP'i !IdentifierPart  _ 'BY'i !IdentifierPart)
+GroupByToken = $('GROUP'i !IdentifierPart _ 'BY'i !IdentifierPart)
 HavingToken = $('HAVING'i !IdentifierPart)
 InToken = $('IN'i !IdentifierPart)
 IntervalToken = $('INTERVAL'i !IdentifierPart)
@@ -748,7 +748,7 @@ TimestampToken = $('TIMESTAMP'i !IdentifierPart)
 ToToken = $('TO'i !IdentifierPart)
 TrailingToken = $('TRAILING'i !IdentifierPart)
 TrueToken = s:$('TRUE'i !IdentifierPart) { return { value: true, stringValue: s }; }
-UnionToken = $('UNION'i !IdentifierPart  _ 'All'i !IdentifierPart)
+UnionToken = $('UNION'i !IdentifierPart _ 'All'i !IdentifierPart)
 WhenToken = $('WHEN'i !IdentifierPart)
 WhereToken = $('WHERE'i !IdentifierPart)
 WithToken = $('WITH'i !IdentifierPart)
