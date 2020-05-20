@@ -592,12 +592,12 @@ BooleanLiteral = v:(TrueToken / FalseToken)
 
 /* Numbers */
 
-Number "Number" = n:$(
+Number "Number" =
   [+-]?
   ((Digits Fraction?) / Fraction)
   ('e'i [+-]? Digits)?
-)
 {
+  var n = text();
   return {
     value: parseFloat(n),
     stringValue: n
