@@ -131,7 +131,7 @@ WithClause =
     postWith: postWith,
     withUnits: withUnitsTail ? makeListMap(withUnitsTail, 1, withUnitsHead) : [withUnitsHead],
     withSeparators: withUnitsTail ? makeListMap(withUnitsTail, 0): undefined,
-  }
+  };
 }
 
 
@@ -154,7 +154,7 @@ WithUnit =
     AsKeyword: AsKeyword,
     postAs: postAs,
     withQuery: withQuery
-  }
+  };
 }
 
 WithColumns = OpenParen postLeftParen:_? withColumnsHead:BaseType withColumnsTail:(Comma BaseType)* preRightParen:_? CloseParen
@@ -164,7 +164,7 @@ WithColumns = OpenParen postLeftParen:_? withColumnsHead:BaseType withColumnsTai
     withColumns: withColumnsHead ? makeListMap(withColumnsTail, 1, withColumnsHead) : withColumnsHead,
     withSeparators: makeListMap(withColumnsTail, 1),
     preRightParen: preRightParen || ''
-  }
+  };
 }
 
 SelectClause = selectKeyword:SelectToken postSelect:_ selectDecorator:((AllToken / DistinctToken) _)? selectValuesHead:(Alias/Expression) annotationsHead:Annotation? selectValuesTail:(Comma (Alias/Expression) Annotation?)*
@@ -177,7 +177,7 @@ SelectClause = selectKeyword:SelectToken postSelect:_ selectDecorator:((AllToken
     selectValues: selectValuesTail ? makeListMap(selectValuesTail, 1, selectValuesHead) : [selectValuesHead],
     selectSeparators: makeListMap(selectValuesTail,0),
     selectAnnotations: selectValuesTail ? makeListMap(selectValuesTail, 2, annotationsHead) : [annotationsHead],
-  }
+  };
 }
 
 FromClause = fromKeyword:FromToken postFrom:_ tableHead:(Alias / SqlRef) tableTail:(Comma (Alias / SqlRef))*
@@ -187,7 +187,7 @@ FromClause = fromKeyword:FromToken postFrom:_ tableHead:(Alias / SqlRef) tableTa
     postFrom: postFrom,
     tables: tableTail ? makeListMap(tableTail, 1, tableHead).map(table => table.upgrade()): [tableHead.upgrade()],
     tableSeparators: tableTail ? makeListMap(tableTail, 0) : undefined
-  }
+  };
 }
 
 JoinClause =
@@ -211,7 +211,7 @@ JoinClause =
     onKeyword: onKeyword,
     postOnSpacing: postOnSpacing,
     onExpression: onExpression
-  }
+  };
 }
 
 WhereClause = whereKeyword:WhereToken postWhereKeyword:_ whereExpression:Expression
@@ -220,7 +220,7 @@ WhereClause = whereKeyword:WhereToken postWhereKeyword:_ whereExpression:Express
     whereKeyword: whereKeyword,
     postWhereKeyword: postWhereKeyword,
     whereExpression: whereExpression
-  }
+  };
 }
 
 GroupByClause = groupByKeyword:GroupByToken postGroupByKeyword:_  groupByExpressionHead:Expression groupByExpressionTail:(Comma Expression)*
@@ -230,7 +230,7 @@ GroupByClause = groupByKeyword:GroupByToken postGroupByKeyword:_  groupByExpress
     postGroupByKeyword: postGroupByKeyword,
     groupByExpression: groupByExpressionTail ? makeListMap(groupByExpressionTail, 1, groupByExpressionHead) : [groupByExpressionHead],
     groupByExpressionSeparators: groupByExpressionTail ? makeListMap(groupByExpressionTail, 0) : undefined,
-  }
+  };
 }
 
 HavingClause = havingKeyword:HavingToken postHavingKeyword:_ havingExpression:Expression
@@ -239,7 +239,7 @@ HavingClause = havingKeyword:HavingToken postHavingKeyword:_ havingExpression:Ex
     havingKeyword: havingKeyword,
     postHavingKeyword: postHavingKeyword,
     havingExpression: havingExpression
-  }
+  };
 }
 
 OrderByClause = orderByKeyword:OrderToken postOrderByKeyword:_ orderByUnitsHead:OrderByPart orderByUnitsTail:(Comma OrderByPart)*
@@ -249,7 +249,7 @@ OrderByClause = orderByKeyword:OrderToken postOrderByKeyword:_ orderByUnitsHead:
     postOrderByKeyword: postOrderByKeyword,
     orderByUnits: orderByUnitsHead ? makeListMap(orderByUnitsTail, 1, orderByUnitsHead) : [orderByUnitsHead],
     orderBySeparators: makeListMap(orderByUnitsTail, 0),
-  }
+  };
 }
 
 OrderByPart = expression:Expression direction:(_ (AscToken / DescToken))?
@@ -258,7 +258,7 @@ OrderByPart = expression:Expression direction:(_ (AscToken / DescToken))?
     expression: expression,
     postExpression: direction ? direction[0] : '',
     direction: direction ? direction[1] : '',
-  }
+  };
 }
 
 LimitClause = limitKeyword:LimitToken postLimitKeyword:_ limitValue:SqlLiteral
@@ -267,7 +267,7 @@ LimitClause = limitKeyword:LimitToken postLimitKeyword:_ limitValue:SqlLiteral
     limitKeyword: limitKeyword,
     postLimitKeyword: postLimitKeyword,
     limitValue: limitValue
-  }
+  };
 }
 
 UnionClause = unionKeyword:UnionToken postUnionKeyword:_ unionQuery:SqlQuery
@@ -276,7 +276,7 @@ UnionClause = unionKeyword:UnionToken postUnionKeyword:_ unionQuery:SqlQuery
     unionKeyword: unionKeyword,
     postUnionKeyword: postUnionKeyword,
     unionQuery: unionQuery
-  }
+  };
 }
 
 // ------------------------------
@@ -536,7 +536,7 @@ Filter = filterKeyword:FilterToken postFilterKeyword:_? OpenParen postLeftParen:
     postWhereKeyword: filterExpression.postWhereKeyword,
     whereExpression: filterExpression.whereExpression,
     preFilterRightParen: preRightParen || '',
-  }
+  };
 }
 
 Comma = left:_? ',' right:_?
@@ -641,7 +641,7 @@ QuotedRefPart = ["] name:$([^"]+) ["]
   return {
     name: name,
     quotes: '"'
-  }
+  };
 }
 
 UnquotedRefPart = name:$([a-z_:*%/]i [a-z0-9_\-:*%/]i*)
@@ -649,7 +649,7 @@ UnquotedRefPart = name:$([a-z_:*%/]i [a-z0-9_\-:*%/]i*)
   return {
     name: name,
     quotes: ''
-  }
+  };
 }
 
 // -----------------------------------
