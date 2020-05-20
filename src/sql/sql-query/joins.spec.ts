@@ -74,7 +74,7 @@ describe('Remove join', () => {
 });
 
 describe('Check if column is in On expression', () => {
-  it('is contained', () => {
+  it('is contained 1', () => {
     expect(
       (parseSqlQuery(sane`
         SELECT countryName
@@ -83,7 +83,7 @@ describe('Check if column is in On expression', () => {
     ).toEqual(true);
   });
 
-  it('is contained', () => {
+  it('is contained 2', () => {
     expect(
       (parseSqlQuery(sane`
         SELECT countryName

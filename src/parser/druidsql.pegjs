@@ -2,12 +2,7 @@ Start = Sql
 
 // Rest of the work...
 
-Sql
-  = SqlQuery
-  / Expression
-  / SqlRef
-  / SqlLiteral
-  / SqlInParens
+Sql = SqlQuery / Expression
 
 // ------------------------------
 
@@ -27,92 +22,102 @@ SqlQuery =
   postQueryAnnotation:Annotation*
   postQuery:EndOfQuery?
 {
-  return new sql.SqlQuery({
-    explainKeyword: explainKeyword ? explainKeyword[0] : '',
+  var value = {};
+  var innerSpacing = value.innerSpacing = {};
 
-    withKeyword: withClause ? withClause[0].withKeyword : undefined,
-    withUnits: withClause ? withClause[0].withUnits : undefined,
-    withSeparators: withClause ? withClause[0].withSeparators : undefined,
+  innerSpacing.preQuery = preQuery || '';
 
-    selectKeyword: select.selectKeyword,
-    selectDecorator: select.selectDecorator,
-    selectSeparators: select.selectSeparators,
-    selectValues: select.selectValues,
-    selectAnnotations: select.selectAnnotations,
+  if (explainKeyword) {
+    value.explainKeyword = explainKeyword[0];
+    innerSpacing.postExplain = explainKeyword[1];
+  }
 
-    fromKeyword: from ? from[1].fromKeyword : undefined,
-    tables: from ? from[1].tables : undefined,
-    tableSeparators: from ? from[1].tableSeparators : undefined,
+  if (withClause) {
+    value.withKeyword = withClause[0].withKeyword;
+    innerSpacing.postWith = withClause[0].postWith;
+    value.withUnits = withClause[0].withUnits;
+    value.withSeparators = withClause[0].withSeparators;
+    innerSpacing.postWithQuery = withClause[1];
+  }
 
-    joinType: join ? join[1].joinType : undefined,
-    joinKeyword: join ? join[1].joinKeyword : undefined,
-    joinTable: join ? join[1].table : undefined,
-    onKeyword: join ? join[1].onKeyword : undefined,
-    onExpression: join ? join[1].onExpression : undefined,
+  value.selectKeyword = select.selectKeyword;
+  innerSpacing.postSelect = select.postSelect;
+  value.selectDecorator = select.selectDecorator;
+  value.selectSeparators = select.selectSeparators;
+  value.selectValues = select.selectValues;
+  value.selectAnnotations = select.selectAnnotations;
+  innerSpacing.postSelectDecorator = select.postSelectDecorator;
 
-    whereKeyword: where ? where[1].whereKeyword : undefined,
-    whereExpression: where ? where[1].whereExpression : undefined,
+  if (from) {
+    innerSpacing.preFrom = from[0];
+    value.fromKeyword = from[1].fromKeyword;
+    innerSpacing.postFrom = from[1].postFrom;
+    value.tables = from[1].tables;
+    value.tableSeparators = from[1].tableSeparators;
+  }
 
-    groupByKeyword: groupBy ? groupBy[1].groupByKeyword : undefined,
-    groupByExpression: groupBy ? groupBy[1].groupByExpression : undefined,
-    groupByExpressionSeparators: groupBy ? groupBy[1].groupByExpressionSeparators : undefined,
+  if (join) {
+    innerSpacing.preJoin = join[0];
+    value.joinType = join[1].joinType;
+    innerSpacing.postJoinType = join[1].postJoinTypeSpacing;
+    value.joinKeyword = join[1].joinKeyword;
+    innerSpacing.postJoinKeyword = join[1].postJoinKeywordSpacing;
+    value.joinTable = join[1].table;
+    innerSpacing.postJoinTable = join[1].postJoinTableSpacing;
+    value.onKeyword = join[1].onKeyword;
+    value.onExpression = join[1].onExpression;
+    innerSpacing.postOn = join[1].postOnSpacing;
+  }
 
-    havingKeyword: having ? having[1].havingKeyword : undefined,
-    havingExpression: having ? having[1].havingExpression : undefined,
+  if (where) {
+    innerSpacing.preWhereKeyword = where[0];
+    value.whereKeyword = where[1].whereKeyword;
+    innerSpacing.postWhereKeyword = where[1].postWhereKeyword;
+    value.whereExpression = where[1].whereExpression;
+  }
 
-    orderByKeyword: orderBy ? orderBy[1].orderByKeyword : undefined,
-    orderByUnits: orderBy ? orderBy[1].orderByUnits : undefined,
-    orderBySeparators: orderBy ? orderBy[1].orderBySeparators : undefined,
+  if (groupBy) {
+    innerSpacing.preGroupByKeyword = groupBy[0];
+    value.groupByKeyword = groupBy[1].groupByKeyword;
+    innerSpacing.postGroupByKeyword = groupBy[1].postGroupByKeyword;
+    value.groupByExpression = groupBy[1].groupByExpression;
+    value.groupByExpressionSeparators = groupBy[1].groupByExpressionSeparators;
+  }
 
-    limitKeyword: limit ? limit[1].limitKeyword: undefined,
-    limitValue: limit ? limit[1].limitValue : undefined,
+  if (having) {
+    innerSpacing.preHavingKeyword = having[0];
+    value.havingKeyword = having[1].havingKeyword;
+    innerSpacing.postHavingKeyword = having[1].postHavingKeyword;
+    value.havingExpression = having[1].havingExpression;
+  }
 
-    unionKeyword: union ? union[1].unionKeyword : undefined,
-    unionQuery: union ? union[1].unionQuery : undefined,
+  if (orderBy) {
+    innerSpacing.preOrderByKeyword = orderBy[0];
+    value.orderByKeyword = orderBy[1].orderByKeyword;
+    innerSpacing.postOrderByKeyword = orderBy[1].postOrderByKeyword;
+    value.orderByUnits = orderBy[1].orderByUnits;
+    value.orderBySeparators = orderBy[1].orderBySeparators;
+  }
 
-    postQueryAnnotation: postQueryAnnotation,
+  if (limit) {
+    innerSpacing.preLimitKeyword = limit[0];
+    value.limitKeyword = limit[1].limitKeyword;
+    innerSpacing.postLimitKeyword = limit[1].postLimitKeyword;
+    value.limitValue = limit[1].limitValue;
+  }
 
-    innerSpacing: {
-      preQuery: preQuery || '',
+  if (union) {
+    innerSpacing.preUnionKeyword = union[0];
+    value.unionKeyword = union[1].unionKeyword;
+    innerSpacing.postUnionKeyword = union[1].postUnionKeyword;
+    value.unionQuery = union[1].unionQuery;
+  }
 
-      postExplain: explainKeyword? explainKeyword[1]: '',
+  value.postQueryAnnotation = postQueryAnnotation;
 
-      postWith: withClause ? withClause[0].postWith : '',
-      postWithQuery: withClause ? withClause[1] : '',
+  innerSpacing.postQuery = postQuery || '';
 
-      postSelect: select.postSelect,
-      postSelectDecorator: select.postSelectDecorator,
-
-      preFrom: from ? from[0] : '',
-      postFrom: from ? from[1].postFrom : '',
-
-      preJoin: join ? join[0] : '',
-      postJoinType: join ? join[1].postJoinTypeSpacing : '',
-      postJoinKeyword: join ? join[1].postJoinKeywordSpacing : '',
-      postJoinTable: join ? join[1].postJoinTableSpacing : '',
-      postOn: join ? join[1].postOnSpacing : '',
-
-      preWhereKeyword: where ? where[0] : '',
-      postWhereKeyword: where ? where[1].postWhereKeyword : undefined,
-
-      preGroupByKeyword: groupBy ? groupBy[0] : '',
-      postGroupByKeyword: groupBy ? groupBy[1].postGroupByKeyword : undefined,
-
-      preHavingKeyword: having ? having[0] : '',
-      postHavingKeyword: having ? having[1].postHavingKeyword : undefined,
-
-      preOrderByKeyword: orderBy ? orderBy[0] : undefined,
-      postOrderByKeyword: orderBy ? orderBy[1].postOrderByKeyword : undefined,
-
-      preLimitKeyword: limit ? limit[0] : '',
-      postLimitKeyword: limit ? limit[1].postLimitKeyword : '',
-
-      preUnionKeyword: union ? union[0] : '',
-      postUnionKeyword: union ? union[1].postUnionKeyword : '',
-
-      postQuery: postQuery || ''
-    }
-  });
+  return new sql.SqlQuery(value);
 }
 
 WithClause =
@@ -185,7 +190,16 @@ FromClause = fromKeyword:FromToken postFrom:_ tableHead:(Alias / SqlRef) tableTa
   }
 }
 
-JoinClause = joinType:JoinType postJoinTypeSpacing:_ joinKeyword:JoinToken postJoinKeywordSpacing:_? table:(Alias/SqlRef) postJoinTableSpacing:_  onKeyword:OnToken postOnSpacing:_? onExpression:Expression
+JoinClause =
+  joinType:JoinType
+  postJoinTypeSpacing:_
+  joinKeyword:JoinToken
+  postJoinKeywordSpacing:_?
+  table:(Alias / SqlRef)
+  postJoinTableSpacing:_
+  onKeyword:OnToken
+  postOnSpacing:_?
+  onExpression:Expression
 {
   return {
     joinType: joinType,

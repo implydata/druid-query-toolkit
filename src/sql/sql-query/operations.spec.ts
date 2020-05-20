@@ -622,7 +622,7 @@ describe('addToGroupBy', () => {
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "explainKeyword": "",
+        "explainKeyword": undefined,
         "fromKeyword": "from",
         "groupByExpression": Array [
           SqlLiteral {
@@ -638,30 +638,16 @@ describe('addToGroupBy', () => {
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
-          "postExplain": "",
           "postFrom": " ",
           "postGroupByKeyword": " ",
-          "postJoinKeyword": "",
-          "postJoinTable": "",
-          "postJoinType": "",
-          "postLimitKeyword": "",
-          "postOn": "",
           "postQuery": "",
           "postSelect": " ",
           "postSelectDecorator": "",
-          "postUnionKeyword": "",
-          "postWith": "",
-          "postWithQuery": "",
           "preFrom": "
       ",
           "preGroupByKeyword": " 
       ",
-          "preHavingKeyword": "",
-          "preJoin": "",
-          "preLimitKeyword": "",
           "preQuery": "",
-          "preUnionKeyword": "",
-          "preWhereKeyword": "",
         },
         "joinKeyword": undefined,
         "joinTable": undefined,
