@@ -674,7 +674,7 @@ export class SqlQuery extends SqlBase {
     const value = this.valueOf();
     const filterExpression = value.whereExpression;
 
-    // create new  filter to be added
+    // create new filter to be added
     const filter: SqlMulti = new SqlMulti({
       expressionType: 'Comparison',
       arguments: [
@@ -684,7 +684,7 @@ export class SqlQuery extends SqlBase {
       separators: [Separator.bothSeparator(operator)],
     } as SqlMulti);
 
-    // If a filter  exists for this column replace it other wise add it with an and expression
+    // If a filter exists for this column replace it other wise add it with an and expression
     value.whereExpression = filterExpression
       ? filterExpression.addOrReplaceColumn(SqlBase.getColumnName(column), filter)
       : filter;
@@ -703,7 +703,7 @@ export class SqlQuery extends SqlBase {
     const value = this.valueOf();
     const filterExpression = value.havingExpression;
 
-    // create new  filter to be added
+    // create new filter to be added
     const filter: SqlMulti = new SqlMulti({
       arguments: [
         typeof column === 'string' ? SqlRef.fromStringWithDoubleQuotes(column) : column,
@@ -712,7 +712,7 @@ export class SqlQuery extends SqlBase {
       separators: [Separator.bothSeparator(operator)],
     } as SqlMulti);
 
-    // If a filter  exists for this column replace it other wise add it with an and expression
+    // If a filter exists for this column replace it other wise add it with an and expression
     value.havingExpression = filterExpression
       ? filterExpression.addOrReplaceColumn(SqlBase.getColumnName(column), filter)
       : filter;
