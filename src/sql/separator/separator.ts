@@ -75,13 +75,13 @@ export class Separator {
     return { values: filteredValues, separators: filteredSeparators };
   }
 
-  static filterStringFromInterfaceList<t>(
-    units: t[],
-    filter: (value: t) => boolean,
+  static filterStringFromInterfaceList<T>(
+    units: T[],
+    filter: (value: T) => boolean,
     separators?: Separator[],
   ) {
     let index = -1;
-    const filteredUnits: t[] = [];
+    const filteredUnits: T[] = [];
     for (let i = 0; i < units.length; i++) {
       const value = units[i];
       if (filter(value)) {
@@ -109,9 +109,9 @@ export class Separator {
 
   // Interface Spacilator is used to re string the pattern:
   // Interface separator interface
-  static customSpacilator<t>(
-    expressions: t[],
-    toString: (expression: t) => string,
+  static customSpacilator<T>(
+    expressions: T[],
+    toString: (expression: T) => string,
     separators?: Separator[],
   ): string {
     if (!separators) {

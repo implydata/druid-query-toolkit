@@ -676,6 +676,7 @@ export class SqlQuery extends SqlBase {
 
     // create new  filter to be added
     const filter: SqlMulti = new SqlMulti({
+      expressionType: 'Comparison',
       arguments: [
         typeof column === 'string' ? SqlRef.fromStringWithDoubleQuotes(column) : column,
         filterValue instanceof SqlBase ? filterValue : SqlLiteral.fromInput(filterValue),

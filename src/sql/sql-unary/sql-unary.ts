@@ -86,11 +86,8 @@ export class SqlUnary extends SqlBase {
   }
 
   addOrReplaceColumn(column: string, filter: SqlUnary | SqlMulti): SqlUnary | SqlMulti {
-    const value = this.valueOf();
-    const currentFilter = new SqlMulti(value);
-
-    if (currentFilter.containsColumn(column)) return filter;
-    return currentFilter;
+    if (this.containsColumn(column)) return filter;
+    return this;
   }
 }
 

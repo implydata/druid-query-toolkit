@@ -16,9 +16,9 @@ import { Separator, SqlRef, SqlUnary } from '../index';
 import { SqlBase, SqlBaseValue } from '../sql-base';
 
 export interface SqlMultiValue extends SqlBaseValue {
-  expressionType?: string;
+  expressionType: string;
+  arguments: SqlBase[];
   separators?: Separator[];
-  arguments?: SqlBase[];
 }
 
 export class SqlMulti extends SqlBase {
@@ -26,26 +26,31 @@ export class SqlMulti extends SqlBase {
 
   static sqlMultiFactory(separator: string, argumentsArray: SqlBase[]) {
     return new SqlMulti({
+      type: SqlMulti.type,
+      expressionType: separator,
       arguments: argumentsArray,
       separators: Separator.fillBetween([], arguments.length, Separator.bothSeparator(separator)),
-      expressionType: separator,
-      type: SqlMulti.type,
     } as SqlMultiValue);
   }
 
-  public expressionType?: string;
-  public separators?: Separator[];
+  public expressionType: string;
   public arguments: SqlBase[];
+  public separators?: Separator[];
 
   constructor(options: SqlMultiValue) {
     super(options, SqlMulti.type);
-    this.arguments = options.arguments || [];
-    this.separators = options.separators;
+
     this.expressionType = options.expressionType;
+    if (!this.expressionType) throw new Error(`must have expressionType`);
+
+    this.arguments = options.arguments;
+    if (!this.arguments) throw new Error(`must have arguments`);
+
+    this.separators = options.separators;
   }
 
-  public valueOf() {
-    const value: SqlMultiValue = super.valueOf();
+  public valueOf(): SqlMultiValue {
+    const value = super.valueOf() as SqlMultiValue;
     value.expressionType = this.expressionType;
     value.separators = this.separators;
     value.arguments = this.arguments;
@@ -73,12 +78,12 @@ export class SqlMulti extends SqlBase {
   }
 
   public removeColumn(column: string): SqlMulti | undefined {
-    const value = this.valueOf();
-    if (!value.arguments) throw Error('expression has no arguments');
+    const filteredList = Separator.filterStringFromList(column, this.arguments, this.separators);
+    if (!filteredList) return;
 
-    const filteredList = Separator.filterStringFromList(column, value.arguments, value.separators);
-    value.separators = filteredList ? filteredList.separators : undefined;
-    value.arguments = filteredList ? filteredList.values : undefined;
+    const value = this.valueOf();
+    value.separators = filteredList.separators;
+    value.arguments = filteredList.values;
 
     return value.arguments && value.arguments.length ? new SqlMulti(value) : undefined;
   }
@@ -95,8 +100,7 @@ export class SqlMulti extends SqlBase {
 
   addOrReplaceColumn(column: string | SqlRef, filter: SqlMulti | SqlUnary): SqlMulti | SqlUnary {
     const value = this.valueOf();
-    const currentFilter = new SqlMulti(value);
-    if (!value.arguments) return currentFilter;
+    if (!value.arguments) return this;
     const columnString = typeof column === 'string' ? column : column.column;
     switch (value.expressionType) {
       case 'AND':
@@ -127,13 +131,13 @@ export class SqlMulti extends SqlBase {
             return argument;
           }
         });
-        return SqlMulti.sqlMultiFactory('AND', [currentFilter.addParens('', ''), filter]);
+        return SqlMulti.sqlMultiFactory('AND', [this.addParens('', ''), filter]);
 
       default:
-        if (columnString && currentFilter.containsColumn(columnString)) {
+        if (columnString && this.containsColumn(columnString)) {
           return filter;
         }
-        return SqlMulti.sqlMultiFactory('AND', [currentFilter, filter]);
+        return SqlMulti.sqlMultiFactory('AND', [this, filter]);
     }
   }
 }
