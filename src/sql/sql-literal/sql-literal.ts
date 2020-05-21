@@ -17,6 +17,7 @@ import { SqlBase, SqlBaseValue } from '../sql-base';
 export type LiteralValue = null | boolean | number | string;
 
 export interface SqlLiteralValue extends SqlBaseValue {
+  keyword?: string;
   value: LiteralValue;
   stringValue?: string;
   quotes?: string;
@@ -39,30 +40,43 @@ export class SqlLiteral extends SqlBase {
     return expression instanceof SqlLiteral && expression.value === value;
   }
 
+  public keyword?: string;
   public value: LiteralValue;
   public stringValue?: string;
 
   constructor(options: SqlLiteralValue) {
     super(options, SqlLiteral.type);
+    this.keyword = options.keyword;
     this.value = options.value;
     this.stringValue = options.stringValue;
   }
 
   public valueOf(): SqlLiteralValue {
     const value = super.valueOf() as SqlLiteralValue;
+    value.keyword = this.keyword;
     value.value = this.value;
     value.stringValue = this.stringValue;
     return value;
   }
 
   public toRawString(): string {
-    if (this.stringValue) return this.stringValue;
+    const retParts: string[] = [];
 
-    if (typeof this.value === 'string') {
-      return SqlLiteral.wrapInQuotes(this.value, "'"); // ToDo: make this smarter
-    } else {
-      return String(this.value); // ToDo: make this smarter
+    if (this.keyword) {
+      retParts.push(this.keyword, this.innerSpacing.postKeyword || '');
     }
+
+    if (this.stringValue) {
+      retParts.push(this.stringValue);
+    } else {
+      if (typeof this.value === 'string') {
+        retParts.push(SqlLiteral.wrapInQuotes(this.value, "'")); // ToDo: make this smarter
+      } else {
+        retParts.push(String(this.value)); // ToDo: make this smarter
+      }
+    }
+
+    return retParts.join('');
   }
 
   public increment(): SqlLiteral | undefined {

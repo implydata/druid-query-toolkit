@@ -118,12 +118,14 @@ describe('SqlFunction', () => {
                 "arguments": Array [
                   SqlLiteral {
                     "innerSpacing": Object {},
+                    "keyword": undefined,
                     "stringValue": "1",
                     "type": "literal",
                     "value": 1,
                   },
                   SqlLiteral {
                     "innerSpacing": Object {},
+                    "keyword": undefined,
                     "stringValue": "2",
                     "type": "literal",
                     "value": 2,
@@ -144,12 +146,14 @@ describe('SqlFunction', () => {
                 "arguments": Array [
                   SqlLiteral {
                     "innerSpacing": Object {},
+                    "keyword": undefined,
                     "stringValue": "3",
                     "type": "literal",
                     "value": 3,
                   },
                   SqlLiteral {
                     "innerSpacing": Object {},
+                    "keyword": undefined,
                     "stringValue": "2",
                     "type": "literal",
                     "value": 2,
@@ -352,6 +356,7 @@ describe('SqlFunction', () => {
                   },
                   SqlLiteral {
                     "innerSpacing": Object {},
+                    "keyword": undefined,
                     "stringValue": "4",
                     "type": "literal",
                     "value": 4,
@@ -444,6 +449,7 @@ describe('SqlFunction', () => {
             },
             SqlLiteral {
               "innerSpacing": Object {},
+              "keyword": undefined,
               "stringValue": "1",
               "type": "literal",
               "value": 1,

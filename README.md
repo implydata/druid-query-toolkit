@@ -329,6 +329,7 @@ SELECT countryName from wikipedia
 - Add support for `ARRAY` literal (`ARRAY ['a', 'b']`)
 - Add support for dynamic parameters `?`
 - Add support for `x NOT IN (subquery)`
+- Add support for `X IN (A, B, C)`
 
 ## License 
 

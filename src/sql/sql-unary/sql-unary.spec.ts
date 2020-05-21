@@ -301,6 +301,7 @@ describe('SqlUnary', () => {
                 },
                 SqlLiteral {
                   "innerSpacing": Object {},
+                  "keyword": undefined,
                   "stringValue": "'D'",
                   "type": "literal",
                   "value": "D",

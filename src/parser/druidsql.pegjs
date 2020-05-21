@@ -171,9 +171,9 @@ SelectClause =
   selectKeyword:SelectToken
   postSelect:_
   selectDecorator:((AllToken / DistinctToken) _)?
-  selectValuesHead:(Alias/Expression)
+  selectValuesHead:(Alias / Expression)
   annotationsHead:Annotation?
-  selectValuesTail:(Comma (Alias/Expression) Annotation?)*
+  selectValuesTail:(Comma (Alias / Expression) Annotation?)*
 {
   return {
     selectKeyword: selectKeyword,
@@ -339,7 +339,7 @@ NotExpression = keyword:NotToken postKeyword:_ argument:NotExpression
 
 ComparisonExpression =
   head:AdditionExpression
-  tail:((__ ComparisonOperator __ (ComparisonExpression/AdditionExpression))/(_ BetweenToken _ (AndExpression / ComparisonExpression))/(_ (IsNotToken/IsToken) _ (NullLiteral / BooleanLiteral)))*
+  tail:((__ ComparisonOperator __ (ComparisonExpression / AdditionExpression)) / (_ BetweenToken _ (AndExpression / ComparisonExpression)) / (_ (IsNotToken / IsToken) _ (NullLiteral / BooleanLiteral)))*
 {
   return maybeMakeMulti('Comparison', head, tail);
 }
@@ -386,14 +386,13 @@ ConcatExpression = head:BaseType tail:(__ '||' __ BaseType)*
 BaseType
   = Function
   / Interval
-  / Timestamp
   / SqlLiteral
   / SqlRef
   / SqlInParens
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 
-CaseExpression = SearchedCaseExpression/SimpleCaseExpression
+CaseExpression = SearchedCaseExpression / SimpleCaseExpression
 
 SearchedCaseExpression =
   caseKeyword:CaseToken
@@ -494,17 +493,6 @@ Unit
   / 'YEAR'i
   / 'SECOND'i
 
-Timestamp = timestampKeyword: TimestampToken postTimestampKeyword: _ timestampValue: SqlLiteral
-{
-  return new sql.SqlTimestamp({
-    timestampKeyword: timestampKeyword,
-    timestampValue: timestampValue,
-    innerSpacing: {
-      postTimestampKeyword: postTimestampKeyword,
-    }
-  })
-}
-
 Function =
   functionName:UnquotedRefPart
   postName:_?
@@ -512,7 +500,7 @@ Function =
   postLeftParen:_?
   decorator:(FunctionDecorator _)?
   argumentHead:Expression
-  argumentTail:((Comma/From) Expression)*
+  argumentTail:((Comma / From) Expression)*
   preRightParen:_?
   CloseParen
   filter:(_ Filter)?
@@ -575,7 +563,7 @@ SqlInParens = OpenParen leftSpacing:_? ex:Sql rightSpacing:_? CloseParen
   return ex.addParens(leftSpacing, rightSpacing);
 }
 
-SqlLiteral = lit:(NullToken / TrueToken / FalseToken / Number / SingleQuotedString / UnicodeString)
+SqlLiteral = lit:(NullToken / TrueToken / FalseToken / Number / SingleQuotedString / UnicodeString / Timestamp)
 {
   return new sql.SqlLiteral(lit);
 }
@@ -610,6 +598,8 @@ Digits = $ Digit+
 
 Digit = [0-9]
 
+/* Strings */
+
 SingleQuotedString = "'" v:$([^']*) "'"
 {
   return {
@@ -623,6 +613,20 @@ UnicodeString = "U&'"i v:$([^']*) "'"
   return {
     value: v.replace(/\\[0-9a-f]{4}/gi, function(s) { return String.fromCharCode(parseInt(s.substr(1), 16)); }),
     stringValue: text()
+  };
+}
+
+/* Timestamp */
+
+Timestamp = keyword:TimestampToken postKeyword:_ v:SingleQuotedString
+{
+  return {
+    keyword: keyword,
+    innerSpacing: {
+      postKeyword: postKeyword
+    },
+    value: v.value,
+    stringValue: v.stringValue
   };
 }
 
