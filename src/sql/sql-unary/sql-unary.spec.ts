@@ -34,7 +34,9 @@ describe('SqlUnary', () => {
           "type": "ref",
         },
         "expressionType": "-",
-        "innerSpacing": Object {},
+        "innerSpacing": Object {
+          "postKeyword": "",
+        },
         "keyword": "-",
         "type": "unaryExpression",
       }

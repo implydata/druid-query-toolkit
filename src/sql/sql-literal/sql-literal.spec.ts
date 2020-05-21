@@ -260,7 +260,7 @@ describe('SqlLiteral', () => {
     `);
   });
 
-  it('timestamp', () => {
+  it('works with timestamp', () => {
     const sql = `TIMESTAMP '2020-02-25 00:00:00'`;
 
     backAndForth(sql);
@@ -274,6 +274,66 @@ describe('SqlLiteral', () => {
         "stringValue": "'2020-02-25 00:00:00'",
         "type": "literal",
         "value": "2020-02-25 00:00:00",
+      }
+    `);
+  });
+
+  it('works with array or numbers', () => {
+    const sql = `Array [1, 2, 3]`;
+
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
+      SqlLiteral {
+        "innerSpacing": Object {
+          "postKeyword": " ",
+        },
+        "keyword": "Array",
+        "stringValue": "[1, 2, 3]",
+        "type": "literal",
+        "value": Array [
+          1,
+          2,
+          3,
+        ],
+      }
+    `);
+  });
+
+  it('works with array or strings', () => {
+    const sql = `Array['1', u&'a', ']']`;
+
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
+      SqlLiteral {
+        "innerSpacing": Object {
+          "postKeyword": "",
+        },
+        "keyword": "Array",
+        "stringValue": "['1', u&'a', ']']",
+        "type": "literal",
+        "value": Array [
+          "1",
+          "a",
+          "]",
+        ],
+      }
+    `);
+  });
+
+  it('works with dynamic placeholder', () => {
+    const sql = `?`;
+
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
+      SqlLiteral {
+        "innerSpacing": Object {},
+        "keyword": undefined,
+        "stringValue": "?",
+        "type": "literal",
+        "value": "?",
       }
     `);
   });

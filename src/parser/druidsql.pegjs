@@ -339,33 +339,33 @@ NotExpression = keyword:NotToken postKeyword:_ argument:NotExpression
 
 ComparisonExpression =
   head:AdditionExpression
-  tail:((__ ComparisonOperator __ (ComparisonExpression / AdditionExpression)) / (_ BetweenToken _ (AndExpression / ComparisonExpression)) / (_ (IsNotToken / IsToken) _ (NullLiteral / BooleanLiteral)))*
+  tail:((_ ComparisonOperator _ (ComparisonExpression / AdditionExpression)) / (_ BetweenToken _ (AndExpression / ComparisonExpression)) / (_ (IsNotToken / IsToken) __ (NullLiteral / BooleanLiteral)))*
 {
   return maybeMakeMulti('Comparison', head, tail);
 }
 
-AdditionExpression = head:SubtractionExpression tail:(__ '+' __ SubtractionExpression)*
+AdditionExpression = head:SubtractionExpression tail:(_ '+' _ SubtractionExpression)*
 {
   return maybeMakeMulti('Additive', head, tail);
 }
 
-SubtractionExpression = head:MultiplicationExpression tail:(__ $('-' !'-') __ MultiplicationExpression)*
+SubtractionExpression = head:MultiplicationExpression tail:(_ $('-' !'-') _ MultiplicationExpression)*
 {
   return maybeMakeMulti('Additive', head, tail);
 }
 
-MultiplicationExpression = head:DivisionExpression tail:(__ '*' __ DivisionExpression)*
+MultiplicationExpression = head:DivisionExpression tail:(_ '*' _ DivisionExpression)*
 {
   return maybeMakeMulti('Multiplicative', head, tail);
 }
 
-DivisionExpression = head:UnaryExpression tail:(__ '/' __ UnaryExpression)*
+DivisionExpression = head:UnaryExpression tail:(_ '/' _ UnaryExpression)*
 {
   return maybeMakeMulti('Multiplicative', head, tail);
 }
 
 // !Number is to make sure that -3 parses as a number and not as -(3)
-UnaryExpression = keyword:[+-] postKeyword:__ !Number argument:ConcatExpression
+UnaryExpression = keyword:[+-] postKeyword:_ !Number argument:ConcatExpression
 {
   return new sql.SqlUnary({
     expressionType: keyword,
@@ -378,7 +378,7 @@ UnaryExpression = keyword:[+-] postKeyword:__ !Number argument:ConcatExpression
 }
   / ConcatExpression
 
-ConcatExpression = head:BaseType tail:(__ '||' __ BaseType)*
+ConcatExpression = head:BaseType tail:(_ '||' _ BaseType)*
 {
   return maybeMakeMulti('Concat', head, tail);
 }
@@ -563,9 +563,17 @@ SqlInParens = OpenParen leftSpacing:_? ex:Sql rightSpacing:_? CloseParen
   return ex.addParens(leftSpacing, rightSpacing);
 }
 
-SqlLiteral = lit:(NullToken / TrueToken / FalseToken / Number / SingleQuotedString / UnicodeString / Timestamp)
+SqlLiteral = lit:(DynamicPlaceholder / NullToken / TrueToken / FalseToken / Number / SingleQuotedString / UnicodeString / Timestamp / Array)
 {
   return new sql.SqlLiteral(lit);
+}
+
+DynamicPlaceholder = "?"
+{
+  return {
+    value: "?",
+    stringValue: "?"
+  };
 }
 
 NullLiteral = v:NullToken
@@ -629,6 +637,34 @@ Timestamp = keyword:TimestampToken postKeyword:_ v:SingleQuotedString
     stringValue: v.stringValue
   };
 }
+
+/* Array */
+
+Array = keyword:ArrayToken postKeyword:_ v:ArrayBody
+{
+ return {
+   keyword: keyword,
+   innerSpacing: {
+     postKeyword: postKeyword
+   },
+   value: v.value,
+   stringValue: v.stringValue
+ };
+}
+
+ArrayBody = '[' vs:(ArrayEntry (Comma ArrayEntry)*)? ']'
+{
+  var values = (vs ? makeListMap(vs[1], 1, vs[0]) : []).map(function(d) {
+    return d.value;
+  });
+
+  return {
+    value: values,
+    stringValue: text()
+  };
+}
+
+ArrayEntry = Number / SingleQuotedString / UnicodeString
 
 // ------------------------------
 
@@ -708,13 +744,13 @@ Annotation = preAnnotation:___ '--:' postAnnotationSignifier: ___? key:$([a-z0-9
 
 IdentifierPart = [a-z_]i
 
-_ =
-  spacing:($(([ \t\n\r]* "--" !':' [^\n]* ([\n] [ \t\n\r]*)?)+)
-/ $([ \t\n\r]+))?
+_ "optional whitespace" = $(Space* ("--" !":" [^\n]* ([\n] Space*)?)*)
 
-__ "optional whitespace" = _ / ''
+__ "mandatory whitespace" = $(Space+ ("--" !":" [^\n]* ([\n] Space*)?)*)
 
-___ "pure whitespace" = spacing:$([ \t\n\r]*)
+___ "pure whitespace" = $(Space*)
+
+Space = [ \t\n\r]
 
 EndOfQuery = $(_ ';'? _)
 
@@ -750,6 +786,7 @@ JoinType =
 
 AllToken = $('ALL'i !IdentifierPart)
 AndToken = $('AND'i !IdentifierPart)
+ArrayToken = $('ARRAY'i !IdentifierPart)
 AsToken = $('AS'i !IdentifierPart)
 AscToken = $('ASC'i !IdentifierPart)
 BetweenToken = $('BETWEEN'i !IdentifierPart)
@@ -760,7 +797,7 @@ DescToken = $('DESC'i !IdentifierPart)
 DistinctToken = $('DISTINCT'i !IdentifierPart)
 ElseToken = $('ELSE'i !IdentifierPart)
 EndToken = $('END'i !IdentifierPart)
-ExplainToken = $('EXPLAIN'i !IdentifierPart _ 'PLAN'i !IdentifierPart _ 'FOR'i !IdentifierPart)
+ExplainToken = $('EXPLAIN'i !IdentifierPart __ 'PLAN'i !IdentifierPart __ 'FOR'i !IdentifierPart)
 FalseToken = s:$('FALSE'i !IdentifierPart) { return { value: false, stringValue: s }; }
 FilterToken= $('FILTER'i !IdentifierPart)
 FromToken = $('FROM'i !IdentifierPart)
@@ -768,7 +805,7 @@ GroupByToken = $('GROUP'i !IdentifierPart _ 'BY'i !IdentifierPart)
 HavingToken = $('HAVING'i !IdentifierPart)
 InToken = $('IN'i !IdentifierPart)
 IntervalToken = $('INTERVAL'i !IdentifierPart)
-IsNotToken = $('IS'i _ 'NOT'i !IdentifierPart)
+IsNotToken = $('IS'i __ 'NOT'i !IdentifierPart)
 IsToken = $('IS'i !IdentifierPart)
 JoinToken = $('JOIN'i !IdentifierPart)
 LeadingToken = $('LEADING'i !IdentifierPart)
@@ -778,14 +815,14 @@ NotToken = $('NOT'i !IdentifierPart)
 NullToken = s:$('NULL'i !IdentifierPart) { return { value: null, stringValue: s }; }
 OnToken = $('ON'i !IdentifierPart)
 OrToken = $('OR'i !IdentifierPart)
-OrderToken = $('ORDER'i !IdentifierPart _ 'BY'i !IdentifierPart)
+OrderToken = $('ORDER'i !IdentifierPart __ 'BY'i !IdentifierPart)
 SelectToken = $('SELECT'i !IdentifierPart)
 ThenToken = $('THEN'i !IdentifierPart)
 TimestampToken = $('TIMESTAMP'i !IdentifierPart)
 ToToken = $('TO'i !IdentifierPart)
 TrailingToken = $('TRAILING'i !IdentifierPart)
 TrueToken = s:$('TRUE'i !IdentifierPart) { return { value: true, stringValue: s }; }
-UnionToken = $('UNION'i !IdentifierPart _ 'All'i !IdentifierPart)
+UnionToken = $('UNION'i !IdentifierPart __ 'All'i !IdentifierPart)
 WhenToken = $('WHEN'i !IdentifierPart)
 WhereToken = $('WHERE'i !IdentifierPart)
 WithToken = $('WITH'i !IdentifierPart)

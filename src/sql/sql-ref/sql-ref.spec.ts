@@ -24,7 +24,10 @@ describe('SqlRef', () => {
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlRef {
         "column": "namespace",
-        "innerSpacing": Object {},
+        "innerSpacing": Object {
+          "postTableDot": "",
+          "preTableDot": "",
+        },
         "namespace": undefined,
         "namespaceQuotes": undefined,
         "quotes": "\\"",
@@ -43,7 +46,10 @@ describe('SqlRef', () => {
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlRef {
         "column": "namespace",
-        "innerSpacing": Object {},
+        "innerSpacing": Object {
+          "postTableDot": "",
+          "preTableDot": "",
+        },
         "namespace": undefined,
         "namespaceQuotes": undefined,
         "quotes": "",
@@ -62,7 +68,10 @@ describe('SqlRef', () => {
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlRef {
         "column": "namespace",
-        "innerSpacing": Object {},
+        "innerSpacing": Object {
+          "postTableDot": "",
+          "preTableDot": "",
+        },
         "namespace": undefined,
         "namespaceQuotes": undefined,
         "quotes": "",
@@ -208,7 +217,9 @@ describe('upgrades', () => {
         "column": undefined,
         "innerSpacing": Object {
           "postTable": "",
+          "postTableDot": "",
           "preTable": "",
+          "preTableDot": "",
         },
         "namespace": "namespace",
         "namespaceQuotes": "\\"",
@@ -277,7 +288,9 @@ describe('upgrades', () => {
             "column": undefined,
             "innerSpacing": Object {
               "postTable": "",
+              "postTableDot": "",
               "preTable": "",
+              "preTableDot": "",
             },
             "namespace": "sys",
             "namespaceQuotes": "",
