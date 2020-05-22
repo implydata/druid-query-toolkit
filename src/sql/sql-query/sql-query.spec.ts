@@ -31,9 +31,9 @@ describe('SqlQuery', () => {
       SqlQuery {
         "explainKeyword": undefined,
         "fromKeyword": undefined,
-        "groupByExpression": undefined,
-        "groupByExpressionSeparators": undefined,
+        "groupByExpressions": undefined,
         "groupByKeyword": undefined,
+        "groupBySeparators": undefined,
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
@@ -91,9 +91,9 @@ describe('SqlQuery', () => {
       SqlQuery {
         "explainKeyword": undefined,
         "fromKeyword": "from",
-        "groupByExpression": undefined,
-        "groupByExpressionSeparators": undefined,
+        "groupByExpressions": undefined,
         "groupByKeyword": undefined,
+        "groupBySeparators": undefined,
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
@@ -170,9 +170,9 @@ describe('SqlQuery', () => {
       SqlQuery {
         "explainKeyword": undefined,
         "fromKeyword": "from",
-        "groupByExpression": undefined,
-        "groupByExpressionSeparators": undefined,
+        "groupByExpressions": undefined,
         "groupByKeyword": undefined,
+        "groupBySeparators": undefined,
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
@@ -255,9 +255,9 @@ describe('SqlQuery', () => {
       SqlQuery {
         "explainKeyword": undefined,
         "fromKeyword": "from",
-        "groupByExpression": undefined,
-        "groupByExpressionSeparators": undefined,
+        "groupByExpressions": undefined,
         "groupByKeyword": undefined,
+        "groupBySeparators": undefined,
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
@@ -382,9 +382,9 @@ describe('SqlQuery', () => {
       SqlQuery {
         "explainKeyword": undefined,
         "fromKeyword": "FROM",
-        "groupByExpression": undefined,
-        "groupByExpressionSeparators": undefined,
+        "groupByExpressions": undefined,
         "groupByKeyword": undefined,
+        "groupBySeparators": undefined,
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
@@ -881,9 +881,9 @@ describe('SqlQuery', () => {
       SqlQuery {
         "explainKeyword": undefined,
         "fromKeyword": "FROM",
-        "groupByExpression": undefined,
-        "groupByExpressionSeparators": undefined,
+        "groupByExpressions": undefined,
         "groupByKeyword": undefined,
+        "groupBySeparators": undefined,
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
@@ -1079,9 +1079,9 @@ describe('SqlQuery', () => {
       SqlQuery {
         "explainKeyword": "Explain plan for",
         "fromKeyword": "from",
-        "groupByExpression": undefined,
-        "groupByExpressionSeparators": undefined,
+        "groupByExpressions": undefined,
         "groupByKeyword": undefined,
+        "groupBySeparators": undefined,
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
@@ -1164,9 +1164,9 @@ describe('SqlQuery', () => {
       SqlQuery {
         "explainKeyword": undefined,
         "fromKeyword": "from",
-        "groupByExpression": undefined,
-        "groupByExpressionSeparators": undefined,
+        "groupByExpressions": undefined,
         "groupByKeyword": undefined,
+        "groupBySeparators": undefined,
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
@@ -1244,9 +1244,9 @@ describe('SqlQuery', () => {
             "withQuery": SqlQuery {
               "explainKeyword": undefined,
               "fromKeyword": "FROM",
-              "groupByExpression": undefined,
-              "groupByExpressionSeparators": undefined,
+              "groupByExpressions": undefined,
               "groupByKeyword": undefined,
+              "groupBySeparators": undefined,
               "havingExpression": undefined,
               "havingKeyword": undefined,
               "innerSpacing": Object {
@@ -1347,9 +1347,9 @@ describe('expressions with where clause', () => {
       SqlQuery {
         "explainKeyword": undefined,
         "fromKeyword": "from",
-        "groupByExpression": undefined,
-        "groupByExpressionSeparators": undefined,
+        "groupByExpressions": undefined,
         "groupByKeyword": undefined,
+        "groupBySeparators": undefined,
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
@@ -1458,9 +1458,9 @@ describe('expressions with where clause', () => {
       SqlQuery {
         "explainKeyword": undefined,
         "fromKeyword": "FROM",
-        "groupByExpression": undefined,
-        "groupByExpressionSeparators": undefined,
+        "groupByExpressions": undefined,
         "groupByKeyword": undefined,
+        "groupBySeparators": undefined,
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
@@ -1571,9 +1571,9 @@ describe('expressions with where clause', () => {
       SqlQuery {
         "explainKeyword": undefined,
         "fromKeyword": "FROM",
-        "groupByExpression": undefined,
-        "groupByExpressionSeparators": undefined,
+        "groupByExpressions": undefined,
         "groupByKeyword": undefined,
+        "groupBySeparators": undefined,
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
@@ -1776,7 +1776,7 @@ describe('expressions with group by clause', () => {
       SqlQuery {
         "explainKeyword": undefined,
         "fromKeyword": "from",
-        "groupByExpression": Array [
+        "groupByExpressions": Array [
           SqlRef {
             "column": "col",
             "innerSpacing": Object {},
@@ -1788,8 +1788,8 @@ describe('expressions with group by clause', () => {
             "type": "ref",
           },
         ],
-        "groupByExpressionSeparators": Array [],
         "groupByKeyword": "group by",
+        "groupBySeparators": Array [],
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
@@ -1868,7 +1868,7 @@ describe('expressions with group by clause', () => {
       SqlQuery {
         "explainKeyword": undefined,
         "fromKeyword": "from",
-        "groupByExpression": Array [
+        "groupByExpressions": Array [
           SqlRef {
             "column": "col",
             "innerSpacing": Object {},
@@ -1880,8 +1880,8 @@ describe('expressions with group by clause', () => {
             "type": "ref",
           },
         ],
-        "groupByExpressionSeparators": Array [],
         "groupByKeyword": "group by",
+        "groupBySeparators": Array [],
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
@@ -1960,7 +1960,7 @@ describe('expressions with group by clause', () => {
       SqlQuery {
         "explainKeyword": undefined,
         "fromKeyword": "from",
-        "groupByExpression": Array [
+        "groupByExpressions": Array [
           SqlRef {
             "column": "col",
             "innerSpacing": Object {},
@@ -1982,14 +1982,14 @@ describe('expressions with group by clause', () => {
             "type": "ref",
           },
         ],
-        "groupByExpressionSeparators": Array [
+        "groupByKeyword": "group by",
+        "groupBySeparators": Array [
           Separator {
             "left": "",
             "right": " ",
             "separator": ",",
           },
         ],
-        "groupByKeyword": "group by",
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
@@ -2076,9 +2076,9 @@ describe('expressions with having clause', () => {
       SqlQuery {
         "explainKeyword": undefined,
         "fromKeyword": "from",
-        "groupByExpression": undefined,
-        "groupByExpressionSeparators": undefined,
+        "groupByExpressions": undefined,
         "groupByKeyword": undefined,
+        "groupBySeparators": undefined,
         "havingExpression": SqlMulti {
           "arguments": Array [
             SqlRef {
@@ -2187,9 +2187,9 @@ describe('expressions with having clause', () => {
       SqlQuery {
         "explainKeyword": undefined,
         "fromKeyword": "FROM",
-        "groupByExpression": undefined,
-        "groupByExpressionSeparators": undefined,
+        "groupByExpressions": undefined,
         "groupByKeyword": undefined,
+        "groupBySeparators": undefined,
         "havingExpression": SqlMulti {
           "arguments": Array [
             SqlRef {
@@ -2300,9 +2300,9 @@ describe('expressions with having clause', () => {
       SqlQuery {
         "explainKeyword": undefined,
         "fromKeyword": "FROM",
-        "groupByExpression": undefined,
-        "groupByExpressionSeparators": undefined,
+        "groupByExpressions": undefined,
         "groupByKeyword": undefined,
+        "groupBySeparators": undefined,
         "havingExpression": SqlMulti {
           "arguments": Array [
             SqlMulti {
@@ -2505,9 +2505,9 @@ describe('expressions with order by clause', () => {
       SqlQuery {
         "explainKeyword": undefined,
         "fromKeyword": "from",
-        "groupByExpression": undefined,
-        "groupByExpressionSeparators": undefined,
+        "groupByExpressions": undefined,
         "groupByKeyword": undefined,
+        "groupBySeparators": undefined,
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
@@ -2598,9 +2598,9 @@ describe('expressions with order by clause', () => {
       SqlQuery {
         "explainKeyword": undefined,
         "fromKeyword": "from",
-        "groupByExpression": undefined,
-        "groupByExpressionSeparators": undefined,
+        "groupByExpressions": undefined,
         "groupByKeyword": undefined,
+        "groupBySeparators": undefined,
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
@@ -2694,9 +2694,9 @@ describe('expressions with order by clause', () => {
       SqlQuery {
         "explainKeyword": undefined,
         "fromKeyword": "from",
-        "groupByExpression": undefined,
-        "groupByExpressionSeparators": undefined,
+        "groupByExpressions": undefined,
         "groupByKeyword": undefined,
+        "groupBySeparators": undefined,
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
@@ -2787,9 +2787,9 @@ describe('expressions with order by clause', () => {
       SqlQuery {
         "explainKeyword": undefined,
         "fromKeyword": "from",
-        "groupByExpression": undefined,
-        "groupByExpressionSeparators": undefined,
+        "groupByExpressions": undefined,
         "groupByKeyword": undefined,
+        "groupBySeparators": undefined,
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
@@ -2900,9 +2900,9 @@ describe('expressions with order by clause', () => {
       SqlQuery {
         "explainKeyword": undefined,
         "fromKeyword": "from",
-        "groupByExpression": undefined,
-        "groupByExpressionSeparators": undefined,
+        "groupByExpressions": undefined,
         "groupByKeyword": undefined,
+        "groupBySeparators": undefined,
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
@@ -3013,9 +3013,9 @@ describe('expressions with order by clause', () => {
       SqlQuery {
         "explainKeyword": undefined,
         "fromKeyword": "from",
-        "groupByExpression": undefined,
-        "groupByExpressionSeparators": undefined,
+        "groupByExpressions": undefined,
         "groupByKeyword": undefined,
+        "groupBySeparators": undefined,
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
@@ -3145,9 +3145,9 @@ describe('expressions with limit clause', () => {
       SqlQuery {
         "explainKeyword": undefined,
         "fromKeyword": "from",
-        "groupByExpression": undefined,
-        "groupByExpressionSeparators": undefined,
+        "groupByExpressions": undefined,
         "groupByKeyword": undefined,
+        "groupBySeparators": undefined,
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
@@ -3234,9 +3234,9 @@ describe('expressions with union clause', () => {
       SqlQuery {
         "explainKeyword": undefined,
         "fromKeyword": "from",
-        "groupByExpression": undefined,
-        "groupByExpressionSeparators": undefined,
+        "groupByExpressions": undefined,
         "groupByKeyword": undefined,
+        "groupBySeparators": undefined,
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
@@ -3299,9 +3299,9 @@ describe('expressions with union clause', () => {
         "unionQuery": SqlQuery {
           "explainKeyword": undefined,
           "fromKeyword": "from",
-          "groupByExpression": undefined,
-          "groupByExpressionSeparators": undefined,
+          "groupByExpressions": undefined,
           "groupByKeyword": undefined,
+          "groupBySeparators": undefined,
           "havingExpression": undefined,
           "havingKeyword": undefined,
           "innerSpacing": Object {
@@ -3386,9 +3386,9 @@ describe('Test Join Clause', () => {
       SqlQuery {
         "explainKeyword": undefined,
         "fromKeyword": "from",
-        "groupByExpression": undefined,
-        "groupByExpressionSeparators": undefined,
+        "groupByExpressions": undefined,
         "groupByKeyword": undefined,
+        "groupBySeparators": undefined,
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
@@ -3515,9 +3515,9 @@ describe('Test Join Clause', () => {
       SqlQuery {
         "explainKeyword": undefined,
         "fromKeyword": "from",
-        "groupByExpression": undefined,
-        "groupByExpressionSeparators": undefined,
+        "groupByExpressions": undefined,
         "groupByKeyword": undefined,
+        "groupBySeparators": undefined,
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
@@ -3644,9 +3644,9 @@ describe('Test Join Clause', () => {
       SqlQuery {
         "explainKeyword": undefined,
         "fromKeyword": "from",
-        "groupByExpression": undefined,
-        "groupByExpressionSeparators": undefined,
+        "groupByExpressions": undefined,
         "groupByKeyword": undefined,
+        "groupBySeparators": undefined,
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
@@ -3773,9 +3773,9 @@ describe('Test Join Clause', () => {
       SqlQuery {
         "explainKeyword": undefined,
         "fromKeyword": "from",
-        "groupByExpression": undefined,
-        "groupByExpressionSeparators": undefined,
+        "groupByExpressions": undefined,
         "groupByKeyword": undefined,
+        "groupBySeparators": undefined,
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
@@ -3902,9 +3902,9 @@ describe('Test Join Clause', () => {
       SqlQuery {
         "explainKeyword": undefined,
         "fromKeyword": "from",
-        "groupByExpression": undefined,
-        "groupByExpressionSeparators": undefined,
+        "groupByExpressions": undefined,
         "groupByKeyword": undefined,
+        "groupBySeparators": undefined,
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
@@ -4036,9 +4036,9 @@ describe('Queries with comments', () => {
       SqlQuery {
         "explainKeyword": undefined,
         "fromKeyword": "from",
-        "groupByExpression": undefined,
-        "groupByExpressionSeparators": undefined,
+        "groupByExpressions": undefined,
         "groupByKeyword": undefined,
+        "groupBySeparators": undefined,
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
@@ -4199,7 +4199,7 @@ describe('No spacing', () => {
       SqlQuery {
         "explainKeyword": undefined,
         "fromKeyword": "FROM",
-        "groupByExpression": Array [
+        "groupByExpressions": Array [
           SqlRef {
             "column": "channel",
             "innerSpacing": Object {},
@@ -4211,8 +4211,8 @@ describe('No spacing', () => {
             "type": "ref",
           },
         ],
-        "groupByExpressionSeparators": Array [],
         "groupByKeyword": "GROUP BY",
+        "groupBySeparators": Array [],
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {

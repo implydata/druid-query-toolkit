@@ -641,7 +641,7 @@ describe('addToGroupBy', () => {
       SqlQuery {
         "explainKeyword": undefined,
         "fromKeyword": "from",
-        "groupByExpression": Array [
+        "groupByExpressions": Array [
           SqlLiteral {
             "innerSpacing": Object {},
             "keyword": undefined,
@@ -650,8 +650,8 @@ describe('addToGroupBy', () => {
             "value": 2,
           },
         ],
-        "groupByExpressionSeparators": Array [],
         "groupByKeyword": "GROUP BY",
+        "groupBySeparators": Array [],
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {

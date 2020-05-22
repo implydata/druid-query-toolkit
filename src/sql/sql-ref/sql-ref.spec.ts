@@ -246,9 +246,9 @@ describe('upgrades', () => {
       SqlQuery {
         "explainKeyword": undefined,
         "fromKeyword": "from",
-        "groupByExpression": undefined,
-        "groupByExpressionSeparators": undefined,
+        "groupByExpressions": undefined,
         "groupByKeyword": undefined,
+        "groupBySeparators": undefined,
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {

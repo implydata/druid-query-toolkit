@@ -80,8 +80,8 @@ SqlQuery =
     innerSpacing.preGroupByKeyword = groupBy[0];
     value.groupByKeyword = groupBy[1].groupByKeyword;
     innerSpacing.postGroupByKeyword = groupBy[1].postGroupByKeyword;
-    value.groupByExpression = groupBy[1].groupByExpression;
-    value.groupByExpressionSeparators = groupBy[1].groupByExpressionSeparators;
+    value.groupByExpressions = groupBy[1].groupByExpressions;
+    value.groupBySeparators = groupBy[1].groupBySeparators;
   }
 
   if (having) {
@@ -229,13 +229,13 @@ WhereClause = whereKeyword:WhereToken postWhereKeyword:_ whereExpression:Express
   };
 }
 
-GroupByClause = groupByKeyword:GroupByToken postGroupByKeyword:_ groupByExpressionHead:Expression groupByExpressionTail:(Comma Expression)*
+GroupByClause = groupByKeyword:GroupByToken postGroupByKeyword:_ groupByExpressionsHead:Expression groupByExpressionsTail:(Comma Expression)*
 {
   return {
     groupByKeyword: groupByKeyword,
     postGroupByKeyword: postGroupByKeyword,
-    groupByExpression: groupByExpressionTail ? makeListMap(groupByExpressionTail, 1, groupByExpressionHead) : [groupByExpressionHead],
-    groupByExpressionSeparators: groupByExpressionTail ? makeListMap(groupByExpressionTail, 0) : undefined,
+    groupByExpressions: groupByExpressionsTail ? makeListMap(groupByExpressionsTail, 1, groupByExpressionsHead) : [groupByExpressionsHead],
+    groupBySeparators: groupByExpressionsTail ? makeListMap(groupByExpressionsTail, 0) : undefined,
   };
 }
 

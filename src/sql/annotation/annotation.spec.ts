@@ -31,9 +31,9 @@ describe('Queries with annotated comments post query', () => {
       SqlQuery {
         "explainKeyword": undefined,
         "fromKeyword": "from",
-        "groupByExpression": undefined,
-        "groupByExpressionSeparators": undefined,
+        "groupByExpressions": undefined,
         "groupByKeyword": undefined,
+        "groupBySeparators": undefined,
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
@@ -186,9 +186,9 @@ describe('Queries with annotated comments post query', () => {
       SqlQuery {
         "explainKeyword": undefined,
         "fromKeyword": "from",
-        "groupByExpression": undefined,
-        "groupByExpressionSeparators": undefined,
+        "groupByExpressions": undefined,
         "groupByKeyword": undefined,
+        "groupBySeparators": undefined,
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
@@ -333,9 +333,9 @@ describe('Queries with annotated comments post query', () => {
       SqlQuery {
         "explainKeyword": undefined,
         "fromKeyword": "from",
-        "groupByExpression": undefined,
-        "groupByExpressionSeparators": undefined,
+        "groupByExpressions": undefined,
         "groupByKeyword": undefined,
+        "groupBySeparators": undefined,
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
@@ -492,9 +492,9 @@ describe('Queries with annotated comments post select', () => {
       SqlQuery {
         "explainKeyword": undefined,
         "fromKeyword": "from",
-        "groupByExpression": undefined,
-        "groupByExpressionSeparators": undefined,
+        "groupByExpressions": undefined,
         "groupByKeyword": undefined,
+        "groupBySeparators": undefined,
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
@@ -639,9 +639,9 @@ describe('Queries with annotated comments post select and post query', () => {
       SqlQuery {
         "explainKeyword": undefined,
         "fromKeyword": "from",
-        "groupByExpression": undefined,
-        "groupByExpressionSeparators": undefined,
+        "groupByExpressions": undefined,
         "groupByKeyword": undefined,
+        "groupBySeparators": undefined,
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
