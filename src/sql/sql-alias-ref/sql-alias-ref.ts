@@ -24,22 +24,22 @@ export interface SqlAliasRefValue extends SqlBaseValue {
 export class SqlAliasRef extends SqlBase {
   static type = 'alias-ref';
 
-  static sqlAliasFactory(column: SqlBase, alias: string) {
+  static sqlAliasFactory(expression: SqlBase, alias: string) {
     return new SqlAliasRef({
       type: SqlAliasRef.type,
-      expression: column,
+      expression: expression,
       asKeyword: 'AS',
       alias: SqlRef.fromStringWithDoubleQuotes(alias),
     } as SqlAliasRefValue);
   }
 
-  public readonly column: SqlBase;
+  public readonly expression: SqlBase;
   public readonly asKeyword: string;
   public readonly alias: SqlRef;
 
   constructor(options: SqlAliasRefValue) {
     super(options, SqlAliasRef.type);
-    this.column = options.expression;
+    this.expression = options.expression;
     this.asKeyword = options.asKeyword;
     this.alias = options.alias;
   }
@@ -52,20 +52,22 @@ export class SqlAliasRef extends SqlBase {
 
   public valueOf() {
     const value = super.valueOf() as SqlAliasRefValue;
-    value.expression = this.column;
+    value.expression = this.expression;
     value.asKeyword = this.asKeyword;
     value.alias = this.alias;
     return value as SqlAliasRefValue;
   }
 
   public toRawString(): string {
-    return [
-      this.column,
-      this.getInnerSpace('postExpression'),
-      this.asKeyword,
-      this.getInnerSpace('postAs'),
-      this.alias.toString(),
-    ].join('');
+    const rawParts: string[] = [this.expression.toString(), this.getInnerSpace('postExpression')];
+
+    if (this.asKeyword) {
+      rawParts.push(this.asKeyword, this.getInnerSpace('postAs'));
+    }
+
+    rawParts.push(this.alias.toString());
+
+    return rawParts.join('');
   }
 }
 

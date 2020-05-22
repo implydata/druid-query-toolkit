@@ -229,20 +229,20 @@ describe('Druid Query Tests', () => {
     backAndForth(sql);
   });
 
-  it('test with clause', () => {
+  it('test WITH clause 1', () => {
     const sql = sane`
       WITH temporaryTable (averageValue) as
       (SELECT avg(Attr1)
-      FROM Table)
+      FROM Tbl)
       SELECT Attr1
-      FROM Table
-      WHERE Table.Attr1 > temporaryTable.averageValue
+      FROM Tbl
+      WHERE Tbl.Attr1 > temporaryTable.averageValue
     `;
 
     backAndForth(sql);
   });
 
-  it('test with clause', () => {
+  it('test WITH clause 2', () => {
     const sql = sane`
       WITH totalSalary(Airline, total) as
       (SELECT Airline, sum(Salary)
@@ -259,7 +259,7 @@ describe('Druid Query Tests', () => {
     backAndForth(sql);
   });
 
-  it('test with clause', () => {
+  it('test WITH clause 3', () => {
     const sql = sane`
       WITH totalSalary(Airline, total) as
       (SELECT Airline, sum(Salary)

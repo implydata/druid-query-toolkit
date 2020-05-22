@@ -25,7 +25,109 @@ export interface SqlBaseValue {
   parens?: Parens[];
 }
 
+const RESERVED: string[] = [
+  'ALL',
+  'ALTER',
+  'APPLY',
+  'AS',
+  'ASC',
+  'ATTRIBUTES',
+  'BY',
+  'CATALOG',
+  'CROSS',
+  'CUBE',
+  'DATABASE',
+  'DELETE',
+  'DESC',
+  'DESCRIBE',
+  'DISTINCT',
+  'EXCEPT',
+  'EXCLUDING',
+  'EXPLAIN',
+  'EXTEND',
+  'FETCH',
+  'FIRST',
+  'FOLLOWING',
+  'FOR',
+  'FROM',
+  'FULL',
+  'GROUP',
+  'GROUPING',
+  'HAVING',
+  'IMPLEMENTATION',
+  'INCLUDING',
+  'INNER',
+  'INSERT',
+  'INTERSECT',
+  'INTO',
+  'JOIN',
+  'JSON',
+  'LAST',
+  'LATERAL',
+  'LEFT',
+  'LIMIT',
+  'MATCHED',
+  'MERGE',
+  'MINUS',
+  'NATURAL',
+  'NEXT',
+  'NOT',
+  'NULL',
+  'NULLS',
+  'OF',
+  'OFFSET',
+  'ON',
+  'ONLY',
+  'ORDER',
+  'ORDINALITY',
+  'OUTER',
+  'PARTITION',
+  'PLAN',
+  'PRECEDING',
+  'RANGE',
+  'RESET',
+  'RIGHT',
+  'ROLLUP',
+  'ROW',
+  'ROWS',
+  'SCHEMA',
+  'SELECT',
+  'SESSION',
+  'SET',
+  'SETS',
+  'SPECIFIC',
+  'STATEMENT',
+  'STREAM',
+  'SYSTEM',
+  'TABLE',
+  'THEN',
+  'TYPE',
+  'UNION',
+  'UNNEST',
+  'UPDATE',
+  'UPSERT',
+  'USING',
+  'VALUES',
+  'WHEN',
+  'WHERE',
+  'WINDOW',
+  'WITH',
+  'WITHOUT',
+  'XML',
+];
+
+const reservedLookup: Record<string, boolean> = {};
+for (const r of RESERVED) {
+  reservedLookup[r] = true;
+}
+
 export abstract class SqlBase {
+  static RESERVED = RESERVED;
+
+  static isReserved(keyword: string) {
+    return Boolean(reservedLookup[keyword.toUpperCase()]);
+  }
+
   static cleanObject(obj: Record<string, any> | undefined): Record<string, string> | undefined {
     if (!obj) return obj;
     const cleanObj: Record<string, string> = {};

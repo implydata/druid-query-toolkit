@@ -17,7 +17,7 @@ import { backAndForth, sane } from '../../test-utils';
 
 describe('SqlQuery', () => {
   it('Simple select with single column', () => {
-    const sql = `Select notingham from table`;
+    const sql = `Select notingham from tbl`;
 
     backAndForth(sql);
   });
@@ -83,7 +83,7 @@ describe('SqlQuery', () => {
   });
 
   it('Simple select', () => {
-    const sql = `Select * from table`;
+    const sql = `Select * from tbl`;
 
     backAndForth(sql);
 
@@ -144,7 +144,7 @@ describe('SqlQuery', () => {
             "namespace": undefined,
             "namespaceQuotes": undefined,
             "quotes": undefined,
-            "table": "table",
+            "table": "tbl",
             "tableQuotes": "",
             "type": "ref",
           },
@@ -162,7 +162,7 @@ describe('SqlQuery', () => {
   });
 
   it('Simple select in brackets', () => {
-    const sql = `(Select * from table)`;
+    const sql = `(Select * from tbl)`;
 
     backAndForth(sql);
 
@@ -229,7 +229,7 @@ describe('SqlQuery', () => {
             "namespace": undefined,
             "namespaceQuotes": undefined,
             "quotes": undefined,
-            "table": "table",
+            "table": "tbl",
             "tableQuotes": "",
             "type": "ref",
           },
@@ -247,7 +247,7 @@ describe('SqlQuery', () => {
   });
 
   it('Simple select, columns with aliases', () => {
-    const sql = `Select Sum(*) As sums from table`;
+    const sql = `Select Sum(*) As sums from tbl`;
 
     backAndForth(sql);
 
@@ -298,7 +298,7 @@ describe('SqlQuery', () => {
               "type": "ref",
             },
             "asKeyword": "As",
-            "column": SqlFunction {
+            "expression": SqlFunction {
               "arguments": Array [
                 SqlRef {
                   "column": "*",
@@ -348,7 +348,7 @@ describe('SqlQuery', () => {
             "namespace": undefined,
             "namespaceQuotes": undefined,
             "quotes": undefined,
-            "table": "table",
+            "table": "tbl",
             "tableQuotes": "",
             "type": "ref",
           },
@@ -368,7 +368,7 @@ describe('SqlQuery', () => {
   it('Simple select, columns with aliases and case expressions', () => {
     const sql = sane`
       SELECT
-        datasource,
+        datasource d,
         SUM("size") AS total_size,
         CASE WHEN SUM("size") = 0 THEN 0 ELSE SUM("size")  END AS avg_size,
         CASE WHEN SUM(num_rows) = 0 THEN 0 ELSE SUM("num_rows") END AS avg_num_rows,
@@ -444,15 +444,32 @@ describe('SqlQuery', () => {
           },
         ],
         "selectValues": Array [
-          SqlRef {
-            "column": "datasource",
-            "innerSpacing": Object {},
-            "namespace": undefined,
-            "namespaceQuotes": undefined,
-            "quotes": "",
-            "table": undefined,
-            "tableQuotes": undefined,
-            "type": "ref",
+          SqlAliasRef {
+            "alias": SqlRef {
+              "column": "d",
+              "innerSpacing": Object {},
+              "namespace": undefined,
+              "namespaceQuotes": undefined,
+              "quotes": "",
+              "table": undefined,
+              "tableQuotes": undefined,
+              "type": "ref",
+            },
+            "asKeyword": undefined,
+            "expression": SqlRef {
+              "column": "datasource",
+              "innerSpacing": Object {},
+              "namespace": undefined,
+              "namespaceQuotes": undefined,
+              "quotes": "",
+              "table": undefined,
+              "tableQuotes": undefined,
+              "type": "ref",
+            },
+            "innerSpacing": Object {
+              "postExpression": " ",
+            },
+            "type": "alias-ref",
           },
           SqlAliasRef {
             "alias": SqlRef {
@@ -466,7 +483,7 @@ describe('SqlQuery', () => {
               "type": "ref",
             },
             "asKeyword": "AS",
-            "column": SqlFunction {
+            "expression": SqlFunction {
               "arguments": Array [
                 SqlRef {
                   "column": "size",
@@ -516,7 +533,7 @@ describe('SqlQuery', () => {
               "type": "ref",
             },
             "asKeyword": "AS",
-            "column": SqlCaseSearched {
+            "expression": SqlCaseSearched {
               "caseKeyword": "CASE",
               "elseExpression": SqlFunction {
                 "arguments": Array [
@@ -648,7 +665,7 @@ describe('SqlQuery', () => {
               "type": "ref",
             },
             "asKeyword": "AS",
-            "column": SqlCaseSearched {
+            "expression": SqlCaseSearched {
               "caseKeyword": "CASE",
               "elseExpression": SqlFunction {
                 "arguments": Array [
@@ -780,7 +797,7 @@ describe('SqlQuery', () => {
               "type": "ref",
             },
             "asKeyword": "AS",
-            "column": SqlFunction {
+            "expression": SqlFunction {
               "arguments": Array [
                 SqlRef {
                   "column": "*",
@@ -934,7 +951,7 @@ describe('SqlQuery', () => {
               "type": "ref",
             },
             "asKeyword": "AS",
-            "column": SqlFunction {
+            "expression": SqlFunction {
               "arguments": Array [
                 SqlRef {
                   "column": "size",
@@ -984,7 +1001,7 @@ describe('SqlQuery', () => {
               "type": "ref",
             },
             "asKeyword": "AS",
-            "column": SqlFunction {
+            "expression": SqlFunction {
               "arguments": Array [
                 SqlRef {
                   "column": "*",
@@ -1054,7 +1071,7 @@ describe('SqlQuery', () => {
   });
 
   it('Simple select with Explain', () => {
-    const sql = `Explain plan for Select * from table`;
+    const sql = `Explain plan for Select * from tbl`;
 
     backAndForth(sql);
 
@@ -1116,7 +1133,7 @@ describe('SqlQuery', () => {
             "namespace": undefined,
             "namespaceQuotes": undefined,
             "quotes": undefined,
-            "table": "table",
+            "table": "tbl",
             "tableQuotes": "",
             "type": "ref",
           },
@@ -1138,7 +1155,7 @@ describe('SqlQuery', () => {
       WITH dept_count AS (
         SELECT deptno
         FROM   emp)
-      Select * from table
+      Select * from tbl
     `;
 
     backAndForth(sql);
@@ -1203,7 +1220,7 @@ describe('SqlQuery', () => {
             "namespace": undefined,
             "namespaceQuotes": undefined,
             "quotes": undefined,
-            "table": "table",
+            "table": "tbl",
             "tableQuotes": "",
             "type": "ref",
           },
@@ -1322,7 +1339,7 @@ describe('SqlQuery', () => {
 
 describe('expressions with where clause', () => {
   it('Simple select with where', () => {
-    const sql = `Select * from table where column > 1`;
+    const sql = `Select * from tbl where column > 1`;
 
     backAndForth(sql);
 
@@ -1385,7 +1402,7 @@ describe('expressions with where clause', () => {
             "namespace": undefined,
             "namespaceQuotes": undefined,
             "quotes": undefined,
-            "table": "table",
+            "table": "tbl",
             "tableQuotes": "",
             "type": "ref",
           },
@@ -1751,7 +1768,7 @@ describe('expressions with where clause', () => {
 
 describe('expressions with group by clause', () => {
   it('Simple select with group by ', () => {
-    const sql = `Select * from table group by column`;
+    const sql = `Select * from tbl group by column`;
 
     backAndForth(sql);
 
@@ -1825,7 +1842,7 @@ describe('expressions with group by clause', () => {
             "namespace": undefined,
             "namespaceQuotes": undefined,
             "quotes": undefined,
-            "table": "table",
+            "table": "tbl",
             "tableQuotes": "",
             "type": "ref",
           },
@@ -1843,7 +1860,7 @@ describe('expressions with group by clause', () => {
   });
 
   it('Simple select with group by ', () => {
-    const sql = `Select * from table group by column`;
+    const sql = `Select * from tbl group by column`;
 
     backAndForth(sql);
 
@@ -1917,7 +1934,7 @@ describe('expressions with group by clause', () => {
             "namespace": undefined,
             "namespaceQuotes": undefined,
             "quotes": undefined,
-            "table": "table",
+            "table": "tbl",
             "tableQuotes": "",
             "type": "ref",
           },
@@ -1935,7 +1952,7 @@ describe('expressions with group by clause', () => {
   });
 
   it('Simple select with multiple group by clauses in brackets', () => {
-    const sql = `(Select * from table group by column, columnTwo)`;
+    const sql = `(Select * from tbl group by column, columnTwo)`;
 
     backAndForth(sql);
 
@@ -2031,7 +2048,7 @@ describe('expressions with group by clause', () => {
             "namespace": undefined,
             "namespaceQuotes": undefined,
             "quotes": undefined,
-            "table": "table",
+            "table": "tbl",
             "tableQuotes": "",
             "type": "ref",
           },
@@ -2051,7 +2068,7 @@ describe('expressions with group by clause', () => {
 
 describe('expressions with having clause', () => {
   it('Simple select with where', () => {
-    const sql = `Select * from table having column > 1`;
+    const sql = `Select * from tbl having column > 1`;
 
     backAndForth(sql);
 
@@ -2144,7 +2161,7 @@ describe('expressions with having clause', () => {
             "namespace": undefined,
             "namespaceQuotes": undefined,
             "quotes": undefined,
-            "table": "table",
+            "table": "tbl",
             "tableQuotes": "",
             "type": "ref",
           },
@@ -2480,7 +2497,7 @@ describe('expressions with having clause', () => {
 
 describe('expressions with order by clause', () => {
   it('Simple select with number order by', () => {
-    const sql = `Select column from table order by 1`;
+    const sql = `Select column from tbl order by 1`;
 
     backAndForth(sql);
 
@@ -2555,7 +2572,7 @@ describe('expressions with order by clause', () => {
             "namespace": undefined,
             "namespaceQuotes": undefined,
             "quotes": undefined,
-            "table": "table",
+            "table": "tbl",
             "tableQuotes": "",
             "type": "ref",
           },
@@ -2573,7 +2590,7 @@ describe('expressions with order by clause', () => {
   });
 
   it('Simple select with ref order by', () => {
-    const sql = `Select column from table order by column`;
+    const sql = `Select column from tbl order by column`;
 
     backAndForth(sql);
 
@@ -2651,7 +2668,7 @@ describe('expressions with order by clause', () => {
             "namespace": undefined,
             "namespaceQuotes": undefined,
             "quotes": undefined,
-            "table": "table",
+            "table": "tbl",
             "tableQuotes": "",
             "type": "ref",
           },
@@ -2669,7 +2686,7 @@ describe('expressions with order by clause', () => {
   });
 
   it('Simple select with number order by and direction', () => {
-    const sql = `Select column from table order by 1 Asc`;
+    const sql = `Select column from tbl order by 1 Asc`;
 
     backAndForth(sql);
 
@@ -2744,7 +2761,7 @@ describe('expressions with order by clause', () => {
             "namespace": undefined,
             "namespaceQuotes": undefined,
             "quotes": undefined,
-            "table": "table",
+            "table": "tbl",
             "tableQuotes": "",
             "type": "ref",
           },
@@ -2762,7 +2779,7 @@ describe('expressions with order by clause', () => {
   });
 
   it('Simple select with ref order by and direction', () => {
-    const sql = `Select column, columnTwo from table order by column DESC`;
+    const sql = `Select column, columnTwo from tbl order by column DESC`;
 
     backAndForth(sql);
 
@@ -2857,7 +2874,7 @@ describe('expressions with order by clause', () => {
             "namespace": undefined,
             "namespaceQuotes": undefined,
             "quotes": undefined,
-            "table": "table",
+            "table": "tbl",
             "tableQuotes": "",
             "type": "ref",
           },
@@ -2875,7 +2892,7 @@ describe('expressions with order by clause', () => {
   });
 
   it('Simple select ordered on multiple columns', () => {
-    const sql = `Select column from table order by 1 ASC, column`;
+    const sql = `Select column from tbl order by 1 ASC, column`;
 
     backAndForth(sql);
 
@@ -2970,7 +2987,7 @@ describe('expressions with order by clause', () => {
             "namespace": undefined,
             "namespaceQuotes": undefined,
             "quotes": undefined,
-            "table": "table",
+            "table": "tbl",
             "tableQuotes": "",
             "type": "ref",
           },
@@ -2988,7 +3005,7 @@ describe('expressions with order by clause', () => {
   });
 
   it('Simple select ordered on multiple columns', () => {
-    const sql = `Select column, columnTwo from table order by 1 ASC, column DESC`;
+    const sql = `Select column, columnTwo from tbl order by 1 ASC, column DESC`;
 
     backAndForth(sql);
 
@@ -3100,7 +3117,7 @@ describe('expressions with order by clause', () => {
             "namespace": undefined,
             "namespaceQuotes": undefined,
             "quotes": undefined,
-            "table": "table",
+            "table": "tbl",
             "tableQuotes": "",
             "type": "ref",
           },
@@ -3120,7 +3137,7 @@ describe('expressions with order by clause', () => {
 
 describe('expressions with limit clause', () => {
   it('Simple select with limit', () => {
-    const sql = `Select * from table limit 1`;
+    const sql = `Select * from tbl limit 1`;
 
     backAndForth(sql);
 
@@ -3189,7 +3206,7 @@ describe('expressions with limit clause', () => {
             "namespace": undefined,
             "namespaceQuotes": undefined,
             "quotes": undefined,
-            "table": "table",
+            "table": "tbl",
             "tableQuotes": "",
             "type": "ref",
           },
@@ -3209,7 +3226,7 @@ describe('expressions with limit clause', () => {
 
 describe('expressions with union clause', () => {
   it('Simple select with union all ', () => {
-    const sql = `Select * from table union all select * from otherTable`;
+    const sql = `Select * from tbl union all select * from otherTable`;
 
     backAndForth(sql);
 
@@ -3272,7 +3289,7 @@ describe('expressions with union clause', () => {
             "namespace": undefined,
             "namespaceQuotes": undefined,
             "quotes": undefined,
-            "table": "table",
+            "table": "tbl",
             "tableQuotes": "",
             "type": "ref",
           },
@@ -3361,7 +3378,7 @@ describe('expressions with union clause', () => {
 
 describe('Test Join Clause', () => {
   it('Inner join', () => {
-    const sql = 'Select * from table INNER Join anotherTable ON column = column';
+    const sql = 'Select * from tbl INNER Join anotherTable ON column = column';
 
     backAndForth(sql);
 
@@ -3472,7 +3489,7 @@ describe('Test Join Clause', () => {
             "namespace": undefined,
             "namespaceQuotes": undefined,
             "quotes": undefined,
-            "table": "table",
+            "table": "tbl",
             "tableQuotes": "",
             "type": "ref",
           },
@@ -3490,7 +3507,7 @@ describe('Test Join Clause', () => {
   });
 
   it('Left join', () => {
-    const sql = 'Select * from table Left Join anotherTable ON column = column';
+    const sql = 'Select * from tbl Left Join anotherTable ON column = column';
 
     backAndForth(sql);
 
@@ -3601,7 +3618,7 @@ describe('Test Join Clause', () => {
             "namespace": undefined,
             "namespaceQuotes": undefined,
             "quotes": undefined,
-            "table": "table",
+            "table": "tbl",
             "tableQuotes": "",
             "type": "ref",
           },
@@ -3619,7 +3636,7 @@ describe('Test Join Clause', () => {
   });
 
   it('Right join', () => {
-    const sql = 'Select * from table RIGHT Join anotherTable ON column = column';
+    const sql = 'Select * from tbl RIGHT Join anotherTable ON column = column';
 
     backAndForth(sql);
 
@@ -3730,7 +3747,7 @@ describe('Test Join Clause', () => {
             "namespace": undefined,
             "namespaceQuotes": undefined,
             "quotes": undefined,
-            "table": "table",
+            "table": "tbl",
             "tableQuotes": "",
             "type": "ref",
           },
@@ -3748,7 +3765,7 @@ describe('Test Join Clause', () => {
   });
 
   it('Full join', () => {
-    const sql = 'Select * from table FULL Join anotherTable ON column = column';
+    const sql = 'Select * from tbl FULL Join anotherTable ON column = column';
 
     backAndForth(sql);
 
@@ -3859,7 +3876,7 @@ describe('Test Join Clause', () => {
             "namespace": undefined,
             "namespaceQuotes": undefined,
             "quotes": undefined,
-            "table": "table",
+            "table": "tbl",
             "tableQuotes": "",
             "type": "ref",
           },
@@ -3877,7 +3894,7 @@ describe('Test Join Clause', () => {
   });
 
   it('Full Outer join', () => {
-    const sql = 'Select * from table FULL OUTER Join anotherTable ON column = column';
+    const sql = 'Select * from tbl FULL OUTER Join anotherTable ON column = column';
 
     backAndForth(sql);
 
@@ -3988,7 +4005,7 @@ describe('Test Join Clause', () => {
             "namespace": undefined,
             "namespaceQuotes": undefined,
             "quotes": undefined,
-            "table": "table",
+            "table": "tbl",
             "tableQuotes": "",
             "type": "ref",
           },
@@ -4010,7 +4027,7 @@ describe('Queries with comments', () => {
   it('single comment', () => {
     const sql = sane`
       Select -- some comment 
-      column from table
+      column from tbl
     `;
 
     backAndForth(sql);
@@ -4073,7 +4090,7 @@ describe('Queries with comments', () => {
             "namespace": undefined,
             "namespaceQuotes": undefined,
             "quotes": undefined,
-            "table": "table",
+            "table": "tbl",
             "tableQuotes": "",
             "type": "ref",
           },
@@ -4094,7 +4111,7 @@ describe('Queries with comments', () => {
     const sql = sane`
       Select --some comment
         --some comment
-      column from table
+      column from tbl
     `;
 
     backAndForth(sql);
@@ -4104,7 +4121,7 @@ describe('Queries with comments', () => {
     const sql = sane`
       Select
         -- some comment
-      column from table
+      column from tbl
     `;
 
     backAndForth(sql);
@@ -4114,7 +4131,7 @@ describe('Queries with comments', () => {
     const sql = sane`
       Select
         -- some--comment
-        column from table
+        column from tbl
     `;
 
     backAndForth(sql);
@@ -4123,7 +4140,7 @@ describe('Queries with comments', () => {
   it('comment with no space', () => {
     const sql = sane`
       Select --some comment
-      column from table
+      column from tbl
     `;
 
     backAndForth(sql);
@@ -4132,7 +4149,7 @@ describe('Queries with comments', () => {
   it('comment with non english', () => {
     const sql = sane`
       Select --Здравствуйте
-      column from table
+      column from tbl
     `;
 
     backAndForth(sql);
@@ -4141,7 +4158,7 @@ describe('Queries with comments', () => {
   it('comment at end of query', () => {
     const sql = sane`
       Select 
-      column from table
+      column from tbl
       -- comment
     `;
 
@@ -4151,7 +4168,7 @@ describe('Queries with comments', () => {
   it('comment with unary negative', () => {
     const sql = sane`
       Select 
-      column from table
+      column from tbl
       -- comment
       order by -1
     `;
@@ -4163,7 +4180,7 @@ describe('Queries with comments', () => {
 describe('Queries with annotated comments', () => {
   it('single comment', () => {
     const sql = sane`
-      Select column, column1, column2 from table 
+      Select column, column1, column2 from tbl 
       order by column
       --: valueName = value
     `;
@@ -4278,7 +4295,7 @@ describe('No spacing', () => {
               "type": "ref",
             },
             "asKeyword": "AS",
-            "column": SqlFunction {
+            "expression": SqlFunction {
               "arguments": Array [
                 SqlRef {
                   "column": "*",
@@ -4328,7 +4345,7 @@ describe('No spacing', () => {
               "type": "ref",
             },
             "asKeyword": "AS",
-            "column": SqlFunction {
+            "expression": SqlFunction {
               "arguments": Array [
                 SqlRef {
                   "column": "cityName",

@@ -287,17 +287,22 @@ UnionClause = unionKeyword:UnionToken postUnionKeyword:_ unionQuery:SqlQuery
 
 // ------------------------------
 
-Alias = expression:Expression postExpression:_ asKeyword:AsToken postAs:_ alias:SqlRef
+Alias = expression:Expression postExpression:_ as:(AsToken _)? alias:SqlRef
 {
-  return new sql.SqlAliasRef({
+  var value = {
     expression: expression,
-    asKeyword: asKeyword,
-    alias: alias,
-    innerSpacing: {
-      postExpression: postExpression,
-      postAs: postAs,
-    }
-  });
+    alias: alias
+  };
+  var innerSpacing = value.innerSpacing = {
+    postExpression: postExpression
+  };
+
+  if (as) {
+    value.asKeyword = as[0];
+    innerSpacing.postAs = as[1];
+  }
+
+  return new sql.SqlAliasRef(value);
 }
 
 /*
@@ -709,10 +714,10 @@ QuotedRefPart = ["] name:$([^"]+) ["]
   };
 }
 
-UnquotedRefPart = name:$([a-z_]i [a-z0-9_]i*)
+UnquotedRefPart = name:$([a-z_]i [a-z0-9_]i*) !{ return SqlBase.isReserved(name) }
 {
   return {
-    name: name,
+    name: text(),
     quotes: ''
   };
 }

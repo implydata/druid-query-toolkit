@@ -21,7 +21,7 @@ describe('Queries with annotated comments post query', () => {
       Select column --: valueName = value
       , column1 --: valueName = value
       , column2 
-      from table 
+      from tbl 
       order by column
     `;
 
@@ -156,7 +156,7 @@ describe('Queries with annotated comments post query', () => {
             "namespace": undefined,
             "namespaceQuotes": undefined,
             "quotes": undefined,
-            "table": "table",
+            "table": "tbl",
             "tableQuotes": "",
             "type": "ref",
           },
@@ -175,7 +175,7 @@ describe('Queries with annotated comments post query', () => {
 
   it('single annotated comment', () => {
     const sql = sane`
-      Select column, column1, column2 from table
+      Select column, column1, column2 from tbl
       order by column
       --: valueName = value
     `;
@@ -302,7 +302,7 @@ describe('Queries with annotated comments post query', () => {
             "namespace": undefined,
             "namespaceQuotes": undefined,
             "quotes": undefined,
-            "table": "table",
+            "table": "tbl",
             "tableQuotes": "",
             "type": "ref",
           },
@@ -321,7 +321,7 @@ describe('Queries with annotated comments post query', () => {
 
   it('double annotated comment no spacing', () => {
     const sql = sane`
-      Select column, column1, column2 from table
+      Select column, column1, column2 from tbl
       order by column
       --: valueName = value
       --:valueName = value
@@ -460,7 +460,7 @@ describe('Queries with annotated comments post query', () => {
             "namespace": undefined,
             "namespaceQuotes": undefined,
             "quotes": undefined,
-            "table": "table",
+            "table": "tbl",
             "tableQuotes": "",
             "type": "ref",
           },
@@ -482,7 +482,7 @@ describe('Queries with annotated comments post select', () => {
   it('single annotated comment', () => {
     const sql = sane`
       Select column, column1, column2 --: valueName = value
-      from table
+      from tbl
       order by column
     `;
 
@@ -606,7 +606,7 @@ describe('Queries with annotated comments post select', () => {
             "namespace": undefined,
             "namespaceQuotes": undefined,
             "quotes": undefined,
-            "table": "table",
+            "table": "tbl",
             "tableQuotes": "",
             "type": "ref",
           },
@@ -628,7 +628,7 @@ describe('Queries with annotated comments post select and post query', () => {
   it('single annotated comment', () => {
     const sql = sane`
       Select column, column1, column2 --: valueName = value 
-      from table
+      from tbl
       order by column
       --: valueName = value
     `;
@@ -765,7 +765,7 @@ describe('Queries with annotated comments post select and post query', () => {
             "namespace": undefined,
             "namespaceQuotes": undefined,
             "quotes": undefined,
-            "table": "table",
+            "table": "tbl",
             "tableQuotes": "",
             "type": "ref",
           },

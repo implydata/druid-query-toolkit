@@ -579,42 +579,42 @@ describe('getCurrentFilters', () => {
 
 describe('addAggregateColumn', () => {
   it('single column', () => {
-    const sql = 'select column1 from table';
+    const sql = 'select column1 from tbl';
 
     expect(
       parseSqlQuery(sql)
         .addAggregateColumn([SqlRef.fromString('column2')], 'min', 'alias')
         .toString(),
-    ).toMatchInlineSnapshot(`"select column1, min(column2) AS \\"alias\\" from table"`);
+    ).toMatchInlineSnapshot(`"select column1, min(column2) AS \\"alias\\" from tbl"`);
   });
 
   it('function with decorator', () => {
-    const sql = 'select column1 from table';
+    const sql = 'select column1 from tbl';
 
     expect(
       parseSqlQuery(sql)
         .addAggregateColumn([SqlRef.fromString('column2')], 'min', 'alias', undefined, 'DISTINCT')
         .toString(),
-    ).toMatchInlineSnapshot(`"select column1, min(DISTINCT column2) AS \\"alias\\" from table"`);
+    ).toMatchInlineSnapshot(`"select column1, min(DISTINCT column2) AS \\"alias\\" from tbl"`);
   });
 });
 
 describe('addToGroupBy', () => {
   it('add simple column to group by', () => {
-    const sql = 'select Count(*) from table';
+    const sql = 'select Count(*) from tbl';
 
     expect(
       parseSqlQuery(sql)
         .addToGroupBy(SqlRef.fromStringWithDoubleQuotes('column'))
         .toString(),
     ).toMatchInlineSnapshot(`
-      "select \\"column\\", Count(*) from table
+      "select \\"column\\", Count(*) from tbl
       GROUP BY 1"
     `);
   });
 
   it('no existing column', () => {
-    const sql = 'select column1 from table';
+    const sql = 'select column1 from tbl';
 
     expect(
       parseSqlQuery(sql)
@@ -626,7 +626,7 @@ describe('addToGroupBy', () => {
         )
         .toString(),
     ).toMatchInlineSnapshot(`
-      "select min(column1) AS \\"MinColumn\\", column1 from table
+      "select min(column1) AS \\"MinColumn\\", column1 from tbl
       GROUP BY 1"
     `);
   });
@@ -634,7 +634,7 @@ describe('addToGroupBy', () => {
   it('existing columns in group by', () => {
     const sql = sane`
       select column1, min(column1) AS aliasName
-      from table 
+      from tbl 
       GROUP BY 2
     `;
 
@@ -714,7 +714,7 @@ describe('addToGroupBy', () => {
               "type": "ref",
             },
             "asKeyword": "AS",
-            "column": SqlFunction {
+            "expression": SqlFunction {
               "arguments": Array [
                 SqlRef {
                   "column": "column1",
@@ -764,7 +764,7 @@ describe('addToGroupBy', () => {
             "namespace": undefined,
             "namespaceQuotes": undefined,
             "quotes": undefined,
-            "table": "table",
+            "table": "tbl",
             "tableQuotes": "",
             "type": "ref",
           },
@@ -790,7 +790,7 @@ describe('addToGroupBy', () => {
         .toString(),
     ).toMatchInlineSnapshot(`
       "select max(column2) AS \\"MaxColumn\\", column1, min(column1) AS aliasName
-      from table 
+      from tbl 
       GROUP BY 1, 3"
     `);
   });
