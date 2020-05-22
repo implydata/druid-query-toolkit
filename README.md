@@ -328,6 +328,7 @@ SELECT countryName from wikipedia
 
 - Add support for `x NOT IN (subquery)`
 - Add support for `X IN (A, B, C)`
+- Add support for `/* inline comments */`
 
 ## License 
 
