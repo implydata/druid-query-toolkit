@@ -291,10 +291,10 @@ Alias = column:Expression postColumn:_ asKeyword:AsToken postAs:_ alias:SqlRef
 {
   return new sql.SqlAliasRef({
     column: column,
-    postColumn: postColumn || '',
     asKeyword: asKeyword,
     alias: alias,
     innerSpacing: {
+      postColumn: postColumn,
       postAs: postAs,
     }
   });

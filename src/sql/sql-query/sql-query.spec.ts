@@ -332,8 +332,8 @@ describe('SqlQuery', () => {
             },
             "innerSpacing": Object {
               "postAs": " ",
+              "postColumn": " ",
             },
-            "postColumn": " ",
             "type": "alias-ref",
           },
         ],
@@ -500,8 +500,8 @@ describe('SqlQuery', () => {
             },
             "innerSpacing": Object {
               "postAs": " ",
+              "postColumn": " ",
             },
-            "postColumn": " ",
             "type": "alias-ref",
           },
           SqlAliasRef {
@@ -632,8 +632,8 @@ describe('SqlQuery', () => {
             },
             "innerSpacing": Object {
               "postAs": " ",
+              "postColumn": " ",
             },
-            "postColumn": " ",
             "type": "alias-ref",
           },
           SqlAliasRef {
@@ -764,8 +764,8 @@ describe('SqlQuery', () => {
             },
             "innerSpacing": Object {
               "postAs": " ",
+              "postColumn": " ",
             },
-            "postColumn": " ",
             "type": "alias-ref",
           },
           SqlAliasRef {
@@ -814,8 +814,8 @@ describe('SqlQuery', () => {
             },
             "innerSpacing": Object {
               "postAs": " ",
+              "postColumn": " ",
             },
-            "postColumn": " ",
             "type": "alias-ref",
           },
         ],
@@ -968,8 +968,8 @@ describe('SqlQuery', () => {
             },
             "innerSpacing": Object {
               "postAs": " ",
+              "postColumn": " ",
             },
-            "postColumn": " ",
             "type": "alias-ref",
           },
           SqlAliasRef {
@@ -1018,8 +1018,8 @@ describe('SqlQuery', () => {
             },
             "innerSpacing": Object {
               "postAs": " ",
+              "postColumn": " ",
             },
-            "postColumn": " ",
             "type": "alias-ref",
           },
         ],
@@ -4312,8 +4312,8 @@ describe('No spacing', () => {
             },
             "innerSpacing": Object {
               "postAs": "",
+              "postColumn": "",
             },
-            "postColumn": "",
             "type": "alias-ref",
           },
           SqlAliasRef {
@@ -4362,8 +4362,8 @@ describe('No spacing', () => {
             },
             "innerSpacing": Object {
               "postAs": "",
+              "postColumn": "",
             },
-            "postColumn": "",
             "type": "alias-ref",
           },
         ],

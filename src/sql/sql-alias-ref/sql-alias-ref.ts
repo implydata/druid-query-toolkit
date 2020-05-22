@@ -17,7 +17,6 @@ import { SqlBase, SqlBaseValue } from '../sql-base';
 
 export interface SqlAliasRefValue extends SqlBaseValue {
   column: SqlBase;
-  postColumn?: string;
   asKeyword: string;
   alias: SqlRef;
 }
@@ -29,24 +28,18 @@ export class SqlAliasRef extends SqlBase {
     return new SqlAliasRef({
       type: SqlAliasRef.type,
       column: column,
-      postColumn: ' ',
       asKeyword: 'AS',
       alias: SqlRef.fromStringWithDoubleQuotes(alias),
-      innerSpacing: {
-        postAs: ' ',
-      },
     } as SqlAliasRefValue);
   }
 
   public readonly column: SqlBase;
-  public readonly postColumn?: string;
   public readonly asKeyword: string;
   public readonly alias: SqlRef;
 
   constructor(options: SqlAliasRefValue) {
     super(options, SqlAliasRef.type);
     this.column = options.column;
-    this.postColumn = options.postColumn;
     this.asKeyword = options.asKeyword;
     this.alias = options.alias;
   }
@@ -60,21 +53,19 @@ export class SqlAliasRef extends SqlBase {
   public valueOf() {
     const value = super.valueOf() as SqlAliasRefValue;
     value.column = this.column;
-    value.postColumn = this.postColumn;
     value.asKeyword = this.asKeyword;
     value.alias = this.alias;
     return value as SqlAliasRefValue;
   }
 
   public toRawString(): string {
-    if (!this.column) throw Error('not a valid alias');
-    return (
-      this.column +
-      (this.postColumn || '') +
-      this.asKeyword +
-      (this.innerSpacing.postAs || '') +
-      this.alias.toString()
-    );
+    return [
+      this.column,
+      this.getInnerSpace('postColumn'),
+      this.asKeyword,
+      this.getInnerSpace('postAs'),
+      this.alias.toString(),
+    ].join('');
   }
 }
 

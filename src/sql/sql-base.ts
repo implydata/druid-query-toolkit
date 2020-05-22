@@ -91,7 +91,7 @@ export abstract class SqlBase {
     return SqlBase.fromValue(value);
   }
 
-  public getInnerSpace(name: string, defaultSpace = '') {
+  public getInnerSpace(name: string, defaultSpace = ' ') {
     const { innerSpacing } = this;
     if (!innerSpacing) return defaultSpace;
     const space = innerSpacing[name];

@@ -507,7 +507,6 @@ export class SqlQuery extends SqlBase {
     return ret;
   }
 
-  // todo fix groupBy indexes
   removeFromSelect(column: string) {
     const value = this.valueOf();
     const index = this.getColumns().indexOf(column);
@@ -810,10 +809,10 @@ export class SqlQuery extends SqlBase {
     return new SqlQuery(value);
   }
 
+  /**
+   * Returns an array of the string name of all columns in the select clause
+   */
   getColumns() {
-    // returns an array of the string name of all columns in the select clause
-    if (!this.selectValues) return [];
-
     return this.selectValues.map(column => {
       if (column instanceof SqlRef) {
         return column.column;

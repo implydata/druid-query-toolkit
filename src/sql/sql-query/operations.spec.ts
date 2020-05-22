@@ -221,40 +221,58 @@ describe('addWhereFilter test ', () => {
 });
 
 describe('remove functions', () => {
-  it('remove first column from select', () => {
-    expect(
-      parseSqlQuery(`SELECT column, column1
-  FROM sys."github"`)
-        .removeFromSelect('column')
-        .toString(),
-    ).toMatchInlineSnapshot(`
-      "SELECT column1
-        FROM sys.\\"github\\""
-    `);
-  });
+  describe('#removeFromSelect', () => {
+    it('basic columns', () => {
+      const query = parseSqlQuery(sane`
+        SELECT column, column1, column2 
+        FROM github
+      `);
 
-  it('remove middle column from select', () => {
-    expect(
-      parseSqlQuery(`SELECT column, column1, column2
-  FROM sys."github"`)
-        .removeFromSelect('column1')
-        .toString(),
-    ).toMatchInlineSnapshot(`
-      "SELECT column, column2
-        FROM sys.\\"github\\""
-    `);
-  });
+      expect(query.removeFromSelect('column').toString()).toEqual(sane`
+        SELECT column1, column2 
+        FROM github
+      `);
 
-  it('remove end column from select', () => {
-    expect(
-      parseSqlQuery(`SELECT column, column1, column2
-  FROM sys."github"`)
-        .removeFromSelect('column2')
-        .toString(),
-    ).toMatchInlineSnapshot(`
-      "SELECT column, column1
-        FROM sys.\\"github\\""
-    `);
+      expect(query.removeFromSelect('column1').toString()).toEqual(sane`
+        SELECT column, column2 
+        FROM github
+      `);
+
+      expect(query.removeFromSelect('column2').toString()).toEqual(sane`
+        SELECT column, column1 
+        FROM github
+      `);
+    });
+
+    it.skip(`removes from group by and order by`, () => {
+      const query = parseSqlQuery(sane`
+        SELECT column, column1, SUM(a), column2 
+        FROM github
+        GROUP BY 1, 2, 4
+        ORDER BY 2
+      `);
+
+      expect(query.removeFromSelect('column').toString()).toEqual(sane`
+        SELECT column1, SUM(a), column2 
+        FROM github
+        GROUP BY 1, 3
+        ORDER BY 2
+      `);
+
+      expect(query.removeFromSelect('column1').toString()).toEqual(sane`
+        SELECT column, SUM(a), column2 
+        FROM github
+        GROUP BY 1, 3
+        ORDER BY 1
+      `);
+
+      expect(query.removeFromSelect('column2').toString()).toEqual(sane`
+        SELECT column, column1, SUM(a) 
+        FROM github
+        GROUP BY 1, 2
+        ORDER BY 1
+      `);
+    });
   });
 
   it('remove column from where', () => {
@@ -730,8 +748,8 @@ describe('addToGroupBy', () => {
             },
             "innerSpacing": Object {
               "postAs": " ",
+              "postColumn": " ",
             },
-            "postColumn": " ",
             "type": "alias-ref",
           },
         ],
