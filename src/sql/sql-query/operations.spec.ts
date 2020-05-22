@@ -748,7 +748,7 @@ describe('addToGroupBy', () => {
             },
             "innerSpacing": Object {
               "postAs": " ",
-              "postColumn": " ",
+              "postExpression": " ",
             },
             "type": "alias-ref",
           },

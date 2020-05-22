@@ -287,14 +287,14 @@ UnionClause = unionKeyword:UnionToken postUnionKeyword:_ unionQuery:SqlQuery
 
 // ------------------------------
 
-Alias = column:Expression postColumn:_ asKeyword:AsToken postAs:_ alias:SqlRef
+Alias = expression:Expression postExpression:_ asKeyword:AsToken postAs:_ alias:SqlRef
 {
   return new sql.SqlAliasRef({
-    column: column,
+    expression: expression,
     asKeyword: asKeyword,
     alias: alias,
     innerSpacing: {
-      postColumn: postColumn,
+      postExpression: postExpression,
       postAs: postAs,
     }
   });
@@ -306,7 +306,7 @@ Expressions are defined below in acceding priority order
   Or (OR)
   And (AND)
   Not (NOT)
-  Comparison (=, <=>, <, >, <=, >=, <>, !=, IS, LIKE, BETWEEN, IN, CONTAINS, REGEXP)
+  Comparison (=, <=>, <, >, <=, >=, <>, !=, IS, LIKE, BETWEEN, IN)
   Additive (+, -)
   Multiplicative (*), Division (/)
   Unary identity (+), negation (-)

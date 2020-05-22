@@ -16,7 +16,7 @@ import { SqlRef } from '..';
 import { SqlBase, SqlBaseValue } from '../sql-base';
 
 export interface SqlAliasRefValue extends SqlBaseValue {
-  column: SqlBase;
+  expression: SqlBase;
   asKeyword: string;
   alias: SqlRef;
 }
@@ -27,7 +27,7 @@ export class SqlAliasRef extends SqlBase {
   static sqlAliasFactory(column: SqlBase, alias: string) {
     return new SqlAliasRef({
       type: SqlAliasRef.type,
-      column: column,
+      expression: column,
       asKeyword: 'AS',
       alias: SqlRef.fromStringWithDoubleQuotes(alias),
     } as SqlAliasRefValue);
@@ -39,7 +39,7 @@ export class SqlAliasRef extends SqlBase {
 
   constructor(options: SqlAliasRefValue) {
     super(options, SqlAliasRef.type);
-    this.column = options.column;
+    this.column = options.expression;
     this.asKeyword = options.asKeyword;
     this.alias = options.alias;
   }
@@ -52,7 +52,7 @@ export class SqlAliasRef extends SqlBase {
 
   public valueOf() {
     const value = super.valueOf() as SqlAliasRefValue;
-    value.column = this.column;
+    value.expression = this.column;
     value.asKeyword = this.asKeyword;
     value.alias = this.alias;
     return value as SqlAliasRefValue;
@@ -61,7 +61,7 @@ export class SqlAliasRef extends SqlBase {
   public toRawString(): string {
     return [
       this.column,
-      this.getInnerSpace('postColumn'),
+      this.getInnerSpace('postExpression'),
       this.asKeyword,
       this.getInnerSpace('postAs'),
       this.alias.toString(),
