@@ -51,12 +51,12 @@ export class SqlCaseSearched extends SqlBase {
     ].join('');
   }
 
-  public caseKeyword?: string;
-  public whenThenUnits: WhenThenUnit[];
-  public elseKeyword?: string;
-  public elseExpression?: string;
-  public endKeyword?: string;
-  public postWhenThenUnitSpaces?: string[];
+  public readonly caseKeyword?: string;
+  public readonly whenThenUnits: WhenThenUnit[];
+  public readonly elseKeyword?: string;
+  public readonly elseExpression?: string;
+  public readonly endKeyword?: string;
+  public readonly postWhenThenUnitSpaces?: string[];
 
   constructor(options: SqlCaseSearchedValue) {
     super(options, SqlCaseSearched.type);

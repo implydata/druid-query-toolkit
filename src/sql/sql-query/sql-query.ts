@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 
+import { deepSet } from '../../utils';
 import {
   Annotation,
   Separator,
@@ -94,38 +95,38 @@ export interface OrderByUnit {
 }
 
 export class SqlQuery extends SqlBase {
-  public explainKeyword?: string;
-  public withKeyword?: string;
-  public withUnits?: WithUnit[];
-  public withSeparators?: Separator[];
-  public selectKeyword?: string;
-  public selectDecorator?: string;
-  public selectValues: SqlBase[];
-  public selectSeparators?: Separator[];
-  public fromKeyword?: string;
-  public joinType?: string;
-  public joinKeyword?: string;
-  public joinTable?: SqlRef;
-  public onKeyword?: string;
-  public onExpression?: SqlBase;
-  public tables?: (SqlAliasRef | SqlRef)[];
-  public tableSeparators?: [];
-  public selectAnnotations?: Annotation[];
-  public whereKeyword?: string;
-  public whereExpression?: SqlMulti | SqlUnary;
-  public groupByKeyword?: string;
-  public groupByExpression?: SqlBase[];
-  public groupByExpressionSeparators?: Separator[];
-  public havingKeyword?: string;
-  public havingExpression?: SqlMulti | SqlUnary;
-  public orderByKeyword?: string;
-  public orderByUnits?: OrderByUnit[];
-  public orderBySeparators?: Separator[];
-  public limitKeyword?: string;
-  public limitValue?: SqlLiteral;
-  public unionKeyword?: string;
-  public unionQuery?: SqlQuery;
-  public postQueryAnnotation?: Annotation[];
+  public readonly explainKeyword?: string;
+  public readonly withKeyword?: string;
+  public readonly withUnits?: WithUnit[];
+  public readonly withSeparators?: Separator[];
+  public readonly selectKeyword?: string;
+  public readonly selectDecorator?: string;
+  public readonly selectValues: SqlBase[];
+  public readonly selectSeparators?: Separator[];
+  public readonly fromKeyword?: string;
+  public readonly joinType?: string;
+  public readonly joinKeyword?: string;
+  public readonly joinTable?: SqlRef;
+  public readonly onKeyword?: string;
+  public readonly onExpression?: SqlBase;
+  public readonly tables?: (SqlAliasRef | SqlRef)[];
+  public readonly tableSeparators?: [];
+  public readonly selectAnnotations?: Annotation[];
+  public readonly whereKeyword?: string;
+  public readonly whereExpression?: SqlMulti | SqlUnary;
+  public readonly groupByKeyword?: string;
+  public readonly groupByExpression?: SqlBase[];
+  public readonly groupByExpressionSeparators?: Separator[];
+  public readonly havingKeyword?: string;
+  public readonly havingExpression?: SqlMulti | SqlUnary;
+  public readonly orderByKeyword?: string;
+  public readonly orderByUnits?: OrderByUnit[];
+  public readonly orderBySeparators?: Separator[];
+  public readonly limitKeyword?: string;
+  public readonly limitValue?: SqlLiteral;
+  public readonly unionKeyword?: string;
+  public readonly unionQuery?: SqlQuery;
+  public readonly postQueryAnnotation?: Annotation[];
 
   static type = 'query';
 
@@ -516,27 +517,30 @@ export class SqlQuery extends SqlBase {
       value.selectSeparators,
     );
 
-    if (value.orderByUnits) {
-      value.orderByUnits = value.orderByUnits.map(unit => {
+    if (value.groupByExpression) {
+      value.groupByExpression = value.groupByExpression.map(unit => {
         if (unit instanceof SqlLiteral && typeof unit.value === 'number' && unit.value > index) {
-          unit.value += -1;
+          return unit.increment(-1)!;
+        } else {
+          return unit;
         }
-        return unit;
       });
     }
 
     if (value.orderByUnits) {
       value.orderByUnits = value.orderByUnits.map(unit => {
+        const { expression } = unit;
         if (
-          unit.expression instanceof SqlLiteral &&
-          typeof unit.expression.value === 'number' &&
-          unit.expression.value > index
+          expression instanceof SqlLiteral &&
+          typeof expression.value === 'number' &&
+          expression.value > index
         ) {
-          unit.expression.value += -1;
+          unit = deepSet(unit, 'expression', expression.increment(-1));
         }
         return unit;
       });
     }
+
     value.selectSeparators = filteredList ? filteredList.separators : undefined;
     value.selectValues = filteredList ? filteredList.values : value.selectValues;
 

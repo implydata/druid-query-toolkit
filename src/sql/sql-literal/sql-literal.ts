@@ -20,7 +20,6 @@ export interface SqlLiteralValue extends SqlBaseValue {
   keyword?: string;
   value: LiteralValue;
   stringValue?: string;
-  quotes?: string;
 }
 
 export class SqlLiteral extends SqlBase {
@@ -40,9 +39,9 @@ export class SqlLiteral extends SqlBase {
     return expression instanceof SqlLiteral && expression.value === value;
   }
 
-  public keyword?: string;
-  public value: LiteralValue;
-  public stringValue?: string;
+  public readonly keyword?: string;
+  public readonly value: LiteralValue;
+  public readonly stringValue?: string;
 
   constructor(options: SqlLiteralValue) {
     super(options, SqlLiteral.type);
@@ -79,11 +78,11 @@ export class SqlLiteral extends SqlBase {
     return retParts.join('');
   }
 
-  public increment(): SqlLiteral | undefined {
+  public increment(ammount = 1): SqlLiteral | undefined {
     if (typeof this.value !== 'number') return;
 
     const value = this.valueOf();
-    value.value = this.value + 1;
+    value.value = this.value + ammount;
     delete value.stringValue;
     return new SqlLiteral(value);
   }

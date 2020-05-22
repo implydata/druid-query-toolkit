@@ -23,11 +23,6 @@ export interface SqlAliasRefValue extends SqlBaseValue {
 }
 
 export class SqlAliasRef extends SqlBase {
-  public column: SqlBase;
-  public postColumn?: string;
-  public asKeyword: string;
-  public alias: SqlRef;
-
   static type = 'alias-ref';
 
   static sqlAliasFactory(column: SqlBase, alias: string) {
@@ -42,6 +37,11 @@ export class SqlAliasRef extends SqlBase {
       },
     } as SqlAliasRefValue);
   }
+
+  public readonly column: SqlBase;
+  public readonly postColumn?: string;
+  public readonly asKeyword: string;
+  public readonly alias: SqlRef;
 
   constructor(options: SqlAliasRefValue) {
     super(options, SqlAliasRef.type);
@@ -58,7 +58,7 @@ export class SqlAliasRef extends SqlBase {
   }
 
   public valueOf() {
-    const value: any = super.valueOf();
+    const value = super.valueOf() as SqlAliasRefValue;
     value.column = this.column;
     value.postColumn = this.postColumn;
     value.asKeyword = this.asKeyword;

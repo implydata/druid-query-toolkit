@@ -20,7 +20,7 @@ import { SqlBase, SqlBaseValue } from '../sql-base';
 //    preParen   leftParen       rightParen
 
 export interface SqlFunctionValue extends SqlBaseValue {
-  functionName?: string;
+  functionName: string;
   arguments?: SqlBase[];
   decorator?: string;
   separators?: Separator[];
@@ -30,14 +30,6 @@ export interface SqlFunctionValue extends SqlBaseValue {
 }
 
 export class SqlFunction extends SqlBase {
-  public functionName?: string;
-  public arguments?: SqlBase[];
-  public decorator?: string;
-  public separators?: Separator[];
-  public filterKeyword?: string;
-  public whereKeyword?: string;
-  public whereExpression?: SqlBase;
-
   static type = 'function';
 
   static sqlFunctionFactory(
@@ -75,6 +67,14 @@ export class SqlFunction extends SqlBase {
     } as SqlFunctionValue);
   }
 
+  public readonly functionName: string;
+  public readonly arguments?: SqlBase[];
+  public readonly decorator?: string;
+  public readonly separators?: Separator[];
+  public readonly filterKeyword?: string;
+  public readonly whereKeyword?: string;
+  public readonly whereExpression?: SqlBase;
+
   constructor(options: SqlFunctionValue) {
     super(options, SqlFunction.type);
     this.functionName = options.functionName;
@@ -86,8 +86,8 @@ export class SqlFunction extends SqlBase {
     this.whereExpression = options.whereExpression;
   }
 
-  public valueOf() {
-    const value: SqlFunctionValue = super.valueOf();
+  public valueOf(): SqlFunctionValue {
+    const value = super.valueOf() as SqlFunctionValue;
     value.functionName = this.functionName;
     value.decorator = this.decorator;
     value.arguments = this.arguments;

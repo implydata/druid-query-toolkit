@@ -27,9 +27,9 @@ export class SqlUnary extends SqlBase {
     return `${quote}${thing}${quote}`;
   }
 
-  public expressionType: string;
-  public keyword: string;
-  public argument: SqlBase;
+  public readonly expressionType: string;
+  public readonly keyword: string;
+  public readonly argument: SqlBase;
 
   constructor(options: UnaryExpressionValue) {
     super(options, SqlUnary.type);

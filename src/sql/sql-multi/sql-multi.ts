@@ -33,9 +33,9 @@ export class SqlMulti extends SqlBase {
     } as SqlMultiValue);
   }
 
-  public expressionType: string;
-  public arguments: SqlBase[];
-  public separators?: Separator[];
+  public readonly expressionType: string;
+  public readonly arguments: SqlBase[];
+  public readonly separators?: Separator[];
 
   constructor(options: SqlMultiValue) {
     super(options, SqlMulti.type);

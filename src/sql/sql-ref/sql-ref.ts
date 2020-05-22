@@ -61,12 +61,12 @@ export class SqlRef extends SqlBase {
     );
   }
 
-  public column?: string;
-  public quotes?: string;
-  public namespace?: string;
-  public namespaceQuotes?: string;
-  public table?: string;
-  public tableQuotes?: string;
+  public readonly column?: string;
+  public readonly quotes?: string;
+  public readonly namespace?: string;
+  public readonly namespaceQuotes?: string;
+  public readonly table?: string;
+  public readonly tableQuotes?: string;
 
   constructor(options: SqlRefValue) {
     super(options, SqlRef.type);
@@ -78,8 +78,8 @@ export class SqlRef extends SqlBase {
     this.tableQuotes = options.tableQuotes;
   }
 
-  public valueOf() {
-    const value: any = super.valueOf();
+  public valueOf(): SqlRefValue {
+    const value = super.valueOf() as SqlRefValue;
     value.column = this.column;
     value.namespace = this.namespace;
     value.table = this.table;
