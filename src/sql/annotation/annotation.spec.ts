@@ -18,11 +18,11 @@ import { backAndForth, sane } from '../../test-utils';
 describe('Queries with annotated comments post query', () => {
   it('single annotated comment', () => {
     const sql = sane`
-      Select column --: valueName = value
-      , column1 --: valueName = value
-      , column2 
+      Select col --: valueName = value
+      , col1 --: valueName = value
+      , col2 
       from tbl 
-      order by column
+      order by col
     `;
 
     backAndForth(sql);
@@ -61,7 +61,7 @@ describe('Queries with annotated comments post query', () => {
           Object {
             "direction": "",
             "expression": SqlRef {
-              "column": "column",
+              "column": "col",
               "innerSpacing": Object {},
               "namespace": undefined,
               "namespaceQuotes": undefined,
@@ -115,7 +115,7 @@ describe('Queries with annotated comments post query', () => {
         ],
         "selectValues": Array [
           SqlRef {
-            "column": "column",
+            "column": "col",
             "innerSpacing": Object {},
             "namespace": undefined,
             "namespaceQuotes": undefined,
@@ -125,7 +125,7 @@ describe('Queries with annotated comments post query', () => {
             "type": "ref",
           },
           SqlRef {
-            "column": "column1",
+            "column": "col1",
             "innerSpacing": Object {},
             "namespace": undefined,
             "namespaceQuotes": undefined,
@@ -135,7 +135,7 @@ describe('Queries with annotated comments post query', () => {
             "type": "ref",
           },
           SqlRef {
-            "column": "column2",
+            "column": "col2",
             "innerSpacing": Object {},
             "namespace": undefined,
             "namespaceQuotes": undefined,
@@ -175,8 +175,8 @@ describe('Queries with annotated comments post query', () => {
 
   it('single annotated comment', () => {
     const sql = sane`
-      Select column, column1, column2 from tbl
-      order by column
+      Select col, col1, col2 from tbl
+      order by col
       --: valueName = value
     `;
 
@@ -215,7 +215,7 @@ describe('Queries with annotated comments post query', () => {
           Object {
             "direction": "",
             "expression": SqlRef {
-              "column": "column",
+              "column": "col",
               "innerSpacing": Object {},
               "namespace": undefined,
               "namespaceQuotes": undefined,
@@ -261,7 +261,7 @@ describe('Queries with annotated comments post query', () => {
         ],
         "selectValues": Array [
           SqlRef {
-            "column": "column",
+            "column": "col",
             "innerSpacing": Object {},
             "namespace": undefined,
             "namespaceQuotes": undefined,
@@ -271,7 +271,7 @@ describe('Queries with annotated comments post query', () => {
             "type": "ref",
           },
           SqlRef {
-            "column": "column1",
+            "column": "col1",
             "innerSpacing": Object {},
             "namespace": undefined,
             "namespaceQuotes": undefined,
@@ -281,7 +281,7 @@ describe('Queries with annotated comments post query', () => {
             "type": "ref",
           },
           SqlRef {
-            "column": "column2",
+            "column": "col2",
             "innerSpacing": Object {},
             "namespace": undefined,
             "namespaceQuotes": undefined,
@@ -321,8 +321,8 @@ describe('Queries with annotated comments post query', () => {
 
   it('double annotated comment no spacing', () => {
     const sql = sane`
-      Select column, column1, column2 from tbl
-      order by column
+      Select col, col1, col2 from tbl
+      order by col
       --: valueName = value
       --:valueName = value
     `;
@@ -362,7 +362,7 @@ describe('Queries with annotated comments post query', () => {
           Object {
             "direction": "",
             "expression": SqlRef {
-              "column": "column",
+              "column": "col",
               "innerSpacing": Object {},
               "namespace": undefined,
               "namespaceQuotes": undefined,
@@ -419,7 +419,7 @@ describe('Queries with annotated comments post query', () => {
         ],
         "selectValues": Array [
           SqlRef {
-            "column": "column",
+            "column": "col",
             "innerSpacing": Object {},
             "namespace": undefined,
             "namespaceQuotes": undefined,
@@ -429,7 +429,7 @@ describe('Queries with annotated comments post query', () => {
             "type": "ref",
           },
           SqlRef {
-            "column": "column1",
+            "column": "col1",
             "innerSpacing": Object {},
             "namespace": undefined,
             "namespaceQuotes": undefined,
@@ -439,7 +439,7 @@ describe('Queries with annotated comments post query', () => {
             "type": "ref",
           },
           SqlRef {
-            "column": "column2",
+            "column": "col2",
             "innerSpacing": Object {},
             "namespace": undefined,
             "namespaceQuotes": undefined,
@@ -481,9 +481,9 @@ describe('Queries with annotated comments post query', () => {
 describe('Queries with annotated comments post select', () => {
   it('single annotated comment', () => {
     const sql = sane`
-      Select column, column1, column2 --: valueName = value
+      Select col, col1, col2 --: valueName = value
       from tbl
-      order by column
+      order by col
     `;
 
     backAndForth(sql);
@@ -522,7 +522,7 @@ describe('Queries with annotated comments post select', () => {
           Object {
             "direction": "",
             "expression": SqlRef {
-              "column": "column",
+              "column": "col",
               "innerSpacing": Object {},
               "namespace": undefined,
               "namespaceQuotes": undefined,
@@ -565,7 +565,7 @@ describe('Queries with annotated comments post select', () => {
         ],
         "selectValues": Array [
           SqlRef {
-            "column": "column",
+            "column": "col",
             "innerSpacing": Object {},
             "namespace": undefined,
             "namespaceQuotes": undefined,
@@ -575,7 +575,7 @@ describe('Queries with annotated comments post select', () => {
             "type": "ref",
           },
           SqlRef {
-            "column": "column1",
+            "column": "col1",
             "innerSpacing": Object {},
             "namespace": undefined,
             "namespaceQuotes": undefined,
@@ -585,7 +585,7 @@ describe('Queries with annotated comments post select', () => {
             "type": "ref",
           },
           SqlRef {
-            "column": "column2",
+            "column": "col2",
             "innerSpacing": Object {},
             "namespace": undefined,
             "namespaceQuotes": undefined,
@@ -627,9 +627,9 @@ describe('Queries with annotated comments post select', () => {
 describe('Queries with annotated comments post select and post query', () => {
   it('single annotated comment', () => {
     const sql = sane`
-      Select column, column1, column2 --: valueName = value 
+      Select col, col1, col2 --: valueName = value 
       from tbl
-      order by column
+      order by col
       --: valueName = value
     `;
 
@@ -669,7 +669,7 @@ describe('Queries with annotated comments post select and post query', () => {
           Object {
             "direction": "",
             "expression": SqlRef {
-              "column": "column",
+              "column": "col",
               "innerSpacing": Object {},
               "namespace": undefined,
               "namespaceQuotes": undefined,
@@ -724,7 +724,7 @@ describe('Queries with annotated comments post select and post query', () => {
         ],
         "selectValues": Array [
           SqlRef {
-            "column": "column",
+            "column": "col",
             "innerSpacing": Object {},
             "namespace": undefined,
             "namespaceQuotes": undefined,
@@ -734,7 +734,7 @@ describe('Queries with annotated comments post select and post query', () => {
             "type": "ref",
           },
           SqlRef {
-            "column": "column1",
+            "column": "col1",
             "innerSpacing": Object {},
             "namespace": undefined,
             "namespaceQuotes": undefined,
@@ -744,7 +744,7 @@ describe('Queries with annotated comments post select and post query', () => {
             "type": "ref",
           },
           SqlRef {
-            "column": "column2",
+            "column": "col2",
             "innerSpacing": Object {},
             "namespace": undefined,
             "namespaceQuotes": undefined,

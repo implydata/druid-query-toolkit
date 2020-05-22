@@ -22,18 +22,27 @@ async function main() {
     "query": `SELECT 123`
   });
 
-  let reserved = [];
-  for (let keyword of keywords) {
+  const calciteRef = await axios.get('https://calcite.apache.org/docs/reference.html');
+  const sqlRef = await axios.get('https://raw.githubusercontent.com/apache/druid/master/docs/querying/sql.md');
+
+  const allData = calciteRef.data + sqlRef.data;
+
+  const possibleKeywords = [...new Set(allData.match(/\b[A-Z]+\b/g)).values()].sort();
+  console.log(`Got ${possibleKeywords.length} possible keywords`);
+
+  let reservedKeywords = [];
+  for (let keyword of possibleKeywords) {
     try {
       await axios.post('http://localhost:8888/druid/v2/sql', {
         "query": `SELECT 123 AS ${keyword}`
       });
     } catch {
-      reserved.push(keyword);
+      reservedKeywords.push(keyword);
     }
   }
 
-  console.log(JSON.stringify(reserved));
+  console.log(`Found ${reservedKeywords.length} reserved keywords`);
+  console.log(JSON.stringify(reservedKeywords));
 }
 
 main();

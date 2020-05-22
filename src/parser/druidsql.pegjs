@@ -499,7 +499,7 @@ Unit
   / 'SECOND'i
 
 Function =
-  functionName:UnquotedRefPart
+  functionName:UnquotedRefPartFree
   postName:_
   OpenParen
   postLeftParen:_
@@ -511,7 +511,7 @@ Function =
   filter:(_ Filter)?
 {
   return new sql.SqlFunction({
-    functionName: functionName.name,
+    functionName: functionName,
     decorator: decorator ? decorator[0] : undefined,
     arguments: argumentTail ? makeListMap(argumentTail, 1, argumentHead) : [argumentHead],
     separators: makeListMap(argumentTail, 0),
@@ -714,13 +714,15 @@ QuotedRefPart = ["] name:$([^"]+) ["]
   };
 }
 
-UnquotedRefPart = name:$([a-z_]i [a-z0-9_]i*) !{ return SqlBase.isReserved(name) }
+UnquotedRefPart = name:UnquotedRefPartFree !{ return SqlBase.isReserved(name) }
 {
   return {
     name: text(),
     quotes: ''
   };
 }
+
+UnquotedRefPartFree = $([a-z_]i [a-z0-9_]i*)
 
 Star = '*'
 {

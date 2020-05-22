@@ -14,6 +14,8 @@
 
 import { SqlAliasRef, SqlRef } from '../index';
 
+import { RESERVED } from './reserved';
+
 export interface Parens {
   leftSpacing: string;
   rightSpacing: string;
@@ -24,73 +26,6 @@ export interface SqlBaseValue {
   innerSpacing: Record<string, string>;
   parens?: Parens[];
 }
-
-const RESERVED: string[] = [
-  'ALL',
-  'ALTER',
-  'AS',
-  'BY',
-  'CROSS',
-  'CUBE',
-  'DELETE',
-  'DESCRIBE',
-  'DISTINCT',
-  'EXCEPT',
-  'EXPLAIN',
-  'EXTEND',
-  'FETCH',
-  'FOR',
-  'FROM',
-  'FULL',
-  'GROUP',
-  'GROUPING',
-  'HAVING',
-  'INNER',
-  'INSERT',
-  'INTERSECT',
-  'INTO',
-  'JOIN',
-  'LATERAL',
-  'LEFT',
-  'LIMIT',
-  'MERGE',
-  'MINUS',
-  'NATURAL',
-  'NEXT',
-  'NOT',
-  'NULL',
-  'OF',
-  'OFFSET',
-  'ON',
-  'ONLY',
-  'ORDER',
-  'OUTER',
-  'PARTITION',
-  'RANGE',
-  'RESET',
-  'RIGHT',
-  'ROLLUP',
-  'ROW',
-  'ROWS',
-  'SELECT',
-  'SET',
-  'SPECIFIC',
-  'STREAM',
-  'SYSTEM',
-  'TABLE',
-  'THEN',
-  'UNION',
-  'UNNEST',
-  'UPDATE',
-  'UPSERT',
-  'USING',
-  'VALUES',
-  'WHEN',
-  'WHERE',
-  'WINDOW',
-  'WITH',
-  'WITHOUT',
-];
 
 const reservedLookup: Record<string, boolean> = {};
 for (const r of RESERVED) {

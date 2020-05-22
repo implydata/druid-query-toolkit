@@ -72,12 +72,12 @@ describe('getSorted Test', () => {
   it('getSorted', () => {
     expect(
       parseSqlQuery(`SELECT *
-  FROM sys."github" ORDER BY column DESC`).getSorted(),
+  FROM sys."github" ORDER BY col DESC`).getSorted(),
     ).toMatchInlineSnapshot(`
       Array [
         Object {
           "desc": true,
-          "id": "column",
+          "id": "col",
         },
       ]
     `);
@@ -86,44 +86,44 @@ describe('getSorted Test', () => {
   it('getSorted with undefined direction', () => {
     expect(
       parseSqlQuery(`SELECT *
-  FROM sys."github" ORDER BY column`).getSorted(),
+  FROM sys."github" ORDER BY col`).getSorted(),
     ).toMatchInlineSnapshot(`
       Array [
         Object {
           "desc": true,
-          "id": "column",
+          "id": "col",
         },
       ]
     `);
   });
 
-  it('getSorted with multiple columns', () => {
+  it('getSorted with multiple cols', () => {
     expect(
       parseSqlQuery(`SELECT *
-  FROM sys."github" ORDER BY column, columnTwo ASC`).getSorted(),
+  FROM sys."github" ORDER BY col, colTwo ASC`).getSorted(),
     ).toMatchInlineSnapshot(`
       Array [
         Object {
           "desc": true,
-          "id": "column",
+          "id": "col",
         },
         Object {
           "desc": false,
-          "id": "columnTwo",
+          "id": "colTwo",
         },
       ]
     `);
   });
 
-  it('getSorted with numbered column', () => {
+  it('getSorted with numbered col', () => {
     expect(
-      parseSqlQuery(`SELECT column, columnTwo 
+      parseSqlQuery(`SELECT col0, colTwo 
   FROM sys."github" ORDER BY 1 ASC`).getSorted(),
     ).toMatchInlineSnapshot(`
       Array [
         Object {
           "desc": false,
-          "id": "column",
+          "id": "col0",
         },
       ]
     `);
@@ -135,36 +135,36 @@ describe('order by Test', () => {
     expect(
       parseSqlQuery(`SELECT *
   FROM sys."github"`)
-        .orderBy('column', 'DESC')
+        .orderBy('col', 'DESC')
         .toString(),
     ).toMatchInlineSnapshot(`
       "SELECT *
         FROM sys.\\"github\\"
-      ORDER BY \\"column\\" DESC"
+      ORDER BY \\"col\\" DESC"
     `);
   });
 
   it('add to order by clause', () => {
     expect(
       parseSqlQuery(`SELECT *
-  FROM sys."github" ORDER BY column`)
-        .orderBy('columnTwo', 'DESC')
+  FROM sys."github" ORDER BY col`)
+        .orderBy('colTwo', 'DESC')
         .toString(),
     ).toMatchInlineSnapshot(`
       "SELECT *
-        FROM sys.\\"github\\" ORDER BY column, \\"columnTwo\\" DESC"
+        FROM sys.\\"github\\" ORDER BY col, \\"colTwo\\" DESC"
     `);
   });
 
   it('order by with out direction', () => {
     expect(
       parseSqlQuery(`SELECT *
-  FROM sys."github" ORDER BY column, columnTwo ASC`)
-        .orderBy('columnThree')
+  FROM sys."github" ORDER BY col, colTwo ASC`)
+        .orderBy('colThree')
         .toString(),
     ).toMatchInlineSnapshot(`
       "SELECT *
-        FROM sys.\\"github\\" ORDER BY column, columnTwo ASC, \\"columnThree\\""
+        FROM sys.\\"github\\" ORDER BY col, colTwo ASC, \\"colThree\\""
     `);
   });
 });
@@ -174,100 +174,100 @@ describe('addWhereFilter test ', () => {
     expect(
       parseSqlQuery(`SELECT *
   FROM sys."github"`)
-        .addWhereFilter('column', '>', 1)
+        .addWhereFilter('col', '>', 1)
         .toString(),
     ).toMatchInlineSnapshot(`
       "SELECT *
         FROM sys.\\"github\\"
-      WHERE \\"column\\" > 1"
+      WHERE \\"col\\" > 1"
     `);
   });
 
   it('Single Where filter value', () => {
     expect(
       parseSqlQuery(`SELECT *
-  FROM sys."github" WHERE column > 1`)
-        .addWhereFilter('columnTwo', '>', 2)
+  FROM sys."github" WHERE col > 1`)
+        .addWhereFilter('colTwo', '>', 2)
         .toString(),
     ).toMatchInlineSnapshot(`
       "SELECT *
-        FROM sys.\\"github\\" WHERE column > 1 AND \\"columnTwo\\" > 2"
+        FROM sys.\\"github\\" WHERE col > 1 AND \\"colTwo\\" > 2"
     `);
   });
 
   it('OR Where filter value', () => {
     expect(
       parseSqlQuery(`SELECT *
-  FROM sys."github" WHERE column > 1 OR column < 5`)
-        .addWhereFilter('columnTwo', '>', 2)
+  FROM sys."github" WHERE col > 1 OR col < 5`)
+        .addWhereFilter('colTwo', '>', 2)
         .toString(),
     ).toMatchInlineSnapshot(`
       "SELECT *
-        FROM sys.\\"github\\" WHERE (column > 1 OR column < 5) AND \\"columnTwo\\" > 2"
+        FROM sys.\\"github\\" WHERE (col > 1 OR col < 5) AND \\"colTwo\\" > 2"
     `);
   });
 
   it('AND Where filter value', () => {
     expect(
       parseSqlQuery(`SELECT *
-        FROM sys."github" WHERE (column > 1 OR column < 5) AND columnTwo > 5`)
-        .addWhereFilter('columnTwo', '>', 2)
+        FROM sys."github" WHERE (col > 1 OR col < 5) AND colTwo > 5`)
+        .addWhereFilter('colTwo', '>', 2)
         .toString(),
     ).toMatchInlineSnapshot(`
       "SELECT *
-              FROM sys.\\"github\\" WHERE (column > 1 OR column < 5) AND \\"columnTwo\\" > 2"
+              FROM sys.\\"github\\" WHERE (col > 1 OR col < 5) AND \\"colTwo\\" > 2"
     `);
   });
 });
 
 describe('remove functions', () => {
   describe('#removeFromSelect', () => {
-    it('basic columns', () => {
+    it('basic cols', () => {
       const query = parseSqlQuery(sane`
-        SELECT column, column1, column2 
+        SELECT col0, col1, col2 
         FROM github
       `);
 
-      expect(query.removeFromSelect('column').toString()).toEqual(sane`
-        SELECT column1, column2 
+      expect(query.removeFromSelect('col0').toString()).toEqual(sane`
+        SELECT col1, col2 
         FROM github
       `);
 
-      expect(query.removeFromSelect('column1').toString()).toEqual(sane`
-        SELECT column, column2 
+      expect(query.removeFromSelect('col1').toString()).toEqual(sane`
+        SELECT col0, col2 
         FROM github
       `);
 
-      expect(query.removeFromSelect('column2').toString()).toEqual(sane`
-        SELECT column, column1 
+      expect(query.removeFromSelect('col2').toString()).toEqual(sane`
+        SELECT col0, col1 
         FROM github
       `);
     });
 
     it.skip(`removes from group by and order by`, () => {
       const query = parseSqlQuery(sane`
-        SELECT column, column1, SUM(a), column2 
+        SELECT col0, col1, SUM(a), col2 
         FROM github
         GROUP BY 1, 2, 4
         ORDER BY 2
       `);
 
-      expect(query.removeFromSelect('column').toString()).toEqual(sane`
-        SELECT column1, SUM(a), column2 
+      expect(query.removeFromSelect('col0').toString()).toEqual(sane`
+        SELECT col1, SUM(a), col2 
         FROM github
         GROUP BY 1, 3
         ORDER BY 2
       `);
 
-      expect(query.removeFromSelect('column1').toString()).toEqual(sane`
-        SELECT column, SUM(a), column2 
+      expect(query.removeFromSelect('col1').toString()).toEqual(sane`
+        SELECT col0, SUM(a), col2 
         FROM github
         GROUP BY 1, 3
         ORDER BY 1
       `);
 
-      expect(query.removeFromSelect('column2').toString()).toEqual(sane`
-        SELECT column, column1, SUM(a) 
+      expect(query.removeFromSelect('col2').toString()).toEqual(sane`
+        SELECT col0, col1, SUM(a) 
         FROM github
         GROUP BY 1, 2
         ORDER BY 1
@@ -275,245 +275,245 @@ describe('remove functions', () => {
     });
   });
 
-  it('remove column from where', () => {
+  it('remove col from where', () => {
     expect(
-      parseSqlQuery(`SELECT column, column1, column2
+      parseSqlQuery(`SELECT col0, col1, col2
   FROM sys."github"
-  Where column AND column2`)
-        .removeFromWhere('column2')
+  Where col AND col2`)
+        .removeFromWhere('col2')
         .toString(),
     ).toMatchInlineSnapshot(`
-      "SELECT column, column1, column2
+      "SELECT col0, col1, col2
         FROM sys.\\"github\\"
-        Where column"
+        Where col"
     `);
   });
 
-  it('remove only column from where', () => {
+  it('remove only col from where', () => {
     expect(
-      parseSqlQuery(`SELECT column, column1, column2
+      parseSqlQuery(`SELECT col0, col1, col2
   FROM sys."github"
-  Where column2 = '1'`)
-        .removeFromWhere('column2')
+  Where col2 = '1'`)
+        .removeFromWhere('col2')
         .toString(),
     ).toMatchInlineSnapshot(`
-      "SELECT column, column1, column2
+      "SELECT col0, col1, col2
         FROM sys.\\"github\\""
     `);
   });
 
-  it('remove multiple filters for the same column', () => {
+  it('remove multiple filters for the same col', () => {
     expect(
-      parseSqlQuery(`SELECT column, column1, column2
+      parseSqlQuery(`SELECT col0, col1, col2
   FROM sys."github"
-  Where column2 > '1' AND column2 < '1'`)
-        .removeFromWhere('column2')
+  Where col2 > '1' AND col2 < '1'`)
+        .removeFromWhere('col2')
         .toString(),
     ).toMatchInlineSnapshot(`
-      "SELECT column, column1, column2
+      "SELECT col0, col1, col2
         FROM sys.\\"github\\""
     `);
   });
 
-  it('remove multiple filters for the same column', () => {
+  it('remove multiple filters for the same col', () => {
     expect(
-      parseSqlQuery(`SELECT column, column1, column2
+      parseSqlQuery(`SELECT col0, col1, col2
   FROM sys."github"
-  Where column2 > '1' AND column1 > 2 OR column2 < '1'`)
-        .removeFromWhere('column2')
+  Where col2 > '1' AND col1 > 2 OR col2 < '1'`)
+        .removeFromWhere('col2')
         .toString(),
     ).toMatchInlineSnapshot(`
-      "SELECT column, column1, column2
+      "SELECT col0, col1, col2
         FROM sys.\\"github\\"
-        Where column1 > 2"
+        Where col1 > 2"
     `);
   });
 
   it('remove only comparison expression from where', () => {
     expect(
-      parseSqlQuery(`SELECT column, column1, column2
+      parseSqlQuery(`SELECT col0, col1, col2
   FROM sys."github"
-  Where column2 > 1`)
-        .removeFromWhere('column2')
+  Where col2 > 1`)
+        .removeFromWhere('col2')
         .toString(),
     ).toMatchInlineSnapshot(`
-      "SELECT column, column1, column2
+      "SELECT col0, col1, col2
         FROM sys.\\"github\\""
     `);
   });
 
   it('remove only comparison expression from where', () => {
     expect(
-      parseSqlQuery(`SELECT column, column1, column2
+      parseSqlQuery(`SELECT col0, col1, col2
   FROM sys."github"
-  Where column2 > 1 AND column1 > 1`)
-        .removeFromWhere('column2')
+  Where col2 > 1 AND col1 > 1`)
+        .removeFromWhere('col2')
         .toString(),
     ).toMatchInlineSnapshot(`
-      "SELECT column, column1, column2
+      "SELECT col0, col1, col2
         FROM sys.\\"github\\"
-        Where column1 > 1"
+        Where col1 > 1"
     `);
   });
 
-  it('remove only column from having', () => {
+  it('remove only col from having', () => {
     expect(
-      parseSqlQuery(`SELECT column, column1, column2
+      parseSqlQuery(`SELECT col0, col1, col2
   FROM sys."github"
-  Having column2 > 1`)
-        .removeFromHaving('column2')
+  Having col2 > 1`)
+        .removeFromHaving('col2')
         .toString(),
     ).toMatchInlineSnapshot(`
-      "SELECT column, column1, column2
+      "SELECT col0, col1, col2
         FROM sys.\\"github\\""
     `);
   });
 
   it('remove only comparison expression from having', () => {
     expect(
-      parseSqlQuery(`SELECT column, column1, column2
+      parseSqlQuery(`SELECT col0, col1, col2
   FROM sys."github"
-  Having column2 > 1`)
-        .removeFromHaving('column2')
+  Having col2 > 1`)
+        .removeFromHaving('col2')
         .toString(),
     ).toMatchInlineSnapshot(`
-      "SELECT column, column1, column2
+      "SELECT col0, col1, col2
         FROM sys.\\"github\\""
     `);
   });
 
   it('remove only comparison expression from having', () => {
     expect(
-      parseSqlQuery(`SELECT column, column1, column2
+      parseSqlQuery(`SELECT col0, col1, col2
   FROM sys."github"
-  Having column2 > 1 AND column1 > 1`)
-        .removeFromHaving('column2')
+  Having col2 > 1 AND col1 > 1`)
+        .removeFromHaving('col2')
         .toString(),
     ).toMatchInlineSnapshot(`
-      "SELECT column, column1, column2
+      "SELECT col0, col1, col2
         FROM sys.\\"github\\"
-        Having column1 > 1"
+        Having col1 > 1"
     `);
   });
 
-  it('remove one numbered column from order by', () => {
+  it('remove one numbered col from order by', () => {
     expect(
-      parseSqlQuery(`SELECT column, column1, column2
+      parseSqlQuery(`SELECT col0, col1, col2
   FROM sys."github"
-  Order By column, 2 ASC`)
-        .removeFromOrderBy('column')
+  Order By col, 2 ASC`)
+        .removeFromOrderBy('col')
         .toString(),
     ).toMatchInlineSnapshot(`
-      "SELECT column, column1, column2
+      "SELECT col0, col1, col2
         FROM sys.\\"github\\"
         Order By 2 ASC"
     `);
   });
 
-  it('remove column not in order by', () => {
+  it('remove col not in order by', () => {
     expect(
-      parseSqlQuery(`SELECT column, column1, column2
+      parseSqlQuery(`SELECT col0, col1, col2
   FROM sys."github"
-  Order By column, column1 ASC`)
-        .removeFromOrderBy('column2')
+  Order By col, col1 ASC`)
+        .removeFromOrderBy('col2')
         .toString(),
     ).toMatchInlineSnapshot(`
-      "SELECT column, column1, column2
+      "SELECT col0, col1, col2
         FROM sys.\\"github\\"
-        Order By column, column1 ASC"
+        Order By col, col1 ASC"
     `);
   });
 
-  it('remove one numbered column not in order by', () => {
+  it('remove one numbered col not in order by', () => {
     expect(
-      parseSqlQuery(`SELECT column, column1, column2
+      parseSqlQuery(`SELECT col0, col1, col2
   FROM sys."github"
-  Order By column, 3 ASC`)
-        .removeFromOrderBy('column1')
+  Order By col, 3 ASC`)
+        .removeFromOrderBy('col1')
         .toString(),
     ).toMatchInlineSnapshot(`
-      "SELECT column, column1, column2
+      "SELECT col0, col1, col2
         FROM sys.\\"github\\"
-        Order By column, 3 ASC"
+        Order By col, 3 ASC"
     `);
   });
 
-  it('remove only column in order by', () => {
+  it('remove only col in order by', () => {
     expect(
-      parseSqlQuery(`SELECT column, column1, column2
+      parseSqlQuery(`SELECT col0, col1, col2
   FROM sys."github"
-  Order By column1`)
-        .removeFromOrderBy('column1')
+  Order By col1`)
+        .removeFromOrderBy('col1')
         .toString(),
     ).toMatchInlineSnapshot(`
-      "SELECT column, column1, column2
+      "SELECT col0, col1, col2
         FROM sys.\\"github\\""
     `);
   });
 
-  it('remove column from group by', () => {
+  it('remove col from group by', () => {
     expect(
-      parseSqlQuery(`SELECT column, column1, column2
+      parseSqlQuery(`SELECT col0, col1, col2
   FROM sys."github"
-  Group By column, 3`)
-        .removeFromGroupBy('column')
+  Group By col, 3`)
+        .removeFromGroupBy('col')
         .toString(),
     ).toMatchInlineSnapshot(`
-      "SELECT column, column1, column2
+      "SELECT col0, col1, col2
         FROM sys.\\"github\\"
         Group By 3"
     `);
   });
 
-  it('remove column as number from group by', () => {
+  it('remove col as number from group by', () => {
     expect(
-      parseSqlQuery(`SELECT column, column1, column2
+      parseSqlQuery(`SELECT col0, col1, col2
   FROM sys."github"
-  Group By column, 3`)
-        .removeFromGroupBy('column2')
+  Group By col, 3`)
+        .removeFromGroupBy('col2')
         .toString(),
     ).toMatchInlineSnapshot(`
-      "SELECT column, column1, column2
+      "SELECT col0, col1, col2
         FROM sys.\\"github\\"
-        Group By column"
+        Group By col"
     `);
   });
 
-  it('remove only column from group by', () => {
+  it('remove only col from group by', () => {
     expect(
-      parseSqlQuery(`SELECT column, column1, column2
+      parseSqlQuery(`SELECT col0, col1, col2
   FROM sys."github"
-  Group By column2`)
-        .removeFromGroupBy('column2')
+  Group By col2`)
+        .removeFromGroupBy('col2')
         .toString(),
     ).toMatchInlineSnapshot(`
-      "SELECT column, column1, column2
+      "SELECT col0, col1, col2
         FROM sys.\\"github\\""
     `);
   });
 });
 
 describe('getAggregateColumns', () => {
-  it('get all aggregate columns', () => {
+  it('get all aggregate cols', () => {
     const sql = sane`
-      SELECT column, SUM(column1) As aggregated, column2
+      SELECT col0, SUM(col1) As aggregated, col2
       FROM sys."github"
-      Group By column2
+      Group By col2
     `;
 
     expect(parseSqlQuery(sql).getAggregateColumns()).toMatchInlineSnapshot(`
       Array [
-        "column",
+        "col0",
         "aggregated",
       ]
     `);
   });
 
-  it('get all aggregate columns using numbers', () => {
+  it('get all aggregate cols using numbers', () => {
     const sql = sane`
-      SELECT column, SUM(column1) As aggregated, column2
+      SELECT col0, SUM(col1) As aggregated, col2
       FROM sys."github"
-      Group By column2,  1, 3
+      Group By col2,  1, 3
     `;
 
     expect(parseSqlQuery(sql).getAggregateColumns()).toMatchInlineSnapshot(`
@@ -527,15 +527,15 @@ describe('getAggregateColumns', () => {
 describe('getCurrentFilters', () => {
   it('get all filters, only having clause', () => {
     const sql = sane`
-      SELECT column, SUM(column1) As aggregated, column2
+      SELECT col1, SUM(col1) As aggregated
       FROM sys."github"
-      Group By column2
-      Having column > 1 AND aggregated < 100
+      Group By col2
+      Having col1 > 1 AND aggregated < 100
     `;
 
     expect(parseSqlQuery(sql).getCurrentFilters()).toMatchInlineSnapshot(`
       Array [
-        "column",
+        "col1",
         "aggregated",
       ]
     `);
@@ -543,15 +543,15 @@ describe('getCurrentFilters', () => {
 
   it('get all filters, only where clause', () => {
     const sql = sane`
-      SELECT column, SUM(column1) As aggregated, column2
+      SELECT col1
       FROM sys."github"
-      Where column > 1 AND aggregated < 100
-      Group By column2
+      Where col1 > 1 AND aggregated < 100
+      Group By col2
     `;
 
     expect(parseSqlQuery(sql).getCurrentFilters()).toMatchInlineSnapshot(`
       Array [
-        "column",
+        "col1",
         "aggregated",
       ]
     `);
@@ -559,18 +559,18 @@ describe('getCurrentFilters', () => {
 
   it('get all filters, where and having clauses', () => {
     const sql = sane`
-      SELECT column, SUM(column1) As aggregated, column2
+      SELECT col0, SUM(col1) As aggregated, col2
       FROM sys."github"
-      Where column > 1 AND aggregated < 100
-      Group By column2
-      Having column3 > 1 AND column4 < 100
+      Where col > 1 AND aggregated < 100
+      Group By col2
+      Having col3 > 1 AND col4 < 100
     `;
 
     expect(parseSqlQuery(sql).getCurrentFilters()).toMatchInlineSnapshot(`
       Array [
-        "column3",
-        "column4",
-        "column",
+        "col3",
+        "col4",
+        "col",
         "aggregated",
       ]
     `);
@@ -578,62 +578,62 @@ describe('getCurrentFilters', () => {
 });
 
 describe('addAggregateColumn', () => {
-  it('single column', () => {
-    const sql = 'select column1 from tbl';
+  it('single col', () => {
+    const sql = 'select col1 from tbl';
 
     expect(
       parseSqlQuery(sql)
-        .addAggregateColumn([SqlRef.fromString('column2')], 'min', 'alias')
+        .addAggregateColumn([SqlRef.fromString('col2')], 'min', 'alias')
         .toString(),
-    ).toMatchInlineSnapshot(`"select column1, min(column2) AS \\"alias\\" from tbl"`);
+    ).toMatchInlineSnapshot(`"select col1, min(col2) AS \\"alias\\" from tbl"`);
   });
 
   it('function with decorator', () => {
-    const sql = 'select column1 from tbl';
+    const sql = 'select col1 from tbl';
 
     expect(
       parseSqlQuery(sql)
-        .addAggregateColumn([SqlRef.fromString('column2')], 'min', 'alias', undefined, 'DISTINCT')
+        .addAggregateColumn([SqlRef.fromString('col2')], 'min', 'alias', undefined, 'DISTINCT')
         .toString(),
-    ).toMatchInlineSnapshot(`"select column1, min(DISTINCT column2) AS \\"alias\\" from tbl"`);
+    ).toMatchInlineSnapshot(`"select col1, min(DISTINCT col2) AS \\"alias\\" from tbl"`);
   });
 });
 
 describe('addToGroupBy', () => {
-  it('add simple column to group by', () => {
+  it('add simple col to group by', () => {
     const sql = 'select Count(*) from tbl';
 
     expect(
       parseSqlQuery(sql)
-        .addToGroupBy(SqlRef.fromStringWithDoubleQuotes('column'))
+        .addToGroupBy(SqlRef.fromStringWithDoubleQuotes('col'))
         .toString(),
     ).toMatchInlineSnapshot(`
-      "select \\"column\\", Count(*) from tbl
+      "select \\"col\\", Count(*) from tbl
       GROUP BY 1"
     `);
   });
 
-  it('no existing column', () => {
-    const sql = 'select column1 from tbl';
+  it('no existing col', () => {
+    const sql = 'select col1 from tbl';
 
     expect(
       parseSqlQuery(sql)
         .addToGroupBy(
           SqlAliasRef.sqlAliasFactory(
-            SqlFunction.sqlFunctionFactory('min', [SqlRef.fromString('column1')]),
+            SqlFunction.sqlFunctionFactory('min', [SqlRef.fromString('col1')]),
             'MinColumn',
           ),
         )
         .toString(),
     ).toMatchInlineSnapshot(`
-      "select min(column1) AS \\"MinColumn\\", column1 from tbl
+      "select min(col1) AS \\"MinColumn\\", col1 from tbl
       GROUP BY 1"
     `);
   });
 
-  it('existing columns in group by', () => {
+  it('existing cols in group by', () => {
     const sql = sane`
-      select column1, min(column1) AS aliasName
+      select col1, min(col1) AS aliasName
       from tbl 
       GROUP BY 2
     `;
@@ -693,7 +693,7 @@ describe('addToGroupBy', () => {
         ],
         "selectValues": Array [
           SqlRef {
-            "column": "column1",
+            "column": "col1",
             "innerSpacing": Object {},
             "namespace": undefined,
             "namespaceQuotes": undefined,
@@ -717,7 +717,7 @@ describe('addToGroupBy', () => {
             "expression": SqlFunction {
               "arguments": Array [
                 SqlRef {
-                  "column": "column1",
+                  "column": "col1",
                   "innerSpacing": Object {},
                   "namespace": undefined,
                   "namespaceQuotes": undefined,
@@ -783,13 +783,13 @@ describe('addToGroupBy', () => {
       parseSqlQuery(sql)
         .addToGroupBy(
           SqlAliasRef.sqlAliasFactory(
-            SqlFunction.sqlFunctionFactory('max', [SqlRef.fromString('column2')]),
+            SqlFunction.sqlFunctionFactory('max', [SqlRef.fromString('col2')]),
             'MaxColumn',
           ),
         )
         .toString(),
     ).toMatchInlineSnapshot(`
-      "select max(column2) AS \\"MaxColumn\\", column1, min(column1) AS aliasName
+      "select max(col2) AS \\"MaxColumn\\", col1, min(col1) AS aliasName
       from tbl 
       GROUP BY 1, 3"
     `);

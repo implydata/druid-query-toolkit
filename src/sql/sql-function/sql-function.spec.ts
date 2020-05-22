@@ -401,7 +401,7 @@ describe('SqlFunction', () => {
   });
 
   it('function with filter', () => {
-    const sql = `Sum(A) Filter (WHERE value > 1)`;
+    const sql = `Sum(A) Filter (WHERE val > 1)`;
 
     backAndForth(sql);
 
@@ -438,7 +438,7 @@ describe('SqlFunction', () => {
         "whereExpression": SqlMulti {
           "arguments": Array [
             SqlRef {
-              "column": "value",
+              "column": "val",
               "innerSpacing": Object {},
               "namespace": undefined,
               "namespaceQuotes": undefined,
