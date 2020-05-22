@@ -16,16 +16,12 @@ import { SqlLiteral } from '..';
 import { SqlBase, SqlBaseValue } from '../sql-base';
 
 export interface SqlIntervalValue extends SqlBaseValue {
-  intervalKeyword?: string;
+  intervalKeyword: string;
   intervalValue?: SqlLiteral;
   unitKeyword?: string;
 }
 
 export class SqlInterval extends SqlBase {
-  public intervalKeyword?: string;
-  public intervalValue?: SqlLiteral;
-  public unitKeyword?: string;
-
   static type = 'interval';
   static sqlIntervalFactory(unit: string, intervalValue: number) {
     return new SqlInterval({
@@ -40,6 +36,10 @@ export class SqlInterval extends SqlBase {
     });
   }
 
+  public readonly intervalKeyword: string;
+  public readonly intervalValue?: SqlLiteral;
+  public readonly unitKeyword?: string;
+
   constructor(options: SqlIntervalValue) {
     super(options, SqlInterval.type);
     this.intervalKeyword = options.intervalKeyword;
@@ -47,8 +47,8 @@ export class SqlInterval extends SqlBase {
     this.unitKeyword = options.unitKeyword;
   }
 
-  public valueOf() {
-    const value: SqlIntervalValue = super.valueOf();
+  public valueOf(): SqlIntervalValue {
+    const value = super.valueOf() as SqlIntervalValue;
     value.intervalKeyword = this.intervalKeyword;
     value.intervalValue = this.intervalValue;
     value.unitKeyword = this.unitKeyword;

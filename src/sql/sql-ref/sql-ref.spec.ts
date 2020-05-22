@@ -16,6 +16,12 @@ import { parseSql, SqlRef } from '../../index';
 import { backAndForth } from '../../test-utils';
 
 describe('SqlRef', () => {
+  it('avoids reserved', () => {
+    const sql = 'From';
+
+    expect(() => parseSql(sql)).toThrowError('Expected');
+  });
+
   it('Ref with double quotes and double quoted namespace', () => {
     const sql = '"test"."namespace"';
 
@@ -24,7 +30,10 @@ describe('SqlRef', () => {
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlRef {
         "column": "namespace",
-        "innerSpacing": Object {},
+        "innerSpacing": Object {
+          "postTableDot": "",
+          "preTableDot": "",
+        },
         "namespace": undefined,
         "namespaceQuotes": undefined,
         "quotes": "\\"",
@@ -43,7 +52,10 @@ describe('SqlRef', () => {
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlRef {
         "column": "namespace",
-        "innerSpacing": Object {},
+        "innerSpacing": Object {
+          "postTableDot": "",
+          "preTableDot": "",
+        },
         "namespace": undefined,
         "namespaceQuotes": undefined,
         "quotes": "",
@@ -62,7 +74,10 @@ describe('SqlRef', () => {
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlRef {
         "column": "namespace",
-        "innerSpacing": Object {},
+        "innerSpacing": Object {
+          "postTableDot": "",
+          "preTableDot": "",
+        },
         "namespace": undefined,
         "namespaceQuotes": undefined,
         "quotes": "",
@@ -115,34 +130,34 @@ describe('SqlRef', () => {
     const sql = `"page"`;
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
-        SqlRef {
-          "column": "page",
-          "innerSpacing": Object {},
-          "namespace": undefined,
-          "namespaceQuotes": undefined,
-          "quotes": "\\"",
-          "table": undefined,
-          "tableQuotes": undefined,
-          "type": "ref",
-        }
-      `);
+      SqlRef {
+        "column": "page",
+        "innerSpacing": Object {},
+        "namespace": undefined,
+        "namespaceQuotes": undefined,
+        "quotes": "\\"",
+        "table": undefined,
+        "tableQuotes": undefined,
+        "type": "ref",
+      }
+    `);
   });
 
   it('without quotes', () => {
     const sql = `channel`;
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
-        SqlRef {
-          "column": "channel",
-          "innerSpacing": Object {},
-          "namespace": undefined,
-          "namespaceQuotes": undefined,
-          "quotes": "",
-          "table": undefined,
-          "tableQuotes": undefined,
-          "type": "ref",
-        }
-      `);
+      SqlRef {
+        "column": "channel",
+        "innerSpacing": Object {},
+        "namespace": undefined,
+        "namespaceQuotes": undefined,
+        "quotes": "",
+        "table": undefined,
+        "tableQuotes": undefined,
+        "type": "ref",
+      }
+    `);
   });
 
   it('without quotes + namespace', () => {
@@ -208,7 +223,9 @@ describe('upgrades', () => {
         "column": undefined,
         "innerSpacing": Object {
           "postTable": "",
+          "postTableDot": "",
           "preTable": "",
+          "preTableDot": "",
         },
         "namespace": "namespace",
         "namespaceQuotes": "\\"",
@@ -221,7 +238,7 @@ describe('upgrades', () => {
   });
 
   it('SqlRef in select should be upgraded', () => {
-    const sql = `select table from sys.segments`;
+    const sql = `select tbl from sys.segments`;
 
     backAndForth(sql);
 
@@ -229,9 +246,9 @@ describe('upgrades', () => {
       SqlQuery {
         "explainKeyword": undefined,
         "fromKeyword": "from",
-        "groupByExpression": undefined,
-        "groupByExpressionSeparators": undefined,
+        "groupByExpressions": undefined,
         "groupByKeyword": undefined,
+        "groupBySeparators": undefined,
         "havingExpression": undefined,
         "havingKeyword": undefined,
         "innerSpacing": Object {
@@ -261,7 +278,7 @@ describe('upgrades', () => {
         "selectSeparators": Array [],
         "selectValues": Array [
           SqlRef {
-            "column": "table",
+            "column": "tbl",
             "innerSpacing": Object {},
             "namespace": undefined,
             "namespaceQuotes": undefined,
@@ -277,7 +294,9 @@ describe('upgrades', () => {
             "column": undefined,
             "innerSpacing": Object {
               "postTable": "",
+              "postTableDot": "",
               "preTable": "",
+              "preTableDot": "",
             },
             "namespace": "sys",
             "namespaceQuotes": "",

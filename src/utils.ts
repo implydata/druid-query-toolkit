@@ -148,3 +148,7 @@ export function whitelistKeys(obj: Record<string, any>, whitelist: string[]): Re
   }
   return newObj;
 }
+
+export function filterMap<T, Q>(xs: T[], f: (x: T, i: number) => Q | undefined): Q[] {
+  return xs.map(f).filter((x: Q | undefined) => typeof x !== 'undefined') as Q[];
+}

@@ -28,13 +28,13 @@ export interface SqlCaseSimpleValue extends SqlBaseValue {
 export class SqlCaseSimple extends SqlBase {
   static type = 'caseSimple';
 
-  public caseKeyword?: string;
-  public caseExpression?: SqlBase;
-  public elseKeyword?: string;
-  public elseExpression?: string;
-  public endKeyword?: string;
-  public whenThenUnits: WhenThenUnit[];
-  public postWhenThenUnits?: string[];
+  public readonly caseKeyword?: string;
+  public readonly caseExpression?: SqlBase;
+  public readonly elseKeyword?: string;
+  public readonly elseExpression?: string;
+  public readonly endKeyword?: string;
+  public readonly whenThenUnits: WhenThenUnit[];
+  public readonly postWhenThenUnits?: string[];
 
   constructor(options: SqlCaseSimpleValue) {
     super(options, SqlCaseSimple.type);

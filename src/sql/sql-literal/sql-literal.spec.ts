@@ -24,7 +24,7 @@ describe('SqlLiteral', () => {
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlLiteral {
         "innerSpacing": Object {},
-        "quotes": undefined,
+        "keyword": undefined,
         "stringValue": "NULL",
         "type": "literal",
         "value": null,
@@ -40,7 +40,7 @@ describe('SqlLiteral', () => {
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlLiteral {
         "innerSpacing": Object {},
-        "quotes": undefined,
+        "keyword": undefined,
         "stringValue": "True",
         "type": "literal",
         "value": true,
@@ -56,7 +56,7 @@ describe('SqlLiteral', () => {
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlLiteral {
         "innerSpacing": Object {},
-        "quotes": undefined,
+        "keyword": undefined,
         "stringValue": "FalsE",
         "type": "literal",
         "value": false,
@@ -72,8 +72,8 @@ describe('SqlLiteral', () => {
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlLiteral {
         "innerSpacing": Object {},
-        "quotes": "'",
-        "stringValue": "word",
+        "keyword": undefined,
+        "stringValue": "'word'",
         "type": "literal",
         "value": "word",
       }
@@ -112,7 +112,7 @@ describe('SqlLiteral', () => {
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlLiteral {
         "innerSpacing": Object {},
-        "quotes": undefined,
+        "keyword": undefined,
         "stringValue": "1",
         "type": "literal",
         "value": 1,
@@ -128,13 +128,13 @@ describe('SqlLiteral', () => {
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlLiteral {
         "innerSpacing": Object {},
+        "keyword": undefined,
         "parens": Array [
           Object {
             "leftSpacing": "",
             "rightSpacing": "",
           },
         ],
-        "quotes": undefined,
         "stringValue": "1",
         "type": "literal",
         "value": 1,
@@ -150,21 +150,21 @@ describe('SqlLiteral', () => {
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlLiteral {
         "innerSpacing": Object {},
+        "keyword": undefined,
         "parens": Array [
           Object {
             "leftSpacing": "",
             "rightSpacing": "",
           },
         ],
-        "quotes": "'",
-        "stringValue": "word",
+        "stringValue": "'word'",
         "type": "literal",
         "value": "word",
       }
     `);
   });
 
-  it('empty literal', () => {
+  it('empty string literal', () => {
     const sql = `''`;
 
     backAndForth(sql);
@@ -172,8 +172,8 @@ describe('SqlLiteral', () => {
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlLiteral {
         "innerSpacing": Object {},
-        "quotes": "'",
-        "stringValue": "",
+        "keyword": undefined,
+        "stringValue": "''",
         "type": "literal",
         "value": "",
       }
@@ -188,7 +188,7 @@ describe('SqlLiteral', () => {
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlLiteral {
         "innerSpacing": Object {},
-        "quotes": undefined,
+        "keyword": undefined,
         "stringValue": "1.01",
         "type": "literal",
         "value": 1.01,
@@ -199,28 +199,142 @@ describe('SqlLiteral', () => {
   it('works with number', () => {
     const sql = `12345`;
 
+    backAndForth(sql);
+
     expect(parseSql(sql)).toMatchInlineSnapshot(`
-        SqlLiteral {
-          "innerSpacing": Object {},
-          "quotes": undefined,
-          "stringValue": "12345",
-          "type": "literal",
-          "value": 12345,
-        }
-      `);
+      SqlLiteral {
+        "innerSpacing": Object {},
+        "keyword": undefined,
+        "stringValue": "12345",
+        "type": "literal",
+        "value": 12345,
+      }
+    `);
   });
 
   it('works with string', () => {
     const sql = `'hello'`;
 
+    backAndForth(sql);
+
     expect(parseSql(sql)).toMatchInlineSnapshot(`
-        SqlLiteral {
-          "innerSpacing": Object {},
-          "quotes": "'",
-          "stringValue": "hello",
-          "type": "literal",
-          "value": "hello",
-        }
-      `);
+      SqlLiteral {
+        "innerSpacing": Object {},
+        "keyword": undefined,
+        "stringValue": "'hello'",
+        "type": "literal",
+        "value": "hello",
+      }
+    `);
+  });
+
+  it('works with unicode string 1', () => {
+    const sql = `U&'fo\\00F6'`;
+
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
+      SqlLiteral {
+        "innerSpacing": Object {},
+        "keyword": undefined,
+        "stringValue": "U&'fo\\\\00F6'",
+        "type": "literal",
+        "value": "foö",
+      }
+    `);
+  });
+
+  it('works with unicode string 2', () => {
+    const sql = `u&'fo\\00F6\\00F6'`;
+
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
+      SqlLiteral {
+        "innerSpacing": Object {},
+        "keyword": undefined,
+        "stringValue": "u&'fo\\\\00F6\\\\00F6'",
+        "type": "literal",
+        "value": "foöö",
+      }
+    `);
+  });
+
+  it('works with timestamp', () => {
+    const sql = `TIMESTAMP '2020-02-25 00:00:00'`;
+
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
+      SqlLiteral {
+        "innerSpacing": Object {
+          "postKeyword": " ",
+        },
+        "keyword": "TIMESTAMP",
+        "stringValue": "'2020-02-25 00:00:00'",
+        "type": "literal",
+        "value": "2020-02-25 00:00:00",
+      }
+    `);
+  });
+
+  it('works with array or numbers', () => {
+    const sql = `Array [1, 2, 3]`;
+
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
+      SqlLiteral {
+        "innerSpacing": Object {
+          "postKeyword": " ",
+        },
+        "keyword": "Array",
+        "stringValue": "[1, 2, 3]",
+        "type": "literal",
+        "value": Array [
+          1,
+          2,
+          3,
+        ],
+      }
+    `);
+  });
+
+  it('works with array or strings', () => {
+    const sql = `Array['1', u&'a', ']']`;
+
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
+      SqlLiteral {
+        "innerSpacing": Object {
+          "postKeyword": "",
+        },
+        "keyword": "Array",
+        "stringValue": "['1', u&'a', ']']",
+        "type": "literal",
+        "value": Array [
+          "1",
+          "a",
+          "]",
+        ],
+      }
+    `);
+  });
+
+  it('works with dynamic placeholder', () => {
+    const sql = `?`;
+
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
+      SqlLiteral {
+        "innerSpacing": Object {},
+        "keyword": undefined,
+        "stringValue": "?",
+        "type": "literal",
+        "value": "?",
+      }
+    `);
   });
 });

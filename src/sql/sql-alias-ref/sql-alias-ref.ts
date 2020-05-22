@@ -16,37 +16,30 @@ import { SqlRef } from '..';
 import { SqlBase, SqlBaseValue } from '../sql-base';
 
 export interface SqlAliasRefValue extends SqlBaseValue {
-  column: SqlBase;
-  postColumn?: string;
+  expression: SqlBase;
   asKeyword: string;
   alias: SqlRef;
 }
 
 export class SqlAliasRef extends SqlBase {
-  public column: SqlBase;
-  public postColumn?: string;
-  public asKeyword: string;
-  public alias: SqlRef;
-
   static type = 'alias-ref';
 
-  static sqlAliasFactory(column: SqlBase, alias: string) {
+  static sqlAliasFactory(expression: SqlBase, alias: string) {
     return new SqlAliasRef({
       type: SqlAliasRef.type,
-      column: column,
-      postColumn: ' ',
+      expression: expression,
       asKeyword: 'AS',
       alias: SqlRef.fromStringWithDoubleQuotes(alias),
-      innerSpacing: {
-        postAs: ' ',
-      },
     } as SqlAliasRefValue);
   }
 
+  public readonly expression: SqlBase;
+  public readonly asKeyword: string;
+  public readonly alias: SqlRef;
+
   constructor(options: SqlAliasRefValue) {
     super(options, SqlAliasRef.type);
-    this.column = options.column;
-    this.postColumn = options.postColumn;
+    this.expression = options.expression;
     this.asKeyword = options.asKeyword;
     this.alias = options.alias;
   }
@@ -58,23 +51,23 @@ export class SqlAliasRef extends SqlBase {
   }
 
   public valueOf() {
-    const value: any = super.valueOf();
-    value.column = this.column;
-    value.postColumn = this.postColumn;
+    const value = super.valueOf() as SqlAliasRefValue;
+    value.expression = this.expression;
     value.asKeyword = this.asKeyword;
     value.alias = this.alias;
     return value as SqlAliasRefValue;
   }
 
   public toRawString(): string {
-    if (!this.column) throw Error('not a valid alias');
-    return (
-      this.column +
-      (this.postColumn || '') +
-      this.asKeyword +
-      (this.innerSpacing.postAs || '') +
-      this.alias.toString()
-    );
+    const rawParts: string[] = [this.expression.toString(), this.getInnerSpace('postExpression')];
+
+    if (this.asKeyword) {
+      rawParts.push(this.asKeyword, this.getInnerSpace('postAs'));
+    }
+
+    rawParts.push(this.alias.toString());
+
+    return rawParts.join('');
   }
 }
 

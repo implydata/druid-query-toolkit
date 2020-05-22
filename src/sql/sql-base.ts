@@ -14,6 +14,8 @@
 
 import { SqlAliasRef, SqlRef } from '../index';
 
+import { RESERVED } from './reserved';
+
 export interface Parens {
   leftSpacing: string;
   rightSpacing: string;
@@ -25,7 +27,18 @@ export interface SqlBaseValue {
   parens?: Parens[];
 }
 
+const reservedLookup: Record<string, boolean> = {};
+for (const r of RESERVED) {
+  reservedLookup[r] = true;
+}
+
 export abstract class SqlBase {
+  static RESERVED = RESERVED;
+
+  static isReserved(keyword: string) {
+    return Boolean(reservedLookup[keyword.toUpperCase()]);
+  }
+
   static cleanObject(obj: Record<string, any> | undefined): Record<string, string> | undefined {
     if (!obj) return obj;
     const cleanObj: Record<string, string> = {};
@@ -91,7 +104,7 @@ export abstract class SqlBase {
     return SqlBase.fromValue(value);
   }
 
-  public getInnerSpace(name: string, defaultSpace = '') {
+  public getInnerSpace(name: string, defaultSpace = ' ') {
     const { innerSpacing } = this;
     if (!innerSpacing) return defaultSpace;
     const space = innerSpacing[name];

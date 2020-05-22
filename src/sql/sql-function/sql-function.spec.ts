@@ -118,14 +118,14 @@ describe('SqlFunction', () => {
                 "arguments": Array [
                   SqlLiteral {
                     "innerSpacing": Object {},
-                    "quotes": undefined,
+                    "keyword": undefined,
                     "stringValue": "1",
                     "type": "literal",
                     "value": 1,
                   },
                   SqlLiteral {
                     "innerSpacing": Object {},
-                    "quotes": undefined,
+                    "keyword": undefined,
                     "stringValue": "2",
                     "type": "literal",
                     "value": 2,
@@ -146,14 +146,14 @@ describe('SqlFunction', () => {
                 "arguments": Array [
                   SqlLiteral {
                     "innerSpacing": Object {},
-                    "quotes": undefined,
+                    "keyword": undefined,
                     "stringValue": "3",
                     "type": "literal",
                     "value": 3,
                   },
                   SqlLiteral {
                     "innerSpacing": Object {},
-                    "quotes": undefined,
+                    "keyword": undefined,
                     "stringValue": "2",
                     "type": "literal",
                     "value": 2,
@@ -356,7 +356,7 @@ describe('SqlFunction', () => {
                   },
                   SqlLiteral {
                     "innerSpacing": Object {},
-                    "quotes": undefined,
+                    "keyword": undefined,
                     "stringValue": "4",
                     "type": "literal",
                     "value": 4,
@@ -401,7 +401,7 @@ describe('SqlFunction', () => {
   });
 
   it('function with filter', () => {
-    const sql = `Sum(A) Filter (WHERE value > 1)`;
+    const sql = `Sum(A) Filter (WHERE val > 1)`;
 
     backAndForth(sql);
 
@@ -438,7 +438,7 @@ describe('SqlFunction', () => {
         "whereExpression": SqlMulti {
           "arguments": Array [
             SqlRef {
-              "column": "value",
+              "column": "val",
               "innerSpacing": Object {},
               "namespace": undefined,
               "namespaceQuotes": undefined,
@@ -449,7 +449,7 @@ describe('SqlFunction', () => {
             },
             SqlLiteral {
               "innerSpacing": Object {},
-              "quotes": undefined,
+              "keyword": undefined,
               "stringValue": "1",
               "type": "literal",
               "value": 1,

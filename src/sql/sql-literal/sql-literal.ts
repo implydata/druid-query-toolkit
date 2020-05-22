@@ -14,10 +14,12 @@
 
 import { SqlBase, SqlBaseValue } from '../sql-base';
 
+export type LiteralValue = null | boolean | number | string;
+
 export interface SqlLiteralValue extends SqlBaseValue {
-  value?: string | number;
+  keyword?: string;
+  value: LiteralValue;
   stringValue?: string;
-  quotes?: string;
 }
 
 export class SqlLiteral extends SqlBase {
@@ -26,11 +28,10 @@ export class SqlLiteral extends SqlBase {
     return `${quote}${thing}${quote}`;
   }
 
-  static fromInput(value: string | number): SqlLiteral {
+  static fromInput(value: LiteralValue): SqlLiteral {
     return new SqlLiteral({
       value: value,
       stringValue: typeof value === 'number' ? String(value) : value,
-      quotes: `'`,
     } as SqlLiteralValue);
   }
 
@@ -38,34 +39,52 @@ export class SqlLiteral extends SqlBase {
     return expression instanceof SqlLiteral && expression.value === value;
   }
 
-  public value?: string | number;
-  public stringValue?: string;
-  public quotes?: string;
+  public readonly keyword?: string;
+  public readonly value: LiteralValue;
+  public readonly stringValue?: string;
 
   constructor(options: SqlLiteralValue) {
     super(options, SqlLiteral.type);
+    this.keyword = options.keyword;
     this.value = options.value;
     this.stringValue = options.stringValue;
-    this.quotes = options.quotes;
   }
 
-  public valueOf() {
-    const value: SqlLiteralValue = super.valueOf();
+  public valueOf(): SqlLiteralValue {
+    const value = super.valueOf() as SqlLiteralValue;
+    value.keyword = this.keyword;
     value.value = this.value;
     value.stringValue = this.stringValue;
-    value.quotes = this.quotes;
     return value;
   }
 
   public toRawString(): string {
-    if (!this.stringValue && this.stringValue !== '') {
-      throw new Error('Could not make raw string');
+    const retParts: string[] = [];
+
+    if (this.keyword) {
+      retParts.push(this.keyword, this.innerSpacing.postKeyword || '');
     }
 
-    if (typeof this.value === 'string' && this.quotes) {
-      return SqlLiteral.wrapInQuotes(this.value, this.quotes);
+    if (this.stringValue) {
+      retParts.push(this.stringValue);
+    } else {
+      if (typeof this.value === 'string') {
+        retParts.push(SqlLiteral.wrapInQuotes(this.value, "'")); // ToDo: make this smarter
+      } else {
+        retParts.push(String(this.value)); // ToDo: make this smarter
+      }
     }
-    return this.stringValue;
+
+    return retParts.join('');
+  }
+
+  public increment(ammount = 1): SqlLiteral | undefined {
+    if (typeof this.value !== 'number') return;
+
+    const value = this.valueOf();
+    value.value = this.value + ammount;
+    delete value.stringValue;
+    return new SqlLiteral(value);
   }
 }
 SqlBase.register(SqlLiteral.type, SqlLiteral);
