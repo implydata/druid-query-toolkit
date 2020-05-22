@@ -200,11 +200,11 @@ JoinClause =
   joinType:JoinType
   postJoinTypeSpacing:_
   joinKeyword:JoinToken
-  postJoinKeywordSpacing:_?
+  postJoinKeywordSpacing:_
   table:(Alias / SqlRef)
   postJoinTableSpacing:_
   onKeyword:OnToken
-  postOnSpacing:_?
+  postOnSpacing:_
   onExpression:Expression
 {
   return {
@@ -500,13 +500,13 @@ Unit
 
 Function =
   functionName:UnquotedRefPart
-  postName:_?
+  postName:_
   OpenParen
-  postLeftParen:_?
+  postLeftParen:_
   decorator:(FunctionDecorator _)?
   argumentHead:Expression
   argumentTail:((Comma / From) Expression)*
-  preRightParen:_?
+  preRightParen:_
   CloseParen
   filter:(_ Filter)?
 {
@@ -532,7 +532,7 @@ Function =
   });
 }
 
-Filter = filterKeyword:FilterToken postFilterKeyword:_? OpenParen postLeftParen:_? filterExpression:WhereClause preRightParen:_? CloseParen
+Filter = filterKeyword:FilterToken postFilterKeyword:_ OpenParen postLeftParen:_ filterExpression:WhereClause preRightParen:_ CloseParen
 {
   return {
     filterKeyword: filterKeyword,
@@ -545,7 +545,7 @@ Filter = filterKeyword:FilterToken postFilterKeyword:_? OpenParen postLeftParen:
   };
 }
 
-Comma = left:_? ',' right:_?
+Comma = left:_ ',' right:_
 {
   return new sql.Separator({
     left: left || '',
@@ -554,7 +554,7 @@ Comma = left:_? ',' right:_?
   });
 }
 
-From = left:_? from:FromToken right:_?
+From = left:_ from:FromToken right:_
 {
   return new sql.Separator({
     left: left || '',
@@ -563,7 +563,7 @@ From = left:_? from:FromToken right:_?
   });
 }
 
-SqlInParens = OpenParen leftSpacing:_? ex:Sql rightSpacing:_? CloseParen
+SqlInParens = OpenParen leftSpacing:_ ex:Sql rightSpacing:_ CloseParen
 {
   return ex.addParens(leftSpacing, rightSpacing);
 }
@@ -673,7 +673,7 @@ ArrayEntry = Number / SingleQuotedString / UnicodeString
 
 // ------------------------------
 
-SqlRef = tableBits:(RefPart _? "." _?)? column:RefPart !"."
+SqlRef = tableBits:(RefPart _ "." _)? column:RefPart !"."
 {
   return new sql.SqlRef({
     column: column.name,
@@ -686,7 +686,7 @@ SqlRef = tableBits:(RefPart _? "." _?)? column:RefPart !"."
     }
   });
 }
-/ namespaceBits:(RefPart _? "." _?) tableBits:(RefPart _? "." _?) column:RefPart !"."
+/ namespaceBits:(RefPart _ "." _) tableBits:(RefPart _ "." _) column:RefPart !"."
 {
   return new sql.SqlRef({
     column: column.name,
