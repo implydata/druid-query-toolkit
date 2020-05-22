@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { deepSet } from '../../utils';
+import { deepSet, filterMap } from '../../utils';
 import {
   Annotation,
   Separator,
@@ -51,11 +51,11 @@ export interface SqlQueryValue extends SqlBaseValue {
   onExpression?: SqlBase;
 
   whereKeyword?: string;
-  whereExpression?: SqlMulti | SqlUnary;
+  whereExpression?: SqlMulti | SqlUnary; // ToDo: change type to SqlBase
 
   groupByKeyword?: string;
-  groupByExpression?: SqlBase[];
-  groupByExpressionSeparators?: Separator[];
+  groupByExpression?: SqlBase[]; // ToDo: rename to groupByExpressions
+  groupByExpressionSeparators?: Separator[]; // ToDo: rename to groupBySeparators
 
   havingKeyword?: string;
   havingExpression?: SqlMulti | SqlUnary;
@@ -509,7 +509,7 @@ export class SqlQuery extends SqlBase {
 
   removeFromSelect(column: string) {
     const value = this.valueOf();
-    const index = this.getColumns().indexOf(column);
+    const index = this.getColumns().indexOf(column) + 1;
     const filteredList = Separator.filterStringFromList(
       column,
       value.selectValues,
@@ -517,27 +517,45 @@ export class SqlQuery extends SqlBase {
     );
 
     if (value.groupByExpression) {
-      value.groupByExpression = value.groupByExpression.map(unit => {
-        if (unit instanceof SqlLiteral && typeof unit.value === 'number' && unit.value > index) {
-          return unit.increment(-1)!;
-        } else {
-          return unit;
-        }
-      });
-    }
-
-    if (value.orderByUnits) {
-      value.orderByUnits = value.orderByUnits.map(unit => {
-        const { expression } = unit;
-        if (
-          expression instanceof SqlLiteral &&
-          typeof expression.value === 'number' &&
-          expression.value > index
-        ) {
-          unit = deepSet(unit, 'expression', expression.increment(-1));
+      value.groupByExpression = filterMap(value.groupByExpression, unit => {
+        if (unit instanceof SqlLiteral && typeof unit.value === 'number') {
+          if (unit.value > index) {
+            return unit.increment(-1)!;
+          } else if (unit.value === index) {
+            return;
+          }
         }
         return unit;
       });
+      if (value.groupByExpressionSeparators) {
+        value.groupByExpressionSeparators = value.groupByExpressionSeparators.slice(
+          0,
+          value.groupByExpression.length - 1,
+        );
+      }
+    }
+
+    if (value.orderByUnits) {
+      value.orderByUnits = filterMap(value.orderByUnits, unit => {
+        const { expression } = unit;
+        if (expression instanceof SqlLiteral && typeof expression.value === 'number') {
+          if (expression.value > index) {
+            unit = deepSet(unit, 'expression', expression.increment(-1));
+          } else if (expression.value === index) {
+            return;
+          }
+        }
+        return unit;
+      });
+      if (value.orderByUnits.length) {
+        if (value.orderBySeparators) {
+          value.orderBySeparators = value.orderBySeparators.slice(0, value.orderByUnits.length - 1);
+        }
+      } else {
+        delete value.orderByKeyword;
+        delete value.orderByUnits;
+        delete value.orderBySeparators;
+      }
     }
 
     value.selectSeparators = filteredList ? filteredList.separators : undefined;

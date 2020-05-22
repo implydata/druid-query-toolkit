@@ -244,7 +244,7 @@ describe('remove functions', () => {
       `);
     });
 
-    it.skip(`removes from group by and order by`, () => {
+    it(`removes from group by and order by`, () => {
       const query = parseSqlQuery(sane`
         SELECT col0, col1, SUM(a), col2 
         FROM github
@@ -256,21 +256,20 @@ describe('remove functions', () => {
         SELECT col1, SUM(a), col2 
         FROM github
         GROUP BY 1, 3
-        ORDER BY 2
+        ORDER BY 1
       `);
 
       expect(query.removeFromSelect('col1').toString()).toEqual(sane`
         SELECT col0, SUM(a), col2 
         FROM github
         GROUP BY 1, 3
-        ORDER BY 1
       `);
 
       expect(query.removeFromSelect('col2').toString()).toEqual(sane`
         SELECT col0, col1, SUM(a) 
         FROM github
         GROUP BY 1, 2
-        ORDER BY 1
+        ORDER BY 2
       `);
     });
   });
