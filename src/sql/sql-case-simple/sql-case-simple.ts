@@ -12,12 +12,11 @@
  * limitations under the License.
  */
 
-import { SqlCaseSearched, WhenThenUnit } from '..';
-import { SqlBase, SqlBaseValue } from '../sql-base';
+import { SqlBase, SqlBaseValue, SqlCaseSearched, SqlExpression, WhenThenUnit } from '..';
 
 export interface SqlCaseSimpleValue extends SqlBaseValue {
   caseKeyword?: string;
-  caseExpression?: SqlBase;
+  caseExpression?: SqlExpression;
   elseKeyword?: string;
   elseExpression?: string;
   endKeyword?: string;
@@ -25,11 +24,11 @@ export interface SqlCaseSimpleValue extends SqlBaseValue {
   postWhenThenUnits?: string[];
 }
 
-export class SqlCaseSimple extends SqlBase {
+export class SqlCaseSimple extends SqlExpression {
   static type = 'caseSimple';
 
   public readonly caseKeyword?: string;
-  public readonly caseExpression?: SqlBase;
+  public readonly caseExpression?: SqlExpression;
   public readonly elseKeyword?: string;
   public readonly elseExpression?: string;
   public readonly endKeyword?: string;

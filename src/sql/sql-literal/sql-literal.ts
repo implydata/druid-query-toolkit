@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlBaseValue } from '../sql-base';
+import { SqlBase, SqlBaseValue, SqlExpression } from '..';
 
 export type LiteralValue = null | boolean | number | string;
 
@@ -22,7 +22,7 @@ export interface SqlLiteralValue extends SqlBaseValue {
   stringValue?: string;
 }
 
-export class SqlLiteral extends SqlBase {
+export class SqlLiteral extends SqlExpression {
   static type = 'literal';
   static wrapInQuotes(thing: string, quote: string): string {
     return `${quote}${thing}${quote}`;

@@ -12,16 +12,16 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlBaseValue } from '../sql-base';
+import { SqlBase, SqlBaseValue, SqlExpression } from '..';
 
 export interface WhenThenUnit {
   whenKeyword: string;
   postWhenSpace: string;
-  whenExpression: SqlBase;
+  whenExpression: SqlExpression;
   postWhenExpressionSpace: string;
   thenKeyword: string;
   postThenSpace: string;
-  thenExpression: SqlBase;
+  thenExpression: SqlExpression;
 }
 
 export interface SqlCaseSearchedValue extends SqlBaseValue {
@@ -33,7 +33,7 @@ export interface SqlCaseSearchedValue extends SqlBaseValue {
   postWhenThenUnitSpaces?: string[];
 }
 
-export class SqlCaseSearched extends SqlBase {
+export class SqlCaseSearched extends SqlExpression {
   static type = 'caseSearched';
 
   static whenThenToString(unit?: WhenThenUnit): string {

@@ -12,8 +12,7 @@
  * limitations under the License.
  */
 
-import { SqlLiteral } from '..';
-import { SqlBase, SqlBaseValue } from '../sql-base';
+import { SqlBase, SqlBaseValue, SqlExpression, SqlLiteral } from '..';
 
 export interface SqlIntervalValue extends SqlBaseValue {
   intervalKeyword: string;
@@ -21,7 +20,7 @@ export interface SqlIntervalValue extends SqlBaseValue {
   unitKeyword?: string;
 }
 
-export class SqlInterval extends SqlBase {
+export class SqlInterval extends SqlExpression {
   static type = 'interval';
   static sqlIntervalFactory(unit: string, intervalValue: number) {
     return new SqlInterval({

@@ -342,12 +342,105 @@ NotExpression = keyword:NotToken postKeyword:_ argument:NotExpression
 }
   / ComparisonExpression
 
-ComparisonExpression =
-  head:AdditionExpression
-  tail:((_ ComparisonOperator _ (ComparisonExpression / AdditionExpression)) / (_ BetweenToken _ (AndExpression / ComparisonExpression)) / (_ (IsNotToken / IsToken) __ (NullLiteral / BooleanLiteral)))*
+ComparisonExpression = lhs:AdditionExpression preOp:_ opRhs:ComparisonOpRhs
 {
-  return maybeMakeMulti('Comparison', head, tail);
+  return new sql.SqlComparison({
+    lhs: lhs,
+    op: opRhs.op,
+    notKeyword: opRhs.notKeyword,
+    rhs: opRhs.rhs,
+    innerSpacing: {
+      preOp: opRhs.preOp ? opRhs.preOp : preOp,
+      postOp: opRhs.postOp,
+      not: opRhs.preOp ? preOp : opRhs.notSpacing
+    }
+  });
 }
+  / AdditionExpression
+
+/*
+  (_ (IsNotToken / IsToken) __ (NullLiteral / BooleanLiteral))
+*/
+
+ComparisonOpRhs = ComparisonOpRhsSimple / ComparisonOpRhsIs / ComparisonOpRhsIn / ComparisonOpRhsBetween / ComparisonOpRhsLike / ComparisonOpRhsNot
+
+ComparisonOpRhsSimple = op:ComparisonOperator postOp:_ rhs:AdditionExpression
+{
+  return {
+    op: op,
+    postOp: postOp,
+    rhs: rhs
+  };
+}
+
+ComparisonOperator =
+  '='
+/ '!='
+/ '<>'
+/ '>='
+/ '<='
+/ '<'
+/ '>'
+
+ComparisonOpRhsIs = op:IsToken postOp:_ not:(NotToken _)? rhs:SqlLiteral
+{
+  return {
+    op: op,
+    postOp: postOp,
+    rhs: rhs,
+    notKeyword: not ? not[0] : undefined,
+    notSpacing: not ? not[1] : undefined
+  };
+}
+
+ComparisonOpRhsIn = op:InToken postOp:_ rhs:Sql
+{
+  return {
+    op: op,
+    postOp: postOp,
+    rhs: rhs
+  };
+}
+
+ComparisonOpRhsBetween = op:BetweenToken postOp:_ start:BaseType preKeyword:_ keyword:AndToken postKeyword:_ end:BaseType
+{
+  return {
+    op: op,
+    postOp: postOp,
+    rhs: {
+      start,
+      preKeyword,
+      keyword,
+      postKeyword,
+      end
+    }
+  };
+}
+
+ComparisonOpRhsLike = op:LikeToken postOp:_ like:SqlLiteral escape:(_ EscapeToken _ SqlLiteral)?
+{
+  return {
+    op: op,
+    postOp: postOp,
+    rhs: escape ? {
+      like: like,
+      preEscape: escape[0],
+      escapeKeyword: escape[1],
+      postEscape: escape[2],
+      escape: escape[3]
+    } : like
+  };
+}
+
+ComparisonOpRhsNot = notKeyword:NotToken preOp:_ opRhs:(ComparisonOpRhsBetween / ComparisonOpRhsLike)
+{
+  return Object.assign({}, opRhs, {
+    notKeyword: notKeyword,
+    preOp: preOp
+  });
+}
+
+// -------------------------------
 
 AdditionExpression = head:SubtractionExpression tail:(_ '+' _ SubtractionExpression)*
 {
@@ -765,17 +858,6 @@ OpenParen "(" = "("
 
 CloseParen ")" = ")"
 
-ComparisonOperator =
-  '='
-/ '<>'
-/ '>='
-/ '<='
-/ '<'
-/ '>'
-/ LikeToken
-/ InToken
-/ '!='
-
 FunctionDecorator =
   LeadingToken
 / BothToken
@@ -804,6 +886,7 @@ DescToken = $('DESC'i !IdentifierPart)
 DistinctToken = $('DISTINCT'i !IdentifierPart)
 ElseToken = $('ELSE'i !IdentifierPart)
 EndToken = $('END'i !IdentifierPart)
+EscapeToken = $('ESCAPE'i !IdentifierPart)
 ExplainToken = $('EXPLAIN'i !IdentifierPart __ 'PLAN'i !IdentifierPart __ 'FOR'i !IdentifierPart)
 FalseToken = $('FALSE'i !IdentifierPart) { return { value: false, stringValue: text() }; }
 FilterToken= $('FILTER'i !IdentifierPart)

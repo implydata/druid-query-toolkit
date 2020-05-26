@@ -12,8 +12,7 @@
  * limitations under the License.
  */
 
-import { Separator } from '..';
-import { SqlBase, SqlBaseValue } from '../sql-base';
+import { Separator, SqlBase, SqlBaseValue, SqlExpression } from '..';
 
 // innerSpacing:
 // Fn          (           A , B             )
@@ -21,22 +20,22 @@ import { SqlBase, SqlBaseValue } from '../sql-base';
 
 export interface SqlFunctionValue extends SqlBaseValue {
   functionName: string;
-  arguments?: SqlBase[];
+  arguments?: SqlExpression[];
   decorator?: string;
   separators?: Separator[];
   filterKeyword?: string;
   whereKeyword?: string;
-  whereExpression?: SqlBase;
+  whereExpression?: SqlExpression;
 }
 
-export class SqlFunction extends SqlBase {
+export class SqlFunction extends SqlExpression {
   static type = 'function';
 
   static sqlFunctionFactory(
     functionName: string,
-    argumentArray: SqlBase[],
+    argumentArray: SqlExpression[],
     separators?: Separator[],
-    filter?: SqlBase,
+    filter?: SqlExpression,
     decorator?: string,
   ) {
     const innerSpacing = {
@@ -68,12 +67,12 @@ export class SqlFunction extends SqlBase {
   }
 
   public readonly functionName: string;
-  public readonly arguments?: SqlBase[];
+  public readonly arguments?: SqlExpression[];
   public readonly decorator?: string;
   public readonly separators?: Separator[];
   public readonly filterKeyword?: string;
   public readonly whereKeyword?: string;
-  public readonly whereExpression?: SqlBase;
+  public readonly whereExpression?: SqlExpression;
 
   constructor(options: SqlFunctionValue) {
     super(options, SqlFunction.type);

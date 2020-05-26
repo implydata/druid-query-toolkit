@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { SqlMulti } from '..';
+import { SqlComparison, SqlMulti } from '..';
 import { SqlBase } from '../sql-base';
 
 export interface SeparatorValue {
@@ -50,7 +50,7 @@ export class Separator {
       const value = values[i];
       if (
         SqlBase.getColumnName(value) === column ||
-        (value instanceof SqlMulti && value.isType('Comparison') && value.containsColumn(column))
+        (value instanceof SqlComparison && value.containsColumn(column))
       ) {
         index = i;
       } else if (value instanceof SqlMulti) {

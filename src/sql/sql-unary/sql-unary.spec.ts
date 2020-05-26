@@ -194,39 +194,34 @@ describe('SqlUnary', () => {
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlUnary {
-        "argument": SqlMulti {
-          "arguments": Array [
-            SqlRef {
-              "column": "A",
-              "innerSpacing": Object {},
-              "namespace": undefined,
-              "namespaceQuotes": undefined,
-              "quotes": "",
-              "table": undefined,
-              "tableQuotes": undefined,
-              "type": "ref",
-            },
-            SqlRef {
-              "column": "B",
-              "innerSpacing": Object {},
-              "namespace": undefined,
-              "namespaceQuotes": undefined,
-              "quotes": "",
-              "table": undefined,
-              "tableQuotes": undefined,
-              "type": "ref",
-            },
-          ],
-          "expressionType": "Comparison",
-          "innerSpacing": Object {},
-          "separators": Array [
-            Separator {
-              "left": " ",
-              "right": " ",
-              "separator": ">",
-            },
-          ],
-          "type": "multi",
+        "argument": SqlComparison {
+          "innerSpacing": Object {
+            "postOp": " ",
+            "preOp": " ",
+          },
+          "lhs": SqlRef {
+            "column": "A",
+            "innerSpacing": Object {},
+            "namespace": undefined,
+            "namespaceQuotes": undefined,
+            "quotes": "",
+            "table": undefined,
+            "tableQuotes": undefined,
+            "type": "ref",
+          },
+          "notKeyword": undefined,
+          "op": ">",
+          "rhs": SqlRef {
+            "column": "B",
+            "innerSpacing": Object {},
+            "namespace": undefined,
+            "namespaceQuotes": undefined,
+            "quotes": "",
+            "table": undefined,
+            "tableQuotes": undefined,
+            "type": "ref",
+          },
+          "type": "comparision",
         },
         "expressionType": "NOT",
         "innerSpacing": Object {
@@ -247,39 +242,34 @@ describe('SqlUnary', () => {
       SqlMulti {
         "arguments": Array [
           SqlUnary {
-            "argument": SqlMulti {
-              "arguments": Array [
-                SqlRef {
-                  "column": "A",
-                  "innerSpacing": Object {},
-                  "namespace": undefined,
-                  "namespaceQuotes": undefined,
-                  "quotes": "",
-                  "table": undefined,
-                  "tableQuotes": undefined,
-                  "type": "ref",
-                },
-                SqlRef {
-                  "column": "B",
-                  "innerSpacing": Object {},
-                  "namespace": undefined,
-                  "namespaceQuotes": undefined,
-                  "quotes": "",
-                  "table": undefined,
-                  "tableQuotes": undefined,
-                  "type": "ref",
-                },
-              ],
-              "expressionType": "Comparison",
-              "innerSpacing": Object {},
-              "separators": Array [
-                Separator {
-                  "left": " ",
-                  "right": " ",
-                  "separator": ">",
-                },
-              ],
-              "type": "multi",
+            "argument": SqlComparison {
+              "innerSpacing": Object {
+                "postOp": " ",
+                "preOp": " ",
+              },
+              "lhs": SqlRef {
+                "column": "A",
+                "innerSpacing": Object {},
+                "namespace": undefined,
+                "namespaceQuotes": undefined,
+                "quotes": "",
+                "table": undefined,
+                "tableQuotes": undefined,
+                "type": "ref",
+              },
+              "notKeyword": undefined,
+              "op": ">",
+              "rhs": SqlRef {
+                "column": "B",
+                "innerSpacing": Object {},
+                "namespace": undefined,
+                "namespaceQuotes": undefined,
+                "quotes": "",
+                "table": undefined,
+                "tableQuotes": undefined,
+                "type": "ref",
+              },
+              "type": "comparision",
             },
             "expressionType": "NOT",
             "innerSpacing": Object {
@@ -289,36 +279,31 @@ describe('SqlUnary', () => {
             "type": "unaryExpression",
           },
           SqlUnary {
-            "argument": SqlMulti {
-              "arguments": Array [
-                SqlRef {
-                  "column": "C",
-                  "innerSpacing": Object {},
-                  "namespace": undefined,
-                  "namespaceQuotes": undefined,
-                  "quotes": "",
-                  "table": undefined,
-                  "tableQuotes": undefined,
-                  "type": "ref",
-                },
-                SqlLiteral {
-                  "innerSpacing": Object {},
-                  "keyword": undefined,
-                  "stringValue": "'D'",
-                  "type": "literal",
-                  "value": "D",
-                },
-              ],
-              "expressionType": "Comparison",
-              "innerSpacing": Object {},
-              "separators": Array [
-                Separator {
-                  "left": " ",
-                  "right": " ",
-                  "separator": "=",
-                },
-              ],
-              "type": "multi",
+            "argument": SqlComparison {
+              "innerSpacing": Object {
+                "postOp": " ",
+                "preOp": " ",
+              },
+              "lhs": SqlRef {
+                "column": "C",
+                "innerSpacing": Object {},
+                "namespace": undefined,
+                "namespaceQuotes": undefined,
+                "quotes": "",
+                "table": undefined,
+                "tableQuotes": undefined,
+                "type": "ref",
+              },
+              "notKeyword": undefined,
+              "op": "=",
+              "rhs": SqlLiteral {
+                "innerSpacing": Object {},
+                "keyword": undefined,
+                "stringValue": "'D'",
+                "type": "literal",
+                "value": "D",
+              },
+              "type": "comparision",
             },
             "expressionType": "NOT",
             "innerSpacing": Object {
@@ -350,39 +335,34 @@ describe('SqlUnary', () => {
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlUnary {
         "argument": SqlUnary {
-          "argument": SqlMulti {
-            "arguments": Array [
-              SqlRef {
-                "column": "A",
-                "innerSpacing": Object {},
-                "namespace": undefined,
-                "namespaceQuotes": undefined,
-                "quotes": "",
-                "table": undefined,
-                "tableQuotes": undefined,
-                "type": "ref",
-              },
-              SqlRef {
-                "column": "B",
-                "innerSpacing": Object {},
-                "namespace": undefined,
-                "namespaceQuotes": undefined,
-                "quotes": "",
-                "table": undefined,
-                "tableQuotes": undefined,
-                "type": "ref",
-              },
-            ],
-            "expressionType": "Comparison",
-            "innerSpacing": Object {},
-            "separators": Array [
-              Separator {
-                "left": " ",
-                "right": " ",
-                "separator": ">",
-              },
-            ],
-            "type": "multi",
+          "argument": SqlComparison {
+            "innerSpacing": Object {
+              "postOp": " ",
+              "preOp": " ",
+            },
+            "lhs": SqlRef {
+              "column": "A",
+              "innerSpacing": Object {},
+              "namespace": undefined,
+              "namespaceQuotes": undefined,
+              "quotes": "",
+              "table": undefined,
+              "tableQuotes": undefined,
+              "type": "ref",
+            },
+            "notKeyword": undefined,
+            "op": ">",
+            "rhs": SqlRef {
+              "column": "B",
+              "innerSpacing": Object {},
+              "namespace": undefined,
+              "namespaceQuotes": undefined,
+              "quotes": "",
+              "table": undefined,
+              "tableQuotes": undefined,
+              "type": "ref",
+            },
+            "type": "comparision",
           },
           "expressionType": "NOT",
           "innerSpacing": Object {

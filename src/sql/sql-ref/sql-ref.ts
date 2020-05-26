@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlBaseValue } from '../sql-base';
+import { SqlBase, SqlBaseValue, SqlExpression } from '..';
 
 export interface SqlRefValue extends SqlBaseValue {
   column?: string;
@@ -23,7 +23,7 @@ export interface SqlRefValue extends SqlBaseValue {
   namespaceQuotes?: string;
 }
 
-export class SqlRef extends SqlBase {
+export class SqlRef extends SqlExpression {
   static type = 'ref';
 
   static fromString(

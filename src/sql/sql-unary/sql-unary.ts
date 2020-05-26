@@ -12,15 +12,15 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlBaseValue, SqlMulti, SqlRef } from '../index';
+import { SqlBase, SqlBaseValue, SqlExpression, SqlMulti, SqlRef } from '..';
 
 export interface UnaryExpressionValue extends SqlBaseValue {
   expressionType: string;
   keyword: string;
-  argument: SqlBase;
+  argument: SqlExpression;
 }
 
-export class SqlUnary extends SqlBase {
+export class SqlUnary extends SqlExpression {
   static type = 'unaryExpression';
 
   static wrapInQuotes(thing: string, quote: string): string {
@@ -29,7 +29,7 @@ export class SqlUnary extends SqlBase {
 
   public readonly expressionType: string;
   public readonly keyword: string;
-  public readonly argument: SqlBase;
+  public readonly argument: SqlExpression;
 
   constructor(options: UnaryExpressionValue) {
     super(options, SqlUnary.type);
@@ -85,7 +85,7 @@ export class SqlUnary extends SqlBase {
     );
   }
 
-  addOrReplaceColumn(column: string, filter: SqlUnary | SqlMulti): SqlUnary | SqlMulti {
+  addOrReplaceColumn(column: string, filter: SqlExpression): SqlExpression {
     if (this.containsColumn(column)) return filter;
     return this;
   }

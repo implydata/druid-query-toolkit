@@ -12,11 +12,11 @@
  * limitations under the License.
  */
 
-import { SqlRef } from '..';
+import { SqlExpression, SqlRef } from '..';
 import { SqlBase, SqlBaseValue } from '../sql-base';
 
 export interface SqlAliasRefValue extends SqlBaseValue {
-  expression: SqlBase;
+  expression: SqlExpression;
   asKeyword: string;
   alias: SqlRef;
 }
@@ -24,7 +24,7 @@ export interface SqlAliasRefValue extends SqlBaseValue {
 export class SqlAliasRef extends SqlBase {
   static type = 'alias-ref';
 
-  static sqlAliasFactory(expression: SqlBase, alias: string) {
+  static sqlAliasFactory(expression: SqlExpression, alias: string) {
     return new SqlAliasRef({
       type: SqlAliasRef.type,
       expression: expression,
@@ -33,7 +33,7 @@ export class SqlAliasRef extends SqlBase {
     } as SqlAliasRefValue);
   }
 
-  public readonly expression: SqlBase;
+  public readonly expression: SqlExpression;
   public readonly asKeyword: string;
   public readonly alias: SqlRef;
 

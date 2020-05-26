@@ -435,36 +435,31 @@ describe('SqlFunction', () => {
         },
         "separators": Array [],
         "type": "function",
-        "whereExpression": SqlMulti {
-          "arguments": Array [
-            SqlRef {
-              "column": "val",
-              "innerSpacing": Object {},
-              "namespace": undefined,
-              "namespaceQuotes": undefined,
-              "quotes": "",
-              "table": undefined,
-              "tableQuotes": undefined,
-              "type": "ref",
-            },
-            SqlLiteral {
-              "innerSpacing": Object {},
-              "keyword": undefined,
-              "stringValue": "1",
-              "type": "literal",
-              "value": 1,
-            },
-          ],
-          "expressionType": "Comparison",
-          "innerSpacing": Object {},
-          "separators": Array [
-            Separator {
-              "left": " ",
-              "right": " ",
-              "separator": ">",
-            },
-          ],
-          "type": "multi",
+        "whereExpression": SqlComparison {
+          "innerSpacing": Object {
+            "postOp": " ",
+            "preOp": " ",
+          },
+          "lhs": SqlRef {
+            "column": "val",
+            "innerSpacing": Object {},
+            "namespace": undefined,
+            "namespaceQuotes": undefined,
+            "quotes": "",
+            "table": undefined,
+            "tableQuotes": undefined,
+            "type": "ref",
+          },
+          "notKeyword": undefined,
+          "op": ">",
+          "rhs": SqlLiteral {
+            "innerSpacing": Object {},
+            "keyword": undefined,
+            "stringValue": "1",
+            "type": "literal",
+            "value": 1,
+          },
+          "type": "comparision",
         },
         "whereKeyword": "WHERE",
       }

@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { parseSqlQuery, SqlMulti, SqlRef } from '../..';
+import { parseSqlQuery, SqlExpression, SqlMulti, SqlRef } from '../..';
 import { backAndForth, sane } from '../../test-utils';
 
 describe('parse join with lookup', () => {
@@ -79,7 +79,7 @@ describe('Check if column is in On expression', () => {
       (parseSqlQuery(sane`
         SELECT countryName
         from wikipedia LEFT JOIN lookup.country ON lookup.country.v = wikipedia.countryName
-      `).onExpression as SqlMulti).containsColumn('v'),
+      `).onExpression as SqlExpression).containsColumn('v'),
     ).toEqual(true);
   });
 
@@ -88,7 +88,7 @@ describe('Check if column is in On expression', () => {
       (parseSqlQuery(sane`
         SELECT countryName
         from wikipedia LEFT JOIN lookup.country ON lookup.country.v = wikipedia.countryName
-      `).onExpression as SqlMulti).containsColumn('countryName'),
+      `).onExpression as SqlExpression).containsColumn('countryName'),
     ).toEqual(true);
   });
 
@@ -97,7 +97,7 @@ describe('Check if column is in On expression', () => {
       (parseSqlQuery(sane`
         SELECT countryName
         from wikipedia LEFT JOIN lookup.country ON lookup.country.v = wikipedia.countryName
-      `).onExpression as SqlMulti).containsColumn('k'),
+      `).onExpression as SqlExpression).containsColumn('k'),
     ).toEqual(false);
   });
 });

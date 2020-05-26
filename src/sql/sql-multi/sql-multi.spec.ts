@@ -498,39 +498,34 @@ describe('Comparison expression', () => {
     backAndForth(sql);
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
-      SqlMulti {
-        "arguments": Array [
-          SqlRef {
-            "column": "A",
-            "innerSpacing": Object {},
-            "namespace": undefined,
-            "namespaceQuotes": undefined,
-            "quotes": "",
-            "table": undefined,
-            "tableQuotes": undefined,
-            "type": "ref",
-          },
-          SqlRef {
-            "column": "B",
-            "innerSpacing": Object {},
-            "namespace": undefined,
-            "namespaceQuotes": undefined,
-            "quotes": "",
-            "table": undefined,
-            "tableQuotes": undefined,
-            "type": "ref",
-          },
-        ],
-        "expressionType": "Comparison",
-        "innerSpacing": Object {},
-        "separators": Array [
-          Separator {
-            "left": " ",
-            "right": " ",
-            "separator": ">",
-          },
-        ],
-        "type": "multi",
+      SqlComparison {
+        "innerSpacing": Object {
+          "postOp": " ",
+          "preOp": " ",
+        },
+        "lhs": SqlRef {
+          "column": "A",
+          "innerSpacing": Object {},
+          "namespace": undefined,
+          "namespaceQuotes": undefined,
+          "quotes": "",
+          "table": undefined,
+          "tableQuotes": undefined,
+          "type": "ref",
+        },
+        "notKeyword": undefined,
+        "op": ">",
+        "rhs": SqlRef {
+          "column": "B",
+          "innerSpacing": Object {},
+          "namespace": undefined,
+          "namespaceQuotes": undefined,
+          "quotes": "",
+          "table": undefined,
+          "tableQuotes": undefined,
+          "type": "ref",
+        },
+        "type": "comparision",
       }
     `);
   });
@@ -541,33 +536,28 @@ describe('Comparison expression', () => {
     backAndForth(sql);
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
-      SqlMulti {
-        "arguments": Array [
-          SqlLiteral {
-            "innerSpacing": Object {},
-            "keyword": undefined,
-            "stringValue": "'A'",
-            "type": "literal",
-            "value": "A",
-          },
-          SqlLiteral {
-            "innerSpacing": Object {},
-            "keyword": undefined,
-            "stringValue": "'B'",
-            "type": "literal",
-            "value": "B",
-          },
-        ],
-        "expressionType": "Comparison",
-        "innerSpacing": Object {},
-        "separators": Array [
-          Separator {
-            "left": " ",
-            "right": " ",
-            "separator": ">",
-          },
-        ],
-        "type": "multi",
+      SqlComparison {
+        "innerSpacing": Object {
+          "postOp": " ",
+          "preOp": " ",
+        },
+        "lhs": SqlLiteral {
+          "innerSpacing": Object {},
+          "keyword": undefined,
+          "stringValue": "'A'",
+          "type": "literal",
+          "value": "A",
+        },
+        "notKeyword": undefined,
+        "op": ">",
+        "rhs": SqlLiteral {
+          "innerSpacing": Object {},
+          "keyword": undefined,
+          "stringValue": "'B'",
+          "type": "literal",
+          "value": "B",
+        },
+        "type": "comparision",
       }
     `);
   });
@@ -578,39 +568,34 @@ describe('Comparison expression', () => {
     backAndForth(sql);
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
-      SqlMulti {
-        "arguments": Array [
-          SqlRef {
-            "column": "A",
-            "innerSpacing": Object {},
-            "namespace": undefined,
-            "namespaceQuotes": undefined,
-            "quotes": "\\"",
-            "table": undefined,
-            "tableQuotes": undefined,
-            "type": "ref",
-          },
-          SqlRef {
-            "column": "B",
-            "innerSpacing": Object {},
-            "namespace": undefined,
-            "namespaceQuotes": undefined,
-            "quotes": "\\"",
-            "table": undefined,
-            "tableQuotes": undefined,
-            "type": "ref",
-          },
-        ],
-        "expressionType": "Comparison",
-        "innerSpacing": Object {},
-        "separators": Array [
-          Separator {
-            "left": " ",
-            "right": " ",
-            "separator": ">",
-          },
-        ],
-        "type": "multi",
+      SqlComparison {
+        "innerSpacing": Object {
+          "postOp": " ",
+          "preOp": " ",
+        },
+        "lhs": SqlRef {
+          "column": "A",
+          "innerSpacing": Object {},
+          "namespace": undefined,
+          "namespaceQuotes": undefined,
+          "quotes": "\\"",
+          "table": undefined,
+          "tableQuotes": undefined,
+          "type": "ref",
+        },
+        "notKeyword": undefined,
+        "op": ">",
+        "rhs": SqlRef {
+          "column": "B",
+          "innerSpacing": Object {},
+          "namespace": undefined,
+          "namespaceQuotes": undefined,
+          "quotes": "\\"",
+          "table": undefined,
+          "tableQuotes": undefined,
+          "type": "ref",
+        },
+        "type": "comparision",
       }
     `);
   });
@@ -621,33 +606,28 @@ describe('Comparison expression', () => {
     backAndForth(sql);
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
-      SqlMulti {
-        "arguments": Array [
-          SqlLiteral {
-            "innerSpacing": Object {},
-            "keyword": undefined,
-            "stringValue": "1",
-            "type": "literal",
-            "value": 1,
-          },
-          SqlLiteral {
-            "innerSpacing": Object {},
-            "keyword": undefined,
-            "stringValue": "2",
-            "type": "literal",
-            "value": 2,
-          },
-        ],
-        "expressionType": "Comparison",
-        "innerSpacing": Object {},
-        "separators": Array [
-          Separator {
-            "left": " ",
-            "right": " ",
-            "separator": ">",
-          },
-        ],
-        "type": "multi",
+      SqlComparison {
+        "innerSpacing": Object {
+          "postOp": " ",
+          "preOp": " ",
+        },
+        "lhs": SqlLiteral {
+          "innerSpacing": Object {},
+          "keyword": undefined,
+          "stringValue": "1",
+          "type": "literal",
+          "value": 1,
+        },
+        "notKeyword": undefined,
+        "op": ">",
+        "rhs": SqlLiteral {
+          "innerSpacing": Object {},
+          "keyword": undefined,
+          "stringValue": "2",
+          "type": "literal",
+          "value": 2,
+        },
+        "type": "comparision",
       }
     `);
   });
@@ -658,39 +638,34 @@ describe('Comparison expression', () => {
     backAndForth(sql);
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
-      SqlMulti {
-        "arguments": Array [
-          SqlLiteral {
-            "innerSpacing": Object {},
-            "keyword": undefined,
-            "stringValue": "1",
-            "type": "literal",
-            "value": 1,
-          },
-          SqlLiteral {
-            "innerSpacing": Object {},
-            "keyword": undefined,
-            "stringValue": "2",
-            "type": "literal",
-            "value": 2,
-          },
-        ],
-        "expressionType": "Comparison",
-        "innerSpacing": Object {},
+      SqlComparison {
+        "innerSpacing": Object {
+          "postOp": " ",
+          "preOp": " ",
+        },
+        "lhs": SqlLiteral {
+          "innerSpacing": Object {},
+          "keyword": undefined,
+          "stringValue": "1",
+          "type": "literal",
+          "value": 1,
+        },
+        "notKeyword": undefined,
+        "op": ">",
         "parens": Array [
           Object {
             "leftSpacing": "",
             "rightSpacing": "",
           },
         ],
-        "separators": Array [
-          Separator {
-            "left": " ",
-            "right": " ",
-            "separator": ">",
-          },
-        ],
-        "type": "multi",
+        "rhs": SqlLiteral {
+          "innerSpacing": Object {},
+          "keyword": undefined,
+          "stringValue": "2",
+          "type": "literal",
+          "value": 2,
+        },
+        "type": "comparision",
       }
     `);
   });
@@ -701,10 +676,26 @@ describe('Comparison expression', () => {
     backAndForth(sql);
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
-      SqlMulti {
-        "arguments": Array [
-          SqlRef {
-            "column": "X",
+      SqlComparison {
+        "innerSpacing": Object {
+          "postOp": " ",
+          "preOp": " ",
+        },
+        "lhs": SqlRef {
+          "column": "X",
+          "innerSpacing": Object {},
+          "namespace": undefined,
+          "namespaceQuotes": undefined,
+          "quotes": "",
+          "table": undefined,
+          "tableQuotes": undefined,
+          "type": "ref",
+        },
+        "notKeyword": undefined,
+        "op": "BETWEEN",
+        "rhs": Object {
+          "end": SqlRef {
+            "column": "Z",
             "innerSpacing": Object {},
             "namespace": undefined,
             "namespaceQuotes": undefined,
@@ -713,51 +704,21 @@ describe('Comparison expression', () => {
             "tableQuotes": undefined,
             "type": "ref",
           },
-          SqlMulti {
-            "arguments": Array [
-              SqlRef {
-                "column": "Y",
-                "innerSpacing": Object {},
-                "namespace": undefined,
-                "namespaceQuotes": undefined,
-                "quotes": "",
-                "table": undefined,
-                "tableQuotes": undefined,
-                "type": "ref",
-              },
-              SqlRef {
-                "column": "Z",
-                "innerSpacing": Object {},
-                "namespace": undefined,
-                "namespaceQuotes": undefined,
-                "quotes": "",
-                "table": undefined,
-                "tableQuotes": undefined,
-                "type": "ref",
-              },
-            ],
-            "expressionType": "AND",
+          "keyword": "AND",
+          "postKeyword": " ",
+          "preKeyword": " ",
+          "start": SqlRef {
+            "column": "Y",
             "innerSpacing": Object {},
-            "separators": Array [
-              Separator {
-                "left": " ",
-                "right": " ",
-                "separator": "AND",
-              },
-            ],
-            "type": "multi",
+            "namespace": undefined,
+            "namespaceQuotes": undefined,
+            "quotes": "",
+            "table": undefined,
+            "tableQuotes": undefined,
+            "type": "ref",
           },
-        ],
-        "expressionType": "Comparison",
-        "innerSpacing": Object {},
-        "separators": Array [
-          Separator {
-            "left": " ",
-            "right": " ",
-            "separator": "BETWEEN",
-          },
-        ],
-        "type": "multi",
+        },
+        "type": "comparision",
       }
     `);
   });
@@ -792,10 +753,26 @@ describe('Comparison expression', () => {
                 "tableQuotes": undefined,
                 "type": "ref",
               },
-              SqlMulti {
-                "arguments": Array [
-                  SqlRef {
-                    "column": "X",
+              SqlComparison {
+                "innerSpacing": Object {
+                  "postOp": " ",
+                  "preOp": " ",
+                },
+                "lhs": SqlRef {
+                  "column": "X",
+                  "innerSpacing": Object {},
+                  "namespace": undefined,
+                  "namespaceQuotes": undefined,
+                  "quotes": "",
+                  "table": undefined,
+                  "tableQuotes": undefined,
+                  "type": "ref",
+                },
+                "notKeyword": undefined,
+                "op": "BETWEEN",
+                "rhs": Object {
+                  "end": SqlRef {
+                    "column": "Z",
                     "innerSpacing": Object {},
                     "namespace": undefined,
                     "namespaceQuotes": undefined,
@@ -804,51 +781,21 @@ describe('Comparison expression', () => {
                     "tableQuotes": undefined,
                     "type": "ref",
                   },
-                  SqlMulti {
-                    "arguments": Array [
-                      SqlRef {
-                        "column": "Y",
-                        "innerSpacing": Object {},
-                        "namespace": undefined,
-                        "namespaceQuotes": undefined,
-                        "quotes": "",
-                        "table": undefined,
-                        "tableQuotes": undefined,
-                        "type": "ref",
-                      },
-                      SqlRef {
-                        "column": "Z",
-                        "innerSpacing": Object {},
-                        "namespace": undefined,
-                        "namespaceQuotes": undefined,
-                        "quotes": "",
-                        "table": undefined,
-                        "tableQuotes": undefined,
-                        "type": "ref",
-                      },
-                    ],
-                    "expressionType": "AND",
+                  "keyword": "AND",
+                  "postKeyword": " ",
+                  "preKeyword": " ",
+                  "start": SqlRef {
+                    "column": "Y",
                     "innerSpacing": Object {},
-                    "separators": Array [
-                      Separator {
-                        "left": " ",
-                        "right": " ",
-                        "separator": "AND",
-                      },
-                    ],
-                    "type": "multi",
+                    "namespace": undefined,
+                    "namespaceQuotes": undefined,
+                    "quotes": "",
+                    "table": undefined,
+                    "tableQuotes": undefined,
+                    "type": "ref",
                   },
-                ],
-                "expressionType": "Comparison",
-                "innerSpacing": Object {},
-                "separators": Array [
-                  Separator {
-                    "left": " ",
-                    "right": " ",
-                    "separator": "BETWEEN",
-                  },
-                ],
-                "type": "multi",
+                },
+                "type": "comparision",
               },
             ],
             "expressionType": "AND",
@@ -870,121 +817,6 @@ describe('Comparison expression', () => {
             "left": " ",
             "right": " ",
             "separator": "OR",
-          },
-        ],
-        "type": "multi",
-      }
-    `);
-  });
-
-  it('Nested Between expression', () => {
-    const sql = `X BETWEEN Y AND A BETWEEN B AND C`;
-
-    backAndForth(sql);
-
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
-      SqlMulti {
-        "arguments": Array [
-          SqlRef {
-            "column": "X",
-            "innerSpacing": Object {},
-            "namespace": undefined,
-            "namespaceQuotes": undefined,
-            "quotes": "",
-            "table": undefined,
-            "tableQuotes": undefined,
-            "type": "ref",
-          },
-          SqlMulti {
-            "arguments": Array [
-              SqlRef {
-                "column": "Y",
-                "innerSpacing": Object {},
-                "namespace": undefined,
-                "namespaceQuotes": undefined,
-                "quotes": "",
-                "table": undefined,
-                "tableQuotes": undefined,
-                "type": "ref",
-              },
-              SqlMulti {
-                "arguments": Array [
-                  SqlRef {
-                    "column": "A",
-                    "innerSpacing": Object {},
-                    "namespace": undefined,
-                    "namespaceQuotes": undefined,
-                    "quotes": "",
-                    "table": undefined,
-                    "tableQuotes": undefined,
-                    "type": "ref",
-                  },
-                  SqlMulti {
-                    "arguments": Array [
-                      SqlRef {
-                        "column": "B",
-                        "innerSpacing": Object {},
-                        "namespace": undefined,
-                        "namespaceQuotes": undefined,
-                        "quotes": "",
-                        "table": undefined,
-                        "tableQuotes": undefined,
-                        "type": "ref",
-                      },
-                      SqlRef {
-                        "column": "C",
-                        "innerSpacing": Object {},
-                        "namespace": undefined,
-                        "namespaceQuotes": undefined,
-                        "quotes": "",
-                        "table": undefined,
-                        "tableQuotes": undefined,
-                        "type": "ref",
-                      },
-                    ],
-                    "expressionType": "AND",
-                    "innerSpacing": Object {},
-                    "separators": Array [
-                      Separator {
-                        "left": " ",
-                        "right": " ",
-                        "separator": "AND",
-                      },
-                    ],
-                    "type": "multi",
-                  },
-                ],
-                "expressionType": "Comparison",
-                "innerSpacing": Object {},
-                "separators": Array [
-                  Separator {
-                    "left": " ",
-                    "right": " ",
-                    "separator": "BETWEEN",
-                  },
-                ],
-                "type": "multi",
-              },
-            ],
-            "expressionType": "AND",
-            "innerSpacing": Object {},
-            "separators": Array [
-              Separator {
-                "left": " ",
-                "right": " ",
-                "separator": "AND",
-              },
-            ],
-            "type": "multi",
-          },
-        ],
-        "expressionType": "Comparison",
-        "innerSpacing": Object {},
-        "separators": Array [
-          Separator {
-            "left": " ",
-            "right": " ",
-            "separator": "BETWEEN",
           },
         ],
         "type": "multi",
@@ -1485,63 +1317,58 @@ describe('Combined expression', () => {
                 "tableQuotes": undefined,
                 "type": "ref",
               },
-              SqlMulti {
-                "arguments": Array [
-                  SqlRef {
-                    "column": "C",
-                    "innerSpacing": Object {},
-                    "namespace": undefined,
-                    "namespaceQuotes": undefined,
-                    "quotes": "",
-                    "table": undefined,
-                    "tableQuotes": undefined,
-                    "type": "ref",
-                  },
-                  SqlMulti {
-                    "arguments": Array [
-                      SqlRef {
-                        "column": "D",
-                        "innerSpacing": Object {},
-                        "namespace": undefined,
-                        "namespaceQuotes": undefined,
-                        "quotes": "",
-                        "table": undefined,
-                        "tableQuotes": undefined,
-                        "type": "ref",
-                      },
-                      SqlRef {
-                        "column": "E",
-                        "innerSpacing": Object {},
-                        "namespace": undefined,
-                        "namespaceQuotes": undefined,
-                        "quotes": "",
-                        "table": undefined,
-                        "tableQuotes": undefined,
-                        "type": "ref",
-                      },
-                    ],
-                    "expressionType": "Additive",
-                    "innerSpacing": Object {},
-                    "separators": Array [
-                      Separator {
-                        "left": " ",
-                        "right": " ",
-                        "separator": "+",
-                      },
-                    ],
-                    "type": "multi",
-                  },
-                ],
-                "expressionType": "Comparison",
-                "innerSpacing": Object {},
-                "separators": Array [
-                  Separator {
-                    "left": " ",
-                    "right": " ",
-                    "separator": ">",
-                  },
-                ],
-                "type": "multi",
+              SqlComparison {
+                "innerSpacing": Object {
+                  "postOp": " ",
+                  "preOp": " ",
+                },
+                "lhs": SqlRef {
+                  "column": "C",
+                  "innerSpacing": Object {},
+                  "namespace": undefined,
+                  "namespaceQuotes": undefined,
+                  "quotes": "",
+                  "table": undefined,
+                  "tableQuotes": undefined,
+                  "type": "ref",
+                },
+                "notKeyword": undefined,
+                "op": ">",
+                "rhs": SqlMulti {
+                  "arguments": Array [
+                    SqlRef {
+                      "column": "D",
+                      "innerSpacing": Object {},
+                      "namespace": undefined,
+                      "namespaceQuotes": undefined,
+                      "quotes": "",
+                      "table": undefined,
+                      "tableQuotes": undefined,
+                      "type": "ref",
+                    },
+                    SqlRef {
+                      "column": "E",
+                      "innerSpacing": Object {},
+                      "namespace": undefined,
+                      "namespaceQuotes": undefined,
+                      "quotes": "",
+                      "table": undefined,
+                      "tableQuotes": undefined,
+                      "type": "ref",
+                    },
+                  ],
+                  "expressionType": "Additive",
+                  "innerSpacing": Object {},
+                  "separators": Array [
+                    Separator {
+                      "left": " ",
+                      "right": " ",
+                      "separator": "+",
+                    },
+                  ],
+                  "type": "multi",
+                },
+                "type": "comparision",
               },
             ],
             "expressionType": "AND",
@@ -1580,63 +1407,58 @@ describe('Combined expression', () => {
         "arguments": Array [
           SqlMulti {
             "arguments": Array [
-              SqlMulti {
-                "arguments": Array [
-                  SqlMulti {
-                    "arguments": Array [
-                      SqlRef {
-                        "column": "A",
-                        "innerSpacing": Object {},
-                        "namespace": undefined,
-                        "namespaceQuotes": undefined,
-                        "quotes": "",
-                        "table": undefined,
-                        "tableQuotes": undefined,
-                        "type": "ref",
-                      },
-                      SqlRef {
-                        "column": "B",
-                        "innerSpacing": Object {},
-                        "namespace": undefined,
-                        "namespaceQuotes": undefined,
-                        "quotes": "",
-                        "table": undefined,
-                        "tableQuotes": undefined,
-                        "type": "ref",
-                      },
-                    ],
-                    "expressionType": "Additive",
-                    "innerSpacing": Object {},
-                    "separators": Array [
-                      Separator {
-                        "left": " ",
-                        "right": " ",
-                        "separator": "+",
-                      },
-                    ],
-                    "type": "multi",
-                  },
-                  SqlRef {
-                    "column": "C",
-                    "innerSpacing": Object {},
-                    "namespace": undefined,
-                    "namespaceQuotes": undefined,
-                    "quotes": "",
-                    "table": undefined,
-                    "tableQuotes": undefined,
-                    "type": "ref",
-                  },
-                ],
-                "expressionType": "Comparison",
-                "innerSpacing": Object {},
-                "separators": Array [
-                  Separator {
-                    "left": " ",
-                    "right": " ",
-                    "separator": ">",
-                  },
-                ],
-                "type": "multi",
+              SqlComparison {
+                "innerSpacing": Object {
+                  "postOp": " ",
+                  "preOp": " ",
+                },
+                "lhs": SqlMulti {
+                  "arguments": Array [
+                    SqlRef {
+                      "column": "A",
+                      "innerSpacing": Object {},
+                      "namespace": undefined,
+                      "namespaceQuotes": undefined,
+                      "quotes": "",
+                      "table": undefined,
+                      "tableQuotes": undefined,
+                      "type": "ref",
+                    },
+                    SqlRef {
+                      "column": "B",
+                      "innerSpacing": Object {},
+                      "namespace": undefined,
+                      "namespaceQuotes": undefined,
+                      "quotes": "",
+                      "table": undefined,
+                      "tableQuotes": undefined,
+                      "type": "ref",
+                    },
+                  ],
+                  "expressionType": "Additive",
+                  "innerSpacing": Object {},
+                  "separators": Array [
+                    Separator {
+                      "left": " ",
+                      "right": " ",
+                      "separator": "+",
+                    },
+                  ],
+                  "type": "multi",
+                },
+                "notKeyword": undefined,
+                "op": ">",
+                "rhs": SqlRef {
+                  "column": "C",
+                  "innerSpacing": Object {},
+                  "namespace": undefined,
+                  "namespaceQuotes": undefined,
+                  "quotes": "",
+                  "table": undefined,
+                  "tableQuotes": undefined,
+                  "type": "ref",
+                },
+                "type": "comparision",
               },
               SqlRef {
                 "column": "D",
@@ -1705,63 +1527,58 @@ describe('Combined expression', () => {
                 "tableQuotes": undefined,
                 "type": "ref",
               },
-              SqlMulti {
-                "arguments": Array [
-                  SqlRef {
-                    "column": "B",
-                    "innerSpacing": Object {},
-                    "namespace": undefined,
-                    "namespaceQuotes": undefined,
-                    "quotes": "",
-                    "table": undefined,
-                    "tableQuotes": undefined,
-                    "type": "ref",
-                  },
-                  SqlMulti {
-                    "arguments": Array [
-                      SqlRef {
-                        "column": "C",
-                        "innerSpacing": Object {},
-                        "namespace": undefined,
-                        "namespaceQuotes": undefined,
-                        "quotes": "",
-                        "table": undefined,
-                        "tableQuotes": undefined,
-                        "type": "ref",
-                      },
-                      SqlRef {
-                        "column": "D",
-                        "innerSpacing": Object {},
-                        "namespace": undefined,
-                        "namespaceQuotes": undefined,
-                        "quotes": "",
-                        "table": undefined,
-                        "tableQuotes": undefined,
-                        "type": "ref",
-                      },
-                    ],
-                    "expressionType": "Additive",
-                    "innerSpacing": Object {},
-                    "separators": Array [
-                      Separator {
-                        "left": " ",
-                        "right": " ",
-                        "separator": "+",
-                      },
-                    ],
-                    "type": "multi",
-                  },
-                ],
-                "expressionType": "Comparison",
-                "innerSpacing": Object {},
-                "separators": Array [
-                  Separator {
-                    "left": " ",
-                    "right": " ",
-                    "separator": ">",
-                  },
-                ],
-                "type": "multi",
+              SqlComparison {
+                "innerSpacing": Object {
+                  "postOp": " ",
+                  "preOp": " ",
+                },
+                "lhs": SqlRef {
+                  "column": "B",
+                  "innerSpacing": Object {},
+                  "namespace": undefined,
+                  "namespaceQuotes": undefined,
+                  "quotes": "",
+                  "table": undefined,
+                  "tableQuotes": undefined,
+                  "type": "ref",
+                },
+                "notKeyword": undefined,
+                "op": ">",
+                "rhs": SqlMulti {
+                  "arguments": Array [
+                    SqlRef {
+                      "column": "C",
+                      "innerSpacing": Object {},
+                      "namespace": undefined,
+                      "namespaceQuotes": undefined,
+                      "quotes": "",
+                      "table": undefined,
+                      "tableQuotes": undefined,
+                      "type": "ref",
+                    },
+                    SqlRef {
+                      "column": "D",
+                      "innerSpacing": Object {},
+                      "namespace": undefined,
+                      "namespaceQuotes": undefined,
+                      "quotes": "",
+                      "table": undefined,
+                      "tableQuotes": undefined,
+                      "type": "ref",
+                    },
+                  ],
+                  "expressionType": "Additive",
+                  "innerSpacing": Object {},
+                  "separators": Array [
+                    Separator {
+                      "left": " ",
+                      "right": " ",
+                      "separator": "+",
+                    },
+                  ],
+                  "type": "multi",
+                },
+                "type": "comparision",
               },
             ],
             "expressionType": "AND",
@@ -2254,13 +2071,13 @@ describe('contains', () => {
   it('nested expression contains string', () => {
     const sql = `A > 1 AND D OR B OR C`;
 
-    expect((parseSql(sql) as SqlMulti).containsColumn('A')).toMatchInlineSnapshot(`true`);
+    expect((parseSql(sql) as SqlMulti).containsColumn('A')).toMatchInlineSnapshot(`false`);
   });
 
   it('nested expression with brackets contains string', () => {
     const sql = `(A + B ) > 1 AND D OR B OR C`;
 
-    expect((parseSql(sql) as SqlMulti).containsColumn('A')).toMatchInlineSnapshot(`true`);
+    expect((parseSql(sql) as SqlMulti).containsColumn('A')).toMatchInlineSnapshot(`false`);
   });
 
   it('nested expression with brackets contains string', () => {
@@ -2276,16 +2093,6 @@ describe('getSqlRefs', () => {
 
     expect((parseSql(sql) as SqlMulti).getSqlRefs()).toMatchInlineSnapshot(`
       Array [
-        SqlRef {
-          "column": "A",
-          "innerSpacing": Object {},
-          "namespace": undefined,
-          "namespaceQuotes": undefined,
-          "quotes": "",
-          "table": undefined,
-          "tableQuotes": undefined,
-          "type": "ref",
-        },
         SqlRef {
           "column": "D",
           "innerSpacing": Object {},
@@ -2326,16 +2133,6 @@ describe('getSqlRefs', () => {
     expect((parseSql(sql) as SqlMulti).getSqlRefs()).toMatchInlineSnapshot(`
       Array [
         SqlRef {
-          "column": "A",
-          "innerSpacing": Object {},
-          "namespace": undefined,
-          "namespaceQuotes": undefined,
-          "quotes": "",
-          "table": undefined,
-          "tableQuotes": undefined,
-          "type": "ref",
-        },
-        SqlRef {
           "column": "D",
           "innerSpacing": Object {},
           "namespace": undefined,
@@ -2374,16 +2171,6 @@ describe('getSqlRefs', () => {
 
     expect((parseSql(sql) as SqlMulti).getSqlRefs()).toMatchInlineSnapshot(`
       Array [
-        SqlRef {
-          "column": "A",
-          "innerSpacing": Object {},
-          "namespace": undefined,
-          "namespaceQuotes": undefined,
-          "quotes": "",
-          "table": undefined,
-          "tableQuotes": undefined,
-          "type": "ref",
-        },
         SqlRef {
           "column": "D",
           "innerSpacing": Object {},
@@ -2492,36 +2279,31 @@ describe('getSqlRefs', () => {
     backAndForth(sql);
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
-      SqlMulti {
-        "arguments": Array [
-          SqlRef {
-            "column": "X",
-            "innerSpacing": Object {},
-            "namespace": undefined,
-            "namespaceQuotes": undefined,
-            "quotes": "",
-            "table": undefined,
-            "tableQuotes": undefined,
-            "type": "ref",
-          },
-          SqlLiteral {
-            "innerSpacing": Object {},
-            "keyword": undefined,
-            "stringValue": "NULL",
-            "type": "literal",
-            "value": null,
-          },
-        ],
-        "expressionType": "Comparison",
-        "innerSpacing": Object {},
-        "separators": Array [
-          Separator {
-            "left": " ",
-            "right": " ",
-            "separator": "IS",
-          },
-        ],
-        "type": "multi",
+      SqlComparison {
+        "innerSpacing": Object {
+          "postOp": " ",
+          "preOp": " ",
+        },
+        "lhs": SqlRef {
+          "column": "X",
+          "innerSpacing": Object {},
+          "namespace": undefined,
+          "namespaceQuotes": undefined,
+          "quotes": "",
+          "table": undefined,
+          "tableQuotes": undefined,
+          "type": "ref",
+        },
+        "notKeyword": undefined,
+        "op": "IS",
+        "rhs": SqlLiteral {
+          "innerSpacing": Object {},
+          "keyword": undefined,
+          "stringValue": "NULL",
+          "type": "literal",
+          "value": null,
+        },
+        "type": "comparision",
       }
     `);
   });
@@ -2532,36 +2314,32 @@ describe('getSqlRefs', () => {
     backAndForth(sql);
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
-      SqlMulti {
-        "arguments": Array [
-          SqlRef {
-            "column": "X",
-            "innerSpacing": Object {},
-            "namespace": undefined,
-            "namespaceQuotes": undefined,
-            "quotes": "",
-            "table": undefined,
-            "tableQuotes": undefined,
-            "type": "ref",
-          },
-          SqlLiteral {
-            "innerSpacing": Object {},
-            "keyword": undefined,
-            "stringValue": "NULL",
-            "type": "literal",
-            "value": null,
-          },
-        ],
-        "expressionType": "Comparison",
-        "innerSpacing": Object {},
-        "separators": Array [
-          Separator {
-            "left": " ",
-            "right": " ",
-            "separator": "IS NOT",
-          },
-        ],
-        "type": "multi",
+      SqlComparison {
+        "innerSpacing": Object {
+          "not": " ",
+          "postOp": " ",
+          "preOp": " ",
+        },
+        "lhs": SqlRef {
+          "column": "X",
+          "innerSpacing": Object {},
+          "namespace": undefined,
+          "namespaceQuotes": undefined,
+          "quotes": "",
+          "table": undefined,
+          "tableQuotes": undefined,
+          "type": "ref",
+        },
+        "notKeyword": "NOT",
+        "op": "IS",
+        "rhs": SqlLiteral {
+          "innerSpacing": Object {},
+          "keyword": undefined,
+          "stringValue": "NULL",
+          "type": "literal",
+          "value": null,
+        },
+        "type": "comparision",
       }
     `);
   });
@@ -2572,36 +2350,32 @@ describe('getSqlRefs', () => {
     backAndForth(sql);
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
-      SqlMulti {
-        "arguments": Array [
-          SqlRef {
-            "column": "X",
-            "innerSpacing": Object {},
-            "namespace": undefined,
-            "namespaceQuotes": undefined,
-            "quotes": "",
-            "table": undefined,
-            "tableQuotes": undefined,
-            "type": "ref",
-          },
-          SqlLiteral {
-            "innerSpacing": Object {},
-            "keyword": undefined,
-            "stringValue": "TRUE",
-            "type": "literal",
-            "value": true,
-          },
-        ],
-        "expressionType": "Comparison",
-        "innerSpacing": Object {},
-        "separators": Array [
-          Separator {
-            "left": " ",
-            "right": " ",
-            "separator": "IS NOT",
-          },
-        ],
-        "type": "multi",
+      SqlComparison {
+        "innerSpacing": Object {
+          "not": " ",
+          "postOp": " ",
+          "preOp": " ",
+        },
+        "lhs": SqlRef {
+          "column": "X",
+          "innerSpacing": Object {},
+          "namespace": undefined,
+          "namespaceQuotes": undefined,
+          "quotes": "",
+          "table": undefined,
+          "tableQuotes": undefined,
+          "type": "ref",
+        },
+        "notKeyword": "NOT",
+        "op": "IS",
+        "rhs": SqlLiteral {
+          "innerSpacing": Object {},
+          "keyword": undefined,
+          "stringValue": "TRUE",
+          "type": "literal",
+          "value": true,
+        },
+        "type": "comparision",
       }
     `);
   });
@@ -2614,67 +2388,58 @@ describe('getSqlRefs', () => {
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "arguments": Array [
-          SqlMulti {
-            "arguments": Array [
-              SqlRef {
-                "column": "X",
-                "innerSpacing": Object {},
-                "namespace": undefined,
-                "namespaceQuotes": undefined,
-                "quotes": "",
-                "table": undefined,
-                "tableQuotes": undefined,
-                "type": "ref",
-              },
-              SqlLiteral {
-                "innerSpacing": Object {},
-                "keyword": undefined,
-                "stringValue": "NULL",
-                "type": "literal",
-                "value": null,
-              },
-            ],
-            "expressionType": "Comparison",
-            "innerSpacing": Object {},
-            "separators": Array [
-              Separator {
-                "left": " ",
-                "right": " ",
-                "separator": "IS NOT",
-              },
-            ],
-            "type": "multi",
+          SqlComparison {
+            "innerSpacing": Object {
+              "not": " ",
+              "postOp": " ",
+              "preOp": " ",
+            },
+            "lhs": SqlRef {
+              "column": "X",
+              "innerSpacing": Object {},
+              "namespace": undefined,
+              "namespaceQuotes": undefined,
+              "quotes": "",
+              "table": undefined,
+              "tableQuotes": undefined,
+              "type": "ref",
+            },
+            "notKeyword": "NOT",
+            "op": "IS",
+            "rhs": SqlLiteral {
+              "innerSpacing": Object {},
+              "keyword": undefined,
+              "stringValue": "NULL",
+              "type": "literal",
+              "value": null,
+            },
+            "type": "comparision",
           },
-          SqlMulti {
-            "arguments": Array [
-              SqlRef {
-                "column": "X",
-                "innerSpacing": Object {},
-                "namespace": undefined,
-                "namespaceQuotes": undefined,
-                "quotes": "",
-                "table": undefined,
-                "tableQuotes": undefined,
-                "type": "ref",
-              },
-              SqlLiteral {
-                "innerSpacing": Object {},
-                "keyword": undefined,
-                "stringValue": "''",
-                "type": "literal",
-                "value": "",
-              },
-            ],
-            "expressionType": "Comparison",
-            "innerSpacing": Object {},
-            "separators": Array [
-              Separator {
-                "left": " ",
-                "right": " ",
-                "separator": "<>",
-              },
-            ],
-            "type": "multi",
+          SqlComparison {
+            "innerSpacing": Object {
+              "postOp": " ",
+              "preOp": " ",
+            },
+            "lhs": SqlRef {
+              "column": "X",
+              "innerSpacing": Object {},
+              "namespace": undefined,
+              "namespaceQuotes": undefined,
+              "quotes": "",
+              "table": undefined,
+              "tableQuotes": undefined,
+              "type": "ref",
+            },
+            "notKeyword": undefined,
+            "op": "<>",
+            "rhs": SqlLiteral {
+              "innerSpacing": Object {},
+              "keyword": undefined,
+              "stringValue": "''",
+              "type": "literal",
+              "value": "",
+            },
+            "type": "comparision",
           },
         ],
         "expressionType": "AND",

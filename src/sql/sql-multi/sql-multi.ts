@@ -12,19 +12,18 @@
  * limitations under the License.
  */
 
-import { Separator, SqlRef, SqlUnary } from '../index';
-import { SqlBase, SqlBaseValue } from '../sql-base';
+import { Separator, SqlBase, SqlBaseValue, SqlExpression, SqlRef, SqlUnary } from '..';
 
 export interface SqlMultiValue extends SqlBaseValue {
   expressionType: string;
-  arguments: SqlBase[];
+  arguments: SqlExpression[];
   separators?: Separator[];
 }
 
-export class SqlMulti extends SqlBase {
+export class SqlMulti extends SqlExpression {
   static type = 'multi';
 
-  static sqlMultiFactory(separator: string, argumentsArray: SqlBase[]) {
+  static sqlMultiFactory(separator: string, argumentsArray: SqlExpression[]) {
     return new SqlMulti({
       type: SqlMulti.type,
       expressionType: separator,
@@ -34,7 +33,7 @@ export class SqlMulti extends SqlBase {
   }
 
   public readonly expressionType: string;
-  public readonly arguments: SqlBase[];
+  public readonly arguments: SqlExpression[];
   public readonly separators?: Separator[];
 
   constructor(options: SqlMultiValue) {
@@ -69,9 +68,7 @@ export class SqlMulti extends SqlBase {
   }
 
   public containsColumn(column: string): boolean {
-    const value = this.valueOf();
-    if (!value.arguments) throw Error('expression has no arguments');
-    return value.arguments.some(
+    return this.arguments.some(
       arg =>
         SqlRef.equalsString(arg, column) || (arg instanceof SqlMulti && arg.containsColumn(column)),
     );
@@ -83,7 +80,7 @@ export class SqlMulti extends SqlBase {
 
     const value = this.valueOf();
     value.separators = filteredList.separators;
-    value.arguments = filteredList.values;
+    value.arguments = filteredList.values as SqlExpression[];
 
     return value.arguments && value.arguments.length ? new SqlMulti(value) : undefined;
   }
@@ -98,17 +95,16 @@ export class SqlMulti extends SqlBase {
     });
   }
 
-  addOrReplaceColumn(column: string | SqlRef, filter: SqlMulti | SqlUnary): SqlMulti | SqlUnary {
+  addOrReplaceColumn(column: string, filter: SqlMulti | SqlUnary): SqlMulti | SqlUnary {
     const value = this.valueOf();
     if (!value.arguments) return this;
-    const columnString = typeof column === 'string' ? column : column.column;
     switch (value.expressionType) {
       case 'AND':
         value.arguments = value.arguments.map(argument => {
           if (
-            columnString &&
+            column &&
             (argument instanceof SqlMulti || argument instanceof SqlMulti) &&
-            argument.containsColumn(columnString)
+            argument.containsColumn(column)
           ) {
             return filter;
           } else {
@@ -134,7 +130,7 @@ export class SqlMulti extends SqlBase {
         return SqlMulti.sqlMultiFactory('AND', [this.addParens('', ''), filter]);
 
       default:
-        if (columnString && this.containsColumn(columnString)) {
+        if (column && this.containsColumn(column)) {
           return filter;
         }
         return SqlMulti.sqlMultiFactory('AND', [this, filter]);

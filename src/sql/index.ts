@@ -13,10 +13,12 @@
  */
 
 export * from './sql-base';
+export * from './sql-expression';
 export * from './sql-ref/sql-ref';
 export * from './sql-literal/sql-literal';
 export * from './sql-multi/sql-multi';
 export * from './sql-unary/sql-unary';
+export * from './sql-comparison/sql-comparison';
 export * from './sql-function/sql-function';
 export * from './separator/separator';
 export * from './sql-case-simple/sql-case-simple';

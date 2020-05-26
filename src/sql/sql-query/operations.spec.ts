@@ -191,7 +191,7 @@ describe('addWhereFilter test ', () => {
         .toString(),
     ).toMatchInlineSnapshot(`
       "SELECT *
-        FROM sys.\\"github\\" WHERE col > 1 AND \\"colTwo\\" > 2"
+        FROM sys.\\"github\\" WHERE col > 1"
     `);
   });
 
@@ -215,7 +215,7 @@ describe('addWhereFilter test ', () => {
         .toString(),
     ).toMatchInlineSnapshot(`
       "SELECT *
-              FROM sys.\\"github\\" WHERE (col > 1 OR col < 5) AND \\"colTwo\\" > 2"
+              FROM sys.\\"github\\" WHERE (col > 1 OR col < 5) AND colTwo > 5"
     `);
   });
 });
@@ -368,7 +368,7 @@ describe('remove functions', () => {
     `);
   });
 
-  it('remove only comparison expression from having', () => {
+  it('remove only comparison expression from having 1', () => {
     expect(
       parseSqlQuery(`SELECT col0, col1, col2
   FROM sys."github"
@@ -381,7 +381,7 @@ describe('remove functions', () => {
     `);
   });
 
-  it('remove only comparison expression from having', () => {
+  it('remove only comparison expression from having 2', () => {
     expect(
       parseSqlQuery(`SELECT col0, col1, col2
   FROM sys."github"
@@ -532,12 +532,7 @@ describe('getCurrentFilters', () => {
       Having col1 > 1 AND aggregated < 100
     `;
 
-    expect(parseSqlQuery(sql).getCurrentFilters()).toMatchInlineSnapshot(`
-      Array [
-        "col1",
-        "aggregated",
-      ]
-    `);
+    expect(parseSqlQuery(sql).getCurrentFilters()).toMatchInlineSnapshot(`Array []`);
   });
 
   it('get all filters, only where clause', () => {
@@ -548,12 +543,7 @@ describe('getCurrentFilters', () => {
       Group By col2
     `;
 
-    expect(parseSqlQuery(sql).getCurrentFilters()).toMatchInlineSnapshot(`
-      Array [
-        "col1",
-        "aggregated",
-      ]
-    `);
+    expect(parseSqlQuery(sql).getCurrentFilters()).toMatchInlineSnapshot(`Array []`);
   });
 
   it('get all filters, where and having clauses', () => {
@@ -565,14 +555,7 @@ describe('getCurrentFilters', () => {
       Having col3 > 1 AND col4 < 100
     `;
 
-    expect(parseSqlQuery(sql).getCurrentFilters()).toMatchInlineSnapshot(`
-      Array [
-        "col3",
-        "col4",
-        "col",
-        "aggregated",
-      ]
-    `);
+    expect(parseSqlQuery(sql).getCurrentFilters()).toMatchInlineSnapshot(`Array []`);
   });
 });
 

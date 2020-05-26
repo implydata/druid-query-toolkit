@@ -12,18 +12,20 @@
  * limitations under the License.
  */
 
-import { deepSet, filterMap } from '../../utils';
 import {
   Annotation,
   Separator,
   SqlAliasRef,
+  SqlBase,
+  SqlBaseValue,
+  SqlComparison,
+  SqlExpression,
   SqlFunction,
   SqlLiteral,
   SqlMulti,
   SqlRef,
-  SqlUnary,
-} from '../index';
-import { SqlBase, SqlBaseValue } from '../sql-base';
+} from '..';
+import { deepSet, filterMap } from '../../utils';
 
 export interface SqlQueryValue extends SqlBaseValue {
   explainKeyword?: string;
@@ -48,17 +50,17 @@ export interface SqlQueryValue extends SqlBaseValue {
   joinKeyword?: string;
   joinTable?: SqlRef;
   onKeyword?: string;
-  onExpression?: SqlBase;
+  onExpression?: SqlExpression;
 
   whereKeyword?: string;
-  whereExpression?: SqlMulti | SqlUnary; // ToDo: change type to SqlBase
+  whereExpression?: SqlExpression;
 
   groupByKeyword?: string;
-  groupByExpressions?: SqlBase[];
+  groupByExpressions?: SqlExpression[];
   groupBySeparators?: Separator[];
 
   havingKeyword?: string;
-  havingExpression?: SqlMulti | SqlUnary;
+  havingExpression?: SqlExpression;
 
   orderByKeyword?: string;
   orderByUnits?: OrderByUnit[];
@@ -89,7 +91,7 @@ export interface WithUnit {
 export type Direction = 'ASC' | 'DESC';
 
 export interface OrderByUnit {
-  expression: SqlBase;
+  expression: SqlExpression;
   postExpression: string;
   direction?: Direction;
 }
@@ -108,17 +110,17 @@ export class SqlQuery extends SqlBase {
   public readonly joinKeyword?: string;
   public readonly joinTable?: SqlRef;
   public readonly onKeyword?: string;
-  public readonly onExpression?: SqlBase;
+  public readonly onExpression?: SqlExpression;
   public readonly tables?: (SqlAliasRef | SqlRef)[];
   public readonly tableSeparators?: [];
   public readonly selectAnnotations?: Annotation[];
   public readonly whereKeyword?: string;
-  public readonly whereExpression?: SqlMulti | SqlUnary;
+  public readonly whereExpression?: SqlExpression;
   public readonly groupByKeyword?: string;
-  public readonly groupByExpressions?: SqlBase[];
+  public readonly groupByExpressions?: SqlExpression[];
   public readonly groupBySeparators?: Separator[];
   public readonly havingKeyword?: string;
-  public readonly havingExpression?: SqlMulti | SqlUnary;
+  public readonly havingExpression?: SqlExpression;
   public readonly orderByKeyword?: string;
   public readonly orderByUnits?: OrderByUnit[];
   public readonly orderBySeparators?: Separator[];
@@ -570,7 +572,7 @@ export class SqlQuery extends SqlBase {
     if (!value.whereExpression) return this;
 
     if (
-      value.whereExpression.isType('Comparison') &&
+      value.whereExpression instanceof SqlComparison &&
       value.whereExpression.containsColumn(column)
     ) {
       value.whereExpression = undefined;
@@ -590,7 +592,7 @@ export class SqlQuery extends SqlBase {
     if (!value.havingExpression) return this;
 
     if (
-      value.havingExpression.isType('Comparison') &&
+      value.havingExpression instanceof SqlExpression &&
       value.havingExpression.containsColumn(column)
     ) {
       value.havingExpression = undefined;
@@ -644,7 +646,7 @@ export class SqlQuery extends SqlBase {
       value.groupBySeparators,
     );
 
-    value.groupByExpressions = filteredUnitsList.units;
+    value.groupByExpressions = filteredUnitsList.units as SqlExpression[];
     value.groupBySeparators = filteredUnitsList.separators;
 
     if (!value.groupByExpressions) {
@@ -776,7 +778,7 @@ export class SqlQuery extends SqlBase {
     // Adds the last column in the select clause to the group by clause via its index
     const value = this.valueOf();
 
-    value.groupByExpressions = [SqlLiteral.fromInput(1) as SqlBase].concat(
+    value.groupByExpressions = [SqlLiteral.fromInput(1) as SqlExpression].concat(
       (value.groupByExpressions || []).map(column => {
         if (column instanceof SqlLiteral) {
           column = column.increment() || column;
@@ -808,10 +810,10 @@ export class SqlQuery extends SqlBase {
   }
 
   addAggregateColumn(
-    columns: SqlBase[],
+    columns: SqlExpression[],
     functionName: string,
     alias: string,
-    filter?: SqlBase,
+    filter?: SqlExpression,
     decorator?: string,
   ) {
     // Adds an aggregate column to the select
