@@ -12,6 +12,17 @@
  * limitations under the License.
  */
 
-export * from './parser';
-export * from './sql';
-export * from './query-result-decoder/query-result-decoder';
+import { Separator } from '..';
+
+import { SeparatedArray } from './separated-array';
+
+describe('SeparatedArray', () => {
+  it('works in basic case', () => {
+    const a = new SeparatedArray(
+      [1, 2, 3],
+      [Separator.rightSeparator(','), Separator.bothSeparator(';')],
+    );
+
+    expect(a.toString()).toEqual('1, 2 ; 3');
+  });
+});

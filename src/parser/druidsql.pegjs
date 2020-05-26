@@ -1,8 +1,22 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 Start = Sql
 
 // Rest of the work...
 
-Sql = SqlQuery / Expression
+Sql = SqlQuery / SqlAlias
 
 // ------------------------------
 
@@ -19,7 +33,6 @@ SqlQuery =
   orderBy:(_ OrderByClause)?
   limit:(_ LimitClause)?
   union:(_ UnionClause)?
-  postQueryAnnotation:Annotation*
   postQuery:EndOfQuery?
 {
   var value = {};
@@ -35,7 +48,7 @@ SqlQuery =
   if (withClause) {
     value.withKeyword = withClause[0].withKeyword;
     innerSpacing.postWith = withClause[0].postWith;
-    value.withUnits = withClause[0].withUnits;
+    value.withParts = withClause[0].withParts;
     value.withSeparators = withClause[0].withSeparators;
     innerSpacing.postWithQuery = withClause[1];
   }
@@ -45,7 +58,6 @@ SqlQuery =
   value.selectDecorator = select.selectDecorator;
   value.selectSeparators = select.selectSeparators;
   value.selectValues = select.selectValues;
-  value.selectAnnotations = select.selectAnnotations;
   innerSpacing.postSelectDecorator = select.postSelectDecorator;
 
   if (from) {
@@ -63,7 +75,7 @@ SqlQuery =
     value.joinKeyword = join[1].joinKeyword;
     innerSpacing.postJoinKeyword = join[1].postJoinKeywordSpacing;
     value.joinTable = join[1].table;
-    innerSpacing.postJoinTable = join[1].postJoinTableSpacing;
+    innerSpacing.preOnKeyword = join[1].preOnKeywordSpacing;
     value.onKeyword = join[1].onKeyword;
     value.onExpression = join[1].onExpression;
     innerSpacing.postOn = join[1].postOnSpacing;
@@ -95,7 +107,7 @@ SqlQuery =
     innerSpacing.preOrderByKeyword = orderBy[0];
     value.orderByKeyword = orderBy[1].orderByKeyword;
     innerSpacing.postOrderByKeyword = orderBy[1].postOrderByKeyword;
-    value.orderByUnits = orderBy[1].orderByUnits;
+    value.orderByParts = orderBy[1].orderByParts;
     value.orderBySeparators = orderBy[1].orderBySeparators;
   }
 
@@ -113,8 +125,6 @@ SqlQuery =
     value.unionQuery = union[1].unionQuery;
   }
 
-  value.postQueryAnnotation = postQueryAnnotation;
-
   innerSpacing.postQuery = postQuery || '';
 
   return new sql.SqlQuery(value);
@@ -123,47 +133,49 @@ SqlQuery =
 WithClause =
   withKeyword:WithToken
   postWith:_
-  withUnitsHead:WithUnit
-  withUnitsTail: (Comma WithUnit)*
+  withPartsHead:SqlWithPart
+  withPartsTail:(Comma SqlWithPart)*
 {
   return {
     withKeyword: withKeyword,
     postWith: postWith,
-    withUnits: withUnitsTail ? makeListMap(withUnitsTail, 1, withUnitsHead) : [withUnitsHead],
-    withSeparators: withUnitsTail ? makeListMap(withUnitsTail, 0): undefined,
+    withParts: makeSeparatedArray(withPartsHead, withPartsTail),
   };
 }
 
 
-WithUnit =
-  withTableName:Expression
+SqlWithPart =
+  withTable:Expression
   postWithTable:_?
   columns:(WithColumns _)?
-  AsKeyword:AsToken
+  asKeyword:AsToken
   postAs:_
   withQuery:SqlInParens
 {
-  return {
-    withTableName: withTableName,
-    postWithTable: postWithTable || '',
-    postLeftParen: columns ? columns[0].postLeftParen : '',
-    withColumns: columns ? columns[0].withColumns : undefined,
-    withSeparators: columns ? columns[0].withSeparators : undefined,
-    preRightParen: columns ? columns[0].preRightParen : '',
-    postWithColumns: columns ? columns[1] : '',
-    AsKeyword: AsKeyword,
-    postAs: postAs,
-    withQuery: withQuery
+  var value = {
+    withTable: withTable,
+    asKeyword: asKeyword,
+    withQuery: withQuery,
   };
+  var innerSpacing = value.innerSpacing = {
+    postWithTable: postWithTable,
+    postAs: postAs,
+  };
+  if (columns) {
+    innerSpacing.postLeftParen = columns[0].postLeftParen;
+    value.withColumns = columns[0].withColumns;
+    innerSpacing.preRightParen = columns[0].preRightParen;
+    innerSpacing.postWithColumns = columns[1];
+  }
+  return new sql.SqlWithPart(value);
 }
 
 WithColumns = OpenParen postLeftParen:_? withColumnsHead:BaseType withColumnsTail:(Comma BaseType)* preRightParen:_? CloseParen
 {
   return {
-    postLeftParen: postLeftParen || '',
-    withColumns: withColumnsHead ? makeListMap(withColumnsTail, 1, withColumnsHead) : withColumnsHead,
-    withSeparators: makeListMap(withColumnsTail, 1),
-    preRightParen: preRightParen || ''
+    postLeftParen: postLeftParen,
+    withColumns: makeSeparatedArray(withColumnsHead, withColumnsTail),
+    preRightParen: preRightParen
   };
 }
 
@@ -171,28 +183,24 @@ SelectClause =
   selectKeyword:SelectToken
   postSelect:_
   selectDecorator:((AllToken / DistinctToken) _)?
-  selectValuesHead:(Alias / Expression)
-  annotationsHead:Annotation?
-  selectValuesTail:(Comma (Alias / Expression) Annotation?)*
+  selectValuesHead:SqlAlias
+  selectValuesTail:(Comma SqlAlias)*
 {
   return {
     selectKeyword: selectKeyword,
     postSelect: postSelect,
     selectDecorator: selectDecorator ? selectDecorator[0] : '',
     postSelectDecorator: selectDecorator ? selectDecorator[1] : '',
-    selectValues: selectValuesTail ? makeListMap(selectValuesTail, 1, selectValuesHead) : [selectValuesHead],
-    selectSeparators: makeListMap(selectValuesTail,0),
-    selectAnnotations: selectValuesTail ? makeListMap(selectValuesTail, 2, annotationsHead) : [annotationsHead],
+    selectValues: makeSeparatedArray(selectValuesHead, selectValuesTail).map(SqlAlias.fromBase),
   };
 }
 
-FromClause = fromKeyword:FromToken postFrom:_ tableHead:(Alias / SqlRef) tableTail:(Comma (Alias / SqlRef))*
+FromClause = fromKeyword:FromToken postFrom:_ tableHead:SqlAlias tableTail:(Comma SqlAlias)*
 {
   return {
     fromKeyword: fromKeyword,
     postFrom: postFrom,
-    tables: tableTail ? makeListMap(tableTail, 1, tableHead).map(table => table.upgrade()): [tableHead.upgrade()],
-    tableSeparators: tableTail ? makeListMap(tableTail, 0) : undefined
+    tables: makeSeparatedArray(tableHead, tableTail).map(table => SqlAlias.fromBase(table.upgrade())),
   };
 }
 
@@ -201,23 +209,23 @@ JoinClause =
   postJoinTypeSpacing:_
   joinKeyword:JoinToken
   postJoinKeywordSpacing:_
-  table:(Alias / SqlRef)
-  postJoinTableSpacing:_
-  onKeyword:OnToken
-  postOnSpacing:_
-  onExpression:Expression
+  table:SqlAlias
+  on:(_ OnToken _ Expression)?
 {
-  return {
+  var ret = {
     joinType: joinType,
     postJoinTypeSpacing: postJoinTypeSpacing,
     joinKeyword: joinKeyword,
     postJoinKeywordSpacing: postJoinKeywordSpacing,
-    table: table.upgrade(),
-    postJoinTableSpacing: postJoinTableSpacing,
-    onKeyword: onKeyword,
-    postOnSpacing: postOnSpacing,
-    onExpression: onExpression
+    table: SqlAlias.fromBase(table.upgrade())
   };
+  if (on) {
+    ret.preOnKeywordSpacing = on[0];
+    ret.onKeyword = on[1];
+    ret.postOnSpacing = on[2];
+    ret.onExpression = on[3];
+  }
+  return ret;
 }
 
 WhereClause = whereKeyword:WhereToken postWhereKeyword:_ whereExpression:Expression
@@ -234,8 +242,7 @@ GroupByClause = groupByKeyword:GroupByToken postGroupByKeyword:_ groupByExpressi
   return {
     groupByKeyword: groupByKeyword,
     postGroupByKeyword: postGroupByKeyword,
-    groupByExpressions: groupByExpressionsTail ? makeListMap(groupByExpressionsTail, 1, groupByExpressionsHead) : [groupByExpressionsHead],
-    groupBySeparators: groupByExpressionsTail ? makeListMap(groupByExpressionsTail, 0) : undefined,
+    groupByExpressions: makeSeparatedArray(groupByExpressionsHead, groupByExpressionsTail),
   };
 }
 
@@ -248,23 +255,28 @@ HavingClause = havingKeyword:HavingToken postHavingKeyword:_ havingExpression:Ex
   };
 }
 
-OrderByClause = orderByKeyword:OrderToken postOrderByKeyword:_ orderByUnitsHead:OrderByPart orderByUnitsTail:(Comma OrderByPart)*
+OrderByClause = orderByKeyword:OrderToken postOrderByKeyword:_ orderByPartsHead:SqlOrderByPart orderByPartsTail:(Comma SqlOrderByPart)*
 {
   return {
     orderByKeyword: orderByKeyword,
     postOrderByKeyword: postOrderByKeyword,
-    orderByUnits: orderByUnitsHead ? makeListMap(orderByUnitsTail, 1, orderByUnitsHead) : [orderByUnitsHead],
-    orderBySeparators: makeListMap(orderByUnitsTail, 0),
+    orderByParts: makeSeparatedArray(orderByPartsHead, orderByPartsTail),
   };
 }
 
-OrderByPart = expression:Expression direction:(_ (AscToken / DescToken))?
+SqlOrderByPart = expression:Expression direction:(_ (AscToken / DescToken))?
 {
-  return {
+  var value = {
     expression: expression,
-    postExpression: direction ? direction[0] : '',
-    direction: direction ? direction[1] : '',
   };
+  var innerSpacing = value.innerSpacing = {};
+
+  if (direction) {
+    innerSpacing.preDirection = direction[0];
+    value.direction = direction[1];
+  }
+
+  return new sql.SqlOrderByPart(value);
 }
 
 LimitClause = limitKeyword:LimitToken postLimitKeyword:_ limitValue:SqlLiteral
@@ -287,22 +299,25 @@ UnionClause = unionKeyword:UnionToken postUnionKeyword:_ unionQuery:SqlQuery
 
 // ------------------------------
 
-Alias = expression:Expression postExpression:_ as:(AsToken _)? alias:SqlRef
+SqlAlias = expression:Expression alias:((_ AsToken)? _ SqlRef)?
 {
-  var value = {
-    expression: expression,
-    alias: alias
-  };
-  var innerSpacing = value.innerSpacing = {
-    postExpression: postExpression
-  };
-
-  if (as) {
-    value.asKeyword = as[0];
-    innerSpacing.postAs = as[1];
+  if (!alias) {
+    return expression;
   }
 
-  return new sql.SqlAliasRef(value);
+  var value = { expression: expression };
+  var innerSpacing = value.innerSpacing = {};
+
+  var as = alias[0];
+  if (as) {
+    innerSpacing.preAs = as[0];
+    value.asKeyword = as[1];
+  }
+
+  innerSpacing.preAlias = alias[1];
+  value.alias = alias[2];
+
+  return new sql.SqlAlias(value);
 }
 
 /*
@@ -393,7 +408,7 @@ ComparisonOpRhsIs = op:IsToken postOp:_ not:(NotToken _)? rhs:SqlLiteral
   };
 }
 
-ComparisonOpRhsIn = op:InToken postOp:_ rhs:Sql
+ComparisonOpRhsIn = op:InToken postOp:_ rhs:(SqlInArrayLiteral / SqlInParens)
 {
   return {
     op: op,
@@ -432,7 +447,7 @@ ComparisonOpRhsLike = op:LikeToken postOp:_ like:SqlLiteral escape:(_ EscapeToke
   };
 }
 
-ComparisonOpRhsNot = notKeyword:NotToken preOp:_ opRhs:(ComparisonOpRhsBetween / ComparisonOpRhsLike)
+ComparisonOpRhsNot = notKeyword:NotToken preOp:_ opRhs:(ComparisonOpRhsIn / ComparisonOpRhsBetween / ComparisonOpRhsLike)
 {
   return Object.assign({}, opRhs, {
     notKeyword: notKeyword,
@@ -495,16 +510,15 @@ CaseExpression = SearchedCaseExpression / SimpleCaseExpression
 SearchedCaseExpression =
   caseKeyword:CaseToken
   postCase:_
-  whenThenUnitsHead:WhenThenPair
-  whenThenUnitsTail:(_ WhenThenPair)*
+  whenThenPartsHead:WhenThenPair
+  whenThenPartsTail:(_ WhenThenPair)*
   elseValue:(_ ElseToken _ Expression)?
   preEnd:_
   endKeyword:EndToken
 {
   return new sql.SqlCaseSearched({
     caseKeyword: caseKeyword,
-    whenThenUnits: whenThenUnitsTail ? makeListMap(whenThenUnitsTail, 1, whenThenUnitsHead) : [whenThenUnitsHead],
-    postWhenThenUnitSpaces: whenThenUnitsTail ? makeListMap(whenThenUnitsTail, 0) : [],
+    whenThenParts: makeSeparatedArray(whenThenPartsHead, whenThenPartsTail),
     elseKeyword: elseValue ? elseValue[1] : undefined,
     elseExpression: elseValue ? elseValue[3] : undefined,
     endKeyword: endKeyword,
@@ -522,8 +536,8 @@ SimpleCaseExpression =
   postCase:_
   caseExpression:Expression
   postCaseExpression:_
-  whenThenUnitsHead:WhenThenPair
-  whenThenUnitsTail:(_ WhenThenPair)*
+  whenThenPartsHead:WhenThenPair
+  whenThenPartsTail:(_ WhenThenPair)*
   elseValue:(_ ElseToken _ Expression)?
   preEnd:_
   endKeyword:EndToken
@@ -531,11 +545,11 @@ SimpleCaseExpression =
   return new sql.SqlCaseSimple({
     caseKeyword: caseKeyword,
     caseExpression: caseExpression,
-    whenThenUnits: whenThenUnitsTail ? makeListMap(whenThenUnitsTail, 1, whenThenUnitsHead) : [whenThenUnitsHead],
+    whenThenParts: makeSeparatedArray(whenThenPartsHead, whenThenPartsTail),
     elseKeyword: elseValue ? elseValue[1] : undefined,
     elseExpression: elseValue ? elseValue[3] : undefined,
     endKeyword: endKeyword,
-    postWhenThenUnits: whenThenUnitsTail ? makeListMap(whenThenUnitsTail, 0) : [],
+    postWhenThenParts: whenThenPartsTail ? makeListMap(whenThenPartsTail, 0) : [],
     innerSpacing: {
       postCase: postCase,
       postCaseExpression: postCaseExpression,
@@ -548,15 +562,17 @@ SimpleCaseExpression =
 
 WhenThenPair = whenKeyword:WhenToken postWhen:_ whenExpression:Expression postWhenExpression:_ thenKeyword:ThenToken postThen:_ thenExpression:OrExpression
 {
-  return {
+  return new sql.SqlWhenThenPart({
     whenKeyword: whenKeyword,
-    postWhenSpace: postWhen,
     whenExpression: whenExpression,
-    postWhenExpressionSpace: postWhenExpression,
     thenKeyword: thenKeyword,
-    postThenSpace: postThen,
     thenExpression: thenExpression,
-  };
+    innerSpacing: {
+      postWhen: postWhen,
+      postWhenExpression: postWhenExpression,
+      postThen: postThen,
+    }
+  });
 }
 
 
@@ -597,32 +613,40 @@ Function =
   OpenParen
   postLeftParen:_
   decorator:(FunctionDecorator _)?
-  argumentHead:Expression
-  argumentTail:((Comma / From) Expression)*
-  preRightParen:_
+  argumentsHead:Expression
+  argumentsTail:((Comma / From) Expression)*
+  postArguments:_
   CloseParen
   filter:(_ Filter)?
 {
-  return new sql.SqlFunction({
+  var value = {
     functionName: functionName,
-    decorator: decorator ? decorator[0] : undefined,
-    arguments: argumentTail ? makeListMap(argumentTail, 1, argumentHead) : [argumentHead],
-    separators: makeListMap(argumentTail, 0),
-    filterKeyword: filter ? filter[1].filterKeyword : undefined,
-    whereKeyword: filter ? filter[1].whereKeyword : undefined,
-    whereExpression: filter ? filter[1].whereExpression : undefined,
-    innerSpacing: {
-      postName: postName ? postName : '',
-      postDecorator: decorator ? decorator[1] || '' : '',
-      postLeftParen: postLeftParen ? postLeftParen : '',
-      preRightParen: preRightParen ? preRightParen : '',
-      preFilter: filter && filter[0] ? filter[0] : '',
-      postFilterKeyword: filter ? filter[1].postFilterKeyword : '',
-      postFilterLeftParen: filter ? filter[1].postFilterLeftParen : '',
-      postWhereKeyword: filter ? filter[1].postWhereKeyword : '',
-      preFilterRightParen: filter ? filter[1].preFilterRightParen : '',
-    }
-  });
+  };
+  var innerSpacing = value.innerSpacing = {
+    postName: postName,
+    postLeftParen: postLeftParen,
+  };
+
+  if (decorator) {
+    value.decorator = decorator[0];
+    innerSpacing.postDecorator = decorator[1];
+  }
+
+  value.arguments = makeSeparatedArray(argumentsHead, argumentsTail);
+  innerSpacing.postArguments = postArguments;
+
+  if (filter) {
+    innerSpacing.preFilter = filter[0];
+    value.filterKeyword = filter[1].filterKeyword;
+    innerSpacing.postFilterKeyword = filter[1].postFilterKeyword;
+    innerSpacing.postFilterLeftParen = filter[1].postFilterLeftParen;
+    value.whereKeyword = filter[1].whereKeyword;
+    innerSpacing.postWhereKeyword = filter[1].postWhereKeyword;
+    value.whereExpression = filter[1].whereExpression;
+    innerSpacing.preFilterRightParen = filter[1].preFilterRightParen;
+  }
+
+  return new sql.SqlFunction(value);
 }
 
 Filter = filterKeyword:FilterToken postFilterKeyword:_ OpenParen postLeftParen:_ filterExpression:WhereClause preRightParen:_ CloseParen
@@ -750,9 +774,9 @@ Array = keyword:ArrayToken postKeyword:_ v:ArrayBody
  };
 }
 
-ArrayBody = '[' vs:(ArrayEntry (Comma ArrayEntry)*)? ']'
+ArrayBody = '[' _ vs:ArrayEntries? _ ']'
 {
-  var values = (vs ? makeListMap(vs[1], 1, vs[0]) : []).map(function(d) {
+  var values = (vs || []).map(function(d) {
     return d.value;
   });
 
@@ -760,6 +784,23 @@ ArrayBody = '[' vs:(ArrayEntry (Comma ArrayEntry)*)? ']'
     value: values,
     stringValue: text()
   };
+}
+
+SqlInArrayLiteral = '(' _ vs:ArrayEntries? _ ')'
+{
+  var values = (vs || []).map(function(d) {
+    return d.value;
+  });
+
+  return new sql.SqlLiteral({
+    value: values,
+    stringValue: text()
+  });
+}
+
+ArrayEntries = head:ArrayEntry tail:(Comma ArrayEntry)*
+{
+  return makeListMap(tail, 1, head);
 }
 
 ArrayEntry = Number / SingleQuotedString / UnicodeString
@@ -827,26 +868,11 @@ Star = '*'
 
 // -----------------------------------
 
-Annotation = preAnnotation:___ '--:' postAnnotationSignifier: ___? key:$([a-z0-9_\-:*%/]i+) postKey:___? "=" postEquals:___? value:$([a-z0-9_\-:*%/]i+)
-{
-  return new sql.Annotation({
-    innerSpacing: {
-      preAnnotation: preAnnotation,
-      postAnnotationSignifier: postAnnotationSignifier,
-      postKey: postKey,
-      postEquals: postEquals,
-      preAnnotation: preAnnotation
-    },
-    key: key,
-    value: value
-  });
-}
-
 IdentifierPart = [a-z_]i
 
-_ "optional whitespace" = $(Space* ("--" !":" [^\n]* ([\n] Space*)?)*)
+_ "optional whitespace" = $(Space* ("--" [^\n]* ([\n] Space*)?)*)
 
-__ "mandatory whitespace" = $(Space+ ("--" !":" [^\n]* ([\n] Space*)?)*)
+__ "mandatory whitespace" = $(Space+ ("--" [^\n]* ([\n] Space*)?)*)
 
 ___ "pure whitespace" = $(Space*)
 
@@ -870,6 +896,7 @@ JoinType =
 / 'INNER'i
 / $('FULL'i _ 'OUTER'i)
 / 'FULL'i
+/ 'CROSS'i
 
 /* Tokens */
 

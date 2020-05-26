@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 
-export * from './parser';
-export * from './sql';
-export * from './query-result-decoder/query-result-decoder';
+export * from './sql-alias/sql-alias';
+export * from './sql-order-by-part/sql-order-by-part';
+export * from './sql-with-part/sql-with-part';
+export * from './sql-query';

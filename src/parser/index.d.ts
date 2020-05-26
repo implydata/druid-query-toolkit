@@ -12,6 +12,8 @@
  * limitations under the License.
  */
 
-export * from './parser';
-export * from './sql';
-export * from './query-result-decoder/query-result-decoder';
+import { SqlBase, SqlExpression, SqlQuery } from '../sql';
+
+export function parseSql(input: string): SqlBase;
+export function parseSqlExpression(input: string): SqlExpression;
+export function parseSqlQuery(input: string): SqlQuery;

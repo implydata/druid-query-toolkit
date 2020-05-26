@@ -16,11 +16,37 @@ import { parseSqlQuery, SqlExpression, SqlMulti, SqlRef } from '../..';
 import { backAndForth, sane } from '../../test-utils';
 
 describe('parse join with lookup', () => {
-  it('parsers a basic math expression', () => {
+  it('parses a basic math expression', () => {
     backAndForth(sane`
       SELECT countryName from wikipedia
       LEFT JOIN lookup.country ON lookup.country.v = wikipedia.countryName
     `);
+  });
+
+  it('parses CROSS JOIN', () => {
+    const sql = sane`
+      SELECT
+        "channel", lookup.lang.v,
+        COUNT(*) AS "Count"
+      FROM "wikipedia_k" CROSS JOIN lookup.lang
+      GROUP BY 1, 2
+      ORDER BY "Count" DESC
+    `;
+
+    backAndForth(sql);
+  });
+
+  it.skip('parses USING', () => {
+    const sql = sane`
+      SELECT
+        "channel", lookup.lang.v,
+        COUNT(*) AS "Count"
+      FROM "wikipedia_k" USING (k)
+      GROUP BY 1, 2
+      ORDER BY "Count" DESC
+    `;
+
+    backAndForth(sql);
   });
 });
 
@@ -37,10 +63,9 @@ describe('Add Join', () => {
           ]),
         )
         .toString(),
-    ).toMatchInlineSnapshot(`
-      "SELECT countryName from wikipedia
-      LEFT JOIN lookup.country ON lookup.country.v = wikipedia.countryName"
-    `);
+    ).toMatchInlineSnapshot(
+      `"SELECT countryName from wikipedia LEFT JOIN lookup.country ON lookup.country.v = wikipedia.countryName"`,
+    );
   });
 
   it('Add inner join', () => {
@@ -55,18 +80,19 @@ describe('Add Join', () => {
           ]),
         )
         .toString(),
-    ).toMatchInlineSnapshot(`
-      "SELECT countryName from wikipedia
-      INNER JOIN lookup.country ON lookup.country.v = wikipedia.countryName"
-    `);
+    ).toMatchInlineSnapshot(
+      `"SELECT countryName from wikipedia INNER JOIN lookup.country ON lookup.country.v = wikipedia.countryName"`,
+    );
   });
 });
 
 describe('Remove join', () => {
   it('Remove Join', () => {
     expect(
-      parseSqlQuery(`SELECT countryName from wikipedia
-      LEFT JOIN lookup.country ON lookup.country.v = wikipedia.countryName`)
+      parseSqlQuery(sane`
+        SELECT countryName from wikipedia
+        LEFT JOIN lookup.country ON lookup.country.v = wikipedia.countryName
+      `)
         .removeJoin()
         .toString(),
     ).toMatchInlineSnapshot(`"SELECT countryName from wikipedia"`);

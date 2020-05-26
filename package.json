@@ -33,7 +33,7 @@
     "test": "npm run tslint && jest",
     "playground": "node script/compile-peg.js && jest src/parser.spec.ts",
     "compile": "rm -rf build/ && node script/compile-peg.js && tsc && npm run cp-parser",
-    "cp-parser": "cp -r src/parser build/parser",
+    "cp-parser": "cp -r src/parser build/",
     "tslint": "./node_modules/.bin/tslint -c tslint.json --project tsconfig.json --formatters-dir ./node_modules/awesome-code-style/formatter 'src/**/*.ts?(x)'",
     "tslint-fix": "npm run tslint -- --fix",
     "tslint-changed-only": "git diff --diff-filter=ACMR --name-only | grep -E \\.tsx\\?$ | xargs ./node_modules/.bin/tslint -c tslint.json --project tsconfig.json --formatters-dir ./node_modules/awesome-code-style/formatter",

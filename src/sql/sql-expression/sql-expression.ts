@@ -12,6 +12,11 @@
  * limitations under the License.
  */
 
-export * from './parser';
-export * from './sql';
-export * from './query-result-decoder/query-result-decoder';
+import { SqlBase } from '../sql-base';
+
+export abstract class SqlExpression extends SqlBase {
+  public removeColumnFromAnd(column: string): SqlExpression | undefined {
+    if (this.containsColumn(column)) return;
+    return this;
+  }
+}

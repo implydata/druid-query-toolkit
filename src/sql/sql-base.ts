@@ -12,7 +12,8 @@
  * limitations under the License.
  */
 
-import { SqlAliasRef, SqlRef } from '../index';
+import { SeparatedArray, SqlAlias, SqlRef } from '../index';
+import { dedupe, filterMap } from '../utils';
 
 import { RESERVED } from './reserved';
 
@@ -22,8 +23,8 @@ export interface Parens {
 }
 
 export interface SqlBaseValue {
-  type: string;
-  innerSpacing: Record<string, string>;
+  type?: string;
+  innerSpacing?: Record<string, string>;
   parens?: Parens[];
 }
 
@@ -39,8 +40,7 @@ export abstract class SqlBase {
     return Boolean(reservedLookup[keyword.toUpperCase()]);
   }
 
-  static cleanObject(obj: Record<string, any> | undefined): Record<string, string> | undefined {
-    if (!obj) return obj;
+  static cleanObject(obj: Record<string, any>): Record<string, string> {
     const cleanObj: Record<string, string> = {};
     for (const k in obj) {
       const v = obj[k];
@@ -49,10 +49,21 @@ export abstract class SqlBase {
     return cleanObj;
   }
 
+  static walkSeparatedArray(
+    a: SeparatedArray<SqlBase> | undefined,
+    fn: (t: SqlBase) => void,
+  ): void {
+    if (a) {
+      a.values.forEach(v => {
+        v.walk(fn);
+      });
+    }
+  }
+
   static getColumnName(column: string | SqlBase): string {
     if (typeof column === 'string') return column;
     if (column instanceof SqlRef && column.column) return column.column;
-    if (column instanceof SqlAliasRef) {
+    if (column instanceof SqlAlias) {
       // @ts-ignore
       return column.alias.name;
     }
@@ -72,6 +83,7 @@ export abstract class SqlBase {
 
   static fromValue(parameters: SqlBaseValue): any {
     const { type } = parameters;
+    if (!type) throw new Error(`must set 'type' to use fromValue`);
     const ClassFn = SqlBase.getConstructorFor(type) as any;
     return new ClassFn(parameters);
   }
@@ -81,8 +93,10 @@ export abstract class SqlBase {
   public parens?: Parens[];
 
   constructor(options: SqlBaseValue, typeOverride: string) {
-    this.type = typeOverride || options.type;
-    this.innerSpacing = SqlBase.cleanObject(options.innerSpacing) || {};
+    const type = typeOverride || options.type;
+    if (!type) throw new Error(`could not determine type`);
+    this.type = type;
+    this.innerSpacing = SqlBase.cleanObject(options.innerSpacing || {});
     if (options.parens) {
       this.parens = options.parens;
     }
@@ -112,6 +126,14 @@ export abstract class SqlBase {
     return space;
   }
 
+  protected getInnerSpacingWithout(...toRemove: string[]) {
+    const ret = Object.assign({}, this.innerSpacing);
+    for (const thing of toRemove) {
+      delete ret[thing];
+    }
+    return ret;
+  }
+
   public abstract toRawString(): string;
 
   toString(): string {
@@ -123,5 +145,33 @@ export abstract class SqlBase {
       }
     }
     return str;
+  }
+
+  public walk(fn: (t: SqlBase) => void) {
+    fn(this);
+  }
+
+  public getSqlRefs(): SqlRef[] {
+    const refs: SqlRef[] = [];
+    this.walk(t => {
+      if (t instanceof SqlRef) {
+        refs.push(t);
+      }
+    });
+    return refs;
+  }
+
+  public getUsedColumns(): string[] {
+    return dedupe(filterMap(this.getSqlRefs(), x => x.column));
+  }
+
+  public containsColumn(column: string): boolean {
+    return Boolean(this.getSqlRefs().find(x => x.column === column));
+  }
+
+  public getFirstColumn(): string | undefined {
+    const ref = this.getSqlRefs().find(x => x.column);
+    if (!ref) return;
+    return ref.column;
   }
 }

@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { parseSql } from '.';
+import { parseSql } from './parser';
 
 // To be used as a tag
 export function sane(_x: TemplateStringsArray) {

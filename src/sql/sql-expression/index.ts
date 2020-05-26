@@ -12,6 +12,14 @@
  * limitations under the License.
  */
 
-export * from './parser';
-export * from './sql';
-export * from './query-result-decoder/query-result-decoder';
+export * from './sql-expression';
+export * from './sql-ref/sql-ref';
+export * from './sql-literal/sql-literal';
+export * from './sql-multi/sql-multi';
+export * from './sql-unary/sql-unary';
+export * from './sql-comparison/sql-comparison';
+export * from './sql-function/sql-function';
+export * from './sql-case-simple/sql-case-simple';
+export * from './sql-case-searched/sql-case-searched';
+export * from './sql-interval/sql-interval';
+export * from './sql-when-then-part/sql-when-then-part';

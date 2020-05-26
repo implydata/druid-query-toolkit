@@ -152,3 +152,15 @@ export function whitelistKeys(obj: Record<string, any>, whitelist: string[]): Re
 export function filterMap<T, Q>(xs: T[], f: (x: T, i: number) => Q | undefined): Q[] {
   return xs.map(f).filter((x: Q | undefined) => typeof x !== 'undefined') as Q[];
 }
+
+export function dedupe<T>(array: T[], keyFn: (x: T) => string = String): T[] {
+  const seen: Record<any, boolean> = {};
+  const deduped: T[] = [];
+  array.forEach(d => {
+    const key = keyFn(d);
+    if (seen[key]) return;
+    seen[key] = true;
+    deduped.push(d);
+  });
+  return deduped;
+}

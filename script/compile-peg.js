@@ -18,15 +18,25 @@ const peg = require('pegjs');
 var header = fs.readFileSync('./src/parser/druidsql.header.js', 'utf-8');
 var rules = fs.readFileSync('./src/parser/druidsql.pegjs', 'utf-8');
 
-var parser = peg.generate(header + '\n\n' + rules, {
-  output: 'source',
-});
+var parser;
+try {
+  parser = peg.generate(header + '\n\n' + rules, {
+    output: 'source',
+  });
+} catch (e) {
+  console.error('Failed to compile');
+  console.error(e.message);
+  console.error(e.location);
+  process.exit(1);
+}
 
 const wrappedParser = `
 var sql = require('../sql');
 var utils = require('../utils');
 var deepGet = utils.deepGet;
 var SqlBase = sql.SqlBase;
+var SqlAlias = sql.SqlAlias;
+var SqlExpression = sql.SqlExpression;
 var SqlQuery = sql.SqlQuery;
 
 var p =
@@ -36,16 +46,25 @@ function parseSql(input) {
   return p.parse(input);
 }
 
-function parseSqlQuery(input) {
-  var ast = parseSql(input);
-  if (!(ast instanceof SqlQuery)) {
-    throw new Error('Provided SQL expression was not a query');
+function parseSqlExpression(input) {
+  var parsed = parseSql(input);
+  if (!(parsed instanceof SqlExpression)) {
+    throw new Error('Provided SQL expression was not an expression');
   }
-  return ast;
+  return parsed;
 }
 
-module.exports.parseSql = parseSql;
-module.exports.parseSqlQuery = parseSqlQuery;
+function parseSqlQuery(input) {
+  var parsed = parseSql(input);
+  if (!(parsed instanceof SqlQuery)) {
+    throw new Error('Provided SQL expression was not a query');
+  }
+  return parsed;
+}
+
+exports.parseSql = parseSql;
+exports.parseSqlExpression = parseSqlExpression;
+exports.parseSqlQuery = parseSqlQuery;
 `;
 
-fs.writeFileSync('./src/parser/druidsql.js', wrappedParser);
+fs.writeFileSync('./src/parser/index.js', wrappedParser);
