@@ -327,8 +327,9 @@ describe('SqlQuery', () => {
                 "innerSpacing": Object {
                   "postArguments": "",
                   "postLeftParen": "",
-                  "postName": "",
+                  "preLeftParen": "",
                 },
+                "special": undefined,
                 "type": "function",
                 "whereExpression": undefined,
                 "whereKeyword": undefined,
@@ -504,8 +505,9 @@ describe('SqlQuery', () => {
                 "innerSpacing": Object {
                   "postArguments": "",
                   "postLeftParen": "",
-                  "postName": "",
+                  "preLeftParen": "",
                 },
+                "special": undefined,
                 "type": "function",
                 "whereExpression": undefined,
                 "whereKeyword": undefined,
@@ -552,8 +554,9 @@ describe('SqlQuery', () => {
                   "innerSpacing": Object {
                     "postArguments": "",
                     "postLeftParen": "",
-                    "postName": "",
+                    "preLeftParen": "",
                   },
+                  "special": undefined,
                   "type": "function",
                   "whereExpression": undefined,
                   "whereKeyword": undefined,
@@ -615,8 +618,9 @@ describe('SqlQuery', () => {
                           "innerSpacing": Object {
                             "postArguments": "",
                             "postLeftParen": "",
-                            "postName": "",
+                            "preLeftParen": "",
                           },
+                          "special": undefined,
                           "type": "function",
                           "whereExpression": undefined,
                           "whereKeyword": undefined,
@@ -679,8 +683,9 @@ describe('SqlQuery', () => {
                   "innerSpacing": Object {
                     "postArguments": "",
                     "postLeftParen": "",
-                    "postName": "",
+                    "preLeftParen": "",
                   },
+                  "special": undefined,
                   "type": "function",
                   "whereExpression": undefined,
                   "whereKeyword": undefined,
@@ -742,8 +747,9 @@ describe('SqlQuery', () => {
                           "innerSpacing": Object {
                             "postArguments": "",
                             "postLeftParen": "",
-                            "postName": "",
+                            "preLeftParen": "",
                           },
+                          "special": undefined,
                           "type": "function",
                           "whereExpression": undefined,
                           "whereKeyword": undefined,
@@ -804,8 +810,9 @@ describe('SqlQuery', () => {
                 "innerSpacing": Object {
                   "postArguments": "",
                   "postLeftParen": "",
-                  "postName": "",
+                  "preLeftParen": "",
                 },
+                "special": undefined,
                 "type": "function",
                 "whereExpression": undefined,
                 "whereKeyword": undefined,
@@ -959,8 +966,9 @@ describe('SqlQuery', () => {
                 "innerSpacing": Object {
                   "postArguments": "",
                   "postLeftParen": "",
-                  "postName": "",
+                  "preLeftParen": "",
                 },
+                "special": undefined,
                 "type": "function",
                 "whereExpression": undefined,
                 "whereKeyword": undefined,
@@ -1005,8 +1013,9 @@ describe('SqlQuery', () => {
                 "innerSpacing": Object {
                   "postArguments": "",
                   "postLeftParen": "",
-                  "postName": "",
+                  "preLeftParen": "",
                 },
+                "special": undefined,
                 "type": "function",
                 "whereExpression": undefined,
                 "whereKeyword": undefined,
@@ -4469,8 +4478,9 @@ describe('No spacing', () => {
                 "innerSpacing": Object {
                   "postArguments": "",
                   "postLeftParen": "",
-                  "postName": "",
+                  "preLeftParen": "",
                 },
+                "special": undefined,
                 "type": "function",
                 "whereExpression": undefined,
                 "whereKeyword": undefined,
@@ -4516,8 +4526,9 @@ describe('No spacing', () => {
                   "postArguments": "",
                   "postDecorator": "",
                   "postLeftParen": "",
-                  "postName": "",
+                  "preLeftParen": "",
                 },
+                "special": undefined,
                 "type": "function",
                 "whereExpression": undefined,
                 "whereKeyword": undefined,
@@ -4556,6 +4567,345 @@ describe('No spacing', () => {
         "unionQuery": undefined,
         "whereExpression": undefined,
         "whereKeyword": undefined,
+        "withKeyword": undefined,
+        "withParts": undefined,
+      }
+    `);
+  });
+});
+
+describe('Extra', () => {
+  it('CURRENT_TIMESTAMP and Dynamic', () => {
+    const sql = sane`
+      SELECT
+        CAST("channel" AS VARCHAR) AS "channel",
+        COUNT(*) AS "Count"
+      FROM "wikipedia"
+      WHERE "__time" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY AND cityName = ?
+      GROUP BY 1
+      ORDER BY "Count" DESC
+    `;
+
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
+      SqlQuery {
+        "explainKeyword": undefined,
+        "fromKeyword": "FROM",
+        "groupByExpressions": SeparatedArray {
+          "separators": Array [],
+          "values": Array [
+            SqlLiteral {
+              "innerSpacing": Object {},
+              "keyword": undefined,
+              "stringValue": "1",
+              "type": "literal",
+              "value": 1,
+            },
+          ],
+        },
+        "groupByKeyword": "GROUP BY",
+        "havingExpression": undefined,
+        "havingKeyword": undefined,
+        "innerSpacing": Object {
+          "postFrom": " ",
+          "postGroupByKeyword": " ",
+          "postOrderByKeyword": " ",
+          "postQuery": "",
+          "postSelect": "
+        ",
+          "postSelectDecorator": "",
+          "postWhereKeyword": " ",
+          "preFrom": "
+      ",
+          "preGroupByKeyword": "
+      ",
+          "preOrderByKeyword": "
+      ",
+          "preQuery": "",
+          "preWhereKeyword": "
+      ",
+        },
+        "joinKeyword": undefined,
+        "joinTable": undefined,
+        "joinType": undefined,
+        "limitKeyword": undefined,
+        "limitValue": undefined,
+        "onExpression": undefined,
+        "onKeyword": undefined,
+        "orderByKeyword": "ORDER BY",
+        "orderByParts": SeparatedArray {
+          "separators": Array [],
+          "values": Array [
+            SqlOrderByPart {
+              "direction": "DESC",
+              "expression": SqlRef {
+                "column": "Count",
+                "innerSpacing": Object {},
+                "namespace": undefined,
+                "namespaceQuotes": undefined,
+                "quotes": "\\"",
+                "table": undefined,
+                "tableQuotes": undefined,
+                "type": "ref",
+              },
+              "innerSpacing": Object {
+                "preDirection": " ",
+              },
+              "type": "orderByPart",
+            },
+          ],
+        },
+        "selectDecorator": "",
+        "selectKeyword": "SELECT",
+        "selectValues": SeparatedArray {
+          "separators": Array [
+            Separator {
+              "left": "",
+              "right": "
+        ",
+              "separator": ",",
+            },
+          ],
+          "values": Array [
+            SqlAlias {
+              "alias": SqlRef {
+                "column": "channel",
+                "innerSpacing": Object {},
+                "namespace": undefined,
+                "namespaceQuotes": undefined,
+                "quotes": "\\"",
+                "table": undefined,
+                "tableQuotes": undefined,
+                "type": "ref",
+              },
+              "asKeyword": "AS",
+              "expression": SqlFunction {
+                "arguments": SeparatedArray {
+                  "separators": Array [
+                    Separator {
+                      "left": " ",
+                      "right": " ",
+                      "separator": "AS",
+                    },
+                  ],
+                  "values": Array [
+                    SqlRef {
+                      "column": "channel",
+                      "innerSpacing": Object {},
+                      "namespace": undefined,
+                      "namespaceQuotes": undefined,
+                      "quotes": "\\"",
+                      "table": undefined,
+                      "tableQuotes": undefined,
+                      "type": "ref",
+                    },
+                    SqlLiteral {
+                      "innerSpacing": Object {},
+                      "keyword": undefined,
+                      "stringValue": "VARCHAR",
+                      "type": "literal",
+                      "value": "VARCHAR",
+                    },
+                  ],
+                },
+                "decorator": undefined,
+                "filterKeyword": undefined,
+                "functionName": "CAST",
+                "innerSpacing": Object {
+                  "postArguments": "",
+                  "postLeftParen": "",
+                  "preLeftParen": "",
+                },
+                "special": undefined,
+                "type": "function",
+                "whereExpression": undefined,
+                "whereKeyword": undefined,
+              },
+              "innerSpacing": Object {
+                "preAlias": " ",
+                "preAs": " ",
+              },
+              "type": "alias",
+            },
+            SqlAlias {
+              "alias": SqlRef {
+                "column": "Count",
+                "innerSpacing": Object {},
+                "namespace": undefined,
+                "namespaceQuotes": undefined,
+                "quotes": "\\"",
+                "table": undefined,
+                "tableQuotes": undefined,
+                "type": "ref",
+              },
+              "asKeyword": "AS",
+              "expression": SqlFunction {
+                "arguments": SeparatedArray {
+                  "separators": Array [],
+                  "values": Array [
+                    SqlRef {
+                      "column": "*",
+                      "innerSpacing": Object {},
+                      "namespace": undefined,
+                      "namespaceQuotes": undefined,
+                      "quotes": "",
+                      "table": undefined,
+                      "tableQuotes": undefined,
+                      "type": "ref",
+                    },
+                  ],
+                },
+                "decorator": undefined,
+                "filterKeyword": undefined,
+                "functionName": "COUNT",
+                "innerSpacing": Object {
+                  "postArguments": "",
+                  "postLeftParen": "",
+                  "preLeftParen": "",
+                },
+                "special": undefined,
+                "type": "function",
+                "whereExpression": undefined,
+                "whereKeyword": undefined,
+              },
+              "innerSpacing": Object {
+                "preAlias": " ",
+                "preAs": " ",
+              },
+              "type": "alias",
+            },
+          ],
+        },
+        "tables": SeparatedArray {
+          "separators": Array [],
+          "values": Array [
+            SqlAlias {
+              "alias": undefined,
+              "asKeyword": undefined,
+              "expression": SqlRef {
+                "column": undefined,
+                "innerSpacing": Object {},
+                "namespace": undefined,
+                "namespaceQuotes": undefined,
+                "quotes": undefined,
+                "table": "wikipedia",
+                "tableQuotes": "\\"",
+                "type": "ref",
+              },
+              "innerSpacing": Object {},
+              "type": "alias",
+            },
+          ],
+        },
+        "type": "query",
+        "unionKeyword": undefined,
+        "unionQuery": undefined,
+        "whereExpression": SqlMulti {
+          "arguments": SeparatedArray {
+            "separators": Array [
+              Separator {
+                "left": " ",
+                "right": " ",
+                "separator": "AND",
+              },
+            ],
+            "values": Array [
+              SqlComparison {
+                "innerSpacing": Object {
+                  "postOp": " ",
+                  "preOp": " ",
+                },
+                "lhs": SqlRef {
+                  "column": "__time",
+                  "innerSpacing": Object {},
+                  "namespace": undefined,
+                  "namespaceQuotes": undefined,
+                  "quotes": "\\"",
+                  "table": undefined,
+                  "tableQuotes": undefined,
+                  "type": "ref",
+                },
+                "notKeyword": undefined,
+                "op": ">=",
+                "rhs": SqlMulti {
+                  "arguments": SeparatedArray {
+                    "separators": Array [
+                      Separator {
+                        "left": " ",
+                        "right": " ",
+                        "separator": "-",
+                      },
+                    ],
+                    "values": Array [
+                      SqlFunction {
+                        "arguments": undefined,
+                        "decorator": undefined,
+                        "filterKeyword": undefined,
+                        "functionName": "CURRENT_TIMESTAMP",
+                        "innerSpacing": Object {},
+                        "special": true,
+                        "type": "function",
+                        "whereExpression": undefined,
+                        "whereKeyword": undefined,
+                      },
+                      SqlInterval {
+                        "innerSpacing": Object {
+                          "postIntervalKeyword": " ",
+                          "postIntervalValue": " ",
+                        },
+                        "intervalKeyword": "INTERVAL",
+                        "intervalValue": SqlLiteral {
+                          "innerSpacing": Object {},
+                          "keyword": undefined,
+                          "stringValue": "'1'",
+                          "type": "literal",
+                          "value": "1",
+                        },
+                        "type": "interval",
+                        "unitKeyword": "DAY",
+                      },
+                    ],
+                  },
+                  "expressionType": "Additive",
+                  "innerSpacing": Object {},
+                  "type": "multi",
+                },
+                "type": "comparision",
+              },
+              SqlComparison {
+                "innerSpacing": Object {
+                  "postOp": " ",
+                  "preOp": " ",
+                },
+                "lhs": SqlRef {
+                  "column": "cityName",
+                  "innerSpacing": Object {},
+                  "namespace": undefined,
+                  "namespaceQuotes": undefined,
+                  "quotes": "",
+                  "table": undefined,
+                  "tableQuotes": undefined,
+                  "type": "ref",
+                },
+                "notKeyword": undefined,
+                "op": "=",
+                "rhs": SqlLiteral {
+                  "innerSpacing": Object {},
+                  "keyword": undefined,
+                  "stringValue": "?",
+                  "type": "literal",
+                  "value": "?",
+                },
+                "type": "comparision",
+              },
+            ],
+          },
+          "expressionType": "AND",
+          "innerSpacing": Object {},
+          "type": "multi",
+        },
+        "whereKeyword": "WHERE",
         "withKeyword": undefined,
         "withParts": undefined,
       }

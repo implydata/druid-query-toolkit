@@ -16,6 +16,29 @@ import { parseSql } from '../../..';
 import { backAndForth } from '../../../test-utils';
 
 describe('SqlFunction', () => {
+  it('Function without args', () => {
+    const sql = `FN()`;
+
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
+      SqlFunction {
+        "arguments": undefined,
+        "decorator": undefined,
+        "filterKeyword": undefined,
+        "functionName": "FN",
+        "innerSpacing": Object {
+          "postLeftParen": "",
+          "preLeftParen": "",
+        },
+        "special": undefined,
+        "type": "function",
+        "whereExpression": undefined,
+        "whereKeyword": undefined,
+      }
+    `);
+  });
+
   it('Simple function', () => {
     const sql = `SUM(A)`;
 
@@ -44,8 +67,9 @@ describe('SqlFunction', () => {
         "innerSpacing": Object {
           "postArguments": "",
           "postLeftParen": "",
-          "postName": "",
+          "preLeftParen": "",
         },
+        "special": undefined,
         "type": "function",
         "whereExpression": undefined,
         "whereKeyword": undefined,
@@ -81,7 +105,7 @@ describe('SqlFunction', () => {
         "innerSpacing": Object {
           "postArguments": "",
           "postLeftParen": "",
-          "postName": "",
+          "preLeftParen": "",
         },
         "parens": Array [
           Object {
@@ -89,6 +113,7 @@ describe('SqlFunction', () => {
             "rightSpacing": "",
           },
         ],
+        "special": undefined,
         "type": "function",
         "whereExpression": undefined,
         "whereKeyword": undefined,
@@ -190,8 +215,9 @@ describe('SqlFunction', () => {
         "innerSpacing": Object {
           "postArguments": "",
           "postLeftParen": " ",
-          "postName": "",
+          "preLeftParen": "",
         },
+        "special": undefined,
         "type": "function",
         "whereExpression": undefined,
         "whereKeyword": undefined,
@@ -227,8 +253,9 @@ describe('SqlFunction', () => {
         "innerSpacing": Object {
           "postArguments": "      ",
           "postLeftParen": " ",
-          "postName": "",
+          "preLeftParen": "",
         },
+        "special": undefined,
         "type": "function",
         "whereExpression": undefined,
         "whereKeyword": undefined,
@@ -274,8 +301,9 @@ describe('SqlFunction', () => {
               "innerSpacing": Object {
                 "postArguments": "",
                 "postLeftParen": "",
-                "postName": "",
+                "preLeftParen": "",
               },
+              "special": undefined,
               "type": "function",
               "whereExpression": undefined,
               "whereKeyword": undefined,
@@ -312,8 +340,9 @@ describe('SqlFunction', () => {
                     "innerSpacing": Object {
                       "postArguments": "",
                       "postLeftParen": "",
-                      "postName": "",
+                      "preLeftParen": "",
                     },
+                    "special": undefined,
                     "type": "function",
                     "whereExpression": undefined,
                     "whereKeyword": undefined,
@@ -350,8 +379,9 @@ describe('SqlFunction', () => {
                           "innerSpacing": Object {
                             "postArguments": "",
                             "postLeftParen": "",
-                            "postName": "",
+                            "preLeftParen": "",
                           },
+                          "special": undefined,
                           "type": "function",
                           "whereExpression": undefined,
                           "whereKeyword": undefined,
@@ -414,11 +444,12 @@ describe('SqlFunction', () => {
           "postFilterKeyword": " ",
           "postFilterLeftParen": "",
           "postLeftParen": "",
-          "postName": "",
           "postWhereKeyword": " ",
           "preFilter": " ",
           "preFilterRightParen": "",
+          "preLeftParen": "",
         },
+        "special": undefined,
         "type": "function",
         "whereExpression": SqlComparison {
           "innerSpacing": Object {

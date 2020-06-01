@@ -25,7 +25,7 @@ async function main() {
 
   const allData = calciteRef.data + sqlRef.data;
 
-  const possibleKeywords = [...new Set(allData.match(/\b[A-Z]+\b/g)).values()].sort();
+  const possibleKeywords = [...new Set(allData.match(/\b[A-Z_]+\b/g)).values()].sort();
   console.log(`Got ${possibleKeywords.length} possible keywords`);
 
   let reservedKeywords = [];

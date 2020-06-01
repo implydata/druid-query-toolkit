@@ -22,6 +22,7 @@ import { SqlExpression } from '../sql-expression';
 
 export interface SqlFunctionValue extends SqlBaseValue {
   functionName: string;
+  special?: boolean;
   arguments?: SeparatedArray<SqlExpression>;
   decorator?: string;
   filterKeyword?: string;
@@ -49,6 +50,7 @@ export class SqlFunction extends SqlExpression {
   }
 
   public readonly functionName: string;
+  public readonly special?: boolean;
   public readonly arguments?: SeparatedArray<SqlExpression>;
   public readonly decorator?: string;
   public readonly filterKeyword?: string;
@@ -58,6 +60,7 @@ export class SqlFunction extends SqlExpression {
   constructor(options: SqlFunctionValue) {
     super(options, SqlFunction.type);
     this.functionName = options.functionName;
+    this.special = options.special;
     this.decorator = options.decorator;
     this.arguments = options.arguments;
     this.filterKeyword = options.filterKeyword;
@@ -68,6 +71,7 @@ export class SqlFunction extends SqlExpression {
   public valueOf(): SqlFunctionValue {
     const value = super.valueOf() as SqlFunctionValue;
     value.functionName = this.functionName;
+    value.special = this.special;
     value.decorator = this.decorator;
     value.arguments = this.arguments;
     value.filterKeyword = this.filterKeyword;
@@ -77,34 +81,37 @@ export class SqlFunction extends SqlExpression {
   }
 
   public toRawString(): string {
-    const rawParts: string[] = [
-      this.functionName,
-      this.getInnerSpace('postName', ''),
-      '(',
-      this.getInnerSpace('postLeftParen', ''),
-    ];
+    const rawParts: string[] = [this.functionName];
 
-    if (this.decorator) {
-      rawParts.push(this.decorator, this.getInnerSpace('postDecorator'));
-    }
-    if (this.arguments) {
-      rawParts.push(this.arguments.toString(), this.getInnerSpace('postArguments', ''));
-    }
-    rawParts.push(')');
-
-    if (this.filterKeyword && this.whereKeyword && this.whereExpression) {
+    if (!this.special) {
       rawParts.push(
-        this.getInnerSpace('preFilter'),
-        this.filterKeyword,
-        this.getInnerSpace('postFilterKeyword'),
+        this.getInnerSpace('preLeftParen', ''),
         '(',
-        this.getInnerSpace('postFilterLeftParen', ''),
-        this.whereKeyword,
-        this.getInnerSpace('postWhereKeyword'),
-        this.whereExpression.toString(),
-        this.getInnerSpace('preFilterRightParen', ''),
-        ')',
+        this.getInnerSpace('postLeftParen', ''),
       );
+
+      if (this.decorator) {
+        rawParts.push(this.decorator, this.getInnerSpace('postDecorator'));
+      }
+      if (this.arguments) {
+        rawParts.push(this.arguments.toString(), this.getInnerSpace('postArguments', ''));
+      }
+      rawParts.push(')');
+
+      if (this.filterKeyword && this.whereKeyword && this.whereExpression) {
+        rawParts.push(
+          this.getInnerSpace('preFilter'),
+          this.filterKeyword,
+          this.getInnerSpace('postFilterKeyword'),
+          '(',
+          this.getInnerSpace('postFilterLeftParen', ''),
+          this.whereKeyword,
+          this.getInnerSpace('postWhereKeyword'),
+          this.whereExpression.toString(),
+          this.getInnerSpace('preFilterRightParen', ''),
+          ')',
+        );
+      }
     }
 
     return rawParts.join('');
@@ -113,6 +120,9 @@ export class SqlFunction extends SqlExpression {
   public walk(fn: (t: SqlBase) => void) {
     super.walk(fn);
     SqlBase.walkSeparatedArray(this.arguments, fn);
+    if (this.whereExpression) {
+      this.whereExpression.walk(fn);
+    }
   }
 }
 

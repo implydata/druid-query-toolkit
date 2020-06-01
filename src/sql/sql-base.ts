@@ -15,7 +15,8 @@
 import { SeparatedArray, SqlAlias, SqlRef } from '../index';
 import { dedupe, filterMap } from '../utils';
 
-import { RESERVED } from './reserved';
+import { RESERVED_KEYWORDS } from './reserved-keywords';
+import { SPECIAL_FUNCTIONS } from './special-functions';
 
 export interface Parens {
   leftSpacing: string;
@@ -28,16 +29,26 @@ export interface SqlBaseValue {
   parens?: Parens[];
 }
 
-const reservedLookup: Record<string, boolean> = {};
-for (const r of RESERVED) {
-  reservedLookup[r] = true;
+const reservedKeywordLookup: Record<string, boolean> = {};
+for (const r of RESERVED_KEYWORDS) {
+  reservedKeywordLookup[r] = true;
+}
+
+const specialFunctionLookup: Record<string, boolean> = {};
+for (const r of SPECIAL_FUNCTIONS) {
+  specialFunctionLookup[r] = true;
 }
 
 export abstract class SqlBase {
-  static RESERVED = RESERVED;
+  static RESERVED_KEYWORDS = RESERVED_KEYWORDS;
+  static SPECIAL_FUNCTIONS = SPECIAL_FUNCTIONS;
 
-  static isReserved(keyword: string) {
-    return Boolean(reservedLookup[keyword.toUpperCase()]);
+  static isReservedKeyword(keyword: string) {
+    return Boolean(reservedKeywordLookup[keyword.toUpperCase()]);
+  }
+
+  static isSpecialFunction(functionName: string) {
+    return Boolean(specialFunctionLookup[functionName.toUpperCase()]);
   }
 
   static cleanObject(obj: Record<string, any>): Record<string, string> {
@@ -149,6 +160,22 @@ export abstract class SqlBase {
 
   public walk(fn: (t: SqlBase) => void) {
     fn(this);
+  }
+
+  public some(fn: (t: SqlBase) => boolean) {
+    let some = false;
+    this.walk(b => {
+      some = some || fn(b);
+    });
+    return some;
+  }
+
+  public every(fn: (t: SqlBase) => boolean) {
+    let every = false;
+    this.walk(b => {
+      every = every && fn(b);
+    });
+    return every;
   }
 
   public getSqlRefs(): SqlRef[] {

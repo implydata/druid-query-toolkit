@@ -923,8 +923,9 @@ describe('Math expression', () => {
               "innerSpacing": Object {
                 "postArguments": "",
                 "postLeftParen": "",
-                "postName": "",
+                "preLeftParen": "",
               },
+              "special": undefined,
               "type": "function",
               "whereExpression": undefined,
               "whereKeyword": undefined,
@@ -968,8 +969,9 @@ describe('Math expression', () => {
                     "innerSpacing": Object {
                       "postArguments": "",
                       "postLeftParen": "",
-                      "postName": "",
+                      "preLeftParen": "",
                     },
+                    "special": undefined,
                     "type": "function",
                     "whereExpression": undefined,
                     "whereKeyword": undefined,
