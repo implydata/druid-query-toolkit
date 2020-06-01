@@ -23,7 +23,19 @@ async function main() {
   const calciteRef = await axios.get('https://calcite.apache.org/docs/reference.html');
   const sqlRef = await axios.get('https://raw.githubusercontent.com/apache/druid/master/docs/querying/sql.md');
 
-  const allData = calciteRef.data + sqlRef.data;
+  let errorMessage;
+  try {
+    await axios.post('http://localhost:8888/druid/v2/sql', {
+      "query": `SELECT CURRENT_ROW`
+    });
+  } catch (e) {
+    errorMessage = e.response.data.errorMessage;
+    if (!errorMessage.startsWith('Encountered')) {
+      throw new Error('unexpected response from error message');
+    }
+  }
+
+  const allData = calciteRef.data + sqlRef.data + errorMessage;
 
   const possibleKeywords = [...new Set(allData.match(/\b[A-Z_]+\b/g)).values()].sort();
   console.log(`Got ${possibleKeywords.length} possible keywords`);
