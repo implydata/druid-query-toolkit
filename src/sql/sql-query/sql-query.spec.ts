@@ -111,7 +111,7 @@ describe('SqlQuery', () => {
     it('does a replace with an if', () => {
       const sql = `SUM(t.added) / COUNT(DISTINCT t."user") + COUNT(*)`;
 
-      const test = parseSqlExpression(
+      const condition = parseSqlExpression(
         `__time BETWEEN TIMESTAMP '2020-01-01 01:00:00' AND TIMESTAMP '2020-01-01 02:00:00'`,
       );
       expect(
@@ -119,11 +119,11 @@ describe('SqlQuery', () => {
           parseSql(sql).walk(x => {
             if (x instanceof SqlRef) {
               if (x.column && x.table === 't') {
-                return SqlCaseSearched.ifFactory(test, x);
+                return SqlCaseSearched.ifFactory(condition, x);
               }
             }
             if (x instanceof SqlFunction && x.isCountStar()) {
-              return x.changeWhereExpression(test);
+              return x.changeWhereExpression(condition);
             }
             return x;
           }),

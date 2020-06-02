@@ -164,5 +164,9 @@ export class SqlRef extends SqlExpression {
     if (!name) throw new Error('SqlRef has no defined table or column');
     return name;
   }
+
+  public isStar(): boolean {
+    return this.column === '*';
+  }
 }
 SqlBase.register(SqlRef.type, SqlRef);

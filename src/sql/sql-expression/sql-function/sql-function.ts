@@ -17,10 +17,6 @@ import { SqlBase, SqlBaseValue, Substitutor } from '../../sql-base';
 import { SeparatedArray, Separator } from '../../utils';
 import { SqlExpression } from '../sql-expression';
 
-// innerSpacing:
-// Fn          (           A , B             ) FILTER ( WHERE X )
-//    preParen   leftParen       rightParen
-
 export interface SqlFunctionValue extends SqlBaseValue {
   functionName: string;
   special?: boolean;
@@ -174,7 +170,7 @@ export class SqlFunction extends SqlExpression {
     const args = this.arguments;
     if (!args || args.length() !== 1) return false;
     const firstArg = args.first();
-    return firstArg instanceof SqlRef && firstArg.column === '*';
+    return firstArg instanceof SqlRef && firstArg.isStar();
   }
 }
 
