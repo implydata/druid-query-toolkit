@@ -75,9 +75,12 @@ export class SqlAlias extends SqlBase {
     return rawParts.join('');
   }
 
-  public walk(fn: (t: SqlBase) => void) {
-    super.walk(fn);
-    this.expression.walk(fn);
+  public walkInner(
+    nextStack: SqlBase[],
+    fn: (t: SqlBase, stack: SqlBase[]) => void,
+    postorder: boolean,
+  ): void {
+    this.expression.walkHelper(nextStack, fn, postorder);
   }
 
   public upgrade() {

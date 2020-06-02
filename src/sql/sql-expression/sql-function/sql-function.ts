@@ -117,11 +117,14 @@ export class SqlFunction extends SqlExpression {
     return rawParts.join('');
   }
 
-  public walk(fn: (t: SqlBase) => void) {
-    super.walk(fn);
-    SqlBase.walkSeparatedArray(this.arguments, fn);
+  public walkInner(
+    nextStack: SqlBase[],
+    fn: (t: SqlBase, stack: SqlBase[]) => void,
+    postorder: boolean,
+  ): void {
+    SqlBase.walkSeparatedArray(this.arguments, nextStack, fn, postorder);
     if (this.whereExpression) {
-      this.whereExpression.walk(fn);
+      this.whereExpression.walkHelper(nextStack, fn, postorder);
     }
   }
 }

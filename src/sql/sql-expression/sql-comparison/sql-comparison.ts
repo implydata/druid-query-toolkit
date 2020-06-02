@@ -110,20 +110,22 @@ export class SqlComparison extends SqlExpression {
     return rawParts.join('');
   }
 
-  public walk(fn: (t: SqlBase) => void) {
-    super.walk(fn);
-    this.lhs.walk(fn);
-
+  public walkInner(
+    nextStack: SqlBase[],
+    fn: (t: SqlBase, stack: SqlBase[]) => void,
+    postorder: boolean,
+  ): void {
+    this.lhs.walkHelper(nextStack, fn, postorder);
     const { rhs } = this;
     if (rhs instanceof SqlBase) {
-      rhs.walk(fn);
+      rhs.walkHelper(nextStack, fn, postorder);
     } else {
       if ((rhs as any).start) {
-        (rhs as BetweenAndUnit).start.walk(fn);
-        (rhs as BetweenAndUnit).end.walk(fn);
+        (rhs as BetweenAndUnit).start.walkHelper(nextStack, fn, postorder);
+        (rhs as BetweenAndUnit).end.walkHelper(nextStack, fn, postorder);
       } else {
-        (rhs as LikeEscapeUnit).like.walk(fn);
-        (rhs as LikeEscapeUnit).escape.walk(fn);
+        (rhs as LikeEscapeUnit).like.walkHelper(nextStack, fn, postorder);
+        (rhs as LikeEscapeUnit).escape.walkHelper(nextStack, fn, postorder);
       }
     }
   }

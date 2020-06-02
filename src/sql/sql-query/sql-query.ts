@@ -279,30 +279,33 @@ export class SqlQuery extends SqlBase {
     return rawStringParts.join('');
   }
 
-  public walk(fn: (t: SqlBase) => void) {
-    super.walk(fn);
-    SqlBase.walkSeparatedArray(this.withParts, fn);
-    SqlBase.walkSeparatedArray(this.selectValues, fn);
-    SqlBase.walkSeparatedArray(this.tables, fn);
+  public walkInner(
+    nextStack: SqlBase[],
+    fn: (t: SqlBase, stack: SqlBase[]) => void,
+    postorder: boolean,
+  ): void {
+    SqlBase.walkSeparatedArray(this.withParts, nextStack, fn, postorder);
+    SqlBase.walkSeparatedArray(this.selectValues, nextStack, fn, postorder);
+    SqlBase.walkSeparatedArray(this.tables, nextStack, fn, postorder);
     if (this.joinTable) {
-      this.joinTable.walk(fn);
+      this.joinTable.walkHelper(nextStack, fn, postorder);
       if (this.onExpression) {
-        this.onExpression.walk(fn);
+        this.onExpression.walkHelper(nextStack, fn, postorder);
       }
     }
     if (this.whereExpression) {
-      this.whereExpression.walk(fn);
+      this.whereExpression.walkHelper(nextStack, fn, postorder);
     }
-    SqlBase.walkSeparatedArray(this.groupByExpressions, fn);
+    SqlBase.walkSeparatedArray(this.groupByExpressions, nextStack, fn, postorder);
     if (this.havingExpression) {
-      this.havingExpression.walk(fn);
+      this.havingExpression.walkHelper(nextStack, fn, postorder);
     }
-    SqlBase.walkSeparatedArray(this.orderByParts, fn);
+    SqlBase.walkSeparatedArray(this.orderByParts, nextStack, fn, postorder);
     if (this.limitValue) {
-      this.limitValue.walk(fn);
+      this.limitValue.walkHelper(nextStack, fn, postorder);
     }
     if (this.unionQuery) {
-      this.unionQuery.walk(fn);
+      this.unionQuery.walkHelper(nextStack, fn, postorder);
     }
   }
 

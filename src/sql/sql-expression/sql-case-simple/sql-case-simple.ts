@@ -82,12 +82,15 @@ export class SqlCaseSimple extends SqlExpression {
     return rawParts.join('');
   }
 
-  public walk(fn: (t: SqlBase) => void) {
-    super.walk(fn);
-    this.caseExpression.walk(fn);
-    SqlBase.walkSeparatedArray(this.whenThenParts, fn);
+  public walkInner(
+    nextStack: SqlBase[],
+    fn: (t: SqlBase, stack: SqlBase[]) => void,
+    postorder: boolean,
+  ): void {
+    this.caseExpression.walkHelper(nextStack, fn, postorder);
+    SqlBase.walkSeparatedArray(this.whenThenParts, nextStack, fn, postorder);
     if (this.elseExpression) {
-      this.elseExpression.walk(fn);
+      this.elseExpression.walkHelper(nextStack, fn, postorder);
     }
   }
 }

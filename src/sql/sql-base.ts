@@ -62,11 +62,13 @@ export abstract class SqlBase {
 
   static walkSeparatedArray(
     a: SeparatedArray<SqlBase> | undefined,
-    fn: (t: SqlBase) => void,
+    stack: SqlBase[],
+    fn: (t: SqlBase, stack: SqlBase[]) => void,
+    postorder: boolean,
   ): void {
     if (a) {
       a.values.forEach(v => {
-        v.walk(fn);
+        v.walkHelper(stack, fn, postorder);
       });
     }
   }
@@ -158,9 +160,29 @@ export abstract class SqlBase {
     return str;
   }
 
-  public walk(fn: (t: SqlBase) => void) {
-    fn(this);
+  public walk(fn: (t: SqlBase, stack: SqlBase[]) => void) {
+    this.walkHelper([], fn, false);
   }
+
+  public walkPostorder(fn: (t: SqlBase, stack: SqlBase[]) => void) {
+    this.walkHelper([], fn, true);
+  }
+
+  public walkHelper(
+    stack: SqlBase[],
+    fn: (t: SqlBase, stack: SqlBase[]) => void,
+    postorder: boolean,
+  ): void {
+    if (!postorder) fn(this, stack);
+    this.walkInner(stack.concat(this), fn, postorder);
+    if (postorder) fn(this, stack);
+  }
+
+  public walkInner(
+    _stack: SqlBase[],
+    _fn: (t: SqlBase, stack: SqlBase[]) => void,
+    _postorder: boolean,
+  ) {}
 
   public some(fn: (t: SqlBase) => boolean) {
     let some = false;

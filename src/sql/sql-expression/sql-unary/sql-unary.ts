@@ -54,9 +54,12 @@ export class SqlUnary extends SqlExpression {
     return this.keyword + this.getInnerSpace('postKeyword') + this.argument.toString();
   }
 
-  public walk(fn: (t: SqlBase) => void) {
-    super.walk(fn);
-    this.argument.walk(fn);
+  public walkInner(
+    nextStack: SqlBase[],
+    fn: (t: SqlBase, stack: SqlBase[]) => void,
+    postorder: boolean,
+  ): void {
+    this.argument.walkHelper(nextStack, fn, postorder);
   }
 
   public isType(type: string) {

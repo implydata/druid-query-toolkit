@@ -62,11 +62,14 @@ export class SqlWithPart extends SqlBase {
     return rawParts.join('');
   }
 
-  public walk(fn: (t: SqlBase) => void) {
-    super.walk(fn);
-    this.withTable.walk(fn);
-    SqlBase.walkSeparatedArray(this.withColumns, fn);
-    this.withQuery.walk(fn);
+  public walkInner(
+    nextStack: SqlBase[],
+    fn: (t: SqlBase, stack: SqlBase[]) => void,
+    postorder: boolean,
+  ): void {
+    this.withTable.walkHelper(nextStack, fn, postorder);
+    SqlBase.walkSeparatedArray(this.withColumns, nextStack, fn, postorder);
+    this.withQuery.walkHelper(nextStack, fn, postorder);
   }
 }
 

@@ -59,10 +59,13 @@ export class SqlWhenThenPart extends SqlBase {
     ].join('');
   }
 
-  public walk(fn: (t: SqlBase) => void) {
-    super.walk(fn);
-    this.whenExpression.walk(fn);
-    this.thenExpression.walk(fn);
+  public walkInner(
+    nextStack: SqlBase[],
+    fn: (t: SqlBase, stack: SqlBase[]) => void,
+    postorder: boolean,
+  ): void {
+    this.whenExpression.walkHelper(nextStack, fn, postorder);
+    this.thenExpression.walkHelper(nextStack, fn, postorder);
   }
 }
 
