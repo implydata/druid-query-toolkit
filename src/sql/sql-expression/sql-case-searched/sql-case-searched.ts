@@ -13,7 +13,7 @@
  */
 
 import { SqlWhenThenPart } from '..';
-import { SqlBase, SqlBaseValue } from '../../sql-base';
+import { SqlBase, SqlBaseValue, Substitutor } from '../../sql-base';
 import { SeparatedArray } from '../../utils';
 import { SqlExpression } from '../sql-expression';
 
@@ -75,15 +75,40 @@ export class SqlCaseSearched extends SqlExpression {
     return rawParts.join('');
   }
 
+  public changeWhenThenParts(whenThenParts: SeparatedArray<SqlWhenThenPart>): this {
+    const value = this.valueOf();
+    value.whenThenParts = whenThenParts;
+    return SqlBase.fromValue(value);
+  }
+
+  public changeElseExpression(elseExpression: SqlExpression): this {
+    const value = this.valueOf();
+    value.elseExpression = elseExpression;
+    return SqlBase.fromValue(value);
+  }
+
   public walkInner(
     nextStack: SqlBase[],
-    fn: (t: SqlBase, stack: SqlBase[]) => void,
+    fn: Substitutor,
     postorder: boolean,
-  ): void {
-    SqlBase.walkSeparatedArray(this.whenThenParts, nextStack, fn, postorder);
-    if (this.elseExpression) {
-      this.elseExpression.walkHelper(nextStack, fn, postorder);
+  ): SqlExpression | undefined {
+    let ret = this;
+
+    const whenThenParts = SqlBase.walkSeparatedArray(this.whenThenParts, nextStack, fn, postorder);
+    if (!whenThenParts) return;
+    if (whenThenParts !== this.whenThenParts) {
+      ret = ret.changeWhenThenParts(whenThenParts);
     }
+
+    if (this.elseExpression) {
+      const elseExpression = this.elseExpression.walkHelper(nextStack, fn, postorder);
+      if (!elseExpression) return;
+      if (elseExpression !== this.elseExpression) {
+        ret = ret.changeElseExpression(elseExpression);
+      }
+    }
+
+    return ret;
   }
 }
 

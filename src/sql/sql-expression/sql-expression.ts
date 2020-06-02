@@ -12,9 +12,32 @@
  * limitations under the License.
  */
 
-import { SqlBase } from '../sql-base';
+import { SqlBase, Substitutor } from '../sql-base';
 
 export abstract class SqlExpression extends SqlBase {
+  public walkHelper(
+    stack: SqlBase[],
+    fn: Substitutor,
+    postorder: boolean,
+  ): SqlExpression | undefined {
+    const ret = super.walkHelper(stack, fn, postorder);
+    if (!ret) return;
+    if (ret === this) return this;
+    if (ret instanceof SqlExpression) {
+      return ret;
+    } else {
+      throw new Error('must return a sql expression');
+    }
+  }
+
+  public walkInner(
+    _nextStack: SqlBase[],
+    _fn: Substitutor,
+    _postorder: boolean,
+  ): SqlExpression | undefined {
+    return this;
+  }
+
   public removeColumnFromAnd(column: string): SqlExpression | undefined {
     if (this.containsColumn(column)) return;
     return this;

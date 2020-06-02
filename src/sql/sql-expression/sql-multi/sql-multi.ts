@@ -13,7 +13,7 @@
  */
 
 import { SqlUnary } from '..';
-import { SqlBase, SqlBaseValue } from '../../sql-base';
+import { SqlBase, SqlBaseValue, Substitutor } from '../../sql-base';
 import { SeparatedArray, Separator } from '../../utils';
 import { SqlExpression } from '../sql-expression';
 
@@ -56,16 +56,26 @@ export class SqlMulti extends SqlExpression {
     return this.arguments.toString();
   }
 
-  public walkInner(
-    nextStack: SqlBase[],
-    fn: (t: SqlBase, stack: SqlBase[]) => void,
-    postorder: boolean,
-  ): void {
-    SqlBase.walkSeparatedArray(this.arguments, nextStack, fn, postorder);
+  public changeArguments(args: SeparatedArray<SqlExpression>): this {
+    const value = this.valueOf();
+    value.arguments = args;
+    return SqlBase.fromValue(value);
   }
 
-  public isType(type: string) {
-    return type === this.expressionType;
+  public walkInner(
+    nextStack: SqlBase[],
+    fn: Substitutor,
+    postorder: boolean,
+  ): SqlExpression | undefined {
+    let ret = this;
+
+    const args = SqlBase.walkSeparatedArray(this.arguments, nextStack, fn, postorder);
+    if (!args) return;
+    if (args !== this.arguments) {
+      ret = ret.changeArguments(args);
+    }
+
+    return ret;
   }
 
   public removeColumnFromAnd(column: string): SqlExpression | undefined {

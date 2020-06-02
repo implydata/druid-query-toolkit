@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlBaseValue } from '../../sql-base';
+import { SqlBase, SqlBaseValue, Substitutor } from '../../sql-base';
 import { SeparatedArray, Separator } from '../../utils';
 import { SqlExpression } from '../sql-expression';
 
@@ -117,15 +117,42 @@ export class SqlFunction extends SqlExpression {
     return rawParts.join('');
   }
 
+  public changeArguments(args: SeparatedArray<SqlExpression>): this {
+    const value = this.valueOf();
+    value.arguments = args;
+    return SqlBase.fromValue(value);
+  }
+
+  public changeWhereExpression(whereExpression: SqlExpression): this {
+    const value = this.valueOf();
+    value.whereExpression = whereExpression;
+    return SqlBase.fromValue(value);
+  }
+
   public walkInner(
     nextStack: SqlBase[],
-    fn: (t: SqlBase, stack: SqlBase[]) => void,
+    fn: Substitutor,
     postorder: boolean,
-  ): void {
-    SqlBase.walkSeparatedArray(this.arguments, nextStack, fn, postorder);
-    if (this.whereExpression) {
-      this.whereExpression.walkHelper(nextStack, fn, postorder);
+  ): SqlExpression | undefined {
+    let ret = this;
+
+    if (this.arguments) {
+      const args = SqlBase.walkSeparatedArray(this.arguments, nextStack, fn, postorder);
+      if (!args) return;
+      if (args !== this.arguments) {
+        ret = ret.changeArguments(args);
+      }
     }
+
+    if (this.whereExpression) {
+      const whereExpression = this.whereExpression.walkHelper(nextStack, fn, postorder);
+      if (!whereExpression) return;
+      if (whereExpression !== this.whereExpression) {
+        ret = ret.changeWhereExpression(whereExpression);
+      }
+    }
+
+    return ret;
   }
 }
 

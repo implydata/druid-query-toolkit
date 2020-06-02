@@ -54,9 +54,6 @@ describe('Case expression', () => {
                 "postWhen": " ",
                 "postWhenExpression": " ",
               },
-              "postThenSpace": undefined,
-              "postWhenExpressionSpace": undefined,
-              "postWhenSpace": undefined,
               "thenExpression": SqlRef {
                 "column": "C",
                 "innerSpacing": Object {},
@@ -134,9 +131,6 @@ describe('Case expression', () => {
                 "postWhen": " ",
                 "postWhenExpression": " ",
               },
-              "postThenSpace": undefined,
-              "postWhenExpressionSpace": undefined,
-              "postWhenSpace": undefined,
               "thenExpression": SqlRef {
                 "column": "C",
                 "innerSpacing": Object {},
@@ -205,9 +199,6 @@ describe('Case expression', () => {
                 "postWhen": "     ",
                 "postWhenExpression": " ",
               },
-              "postThenSpace": undefined,
-              "postWhenExpressionSpace": undefined,
-              "postWhenSpace": undefined,
               "thenExpression": SqlRef {
                 "column": "C",
                 "innerSpacing": Object {},
@@ -282,9 +273,6 @@ describe('Case expression', () => {
                 "postWhen": " ",
                 "postWhenExpression": " ",
               },
-              "postThenSpace": undefined,
-              "postWhenExpressionSpace": undefined,
-              "postWhenSpace": undefined,
               "thenExpression": SqlRef {
                 "column": "C",
                 "innerSpacing": Object {},
@@ -359,9 +347,6 @@ describe('Case expression', () => {
                 "postWhen": "   ",
                 "postWhenExpression": " ",
               },
-              "postThenSpace": undefined,
-              "postWhenExpressionSpace": undefined,
-              "postWhenSpace": undefined,
               "thenExpression": SqlRef {
                 "column": "C",
                 "innerSpacing": Object {},
@@ -436,9 +421,6 @@ describe('Case expression', () => {
                 "postWhen": "  ",
                 "postWhenExpression": " ",
               },
-              "postThenSpace": undefined,
-              "postWhenExpressionSpace": undefined,
-              "postWhenSpace": undefined,
               "thenExpression": SqlMulti {
                 "arguments": SeparatedArray {
                   "separators": Array [

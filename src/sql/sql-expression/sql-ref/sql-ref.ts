@@ -90,6 +90,7 @@ export class SqlRef extends SqlExpression {
     value.namespaceQuotes = this.namespaceQuotes;
     return value as SqlRefValue;
   }
+
   public assemblePart(
     main?: string,
     quotes?: string,
@@ -101,6 +102,7 @@ export class SqlRef extends SqlExpression {
       '',
     );
   }
+
   public toRawString(): string {
     return [
       this.assemblePart(
@@ -119,6 +121,12 @@ export class SqlRef extends SqlExpression {
       ),
       SqlRef.wrapInQuotes(this.column || '', this.quotes || ''),
     ].join('');
+  }
+
+  public changeColumn(column: string): SqlRef {
+    const value = this.valueOf();
+    value.column = column;
+    return SqlBase.fromValue(value);
   }
 
   public upgrade() {

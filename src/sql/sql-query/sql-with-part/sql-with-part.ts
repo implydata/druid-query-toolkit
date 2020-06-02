@@ -12,14 +12,14 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlBaseValue } from '../../sql-base';
-import { SqlExpression } from '../../sql-expression';
+import { SqlBase, SqlBaseValue, Substitutor } from '../../sql-base';
+import { SqlExpression, SqlRef } from '../../sql-expression';
 import { SeparatedArray } from '../../utils';
 import { SqlQuery } from '../sql-query';
 
 export interface SqlWithPartValue extends SqlBaseValue {
   withTable: SqlExpression;
-  withColumns?: SeparatedArray<SqlBase>;
+  withColumns?: SeparatedArray<SqlRef>;
   postWithColumns: string;
   asKeyword: string;
   withQuery: SqlQuery;
@@ -29,7 +29,7 @@ export class SqlWithPart extends SqlBase {
   static type = 'withPart';
 
   public readonly withTable: SqlExpression;
-  public readonly withColumns?: SeparatedArray<SqlBase>;
+  public readonly withColumns?: SeparatedArray<SqlRef>;
   public readonly postWithColumns: string;
   public readonly asKeyword: string;
   public readonly withQuery: SqlQuery;
@@ -41,6 +41,16 @@ export class SqlWithPart extends SqlBase {
     this.postWithColumns = options.postWithColumns;
     this.asKeyword = options.asKeyword;
     this.withQuery = options.withQuery;
+  }
+
+  public valueOf(): SqlWithPartValue {
+    const value = super.valueOf() as SqlWithPartValue;
+    value.withTable = this.withTable;
+    value.withColumns = this.withColumns;
+    value.postWithColumns = this.postWithColumns;
+    value.asKeyword = this.asKeyword;
+    value.withQuery = this.withQuery;
+    return value;
   }
 
   public toRawString(): string {
@@ -62,14 +72,48 @@ export class SqlWithPart extends SqlBase {
     return rawParts.join('');
   }
 
-  public walkInner(
-    nextStack: SqlBase[],
-    fn: (t: SqlBase, stack: SqlBase[]) => void,
-    postorder: boolean,
-  ): void {
-    this.withTable.walkHelper(nextStack, fn, postorder);
-    SqlBase.walkSeparatedArray(this.withColumns, nextStack, fn, postorder);
-    this.withQuery.walkHelper(nextStack, fn, postorder);
+  public changeWithTable(withTable: SqlExpression): this {
+    const value = this.valueOf();
+    value.withTable = withTable;
+    return SqlBase.fromValue(value);
+  }
+
+  public changeWithColumns(withColumns: SeparatedArray<SqlRef>): this {
+    const value = this.valueOf();
+    value.withColumns = withColumns;
+    return SqlBase.fromValue(value);
+  }
+
+  public changeWithQuery(withQuery: SqlQuery): this {
+    const value = this.valueOf();
+    value.withQuery = withQuery;
+    return SqlBase.fromValue(value);
+  }
+
+  public walkInner(nextStack: SqlBase[], fn: Substitutor, postorder: boolean): SqlBase | undefined {
+    let ret = this;
+
+    const withTable = this.withTable.walkHelper(nextStack, fn, postorder);
+    if (!withTable) return;
+    if (withTable !== this.withTable) {
+      ret = ret.changeWithTable(withTable);
+    }
+
+    if (this.withColumns) {
+      const withColumns = SqlBase.walkSeparatedArray(this.withColumns, nextStack, fn, postorder);
+      if (!withColumns) return;
+      if (withColumns !== this.withColumns) {
+        ret = ret.changeWithColumns(withColumns);
+      }
+    }
+
+    const withQuery = this.withQuery.walkHelper(nextStack, fn, postorder);
+    if (!withQuery) return;
+    if (withQuery !== this.withQuery) {
+      ret = ret.changeWithQuery(withQuery as SqlQuery);
+    }
+
+    return ret;
   }
 }
 

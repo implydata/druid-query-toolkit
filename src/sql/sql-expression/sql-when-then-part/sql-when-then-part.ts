@@ -12,16 +12,13 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlBaseValue } from '../../sql-base';
+import { SqlBase, SqlBaseValue, Substitutor } from '../../sql-base';
 import { SqlExpression } from '../sql-expression';
 
 export interface SqlWhenThenPartValue extends SqlBaseValue {
   whenKeyword: string;
-  postWhenSpace: string;
   whenExpression: SqlExpression;
-  postWhenExpressionSpace: string;
   thenKeyword: string;
-  postThenSpace: string;
   thenExpression: SqlExpression;
 }
 
@@ -29,22 +26,25 @@ export class SqlWhenThenPart extends SqlBase {
   static type = 'whenThenPart';
 
   public readonly whenKeyword: string;
-  public readonly postWhenSpace: string;
   public readonly whenExpression: SqlExpression;
-  public readonly postWhenExpressionSpace: string;
   public readonly thenKeyword: string;
-  public readonly postThenSpace: string;
   public readonly thenExpression: SqlExpression;
 
   constructor(options: SqlWhenThenPartValue) {
     super(options, SqlWhenThenPart.type);
     this.whenKeyword = options.whenKeyword;
-    this.postWhenSpace = options.postWhenSpace;
     this.whenExpression = options.whenExpression;
-    this.postWhenExpressionSpace = options.postWhenExpressionSpace;
     this.thenKeyword = options.thenKeyword;
-    this.postThenSpace = options.postThenSpace;
     this.thenExpression = options.thenExpression;
+  }
+
+  public valueOf(): SqlWhenThenPartValue {
+    const value = super.valueOf() as SqlWhenThenPartValue;
+    value.whenKeyword = this.whenKeyword;
+    value.whenExpression = this.whenExpression;
+    value.thenKeyword = this.thenKeyword;
+    value.thenExpression = this.thenExpression;
+    return value;
   }
 
   public toRawString(): string {
@@ -59,13 +59,34 @@ export class SqlWhenThenPart extends SqlBase {
     ].join('');
   }
 
-  public walkInner(
-    nextStack: SqlBase[],
-    fn: (t: SqlBase, stack: SqlBase[]) => void,
-    postorder: boolean,
-  ): void {
-    this.whenExpression.walkHelper(nextStack, fn, postorder);
-    this.thenExpression.walkHelper(nextStack, fn, postorder);
+  public changeWhenExpression(whenExpression: SqlExpression): this {
+    const value = this.valueOf();
+    value.whenExpression = whenExpression;
+    return SqlBase.fromValue(value);
+  }
+
+  public changeThenExpression(thenExpression: SqlExpression): this {
+    const value = this.valueOf();
+    value.thenExpression = thenExpression;
+    return SqlBase.fromValue(value);
+  }
+
+  public walkInner(nextStack: SqlBase[], fn: Substitutor, postorder: boolean): SqlBase | undefined {
+    let ret = this;
+
+    const whenExpression = this.whenExpression.walkHelper(nextStack, fn, postorder);
+    if (!whenExpression) return;
+    if (whenExpression !== this.whenExpression) {
+      ret = ret.changeWhenExpression(whenExpression);
+    }
+
+    const thenExpression = this.thenExpression.walkHelper(nextStack, fn, postorder);
+    if (!thenExpression) return;
+    if (thenExpression !== this.thenExpression) {
+      ret = ret.changeThenExpression(thenExpression);
+    }
+
+    return ret;
   }
 }
 

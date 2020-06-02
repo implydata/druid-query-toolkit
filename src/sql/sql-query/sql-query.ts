@@ -21,6 +21,7 @@ import {
   SqlExpression,
   SqlLiteral,
   SqlRef,
+  Substitutor,
 } from '../..';
 import { parseSql } from '../../parser';
 import { deepDelete, deepSet, filterMap } from '../../utils';
@@ -279,34 +280,173 @@ export class SqlQuery extends SqlBase {
     return rawStringParts.join('');
   }
 
+  public changeWithParts(withParts: SeparatedArray<SqlWithPart>): this {
+    const value = this.valueOf();
+    value.withParts = withParts;
+    return SqlBase.fromValue(value);
+  }
+
+  public changeSelectValues(selectValues: SeparatedArray<SqlAlias>): this {
+    const value = this.valueOf();
+    value.selectValues = selectValues;
+    return SqlBase.fromValue(value);
+  }
+
+  public changeTables(tables: SeparatedArray<SqlAlias>): this {
+    const value = this.valueOf();
+    value.tables = tables;
+    return SqlBase.fromValue(value);
+  }
+
+  public changeJoinTable(joinTable: SqlAlias): this {
+    const value = this.valueOf();
+    value.joinTable = joinTable;
+    return SqlBase.fromValue(value);
+  }
+
+  public changeOnExpression(onExpression: SqlExpression): this {
+    const value = this.valueOf();
+    value.onExpression = onExpression;
+    return SqlBase.fromValue(value);
+  }
+
+  public changeWhereExpression(whereExpression: SqlExpression): this {
+    const value = this.valueOf();
+    value.whereExpression = whereExpression;
+    return SqlBase.fromValue(value);
+  }
+
+  public changeGroupByExpressions(groupByExpressions: SeparatedArray<SqlExpression>): this {
+    const value = this.valueOf();
+    value.groupByExpressions = groupByExpressions;
+    return SqlBase.fromValue(value);
+  }
+
+  public changeHavingExpression(havingExpression: SqlExpression): this {
+    const value = this.valueOf();
+    value.havingExpression = havingExpression;
+    return SqlBase.fromValue(value);
+  }
+
+  public changeOrderByParts(orderByParts: SeparatedArray<SqlOrderByPart>): this {
+    const value = this.valueOf();
+    value.orderByParts = orderByParts;
+    return SqlBase.fromValue(value);
+  }
+
+  public changeLimitValue(limitValue: SqlLiteral): this {
+    const value = this.valueOf();
+    value.limitValue = limitValue;
+    return SqlBase.fromValue(value);
+  }
+
+  public changeUnionQuery(unionQuery: SqlQuery): this {
+    const value = this.valueOf();
+    value.unionQuery = unionQuery;
+    return SqlBase.fromValue(value);
+  }
+
   public walkInner(
     nextStack: SqlBase[],
-    fn: (t: SqlBase, stack: SqlBase[]) => void,
+    fn: Substitutor,
     postorder: boolean,
-  ): void {
-    SqlBase.walkSeparatedArray(this.withParts, nextStack, fn, postorder);
-    SqlBase.walkSeparatedArray(this.selectValues, nextStack, fn, postorder);
-    SqlBase.walkSeparatedArray(this.tables, nextStack, fn, postorder);
-    if (this.joinTable) {
-      this.joinTable.walkHelper(nextStack, fn, postorder);
-      if (this.onExpression) {
-        this.onExpression.walkHelper(nextStack, fn, postorder);
+  ): SqlQuery | undefined {
+    let ret = this;
+
+    if (this.withParts) {
+      const withParts = SqlBase.walkSeparatedArray(this.withParts, nextStack, fn, postorder);
+      if (!withParts) return;
+      if (withParts !== this.withParts) {
+        ret = ret.changeWithParts(withParts);
       }
     }
+
+    if (this.selectValues) {
+      const selectValues = SqlBase.walkSeparatedArray(this.selectValues, nextStack, fn, postorder);
+      if (!selectValues) return;
+      if (selectValues !== this.selectValues) {
+        ret = ret.changeSelectValues(selectValues);
+      }
+    }
+
+    if (this.tables) {
+      const tables = SqlBase.walkSeparatedArray(this.tables, nextStack, fn, postorder);
+      if (!tables) return;
+      if (tables !== this.tables) {
+        ret = ret.changeTables(tables);
+      }
+    }
+
+    if (this.joinTable) {
+      const joinTable = this.joinTable.walkHelper(nextStack, fn, postorder);
+      if (!joinTable) return;
+      if (joinTable !== this.joinTable) {
+        ret = ret.changeJoinTable(joinTable as SqlAlias);
+      }
+
+      if (this.onExpression) {
+        const onExpression = this.onExpression.walkHelper(nextStack, fn, postorder);
+        if (!onExpression) return;
+        if (onExpression !== this.onExpression) {
+          ret = ret.changeOnExpression(onExpression);
+        }
+      }
+    }
+
     if (this.whereExpression) {
-      this.whereExpression.walkHelper(nextStack, fn, postorder);
+      const whereExpression = this.whereExpression.walkHelper(nextStack, fn, postorder);
+      if (!whereExpression) return;
+      if (whereExpression !== this.whereExpression) {
+        ret = ret.changeWhereExpression(whereExpression);
+      }
     }
-    SqlBase.walkSeparatedArray(this.groupByExpressions, nextStack, fn, postorder);
+
+    if (this.groupByExpressions) {
+      const groupByExpressions = SqlBase.walkSeparatedArray(
+        this.groupByExpressions,
+        nextStack,
+        fn,
+        postorder,
+      );
+      if (!groupByExpressions) return;
+      if (groupByExpressions !== this.groupByExpressions) {
+        ret = ret.changeGroupByExpressions(groupByExpressions);
+      }
+    }
+
     if (this.havingExpression) {
-      this.havingExpression.walkHelper(nextStack, fn, postorder);
+      const havingExpression = this.havingExpression.walkHelper(nextStack, fn, postorder);
+      if (!havingExpression) return;
+      if (havingExpression !== this.havingExpression) {
+        ret = ret.changeHavingExpression(havingExpression);
+      }
     }
-    SqlBase.walkSeparatedArray(this.orderByParts, nextStack, fn, postorder);
+
+    if (this.orderByParts) {
+      const orderByParts = SqlBase.walkSeparatedArray(this.orderByParts, nextStack, fn, postorder);
+      if (!orderByParts) return;
+      if (orderByParts !== this.orderByParts) {
+        ret = ret.changeOrderByParts(orderByParts);
+      }
+    }
+
     if (this.limitValue) {
-      this.limitValue.walkHelper(nextStack, fn, postorder);
+      const limitValue = this.limitValue.walkHelper(nextStack, fn, postorder);
+      if (!limitValue) return;
+      if (limitValue !== this.limitValue) {
+        ret = ret.changeLimitValue(limitValue as SqlLiteral);
+      }
     }
+
     if (this.unionQuery) {
-      this.unionQuery.walkHelper(nextStack, fn, postorder);
+      const unionQuery = this.unionQuery.walkHelper(nextStack, fn, postorder);
+      if (!unionQuery) return;
+      if (unionQuery !== this.unionQuery) {
+        ret = ret.changeUnionQuery(unionQuery as SqlQuery);
+      }
     }
+
+    return ret;
   }
 
   /* ~~~~~ General Stuff ~~~~~ */

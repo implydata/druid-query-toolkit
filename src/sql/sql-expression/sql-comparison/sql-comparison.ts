@@ -13,7 +13,7 @@
  */
 
 import { SqlLiteral } from '..';
-import { SqlBase, SqlBaseValue } from '../../sql-base';
+import { SqlBase, SqlBaseValue, Substitutor } from '../../sql-base';
 import { SqlExpression } from '../sql-expression';
 
 // innerSpacing:
@@ -37,11 +37,13 @@ export interface LikeEscapeUnit {
   escape: SqlLiteral;
 }
 
+export type ComparisonRhs = SqlBase | BetweenAndUnit | LikeEscapeUnit;
+
 export interface SqlComparisonValue extends SqlBaseValue {
   op: string;
   notKeyword?: string;
   lhs: SqlExpression;
-  rhs: SqlBase | BetweenAndUnit | LikeEscapeUnit;
+  rhs: ComparisonRhs;
 }
 
 export class SqlComparison extends SqlExpression {
@@ -50,7 +52,7 @@ export class SqlComparison extends SqlExpression {
   public readonly op: string;
   public readonly notKeyword?: string;
   public readonly lhs: SqlExpression;
-  public readonly rhs: SqlBase | BetweenAndUnit | LikeEscapeUnit;
+  public readonly rhs: ComparisonRhs;
 
   constructor(options: SqlComparisonValue) {
     super(options, SqlComparison.type);
@@ -110,24 +112,71 @@ export class SqlComparison extends SqlExpression {
     return rawParts.join('');
   }
 
+  public changeLhs(lhs: SqlExpression): this {
+    const value = this.valueOf();
+    value.lhs = lhs;
+    return SqlBase.fromValue(value);
+  }
+
+  public changeRhs(rhs: ComparisonRhs): this {
+    const value = this.valueOf();
+    value.rhs = rhs;
+    return SqlBase.fromValue(value);
+  }
+
   public walkInner(
     nextStack: SqlBase[],
-    fn: (t: SqlBase, stack: SqlBase[]) => void,
+    fn: Substitutor,
     postorder: boolean,
-  ): void {
-    this.lhs.walkHelper(nextStack, fn, postorder);
-    const { rhs } = this;
-    if (rhs instanceof SqlBase) {
-      rhs.walkHelper(nextStack, fn, postorder);
+  ): SqlExpression | undefined {
+    let ret = this;
+
+    const lhs = this.lhs.walkHelper(nextStack, fn, postorder);
+    if (!lhs) return;
+    if (lhs !== this.lhs) {
+      ret = ret.changeLhs(lhs);
+    }
+
+    if (this.rhs instanceof SqlBase) {
+      const rhs = this.rhs.walkHelper(nextStack, fn, postorder);
+      if (!rhs) return;
+      if (rhs !== this.rhs) {
+        ret = ret.changeRhs(rhs);
+      }
     } else {
-      if ((rhs as any).start) {
-        (rhs as BetweenAndUnit).start.walkHelper(nextStack, fn, postorder);
-        (rhs as BetweenAndUnit).end.walkHelper(nextStack, fn, postorder);
+      let newRhs: any = this.rhs;
+      if (newRhs.start) {
+        const start = newRhs.start.walkHelper(nextStack, fn, postorder);
+        if (!start) return;
+        if (start !== newRhs.start) {
+          newRhs = Object.assign({}, newRhs, { start });
+        }
+
+        const end = newRhs.end.walkHelper(nextStack, fn, postorder);
+        if (!end) return;
+        if (end !== newRhs.end) {
+          newRhs = Object.assign({}, newRhs, { end });
+        }
       } else {
-        (rhs as LikeEscapeUnit).like.walkHelper(nextStack, fn, postorder);
-        (rhs as LikeEscapeUnit).escape.walkHelper(nextStack, fn, postorder);
+        const like = newRhs.like.walkHelper(nextStack, fn, postorder);
+        if (!like) return;
+        if (like !== newRhs.like) {
+          newRhs = Object.assign({}, newRhs, { like });
+        }
+
+        const escape = newRhs.escape.walkHelper(nextStack, fn, postorder);
+        if (!escape) return;
+        if (escape !== newRhs.escape) {
+          newRhs = Object.assign({}, newRhs, { escape });
+        }
+      }
+
+      if (newRhs !== this.rhs) {
+        ret = ret.changeRhs(newRhs);
       }
     }
+
+    return ret;
   }
 }
 

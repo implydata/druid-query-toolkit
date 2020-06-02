@@ -23,6 +23,8 @@ export interface Parens {
   rightSpacing: string;
 }
 
+export type Substitutor = (t: SqlBase, stack: SqlBase[]) => SqlBase | undefined;
+
 export interface SqlBaseValue {
   type?: string;
   innerSpacing?: Record<string, string>;
@@ -60,17 +62,31 @@ export abstract class SqlBase {
     return cleanObj;
   }
 
-  static walkSeparatedArray(
-    a: SeparatedArray<SqlBase> | undefined,
+  static walkSeparatedArray<T extends SqlBase>(
+    a: SeparatedArray<T>,
     stack: SqlBase[],
-    fn: (t: SqlBase, stack: SqlBase[]) => void,
+    fn: Substitutor,
     postorder: boolean,
-  ): void {
-    if (a) {
-      a.values.forEach(v => {
-        v.walkHelper(stack, fn, postorder);
-      });
-    }
+  ): SeparatedArray<T> | undefined {
+    let stop = false;
+    let changed = false;
+    const newA = a.map(v => {
+      if (stop) return v;
+      const ret = v.walkHelper(stack, fn, postorder) as T;
+      if (!ret) {
+        stop = true;
+        return v;
+      }
+      if (ret !== v) {
+        changed = true;
+        if (ret.type !== v.type) {
+          throw new Error('can not change type');
+        }
+      }
+      return ret;
+    });
+    if (stop) return undefined;
+    return changed ? newA : a;
   }
 
   static getColumnName(column: string | SqlBase): string {
@@ -160,42 +176,60 @@ export abstract class SqlBase {
     return str;
   }
 
-  public walk(fn: (t: SqlBase, stack: SqlBase[]) => void) {
-    this.walkHelper([], fn, false);
+  public walk(fn: Substitutor): SqlBase {
+    const ret = this.walkHelper([], fn, false);
+    if (!ret) return this;
+    return ret;
   }
 
-  public walkPostorder(fn: (t: SqlBase, stack: SqlBase[]) => void) {
-    this.walkHelper([], fn, true);
+  public walkPostorder(fn: Substitutor): SqlBase {
+    const ret = this.walkHelper([], fn, true);
+    if (!ret) return this;
+    return ret;
   }
 
-  public walkHelper(
-    stack: SqlBase[],
-    fn: (t: SqlBase, stack: SqlBase[]) => void,
-    postorder: boolean,
-  ): void {
-    if (!postorder) fn(this, stack);
-    this.walkInner(stack.concat(this), fn, postorder);
-    if (postorder) fn(this, stack);
+  public walkHelper(stack: SqlBase[], fn: Substitutor, postorder: boolean): SqlBase | undefined {
+    if (!postorder) {
+      const ret = fn(this, stack);
+      if (!ret) return;
+      if (ret !== this) return ret;
+    }
+
+    const ret = this.walkInner(stack.concat(this), fn, postorder);
+    if (!ret) return;
+    if (ret !== this) return ret;
+
+    if (postorder) {
+      const ret = fn(this, stack);
+      if (!ret) return;
+      if (ret !== this) return ret;
+    }
+
+    return this;
   }
 
   public walkInner(
-    _stack: SqlBase[],
-    _fn: (t: SqlBase, stack: SqlBase[]) => void,
+    _nextStack: SqlBase[],
+    _fn: Substitutor,
     _postorder: boolean,
-  ) {}
+  ): SqlBase | undefined {
+    return this;
+  }
 
-  public some(fn: (t: SqlBase) => boolean) {
+  public some(fn: (t: SqlBase) => boolean): boolean {
     let some = false;
     this.walk(b => {
       some = some || fn(b);
+      return some ? undefined : b;
     });
     return some;
   }
 
-  public every(fn: (t: SqlBase) => boolean) {
-    let every = false;
+  public every(fn: (t: SqlBase) => boolean): boolean {
+    let every = true;
     this.walk(b => {
       every = every && fn(b);
+      return every ? b : undefined;
     });
     return every;
   }
@@ -206,6 +240,7 @@ export abstract class SqlBase {
       if (t instanceof SqlRef) {
         refs.push(t);
       }
+      return t;
     });
     return refs;
   }

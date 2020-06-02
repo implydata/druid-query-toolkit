@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlBaseValue } from '../../sql-base';
+import { SqlBase, SqlBaseValue, Substitutor } from '../../sql-base';
 import { SqlExpression } from '../sql-expression';
 
 export interface UnaryExpressionValue extends SqlBaseValue {
@@ -54,16 +54,26 @@ export class SqlUnary extends SqlExpression {
     return this.keyword + this.getInnerSpace('postKeyword') + this.argument.toString();
   }
 
-  public walkInner(
-    nextStack: SqlBase[],
-    fn: (t: SqlBase, stack: SqlBase[]) => void,
-    postorder: boolean,
-  ): void {
-    this.argument.walkHelper(nextStack, fn, postorder);
+  public changeArgument(argument: SqlExpression): this {
+    const value = this.valueOf();
+    value.argument = argument;
+    return SqlBase.fromValue(value);
   }
 
-  public isType(type: string) {
-    return type === this.type && this instanceof SqlUnary;
+  public walkInner(
+    nextStack: SqlBase[],
+    fn: Substitutor,
+    postorder: boolean,
+  ): SqlExpression | undefined {
+    let ret = this;
+
+    const argument = this.argument.walkHelper(nextStack, fn, postorder);
+    if (!argument) return;
+    if (argument !== this.argument) {
+      ret = ret.changeArgument(argument);
+    }
+
+    return ret;
   }
 }
 

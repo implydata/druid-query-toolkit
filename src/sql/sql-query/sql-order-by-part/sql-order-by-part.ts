@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlBaseValue } from '../../sql-base';
+import { SqlBase, SqlBaseValue, Substitutor } from '../../sql-base';
 import { SqlExpression } from '../../sql-expression';
 
 export type Direction = 'ASC' | 'DESC';
@@ -42,6 +42,13 @@ export class SqlOrderByPart extends SqlBase {
     }
   }
 
+  public valueOf(): SqlOrderByPartValue {
+    const value = super.valueOf() as SqlOrderByPartValue;
+    value.expression = this.expression;
+    value.direction = this.direction;
+    return value;
+  }
+
   toRawString(): string {
     const rawParts = [this.expression.toString()];
 
@@ -52,12 +59,22 @@ export class SqlOrderByPart extends SqlBase {
     return rawParts.join('');
   }
 
-  public walkInner(
-    nextStack: SqlBase[],
-    fn: (t: SqlBase, stack: SqlBase[]) => void,
-    postorder: boolean,
-  ): void {
-    this.expression.walkHelper(nextStack, fn, postorder);
+  public changeExpression(expression: SqlExpression): this {
+    const value = this.valueOf();
+    value.expression = expression;
+    return SqlBase.fromValue(value);
+  }
+
+  public walkInner(nextStack: SqlBase[], fn: Substitutor, postorder: boolean): SqlBase | undefined {
+    let ret = this;
+
+    const expression = this.expression.walkHelper(nextStack, fn, postorder);
+    if (!expression) return;
+    if (expression !== this.expression) {
+      ret = ret.changeExpression(expression);
+    }
+
+    return ret;
   }
 
   public getActualDirection(): Direction {

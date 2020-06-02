@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { parseSql, parseSqlQuery } from '../../index';
+import { parseSql, parseSqlQuery, SqlRef } from '../../index';
 import { backAndForth, sane } from '../../test-utils';
 
 describe('SqlQuery', () => {
@@ -57,6 +57,47 @@ describe('SqlQuery', () => {
         throw new Error(`should not parse: ${sql}`);
       }
     }
+  });
+
+  it('#walk', () => {
+    const sql = sane`
+      SELECT
+        datasource d,
+        SUM("size") AS total_size,
+        CASE WHEN SUM("size") = 0 THEN 0 ELSE SUM("size") END AS avg_size,
+        CASE WHEN SUM(num_rows) = 0 THEN 0 ELSE SUM("num_rows") END AS avg_num_rows,
+        COUNT(*) AS num_segments
+      FROM sys.segments
+      WHERE datasource IN ('moon', 'beam') AND 'druid' = schema 
+      GROUP BY datasource
+      HAVING total_size > 100
+      ORDER BY datasource 
+    `;
+
+    expect(
+      String(
+        parseSql(sql).walk(x => {
+          if (x instanceof SqlRef) {
+            if (x.column && x.column !== '*') {
+              return x.changeColumn(x.column + '_lol');
+            }
+          }
+          return x;
+        }),
+      ),
+    ).toMatchInlineSnapshot(`
+      "SELECT
+        datasource_lol d,
+        SUM(\\"size_lol\\") AS total_size,
+        CASE WHEN SUM(\\"size_lol\\") = 0 THEN 0 ELSE SUM(\\"size_lol\\") END AS avg_size,
+        CASE WHEN SUM(num_rows_lol) = 0 THEN 0 ELSE SUM(\\"num_rows_lol\\") END AS avg_num_rows,
+        COUNT(*) AS num_segments
+      FROM sys.segments
+      WHERE datasource_lol IN ('moon', 'beam') AND 'druid' = schema_lol 
+      GROUP BY datasource_lol
+      HAVING total_size_lol > 100
+      ORDER BY datasource_lol "
+    `);
   });
 
   it('Simple select, cols with many cols and aliases', () => {
