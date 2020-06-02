@@ -28,6 +28,27 @@ export interface SqlCaseSearchedValue extends SqlBaseValue {
 export class SqlCaseSearched extends SqlExpression {
   static type = 'caseSearched';
 
+  static ifFactory(
+    conditionExpression: SqlExpression,
+    thenExpression: SqlExpression,
+    elseExpression?: SqlExpression,
+  ) {
+    return new SqlCaseSearched({
+      caseKeyword: 'CASE',
+      whenThenParts: SeparatedArray.fromSingleValue(
+        new SqlWhenThenPart({
+          whenKeyword: 'WHEN',
+          whenExpression: conditionExpression,
+          thenKeyword: 'THEN',
+          thenExpression,
+        }),
+      ),
+      elseKeyword: elseExpression ? 'ELSE' : undefined,
+      elseExpression,
+      endKeyword: 'END',
+    });
+  }
+
   public readonly caseKeyword: string;
   public readonly whenThenParts: SeparatedArray<SqlWhenThenPart>;
   public readonly elseKeyword?: string;

@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 
+import { SqlRef } from '..';
 import { SqlBase, SqlBaseValue, Substitutor } from '../../sql-base';
 import { SeparatedArray, Separator } from '../../utils';
 import { SqlExpression } from '../sql-expression';
@@ -32,6 +33,8 @@ export interface SqlFunctionValue extends SqlBaseValue {
 
 export class SqlFunction extends SqlExpression {
   static type = 'function';
+  static DEFAULT_FILTER_KEYWORD = 'FILTER';
+  static DEFAULT_WHERE_KEYWORD = 'WHERE';
 
   static sqlFunctionFactory(
     functionName: string,
@@ -43,8 +46,8 @@ export class SqlFunction extends SqlExpression {
       functionName: functionName,
       decorator: decorator,
       arguments: SeparatedArray.fromArray(argumentArray, Separator.rightSeparator(',')),
-      filterKeyword: filter ? 'FILTER' : undefined,
-      whereKeyword: filter ? 'WHERE' : undefined,
+      filterKeyword: filter ? SqlFunction.DEFAULT_FILTER_KEYWORD : undefined,
+      whereKeyword: filter ? SqlFunction.DEFAULT_WHERE_KEYWORD : undefined,
       whereExpression: filter,
     });
   }
@@ -117,6 +120,10 @@ export class SqlFunction extends SqlExpression {
     return rawParts.join('');
   }
 
+  public getEffectiveFunctionName(): string {
+    return this.functionName.toUpperCase();
+  }
+
   public changeArguments(args: SeparatedArray<SqlExpression>): this {
     const value = this.valueOf();
     value.arguments = args;
@@ -126,6 +133,13 @@ export class SqlFunction extends SqlExpression {
   public changeWhereExpression(whereExpression: SqlExpression): this {
     const value = this.valueOf();
     value.whereExpression = whereExpression;
+    if (whereExpression) {
+      value.filterKeyword = value.filterKeyword || SqlFunction.DEFAULT_FILTER_KEYWORD;
+      value.whereKeyword = value.whereKeyword || SqlFunction.DEFAULT_WHERE_KEYWORD;
+    } else {
+      delete value.filterKeyword;
+      delete value.whereKeyword;
+    }
     return SqlBase.fromValue(value);
   }
 
@@ -153,6 +167,14 @@ export class SqlFunction extends SqlExpression {
     }
 
     return ret;
+  }
+
+  public isCountStar(): boolean {
+    if (this.getEffectiveFunctionName() !== 'COUNT') return false;
+    const args = this.arguments;
+    if (!args || args.length() !== 1) return false;
+    const firstArg = args.first();
+    return firstArg instanceof SqlRef && firstArg.column === '*';
   }
 }
 

@@ -79,9 +79,9 @@ export abstract class SqlBase {
       }
       if (ret !== v) {
         changed = true;
-        if (ret.type !== v.type) {
-          throw new Error('can not change type');
-        }
+        // if (ret.type !== v.type) {
+        //   throw new Error(`can not change type of array (from ${v.type} to ${ret.type})`);
+        // }
       }
       return ret;
     });
