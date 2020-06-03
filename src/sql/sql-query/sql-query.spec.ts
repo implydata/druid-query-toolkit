@@ -45,7 +45,11 @@ describe('SqlQuery', () => {
     ];
 
     for (const sql of queries) {
-      backAndForth(sql);
+      try {
+        backAndForth(sql);
+      } catch (e) {
+        throw new Error(`problem with \`${sql}\`: ${e.message}`);
+      }
     }
   });
 
