@@ -16,6 +16,40 @@ import { parseSql } from '../../..';
 import { backAndForth } from '../../../test-utils';
 
 describe('SqlFunction', () => {
+  it('queries that work', () => {
+    const queries: string[] = [
+      "position('b' in 'abc')",
+      "position('' in 'abc')",
+      "position('b' in 'abcabc' FROM 3)",
+      "position('b' in 'abcabc' FROM 5)",
+      "position('b' in 'abcabc' FROM 6)",
+      "position('b' in 'abcabc' FROM -5)",
+      "position('' in 'abc' FROM 3)",
+      "position('' in 'abc' FROM 10)",
+      "position(x'bb' in x'aabbcc')",
+      "position(x'' in x'aabbcc')",
+      "position(x'bb' in x'aabbccaabbcc' FROM 3)",
+      "position(x'bb' in x'aabbccaabbcc' FROM 5)",
+      "position(x'bb' in x'aabbccaabbcc' FROM 6)",
+      "position(x'bb' in x'aabbccaabbcc' FROM -5)",
+      "position(x'cc' in x'aabbccdd' FROM 2)",
+      "position(x'' in x'aabbcc' FROM 3)",
+      "position(x'' in x'aabbcc' FROM 10)",
+
+      "trim(leading 'eh' from 'hehe__hehe')",
+      "trim(trailing 'eh' from 'hehe__hehe')",
+      "trim('eh' from 'hehe__hehe')",
+    ];
+
+    for (const sql of queries) {
+      try {
+        backAndForth(sql);
+      } catch (e) {
+        throw new Error(`problem with \`${sql}\`: ${e.message}`);
+      }
+    }
+  });
+
   it('Function without args', () => {
     const sql = `FN()`;
 
@@ -475,7 +509,7 @@ describe('SqlFunction', () => {
             "type": "literal",
             "value": 1,
           },
-          "type": "comparision",
+          "type": "comparison",
         },
         "whereKeyword": "WHERE",
       }

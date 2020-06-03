@@ -47,7 +47,7 @@ export interface SqlComparisonValue extends SqlBaseValue {
 }
 
 export class SqlComparison extends SqlExpression {
-  static type = 'comparision';
+  static type = 'comparison';
 
   public readonly op: string;
   public readonly notKeyword?: string;

@@ -432,7 +432,7 @@ ComparisonOpRhsBetween = op:BetweenToken postOp:_ start:BaseType preKeyword:_ ke
   };
 }
 
-ComparisonOpRhsLike = op:LikeToken postOp:_ like:SqlLiteral escape:(_ EscapeToken _ SqlLiteral)?
+ComparisonOpRhsLike = op:(LikeToken / SimilarToToken) postOp:_ like:SqlLiteral escape:(_ EscapeToken _ SqlLiteral)?
 {
   return {
     op: op,
@@ -502,6 +502,7 @@ BaseType =
 / ExtractFunction
 / TrimFunction
 / FloorCeilFunction
+/ PositionFunction
 / Interval
 / SqlLiteral
 / SqlRef
@@ -772,6 +773,33 @@ FloorCeilFunction =
   });
 }
 
+PositionFunction =
+  functionName:PositionToken
+  preLeftParen:_
+  OpenParen
+  postLeftParen:_
+  expr1:Expression
+  inSeparator:InSeparator
+  expr2:Expression
+  extra:(FromSeparator Expression)?
+  postArguments:_
+  CloseParen
+{
+  var args = extra
+    ? new sql.SeparatedArray([expr1, expr2, extra[1]], [inSeparator, extra[0]])
+    : new sql.SeparatedArray([expr1, expr2], [inSeparator])
+
+  return new sql.SqlFunction({
+    functionName: functionName,
+    arguments: args,
+    innerSpacing: {
+      preLeftParen: preLeftParen,
+      postLeftParen: postLeftParen,
+      postArguments: postArguments,
+    },
+  });
+}
+
 Filter = filterKeyword:FilterToken postFilterKeyword:_ OpenParen postLeftParen:_ filterExpression:WhereClause preRightParen:_ CloseParen
 {
   return {
@@ -821,12 +849,21 @@ ToSeparator = left:_ separator:ToToken right:_
   });
 }
 
+InSeparator = left:_ separator:InToken right:_
+{
+  return new sql.Separator({
+    left: left,
+    separator: separator,
+    right: right,
+  });
+}
+
 SqlInParens = OpenParen leftSpacing:_ ex:Sql rightSpacing:_ CloseParen
 {
   return ex.addParens(leftSpacing, rightSpacing);
 }
 
-SqlLiteral = lit:(DynamicPlaceholder / NullToken / TrueToken / FalseToken / Number / SingleQuotedString / UnicodeString / Timestamp / Array)
+SqlLiteral = lit:(DynamicPlaceholder / NullToken / TrueToken / FalseToken / Number / SingleQuotedString / UnicodeString / BinaryString / Timestamp / Array)
 {
   return new sql.SqlLiteral(lit);
 }
@@ -883,6 +920,14 @@ UnicodeString = "U&'"i v:$([^']*) "'"
 {
   return {
     value: v.replace(/\\[0-9a-f]{4}/gi, function(s) { return String.fromCharCode(parseInt(s.substr(1), 16)); }),
+    stringValue: text()
+  };
+}
+
+BinaryString = "X'"i v:$([0-9A-F]i*) "'"
+{
+  return {
+    value: v, // ToDo: fix this
     stringValue: text()
   };
 }
@@ -944,7 +989,7 @@ ArrayEntries = head:ArrayEntry tail:(CommaSeparator ArrayEntry)*
   return makeListMap(tail, 1, head);
 }
 
-ArrayEntry = Number / SingleQuotedString / UnicodeString
+ArrayEntry = Number / SingleQuotedString / UnicodeString / BinaryString
 
 // ------------------------------
 
@@ -1049,7 +1094,7 @@ AndToken = $('AND'i !IdentifierPart)
 ArrayToken = $('ARRAY'i !IdentifierPart)
 AsToken = $('AS'i !IdentifierPart)
 AscToken = $('ASC'i !IdentifierPart)
-BetweenToken = $('BETWEEN'i !IdentifierPart)
+BetweenToken = $('BETWEEN'i !IdentifierPart (__ 'SYMMETRIC'i !IdentifierPart)?)
 BothToken = $('BOTH'i !IdentifierPart)
 ByToken = $('BY'i !IdentifierPart)
 CaseToken = $('CASE'i !IdentifierPart)
@@ -1081,7 +1126,9 @@ NullToken = $('NULL'i !IdentifierPart) { return { value: null, stringValue: text
 OnToken = $('ON'i !IdentifierPart)
 OrToken = $('OR'i !IdentifierPart)
 OrderToken = $('ORDER'i !IdentifierPart __ ByToken)
+PositionToken = $('POSITION'i !IdentifierPart)
 SelectToken = $('SELECT'i !IdentifierPart)
+SimilarToToken = $('SIMILAR'i !IdentifierPart __ ToToken)
 ThenToken = $('THEN'i !IdentifierPart)
 TimestampToken = $('TIMESTAMP'i !IdentifierPart)
 ToToken = $('TO'i !IdentifierPart)

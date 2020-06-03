@@ -223,7 +223,7 @@ describe('SqlUnary', () => {
             "tableQuotes": undefined,
             "type": "ref",
           },
-          "type": "comparision",
+          "type": "comparison",
         },
         "expressionType": "NOT",
         "innerSpacing": Object {
@@ -279,7 +279,7 @@ describe('SqlUnary', () => {
                   "tableQuotes": undefined,
                   "type": "ref",
                 },
-                "type": "comparision",
+                "type": "comparison",
               },
               "expressionType": "NOT",
               "innerSpacing": Object {
@@ -313,7 +313,7 @@ describe('SqlUnary', () => {
                   "type": "literal",
                   "value": "D",
                 },
-                "type": "comparision",
+                "type": "comparison",
               },
               "expressionType": "NOT",
               "innerSpacing": Object {
@@ -366,7 +366,7 @@ describe('SqlUnary', () => {
               "tableQuotes": undefined,
               "type": "ref",
             },
-            "type": "comparision",
+            "type": "comparison",
           },
           "expressionType": "NOT",
           "innerSpacing": Object {

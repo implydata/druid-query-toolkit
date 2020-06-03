@@ -1092,7 +1092,7 @@ describe('Combined expression', () => {
                       "innerSpacing": Object {},
                       "type": "multi",
                     },
-                    "type": "comparision",
+                    "type": "comparison",
                   },
                 ],
               },
@@ -1188,7 +1188,7 @@ describe('Combined expression', () => {
                       "tableQuotes": undefined,
                       "type": "ref",
                     },
-                    "type": "comparision",
+                    "type": "comparison",
                   },
                   SqlRef {
                     "column": "D",
@@ -1314,7 +1314,7 @@ describe('Combined expression', () => {
                       "innerSpacing": Object {},
                       "type": "multi",
                     },
-                    "type": "comparision",
+                    "type": "comparison",
                   },
                 ],
               },
@@ -2072,7 +2072,7 @@ describe('getSqlRefs', () => {
           "type": "literal",
           "value": null,
         },
-        "type": "comparision",
+        "type": "comparison",
       }
     `);
   });
@@ -2108,7 +2108,7 @@ describe('getSqlRefs', () => {
           "type": "literal",
           "value": null,
         },
-        "type": "comparision",
+        "type": "comparison",
       }
     `);
   });
@@ -2144,7 +2144,7 @@ describe('getSqlRefs', () => {
           "type": "literal",
           "value": true,
         },
-        "type": "comparision",
+        "type": "comparison",
       }
     `);
   });
@@ -2190,7 +2190,7 @@ describe('getSqlRefs', () => {
                 "type": "literal",
                 "value": null,
               },
-              "type": "comparision",
+              "type": "comparison",
             },
             SqlComparison {
               "innerSpacing": Object {
@@ -2216,7 +2216,7 @@ describe('getSqlRefs', () => {
                 "type": "literal",
                 "value": "",
               },
-              "type": "comparision",
+              "type": "comparison",
             },
           ],
         },

@@ -138,7 +138,7 @@ export abstract class SqlBase {
     return value;
   }
 
-  public addParens(leftSpacing: string | null, rightSpacing: string | null): this {
+  public addParens(leftSpacing?: string, rightSpacing?: string): this {
     const value = this.valueOf();
     value.parens = (value.parens || []).concat({
       leftSpacing: leftSpacing || '',
