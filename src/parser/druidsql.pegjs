@@ -863,7 +863,7 @@ SqlInParens = OpenParen leftSpacing:_ ex:Sql rightSpacing:_ CloseParen
   return ex.addParens(leftSpacing, rightSpacing);
 }
 
-SqlLiteral = lit:(DynamicPlaceholder / NullToken / TrueToken / FalseToken / Number / SingleQuotedString / UnicodeString / BinaryString / Timestamp / Array)
+SqlLiteral = lit:(DynamicPlaceholder / NullToken / TrueToken / FalseToken / Number / SingleQuotedString / UnicodeString / CharsetString/ BinaryString / Timestamp / Array)
 {
   return new sql.SqlLiteral(lit);
 }
@@ -920,6 +920,14 @@ UnicodeString = "U&'"i v:$([^']*) "'"
 {
   return {
     value: v.replace(/\\[0-9a-f]{4}/gi, function(s) { return String.fromCharCode(parseInt(s.substr(1), 16)); }),
+    stringValue: text()
+  };
+}
+
+CharsetString = "_" [a-z0-9]i [a-z0-9_-]i* "'" v:$([^']*) "'"
+{
+  return {
+    value: v, // ToDo: fix this
     stringValue: text()
   };
 }

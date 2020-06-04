@@ -16,7 +16,7 @@ import { parseSql } from '../../..';
 import { backAndForth } from '../../../test-utils';
 
 describe('SqlFunction', () => {
-  it('queries that work', () => {
+  it('things that work', () => {
     const queries: string[] = [
       "position('b' in 'abc')",
       "position('' in 'abc')",

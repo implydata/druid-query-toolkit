@@ -16,7 +16,7 @@ import { parseSql } from '../../..';
 import { backAndForth } from '../../../test-utils';
 
 describe('SqlComparison', () => {
-  it('queries that work', () => {
+  it('things that work', () => {
     const queries: string[] = [
       "''  similar to ''",
       "'a' similar to 'a'",

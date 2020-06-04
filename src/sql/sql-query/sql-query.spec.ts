@@ -23,7 +23,7 @@ import {
 import { backAndForth, sane } from '../../test-utils';
 
 describe('SqlQuery', () => {
-  it('queries that work', () => {
+  it('things that work', () => {
     const queries: string[] = [
       `Select notingham from tbl`,
       `Select 3`,
@@ -53,7 +53,7 @@ describe('SqlQuery', () => {
     }
   });
 
-  it('queries that do not work', () => {
+  it('things that do not work', () => {
     const queries: string[] = [
       `Select notingham from table`,
       `Selec 3`,

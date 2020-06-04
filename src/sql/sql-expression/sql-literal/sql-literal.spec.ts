@@ -12,10 +12,47 @@
  * limitations under the License.
  */
 
-import { parseSql, SqlLiteral } from '../../..';
+import { parseSql, parseSqlQuery, SqlLiteral } from '../../..';
 import { backAndForth } from '../../../test-utils';
 
 describe('SqlLiteral', () => {
+  it('things that work', () => {
+    const queries: string[] = [
+      `NULL`,
+      `TRUE`,
+      `FALSE`,
+      `'lol'`,
+      `U&'hello'`,
+      `_latin1'hello'`,
+      `_UTF8'hello'`,
+      `_l-1'hello'`,
+      `_8l-1'hello'`,
+    ];
+
+    for (const sql of queries) {
+      try {
+        backAndForth(sql);
+      } catch (e) {
+        throw new Error(`problem with \`${sql}\`: ${e.message}`);
+      }
+    }
+  });
+
+  it('things that do not work', () => {
+    const queries: string[] = [`__l-1'hello'`, `_-l-1'hello'`];
+
+    for (const sql of queries) {
+      let didNotError = false;
+      try {
+        parseSqlQuery(sql);
+        didNotError = true;
+      } catch {}
+      if (didNotError) {
+        throw new Error(`should not parse: ${sql}`);
+      }
+    }
+  });
+
   it('Works with Null', () => {
     const sql = `NULL`;
 
