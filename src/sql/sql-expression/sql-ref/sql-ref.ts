@@ -42,7 +42,7 @@ export class SqlRef extends SqlExpression {
       quotes: quotes,
       tableQuotes: tableQuotes,
       namespaceQuotes: namespaceQuotes,
-    } as SqlRefValue);
+    });
   }
   static fromStringWithDoubleQuotes(column: string) {
     return new SqlRef({ column: column, quotes: '"' } as SqlRefValue);
@@ -88,45 +88,57 @@ export class SqlRef extends SqlExpression {
     value.namespaceQuotes = this.namespaceQuotes;
     value.tableQuotes = this.tableQuotes;
     value.namespaceQuotes = this.namespaceQuotes;
-    return value as SqlRefValue;
-  }
-
-  public assemblePart(
-    main?: string,
-    quotes?: string,
-    preDotSpacing?: string,
-    dot?: string,
-    posDotSpacing?: string,
-  ) {
-    return [SqlRef.wrapInQuotes(main || '', quotes || ''), preDotSpacing, dot, posDotSpacing].join(
-      '',
-    );
+    return value;
   }
 
   public toRawString(): string {
     return [
-      this.assemblePart(
-        this.namespace,
-        this.namespaceQuotes,
-        this.getInnerSpace('preNamespaceDot', ''),
-        this.namespace && this.table ? '.' : '',
-        this.getInnerSpace('postNamespaceDot', ''),
-      ),
-      this.assemblePart(
-        this.table,
-        this.tableQuotes,
-        this.getInnerSpace('preTableDot', ''),
-        this.column && this.table ? '.' : '',
-        this.getInnerSpace('postTableDot', ''),
-      ),
+      SqlRef.wrapInQuotes(this.namespace || '', this.namespaceQuotes || ''),
+
+      this.getInnerSpace('preNamespaceDot', ''),
+      this.namespace && this.table ? '.' : '',
+      this.getInnerSpace('postNamespaceDot', ''),
+
+      SqlRef.wrapInQuotes(this.table || '', this.tableQuotes || ''),
+
+      this.getInnerSpace('preTableDot', ''),
+      this.column && this.table ? '.' : '',
+      this.getInnerSpace('postTableDot', ''),
+
       SqlRef.wrapInQuotes(this.column || '', this.quotes || ''),
     ].join('');
+  }
+
+  public getColumn(): string {
+    if (!this.column) throw Error('SqlRef has no defined column');
+    return this.column;
   }
 
   public changeColumn(column: string): SqlRef {
     const value = this.valueOf();
     value.column = column;
     return SqlBase.fromValue(value);
+  }
+
+  public getTable(): string {
+    if (!this.table) throw Error('SqlRef has no defined table');
+    return this.table;
+  }
+
+  public changeTable(table: string): SqlRef {
+    const value = this.valueOf();
+    value.table = table;
+    return SqlBase.fromValue(value);
+  }
+
+  public getName(): string {
+    const name = this.column || this.table;
+    if (!name) throw new Error('SqlRef has no defined table or column');
+    return name;
+  }
+
+  public isStar(): boolean {
+    return this.column === '*';
   }
 
   public upgrade() {
@@ -148,25 +160,6 @@ export class SqlRef extends SqlExpression {
 
     return new SqlRef(value);
   }
-
-  public getColumn(): string {
-    if (!this.column) throw Error('SqlRef has no defined column');
-    return this.column;
-  }
-
-  public getTable(): string {
-    if (!this.table) throw Error('SqlRef has no defined table');
-    return this.table;
-  }
-
-  public getName(): string {
-    const name = this.column || this.table;
-    if (!name) throw new Error('SqlRef has no defined table or column');
-    return name;
-  }
-
-  public isStar(): boolean {
-    return this.column === '*';
-  }
 }
+
 SqlBase.register(SqlRef.type, SqlRef);

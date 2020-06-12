@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 
+import { SqlMulti } from '..';
 import { SqlBase, Substitutor } from '../sql-base';
 
 export abstract class SqlExpression extends SqlBase {
@@ -36,6 +37,10 @@ export abstract class SqlExpression extends SqlBase {
     _postorder: boolean,
   ): SqlExpression | undefined {
     return this;
+  }
+
+  public addExpressionToAnd(expression: SqlExpression): SqlExpression {
+    return SqlMulti.and([this, expression]);
   }
 
   public removeColumnFromAnd(column: string): SqlExpression | undefined {

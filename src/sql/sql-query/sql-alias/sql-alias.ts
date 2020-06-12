@@ -14,9 +14,10 @@
 
 import { SqlBase, SqlBaseValue, Substitutor } from '../../sql-base';
 import { SqlExpression, SqlRef } from '../../sql-expression';
+import { SqlQuery } from '../sql-query';
 
 export interface SqlAliasValue extends SqlBaseValue {
-  expression: SqlExpression;
+  expression: SqlExpression | SqlQuery;
   asKeyword?: string;
   alias?: SqlRef;
 }
@@ -26,7 +27,18 @@ export class SqlAlias extends SqlBase {
 
   static fromBase(base: SqlBase): SqlAlias {
     if (base instanceof SqlAlias) return base;
-    if (base instanceof SqlExpression) {
+    if (base instanceof SqlExpression || base instanceof SqlQuery) {
+      return new SqlAlias({
+        expression: base,
+      });
+    }
+    throw new Error(`can not construct and alias from ${base.type}`);
+  }
+
+  static fromBaseAndUpgrade(base: SqlBase): SqlAlias {
+    if (base instanceof SqlAlias) return base.upgrade();
+    if (base instanceof SqlRef) base = base.upgrade();
+    if (base instanceof SqlExpression || base instanceof SqlQuery) {
       return new SqlAlias({
         expression: base,
       });
@@ -42,7 +54,7 @@ export class SqlAlias extends SqlBase {
     });
   }
 
-  public readonly expression: SqlExpression;
+  public readonly expression: SqlExpression | SqlQuery;
   public readonly asKeyword?: string;
   public readonly alias?: SqlRef;
 
@@ -75,7 +87,7 @@ export class SqlAlias extends SqlBase {
     return rawParts.join('');
   }
 
-  public changeExpression(expression: SqlExpression): this {
+  public changeExpression(expression: SqlExpression | SqlQuery): this {
     const value = this.valueOf();
     value.expression = expression;
     return SqlBase.fromValue(value);
@@ -87,7 +99,7 @@ export class SqlAlias extends SqlBase {
     const expression = this.expression.walkHelper(nextStack, fn, postorder);
     if (!expression) return;
     if (expression !== this.expression) {
-      ret = ret.changeExpression(expression);
+      ret = ret.changeExpression(expression as any);
     }
 
     return ret;
@@ -95,9 +107,10 @@ export class SqlAlias extends SqlBase {
 
   public upgrade(): this {
     const { expression } = this;
-    if (!(expression instanceof SqlRef)) return this;
-
-    return this.changeExpression(expression.upgrade());
+    if (expression instanceof SqlRef) {
+      return this.changeExpression(expression.upgrade());
+    }
+    return this;
   }
 
   public getOutputName(): string | undefined {

@@ -16,7 +16,7 @@ import { parseSqlQuery, SqlAlias, SqlFunction, SqlRef } from '../..';
 import { sane } from '../../test-utils';
 
 describe('SqlQuery operations', () => {
-  describe('getFirstTableName Tests', () => {
+  describe('#getFirstTableName', () => {
     it('getFirstTableNames', () => {
       expect(
         parseSqlQuery(sane`

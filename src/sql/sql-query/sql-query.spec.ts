@@ -141,6 +141,199 @@ describe('SqlQuery', () => {
     });
   });
 
+  it('Simple subquery in from', () => {
+    const sql = sane`
+      SELECT * FROM (SELECT dim1 FROM druid.foo ORDER BY __time DESC) LIMIT 2
+    `;
+
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
+      SqlQuery {
+        "explainKeyword": undefined,
+        "fromKeyword": "FROM",
+        "groupByExpressions": undefined,
+        "groupByKeyword": undefined,
+        "havingExpression": undefined,
+        "havingKeyword": undefined,
+        "innerSpacing": Object {
+          "postFrom": " ",
+          "postLimitKeyword": " ",
+          "postQuery": "",
+          "postSelect": " ",
+          "postSelectDecorator": "",
+          "preFrom": " ",
+          "preLimitKeyword": " ",
+          "preQuery": "",
+        },
+        "joinKeyword": undefined,
+        "joinTable": undefined,
+        "joinType": undefined,
+        "limitKeyword": "LIMIT",
+        "limitValue": SqlLiteral {
+          "innerSpacing": Object {},
+          "keyword": undefined,
+          "stringValue": "2",
+          "type": "literal",
+          "value": 2,
+        },
+        "onExpression": undefined,
+        "onKeyword": undefined,
+        "orderByKeyword": undefined,
+        "orderByParts": undefined,
+        "selectDecorator": "",
+        "selectKeyword": "SELECT",
+        "selectValues": SeparatedArray {
+          "separators": Array [],
+          "values": Array [
+            SqlAlias {
+              "alias": undefined,
+              "asKeyword": undefined,
+              "expression": SqlRef {
+                "column": "*",
+                "innerSpacing": Object {},
+                "namespace": undefined,
+                "namespaceQuotes": undefined,
+                "quotes": "",
+                "table": undefined,
+                "tableQuotes": undefined,
+                "type": "ref",
+              },
+              "innerSpacing": Object {},
+              "type": "alias",
+            },
+          ],
+        },
+        "tables": SeparatedArray {
+          "separators": Array [],
+          "values": Array [
+            SqlAlias {
+              "alias": undefined,
+              "asKeyword": undefined,
+              "expression": SqlQuery {
+                "explainKeyword": undefined,
+                "fromKeyword": "FROM",
+                "groupByExpressions": undefined,
+                "groupByKeyword": undefined,
+                "havingExpression": undefined,
+                "havingKeyword": undefined,
+                "innerSpacing": Object {
+                  "postFrom": " ",
+                  "postOrderByKeyword": " ",
+                  "postQuery": "",
+                  "postSelect": " ",
+                  "postSelectDecorator": "",
+                  "preFrom": " ",
+                  "preOrderByKeyword": " ",
+                  "preQuery": "",
+                },
+                "joinKeyword": undefined,
+                "joinTable": undefined,
+                "joinType": undefined,
+                "limitKeyword": undefined,
+                "limitValue": undefined,
+                "onExpression": undefined,
+                "onKeyword": undefined,
+                "orderByKeyword": "ORDER BY",
+                "orderByParts": SeparatedArray {
+                  "separators": Array [],
+                  "values": Array [
+                    SqlOrderByPart {
+                      "direction": "DESC",
+                      "expression": SqlRef {
+                        "column": "__time",
+                        "innerSpacing": Object {},
+                        "namespace": undefined,
+                        "namespaceQuotes": undefined,
+                        "quotes": "",
+                        "table": undefined,
+                        "tableQuotes": undefined,
+                        "type": "ref",
+                      },
+                      "innerSpacing": Object {
+                        "preDirection": " ",
+                      },
+                      "type": "orderByPart",
+                    },
+                  ],
+                },
+                "parens": Array [
+                  Object {
+                    "leftSpacing": "",
+                    "rightSpacing": "",
+                  },
+                ],
+                "selectDecorator": "",
+                "selectKeyword": "SELECT",
+                "selectValues": SeparatedArray {
+                  "separators": Array [],
+                  "values": Array [
+                    SqlAlias {
+                      "alias": undefined,
+                      "asKeyword": undefined,
+                      "expression": SqlRef {
+                        "column": "dim1",
+                        "innerSpacing": Object {},
+                        "namespace": undefined,
+                        "namespaceQuotes": undefined,
+                        "quotes": "",
+                        "table": undefined,
+                        "tableQuotes": undefined,
+                        "type": "ref",
+                      },
+                      "innerSpacing": Object {},
+                      "type": "alias",
+                    },
+                  ],
+                },
+                "tables": SeparatedArray {
+                  "separators": Array [],
+                  "values": Array [
+                    SqlAlias {
+                      "alias": undefined,
+                      "asKeyword": undefined,
+                      "expression": SqlRef {
+                        "column": undefined,
+                        "innerSpacing": Object {
+                          "postTableDot": "",
+                          "preTableDot": "",
+                        },
+                        "namespace": "druid",
+                        "namespaceQuotes": "",
+                        "quotes": undefined,
+                        "table": "foo",
+                        "tableQuotes": "",
+                        "type": "ref",
+                      },
+                      "innerSpacing": Object {},
+                      "type": "alias",
+                    },
+                  ],
+                },
+                "type": "query",
+                "unionKeyword": undefined,
+                "unionQuery": undefined,
+                "whereExpression": undefined,
+                "whereKeyword": undefined,
+                "withKeyword": undefined,
+                "withParts": undefined,
+              },
+              "innerSpacing": Object {},
+              "type": "alias",
+            },
+          ],
+        },
+        "type": "query",
+        "unionKeyword": undefined,
+        "unionQuery": undefined,
+        "whereExpression": undefined,
+        "whereKeyword": undefined,
+        "withKeyword": undefined,
+        "withParts": undefined,
+      }
+    `);
+  });
+
   it('Simple select, cols with many cols and aliases', () => {
     const sql = sane`
       SELECT

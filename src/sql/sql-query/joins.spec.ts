@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { parseSqlQuery, SqlExpression, SqlMulti, SqlRef } from '../..';
+import { parseSqlExpression, parseSqlQuery, SqlExpression, SqlRef } from '../..';
 import { backAndForth, sane } from '../../test-utils';
 
 describe('parse join with lookup', () => {
@@ -57,10 +57,7 @@ describe('Add Join', () => {
         .addJoin(
           'LEFT',
           SqlRef.fromString('country', 'lookup'),
-          SqlMulti.sqlMultiFactory('=', [
-            SqlRef.fromString('v', 'country', 'lookup'),
-            SqlRef.fromString('countryName', 'wikipedia'),
-          ]),
+          parseSqlExpression('lookup.country.v = wikipedia.countryName'),
         )
         .toString(),
     ).toMatchInlineSnapshot(
@@ -74,10 +71,7 @@ describe('Add Join', () => {
         .addJoin(
           'INNER',
           SqlRef.fromString('country', 'lookup'),
-          SqlMulti.sqlMultiFactory('=', [
-            SqlRef.fromString('v', 'country', 'lookup'),
-            SqlRef.fromString('countryName', 'wikipedia'),
-          ]),
+          parseSqlExpression('lookup.country.v = wikipedia.countryName'),
         )
         .toString(),
     ).toMatchInlineSnapshot(

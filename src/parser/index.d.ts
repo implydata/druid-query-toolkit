@@ -14,6 +14,6 @@
 
 import { SqlBase, SqlExpression, SqlQuery } from '../sql';
 
-export function parseSql(input: string): SqlBase;
-export function parseSqlExpression(input: string): SqlExpression;
-export function parseSqlQuery(input: string): SqlQuery;
+export function parseSql(input: string | SqlBase): SqlBase;
+export function parseSqlExpression(input: string | SqlExpression): SqlExpression;
+export function parseSqlQuery(input: string | SqlQuery): SqlQuery;

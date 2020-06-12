@@ -16,7 +16,7 @@ Start = Sql
 
 // Rest of the work...
 
-Sql = SqlQuery / SqlAlias
+Sql = SqlQuery / SqlAliasExpression
 
 // ------------------------------
 
@@ -183,8 +183,8 @@ SelectClause =
   selectKeyword:SelectToken
   postSelect:_
   selectDecorator:((AllToken / DistinctToken) _)?
-  selectValuesHead:SqlAlias
-  selectValuesTail:(CommaSeparator SqlAlias)*
+  selectValuesHead:SqlAliasExpression
+  selectValuesTail:(CommaSeparator SqlAliasExpression)*
 {
   return {
     selectKeyword: selectKeyword,
@@ -200,7 +200,9 @@ FromClause = fromKeyword:FromToken postFrom:_ tableHead:SqlAlias tableTail:(Comm
   return {
     fromKeyword: fromKeyword,
     postFrom: postFrom,
-    tables: makeSeparatedArray(tableHead, tableTail).map(table => SqlAlias.fromBase(table.upgrade())),
+    tables: makeSeparatedArray(tableHead, tableTail).map(function(table) {
+      return SqlAlias.fromBaseAndUpgrade(table);
+    }),
   };
 }
 
@@ -217,7 +219,7 @@ JoinClause =
     postJoinTypeSpacing: postJoinTypeSpacing,
     joinKeyword: joinKeyword,
     postJoinKeywordSpacing: postJoinKeywordSpacing,
-    table: SqlAlias.fromBase(table.upgrade())
+    table: SqlAlias.fromBaseAndUpgrade(table)
   };
   if (on) {
     ret.preOnKeywordSpacing = on[0];
@@ -299,7 +301,28 @@ UnionClause = unionKeyword:UnionToken postUnionKeyword:_ unionQuery:SqlQuery
 
 // ------------------------------
 
-SqlAlias = expression:Expression alias:((_ AsToken)? _ SqlRef)?
+SqlAlias = expression:(Expression / SqlInParens) alias:((_ AsToken)? _ SqlRef)?
+{
+  if (!alias) {
+    return expression;
+  }
+
+  var value = { expression: expression };
+  var innerSpacing = value.innerSpacing = {};
+
+  var as = alias[0];
+  if (as) {
+    innerSpacing.preAs = as[0];
+    value.asKeyword = as[1];
+  }
+
+  innerSpacing.preAlias = alias[1];
+  value.alias = alias[2];
+
+  return new sql.SqlAlias(value);
+}
+
+SqlAliasExpression = expression:Expression alias:((_ AsToken)? _ SqlRef)?
 {
   if (!alias) {
     return expression;

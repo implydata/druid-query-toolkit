@@ -12,7 +12,6 @@
  * limitations under the License.
  */
 
-import { SqlUnary } from '..';
 import { SqlBase, SqlBaseValue, Substitutor } from '../../sql-base';
 import { SeparatedArray, Separator } from '../../utils';
 import { SqlExpression } from '../sql-expression';
@@ -25,10 +24,10 @@ export interface SqlMultiValue extends SqlBaseValue {
 export class SqlMulti extends SqlExpression {
   static type = 'multi';
 
-  static sqlMultiFactory(separator: string, argumentsArray: SqlExpression[]) {
+  static and(argumentsArray: SqlExpression[]) {
     return new SqlMulti({
-      expressionType: separator,
-      arguments: SeparatedArray.fromArray(argumentsArray, Separator.bothSeparator(separator)),
+      expressionType: 'AND',
+      arguments: SeparatedArray.fromArray(argumentsArray, Separator.bothSeparator('AND')),
     });
   }
 
@@ -95,7 +94,7 @@ export class SqlMulti extends SqlExpression {
     return new SqlMulti(value);
   }
 
-  public addOrReplaceColumn(column: string, filter: SqlMulti | SqlUnary): SqlMulti | SqlUnary {
+  public addOrReplaceColumn(column: string, filter: SqlExpression): SqlExpression {
     const value = this.valueOf();
     if (!value.arguments) return this;
     switch (value.expressionType) {
@@ -127,13 +126,13 @@ export class SqlMulti extends SqlExpression {
         //     return argument;
         //   }
         // });
-        return SqlMulti.sqlMultiFactory('AND', [this.addParens('', ''), filter]);
+        return SqlMulti.and([this.addParens(), filter]);
 
       default:
         if (column && this.containsColumn(column)) {
           return filter;
         }
-        return SqlMulti.sqlMultiFactory('AND', [this, filter]);
+        return SqlMulti.and([this, filter]);
     }
   }
 }

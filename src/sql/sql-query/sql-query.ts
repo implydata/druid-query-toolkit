@@ -891,4 +891,5 @@ export class SqlQuery extends SqlBase {
 
   // Tumbleweeds live here
 }
+
 SqlBase.register(SqlQuery.type, SqlQuery);

@@ -88,4 +88,5 @@ export class SqlLiteral extends SqlExpression {
     return new SqlLiteral(value);
   }
 }
+
 SqlBase.register(SqlLiteral.type, SqlLiteral);

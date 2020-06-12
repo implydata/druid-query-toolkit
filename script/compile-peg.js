@@ -43,23 +43,37 @@ var p =
 ${parser}
 
 function parseSql(input) {
-  return p.parse(input);
+  if (typeof input === 'string') {
+    return p.parse(input);
+  } else if (input instanceof SqlBase) {
+    return input;
+  } else {
+    throw new Error('unknown input');
+  }
 }
 
 function parseSqlExpression(input) {
-  var parsed = parseSql(input);
-  if (!(parsed instanceof SqlExpression)) {
-    throw new Error('Provided SQL expression was not an expression');
+  if (typeof input === 'string') {
+    var parsed = parseSql(input);
+    if (!(parsed instanceof SqlExpression)) throw new Error('Provided SQL expression was not an expression');
+    return parsed;
+  } else if (input instanceof SqlExpression) {
+    return input;
+  } else {
+    throw new Error('unknown input');
   }
-  return parsed;
 }
 
 function parseSqlQuery(input) {
-  var parsed = parseSql(input);
-  if (!(parsed instanceof SqlQuery)) {
-    throw new Error('Provided SQL expression was not a query');
+  if (typeof input === 'string') {
+    var parsed = parseSql(input);
+    if (!(parsed instanceof SqlQuery)) throw new Error('Provided SQL expression was not a query');
+    return parsed;
+  } else if (input instanceof SqlQuery) {
+    return input;
+  } else {
+    throw new Error('unknown input');
   }
-  return parsed;
 }
 
 exports.parseSql = parseSql;
