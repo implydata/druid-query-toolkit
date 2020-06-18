@@ -27,6 +27,7 @@ import { parseSql } from '../../parser';
 import { deepDelete, deepSet, filterMap } from '../../utils';
 import { SqlBase, SqlBaseValue } from '../sql-base';
 
+import { SqlJoinPart } from './sql-join-part/sql-join-part';
 import { Direction, SqlOrderByPart } from './sql-order-by-part/sql-order-by-part';
 import { SqlWithPart } from './sql-with-part/sql-with-part';
 
@@ -41,14 +42,8 @@ export interface SqlQueryValue extends SqlBaseValue {
   selectValues: SeparatedArray<SqlAlias>;
 
   fromKeyword?: string;
-
   tables?: SeparatedArray<SqlAlias>;
-
-  joinType?: string;
-  joinKeyword?: string;
-  joinTable?: SqlAlias;
-  onKeyword?: string;
-  onExpression?: SqlExpression;
+  joinParts?: SeparatedArray<SqlJoinPart>;
 
   whereKeyword?: string;
   whereExpression?: SqlExpression;
@@ -79,12 +74,8 @@ export class SqlQuery extends SqlBase {
   public readonly selectDecorator?: string;
   public readonly selectValues: SeparatedArray<SqlAlias>;
   public readonly fromKeyword?: string;
-  public readonly joinType?: string;
-  public readonly joinKeyword?: string;
-  public readonly joinTable?: SqlAlias;
-  public readonly onKeyword?: string;
-  public readonly onExpression?: SqlExpression;
   public readonly tables?: SeparatedArray<SqlAlias>;
+  public readonly joinParts?: SeparatedArray<SqlJoinPart>;
   public readonly whereKeyword?: string;
   public readonly whereExpression?: SqlExpression;
   public readonly groupByKeyword?: string;
@@ -107,12 +98,8 @@ export class SqlQuery extends SqlBase {
     this.selectDecorator = options.selectDecorator;
     this.selectValues = options.selectValues;
     this.fromKeyword = options.fromKeyword;
-    this.joinType = options.joinType;
-    this.joinKeyword = options.joinKeyword;
-    this.joinTable = options.joinTable;
-    this.onKeyword = options.onKeyword;
-    this.onExpression = options.onExpression;
     this.tables = options.tables;
+    this.joinParts = options.joinParts;
     this.whereKeyword = options.whereKeyword;
     this.whereExpression = options.whereExpression;
     this.groupByKeyword = options.groupByKeyword;
@@ -136,12 +123,8 @@ export class SqlQuery extends SqlBase {
     value.selectDecorator = this.selectDecorator;
     value.selectValues = this.selectValues;
     value.fromKeyword = this.fromKeyword;
-    value.joinType = this.joinType;
-    value.joinKeyword = this.joinKeyword;
-    value.joinTable = this.joinTable;
-    value.onKeyword = this.onKeyword;
-    value.onExpression = this.onExpression;
     value.tables = this.tables;
+    value.joinParts = this.joinParts;
     value.whereKeyword = this.whereKeyword;
     value.whereExpression = this.whereExpression;
     value.groupByKeyword = this.groupByKeyword;
@@ -158,16 +141,16 @@ export class SqlQuery extends SqlBase {
   }
 
   public toRawString(): string {
-    const rawStringParts: string[] = [this.getInnerSpace('preQuery')];
+    const rawParts: string[] = [this.getInnerSpace('preQuery')];
 
     // Explain clause
     if (this.explainKeyword) {
-      rawStringParts.push(this.explainKeyword, this.getInnerSpace('postExplain'));
+      rawParts.push(this.explainKeyword, this.getInnerSpace('postExplain'));
     }
 
     // With clause
     if (this.withKeyword && this.withParts) {
-      rawStringParts.push(
+      rawParts.push(
         this.withKeyword,
         this.getInnerSpace('postWith'),
         this.withParts.toString(),
@@ -177,17 +160,17 @@ export class SqlQuery extends SqlBase {
 
     // Select clause
     if (this.selectKeyword && this.selectValues) {
-      rawStringParts.push(this.selectKeyword, this.getInnerSpace('postSelect'));
+      rawParts.push(this.selectKeyword, this.getInnerSpace('postSelect'));
       if (this.selectDecorator) {
-        rawStringParts.push(this.selectDecorator, this.getInnerSpace('postSelectDecorato'));
+        rawParts.push(this.selectDecorator, this.getInnerSpace('postSelectDecorato'));
       }
 
-      rawStringParts.push(this.selectValues.toString());
+      rawParts.push(this.selectValues.toString());
     }
 
     // From clause
     if (this.fromKeyword && this.tables) {
-      rawStringParts.push(
+      rawParts.push(
         this.getInnerSpace('preFrom', '\n'),
         this.fromKeyword,
         this.getInnerSpace('postFrom'),
@@ -196,29 +179,13 @@ export class SqlQuery extends SqlBase {
     }
 
     // Join Clause
-    if (this.joinKeyword && this.joinType && this.joinTable) {
-      rawStringParts.push(
-        this.getInnerSpace('preJoin'),
-        this.joinType,
-        this.getInnerSpace('postJoinType'),
-        this.joinKeyword,
-        this.getInnerSpace('postJoinKeyword'),
-        this.joinTable.toString(),
-      );
-
-      if (this.onKeyword && this.onExpression) {
-        rawStringParts.push(
-          this.getInnerSpace('preOnKeyword'),
-          this.onKeyword,
-          this.getInnerSpace('postOn'),
-          this.onExpression.toString(),
-        );
-      }
+    if (this.joinParts) {
+      rawParts.push(this.getInnerSpace('preJoin'), this.joinParts.toString());
     }
 
     // Where Clause
     if (this.whereKeyword && this.whereExpression) {
-      rawStringParts.push(
+      rawParts.push(
         this.getInnerSpace('preWhereKeyword', '\n'),
         this.whereKeyword,
         this.getInnerSpace('postWhereKeyword'),
@@ -228,7 +195,7 @@ export class SqlQuery extends SqlBase {
 
     // GroupBy Clause
     if (this.groupByKeyword && this.groupByExpressions) {
-      rawStringParts.push(
+      rawParts.push(
         this.getInnerSpace('preGroupByKeyword', '\n'),
         this.groupByKeyword,
         this.getInnerSpace('postGroupByKeyword'),
@@ -238,7 +205,7 @@ export class SqlQuery extends SqlBase {
 
     // Having Clause
     if (this.havingKeyword && this.havingExpression) {
-      rawStringParts.push(
+      rawParts.push(
         this.getInnerSpace('preHavingKeyword', '\n'),
         this.havingKeyword,
         this.getInnerSpace('postHavingKeyword'),
@@ -248,7 +215,7 @@ export class SqlQuery extends SqlBase {
 
     // OrderBy Clause
     if (this.orderByKeyword && this.orderByParts) {
-      rawStringParts.push(
+      rawParts.push(
         this.getInnerSpace('preOrderByKeyword', '\n'),
         this.orderByKeyword,
         this.getInnerSpace('postOrderByKeyword'),
@@ -258,7 +225,7 @@ export class SqlQuery extends SqlBase {
 
     // Limit Clause
     if (this.limitKeyword && this.limitValue) {
-      rawStringParts.push(
+      rawParts.push(
         this.getInnerSpace('preLimitKeyword', '\n'),
         this.limitKeyword,
         this.getInnerSpace('postLimitKeyword'),
@@ -268,7 +235,7 @@ export class SqlQuery extends SqlBase {
 
     // Union Clause
     if (this.unionKeyword && this.unionQuery) {
-      rawStringParts.push(
+      rawParts.push(
         this.getInnerSpace('preUnionKeyword', '\n'),
         this.unionKeyword,
         this.getInnerSpace('postUnionKeyword'),
@@ -276,8 +243,8 @@ export class SqlQuery extends SqlBase {
       );
     }
 
-    rawStringParts.push(this.getInnerSpace('postQuery'));
-    return rawStringParts.join('');
+    rawParts.push(this.getInnerSpace('postQuery'));
+    return rawParts.join('');
   }
 
   public changeWithParts(withParts: SeparatedArray<SqlWithPart>): this {
@@ -298,15 +265,9 @@ export class SqlQuery extends SqlBase {
     return SqlBase.fromValue(value);
   }
 
-  public changeJoinTable(joinTable: SqlAlias): this {
+  public changeJoinParts(joinParts: SeparatedArray<SqlJoinPart>): this {
     const value = this.valueOf();
-    value.joinTable = joinTable;
-    return SqlBase.fromValue(value);
-  }
-
-  public changeOnExpression(onExpression: SqlExpression): this {
-    const value = this.valueOf();
-    value.onExpression = onExpression;
+    value.joinParts = joinParts;
     return SqlBase.fromValue(value);
   }
 
@@ -377,19 +338,11 @@ export class SqlQuery extends SqlBase {
       }
     }
 
-    if (this.joinTable) {
-      const joinTable = this.joinTable.walkHelper(nextStack, fn, postorder);
-      if (!joinTable) return;
-      if (joinTable !== this.joinTable) {
-        ret = ret.changeJoinTable(joinTable as SqlAlias);
-      }
-
-      if (this.onExpression) {
-        const onExpression = this.onExpression.walkHelper(nextStack, fn, postorder);
-        if (!onExpression) return;
-        if (onExpression !== this.onExpression) {
-          ret = ret.changeOnExpression(onExpression);
-        }
+    if (this.joinParts) {
+      const joinParts = SqlBase.walkSeparatedArray(this.joinParts, nextStack, fn, postorder);
+      if (!joinParts) return;
+      if (joinParts !== this.joinParts) {
+        ret = ret.changeJoinParts(joinParts);
       }
     }
 
@@ -612,30 +565,20 @@ export class SqlQuery extends SqlBase {
 
   /* ~~~~~ JOIN ~~~~~ */
 
-  addJoin(joinType: 'LEFT' | 'INNER', joinTable: SqlBase, onExpression: SqlExpression) {
+  addJoin(join: SqlJoinPart) {
     const value = this.valueOf();
-    value.joinType = joinType;
-    value.joinKeyword = 'JOIN';
-    value.joinTable = SqlAlias.fromBase(joinTable);
-    value.onKeyword = 'ON';
-    value.onExpression = onExpression;
+    if (value.joinParts) {
+      value.joinParts = value.joinParts.addLast(join, '\n');
+    } else {
+      value.joinParts = SeparatedArray.fromSingleValue(join);
+    }
     return new SqlQuery(value);
   }
 
-  removeJoin() {
+  removeAllJoins() {
     const value = this.valueOf();
-    delete value.joinType;
-    delete value.joinKeyword;
-    delete value.joinTable;
-    delete value.onKeyword;
-    delete value.onExpression;
-    value.innerSpacing = this.getInnerSpacingWithout(
-      'preJoin',
-      'postJoinType',
-      'postJoinKeyword',
-      'preOnKeyword',
-      'postOn',
-    );
+    delete value.joinParts;
+    value.innerSpacing = this.getInnerSpacingWithout('preJoin');
     return new SqlQuery(value);
   }
 

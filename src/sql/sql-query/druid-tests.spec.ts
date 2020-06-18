@@ -1846,7 +1846,6 @@ describe.skip('Druid test queries', () => {
       }
     }
 
-    // @ts-ignore
-    console.log('Bad:', bad);
+    expect(bad).toEqual(0);
   });
 });

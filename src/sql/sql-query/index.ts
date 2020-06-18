@@ -15,4 +15,5 @@
 export * from './sql-alias/sql-alias';
 export * from './sql-order-by-part/sql-order-by-part';
 export * from './sql-with-part/sql-with-part';
+export * from './sql-join-part/sql-join-part';
 export * from './sql-query';

@@ -339,9 +339,7 @@ describe('SqlComparison', () => {
             "preLimitKeyword": " ",
             "preQuery": "",
           },
-          "joinKeyword": undefined,
-          "joinTable": undefined,
-          "joinType": undefined,
+          "joinParts": undefined,
           "limitKeyword": "LIMIT",
           "limitValue": SqlLiteral {
             "innerSpacing": Object {},
@@ -350,8 +348,6 @@ describe('SqlComparison', () => {
             "type": "literal",
             "value": 1,
           },
-          "onExpression": undefined,
-          "onKeyword": undefined,
           "orderByKeyword": undefined,
           "orderByParts": undefined,
           "parens": Array [
@@ -458,9 +454,7 @@ describe('SqlComparison', () => {
             "preLimitKeyword": " ",
             "preQuery": "",
           },
-          "joinKeyword": undefined,
-          "joinTable": undefined,
-          "joinType": undefined,
+          "joinParts": undefined,
           "limitKeyword": "LIMIT",
           "limitValue": SqlLiteral {
             "innerSpacing": Object {},
@@ -469,8 +463,6 @@ describe('SqlComparison', () => {
             "type": "literal",
             "value": 1,
           },
-          "onExpression": undefined,
-          "onKeyword": undefined,
           "orderByKeyword": undefined,
           "orderByParts": undefined,
           "parens": Array [

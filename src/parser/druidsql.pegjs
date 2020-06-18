@@ -26,7 +26,7 @@ SqlQuery =
   withClause:(WithClause _)?
   select:SelectClause
   from:(_ FromClause)?
-  join:(_ JoinClause)?
+  joins:(_ JoinClauses)?
   where:(_ WhereClause)?
   groupBy:(_ GroupByClause)?
   having:(_ HavingClause)?
@@ -68,17 +68,9 @@ SqlQuery =
     value.tableSeparators = from[1].tableSeparators;
   }
 
-  if (join) {
-    innerSpacing.preJoin = join[0];
-    value.joinType = join[1].joinType;
-    innerSpacing.postJoinType = join[1].postJoinTypeSpacing;
-    value.joinKeyword = join[1].joinKeyword;
-    innerSpacing.postJoinKeyword = join[1].postJoinKeywordSpacing;
-    value.joinTable = join[1].table;
-    innerSpacing.preOnKeyword = join[1].preOnKeywordSpacing;
-    value.onKeyword = join[1].onKeyword;
-    value.onExpression = join[1].onExpression;
-    innerSpacing.postOn = join[1].postOnSpacing;
+  if (joins) {
+    innerSpacing.preJoin = joins[0];
+    value.joinParts = joins[1];
   }
 
   if (where) {
@@ -206,7 +198,12 @@ FromClause = fromKeyword:FromToken postFrom:_ tableHead:SqlAlias tableTail:(Comm
   };
 }
 
-JoinClause =
+JoinClauses = head:SqlJoinPart tail:(_ SqlJoinPart)*
+{
+  return makeSeparatedArray(head, tail);
+}
+
+SqlJoinPart =
   joinType:JoinType
   postJoinTypeSpacing:_
   joinKeyword:JoinToken
@@ -214,20 +211,23 @@ JoinClause =
   table:SqlAlias
   on:(_ OnToken _ Expression)?
 {
-  var ret = {
+  var value = {
     joinType: joinType,
-    postJoinTypeSpacing: postJoinTypeSpacing,
     joinKeyword: joinKeyword,
-    postJoinKeywordSpacing: postJoinKeywordSpacing,
-    table: SqlAlias.fromBaseAndUpgrade(table)
+    table: SqlAlias.fromBaseAndUpgrade(table),
   };
+  var innerSpacing = value.innerSpacing = {
+    postJoinTypeSpacing: postJoinTypeSpacing,
+    postJoinKeywordSpacing: postJoinKeywordSpacing,
+  };
+
   if (on) {
-    ret.preOnKeywordSpacing = on[0];
-    ret.onKeyword = on[1];
-    ret.postOnSpacing = on[2];
-    ret.onExpression = on[3];
+    innerSpacing.preOnKeywordSpacing = on[0];
+    value.onKeyword = on[1];
+    innerSpacing.postOnSpacing = on[2];
+    value.onExpression = on[3];
   }
-  return ret;
+  return new sql.SqlJoinPart(value);
 }
 
 WhereClause = whereKeyword:WhereToken postWhereKeyword:_ whereExpression:Expression
