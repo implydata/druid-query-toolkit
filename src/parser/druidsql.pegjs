@@ -612,7 +612,7 @@ Interval =
   postIntervalKeyword:_
   intervalValue:BaseType
   postIntervalValue:_
-  unitKeyword:($(Unit _ ToToken _ Unit) / $(Unit '_' Unit) / Unit)
+  unitKeyword:($(TimeUnit _ ToToken _ TimeUnit) / $(TimeUnit '_' TimeUnit) / TimeUnit)
 {
   return new sql.SqlInterval({
     intervalKeyword: intervalKeyword,
@@ -625,7 +625,7 @@ Interval =
   });
 }
 
-Unit =
+TimeUnit =
   'SECOND'i
 / 'MINUTE'i
 / 'HOUR'i
@@ -634,6 +634,19 @@ Unit =
 / 'MONTH'i
 / 'QUARTER'i
 / 'YEAR'i
+
+TimeUnitExtra =
+  TimeUnit
+/ 'EPOCH'i
+/ 'MICROSECOND'i
+/ 'MILLISECOND'i
+/ 'DOW'i
+/ 'ISODOW'i
+/ 'DOY'i
+/ 'ISOYEAR'i
+/ 'DECADE'i
+/ 'CENTURY'i
+/ 'MILLENNIUM'i
 
 Function =
   functionName:UnquotedRefPartFree
@@ -718,7 +731,7 @@ ExtractFunction =
   preLeftParen:_
   OpenParen
   postLeftParen:_
-  unit:Unit
+  unit:TimeUnitExtra
   separator:FromSeparator
   expr:Expression
   postArguments:_
@@ -776,7 +789,7 @@ FloorCeilFunction =
   postLeftParen:_
   expr:Expression
   separator:ToSeparator
-  unit:Unit
+  unit:TimeUnit
   postArguments:_
   CloseParen
 {
