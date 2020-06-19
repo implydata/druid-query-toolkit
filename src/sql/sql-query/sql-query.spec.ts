@@ -2969,10 +2969,10 @@ describe('Join Clause', () => {
           "values": Array [
             SqlJoinPart {
               "innerSpacing": Object {
-                "postJoinKeywordSpacing": " ",
-                "postJoinTypeSpacing": " ",
-                "postOnSpacing": " ",
-                "preOnKeywordSpacing": " ",
+                "postJoinKeyword": " ",
+                "postJoinType": " ",
+                "postOn": " ",
+                "preOn": " ",
               },
               "joinKeyword": "Join",
               "joinType": "INNER",
@@ -3114,10 +3114,10 @@ describe('Join Clause', () => {
           "values": Array [
             SqlJoinPart {
               "innerSpacing": Object {
-                "postJoinKeywordSpacing": " ",
-                "postJoinTypeSpacing": " ",
-                "postOnSpacing": " ",
-                "preOnKeywordSpacing": " ",
+                "postJoinKeyword": " ",
+                "postJoinType": " ",
+                "postOn": " ",
+                "preOn": " ",
               },
               "joinKeyword": "Join",
               "joinType": "Left",
@@ -3259,10 +3259,10 @@ describe('Join Clause', () => {
           "values": Array [
             SqlJoinPart {
               "innerSpacing": Object {
-                "postJoinKeywordSpacing": " ",
-                "postJoinTypeSpacing": " ",
-                "postOnSpacing": " ",
-                "preOnKeywordSpacing": " ",
+                "postJoinKeyword": " ",
+                "postJoinType": " ",
+                "postOn": " ",
+                "preOn": " ",
               },
               "joinKeyword": "Join",
               "joinType": "RIGHT",
@@ -3404,10 +3404,10 @@ describe('Join Clause', () => {
           "values": Array [
             SqlJoinPart {
               "innerSpacing": Object {
-                "postJoinKeywordSpacing": " ",
-                "postJoinTypeSpacing": " ",
-                "postOnSpacing": " ",
-                "preOnKeywordSpacing": " ",
+                "postJoinKeyword": " ",
+                "postJoinType": " ",
+                "postOn": " ",
+                "preOn": " ",
               },
               "joinKeyword": "Join",
               "joinType": "FULL",
@@ -3549,10 +3549,10 @@ describe('Join Clause', () => {
           "values": Array [
             SqlJoinPart {
               "innerSpacing": Object {
-                "postJoinKeywordSpacing": " ",
-                "postJoinTypeSpacing": " ",
-                "postOnSpacing": " ",
-                "preOnKeywordSpacing": " ",
+                "postJoinKeyword": " ",
+                "postJoinType": " ",
+                "postOn": " ",
+                "preOn": " ",
               },
               "joinKeyword": "Join",
               "joinType": "FULL OUTER",

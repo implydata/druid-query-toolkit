@@ -73,7 +73,7 @@ export class SqlJoinPart extends SqlBase {
 
     if (this.onKeyword && this.onExpression) {
       rawParts.push(
-        this.getInnerSpace('preOnKeyword'),
+        this.getInnerSpace('preOn'),
         this.onKeyword,
         this.getInnerSpace('postOn'),
         this.onExpression.toString(),

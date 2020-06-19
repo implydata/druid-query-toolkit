@@ -213,9 +213,9 @@ JoinClauses = head:SqlJoinPart tail:(_ SqlJoinPart)*
 
 SqlJoinPart =
   joinType:JoinType
-  postJoinTypeSpacing:_
+  postJoinType:_
   joinKeyword:JoinToken
-  postJoinKeywordSpacing:_
+  postJoinKeyword:_
   table:SqlAlias
   on:(_ OnToken _ Expression)?
 {
@@ -225,14 +225,14 @@ SqlJoinPart =
     table: SqlAlias.fromBaseAndUpgrade(table),
   };
   var innerSpacing = value.innerSpacing = {
-    postJoinTypeSpacing: postJoinTypeSpacing,
-    postJoinKeywordSpacing: postJoinKeywordSpacing,
+    postJoinType: postJoinType,
+    postJoinKeyword: postJoinKeyword,
   };
 
   if (on) {
-    innerSpacing.preOnKeywordSpacing = on[0];
+    innerSpacing.preOn = on[0];
     value.onKeyword = on[1];
-    innerSpacing.postOnSpacing = on[2];
+    innerSpacing.postOn = on[2];
     value.onExpression = on[3];
   }
   return new sql.SqlJoinPart(value);
