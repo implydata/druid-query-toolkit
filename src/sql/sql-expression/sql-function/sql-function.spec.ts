@@ -534,46 +534,122 @@ describe('SqlFunction', () => {
     backAndForth(sql);
   });
 
-  it('works with array or numbers', () => {
+  it('array works with array or numbers', () => {
     const sql = `Array [ 1, 2, 3  ]`;
 
     backAndForth(sql);
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
-      SqlLiteral {
-        "innerSpacing": Object {
-          "postKeyword": " ",
+      SqlFunction {
+        "args": SeparatedArray {
+          "separators": Array [
+            Separator {
+              "left": "",
+              "right": " ",
+              "separator": ",",
+            },
+            Separator {
+              "left": "",
+              "right": " ",
+              "separator": ",",
+            },
+          ],
+          "values": Array [
+            SqlLiteral {
+              "innerSpacing": Object {},
+              "keyword": undefined,
+              "stringValue": "1",
+              "type": "literal",
+              "value": 1,
+            },
+            SqlLiteral {
+              "innerSpacing": Object {},
+              "keyword": undefined,
+              "stringValue": "2",
+              "type": "literal",
+              "value": 2,
+            },
+            SqlLiteral {
+              "innerSpacing": Object {},
+              "keyword": undefined,
+              "stringValue": "3",
+              "type": "literal",
+              "value": 3,
+            },
+          ],
         },
-        "keyword": "Array",
-        "stringValue": "[ 1, 2, 3  ]",
-        "type": "literal",
-        "value": Array [
-          1,
-          2,
-          3,
-        ],
+        "decorator": undefined,
+        "filterKeyword": undefined,
+        "functionName": "Array",
+        "innerSpacing": Object {
+          "postArguments": "  ",
+          "postLeftParen": " ",
+          "preLeftParen": " ",
+        },
+        "specialParen": "square",
+        "type": "function",
+        "whereExpression": undefined,
+        "whereKeyword": undefined,
       }
     `);
   });
 
-  it('works with array or strings', () => {
+  it('array works with array or strings', () => {
     const sql = `Array['1', u&'a', ']']`;
 
     backAndForth(sql);
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
-      SqlLiteral {
-        "innerSpacing": Object {
-          "postKeyword": "",
+      SqlFunction {
+        "args": SeparatedArray {
+          "separators": Array [
+            Separator {
+              "left": "",
+              "right": " ",
+              "separator": ",",
+            },
+            Separator {
+              "left": "",
+              "right": " ",
+              "separator": ",",
+            },
+          ],
+          "values": Array [
+            SqlLiteral {
+              "innerSpacing": Object {},
+              "keyword": undefined,
+              "stringValue": "'1'",
+              "type": "literal",
+              "value": "1",
+            },
+            SqlLiteral {
+              "innerSpacing": Object {},
+              "keyword": undefined,
+              "stringValue": "u&'a'",
+              "type": "literal",
+              "value": "a",
+            },
+            SqlLiteral {
+              "innerSpacing": Object {},
+              "keyword": undefined,
+              "stringValue": "']'",
+              "type": "literal",
+              "value": "]",
+            },
+          ],
         },
-        "keyword": "Array",
-        "stringValue": "['1', u&'a', ']']",
-        "type": "literal",
-        "value": Array [
-          "1",
-          "a",
-          "]",
-        ],
+        "decorator": undefined,
+        "filterKeyword": undefined,
+        "functionName": "Array",
+        "innerSpacing": Object {
+          "postArguments": "",
+          "postLeftParen": "",
+          "preLeftParen": "",
+        },
+        "specialParen": "square",
+        "type": "function",
+        "whereExpression": undefined,
+        "whereKeyword": undefined,
       }
     `);
   });

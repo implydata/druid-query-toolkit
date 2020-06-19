@@ -524,10 +524,11 @@ BaseType =
 / TrimFunction
 / FloorCeilFunction
 / PositionFunction
+/ ArrayFunction
 / Interval
 / SqlLiteral
 / SqlRef
-/ SpecialFunction
+/ NakedFunction
 / SqlInParens
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -678,7 +679,7 @@ Function =
   return new sql.SqlFunction(value);
 }
 
-SpecialFunction = functionName:UnquotedRefPartFree &{ return SqlBase.isSpecialFunction(functionName) }
+NakedFunction = functionName:UnquotedRefPartFree &{ return SqlBase.isNakedFunction(functionName) }
 {
   return new sql.SqlFunction({
     functionName: functionName,
@@ -819,6 +820,33 @@ PositionFunction =
       postArguments: postArguments,
     },
   });
+}
+
+ArrayFunction =
+  functionName:ArrayToken
+  preLeftParen:_
+  '['
+  postLeftParen:_
+  argHead:Expression?
+  argTail:(CommaSeparator Expression)*
+  postArguments:_
+  ']'
+{
+  var value = {
+    functionName: functionName,
+    specialParen: 'square',
+  };
+  var innerSpacing = value.innerSpacing = {
+    preLeftParen: preLeftParen,
+    postLeftParen: postLeftParen,
+  };
+
+  if (argHead) {
+    value.args = makeSeparatedArray(argHead, argTail);
+    innerSpacing.postArguments = postArguments;
+  }
+
+  return new sql.SqlFunction(value);
 }
 
 Filter = filterKeyword:FilterToken postFilterKeyword:_ OpenParen postLeftParen:_ filterExpression:WhereClause preRightParen:_ CloseParen

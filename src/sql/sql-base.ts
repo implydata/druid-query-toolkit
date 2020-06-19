@@ -49,7 +49,7 @@ export abstract class SqlBase {
     return Boolean(reservedKeywordLookup[keyword.toUpperCase()]);
   }
 
-  static isSpecialFunction(functionName: string) {
+  static isNakedFunction(functionName: string) {
     return Boolean(specialFunctionLookup[functionName.toUpperCase()]);
   }
 
