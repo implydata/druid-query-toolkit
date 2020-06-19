@@ -60,6 +60,9 @@ export interface SqlQueryValue extends SqlBaseValue {
   limitKeyword?: string;
   limitValue?: SqlLiteral;
 
+  offsetKeyword?: string;
+  offsetValue?: SqlLiteral;
+
   unionKeyword?: string;
   unionQuery?: SqlQuery;
 }
@@ -86,6 +89,8 @@ export class SqlQuery extends SqlBase {
   public readonly orderByParts?: SeparatedArray<SqlOrderByPart>;
   public readonly limitKeyword?: string;
   public readonly limitValue?: SqlLiteral;
+  public readonly offsetKeyword?: string;
+  public readonly offsetValue?: SqlLiteral;
   public readonly unionKeyword?: string;
   public readonly unionQuery?: SqlQuery;
 
@@ -110,6 +115,8 @@ export class SqlQuery extends SqlBase {
     this.orderByParts = options.orderByParts;
     this.limitKeyword = options.limitKeyword;
     this.limitValue = options.limitValue;
+    this.offsetKeyword = options.offsetKeyword;
+    this.offsetValue = options.offsetValue;
     this.unionKeyword = options.unionKeyword;
     this.unionQuery = options.unionQuery;
   }
@@ -135,6 +142,8 @@ export class SqlQuery extends SqlBase {
     value.orderByParts = this.orderByParts;
     value.limitKeyword = this.limitKeyword;
     value.limitValue = this.limitValue;
+    value.offsetKeyword = this.offsetKeyword;
+    value.offsetValue = this.offsetValue;
     value.unionKeyword = this.unionKeyword;
     value.unionQuery = this.unionQuery;
     return value;
@@ -233,6 +242,16 @@ export class SqlQuery extends SqlBase {
       );
     }
 
+    // Offset Clause
+    if (this.offsetKeyword && this.offsetValue) {
+      rawParts.push(
+        this.getInnerSpace('preOffsetKeyword', '\n'),
+        this.offsetKeyword,
+        this.getInnerSpace('postOffsetKeyword'),
+        this.offsetValue.toString(),
+      );
+    }
+
     // Union Clause
     if (this.unionKeyword && this.unionQuery) {
       rawParts.push(
@@ -298,6 +317,12 @@ export class SqlQuery extends SqlBase {
   public changeLimitValue(limitValue: SqlLiteral): this {
     const value = this.valueOf();
     value.limitValue = limitValue;
+    return SqlBase.fromValue(value);
+  }
+
+  public changeOffsetValue(offsetValue: SqlLiteral): this {
+    const value = this.valueOf();
+    value.offsetValue = offsetValue;
     return SqlBase.fromValue(value);
   }
 
@@ -388,6 +413,14 @@ export class SqlQuery extends SqlBase {
       if (!limitValue) return;
       if (limitValue !== this.limitValue) {
         ret = ret.changeLimitValue(limitValue as SqlLiteral);
+      }
+    }
+
+    if (this.offsetValue) {
+      const offsetValue = this.offsetValue.walkHelper(nextStack, fn, postorder);
+      if (!offsetValue) return;
+      if (offsetValue !== this.offsetValue) {
+        ret = ret.changeOffsetValue(offsetValue as SqlLiteral);
       }
     }
 

@@ -348,6 +348,8 @@ describe('SqlComparison', () => {
             "type": "literal",
             "value": 1,
           },
+          "offsetKeyword": undefined,
+          "offsetValue": undefined,
           "orderByKeyword": undefined,
           "orderByParts": undefined,
           "parens": Array [
@@ -463,6 +465,8 @@ describe('SqlComparison', () => {
             "type": "literal",
             "value": 1,
           },
+          "offsetKeyword": undefined,
+          "offsetValue": undefined,
           "orderByKeyword": undefined,
           "orderByParts": undefined,
           "parens": Array [

@@ -310,7 +310,25 @@ describe('SqlLiteral', () => {
         "keyword": "TIMESTAMP",
         "stringValue": "'2020-02-25 00:00:00'",
         "type": "literal",
-        "value": "2020-02-25 00:00:00",
+        "value": 2020-02-25T00:00:00.000Z,
+      }
+    `);
+  });
+
+  it('works with date', () => {
+    const sql = `DATE '2020-02-25'`;
+
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
+      SqlLiteral {
+        "innerSpacing": Object {
+          "postKeyword": " ",
+        },
+        "keyword": "DATE",
+        "stringValue": "'2020-02-25'",
+        "type": "literal",
+        "value": 2020-02-25T00:00:00.000Z,
       }
     `);
   });

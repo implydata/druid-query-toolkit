@@ -259,6 +259,8 @@ describe('upgrades', () => {
         "joinParts": undefined,
         "limitKeyword": undefined,
         "limitValue": undefined,
+        "offsetKeyword": undefined,
+        "offsetValue": undefined,
         "orderByKeyword": undefined,
         "orderByParts": undefined,
         "selectDecorator": "",

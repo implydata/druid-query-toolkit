@@ -32,6 +32,7 @@ SqlQuery =
   having:(_ HavingClause)?
   orderBy:(_ OrderByClause)?
   limit:(_ LimitClause)?
+  offset:(_ OffsetClause)?
   union:(_ UnionClause)?
   postQuery:EndOfQuery?
 {
@@ -108,6 +109,13 @@ SqlQuery =
     value.limitKeyword = limit[1].limitKeyword;
     innerSpacing.postLimitKeyword = limit[1].postLimitKeyword;
     value.limitValue = limit[1].limitValue;
+  }
+
+  if (offset) {
+    innerSpacing.preOffsetKeyword = offset[0];
+    value.offsetKeyword = offset[1].offsetKeyword;
+    innerSpacing.postOffsetKeyword = offset[1].postOffsetKeyword;
+    value.offsetValue = offset[1].offsetValue;
   }
 
   if (union) {
@@ -287,6 +295,15 @@ LimitClause = limitKeyword:LimitToken postLimitKeyword:_ limitValue:SqlLiteral
     limitKeyword: limitKeyword,
     postLimitKeyword: postLimitKeyword,
     limitValue: limitValue
+  };
+}
+
+OffsetClause = offsetKeyword:OffsetToken postOffsetKeyword:_ offsetValue:SqlLiteral
+{
+  return {
+    offsetKeyword: offsetKeyword,
+    postOffsetKeyword: postOffsetKeyword,
+    offsetValue: offsetValue
   };
 }
 
@@ -925,7 +942,7 @@ SqlInParens = OpenParen leftSpacing:_ ex:Sql rightSpacing:_ CloseParen
   return ex.addParens(leftSpacing, rightSpacing);
 }
 
-SqlLiteral = lit:(DynamicPlaceholder / NullToken / TrueToken / FalseToken / Number / SingleQuotedString / UnicodeString / CharsetString/ BinaryString / Timestamp / Array)
+SqlLiteral = lit:(DynamicPlaceholder / NullToken / TrueToken / FalseToken / Number / SingleQuotedString / UnicodeString / CharsetString/ BinaryString / Timestamp)
 {
   return new sql.SqlLiteral(lit);
 }
@@ -1004,43 +1021,19 @@ BinaryString = "X'"i v:$([0-9A-F]i*) "'"
 
 /* Timestamp */
 
-Timestamp = keyword:TimestampToken postKeyword:_ v:SingleQuotedString
+Timestamp = keyword:(TimestampToken / DateToken) postKeyword:_ v:SingleQuotedString
 {
   return {
     keyword: keyword,
     innerSpacing: {
       postKeyword: postKeyword
     },
-    value: v.value,
+    value: new Date(v.value.replace(' ', 'T') + 'Z'),
     stringValue: v.stringValue
   };
 }
 
 /* Array */
-
-Array = keyword:ArrayToken postKeyword:_ v:ArrayBody
-{
- return {
-   keyword: keyword,
-   innerSpacing: {
-     postKeyword: postKeyword
-   },
-   value: v.value,
-   stringValue: v.stringValue
- };
-}
-
-ArrayBody = '[' _ vs:ArrayEntries? _ ']'
-{
-  var values = (vs || []).map(function(d) {
-    return d.value;
-  });
-
-  return {
-    value: values,
-    stringValue: text()
-  };
-}
 
 SqlInArrayLiteral = '(' _ vs:ArrayEntries? _ ')'
 {
@@ -1170,6 +1163,7 @@ ByToken = $('BY'i !IdentifierPart)
 CaseToken = $('CASE'i !IdentifierPart)
 CastToken = $('CAST'i !IdentifierPart)
 CeilToken = $('CEIL'i !IdentifierPart)
+DateToken = $('DATE'i !IdentifierPart)
 DescToken = $('DESC'i !IdentifierPart)
 DistinctToken = $('DISTINCT'i !IdentifierPart)
 ElseToken = $('ELSE'i !IdentifierPart)
@@ -1193,6 +1187,7 @@ LikeToken = $('LIKE'i !IdentifierPart)
 LimitToken = $('LIMIT'i !IdentifierPart)
 NotToken = $('NOT'i !IdentifierPart)
 NullToken = $('NULL'i !IdentifierPart) { return { value: null, stringValue: text() }; }
+OffsetToken = $('OFFSET'i !IdentifierPart)
 OnToken = $('ON'i !IdentifierPart)
 OrToken = $('OR'i !IdentifierPart)
 OrderToken = $('ORDER'i !IdentifierPart __ ByToken)
