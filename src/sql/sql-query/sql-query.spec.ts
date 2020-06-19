@@ -407,7 +407,7 @@ describe('SqlQuery', () => {
               },
               "asKeyword": "AS",
               "expression": SqlFunction {
-                "arguments": SeparatedArray {
+                "args": SeparatedArray {
                   "separators": Array [],
                   "values": Array [
                     SqlRef {
@@ -430,7 +430,7 @@ describe('SqlQuery', () => {
                   "postLeftParen": "",
                   "preLeftParen": "",
                 },
-                "special": undefined,
+                "specialParen": undefined,
                 "type": "function",
                 "whereExpression": undefined,
                 "whereKeyword": undefined,
@@ -454,7 +454,7 @@ describe('SqlQuery', () => {
               },
               "asKeyword": "AS",
               "expression": SqlFunction {
-                "arguments": SeparatedArray {
+                "args": SeparatedArray {
                   "separators": Array [],
                   "values": Array [
                     SqlRef {
@@ -477,7 +477,7 @@ describe('SqlQuery', () => {
                   "postLeftParen": "",
                   "preLeftParen": "",
                 },
-                "special": undefined,
+                "specialParen": undefined,
                 "type": "function",
                 "whereExpression": undefined,
                 "whereKeyword": undefined,
@@ -3877,7 +3877,7 @@ describe('No spacing', () => {
               },
               "asKeyword": "AS",
               "expression": SqlFunction {
-                "arguments": SeparatedArray {
+                "args": SeparatedArray {
                   "separators": Array [],
                   "values": Array [
                     SqlRef {
@@ -3900,7 +3900,7 @@ describe('No spacing', () => {
                   "postLeftParen": "",
                   "preLeftParen": "",
                 },
-                "special": undefined,
+                "specialParen": undefined,
                 "type": "function",
                 "whereExpression": undefined,
                 "whereKeyword": undefined,
@@ -3924,7 +3924,7 @@ describe('No spacing', () => {
               },
               "asKeyword": "AS",
               "expression": SqlFunction {
-                "arguments": SeparatedArray {
+                "args": SeparatedArray {
                   "separators": Array [],
                   "values": Array [
                     SqlRef {
@@ -3948,7 +3948,7 @@ describe('No spacing', () => {
                   "postLeftParen": "",
                   "preLeftParen": "",
                 },
-                "special": undefined,
+                "specialParen": undefined,
                 "type": "function",
                 "whereExpression": undefined,
                 "whereKeyword": undefined,
@@ -4097,7 +4097,7 @@ describe('Extra', () => {
               },
               "asKeyword": "AS",
               "expression": SqlFunction {
-                "arguments": SeparatedArray {
+                "args": SeparatedArray {
                   "separators": Array [
                     Separator {
                       "left": " ",
@@ -4133,7 +4133,7 @@ describe('Extra', () => {
                   "postLeftParen": "",
                   "preLeftParen": "",
                 },
-                "special": undefined,
+                "specialParen": undefined,
                 "type": "function",
                 "whereExpression": undefined,
                 "whereKeyword": undefined,
@@ -4157,7 +4157,7 @@ describe('Extra', () => {
               },
               "asKeyword": "AS",
               "expression": SqlFunction {
-                "arguments": SeparatedArray {
+                "args": SeparatedArray {
                   "separators": Array [],
                   "values": Array [
                     SqlRef {
@@ -4180,7 +4180,7 @@ describe('Extra', () => {
                   "postLeftParen": "",
                   "preLeftParen": "",
                 },
-                "special": undefined,
+                "specialParen": undefined,
                 "type": "function",
                 "whereExpression": undefined,
                 "whereKeyword": undefined,
@@ -4255,12 +4255,12 @@ describe('Extra', () => {
                     ],
                     "values": Array [
                       SqlFunction {
-                        "arguments": undefined,
+                        "args": undefined,
                         "decorator": undefined,
                         "filterKeyword": undefined,
                         "functionName": "CURRENT_TIMESTAMP",
                         "innerSpacing": Object {},
-                        "special": true,
+                        "specialParen": "none",
                         "type": "function",
                         "whereExpression": undefined,
                         "whereKeyword": undefined,

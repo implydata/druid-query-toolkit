@@ -315,50 +315,6 @@ describe('SqlLiteral', () => {
     `);
   });
 
-  it('works with array or numbers', () => {
-    const sql = `Array [ 1, 2, 3  ]`;
-
-    backAndForth(sql);
-
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
-      SqlLiteral {
-        "innerSpacing": Object {
-          "postKeyword": " ",
-        },
-        "keyword": "Array",
-        "stringValue": "[ 1, 2, 3  ]",
-        "type": "literal",
-        "value": Array [
-          1,
-          2,
-          3,
-        ],
-      }
-    `);
-  });
-
-  it('works with array or strings', () => {
-    const sql = `Array['1', u&'a', ']']`;
-
-    backAndForth(sql);
-
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
-      SqlLiteral {
-        "innerSpacing": Object {
-          "postKeyword": "",
-        },
-        "keyword": "Array",
-        "stringValue": "['1', u&'a', ']']",
-        "type": "literal",
-        "value": Array [
-          "1",
-          "a",
-          "]",
-        ],
-      }
-    `);
-  });
-
   it('works with dynamic placeholder', () => {
     const sql = `?`;
 

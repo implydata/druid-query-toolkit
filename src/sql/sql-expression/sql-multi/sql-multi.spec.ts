@@ -902,7 +902,7 @@ describe('Math expression', () => {
           ],
           "values": Array [
             SqlFunction {
-              "arguments": SeparatedArray {
+              "args": SeparatedArray {
                 "separators": Array [],
                 "values": Array [
                   SqlRef {
@@ -925,7 +925,7 @@ describe('Math expression', () => {
                 "postLeftParen": "",
                 "preLeftParen": "",
               },
-              "special": undefined,
+              "specialParen": undefined,
               "type": "function",
               "whereExpression": undefined,
               "whereKeyword": undefined,
@@ -948,7 +948,7 @@ describe('Math expression', () => {
                     "value": 1,
                   },
                   SqlFunction {
-                    "arguments": SeparatedArray {
+                    "args": SeparatedArray {
                       "separators": Array [],
                       "values": Array [
                         SqlRef {
@@ -971,7 +971,7 @@ describe('Math expression', () => {
                       "postLeftParen": "",
                       "preLeftParen": "",
                     },
-                    "special": undefined,
+                    "specialParen": undefined,
                     "type": "function",
                     "whereExpression": undefined,
                     "whereKeyword": undefined,
@@ -1692,8 +1692,8 @@ describe('Brackets', () => {
           ],
           "values": Array [
             SqlUnary {
-              "argument": SqlUnary {
-                "argument": SqlMulti {
+              "arg": SqlUnary {
+                "arg": SqlMulti {
                   "arguments": SeparatedArray {
                     "separators": Array [
                       Separator {
@@ -1735,19 +1735,17 @@ describe('Brackets', () => {
                   ],
                   "type": "multi",
                 },
-                "expressionType": "NOT",
                 "innerSpacing": Object {
                   "postKeyword": " ",
                 },
                 "keyword": "NOT",
-                "type": "unaryExpression",
+                "type": "unary",
               },
-              "expressionType": "NOT",
               "innerSpacing": Object {
                 "postKeyword": " ",
               },
               "keyword": "NOT",
-              "type": "unaryExpression",
+              "type": "unary",
             },
             SqlRef {
               "column": "c",

@@ -16,47 +16,39 @@ import { SqlBase, SqlBaseValue, Substitutor } from '../../sql-base';
 import { SqlExpression } from '../sql-expression';
 
 export interface UnaryExpressionValue extends SqlBaseValue {
-  expressionType: string;
   keyword: string;
-  argument: SqlExpression;
+  arg: SqlExpression;
 }
 
 export class SqlUnary extends SqlExpression {
-  static type = 'unaryExpression';
+  static type = 'unary';
 
-  static wrapInQuotes(thing: string, quote: string): string {
-    return `${quote}${thing}${quote}`;
-  }
-
-  public readonly expressionType: string;
   public readonly keyword: string;
-  public readonly argument: SqlExpression;
+  public readonly arg: SqlExpression;
 
   constructor(options: UnaryExpressionValue) {
     super(options, SqlUnary.type);
-    this.expressionType = options.expressionType;
     this.keyword = options.keyword;
-    this.argument = options.argument;
+    this.arg = options.arg;
   }
 
   public valueOf(): UnaryExpressionValue {
     const value = super.valueOf() as UnaryExpressionValue;
-    value.expressionType = this.expressionType;
     value.keyword = this.keyword;
-    value.argument = this.argument;
+    value.arg = this.arg;
     return value;
   }
 
   public toRawString(): string {
-    if (!this.argument) {
+    if (!this.arg) {
       throw new Error('Could not make raw string');
     }
-    return this.keyword + this.getInnerSpace('postKeyword') + this.argument.toString();
+    return this.keyword + this.getInnerSpace('postKeyword') + this.arg.toString();
   }
 
-  public changeArgument(argument: SqlExpression): this {
+  public changeArgument(arg: SqlExpression): this {
     const value = this.valueOf();
-    value.argument = argument;
+    value.arg = arg;
     return SqlBase.fromValue(value);
   }
 
@@ -67,10 +59,10 @@ export class SqlUnary extends SqlExpression {
   ): SqlExpression | undefined {
     let ret = this;
 
-    const argument = this.argument.walkHelper(nextStack, fn, postorder);
-    if (!argument) return;
-    if (argument !== this.argument) {
-      ret = ret.changeArgument(argument);
+    const arg = this.arg.walkHelper(nextStack, fn, postorder);
+    if (!arg) return;
+    if (arg !== this.arg) {
+      ret = ret.changeArgument(arg);
     }
 
     return ret;

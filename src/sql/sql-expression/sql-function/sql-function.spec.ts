@@ -57,7 +57,7 @@ describe('SqlFunction', () => {
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlFunction {
-        "arguments": undefined,
+        "args": undefined,
         "decorator": undefined,
         "filterKeyword": undefined,
         "functionName": "FN",
@@ -65,7 +65,7 @@ describe('SqlFunction', () => {
           "postLeftParen": "",
           "preLeftParen": "",
         },
-        "special": undefined,
+        "specialParen": undefined,
         "type": "function",
         "whereExpression": undefined,
         "whereKeyword": undefined,
@@ -80,7 +80,7 @@ describe('SqlFunction', () => {
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlFunction {
-        "arguments": SeparatedArray {
+        "args": SeparatedArray {
           "separators": Array [],
           "values": Array [
             SqlRef {
@@ -103,7 +103,7 @@ describe('SqlFunction', () => {
           "postLeftParen": "",
           "preLeftParen": "",
         },
-        "special": undefined,
+        "specialParen": undefined,
         "type": "function",
         "whereExpression": undefined,
         "whereKeyword": undefined,
@@ -118,7 +118,7 @@ describe('SqlFunction', () => {
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlFunction {
-        "arguments": SeparatedArray {
+        "args": SeparatedArray {
           "separators": Array [],
           "values": Array [
             SqlRef {
@@ -147,7 +147,7 @@ describe('SqlFunction', () => {
             "rightSpacing": "",
           },
         ],
-        "special": undefined,
+        "specialParen": undefined,
         "type": "function",
         "whereExpression": undefined,
         "whereKeyword": undefined,
@@ -162,7 +162,7 @@ describe('SqlFunction', () => {
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlFunction {
-        "arguments": SeparatedArray {
+        "args": SeparatedArray {
           "separators": Array [],
           "values": Array [
             SqlMulti {
@@ -251,7 +251,7 @@ describe('SqlFunction', () => {
           "postLeftParen": " ",
           "preLeftParen": "",
         },
-        "special": undefined,
+        "specialParen": undefined,
         "type": "function",
         "whereExpression": undefined,
         "whereKeyword": undefined,
@@ -266,7 +266,7 @@ describe('SqlFunction', () => {
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlFunction {
-        "arguments": SeparatedArray {
+        "args": SeparatedArray {
           "separators": Array [],
           "values": Array [
             SqlRef {
@@ -289,7 +289,7 @@ describe('SqlFunction', () => {
           "postLeftParen": " ",
           "preLeftParen": "",
         },
-        "special": undefined,
+        "specialParen": undefined,
         "type": "function",
         "whereExpression": undefined,
         "whereKeyword": undefined,
@@ -314,7 +314,7 @@ describe('SqlFunction', () => {
           ],
           "values": Array [
             SqlFunction {
-              "arguments": SeparatedArray {
+              "args": SeparatedArray {
                 "separators": Array [],
                 "values": Array [
                   SqlRef {
@@ -337,7 +337,7 @@ describe('SqlFunction', () => {
                 "postLeftParen": "",
                 "preLeftParen": "",
               },
-              "special": undefined,
+              "specialParen": undefined,
               "type": "function",
               "whereExpression": undefined,
               "whereKeyword": undefined,
@@ -353,7 +353,7 @@ describe('SqlFunction', () => {
                 ],
                 "values": Array [
                   SqlFunction {
-                    "arguments": SeparatedArray {
+                    "args": SeparatedArray {
                       "separators": Array [],
                       "values": Array [
                         SqlRef {
@@ -376,7 +376,7 @@ describe('SqlFunction', () => {
                       "postLeftParen": "",
                       "preLeftParen": "",
                     },
-                    "special": undefined,
+                    "specialParen": undefined,
                     "type": "function",
                     "whereExpression": undefined,
                     "whereKeyword": undefined,
@@ -392,7 +392,7 @@ describe('SqlFunction', () => {
                       ],
                       "values": Array [
                         SqlFunction {
-                          "arguments": SeparatedArray {
+                          "args": SeparatedArray {
                             "separators": Array [],
                             "values": Array [
                               SqlRef {
@@ -415,7 +415,7 @@ describe('SqlFunction', () => {
                             "postLeftParen": "",
                             "preLeftParen": "",
                           },
-                          "special": undefined,
+                          "specialParen": undefined,
                           "type": "function",
                           "whereExpression": undefined,
                           "whereKeyword": undefined,
@@ -455,7 +455,7 @@ describe('SqlFunction', () => {
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlFunction {
-        "arguments": SeparatedArray {
+        "args": SeparatedArray {
           "separators": Array [],
           "values": Array [
             SqlRef {
@@ -483,7 +483,7 @@ describe('SqlFunction', () => {
           "preFilterRightParen": "",
           "preLeftParen": "",
         },
-        "special": undefined,
+        "specialParen": undefined,
         "type": "function",
         "whereExpression": SqlComparison {
           "innerSpacing": Object {
@@ -532,5 +532,49 @@ describe('SqlFunction', () => {
     const sql = `Trim( Both A and B FROM D)`;
 
     backAndForth(sql);
+  });
+
+  it('works with array or numbers', () => {
+    const sql = `Array [ 1, 2, 3  ]`;
+
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
+      SqlLiteral {
+        "innerSpacing": Object {
+          "postKeyword": " ",
+        },
+        "keyword": "Array",
+        "stringValue": "[ 1, 2, 3  ]",
+        "type": "literal",
+        "value": Array [
+          1,
+          2,
+          3,
+        ],
+      }
+    `);
+  });
+
+  it('works with array or strings', () => {
+    const sql = `Array['1', u&'a', ']']`;
+
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
+      SqlLiteral {
+        "innerSpacing": Object {
+          "postKeyword": "",
+        },
+        "keyword": "Array",
+        "stringValue": "['1', u&'a', ']']",
+        "type": "literal",
+        "value": Array [
+          "1",
+          "a",
+          "]",
+        ],
+      }
+    `);
   });
 });

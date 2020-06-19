@@ -664,7 +664,7 @@ describe('SqlQuery operations', () => {
         parseSqlQuery(sql)
           .addToGroupBy(
             SqlAlias.sqlAliasFactory(
-              SqlFunction.sqlFunctionFactory('min', [SqlRef.fromString('col1')]),
+              SqlFunction.factory('min', [SqlRef.fromString('col1')]),
               'MinColumn',
             ),
           )
@@ -686,7 +686,7 @@ describe('SqlQuery operations', () => {
         parseSqlQuery(sql)
           .addToGroupBy(
             SqlAlias.sqlAliasFactory(
-              SqlFunction.sqlFunctionFactory('max', [SqlRef.fromString('col2')]),
+              SqlFunction.factory('max', [SqlRef.fromString('col2')]),
               'MaxColumn',
             ),
           )

@@ -367,15 +367,14 @@ AndExpression = head:NotExpression tail:(_ AndToken _ NotExpression)*
   return maybeMakeMulti('AND', head, tail);
 }
 
-NotExpression = keyword:NotToken postKeyword:_ argument:NotExpression
+NotExpression = keyword:NotToken postKeyword:_ arg:NotExpression
 {
   return new sql.SqlUnary({
-    expressionType: 'NOT',
     keyword: keyword,
     innerSpacing: {
       postKeyword: postKeyword
     },
-    argument: argument
+    arg: arg
   });
 }
   / ComparisonExpression
@@ -501,15 +500,14 @@ DivisionExpression = head:UnaryExpression tail:(_ '/' _ UnaryExpression)*
 }
 
 // !Number is to make sure that -3 parses as a number and not as -(3)
-UnaryExpression = keyword:[+-] postKeyword:_ !Number argument:ConcatExpression
+UnaryExpression = keyword:[+-] postKeyword:_ !Number arg:ConcatExpression
 {
   return new sql.SqlUnary({
-    expressionType: keyword,
     keyword: keyword,
+    arg: arg,
     innerSpacing: {
       postKeyword: postKeyword
-    },
-    argument: argument
+    }
   });
 }
   / ConcatExpression
@@ -642,8 +640,8 @@ Function =
   OpenParen
   postLeftParen:_
   decorator:(FunctionDecorator _)?
-  argumentsHead:Expression?
-  argumentsTail:(CommaSeparator Expression)*
+  argHead:Expression?
+  argTail:(CommaSeparator Expression)*
   postArguments:_
   CloseParen
   filter:(_ Filter)?
@@ -661,8 +659,8 @@ Function =
     innerSpacing.postDecorator = decorator[1];
   }
 
-  if (argumentsHead) {
-    value.arguments = makeSeparatedArray(argumentsHead, argumentsTail);
+  if (argHead) {
+    value.args = makeSeparatedArray(argHead, argTail);
     innerSpacing.postArguments = postArguments;
   }
 
@@ -684,7 +682,7 @@ SpecialFunction = functionName:UnquotedRefPartFree &{ return SqlBase.isSpecialFu
 {
   return new sql.SqlFunction({
     functionName: functionName,
-    special: true,
+    specialParen: 'none',
   });
 }
 
@@ -705,7 +703,7 @@ CastFunction =
   });
   return new sql.SqlFunction({
     functionName: functionName,
-    arguments: new sql.SeparatedArray([expr, typeLiteral], [separator]),
+    args: new sql.SeparatedArray([expr, typeLiteral], [separator]),
     innerSpacing: {
       preLeftParen: preLeftParen,
       postLeftParen: postLeftParen,
@@ -731,7 +729,7 @@ ExtractFunction =
   });
   return new sql.SqlFunction({
     functionName: functionName,
-    arguments: new sql.SeparatedArray([unitLiteral, expr], [separator]),
+    args: new sql.SeparatedArray([unitLiteral, expr], [separator]),
     innerSpacing: {
       preLeftParen: preLeftParen,
       postLeftParen: postLeftParen,
@@ -754,7 +752,7 @@ TrimFunction =
 {
   var value = {
     functionName: functionName,
-    arguments: new sql.SeparatedArray([expr1, expr2], [separator]),
+    args: new sql.SeparatedArray([expr1, expr2], [separator]),
   };
   var innerSpacing = value.innerSpacing = {
     preLeftParen: preLeftParen,
@@ -787,7 +785,7 @@ FloorCeilFunction =
   });
   return new sql.SqlFunction({
     functionName: functionName,
-    arguments: new sql.SeparatedArray([expr, unitLiteral], [separator]),
+    args: new sql.SeparatedArray([expr, unitLiteral], [separator]),
     innerSpacing: {
       preLeftParen: preLeftParen,
       postLeftParen: postLeftParen,
@@ -814,7 +812,7 @@ PositionFunction =
 
   return new sql.SqlFunction({
     functionName: functionName,
-    arguments: args,
+    args: args,
     innerSpacing: {
       preLeftParen: preLeftParen,
       postLeftParen: postLeftParen,

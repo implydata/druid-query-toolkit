@@ -17,11 +17,13 @@ import { SqlBase, SqlBaseValue, Substitutor } from '../../sql-base';
 import { SeparatedArray, Separator } from '../../utils';
 import { SqlExpression } from '../sql-expression';
 
+export type SpecialParen = 'square' | 'none';
+
 export interface SqlFunctionValue extends SqlBaseValue {
   functionName: string;
-  special?: boolean;
-  arguments?: SeparatedArray<SqlExpression>;
+  specialParen?: SpecialParen;
   decorator?: string;
+  args?: SeparatedArray<SqlExpression>;
   filterKeyword?: string;
   whereKeyword?: string;
   whereExpression?: SqlExpression;
@@ -32,16 +34,16 @@ export class SqlFunction extends SqlExpression {
   static DEFAULT_FILTER_KEYWORD = 'FILTER';
   static DEFAULT_WHERE_KEYWORD = 'WHERE';
 
-  static sqlFunctionFactory(
+  static factory(
     functionName: string,
-    argumentArray: SqlExpression[] | SeparatedArray<SqlExpression>,
+    args: SqlExpression[] | SeparatedArray<SqlExpression>,
     filter?: SqlExpression,
     decorator?: string,
   ) {
     return new SqlFunction({
       functionName: functionName,
       decorator: decorator,
-      arguments: SeparatedArray.fromArray(argumentArray, Separator.rightSeparator(',')),
+      args: SeparatedArray.fromArray(args, Separator.rightSeparator(',')),
       filterKeyword: filter ? SqlFunction.DEFAULT_FILTER_KEYWORD : undefined,
       whereKeyword: filter ? SqlFunction.DEFAULT_WHERE_KEYWORD : undefined,
       whereExpression: filter,
@@ -49,8 +51,8 @@ export class SqlFunction extends SqlExpression {
   }
 
   public readonly functionName: string;
-  public readonly special?: boolean;
-  public readonly arguments?: SeparatedArray<SqlExpression>;
+  public readonly specialParen?: SpecialParen;
+  public readonly args?: SeparatedArray<SqlExpression>;
   public readonly decorator?: string;
   public readonly filterKeyword?: string;
   public readonly whereKeyword?: string;
@@ -59,9 +61,9 @@ export class SqlFunction extends SqlExpression {
   constructor(options: SqlFunctionValue) {
     super(options, SqlFunction.type);
     this.functionName = options.functionName;
-    this.special = options.special;
+    this.specialParen = options.specialParen;
     this.decorator = options.decorator;
-    this.arguments = options.arguments;
+    this.args = options.args;
     this.filterKeyword = options.filterKeyword;
     this.whereKeyword = options.whereKeyword;
     this.whereExpression = options.whereExpression;
@@ -70,9 +72,9 @@ export class SqlFunction extends SqlExpression {
   public valueOf(): SqlFunctionValue {
     const value = super.valueOf() as SqlFunctionValue;
     value.functionName = this.functionName;
-    value.special = this.special;
+    value.specialParen = this.specialParen;
     value.decorator = this.decorator;
-    value.arguments = this.arguments;
+    value.args = this.args;
     value.filterKeyword = this.filterKeyword;
     value.whereKeyword = this.whereKeyword;
     value.whereExpression = this.whereExpression;
@@ -80,22 +82,25 @@ export class SqlFunction extends SqlExpression {
   }
 
   public toRawString(): string {
+    const { specialParen } = this;
     const rawParts: string[] = [this.functionName];
 
-    if (!this.special) {
+    if (specialParen !== 'none') {
       rawParts.push(
         this.getInnerSpace('preLeftParen', ''),
-        '(',
+        specialParen === 'square' ? '[' : '(',
         this.getInnerSpace('postLeftParen', ''),
       );
 
       if (this.decorator) {
         rawParts.push(this.decorator, this.getInnerSpace('postDecorator'));
       }
-      if (this.arguments) {
-        rawParts.push(this.arguments.toString(), this.getInnerSpace('postArguments', ''));
+
+      if (this.args) {
+        rawParts.push(this.args.toString(), this.getInnerSpace('postArguments', ''));
       }
-      rawParts.push(')');
+
+      rawParts.push(specialParen === 'square' ? ']' : ')');
 
       if (this.filterKeyword && this.whereKeyword && this.whereExpression) {
         rawParts.push(
@@ -122,7 +127,7 @@ export class SqlFunction extends SqlExpression {
 
   public changeArguments(args: SeparatedArray<SqlExpression>): this {
     const value = this.valueOf();
-    value.arguments = args;
+    value.args = args;
     return SqlBase.fromValue(value);
   }
 
@@ -146,10 +151,10 @@ export class SqlFunction extends SqlExpression {
   ): SqlExpression | undefined {
     let ret = this;
 
-    if (this.arguments) {
-      const args = SqlBase.walkSeparatedArray(this.arguments, nextStack, fn, postorder);
+    if (this.args) {
+      const args = SqlBase.walkSeparatedArray(this.args, nextStack, fn, postorder);
       if (!args) return;
-      if (args !== this.arguments) {
+      if (args !== this.args) {
         ret = ret.changeArguments(args);
       }
     }
@@ -167,7 +172,7 @@ export class SqlFunction extends SqlExpression {
 
   public isCountStar(): boolean {
     if (this.getEffectiveFunctionName() !== 'COUNT') return false;
-    const args = this.arguments;
+    const args = this.args;
     if (!args || args.length() !== 1) return false;
     const firstArg = args.first();
     return firstArg instanceof SqlRef && firstArg.isStar();
