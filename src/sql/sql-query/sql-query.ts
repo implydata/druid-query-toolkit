@@ -171,7 +171,7 @@ export class SqlQuery extends SqlBase {
     if (this.selectKeyword && this.selectValues) {
       rawParts.push(this.selectKeyword, this.getInnerSpace('postSelect'));
       if (this.selectDecorator) {
-        rawParts.push(this.selectDecorator, this.getInnerSpace('postSelectDecorato'));
+        rawParts.push(this.selectDecorator, this.getInnerSpace('postSelectDecorator'));
       }
 
       rawParts.push(this.selectValues.toString());

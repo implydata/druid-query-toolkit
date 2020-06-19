@@ -540,6 +540,7 @@ BaseType =
 / ExtractFunction
 / TrimFunction
 / FloorCeilFunction
+/ TimestampAddDiffFunction
 / PositionFunction
 / ArrayFunction
 / Interval
@@ -823,6 +824,35 @@ FloorCeilFunction =
       postArguments: postArguments,
     },
   });
+}
+
+TimestampAddDiffFunction =
+  functionName:(TimestampaddToken / TimestampdiffToken)
+  preLeftParen:_
+  OpenParen
+  postLeftParen:_
+  unit:TimeUnit
+  argTail:(CommaSeparator Expression)*
+  postArguments:_
+  CloseParen
+{
+  var value = {
+    functionName: functionName,
+  };
+  var innerSpacing = value.innerSpacing = {
+    preLeftParen: preLeftParen,
+    postLeftParen: postLeftParen,
+  };
+
+  var argHead = new sql.SqlLiteral({
+    value: unit.toUpperCase(),
+    stringValue: unit,
+  });
+
+  value.args = makeSeparatedArray(argHead, argTail);
+  innerSpacing.postArguments = postArguments;
+
+  return new sql.SqlFunction(value);
 }
 
 PositionFunction =
@@ -1196,6 +1226,8 @@ SelectToken = $('SELECT'i !IdentifierPart)
 SimilarToToken = $('SIMILAR'i !IdentifierPart __ ToToken)
 ThenToken = $('THEN'i !IdentifierPart)
 TimestampToken = $('TIMESTAMP'i !IdentifierPart)
+TimestampaddToken = $('TIMESTAMPADD'i !IdentifierPart)
+TimestampdiffToken = $('TIMESTAMPDIFF'i !IdentifierPart)
 ToToken = $('TO'i !IdentifierPart)
 TrailingToken = $('TRAILING'i !IdentifierPart)
 TrimToken = $('TRIM'i !IdentifierPart)
