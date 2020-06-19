@@ -328,7 +328,8 @@ SELECT countryName from wikipedia
 
 - Add support for `/* inline comments */`
 - Clean up APIs
-- WITH with no AS
+- `(a, b) IN (subquery)`
+- Fancy group by definitions e.g. `GROUPING SETS`, `CUBE`
 
 ## License 
 
