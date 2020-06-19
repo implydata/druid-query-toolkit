@@ -17,31 +17,27 @@ import { SqlBase, SqlBaseValue, Substitutor } from '../../sql-base';
 import { SeparatedArray } from '../../utils';
 import { SqlExpression } from '../sql-expression';
 
-export interface SqlCaseSearchedValue extends SqlBaseValue {
+export interface SqlCaseValue extends SqlBaseValue {
   caseKeyword: string;
+  caseExpression?: SqlExpression;
   whenThenParts: SeparatedArray<SqlWhenThenPart>;
   elseKeyword?: string;
   elseExpression?: SqlExpression;
   endKeyword: string;
 }
 
-export class SqlCaseSearched extends SqlExpression {
-  static type = 'caseSearched';
+export class SqlCase extends SqlExpression {
+  static type = 'case';
 
   static ifFactory(
     conditionExpression: SqlExpression,
     thenExpression: SqlExpression,
     elseExpression?: SqlExpression,
   ) {
-    return new SqlCaseSearched({
+    return new SqlCase({
       caseKeyword: 'CASE',
       whenThenParts: SeparatedArray.fromSingleValue(
-        new SqlWhenThenPart({
-          whenKeyword: 'WHEN',
-          whenExpression: conditionExpression,
-          thenKeyword: 'THEN',
-          thenExpression,
-        }),
+        SqlWhenThenPart.factory(conditionExpression, thenExpression),
       ),
       elseKeyword: elseExpression ? 'ELSE' : undefined,
       elseExpression,
@@ -50,23 +46,26 @@ export class SqlCaseSearched extends SqlExpression {
   }
 
   public readonly caseKeyword: string;
+  public readonly caseExpression?: SqlExpression;
   public readonly whenThenParts: SeparatedArray<SqlWhenThenPart>;
   public readonly elseKeyword?: string;
   public readonly elseExpression?: SqlExpression;
   public readonly endKeyword: string;
 
-  constructor(options: SqlCaseSearchedValue) {
-    super(options, SqlCaseSearched.type);
+  constructor(options: SqlCaseValue) {
+    super(options, SqlCase.type);
     this.caseKeyword = options.caseKeyword;
+    this.caseExpression = options.caseExpression;
     this.whenThenParts = options.whenThenParts;
     this.elseKeyword = options.elseKeyword;
     this.elseExpression = options.elseExpression;
     this.endKeyword = options.endKeyword;
   }
 
-  public valueOf(): SqlCaseSearchedValue {
-    const value = super.valueOf() as SqlCaseSearchedValue;
+  public valueOf(): SqlCaseValue {
+    const value = super.valueOf() as SqlCaseValue;
     value.caseKeyword = this.caseKeyword;
+    value.caseExpression = this.caseExpression;
     value.whenThenParts = this.whenThenParts;
     value.elseKeyword = this.elseKeyword;
     value.elseExpression = this.elseExpression;
@@ -75,16 +74,17 @@ export class SqlCaseSearched extends SqlExpression {
   }
 
   public toRawString(): string {
-    const rawParts: string[] = [this.caseKeyword, this.getInnerSpace('postCase')];
+    const rawParts: string[] = [this.caseKeyword.toString(), this.getInnerSpace('postCase')];
 
-    if (this.whenThenParts) {
-      rawParts.push(this.whenThenParts.toString());
+    if (this.caseExpression) {
+      rawParts.push(this.caseExpression.toString(), this.getInnerSpace('postCaseExpression'));
     }
 
-    rawParts.push(this.getInnerSpace('postWhenThen'));
+    rawParts.push(this.whenThenParts.toString());
 
     if (this.elseKeyword && this.elseExpression) {
       rawParts.push(
+        this.getInnerSpace('preElse'),
         this.elseKeyword,
         this.getInnerSpace('postElse'),
         this.elseExpression.toString(),
@@ -94,6 +94,12 @@ export class SqlCaseSearched extends SqlExpression {
     rawParts.push(this.getInnerSpace('preEnd'), this.endKeyword);
 
     return rawParts.join('');
+  }
+
+  public changeCaseExpression(caseExpression: SqlExpression): this {
+    const value = this.valueOf();
+    value.caseExpression = caseExpression;
+    return SqlBase.fromValue(value);
   }
 
   public changeWhenThenParts(whenThenParts: SeparatedArray<SqlWhenThenPart>): this {
@@ -115,6 +121,14 @@ export class SqlCaseSearched extends SqlExpression {
   ): SqlExpression | undefined {
     let ret = this;
 
+    if (this.caseExpression) {
+      const caseExpression = this.caseExpression.walkHelper(nextStack, fn, postorder);
+      if (!caseExpression) return;
+      if (caseExpression !== this.caseExpression) {
+        ret = ret.changeCaseExpression(caseExpression);
+      }
+    }
+
     const whenThenParts = SqlBase.walkSeparatedArray(this.whenThenParts, nextStack, fn, postorder);
     if (!whenThenParts) return;
     if (whenThenParts !== this.whenThenParts) {
@@ -133,4 +147,4 @@ export class SqlCaseSearched extends SqlExpression {
   }
 }
 
-SqlBase.register(SqlCaseSearched.type, SqlCaseSearched);
+SqlBase.register(SqlCase.type, SqlCase);

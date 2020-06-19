@@ -19,7 +19,6 @@ export * from './sql-multi/sql-multi';
 export * from './sql-unary/sql-unary';
 export * from './sql-comparison/sql-comparison';
 export * from './sql-function/sql-function';
-export * from './sql-case-simple/sql-case-simple';
-export * from './sql-case-searched/sql-case-searched';
+export * from './sql-case/sql-case';
 export * from './sql-interval/sql-interval';
 export * from './sql-when-then-part/sql-when-then-part';

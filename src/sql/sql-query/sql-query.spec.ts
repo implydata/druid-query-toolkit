@@ -16,7 +16,7 @@ import {
   parseSql,
   parseSqlExpression,
   parseSqlQuery,
-  SqlCaseSearched,
+  SqlCase,
   SqlFunction,
   SqlRef,
 } from '../../index';
@@ -126,7 +126,7 @@ describe('SqlQuery', () => {
           parseSql(sql).walk(x => {
             if (x instanceof SqlRef) {
               if (x.column && x.table === 't') {
-                return SqlCaseSearched.ifFactory(condition, x);
+                return SqlCase.ifFactory(condition, x);
               }
             }
             if (x instanceof SqlFunction && x.isCountStar()) {
@@ -136,7 +136,7 @@ describe('SqlQuery', () => {
           }),
         ),
       ).toMatchInlineSnapshot(
-        `"SUM(CASE WHEN __time BETWEEN TIMESTAMP '2020-01-01 01:00:00' AND TIMESTAMP '2020-01-01 02:00:00' THEN t.added  END) / COUNT(DISTINCT CASE WHEN __time BETWEEN TIMESTAMP '2020-01-01 01:00:00' AND TIMESTAMP '2020-01-01 02:00:00' THEN t.\\"user\\"  END) + COUNT(*) FILTER (WHERE __time BETWEEN TIMESTAMP '2020-01-01 01:00:00' AND TIMESTAMP '2020-01-01 02:00:00')"`,
+        `"SUM(CASE WHEN __time BETWEEN TIMESTAMP '2020-01-01 01:00:00' AND TIMESTAMP '2020-01-01 02:00:00' THEN t.added END) / COUNT(DISTINCT CASE WHEN __time BETWEEN TIMESTAMP '2020-01-01 01:00:00' AND TIMESTAMP '2020-01-01 02:00:00' THEN t.\\"user\\" END) + COUNT(*) FILTER (WHERE __time BETWEEN TIMESTAMP '2020-01-01 01:00:00' AND TIMESTAMP '2020-01-01 02:00:00')"`,
       );
     });
   });

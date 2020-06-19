@@ -372,7 +372,7 @@ Expressions are defined below in acceding priority order
   Unary identity (+), negation (-)
 */
 
-Expression = CaseExpression / OrExpression
+Expression = OrExpression
 
 OrExpression = head:AndExpression tail:(_ OrToken _ AndExpression)*
 {
@@ -535,7 +535,8 @@ ConcatExpression = head:BaseType tail:(_ '||' _ BaseType)*
 }
 
 BaseType =
-  Function
+  CaseExpression
+/ Function
 / CastFunction
 / ExtractFunction
 / TrimFunction
@@ -551,46 +552,19 @@ BaseType =
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 
-CaseExpression = SearchedCaseExpression / SimpleCaseExpression
-
-SearchedCaseExpression =
+CaseExpression =
   caseKeyword:CaseToken
   postCase:_
+  caseExpression:(Expression _)?
   whenThenPartsHead:WhenThenPair
   whenThenPartsTail:(_ WhenThenPair)*
   elseValue:(_ ElseToken _ Expression)?
   preEnd:_
   endKeyword:EndToken
 {
-  return new sql.SqlCaseSearched({
+  return new sql.SqlCase({
     caseKeyword: caseKeyword,
-    whenThenParts: makeSeparatedArray(whenThenPartsHead, whenThenPartsTail),
-    elseKeyword: elseValue ? elseValue[1] : undefined,
-    elseExpression: elseValue ? elseValue[3] : undefined,
-    endKeyword: endKeyword,
-    innerSpacing: {
-      postCase: postCase,
-      postWhenThen: elseValue ? elseValue[0] : '',
-      postElse: elseValue ? elseValue[2] : '',
-      preEnd: preEnd,
-    }
-  });
-}
-
-SimpleCaseExpression =
-  caseKeyword:CaseToken
-  postCase:_
-  caseExpression:Expression
-  postCaseExpression:_
-  whenThenPartsHead:WhenThenPair
-  whenThenPartsTail:(_ WhenThenPair)*
-  elseValue:(_ ElseToken _ Expression)?
-  preEnd:_
-  endKeyword:EndToken
-{
-  return new sql.SqlCaseSimple({
-    caseKeyword: caseKeyword,
-    caseExpression: caseExpression,
+    caseExpression: caseExpression ? caseExpression[0] : undefined,
     whenThenParts: makeSeparatedArray(whenThenPartsHead, whenThenPartsTail),
     elseKeyword: elseValue ? elseValue[1] : undefined,
     elseExpression: elseValue ? elseValue[3] : undefined,
@@ -598,9 +572,9 @@ SimpleCaseExpression =
     postWhenThenParts: whenThenPartsTail ? makeListMap(whenThenPartsTail, 0) : [],
     innerSpacing: {
       postCase: postCase,
-      postCaseExpression: postCaseExpression,
-      postWhenThen: elseValue ? elseValue[0] : '',
-      postElse: elseValue ? elseValue[2] : '',
+      postCaseExpression: caseExpression ? caseExpression[1] : undefined,
+      preElse: elseValue ? elseValue[0] : undefined,
+      postElse: elseValue ? elseValue[2] : undefined,
       preEnd: preEnd,
     }
   });

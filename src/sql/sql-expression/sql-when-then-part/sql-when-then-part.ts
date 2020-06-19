@@ -25,6 +25,15 @@ export interface SqlWhenThenPartValue extends SqlBaseValue {
 export class SqlWhenThenPart extends SqlBase {
   static type = 'whenThenPart';
 
+  static factory(whenExpression: SqlExpression, thenExpression: SqlExpression): SqlWhenThenPart {
+    return new SqlWhenThenPart({
+      whenKeyword: 'WHEN',
+      whenExpression,
+      thenKeyword: 'THEN',
+      thenExpression,
+    });
+  }
+
   public readonly whenKeyword: string;
   public readonly whenExpression: SqlExpression;
   public readonly thenKeyword: string;
@@ -55,7 +64,7 @@ export class SqlWhenThenPart extends SqlBase {
       this.getInnerSpace('postWhenExpression'),
       this.thenKeyword,
       this.getInnerSpace('postThen'),
-      this.thenExpression,
+      this.thenExpression.toString(),
     ].join('');
   }
 

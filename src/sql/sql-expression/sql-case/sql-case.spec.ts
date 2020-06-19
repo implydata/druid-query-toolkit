@@ -16,24 +16,33 @@ import { parseSql } from '../../..';
 import { backAndForth } from '../../../test-utils';
 
 describe('Case expression', () => {
-  it('searched CASE', () => {
-    const sql = `CASE WHEN B THEN C END`;
+  it('simple CASE Expression', () => {
+    const sql = `CASE A WHEN B THEN C END`;
 
     backAndForth(sql);
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
-      SqlCaseSearched {
+      SqlCase {
+        "caseExpression": SqlRef {
+          "column": "A",
+          "innerSpacing": Object {},
+          "namespace": undefined,
+          "namespaceQuotes": undefined,
+          "quotes": "",
+          "table": undefined,
+          "tableQuotes": undefined,
+          "type": "ref",
+        },
         "caseKeyword": "CASE",
         "elseExpression": undefined,
         "elseKeyword": undefined,
         "endKeyword": "END",
         "innerSpacing": Object {
           "postCase": " ",
-          "postElse": "",
-          "postWhenThen": "",
+          "postCaseExpression": " ",
           "preEnd": " ",
         },
-        "type": "caseSearched",
+        "type": "case",
         "whenThenParts": SeparatedArray {
           "separators": Array [],
           "values": Array [
@@ -73,13 +82,23 @@ describe('Case expression', () => {
     `);
   });
 
-  it('searched CASE with Else', () => {
-    const sql = `CASE WHEN B THEN C ELSE D END`;
+  it('simple CASE Expression with ELSE', () => {
+    const sql = `CASE A WHEN B THEN C ELSE D END`;
 
     backAndForth(sql);
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
-      SqlCaseSearched {
+      SqlCase {
+        "caseExpression": SqlRef {
+          "column": "A",
+          "innerSpacing": Object {},
+          "namespace": undefined,
+          "namespaceQuotes": undefined,
+          "quotes": "",
+          "table": undefined,
+          "tableQuotes": undefined,
+          "type": "ref",
+        },
         "caseKeyword": "CASE",
         "elseExpression": SqlRef {
           "column": "D",
@@ -95,11 +114,12 @@ describe('Case expression', () => {
         "endKeyword": "END",
         "innerSpacing": Object {
           "postCase": " ",
+          "postCaseExpression": " ",
           "postElse": " ",
-          "postWhenThen": " ",
+          "preElse": " ",
           "preEnd": " ",
         },
-        "type": "caseSearched",
+        "type": "case",
         "whenThenParts": SeparatedArray {
           "separators": Array [],
           "values": Array [
@@ -145,7 +165,7 @@ describe('Case expression', () => {
     backAndForth(sql);
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
-      SqlCaseSimple {
+      SqlCase {
         "caseExpression": SqlRef {
           "column": "A",
           "innerSpacing": Object {},
@@ -163,11 +183,9 @@ describe('Case expression', () => {
         "innerSpacing": Object {
           "postCase": " ",
           "postCaseExpression": "  ",
-          "postElse": "",
-          "postWhenThen": "",
           "preEnd": "      ",
         },
-        "type": "caseSimple",
+        "type": "case",
         "whenThenParts": SeparatedArray {
           "separators": Array [],
           "values": Array [
@@ -213,7 +231,7 @@ describe('Case expression', () => {
     backAndForth(sql);
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
-      SqlCaseSimple {
+      SqlCase {
         "caseExpression": SqlRef {
           "column": "A",
           "innerSpacing": Object {},
@@ -231,8 +249,6 @@ describe('Case expression', () => {
         "innerSpacing": Object {
           "postCase": " ",
           "postCaseExpression": " ",
-          "postElse": "",
-          "postWhenThen": "",
           "preEnd": " ",
         },
         "parens": Array [
@@ -241,7 +257,7 @@ describe('Case expression', () => {
             "rightSpacing": "",
           },
         ],
-        "type": "caseSimple",
+        "type": "case",
         "whenThenParts": SeparatedArray {
           "separators": Array [],
           "values": Array [
@@ -287,7 +303,7 @@ describe('Case expression', () => {
     backAndForth(sql);
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
-      SqlCaseSimple {
+      SqlCase {
         "caseExpression": SqlRef {
           "column": "A",
           "innerSpacing": Object {},
@@ -305,8 +321,6 @@ describe('Case expression', () => {
         "innerSpacing": Object {
           "postCase": "   ",
           "postCaseExpression": " ",
-          "postElse": "",
-          "postWhenThen": "",
           "preEnd": " ",
         },
         "parens": Array [
@@ -315,7 +329,7 @@ describe('Case expression', () => {
             "rightSpacing": "  ",
           },
         ],
-        "type": "caseSimple",
+        "type": "case",
         "whenThenParts": SeparatedArray {
           "separators": Array [],
           "values": Array [
@@ -361,7 +375,7 @@ describe('Case expression', () => {
     backAndForth(sql);
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
-      SqlCaseSimple {
+      SqlCase {
         "caseExpression": SqlRef {
           "column": "A",
           "innerSpacing": Object {},
@@ -379,8 +393,6 @@ describe('Case expression', () => {
         "innerSpacing": Object {
           "postCase": "   ",
           "postCaseExpression": " ",
-          "postElse": "",
-          "postWhenThen": "",
           "preEnd": " ",
         },
         "parens": Array [
@@ -389,7 +401,464 @@ describe('Case expression', () => {
             "rightSpacing": "  ",
           },
         ],
-        "type": "caseSimple",
+        "type": "case",
+        "whenThenParts": SeparatedArray {
+          "separators": Array [],
+          "values": Array [
+            SqlWhenThenPart {
+              "innerSpacing": Object {
+                "postThen": " ",
+                "postWhen": "  ",
+                "postWhenExpression": " ",
+              },
+              "thenExpression": SqlMulti {
+                "arguments": SeparatedArray {
+                  "separators": Array [
+                    Separator {
+                      "left": " ",
+                      "right": " ",
+                      "separator": "OR",
+                    },
+                  ],
+                  "values": Array [
+                    SqlRef {
+                      "column": "C",
+                      "innerSpacing": Object {},
+                      "namespace": undefined,
+                      "namespaceQuotes": undefined,
+                      "quotes": "",
+                      "table": undefined,
+                      "tableQuotes": undefined,
+                      "type": "ref",
+                    },
+                    SqlRef {
+                      "column": "C",
+                      "innerSpacing": Object {},
+                      "namespace": undefined,
+                      "namespaceQuotes": undefined,
+                      "quotes": "",
+                      "table": undefined,
+                      "tableQuotes": undefined,
+                      "type": "ref",
+                    },
+                  ],
+                },
+                "expressionType": "OR",
+                "innerSpacing": Object {},
+                "type": "multi",
+              },
+              "thenKeyword": "THEN",
+              "type": "whenThenPart",
+              "whenExpression": SqlMulti {
+                "arguments": SeparatedArray {
+                  "separators": Array [
+                    Separator {
+                      "left": " ",
+                      "right": " ",
+                      "separator": "AND",
+                    },
+                  ],
+                  "values": Array [
+                    SqlRef {
+                      "column": "B",
+                      "innerSpacing": Object {},
+                      "namespace": undefined,
+                      "namespaceQuotes": undefined,
+                      "quotes": "",
+                      "table": undefined,
+                      "tableQuotes": undefined,
+                      "type": "ref",
+                    },
+                    SqlRef {
+                      "column": "B",
+                      "innerSpacing": Object {},
+                      "namespace": undefined,
+                      "namespaceQuotes": undefined,
+                      "quotes": "",
+                      "table": undefined,
+                      "tableQuotes": undefined,
+                      "type": "ref",
+                    },
+                  ],
+                },
+                "expressionType": "AND",
+                "innerSpacing": Object {},
+                "type": "multi",
+              },
+              "whenKeyword": "WHEN",
+            },
+          ],
+        },
+      }
+    `);
+  });
+
+  it('searched CASE', () => {
+    const sql = `CASE WHEN B THEN C END`;
+
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
+      SqlCase {
+        "caseExpression": undefined,
+        "caseKeyword": "CASE",
+        "elseExpression": undefined,
+        "elseKeyword": undefined,
+        "endKeyword": "END",
+        "innerSpacing": Object {
+          "postCase": " ",
+          "preEnd": " ",
+        },
+        "type": "case",
+        "whenThenParts": SeparatedArray {
+          "separators": Array [],
+          "values": Array [
+            SqlWhenThenPart {
+              "innerSpacing": Object {
+                "postThen": " ",
+                "postWhen": " ",
+                "postWhenExpression": " ",
+              },
+              "thenExpression": SqlRef {
+                "column": "C",
+                "innerSpacing": Object {},
+                "namespace": undefined,
+                "namespaceQuotes": undefined,
+                "quotes": "",
+                "table": undefined,
+                "tableQuotes": undefined,
+                "type": "ref",
+              },
+              "thenKeyword": "THEN",
+              "type": "whenThenPart",
+              "whenExpression": SqlRef {
+                "column": "B",
+                "innerSpacing": Object {},
+                "namespace": undefined,
+                "namespaceQuotes": undefined,
+                "quotes": "",
+                "table": undefined,
+                "tableQuotes": undefined,
+                "type": "ref",
+              },
+              "whenKeyword": "WHEN",
+            },
+          ],
+        },
+      }
+    `);
+  });
+
+  it('searched CASE with Else', () => {
+    const sql = `CASE WHEN B THEN C ELSE D END`;
+
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
+      SqlCase {
+        "caseExpression": undefined,
+        "caseKeyword": "CASE",
+        "elseExpression": SqlRef {
+          "column": "D",
+          "innerSpacing": Object {},
+          "namespace": undefined,
+          "namespaceQuotes": undefined,
+          "quotes": "",
+          "table": undefined,
+          "tableQuotes": undefined,
+          "type": "ref",
+        },
+        "elseKeyword": "ELSE",
+        "endKeyword": "END",
+        "innerSpacing": Object {
+          "postCase": " ",
+          "postElse": " ",
+          "preElse": " ",
+          "preEnd": " ",
+        },
+        "type": "case",
+        "whenThenParts": SeparatedArray {
+          "separators": Array [],
+          "values": Array [
+            SqlWhenThenPart {
+              "innerSpacing": Object {
+                "postThen": " ",
+                "postWhen": " ",
+                "postWhenExpression": " ",
+              },
+              "thenExpression": SqlRef {
+                "column": "C",
+                "innerSpacing": Object {},
+                "namespace": undefined,
+                "namespaceQuotes": undefined,
+                "quotes": "",
+                "table": undefined,
+                "tableQuotes": undefined,
+                "type": "ref",
+              },
+              "thenKeyword": "THEN",
+              "type": "whenThenPart",
+              "whenExpression": SqlRef {
+                "column": "B",
+                "innerSpacing": Object {},
+                "namespace": undefined,
+                "namespaceQuotes": undefined,
+                "quotes": "",
+                "table": undefined,
+                "tableQuotes": undefined,
+                "type": "ref",
+              },
+              "whenKeyword": "WHEN",
+            },
+          ],
+        },
+      }
+    `);
+  });
+
+  it('simple CASE Expression with weird spacing', () => {
+    const sql = `CASE A  WHEN     B THEN C      END`;
+
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
+      SqlCase {
+        "caseExpression": SqlRef {
+          "column": "A",
+          "innerSpacing": Object {},
+          "namespace": undefined,
+          "namespaceQuotes": undefined,
+          "quotes": "",
+          "table": undefined,
+          "tableQuotes": undefined,
+          "type": "ref",
+        },
+        "caseKeyword": "CASE",
+        "elseExpression": undefined,
+        "elseKeyword": undefined,
+        "endKeyword": "END",
+        "innerSpacing": Object {
+          "postCase": " ",
+          "postCaseExpression": "  ",
+          "preEnd": "      ",
+        },
+        "type": "case",
+        "whenThenParts": SeparatedArray {
+          "separators": Array [],
+          "values": Array [
+            SqlWhenThenPart {
+              "innerSpacing": Object {
+                "postThen": " ",
+                "postWhen": "     ",
+                "postWhenExpression": " ",
+              },
+              "thenExpression": SqlRef {
+                "column": "C",
+                "innerSpacing": Object {},
+                "namespace": undefined,
+                "namespaceQuotes": undefined,
+                "quotes": "",
+                "table": undefined,
+                "tableQuotes": undefined,
+                "type": "ref",
+              },
+              "thenKeyword": "THEN",
+              "type": "whenThenPart",
+              "whenExpression": SqlRef {
+                "column": "B",
+                "innerSpacing": Object {},
+                "namespace": undefined,
+                "namespaceQuotes": undefined,
+                "quotes": "",
+                "table": undefined,
+                "tableQuotes": undefined,
+                "type": "ref",
+              },
+              "whenKeyword": "WHEN",
+            },
+          ],
+        },
+      }
+    `);
+  });
+
+  it('simple CASE Expression with brackets', () => {
+    const sql = `(CASE A WHEN B THEN C END)`;
+
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
+      SqlCase {
+        "caseExpression": SqlRef {
+          "column": "A",
+          "innerSpacing": Object {},
+          "namespace": undefined,
+          "namespaceQuotes": undefined,
+          "quotes": "",
+          "table": undefined,
+          "tableQuotes": undefined,
+          "type": "ref",
+        },
+        "caseKeyword": "CASE",
+        "elseExpression": undefined,
+        "elseKeyword": undefined,
+        "endKeyword": "END",
+        "innerSpacing": Object {
+          "postCase": " ",
+          "postCaseExpression": " ",
+          "preEnd": " ",
+        },
+        "parens": Array [
+          Object {
+            "leftSpacing": "",
+            "rightSpacing": "",
+          },
+        ],
+        "type": "case",
+        "whenThenParts": SeparatedArray {
+          "separators": Array [],
+          "values": Array [
+            SqlWhenThenPart {
+              "innerSpacing": Object {
+                "postThen": " ",
+                "postWhen": " ",
+                "postWhenExpression": " ",
+              },
+              "thenExpression": SqlRef {
+                "column": "C",
+                "innerSpacing": Object {},
+                "namespace": undefined,
+                "namespaceQuotes": undefined,
+                "quotes": "",
+                "table": undefined,
+                "tableQuotes": undefined,
+                "type": "ref",
+              },
+              "thenKeyword": "THEN",
+              "type": "whenThenPart",
+              "whenExpression": SqlRef {
+                "column": "B",
+                "innerSpacing": Object {},
+                "namespace": undefined,
+                "namespaceQuotes": undefined,
+                "quotes": "",
+                "table": undefined,
+                "tableQuotes": undefined,
+                "type": "ref",
+              },
+              "whenKeyword": "WHEN",
+            },
+          ],
+        },
+      }
+    `);
+  });
+
+  it('simple CASE Expression with brackets and weird spacing', () => {
+    const sql = `(   CASE   A WHEN   B THEN C END  )`;
+
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
+      SqlCase {
+        "caseExpression": SqlRef {
+          "column": "A",
+          "innerSpacing": Object {},
+          "namespace": undefined,
+          "namespaceQuotes": undefined,
+          "quotes": "",
+          "table": undefined,
+          "tableQuotes": undefined,
+          "type": "ref",
+        },
+        "caseKeyword": "CASE",
+        "elseExpression": undefined,
+        "elseKeyword": undefined,
+        "endKeyword": "END",
+        "innerSpacing": Object {
+          "postCase": "   ",
+          "postCaseExpression": " ",
+          "preEnd": " ",
+        },
+        "parens": Array [
+          Object {
+            "leftSpacing": "   ",
+            "rightSpacing": "  ",
+          },
+        ],
+        "type": "case",
+        "whenThenParts": SeparatedArray {
+          "separators": Array [],
+          "values": Array [
+            SqlWhenThenPart {
+              "innerSpacing": Object {
+                "postThen": " ",
+                "postWhen": "   ",
+                "postWhenExpression": " ",
+              },
+              "thenExpression": SqlRef {
+                "column": "C",
+                "innerSpacing": Object {},
+                "namespace": undefined,
+                "namespaceQuotes": undefined,
+                "quotes": "",
+                "table": undefined,
+                "tableQuotes": undefined,
+                "type": "ref",
+              },
+              "thenKeyword": "THEN",
+              "type": "whenThenPart",
+              "whenExpression": SqlRef {
+                "column": "B",
+                "innerSpacing": Object {},
+                "namespace": undefined,
+                "namespaceQuotes": undefined,
+                "quotes": "",
+                "table": undefined,
+                "tableQuotes": undefined,
+                "type": "ref",
+              },
+              "whenKeyword": "WHEN",
+            },
+          ],
+        },
+      }
+    `);
+  });
+
+  it('simple CASE Expression with complex expressions', () => {
+    const sql = `(   CASE   A WHEN  B AND B THEN C OR C END  )`;
+
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
+      SqlCase {
+        "caseExpression": SqlRef {
+          "column": "A",
+          "innerSpacing": Object {},
+          "namespace": undefined,
+          "namespaceQuotes": undefined,
+          "quotes": "",
+          "table": undefined,
+          "tableQuotes": undefined,
+          "type": "ref",
+        },
+        "caseKeyword": "CASE",
+        "elseExpression": undefined,
+        "elseKeyword": undefined,
+        "endKeyword": "END",
+        "innerSpacing": Object {
+          "postCase": "   ",
+          "postCaseExpression": " ",
+          "preEnd": " ",
+        },
+        "parens": Array [
+          Object {
+            "leftSpacing": "   ",
+            "rightSpacing": "  ",
+          },
+        ],
+        "type": "case",
         "whenThenParts": SeparatedArray {
           "separators": Array [],
           "values": Array [
@@ -487,7 +956,7 @@ describe('Case expression', () => {
     backAndForth(sql);
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
-      SqlCaseSimple {
+      SqlCase {
         "caseExpression": SqlRef {
           "column": "runner_status",
           "innerSpacing": Object {},
@@ -512,10 +981,10 @@ describe('Case expression', () => {
           "postCase": " ",
           "postCaseExpression": " ",
           "postElse": " ",
-          "postWhenThen": " ",
+          "preElse": " ",
           "preEnd": " ",
         },
-        "type": "caseSimple",
+        "type": "case",
         "whenThenParts": SeparatedArray {
           "separators": Array [],
           "values": Array [
