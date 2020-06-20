@@ -49,6 +49,54 @@ export interface SqlComparisonValue extends SqlBaseValue {
 export class SqlComparison extends SqlExpression {
   static type = 'comparison';
 
+  static equal(lhs: SqlExpression, rhs: SqlExpression): SqlComparison {
+    return new SqlComparison({
+      op: '=',
+      lhs,
+      rhs,
+    });
+  }
+
+  static unequal(lhs: SqlExpression, rhs: SqlExpression): SqlComparison {
+    return new SqlComparison({
+      op: '!=',
+      lhs,
+      rhs,
+    });
+  }
+
+  static lessThan(lhs: SqlExpression, rhs: SqlExpression): SqlComparison {
+    return new SqlComparison({
+      op: '<',
+      lhs,
+      rhs,
+    });
+  }
+
+  static greaterThan(lhs: SqlExpression, rhs: SqlExpression): SqlComparison {
+    return new SqlComparison({
+      op: '>',
+      lhs,
+      rhs,
+    });
+  }
+
+  static lessThanOrEqual(lhs: SqlExpression, rhs: SqlExpression): SqlComparison {
+    return new SqlComparison({
+      op: '<=',
+      lhs,
+      rhs,
+    });
+  }
+
+  static greaterThanOrEqual(lhs: SqlExpression, rhs: SqlExpression): SqlComparison {
+    return new SqlComparison({
+      op: '>=',
+      lhs,
+      rhs,
+    });
+  }
+
   public readonly op: string;
   public readonly notKeyword?: string;
   public readonly lhs: SqlExpression;

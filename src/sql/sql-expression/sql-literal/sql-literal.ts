@@ -15,7 +15,7 @@
 import { SqlBase, SqlBaseValue } from '../../sql-base';
 import { SqlExpression } from '../sql-expression';
 
-export type LiteralValue = null | boolean | number | string;
+export type LiteralValue = null | boolean | number | string | Date;
 
 export interface SqlLiteralValue extends SqlBaseValue {
   keyword?: string;
@@ -25,15 +25,61 @@ export interface SqlLiteralValue extends SqlBaseValue {
 
 export class SqlLiteral extends SqlExpression {
   static type = 'literal';
+
   static wrapInQuotes(thing: string, quote: string): string {
     return `${quote}${thing}${quote}`;
   }
 
-  static fromInput(value: LiteralValue): SqlLiteral {
+  static factory(value: LiteralValue): SqlLiteral {
+    let keyword: string | undefined;
+    let stringValue: string;
+    switch (typeof value) {
+      case 'object':
+        if (value === null) {
+          stringValue = 'NULL';
+        } else if ((value as any).toISOString) {
+          keyword = 'TIMESTAMP';
+          stringValue = `'${SqlLiteral.dateToTimestampValue(value)}'`;
+        } else {
+          throw new TypeError('invalid input');
+        }
+        break;
+
+      case 'boolean':
+        stringValue = SqlLiteral.booleanToSql(value);
+        break;
+
+      case 'number':
+        stringValue = String(value);
+        break;
+
+      case 'string':
+        stringValue = SqlLiteral.escapeLiteralString(value);
+        break;
+    }
+
     return new SqlLiteral({
-      value: value,
-      stringValue: typeof value === 'number' ? String(value) : value,
-    } as SqlLiteralValue);
+      keyword,
+      value,
+      stringValue,
+    });
+  }
+
+  static escapeLiteralString(str: string): string {
+    return `'${str.replace(/'/g, "''")}'`;
+  }
+
+  static dateToTimestampValue(date: Date): string {
+    return date
+      .toISOString()
+      .replace('T', ' ')
+      .replace('Z', '')
+      .replace(/\.000$/, '')
+      .replace(/ 00:00:00$/, '');
+  }
+
+  static booleanToSql(b: boolean): string {
+    return String(b).toUpperCase();
   }
 
   static equalsLiteral(expression: SqlBase, value: number) {
