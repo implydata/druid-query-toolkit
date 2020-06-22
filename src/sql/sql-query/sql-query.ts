@@ -592,7 +592,7 @@ export class SqlQuery extends SqlBase {
 
   replaceFrom(table: string) {
     const value = this.valueOf();
-    value.tables = SeparatedArray.fromSingleValue(SqlAlias.fromBase(SqlRef.fromString(table)));
+    value.tables = SeparatedArray.fromSingleValue(SqlAlias.fromBase(SqlRef.factory(table)));
     return new SqlQuery(value);
   }
 
@@ -676,7 +676,7 @@ export class SqlQuery extends SqlBase {
     // Adds the last column in the select clause to the group by clause via its index
     const value = this.valueOf();
 
-    const newGroupBy = SqlLiteral.fromInput(1);
+    const newGroupBy = SqlLiteral.factory(1);
     if (this.groupByExpressions) {
       value.groupByExpressions = this.groupByExpressions
         .map(groupByExpression => {
@@ -804,7 +804,7 @@ export class SqlQuery extends SqlBase {
 
   orderBy(column: string, direction?: Direction) {
     const orderByPart = new SqlOrderByPart({
-      expression: SqlRef.fromStringWithDoubleQuotes(column),
+      expression: SqlRef.factoryWithQuotes(column),
       direction: direction,
     });
     const value = this.valueOf();

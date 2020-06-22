@@ -12,5 +12,6 @@
  * limitations under the License.
  */
 
+export * from './general/general';
 export * from './separator/separator';
 export * from './separated-array/separated-array';

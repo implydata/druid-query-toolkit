@@ -12,9 +12,10 @@
  * limitations under the License.
  */
 
-import { SeparatedArray, SqlAlias, SqlRef } from '../index';
+import { parseSql } from '..';
 import { dedupe, filterMap } from '../utils';
 
+import { LiteralValue, SeparatedArray, SqlAlias, SqlLiteral, SqlPlaceholder, SqlRef } from '.';
 import { RESERVED_KEYWORDS } from './reserved-keywords';
 import { SPECIAL_FUNCTIONS } from './special-functions';
 
@@ -257,5 +258,37 @@ export abstract class SqlBase {
     const ref = this.getSqlRefs().find(x => x.column);
     if (!ref) return;
     return ref.column;
+  }
+
+  public fillPlaceholders(fillWith: (SqlBase | LiteralValue)[]): SqlBase {
+    let i = 0;
+    return this.walk(ex => {
+      if (ex instanceof SqlPlaceholder) {
+        if (i === fillWith.length) {
+          return ex;
+        }
+
+        let filler = fillWith[i++];
+        if (!(filler instanceof SqlBase)) {
+          if (typeof filler === 'string') {
+            filler = parseSql(filler);
+          } else {
+            filler = SqlLiteral.factory(filler);
+          }
+        }
+
+        return filler;
+      }
+      return ex;
+    });
+  }
+
+  public prettyTrim(maxLength: number): SqlBase {
+    return this.walk(ex => {
+      if (ex instanceof SqlLiteral || ex instanceof SqlRef) {
+        return ex.prettyTrim(maxLength);
+      }
+      return ex;
+    });
   }
 }

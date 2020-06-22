@@ -535,19 +535,12 @@ ConcatExpression = head:BaseType tail:(_ '||' _ BaseType)*
 }
 
 BaseType =
-  CaseExpression
-/ Function
-/ CastFunction
-/ ExtractFunction
-/ TrimFunction
-/ FloorCeilFunction
-/ TimestampAddDiffFunction
-/ PositionFunction
-/ ArrayFunction
+  SqlPlaceholder
 / Interval
+/ CaseExpression
+/ Function
 / SqlLiteral
 / SqlRef
-/ NakedFunction
 / SqlInParens
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -641,6 +634,17 @@ TimeUnitExtra =
 / 'MILLENNIUM'i
 
 Function =
+  GenericFunction
+/ CastFunction
+/ ExtractFunction
+/ TrimFunction
+/ FloorCeilFunction
+/ TimestampAddDiffFunction
+/ PositionFunction
+/ ArrayFunction
+/ NakedFunction
+
+GenericFunction =
   functionName:UnquotedRefPartFree
   preLeftParen:_
   OpenParen
@@ -946,17 +950,14 @@ SqlInParens = OpenParen leftSpacing:_ ex:Sql rightSpacing:_ CloseParen
   return ex.addParens(leftSpacing, rightSpacing);
 }
 
-SqlLiteral = lit:(DynamicPlaceholder / NullToken / TrueToken / FalseToken / Number / SingleQuotedString / UnicodeString / CharsetString/ BinaryString / Timestamp)
+SqlPlaceholder = "?"
 {
-  return new sql.SqlLiteral(lit);
+  return new sql.SqlPlaceholder();
 }
 
-DynamicPlaceholder = "?"
+SqlLiteral = lit:(NullToken / TrueToken / FalseToken / Number / SingleQuotedString / UnicodeString / CharsetString/ BinaryString / Timestamp)
 {
-  return {
-    value: "?",
-    stringValue: "?"
-  };
+  return new sql.SqlLiteral(lit);
 }
 
 NullLiteral = v:NullToken
@@ -1097,7 +1098,7 @@ QuotedRefPart = ["] name:$([^"]+) ["]
 {
   return {
     name: name,
-    quotes: '"'
+    quotes: true
   };
 }
 
@@ -1105,7 +1106,7 @@ UnquotedRefPart = name:UnquotedRefPartFree !{ return SqlBase.isReservedKeyword(n
 {
   return {
     name: text(),
-    quotes: ''
+    quotes: false
   };
 }
 
@@ -1115,7 +1116,7 @@ Star = '*'
 {
   return {
     name: '*',
-    quotes: ''
+    quotes: false
   };
 }
 

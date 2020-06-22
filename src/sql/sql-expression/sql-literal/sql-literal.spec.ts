@@ -333,22 +333,6 @@ describe('SqlLiteral', () => {
     `);
   });
 
-  it('works with dynamic placeholder', () => {
-    const sql = `?`;
-
-    backAndForth(sql);
-
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
-      SqlLiteral {
-        "innerSpacing": Object {},
-        "keyword": undefined,
-        "stringValue": "?",
-        "type": "literal",
-        "value": "?",
-      }
-    `);
-  });
-
   it('works with factory', () => {
     expect(SqlLiteral.factory(null).toString()).toEqual('NULL');
     expect(SqlLiteral.factory(false).toString()).toEqual('FALSE');

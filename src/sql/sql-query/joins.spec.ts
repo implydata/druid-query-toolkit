@@ -57,7 +57,7 @@ describe('Add Join', () => {
         .addJoin(
           SqlJoinPart.factory(
             'LEFT',
-            SqlRef.fromString('country', 'lookup'),
+            SqlRef.factory('country', 'lookup'),
             parseSqlExpression('lookup.country.v = wikipedia.countryName'),
           ),
         )
@@ -73,7 +73,7 @@ describe('Add Join', () => {
         .addJoin(
           SqlJoinPart.factory(
             'INNER',
-            SqlRef.fromString('country', 'lookup'),
+            SqlRef.factory('country', 'lookup'),
             parseSqlExpression('lookup.country.v = wikipedia.countryName'),
           ),
         )

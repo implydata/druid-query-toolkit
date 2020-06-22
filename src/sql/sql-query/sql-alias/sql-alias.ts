@@ -46,11 +46,11 @@ export class SqlAlias extends SqlBase {
     throw new Error(`can not construct and alias from ${base.type}`);
   }
 
-  static sqlAliasFactory(expression: SqlExpression, alias: string) {
+  static factory(expression: SqlExpression, alias: string) {
     return new SqlAlias({
       expression: expression,
       asKeyword: 'AS',
-      alias: SqlRef.fromStringWithDoubleQuotes(alias),
+      alias: SqlRef.factoryWithQuotes(alias),
     });
   }
 

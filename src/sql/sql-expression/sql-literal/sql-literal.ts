@@ -13,6 +13,7 @@
  */
 
 import { SqlBase, SqlBaseValue } from '../../sql-base';
+import { trimString } from '../../utils';
 import { SqlExpression } from '../sql-expression';
 
 export type LiteralValue = null | boolean | number | string | Date;
@@ -132,6 +133,13 @@ export class SqlLiteral extends SqlExpression {
     value.value = this.value + ammount;
     delete value.stringValue;
     return new SqlLiteral(value);
+  }
+
+  public prettyTrim(maxLength: number): SqlBase {
+    if (typeof this.value === 'string') {
+      return SqlLiteral.factory(trimString(this.value, maxLength));
+    }
+    return this;
   }
 }
 

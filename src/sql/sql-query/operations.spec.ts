@@ -647,7 +647,7 @@ describe('SqlQuery operations', () => {
 
       expect(
         parseSqlQuery(sql)
-          .addToGroupBy(SqlRef.fromStringWithDoubleQuotes('col'))
+          .addToGroupBy(SqlRef.factoryWithQuotes('col'))
           .toString(),
       ).toEqual(sane`
         select "col", Count(*) from tbl
@@ -663,10 +663,7 @@ describe('SqlQuery operations', () => {
       expect(
         parseSqlQuery(sql)
           .addToGroupBy(
-            SqlAlias.sqlAliasFactory(
-              SqlFunction.factory('min', [SqlRef.fromString('col1')]),
-              'MinColumn',
-            ),
+            SqlAlias.factory(SqlFunction.factory('min', [SqlRef.factory('col1')]), 'MinColumn'),
           )
           .toString(),
       ).toEqual(sane`
@@ -685,10 +682,7 @@ describe('SqlQuery operations', () => {
       expect(
         parseSqlQuery(sql)
           .addToGroupBy(
-            SqlAlias.sqlAliasFactory(
-              SqlFunction.factory('max', [SqlRef.fromString('col2')]),
-              'MaxColumn',
-            ),
+            SqlAlias.factory(SqlFunction.factory('max', [SqlRef.factory('col2')]), 'MaxColumn'),
           )
           .toString(),
       ).toEqual(sane`

@@ -12,14 +12,7 @@
  * limitations under the License.
  */
 
-export * from './sql-expression';
-export * from './sql-placeholder/sql-placeholder';
-export * from './sql-ref/sql-ref';
-export * from './sql-literal/sql-literal';
-export * from './sql-multi/sql-multi';
-export * from './sql-unary/sql-unary';
-export * from './sql-comparison/sql-comparison';
-export * from './sql-function/sql-function';
-export * from './sql-case/sql-case';
-export * from './sql-interval/sql-interval';
-export * from './sql-when-then-part/sql-when-then-part';
+export function trimString(str: string, maxLength: number): string {
+  if (str.length < maxLength) return str;
+  return str.substr(0, Math.max(maxLength - 3, 1)) + '...';
+}

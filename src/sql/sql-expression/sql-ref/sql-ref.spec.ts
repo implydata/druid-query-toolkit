@@ -35,10 +35,10 @@ describe('SqlRef', () => {
           "preTableDot": "",
         },
         "namespace": undefined,
-        "namespaceQuotes": undefined,
-        "quotes": "\\"",
+        "namespaceQuotes": false,
+        "quotes": true,
         "table": "test",
-        "tableQuotes": "\\"",
+        "tableQuotes": true,
         "type": "ref",
       }
     `);
@@ -57,10 +57,10 @@ describe('SqlRef', () => {
           "preTableDot": "",
         },
         "namespace": undefined,
-        "namespaceQuotes": undefined,
-        "quotes": "",
+        "namespaceQuotes": false,
+        "quotes": false,
         "table": "test",
-        "tableQuotes": "\\"",
+        "tableQuotes": true,
         "type": "ref",
       }
     `);
@@ -79,10 +79,10 @@ describe('SqlRef', () => {
           "preTableDot": "",
         },
         "namespace": undefined,
-        "namespaceQuotes": undefined,
-        "quotes": "",
+        "namespaceQuotes": false,
+        "quotes": false,
         "table": "test",
-        "tableQuotes": "",
+        "tableQuotes": false,
         "type": "ref",
       }
     `);
@@ -98,10 +98,10 @@ describe('SqlRef', () => {
         "column": "test",
         "innerSpacing": Object {},
         "namespace": undefined,
-        "namespaceQuotes": undefined,
-        "quotes": "",
+        "namespaceQuotes": false,
+        "quotes": false,
         "table": undefined,
-        "tableQuotes": undefined,
+        "tableQuotes": false,
         "type": "ref",
       }
     `);
@@ -117,10 +117,10 @@ describe('SqlRef', () => {
         "column": "test",
         "innerSpacing": Object {},
         "namespace": undefined,
-        "namespaceQuotes": undefined,
-        "quotes": "\\"",
+        "namespaceQuotes": false,
+        "quotes": true,
         "table": undefined,
-        "tableQuotes": undefined,
+        "tableQuotes": false,
         "type": "ref",
       }
     `);
@@ -134,10 +134,10 @@ describe('SqlRef', () => {
         "column": "page",
         "innerSpacing": Object {},
         "namespace": undefined,
-        "namespaceQuotes": undefined,
-        "quotes": "\\"",
+        "namespaceQuotes": false,
+        "quotes": true,
         "table": undefined,
-        "tableQuotes": undefined,
+        "tableQuotes": false,
         "type": "ref",
       }
     `);
@@ -151,10 +151,10 @@ describe('SqlRef', () => {
         "column": "channel",
         "innerSpacing": Object {},
         "namespace": undefined,
-        "namespaceQuotes": undefined,
-        "quotes": "",
+        "namespaceQuotes": false,
+        "quotes": false,
         "table": undefined,
-        "tableQuotes": undefined,
+        "tableQuotes": false,
         "type": "ref",
       }
     `);
@@ -164,50 +164,50 @@ describe('SqlRef', () => {
     const sql = `"lol" . channel`;
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
-        SqlRef {
-          "column": "channel",
-          "innerSpacing": Object {
-            "postTableDot": " ",
-            "preTableDot": " ",
-          },
-          "namespace": undefined,
-          "namespaceQuotes": undefined,
-          "quotes": "",
-          "table": "lol",
-          "tableQuotes": "\\"",
-          "type": "ref",
-        }
-      `);
+      SqlRef {
+        "column": "channel",
+        "innerSpacing": Object {
+          "postTableDot": " ",
+          "preTableDot": " ",
+        },
+        "namespace": undefined,
+        "namespaceQuotes": false,
+        "quotes": false,
+        "table": "lol",
+        "tableQuotes": true,
+        "type": "ref",
+      }
+    `);
   });
 
   it('without quotes + namespace + parens', () => {
     const sql = `(( "lol" . channel)   )`;
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
-        SqlRef {
-          "column": "channel",
-          "innerSpacing": Object {
-            "postTableDot": " ",
-            "preTableDot": " ",
+      SqlRef {
+        "column": "channel",
+        "innerSpacing": Object {
+          "postTableDot": " ",
+          "preTableDot": " ",
+        },
+        "namespace": undefined,
+        "namespaceQuotes": false,
+        "parens": Array [
+          Object {
+            "leftSpacing": " ",
+            "rightSpacing": "",
           },
-          "namespace": undefined,
-          "namespaceQuotes": undefined,
-          "parens": Array [
-            Object {
-              "leftSpacing": " ",
-              "rightSpacing": "",
-            },
-            Object {
-              "leftSpacing": "",
-              "rightSpacing": "   ",
-            },
-          ],
-          "quotes": "",
-          "table": "lol",
-          "tableQuotes": "\\"",
-          "type": "ref",
-        }
-      `);
+          Object {
+            "leftSpacing": "",
+            "rightSpacing": "   ",
+          },
+        ],
+        "quotes": false,
+        "table": "lol",
+        "tableQuotes": true,
+        "type": "ref",
+      }
+    `);
     expect(parseSql(sql).toRawString()).toMatchInlineSnapshot(`"\\"lol\\" . channel"`);
   });
 });
@@ -226,10 +226,10 @@ describe('upgrades', () => {
           "preTableDot": "",
         },
         "namespace": "namespace",
-        "namespaceQuotes": "\\"",
-        "quotes": undefined,
+        "namespaceQuotes": true,
+        "quotes": false,
         "table": "table",
-        "tableQuotes": "\\"",
+        "tableQuotes": true,
         "type": "ref",
       }
     `);
@@ -275,10 +275,10 @@ describe('upgrades', () => {
                 "column": "tbl",
                 "innerSpacing": Object {},
                 "namespace": undefined,
-                "namespaceQuotes": undefined,
-                "quotes": "",
+                "namespaceQuotes": false,
+                "quotes": false,
                 "table": undefined,
-                "tableQuotes": undefined,
+                "tableQuotes": false,
                 "type": "ref",
               },
               "innerSpacing": Object {},
@@ -299,10 +299,10 @@ describe('upgrades', () => {
                   "preTableDot": "",
                 },
                 "namespace": "sys",
-                "namespaceQuotes": "",
-                "quotes": undefined,
+                "namespaceQuotes": false,
+                "quotes": false,
                 "table": "segments",
-                "tableQuotes": "",
+                "tableQuotes": false,
                 "type": "ref",
               },
               "innerSpacing": Object {},

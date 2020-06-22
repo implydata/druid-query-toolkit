@@ -183,7 +183,7 @@ Takes argument:
     
 ```
 let query = parseSqlQuery(`select Count(*) from table`);
-query = query.addToGroupBy(SqlRef.fromStringWithDoubleQuotes('column');
+query = query.addToGroupBy(SqlRef.factoryWithQuotes('column');
 console.log(query.toString());
 ```
 
@@ -208,7 +208,7 @@ Takes arguments:
     
 ```
 let query = parseSqlQuery(`select column1 from table`);
-query = query.addAggregateColumn([SqlRef.fromString('column2')], 'min', 'alias');
+query = query.addAggregateColumn([SqlRef.factory('column2')], 'min', 'alias');
 console.log(query.toString());
 ```
 
@@ -290,10 +290,10 @@ Takes arguments:
 let query = parseSqlQuery(`SELECT countryName from wikipedia`)
 query = query.addJoin(
   'LEFT',
-  SqlRef.fromString('country', 'lookup'),
+  SqlRef.factory('country', 'lookup'),
   SqlMulti.sqlMultiFactory('=', [
-    SqlRef.fromString('v', 'country', 'lookup'),
-    SqlRef.fromString('countryName', 'wikipedia'),
+    SqlRef.factory('v', 'country', 'lookup'),
+    SqlRef.factory('countryName', 'wikipedia'),
   ]),
 );
 

@@ -25,11 +25,11 @@ export interface SqlIntervalValue extends SqlBaseValue {
 export class SqlInterval extends SqlExpression {
   static type = 'interval';
 
-  static sqlIntervalFactory(unit: string, intervalValue: number) {
+  static factory(unit: string, intervalValue: number) {
     return new SqlInterval({
-      unitKeyword: unit,
-      intervalValue: SqlLiteral.fromInput(String(intervalValue)),
       intervalKeyword: 'INTERVAL',
+      intervalValue: SqlLiteral.factory(String(intervalValue)),
+      unitKeyword: unit,
     });
   }
 
