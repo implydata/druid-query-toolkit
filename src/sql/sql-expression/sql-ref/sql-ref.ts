@@ -28,6 +28,8 @@ export interface SqlRefValue extends SqlBaseValue {
 export class SqlRef extends SqlExpression {
   static type = 'ref';
 
+  static STAR: SqlRef;
+
   static factory(
     column: string,
     table?: string,
@@ -36,6 +38,7 @@ export class SqlRef extends SqlExpression {
     forceTableQuotes = false,
     forceNamespaceQuotes = false,
   ) {
+    if (column === '*') return SqlRef.STAR;
     return new SqlRef({
       column,
       table,
@@ -212,3 +215,7 @@ export class SqlRef extends SqlExpression {
 }
 
 SqlBase.register(SqlRef.type, SqlRef);
+
+SqlRef.STAR = new SqlRef({
+  column: '*',
+});

@@ -22,6 +22,23 @@ describe('SqlRef', () => {
     expect(() => parseSql(sql)).toThrowError('Expected');
   });
 
+  it('#factory', () => {
+    const sql = SqlRef.factory('*');
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
+      SqlRef {
+        "column": "*",
+        "innerSpacing": Object {},
+        "namespace": undefined,
+        "namespaceQuotes": false,
+        "quotes": false,
+        "table": undefined,
+        "tableQuotes": false,
+        "type": "ref",
+      }
+    `);
+  });
+
   it('Ref with double quotes and double quoted namespace', () => {
     const sql = '"test"."namespace"';
 
