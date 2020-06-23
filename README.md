@@ -228,7 +228,7 @@ Takes argument:
 let query = parseSqlQuery(`SELECT column, column1, column2
                       FROM sys."github"
                       Group By column, 3`);
-query = query.hasGroupByColumn("column2");
+query = query.hasGroupByOnColumn("column2");
 console.log(query.toString());
 ```
 

@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { SqlMulti } from '..';
+import { SqlAlias, SqlMulti } from '..';
 import { SqlBase, Substitutor } from '../sql-base';
 
 export abstract class SqlExpression extends SqlBase {
@@ -37,6 +37,10 @@ export abstract class SqlExpression extends SqlBase {
     _postorder: boolean,
   ): SqlExpression | undefined {
     return this;
+  }
+
+  public as(alias: string) {
+    return SqlAlias.factory(this, alias);
   }
 
   public addExpressionToAnd(expression: SqlExpression): SqlExpression {

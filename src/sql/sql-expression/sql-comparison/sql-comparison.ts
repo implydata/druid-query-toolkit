@@ -97,6 +97,14 @@ export class SqlComparison extends SqlExpression {
     });
   }
 
+  static like(lhs: SqlExpression, rhs: SqlExpression): SqlComparison {
+    return new SqlComparison({
+      op: 'LIKE',
+      lhs,
+      rhs,
+    });
+  }
+
   public readonly op: string;
   public readonly notKeyword?: string;
   public readonly lhs: SqlExpression;
@@ -121,7 +129,7 @@ export class SqlComparison extends SqlExpression {
 
   public toRawString(): string {
     const { lhs, op, notKeyword, rhs } = this;
-    const opIsIs = op.toUpperCase() === 'IS';
+    const opIsIs = this.getEffectiveOp() === 'IS';
 
     const rawParts: string[] = [lhs.toString()];
 
@@ -158,6 +166,10 @@ export class SqlComparison extends SqlExpression {
     }
 
     return rawParts.join('');
+  }
+
+  public getEffectiveOp(): string {
+    return this.op.toUpperCase();
   }
 
   public changeLhs(lhs: SqlExpression): this {

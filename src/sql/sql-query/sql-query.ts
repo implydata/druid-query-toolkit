@@ -649,7 +649,7 @@ export class SqlQuery extends SqlBase {
   /* ~~~~~ GROUP BY ~~~~~ */
 
   // Checks to see if a column is in the group by clause either by name or index
-  hasGroupByColumn(column: string) {
+  hasGroupByOnColumn(column: string) {
     const index = this.getOutputColumns().indexOf(column) + 1;
     if (!this.groupByExpressions) return false;
     return this.groupByExpressions.values.some(
