@@ -27,6 +27,11 @@ export interface SqlLiteralValue extends SqlBaseValue {
 export class SqlLiteral extends SqlExpression {
   static type = 'literal';
 
+  static NULL: SqlLiteral;
+  static FALSE: SqlLiteral;
+  static TRUE: SqlLiteral;
+  static ZERO: SqlLiteral;
+
   static wrapInQuotes(thing: string, quote: string): string {
     return `${quote}${thing}${quote}`;
   }
@@ -144,3 +149,8 @@ export class SqlLiteral extends SqlExpression {
 }
 
 SqlBase.register(SqlLiteral.type, SqlLiteral);
+
+SqlLiteral.NULL = SqlLiteral.factory(null);
+SqlLiteral.FALSE = SqlLiteral.factory(false);
+SqlLiteral.TRUE = SqlLiteral.factory(true);
+SqlLiteral.ZERO = SqlLiteral.factory(0);

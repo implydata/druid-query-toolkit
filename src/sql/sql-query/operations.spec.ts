@@ -162,11 +162,11 @@ describe('SqlQuery operations', () => {
       ).toEqual(sane`
         SELECT *
         FROM sys."github"
-        ORDER BY col, "colTwo" DESC
+        ORDER BY "colTwo" DESC, col
       `);
     });
 
-    it('ORDER BY with out direction', () => {
+    it('ORDER BY without direction', () => {
       expect(
         parseSqlQuery(sane`
           SELECT *
@@ -178,19 +178,19 @@ describe('SqlQuery operations', () => {
       ).toEqual(sane`
         SELECT *
         FROM sys."github"
-        ORDER BY col, colTwo ASC, "colThree"
+        ORDER BY "colThree", col, colTwo ASC
       `);
     });
   });
 
-  describe.skip('#addWhereFilter', () => {
+  describe.skip('#addWhere', () => {
     it('no Where filter', () => {
       expect(
         parseSqlQuery(sane`
           SELECT *
           FROM sys."github"
         `)
-          .addWhereFilter(`col > 1`)
+          .addWhere(`col > 1`)
           .toString(),
       ).toEqual(sane`
         SELECT *
@@ -205,7 +205,7 @@ describe('SqlQuery operations', () => {
           SELECT *
           FROM sys."github" WHERE col > 1
         `)
-          .addWhereFilter(`colTwo > 2`)
+          .addWhere(`colTwo > 2`)
           .toString(),
       ).toEqual(sane`
         SELECT *
@@ -219,7 +219,7 @@ describe('SqlQuery operations', () => {
           SELECT *
           FROM sys."github" WHERE col > 1 OR col < 5
         `)
-          .addWhereFilter(`colTwo > 2`)
+          .addWhere(`colTwo > 2`)
           .toString(),
       ).toEqual(sane`
         SELECT *
@@ -233,7 +233,7 @@ describe('SqlQuery operations', () => {
           SELECT *
           FROM sys."github" WHERE (col > 1 OR col < 5) AND colTwo > 5
         `)
-          .addWhereFilter(`colTwo > 2`)
+          .addWhere(`colTwo > 2`)
           .toString(),
       ).toEqual(sane`
         SELECT *
@@ -566,42 +566,6 @@ describe('SqlQuery operations', () => {
       `;
 
       expect(parseSqlQuery(sql).getAggregateColumns()).toEqual(['aggregated']);
-    });
-  });
-
-  describe.skip('getCurrentFilters', () => {
-    it('get all filters, only having clause', () => {
-      const sql = sane`
-        SELECT col1, SUM(col1) As aggregated
-        FROM sys."github"
-        Group By col2
-        Having col1 > 1 AND aggregated < 100
-      `;
-
-      expect(parseSqlQuery(sql).getCurrentFilters()).toEqual([]);
-    });
-
-    it('get all filters, only where clause', () => {
-      const sql = sane`
-        SELECT col1
-        FROM sys."github"
-        Where col1 > 1 AND aggregated < 100
-        Group By col2
-      `;
-
-      expect(parseSqlQuery(sql).getCurrentFilters()).toEqual([]);
-    });
-
-    it('get all filters, where and having clauses', () => {
-      const sql = sane`
-        SELECT col0, SUM(col1) As aggregated, col2
-        FROM sys."github"
-        Where col > 1 AND aggregated < 100
-        Group By col2
-        Having col3 > 1 AND col4 < 100
-      `;
-
-      expect(parseSqlQuery(sql).getCurrentFilters()).toEqual([]);
     });
   });
 

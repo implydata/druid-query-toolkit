@@ -15,7 +15,7 @@
 import { parseSql } from '../../..';
 import { backAndForth } from '../../../test-utils';
 
-describe('SqlAliasRef', () => {
+describe('SqlAlias', () => {
   it('works in no alias case', () => {
     const sql = `SELECT city`;
 

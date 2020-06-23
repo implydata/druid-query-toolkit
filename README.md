@@ -154,25 +154,6 @@ Array [
 ]
 ```
 
-## getCurrentFilters
-
-Returns an array of the string names of all the columns currently being used byy the having and where filters
-    
-```
-let query = parseSqlQuery(`SELECT column, SUM(column1) As aggregated, column2
-                      FROM sys."github"
-                      Group By column2
-                      Having column > 1 AND aggregated < 100`);
-query = query.getCurrentFilters();
-console.log(query.toString());
-```
-
-logs:                 
-
-```
-["column", "aggregated"]
-```
-
 ## addToGroupBy
 
 Adds a column with no alias to the group by clause and the select clause

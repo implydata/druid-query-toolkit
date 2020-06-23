@@ -460,19 +460,6 @@ export class SqlQuery extends SqlBase {
     return ret;
   }
 
-  getCurrentFilters() {
-    let filterSqlRefs: SqlRef[] = [];
-
-    if (this.havingExpression) {
-      filterSqlRefs = filterSqlRefs.concat(this.havingExpression.getSqlRefs());
-    }
-    if (this.whereExpression) {
-      filterSqlRefs = filterSqlRefs.concat(this.whereExpression.getSqlRefs());
-    }
-
-    return filterSqlRefs.map(sqlRef => sqlRef.column);
-  }
-
   /* ~~~~~ SELECT ~~~~~ */
 
   /**
@@ -617,7 +604,11 @@ export class SqlQuery extends SqlBase {
 
   /* ~~~~~ WHERE ~~~~~ */
 
-  addWhereFilter(expressionString: string | SqlExpression) {
+  getEffectiveWhere(): SqlExpression {
+    return this.whereExpression || SqlLiteral.TRUE;
+  }
+
+  addWhere(expressionString: string | SqlExpression) {
     const expression: SqlExpression =
       typeof expressionString === 'string'
         ? parseSqlExpression(expressionString)
@@ -736,7 +727,11 @@ export class SqlQuery extends SqlBase {
 
   /* ~~~~~ HAVING ~~~~~ */
 
-  addHavingFilter(expressionString: SqlExpression | string) {
+  getEffectiveHaving(): SqlExpression {
+    return this.havingExpression || SqlLiteral.TRUE;
+  }
+
+  addHaving(expressionString: SqlExpression | string) {
     const expression: SqlExpression =
       typeof expressionString === 'string'
         ? parseSqlExpression(expressionString)
@@ -807,30 +802,31 @@ export class SqlQuery extends SqlBase {
       expression: SqlRef.factoryWithQuotes(column),
       direction: direction,
     });
-    const value = this.valueOf();
     const sqlIndex = this.getOutputColumns().indexOf(column) + 1;
+    const value = this.valueOf();
 
     // If already in the OrderBy
     if (this.orderByParts) {
       if (
         this.orderByParts.values.some(
-          unit =>
-            SqlLiteral.equalsLiteral(unit.expression, sqlIndex) ||
-            SqlRef.equalsString(unit.expression, column),
+          orderByPart =>
+            SqlLiteral.equalsLiteral(orderByPart.expression, sqlIndex) ||
+            SqlRef.equalsString(orderByPart.expression, column),
         )
       ) {
-        value.orderByParts = this.orderByParts.map(unit => {
+        value.orderByParts = this.orderByParts.map(orderByPart => {
           if (
-            (unit.expression instanceof SqlLiteral && unit.expression.value === sqlIndex) ||
-            SqlRef.equalsString(unit.expression, column)
+            (orderByPart.expression instanceof SqlLiteral &&
+              orderByPart.expression.value === sqlIndex) ||
+            SqlRef.equalsString(orderByPart.expression, column)
           ) {
             return orderByPart;
           } else {
-            return unit;
+            return orderByPart;
           }
         });
       } else {
-        value.orderByParts = this.orderByParts.addLast(orderByPart, Separator.COMMA);
+        value.orderByParts = this.orderByParts.addFirst(orderByPart, Separator.COMMA);
       }
     } else {
       value.orderByParts = SeparatedArray.fromSingleValue(orderByPart);

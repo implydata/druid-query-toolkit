@@ -23,9 +23,11 @@ describe('SqlRef', () => {
   });
 
   it('#factory', () => {
-    const sql = SqlRef.factory('*');
+    const star = SqlRef.factory('*');
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    backAndForth(star.toString());
+    expect(star.isStar()).toEqual(true);
+    expect(star).toMatchInlineSnapshot(`
       SqlRef {
         "column": "*",
         "innerSpacing": Object {},
