@@ -604,7 +604,7 @@ export class SqlQuery extends SqlBase {
 
   /* ~~~~~ WHERE ~~~~~ */
 
-  getEffectiveWhere(): SqlExpression {
+  getWhereExpression(): SqlExpression {
     return this.whereExpression || SqlLiteral.TRUE;
   }
 
@@ -727,7 +727,7 @@ export class SqlQuery extends SqlBase {
 
   /* ~~~~~ HAVING ~~~~~ */
 
-  getEffectiveHaving(): SqlExpression {
+  getHavingExpression(): SqlExpression {
     return this.havingExpression || SqlLiteral.TRUE;
   }
 
