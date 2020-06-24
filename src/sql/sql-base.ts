@@ -15,7 +15,7 @@
 import { parseSql } from '..';
 import { dedupe, filterMap } from '../utils';
 
-import { LiteralValue, SeparatedArray, SqlAlias, SqlLiteral, SqlPlaceholder, SqlRef } from '.';
+import { LiteralValue, SeparatedArray, SqlLiteral, SqlPlaceholder, SqlRef } from '.';
 import { RESERVED_KEYWORDS } from './reserved-keywords';
 import { SPECIAL_FUNCTIONS } from './special-functions';
 
@@ -90,16 +90,6 @@ export abstract class SqlBase {
     return changed ? newA : a;
   }
 
-  static getColumnName(column: string | SqlBase): string {
-    if (typeof column === 'string') return column;
-    if (column instanceof SqlRef && column.column) return column.column;
-    if (column instanceof SqlAlias) {
-      // @ts-ignore
-      return column.alias.name;
-    }
-    return '';
-  }
-
   static classMap: Record<string, typeof SqlBase> = {};
   static register(type: string, ex: typeof SqlBase): void {
     SqlBase.classMap[type] = ex;
@@ -137,6 +127,16 @@ export abstract class SqlBase {
     if (this.innerSpacing) value.innerSpacing = this.innerSpacing;
     if (this.parens) value.parens = this.parens;
     return value;
+  }
+
+  public equals(other: SqlBase): boolean {
+    // ToDo: make this not use toString
+    return this.toString() === other.toString();
+  }
+
+  public logicalEquals(other: SqlBase): boolean {
+    // ToDo: make this not use toString
+    return this.toString() === other.toString();
   }
 
   public addParens(leftSpacing?: string, rightSpacing?: string): this {

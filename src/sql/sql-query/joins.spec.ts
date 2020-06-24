@@ -62,9 +62,10 @@ describe('Add Join', () => {
           ),
         )
         .toString(),
-    ).toMatchInlineSnapshot(
-      `"SELECT countryName from wikipedia LEFT JOIN lookup.country ON lookup.country.v = wikipedia.countryName"`,
-    );
+    ).toMatchInlineSnapshot(`
+      "SELECT countryName from wikipedia
+      LEFT JOIN lookup.country ON lookup.country.v = wikipedia.countryName"
+    `);
   });
 
   it('Add inner join', () => {
@@ -78,9 +79,10 @@ describe('Add Join', () => {
           ),
         )
         .toString(),
-    ).toMatchInlineSnapshot(
-      `"SELECT countryName from wikipedia INNER JOIN lookup.country ON lookup.country.v = wikipedia.countryName"`,
-    );
+    ).toMatchInlineSnapshot(`
+      "SELECT countryName from wikipedia
+      INNER JOIN lookup.country ON lookup.country.v = wikipedia.countryName"
+    `);
   });
 });
 

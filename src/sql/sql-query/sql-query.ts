@@ -70,6 +70,10 @@ export interface SqlQueryValue extends SqlBaseValue {
 export class SqlQuery extends SqlBase {
   static type = 'query';
 
+  static getSelectValueOutput(selectValue: SqlAlias, i: number) {
+    return selectValue.getOutputName() || `EXPR$${i}`;
+  }
+
   public readonly explainKeyword?: string;
   public readonly withKeyword?: string;
   public readonly withParts?: SeparatedArray<SqlWithPart>;
@@ -189,7 +193,7 @@ export class SqlQuery extends SqlBase {
 
     // Join Clause
     if (this.joinParts) {
-      rawParts.push(this.getInnerSpace('preJoin'), this.joinParts.toString());
+      rawParts.push(this.getInnerSpace('preJoin', '\n'), this.joinParts.toString());
     }
 
     // Where Clause
@@ -466,28 +470,57 @@ export class SqlQuery extends SqlBase {
    * Returns an array of the string name of all columns in the select clause
    */
   getOutputColumns(): string[] {
-    return this.selectValues.values.map((selectValue, i) => {
-      return selectValue.getOutputName() || `EXPR$${i}`;
-    });
+    return this.selectValues.values.map(SqlQuery.getSelectValueOutput);
   }
 
-  getGroupedColumns(): string[] {
-    if (!this.groupByExpressions) return [];
-    const columns = this.getOutputColumns();
-    return filterMap(this.groupByExpressions.values, column => {
-      if (column instanceof SqlRef) {
-        return column.column;
-      } else if (column instanceof SqlLiteral && typeof column.value === 'number') {
-        return columns[column.value - 1];
+  getSelectIndexForExpression(ex: SqlExpression, allowAliasReferences: boolean): number {
+    if (ex instanceof SqlLiteral && ex.isInteger()) {
+      return Number(ex.value) - 1;
+    }
+
+    if (allowAliasReferences) {
+      if (ex instanceof SqlRef) {
+        const refIdx = this.selectValues.values.findIndex((selectValue, i) => {
+          return SqlQuery.getSelectValueOutput(selectValue, i) === ex.column;
+        });
+        if (refIdx !== -1) {
+          return refIdx;
+        }
       }
-      return;
+    }
+
+    return this.selectValues.values.findIndex(selectValue => {
+      return ex.equals(selectValue.expression);
     });
   }
 
-  getAggregateColumns(): string[] {
+  isGroupedOutputColumn(outputColumn: string): boolean {
+    const { groupByExpressions, selectValues } = this;
+    if (!groupByExpressions) return false;
+    return groupByExpressions.values.some(groupByExpression => {
+      const selectIndex = this.getSelectIndexForExpression(groupByExpression, false);
+      if (selectIndex === -1) return false;
+      return (
+        SqlQuery.getSelectValueOutput(selectValues.get(selectIndex), selectIndex) === outputColumn
+      );
+    });
+  }
+
+  getGroupedOutputColumns(): string[] {
     if (!this.groupByExpressions) return [];
-    const groupedColumns = this.getGroupedColumns();
-    return this.getOutputColumns().filter(column => !groupedColumns.includes(column));
+    const outputColumns = this.getOutputColumns();
+    return outputColumns.filter(this.isGroupedOutputColumn, this);
+  }
+
+  isAggregateOutputColumn(outputColumn: string): boolean {
+    if (!this.groupByExpressions) return false;
+    return !this.isGroupedOutputColumn(outputColumn);
+  }
+
+  getAggregateOutputColumns(): string[] {
+    if (!this.groupByExpressions) return [];
+    const outputColumns = this.getOutputColumns();
+    return outputColumns.filter(this.isAggregateOutputColumn, this);
   }
 
   addColumn(column: SqlBase | string, first = false) {
@@ -773,28 +806,25 @@ export class SqlQuery extends SqlBase {
 
   /* ~~~~~ ORDER BY ~~~~~ */
 
-  getSorted() {
+  getEffectiveDirectionOfOutputColumn(outputColumn: string): Direction | undefined {
     if (!this.orderByParts) return;
-
-    const columns = this.getOutputColumns();
-    return this.orderByParts.values.map(unit => {
-      let id = '';
-      if (unit.expression instanceof SqlLiteral && typeof unit.expression.value === 'number') {
-        id = (columns[unit.expression.value - 1] || '').toString();
-      } else if (unit.expression instanceof SqlRef && unit.expression.column) {
-        id = unit.expression.column;
-      }
-      return {
-        // if the order by contains a number instead of a column name get the proper column name
-        id: id,
-        // if direction undefined it should sort by desc:true
-        direction: unit.getActualDirection(),
-      };
+    const myOrderByPart = this.orderByParts.values.find(orderByPart => {
+      const selectIndex = this.getSelectIndexForExpression(orderByPart.expression, true);
+      if (selectIndex === -1) return;
+      return (
+        SqlQuery.getSelectValueOutput(this.selectValues.get(selectIndex), selectIndex) ===
+        outputColumn
+      );
     });
+
+    if (!myOrderByPart) return;
+    return myOrderByPart.getEffectiveDirection();
   }
 
-  getOrderByColumns(): string[] {
-    throw new Error('ToDo');
+  getOrderedOutputColumns() {
+    if (!this.orderByParts) return [];
+    const outputColumns = this.getOutputColumns();
+    return outputColumns.filter(this.getEffectiveDirectionOfOutputColumn, this);
   }
 
   orderBy(column: string, direction?: Direction) {

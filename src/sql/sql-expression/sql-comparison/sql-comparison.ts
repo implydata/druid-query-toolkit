@@ -16,11 +16,6 @@ import { SqlLiteral } from '..';
 import { SqlBase, SqlBaseValue, Substitutor } from '../../sql-base';
 import { SqlExpression } from '../sql-expression';
 
-// innerSpacing:
-// A       <        B
-//   preOp   postOp
-// Also 'not'
-
 export interface BetweenAndUnit {
   start: SqlLiteral;
   preKeyword: string;

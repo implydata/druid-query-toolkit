@@ -25,6 +25,13 @@ export interface SqlOrderByPartValue extends SqlBaseValue {
 export class SqlOrderByPart extends SqlBase {
   static type = 'orderByPart';
 
+  static factory(expression: SqlExpression, direction?: string) {
+    return new SqlOrderByPart({
+      expression,
+      direction,
+    });
+  }
+
   public readonly expression: SqlExpression;
   public readonly direction?: string;
 
@@ -65,6 +72,23 @@ export class SqlOrderByPart extends SqlBase {
     return SqlBase.fromValue(value);
   }
 
+  public changeDirection(direction: Direction | undefined): this {
+    const value = this.valueOf();
+    if (direction) {
+      value.direction = direction;
+    } else {
+      delete value.direction;
+      value.innerSpacing = this.getInnerSpacingWithout('preDirection');
+    }
+    return SqlBase.fromValue(value);
+  }
+
+  public getEffectiveDirection(): Direction {
+    const { direction } = this;
+    if (!direction) return 'ASC';
+    return direction.toUpperCase() as Direction;
+  }
+
   public walkInner(nextStack: SqlBase[], fn: Substitutor, postorder: boolean): SqlBase | undefined {
     let ret = this;
 
@@ -75,12 +99,6 @@ export class SqlOrderByPart extends SqlBase {
     }
 
     return ret;
-  }
-
-  public getActualDirection(): Direction {
-    const { direction } = this;
-    if (!direction) return 'DESC';
-    return direction.toUpperCase() as Direction;
   }
 }
 

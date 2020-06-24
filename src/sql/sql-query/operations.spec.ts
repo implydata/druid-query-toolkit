@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { parseSqlQuery, SqlAlias, SqlFunction, SqlRef } from '../..';
+import { parseSqlExpression, parseSqlQuery, SqlAlias, SqlFunction, SqlRef } from '../..';
 import { sane } from '../../test-utils';
 
 describe('SqlQuery operations', () => {
@@ -76,61 +76,45 @@ describe('SqlQuery operations', () => {
     });
   });
 
-  describe('getSorted Test', () => {
-    it('getSorted', () => {
+  describe('output columns', () => {
+    const query = parseSqlQuery(sane`
+      SELECT
+        channel, SUBSTR(cityName, 1, 2), namespace AS s_namespace,
+        COUNT(*), SUM(added) AS "Added"            
+      FROM wikipedia
+      GROUP BY 1, namespace, SUBSTR(cityName, 1, 2)
+      ORDER BY channel, s_namespace DESC, COUNT(*)
+      LIMIT 5 
+    `);
+
+    it('#getSelectIndexForExpression', () => {
+      expect(query.getSelectIndexForExpression(parseSqlExpression('channel'), false)).toEqual(0);
       expect(
-        parseSqlQuery(sane`
-          SELECT * FROM sys."github" ORDER BY col DESC
-        `).getSorted(),
-      ).toEqual([
-        {
-          direction: 'DESC',
-          id: 'col',
-        },
-      ]);
+        query.getSelectIndexForExpression(parseSqlExpression('SUBSTR(cityName, 1, 2)'), false),
+      ).toEqual(1);
+      expect(query.getSelectIndexForExpression(parseSqlExpression('s_namespace'), false)).toEqual(
+        -1,
+      );
+      expect(query.getSelectIndexForExpression(parseSqlExpression('s_namespace'), true)).toEqual(2);
     });
 
-    it('getSorted with undefined direction', () => {
-      expect(
-        parseSqlQuery(sane`
-          SELECT * FROM sys."github" ORDER BY col
-        `).getSorted(),
-      ).toEqual([
-        {
-          direction: 'DESC',
-          id: 'col',
-        },
-      ]);
+    it('#getGroupedOutputColumns', () => {
+      expect(query.getGroupedOutputColumns()).toEqual(['channel', 'EXPR$1', 's_namespace']);
     });
 
-    it('getSorted with multiple cols', () => {
-      expect(
-        parseSqlQuery(sane`
-          SELECT * FROM sys."github" ORDER BY col, colTwo ASC
-        `).getSorted(),
-      ).toEqual([
-        {
-          direction: 'DESC',
-          id: 'col',
-        },
-        {
-          direction: 'ASC',
-          id: 'colTwo',
-        },
-      ]);
+    it('#getAggregateOutputColumns', () => {
+      expect(query.getAggregateOutputColumns()).toEqual(['EXPR$3', 'Added']);
     });
 
-    it('getSorted with numbered col', () => {
-      expect(
-        parseSqlQuery(sane`
-          SELECT col0, colTwo FROM sys."github" ORDER BY 1 ASC
-        `).getSorted(),
-      ).toEqual([
-        {
-          direction: 'ASC',
-          id: 'col0',
-        },
-      ]);
+    it('#getEffectiveDirectionOfOutputColumn', () => {
+      expect(query.getEffectiveDirectionOfOutputColumn('channel')).toEqual('ASC');
+      expect(query.getEffectiveDirectionOfOutputColumn('s_namespace')).toEqual('DESC');
+      expect(query.getEffectiveDirectionOfOutputColumn('Added')).toBeUndefined();
+      expect(query.getEffectiveDirectionOfOutputColumn('lol')).toBeUndefined();
+    });
+
+    it('#getOrderedOutputColumns', () => {
+      expect(query.getOrderedOutputColumns()).toEqual(['channel', 's_namespace', 'EXPR$3']);
     });
   });
 
@@ -555,7 +539,7 @@ describe('SqlQuery operations', () => {
         Group By col2
       `;
 
-      expect(parseSqlQuery(sql).getAggregateColumns()).toEqual(['col0', 'aggregated']);
+      expect(parseSqlQuery(sql).getAggregateOutputColumns()).toEqual(['col0', 'aggregated']);
     });
 
     it('get all aggregate cols using numbers', () => {
@@ -565,7 +549,7 @@ describe('SqlQuery operations', () => {
         Group By col2,  1, 3
       `;
 
-      expect(parseSqlQuery(sql).getAggregateColumns()).toEqual(['aggregated']);
+      expect(parseSqlQuery(sql).getAggregateOutputColumns()).toEqual(['aggregated']);
     });
   });
 

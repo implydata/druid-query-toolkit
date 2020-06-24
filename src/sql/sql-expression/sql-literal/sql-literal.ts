@@ -146,6 +146,11 @@ export class SqlLiteral extends SqlExpression {
     }
     return this;
   }
+
+  public isInteger(): boolean {
+    const { value } = this;
+    return typeof value === 'number' && isFinite(value) && Math.floor(value) === value;
+  }
 }
 
 SqlBase.register(SqlLiteral.type, SqlLiteral);

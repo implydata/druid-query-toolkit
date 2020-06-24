@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { SqlAlias, SqlMulti } from '..';
+import { Direction, SqlAlias, SqlMulti, SqlOrderByPart } from '..';
 import { SqlBase, Substitutor } from '../sql-base';
 
 export abstract class SqlExpression extends SqlBase {
@@ -41,6 +41,10 @@ export abstract class SqlExpression extends SqlBase {
 
   public as(alias: string) {
     return SqlAlias.factory(this, alias);
+  }
+
+  public sort(direction: Direction | undefined): SqlOrderByPart {
+    return SqlOrderByPart.factory(this, direction);
   }
 
   public addExpressionToAnd(expression: SqlExpression): SqlExpression {

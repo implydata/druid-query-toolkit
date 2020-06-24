@@ -55,6 +55,10 @@ export class SeparatedArray<T> {
     return this.values.length;
   }
 
+  public get(i: number): T {
+    return this.values[i];
+  }
+
   public first(): T {
     return this.values[0];
   }
