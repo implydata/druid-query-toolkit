@@ -72,51 +72,51 @@ SqlQuery =
   }
 
   if (where) {
-    innerSpacing.preWhereKeyword = where[0];
+    innerSpacing.preWhere = where[0];
     value.whereKeyword = where[1].whereKeyword;
-    innerSpacing.postWhereKeyword = where[1].postWhereKeyword;
+    innerSpacing.postWhere = where[1].postWhere;
     value.whereExpression = where[1].whereExpression;
   }
 
   if (groupBy) {
-    innerSpacing.preGroupByKeyword = groupBy[0];
+    innerSpacing.preGroupBy = groupBy[0];
     value.groupByKeyword = groupBy[1].groupByKeyword;
-    innerSpacing.postGroupByKeyword = groupBy[1].postGroupByKeyword;
+    innerSpacing.postGroupBy = groupBy[1].postGroupBy;
     value.groupByExpressions = groupBy[1].groupByExpressions;
   }
 
   if (having) {
-    innerSpacing.preHavingKeyword = having[0];
+    innerSpacing.preHaving = having[0];
     value.havingKeyword = having[1].havingKeyword;
-    innerSpacing.postHavingKeyword = having[1].postHavingKeyword;
+    innerSpacing.postHaving = having[1].postHaving;
     value.havingExpression = having[1].havingExpression;
   }
 
   if (orderBy) {
-    innerSpacing.preOrderByKeyword = orderBy[0];
+    innerSpacing.preOrderBy = orderBy[0];
     value.orderByKeyword = orderBy[1].orderByKeyword;
-    innerSpacing.postOrderByKeyword = orderBy[1].postOrderByKeyword;
+    innerSpacing.postOrderBy = orderBy[1].postOrderBy;
     value.orderByParts = orderBy[1].orderByParts;
   }
 
   if (limit) {
-    innerSpacing.preLimitKeyword = limit[0];
+    innerSpacing.preLimit = limit[0];
     value.limitKeyword = limit[1].limitKeyword;
-    innerSpacing.postLimitKeyword = limit[1].postLimitKeyword;
+    innerSpacing.postLimit = limit[1].postLimit;
     value.limitValue = limit[1].limitValue;
   }
 
   if (offset) {
-    innerSpacing.preOffsetKeyword = offset[0];
+    innerSpacing.preOffset = offset[0];
     value.offsetKeyword = offset[1].offsetKeyword;
-    innerSpacing.postOffsetKeyword = offset[1].postOffsetKeyword;
+    innerSpacing.postOffset = offset[1].postOffset;
     value.offsetValue = offset[1].offsetValue;
   }
 
   if (union) {
-    innerSpacing.preUnionKeyword = union[0];
+    innerSpacing.preUnion = union[0];
     value.unionKeyword = union[1].unionKeyword;
-    innerSpacing.postUnionKeyword = union[1].postUnionKeyword;
+    innerSpacing.postUnion = union[1].postUnion;
     value.unionQuery = union[1].unionQuery;
   }
 
@@ -233,20 +233,20 @@ SqlJoinPart =
   return new sql.SqlJoinPart(value);
 }
 
-WhereClause = whereKeyword:WhereToken postWhereKeyword:_ whereExpression:Expression
+WhereClause = whereKeyword:WhereToken postWhere:_ whereExpression:Expression
 {
   return {
     whereKeyword: whereKeyword,
-    postWhereKeyword: postWhereKeyword,
+    postWhere: postWhere,
     whereExpression: whereExpression
   };
 }
 
-GroupByClause = groupByKeyword:GroupByToken postGroupByKeyword:_ groupByExpressions:(ExpressionList / "()")
+GroupByClause = groupByKeyword:GroupByToken postGroupBy:_ groupByExpressions:(ExpressionList / "()")
 {
   return {
     groupByKeyword: groupByKeyword,
-    postGroupByKeyword: postGroupByKeyword,
+    postGroupBy: postGroupBy,
     groupByExpressions: groupByExpressions === '()' ? undefined : groupByExpressions,
   };
 }
@@ -256,20 +256,20 @@ ExpressionList = head:Expression tail:(CommaSeparator Expression)*
   return makeSeparatedArray(head, tail);
 }
 
-HavingClause = havingKeyword:HavingToken postHavingKeyword:_ havingExpression:Expression
+HavingClause = havingKeyword:HavingToken postHaving:_ havingExpression:Expression
 {
   return {
     havingKeyword: havingKeyword,
-    postHavingKeyword: postHavingKeyword,
+    postHaving: postHaving,
     havingExpression: havingExpression
   };
 }
 
-OrderByClause = orderByKeyword:OrderToken postOrderByKeyword:_ orderByPartsHead:SqlOrderByPart orderByPartsTail:(CommaSeparator SqlOrderByPart)*
+OrderByClause = orderByKeyword:OrderToken postOrderBy:_ orderByPartsHead:SqlOrderByPart orderByPartsTail:(CommaSeparator SqlOrderByPart)*
 {
   return {
     orderByKeyword: orderByKeyword,
-    postOrderByKeyword: postOrderByKeyword,
+    postOrderBy: postOrderBy,
     orderByParts: makeSeparatedArray(orderByPartsHead, orderByPartsTail),
   };
 }
@@ -289,29 +289,29 @@ SqlOrderByPart = expression:Expression direction:(_ (AscToken / DescToken))?
   return new sql.SqlOrderByPart(value);
 }
 
-LimitClause = limitKeyword:LimitToken postLimitKeyword:_ limitValue:SqlLiteral
+LimitClause = limitKeyword:LimitToken postLimit:_ limitValue:SqlLiteral
 {
   return {
     limitKeyword: limitKeyword,
-    postLimitKeyword: postLimitKeyword,
+    postLimit: postLimit,
     limitValue: limitValue
   };
 }
 
-OffsetClause = offsetKeyword:OffsetToken postOffsetKeyword:_ offsetValue:SqlLiteral
+OffsetClause = offsetKeyword:OffsetToken postOffset:_ offsetValue:SqlLiteral
 {
   return {
     offsetKeyword: offsetKeyword,
-    postOffsetKeyword: postOffsetKeyword,
+    postOffset: postOffset,
     offsetValue: offsetValue
   };
 }
 
-UnionClause = unionKeyword:UnionToken postUnionKeyword:_ unionQuery:SqlQuery
+UnionClause = unionKeyword:UnionToken postUnion:_ unionQuery:SqlQuery
 {
   return {
     unionKeyword: unionKeyword,
-    postUnionKeyword: postUnionKeyword,
+    postUnion: postUnion,
     unionQuery: unionQuery
   };
 }
@@ -680,7 +680,7 @@ GenericFunction =
     innerSpacing.postFilterKeyword = filter[1].postFilterKeyword;
     innerSpacing.postFilterLeftParen = filter[1].postFilterLeftParen;
     value.whereKeyword = filter[1].whereKeyword;
-    innerSpacing.postWhereKeyword = filter[1].postWhereKeyword;
+    innerSpacing.postWhere = filter[1].postWhere;
     value.whereExpression = filter[1].whereExpression;
     innerSpacing.preFilterRightParen = filter[1].preFilterRightParen;
   }
@@ -894,7 +894,7 @@ Filter = filterKeyword:FilterToken postFilterKeyword:_ OpenParen postLeftParen:_
     postFilterKeyword: postFilterKeyword,
     postFilterLeftParen: postLeftParen,
     whereKeyword: filterExpression.whereKeyword,
-    postWhereKeyword: filterExpression.postWhereKeyword,
+    postWhere: filterExpression.postWhere,
     whereExpression: filterExpression.whereExpression,
     preFilterRightParen: preRightParen,
   };

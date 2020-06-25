@@ -61,7 +61,7 @@ export abstract class SqlExpression extends SqlBase {
     return this;
   }
 
-  public as(alias: string) {
+  public as(alias?: string) {
     return SqlAlias.factory(this, alias);
   }
 

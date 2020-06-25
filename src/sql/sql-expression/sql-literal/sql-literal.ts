@@ -36,11 +36,12 @@ export class SqlLiteral extends SqlExpression {
     return `${quote}${thing}${quote}`;
   }
 
-  static factory(value: LiteralValue): SqlLiteral {
+  static factory(value: LiteralValue | SqlLiteral): SqlLiteral {
     let keyword: string | undefined;
     let stringValue: string;
     switch (typeof value) {
       case 'object':
+        if (value instanceof SqlLiteral) return value;
         if (value === null) {
           stringValue = 'NULL';
         } else if ((value as any).toISOString) {

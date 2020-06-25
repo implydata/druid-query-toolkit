@@ -25,6 +25,8 @@ export interface SqlAliasValue extends SqlBaseValue {
 export class SqlAlias extends SqlBase {
   static type = 'alias';
 
+  static STAR: SqlAlias;
+
   static fromBase(base: SqlBase): SqlAlias {
     if (base instanceof SqlAlias) return base;
     if (base instanceof SqlExpression || base instanceof SqlQuery) {
@@ -46,11 +48,11 @@ export class SqlAlias extends SqlBase {
     throw new Error(`can not construct and alias from ${base.type}`);
   }
 
-  static factory(expression: SqlExpression, alias: string) {
+  static factory(expression: SqlExpression, alias?: string) {
     return new SqlAlias({
       expression: expression,
-      asKeyword: 'AS',
-      alias: SqlRef.factoryWithQuotes(alias),
+      asKeyword: alias ? 'AS' : undefined,
+      alias: alias ? SqlRef.factoryWithQuotes(alias) : undefined,
     });
   }
 
@@ -124,3 +126,5 @@ export class SqlAlias extends SqlBase {
 }
 
 SqlBase.register(SqlAlias.type, SqlAlias);
+
+SqlAlias.STAR = SqlAlias.factory(SqlRef.STAR);

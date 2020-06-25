@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
+export * from './utils';
 export * from './sql-base';
 export * from './sql-expression';
 export * from './sql-query';
-export * from './utils';

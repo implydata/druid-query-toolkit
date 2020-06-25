@@ -37,7 +37,7 @@ export interface SqlQueryValue extends SqlBaseValue {
   withKeyword?: string;
   withParts?: SeparatedArray<SqlWithPart>;
 
-  selectKeyword?: string;
+  selectKeyword: string;
   selectDecorator?: string;
   selectValues: SeparatedArray<SqlAlias>;
 
@@ -70,6 +70,15 @@ export interface SqlQueryValue extends SqlBaseValue {
 export class SqlQuery extends SqlBase {
   static type = 'query';
 
+  static factory(from: SqlBase): SqlQuery {
+    return new SqlQuery({
+      selectKeyword: 'SELECT',
+      selectValues: SeparatedArray.fromSingleValue(SqlAlias.STAR),
+      fromKeyword: 'FROM',
+      tables: SeparatedArray.fromSingleValue(SqlAlias.fromBaseAndUpgrade(from)),
+    });
+  }
+
   static getSelectValueOutput(selectValue: SqlAlias, i: number) {
     return selectValue.getOutputName() || `EXPR$${i}`;
   }
@@ -77,7 +86,7 @@ export class SqlQuery extends SqlBase {
   public readonly explainKeyword?: string;
   public readonly withKeyword?: string;
   public readonly withParts?: SeparatedArray<SqlWithPart>;
-  public readonly selectKeyword?: string;
+  public readonly selectKeyword: string;
   public readonly selectDecorator?: string;
   public readonly selectValues: SeparatedArray<SqlAlias>;
   public readonly fromKeyword?: string;
@@ -154,7 +163,7 @@ export class SqlQuery extends SqlBase {
   }
 
   public toRawString(): string {
-    const rawParts: string[] = [this.getInnerSpace('preQuery')];
+    const rawParts: string[] = [this.getInnerSpace('preQuery', '')];
 
     // Explain clause
     if (this.explainKeyword) {
@@ -172,14 +181,12 @@ export class SqlQuery extends SqlBase {
     }
 
     // Select clause
-    if (this.selectKeyword && this.selectValues) {
-      rawParts.push(this.selectKeyword, this.getInnerSpace('postSelect'));
-      if (this.selectDecorator) {
-        rawParts.push(this.selectDecorator, this.getInnerSpace('postSelectDecorator'));
-      }
-
-      rawParts.push(this.selectValues.toString());
+    rawParts.push(this.selectKeyword, this.getInnerSpace('postSelect'));
+    if (this.selectDecorator) {
+      rawParts.push(this.selectDecorator, this.getInnerSpace('postSelectDecorator'));
     }
+
+    rawParts.push(this.selectValues.toString());
 
     // From clause
     if (this.fromKeyword && this.tables) {
@@ -199,9 +206,9 @@ export class SqlQuery extends SqlBase {
     // Where Clause
     if (this.whereKeyword && this.whereExpression) {
       rawParts.push(
-        this.getInnerSpace('preWhereKeyword', '\n'),
+        this.getInnerSpace('preWhere', '\n'),
         this.whereKeyword,
-        this.getInnerSpace('postWhereKeyword'),
+        this.getInnerSpace('postWhere'),
         this.whereExpression.toString(),
       );
     }
@@ -209,9 +216,9 @@ export class SqlQuery extends SqlBase {
     // GroupBy Clause
     if (this.groupByKeyword) {
       rawParts.push(
-        this.getInnerSpace('preGroupByKeyword', '\n'),
+        this.getInnerSpace('preGroupBy', '\n'),
         this.groupByKeyword,
-        this.getInnerSpace('postGroupByKeyword'),
+        this.getInnerSpace('postGroupBy'),
       );
 
       if (this.groupByExpressions) {
@@ -224,9 +231,9 @@ export class SqlQuery extends SqlBase {
     // Having Clause
     if (this.havingKeyword && this.havingExpression) {
       rawParts.push(
-        this.getInnerSpace('preHavingKeyword', '\n'),
+        this.getInnerSpace('preHaving', '\n'),
         this.havingKeyword,
-        this.getInnerSpace('postHavingKeyword'),
+        this.getInnerSpace('postHaving'),
         this.havingExpression.toString(),
       );
     }
@@ -234,9 +241,9 @@ export class SqlQuery extends SqlBase {
     // OrderBy Clause
     if (this.orderByKeyword && this.orderByParts) {
       rawParts.push(
-        this.getInnerSpace('preOrderByKeyword', '\n'),
+        this.getInnerSpace('preOrderBy', '\n'),
         this.orderByKeyword,
-        this.getInnerSpace('postOrderByKeyword'),
+        this.getInnerSpace('postOrderBy'),
         this.orderByParts.toString(),
       );
     }
@@ -244,9 +251,9 @@ export class SqlQuery extends SqlBase {
     // Limit Clause
     if (this.limitKeyword && this.limitValue) {
       rawParts.push(
-        this.getInnerSpace('preLimitKeyword', '\n'),
+        this.getInnerSpace('preLimit', '\n'),
         this.limitKeyword,
-        this.getInnerSpace('postLimitKeyword'),
+        this.getInnerSpace('postLimit'),
         this.limitValue.toString(),
       );
     }
@@ -254,9 +261,9 @@ export class SqlQuery extends SqlBase {
     // Offset Clause
     if (this.offsetKeyword && this.offsetValue) {
       rawParts.push(
-        this.getInnerSpace('preOffsetKeyword', '\n'),
+        this.getInnerSpace('preOffset', '\n'),
         this.offsetKeyword,
-        this.getInnerSpace('postOffsetKeyword'),
+        this.getInnerSpace('postOffset'),
         this.offsetValue.toString(),
       );
     }
@@ -264,90 +271,117 @@ export class SqlQuery extends SqlBase {
     // Union Clause
     if (this.unionKeyword && this.unionQuery) {
       rawParts.push(
-        this.getInnerSpace('preUnionKeyword', '\n'),
+        this.getInnerSpace('preUnion', '\n'),
         this.unionKeyword,
-        this.getInnerSpace('postUnionKeyword'),
+        this.getInnerSpace('postUnion'),
         this.unionQuery.toString(),
       );
     }
 
-    rawParts.push(this.getInnerSpace('postQuery'));
+    rawParts.push(this.getInnerSpace('postQuery', ''));
     return rawParts.join('');
   }
 
-  public changeWithParts(withParts: SeparatedArray<SqlWithPart>): this {
+  public changeWithParts(withParts: SeparatedArray<SqlWithPart> | SqlWithPart[] | undefined): this {
     const value = this.valueOf();
-    value.withParts = withParts;
-    return SqlBase.fromValue(value);
-  }
-
-  public changeSelectValues(selectValues: SeparatedArray<SqlAlias>): this {
-    const value = this.valueOf();
-    value.selectValues = selectValues;
-    return SqlBase.fromValue(value);
-  }
-
-  public changeTables(tables: SeparatedArray<SqlAlias>): this {
-    const value = this.valueOf();
-    value.tables = tables;
-    return SqlBase.fromValue(value);
-  }
-
-  public changeJoinParts(joinParts: SeparatedArray<SqlJoinPart>): this {
-    const value = this.valueOf();
-    value.joinParts = joinParts;
-    return SqlBase.fromValue(value);
-  }
-
-  public changeWhereExpression(whereExpression: SqlExpression | undefined) {
-    const value = this.valueOf();
-
-    value.whereExpression = whereExpression;
-    if (whereExpression) {
-      value.whereKeyword = value.whereKeyword || 'WHERE';
+    if (withParts) {
+      value.withParts = SeparatedArray.fromArray(withParts, '\n');
+      value.withKeyword = value.withKeyword || 'WITH';
     } else {
+      delete value.withParts;
+      delete value.withKeyword;
+      value.innerSpacing = this.getInnerSpacingWithout('postWith', 'postWithQuery');
+    }
+    return SqlBase.fromValue(value);
+  }
+
+  public changeSelectValues(selectValues: SeparatedArray<SqlAlias> | SqlAlias[]): this {
+    const value = this.valueOf();
+    value.selectValues = SeparatedArray.fromArray(selectValues, Separator.COMMA);
+    return SqlBase.fromValue(value);
+  }
+
+  public changeTables(tables: SeparatedArray<SqlAlias> | SqlAlias[] | undefined): this {
+    const value = this.valueOf();
+    if (tables) {
+      value.tables = SeparatedArray.fromArray(tables, Separator.COMMA);
+      value.fromKeyword = value.fromKeyword || 'FROM';
+    } else {
+      delete value.tables;
+      delete value.fromKeyword;
+      value.innerSpacing = this.getInnerSpacingWithout('preFrom', 'postFrom');
+    }
+    return SqlBase.fromValue(value);
+  }
+
+  public changeJoinParts(joinParts: SeparatedArray<SqlJoinPart> | SqlJoinPart[] | undefined): this {
+    const value = this.valueOf();
+    if (joinParts) {
+      value.joinParts = SeparatedArray.fromArray(joinParts, '\n');
+    } else {
+      delete value.joinParts;
+    }
+    return SqlBase.fromValue(value);
+  }
+
+  public changeWhereExpression(whereExpression: SqlExpression | string | undefined) {
+    const value = this.valueOf();
+    if (typeof whereExpression === 'undefined') {
+      delete value.whereExpression;
       delete value.whereKeyword;
-      value.innerSpacing = this.getInnerSpacingWithout('preWhereKeyword', 'postWhereKeyword');
-    }
-
-    return new SqlQuery(value);
-  }
-
-  public changeGroupByExpressions(groupByExpressions: SeparatedArray<SqlExpression>): this {
-    const value = this.valueOf();
-    value.groupByExpressions = groupByExpressions;
-    return SqlBase.fromValue(value);
-  }
-
-  public changeHavingExpression(havingExpression: SqlExpression | undefined) {
-    const value = this.valueOf();
-
-    value.havingExpression = havingExpression;
-    if (havingExpression) {
-      value.havingKeyword = value.havingKeyword || 'HAVING';
+      value.innerSpacing = this.getInnerSpacingWithout('preWhere', 'postWhere');
     } else {
-      delete value.havingKeyword;
-      value.innerSpacing = this.getInnerSpacingWithout('preHavingKeyword', 'postHavingKeyword');
+      value.whereExpression = parseSqlExpression(whereExpression);
+      value.whereKeyword = value.whereKeyword || 'WHERE';
     }
-
     return new SqlQuery(value);
   }
 
-  public changeOrderByParts(orderByParts: SeparatedArray<SqlOrderByPart>): this {
+  public changeGroupByExpressions(
+    groupByExpressions: SeparatedArray<SqlExpression> | SqlExpression[],
+  ): this {
     const value = this.valueOf();
-    value.orderByParts = orderByParts;
+    value.groupByExpressions = SeparatedArray.fromArray(groupByExpressions, Separator.COMMA);
     return SqlBase.fromValue(value);
   }
 
-  public changeLimitValue(limitValue: SqlLiteral): this {
+  public changeHavingExpression(havingExpression: SqlExpression | string | undefined) {
     const value = this.valueOf();
-    value.limitValue = limitValue;
+    if (typeof havingExpression === 'undefined') {
+      delete value.havingExpression;
+      delete value.havingKeyword;
+      value.innerSpacing = this.getInnerSpacingWithout('preHaving', 'postHaving');
+    } else {
+      value.havingExpression = parseSqlExpression(havingExpression);
+      value.havingKeyword = value.havingKeyword || 'HAVING';
+    }
+    return new SqlQuery(value);
+  }
+
+  public changeOrderByParts(
+    orderByParts: SeparatedArray<SqlOrderByPart> | SqlOrderByPart[] | undefined,
+  ): this {
+    const value = this.valueOf();
+    if (typeof orderByParts === 'undefined') {
+      delete value.orderByParts;
+      delete value.orderByKeyword;
+      value.innerSpacing = this.getInnerSpacingWithout('preOrderBy', 'postOrderBy');
+    } else {
+      value.orderByParts = SeparatedArray.fromArray(orderByParts, Separator.COMMA);
+      value.orderByKeyword = value.orderByKeyword || 'ORDER BY';
+    }
     return SqlBase.fromValue(value);
   }
 
-  public changeOffsetValue(offsetValue: SqlLiteral): this {
+  public changeLimitValue(limitValue: SqlLiteral | number): this {
     const value = this.valueOf();
-    value.offsetValue = offsetValue;
+    value.limitValue = SqlLiteral.factory(limitValue);
+    return SqlBase.fromValue(value);
+  }
+
+  public changeOffsetValue(offsetValue: SqlLiteral | number): this {
+    const value = this.valueOf();
+    value.offsetValue = SqlLiteral.factory(offsetValue);
     return SqlBase.fromValue(value);
   }
 
@@ -657,7 +691,7 @@ export class SqlQuery extends SqlBase {
     ) {
       value.whereExpression = undefined;
       value.whereKeyword = undefined;
-      value.innerSpacing = this.getInnerSpacingWithout('preWhereKeyword', 'postWhereKeyword');
+      value.innerSpacing = this.getInnerSpacingWithout('preWhere', 'postWhere');
     } else {
       value.whereExpression = this.whereExpression.removeColumnFromAnd(column);
     }
@@ -742,7 +776,7 @@ export class SqlQuery extends SqlBase {
 
     if (!value.groupByExpressions) {
       delete value.groupByKeyword;
-      value.innerSpacing = this.getInnerSpacingWithout('preGroupByKeyword', 'postGroupByKeyword');
+      value.innerSpacing = this.getInnerSpacingWithout('preGroupBy', 'postGroupBy');
     }
 
     return new SqlQuery(value);
@@ -783,7 +817,7 @@ export class SqlQuery extends SqlBase {
       value.havingExpression = undefined;
       value.havingKeyword = undefined;
       value = deepDelete(value, 'innerSpacing.preHavingKeyord');
-      value = deepDelete(value, 'innerSpacing.postHavingKeyword');
+      value = deepDelete(value, 'innerSpacing.postHaving');
     } else {
       value.havingExpression = this.havingExpression.removeColumnFromAnd(column);
     }
@@ -869,8 +903,8 @@ export class SqlQuery extends SqlBase {
 
     if (!value.orderByParts) {
       delete value.orderByKeyword;
-      value = deepDelete(value, 'innerSpacing.preOrderByKeyword');
-      value = deepDelete(value, 'innerSpacing.postOrderByKeyword');
+      value = deepDelete(value, 'innerSpacing.preOrderBy');
+      value = deepDelete(value, 'innerSpacing.postOrderBy');
     }
     return new SqlQuery(value);
   }

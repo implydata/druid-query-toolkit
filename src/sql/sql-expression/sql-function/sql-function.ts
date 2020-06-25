@@ -110,7 +110,7 @@ export class SqlFunction extends SqlExpression {
           '(',
           this.getInnerSpace('postFilterLeftParen', ''),
           this.whereKeyword,
-          this.getInnerSpace('postWhereKeyword'),
+          this.getInnerSpace('postWhere'),
           this.whereExpression.toString(),
           this.getInnerSpace('preFilterRightParen', ''),
           ')',

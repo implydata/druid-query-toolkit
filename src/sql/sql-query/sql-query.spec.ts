@@ -18,6 +18,7 @@ import {
   parseSqlQuery,
   SqlCase,
   SqlFunction,
+  SqlQuery,
   SqlRef,
 } from '../../index';
 import { backAndForth, sane } from '../../test-utils';
@@ -72,6 +73,31 @@ describe('SqlQuery', () => {
         throw new Error(`should not parse: ${sql}`);
       }
     }
+  });
+
+  describe('.factory', () => {
+    it('works', () => {
+      expect(String(SqlQuery.factory(SqlRef.table('lol')))).toEqual(sane`
+        SELECT *
+        FROM lol
+      `);
+    });
+
+    it('works in advanced case', () => {
+      const query = SqlQuery.factory(SqlRef.table('lol'))
+        .changeSelectValues([
+          SqlRef.factory('channel').as(),
+          SqlRef.factory('page').as(),
+          SqlRef.factory('user').as(),
+        ])
+        .changeWhereExpression(`channel  =  '#en.wikipedia'`);
+
+      expect(String(query)).toEqual(sane`
+        SELECT channel, page, "user"
+        FROM lol
+        WHERE channel  =  '#en.wikipedia'
+      `);
+    });
   });
 
   describe('#walk', () => {
@@ -159,12 +185,12 @@ describe('SqlQuery', () => {
         "havingKeyword": undefined,
         "innerSpacing": Object {
           "postFrom": " ",
-          "postLimitKeyword": " ",
+          "postLimit": " ",
           "postQuery": "",
           "postSelect": " ",
           "postSelectDecorator": "",
           "preFrom": " ",
-          "preLimitKeyword": " ",
+          "preLimit": " ",
           "preQuery": "",
         },
         "joinParts": undefined,
@@ -218,12 +244,12 @@ describe('SqlQuery', () => {
                 "havingKeyword": undefined,
                 "innerSpacing": Object {
                   "postFrom": " ",
-                  "postOrderByKeyword": " ",
+                  "postOrderBy": " ",
                   "postQuery": "",
                   "postSelect": " ",
                   "postSelectDecorator": "",
                   "preFrom": " ",
-                  "preOrderByKeyword": " ",
+                  "preOrderBy": " ",
                   "preQuery": "",
                 },
                 "joinParts": undefined,
@@ -833,10 +859,10 @@ describe('expressions with where clause', () => {
           "postQuery": "",
           "postSelect": " ",
           "postSelectDecorator": "",
-          "postWhereKeyword": " ",
+          "postWhere": " ",
           "preFrom": " ",
           "preQuery": "",
-          "preWhereKeyword": " ",
+          "preWhere": " ",
         },
         "joinParts": undefined,
         "limitKeyword": undefined,
@@ -943,10 +969,10 @@ describe('expressions with where clause', () => {
           "postQuery": "",
           "postSelect": " ",
           "postSelectDecorator": "",
-          "postWhereKeyword": " ",
+          "postWhere": " ",
           "preFrom": " ",
           "preQuery": "",
-          "preWhereKeyword": " ",
+          "preWhere": " ",
         },
         "joinParts": undefined,
         "limitKeyword": undefined,
@@ -1056,10 +1082,10 @@ describe('expressions with where clause', () => {
           "postQuery": "",
           "postSelect": " ",
           "postSelectDecorator": "",
-          "postWhereKeyword": " ",
+          "postWhere": " ",
           "preFrom": " ",
           "preQuery": "",
-          "preWhereKeyword": " ",
+          "preWhere": " ",
         },
         "joinParts": undefined,
         "limitKeyword": undefined,
@@ -1266,12 +1292,12 @@ describe('expressions with group by clause', () => {
         "havingKeyword": undefined,
         "innerSpacing": Object {
           "postFrom": " ",
-          "postGroupByKeyword": " ",
+          "postGroupBy": " ",
           "postQuery": "",
           "postSelect": " ",
           "postSelectDecorator": "",
           "preFrom": " ",
-          "preGroupByKeyword": " ",
+          "preGroupBy": " ",
           "preQuery": "",
         },
         "joinParts": undefined,
@@ -1365,12 +1391,12 @@ describe('expressions with group by clause', () => {
         "havingKeyword": undefined,
         "innerSpacing": Object {
           "postFrom": " ",
-          "postGroupByKeyword": " ",
+          "postGroupBy": " ",
           "postQuery": "",
           "postSelect": " ",
           "postSelectDecorator": "",
           "preFrom": " ",
-          "preGroupByKeyword": " ",
+          "preGroupBy": " ",
           "preQuery": "",
         },
         "joinParts": undefined,
@@ -1480,12 +1506,12 @@ describe('expressions with group by clause', () => {
         "havingKeyword": undefined,
         "innerSpacing": Object {
           "postFrom": " ",
-          "postGroupByKeyword": " ",
+          "postGroupBy": " ",
           "postQuery": "",
           "postSelect": " ",
           "postSelectDecorator": "",
           "preFrom": " ",
-          "preGroupByKeyword": " ",
+          "preGroupBy": " ",
           "preQuery": "",
         },
         "joinParts": undefined,
@@ -1598,12 +1624,12 @@ describe('expressions with having clause', () => {
         "havingKeyword": "having",
         "innerSpacing": Object {
           "postFrom": " ",
-          "postHavingKeyword": " ",
+          "postHaving": " ",
           "postQuery": "",
           "postSelect": " ",
           "postSelectDecorator": "",
           "preFrom": " ",
-          "preHavingKeyword": " ",
+          "preHaving": " ",
           "preQuery": "",
         },
         "joinParts": undefined,
@@ -1708,12 +1734,12 @@ describe('expressions with having clause', () => {
         "havingKeyword": "HAVING",
         "innerSpacing": Object {
           "postFrom": " ",
-          "postHavingKeyword": " ",
+          "postHaving": " ",
           "postQuery": "",
           "postSelect": " ",
           "postSelectDecorator": "",
           "preFrom": " ",
-          "preHavingKeyword": " ",
+          "preHaving": " ",
           "preQuery": "",
         },
         "joinParts": undefined,
@@ -1905,12 +1931,12 @@ describe('expressions with having clause', () => {
         "havingKeyword": "HAVING",
         "innerSpacing": Object {
           "postFrom": " ",
-          "postHavingKeyword": " ",
+          "postHaving": " ",
           "postQuery": "",
           "postSelect": " ",
           "postSelectDecorator": "",
           "preFrom": " ",
-          "preHavingKeyword": " ",
+          "preHaving": " ",
           "preQuery": "",
         },
         "joinParts": undefined,
@@ -1995,12 +2021,12 @@ describe('expressions with order by clause', () => {
         "havingKeyword": undefined,
         "innerSpacing": Object {
           "postFrom": " ",
-          "postOrderByKeyword": " ",
+          "postOrderBy": " ",
           "postQuery": "",
           "postSelect": " ",
           "postSelectDecorator": "",
           "preFrom": " ",
-          "preOrderByKeyword": " ",
+          "preOrderBy": " ",
           "preQuery": "",
         },
         "joinParts": undefined,
@@ -2096,12 +2122,12 @@ describe('expressions with order by clause', () => {
         "havingKeyword": undefined,
         "innerSpacing": Object {
           "postFrom": " ",
-          "postOrderByKeyword": " ",
+          "postOrderBy": " ",
           "postQuery": "",
           "postSelect": " ",
           "postSelectDecorator": "",
           "preFrom": " ",
-          "preOrderByKeyword": " ",
+          "preOrderBy": " ",
           "preQuery": "",
         },
         "joinParts": undefined,
@@ -2200,12 +2226,12 @@ describe('expressions with order by clause', () => {
         "havingKeyword": undefined,
         "innerSpacing": Object {
           "postFrom": " ",
-          "postOrderByKeyword": " ",
+          "postOrderBy": " ",
           "postQuery": "",
           "postSelect": " ",
           "postSelectDecorator": "",
           "preFrom": " ",
-          "preOrderByKeyword": " ",
+          "preOrderBy": " ",
           "preQuery": "",
         },
         "joinParts": undefined,
@@ -2303,12 +2329,12 @@ describe('expressions with order by clause', () => {
         "havingKeyword": undefined,
         "innerSpacing": Object {
           "postFrom": " ",
-          "postOrderByKeyword": " ",
+          "postOrderBy": " ",
           "postQuery": "",
           "postSelect": " ",
           "postSelectDecorator": "",
           "preFrom": " ",
-          "preOrderByKeyword": " ",
+          "preOrderBy": " ",
           "preQuery": "",
         },
         "joinParts": undefined,
@@ -2431,12 +2457,12 @@ describe('expressions with order by clause', () => {
         "havingKeyword": undefined,
         "innerSpacing": Object {
           "postFrom": " ",
-          "postOrderByKeyword": " ",
+          "postOrderBy": " ",
           "postQuery": "",
           "postSelect": " ",
           "postSelectDecorator": "",
           "preFrom": " ",
-          "preOrderByKeyword": " ",
+          "preOrderBy": " ",
           "preQuery": "",
         },
         "joinParts": undefined,
@@ -2555,12 +2581,12 @@ describe('expressions with order by clause', () => {
         "havingKeyword": undefined,
         "innerSpacing": Object {
           "postFrom": " ",
-          "postOrderByKeyword": " ",
+          "postOrderBy": " ",
           "postQuery": "",
           "postSelect": " ",
           "postSelectDecorator": "",
           "preFrom": " ",
-          "preOrderByKeyword": " ",
+          "preOrderBy": " ",
           "preQuery": "",
         },
         "joinParts": undefined,
@@ -2705,12 +2731,12 @@ describe('expressions with limit clause', () => {
         "havingKeyword": undefined,
         "innerSpacing": Object {
           "postFrom": " ",
-          "postLimitKeyword": " ",
+          "postLimit": " ",
           "postQuery": "",
           "postSelect": " ",
           "postSelectDecorator": "",
           "preFrom": " ",
-          "preLimitKeyword": " ",
+          "preLimit": " ",
           "preQuery": "",
         },
         "joinParts": undefined,
@@ -2801,10 +2827,10 @@ describe('expressions with union clause', () => {
           "postQuery": "",
           "postSelect": " ",
           "postSelectDecorator": "",
-          "postUnionKeyword": " ",
+          "postUnion": " ",
           "preFrom": " ",
           "preQuery": "",
-          "preUnionKeyword": " ",
+          "preUnion": " ",
         },
         "joinParts": undefined,
         "limitKeyword": undefined,
@@ -3857,14 +3883,14 @@ describe('No spacing', () => {
         "havingKeyword": undefined,
         "innerSpacing": Object {
           "postFrom": "",
-          "postGroupByKeyword": "",
-          "postOrderByKeyword": "",
+          "postGroupBy": "",
+          "postOrderBy": "",
           "postQuery": "",
           "postSelect": "",
           "postSelectDecorator": "",
           "preFrom": "",
-          "preGroupByKeyword": "",
-          "preOrderByKeyword": "",
+          "preGroupBy": "",
+          "preOrderBy": "",
           "preQuery": "",
         },
         "joinParts": undefined,
@@ -4092,21 +4118,21 @@ describe('Extra', () => {
         "havingKeyword": undefined,
         "innerSpacing": Object {
           "postFrom": " ",
-          "postGroupByKeyword": " ",
-          "postOrderByKeyword": " ",
+          "postGroupBy": " ",
+          "postOrderBy": " ",
           "postQuery": "",
           "postSelect": "
         ",
           "postSelectDecorator": "",
-          "postWhereKeyword": " ",
+          "postWhere": " ",
           "preFrom": "
       ",
-          "preGroupByKeyword": "
+          "preGroupBy": "
       ",
-          "preOrderByKeyword": "
+          "preOrderBy": "
       ",
           "preQuery": "",
-          "preWhereKeyword": "
+          "preWhere": "
       ",
         },
         "joinParts": undefined,

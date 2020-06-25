@@ -478,7 +478,7 @@ describe('SqlFunction', () => {
           "postFilterKeyword": " ",
           "postFilterLeftParen": "",
           "postLeftParen": "",
-          "postWhereKeyword": " ",
+          "postWhere": " ",
           "preFilter": " ",
           "preFilterRightParen": "",
           "preLeftParen": "",
