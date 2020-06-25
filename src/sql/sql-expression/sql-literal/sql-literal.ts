@@ -131,11 +131,11 @@ export class SqlLiteral extends SqlExpression {
     return retParts.join('');
   }
 
-  public increment(ammount = 1): SqlLiteral | undefined {
-    if (typeof this.value !== 'number') return;
+  public increment(ammount = 1): SqlLiteral {
+    if (!this.isInteger()) return this;
 
     const value = this.valueOf();
-    value.value = this.value + ammount;
+    value.value = Number(this.value) + ammount;
     delete value.stringValue;
     return new SqlLiteral(value);
   }

@@ -216,28 +216,6 @@ logs:
 ["column", "column1", "column2"]
 ```
 
-## HasGroupByColumn
-
-Checks to see if a column is in the group by clause either by name or index
-
-Takes argument:
-
-- `column: string`
-
-```
-let query = parseSqlQuery(`SELECT column, column1, column2
-                      FROM sys."github"
-                      Group By column, 3`);
-query = query.hasGroupByOnColumn("column2");
-console.log(query.toString());
-```
-
-logs:                 
-
-```
-true
-```
-
 ## ReplaceFrom
 
 Replaces the `From` value of an SqlQuery Object, allowing you to which the the table in the select clause.  

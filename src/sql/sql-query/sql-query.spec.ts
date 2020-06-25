@@ -30,6 +30,7 @@ describe('SqlQuery', () => {
       `Select * from tbl`,
       `(Select * from tbl)`,
       `Select count(*) As sums from tbl`,
+      `Select count(*) As sums from tbl GROUP BY ()`,
       sane`
         SELECT
           datasource d,
@@ -1118,7 +1119,7 @@ describe('expressions with where clause', () => {
         "unionKeyword": undefined,
         "unionQuery": undefined,
         "whereExpression": SqlMulti {
-          "arguments": SeparatedArray {
+          "args": SeparatedArray {
             "separators": Array [
               Separator {
                 "left": " ",
@@ -1128,7 +1129,7 @@ describe('expressions with where clause', () => {
             ],
             "values": Array [
               SqlMulti {
-                "arguments": SeparatedArray {
+                "args": SeparatedArray {
                   "separators": Array [
                     Separator {
                       "left": " ",
@@ -1792,7 +1793,7 @@ describe('expressions with having clause', () => {
         "groupByExpressions": undefined,
         "groupByKeyword": undefined,
         "havingExpression": SqlMulti {
-          "arguments": SeparatedArray {
+          "args": SeparatedArray {
             "separators": Array [
               Separator {
                 "left": " ",
@@ -1802,7 +1803,7 @@ describe('expressions with having clause', () => {
             ],
             "values": Array [
               SqlMulti {
-                "arguments": SeparatedArray {
+                "args": SeparatedArray {
                   "separators": Array [
                     Separator {
                       "left": " ",
@@ -4282,7 +4283,7 @@ describe('Extra', () => {
         "unionKeyword": undefined,
         "unionQuery": undefined,
         "whereExpression": SqlMulti {
-          "arguments": SeparatedArray {
+          "args": SeparatedArray {
             "separators": Array [
               Separator {
                 "left": " ",
@@ -4309,7 +4310,7 @@ describe('Extra', () => {
                 "notKeyword": undefined,
                 "op": ">=",
                 "rhs": SqlMulti {
-                  "arguments": SeparatedArray {
+                  "args": SeparatedArray {
                     "separators": Array [
                       Separator {
                         "left": " ",

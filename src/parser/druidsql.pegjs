@@ -50,14 +50,12 @@ SqlQuery =
     value.withKeyword = withClause[0].withKeyword;
     innerSpacing.postWith = withClause[0].postWith;
     value.withParts = withClause[0].withParts;
-    value.withSeparators = withClause[0].withSeparators;
     innerSpacing.postWithQuery = withClause[1];
   }
 
   value.selectKeyword = select.selectKeyword;
   innerSpacing.postSelect = select.postSelect;
   value.selectDecorator = select.selectDecorator;
-  value.selectSeparators = select.selectSeparators;
   value.selectValues = select.selectValues;
   innerSpacing.postSelectDecorator = select.postSelectDecorator;
 
@@ -66,7 +64,6 @@ SqlQuery =
     value.fromKeyword = from[1].fromKeyword;
     innerSpacing.postFrom = from[1].postFrom;
     value.tables = from[1].tables;
-    value.tableSeparators = from[1].tableSeparators;
   }
 
   if (joins) {
@@ -86,7 +83,6 @@ SqlQuery =
     value.groupByKeyword = groupBy[1].groupByKeyword;
     innerSpacing.postGroupByKeyword = groupBy[1].postGroupByKeyword;
     value.groupByExpressions = groupBy[1].groupByExpressions;
-    value.groupBySeparators = groupBy[1].groupBySeparators;
   }
 
   if (having) {
@@ -101,7 +97,6 @@ SqlQuery =
     value.orderByKeyword = orderBy[1].orderByKeyword;
     innerSpacing.postOrderByKeyword = orderBy[1].postOrderByKeyword;
     value.orderByParts = orderBy[1].orderByParts;
-    value.orderBySeparators = orderBy[1].orderBySeparators;
   }
 
   if (limit) {
@@ -247,13 +242,18 @@ WhereClause = whereKeyword:WhereToken postWhereKeyword:_ whereExpression:Express
   };
 }
 
-GroupByClause = groupByKeyword:GroupByToken postGroupByKeyword:_ groupByExpressionsHead:Expression groupByExpressionsTail:(CommaSeparator Expression)*
+GroupByClause = groupByKeyword:GroupByToken postGroupByKeyword:_ groupByExpressions:(ExpressionList / "()")
 {
   return {
     groupByKeyword: groupByKeyword,
     postGroupByKeyword: postGroupByKeyword,
-    groupByExpressions: makeSeparatedArray(groupByExpressionsHead, groupByExpressionsTail),
+    groupByExpressions: groupByExpressions === '()' ? undefined : groupByExpressions,
   };
+}
+
+ExpressionList = head:Expression tail:(CommaSeparator Expression)*
+{
+  return makeSeparatedArray(head, tail);
 }
 
 HavingClause = havingKeyword:HavingToken postHavingKeyword:_ havingExpression:Expression

@@ -166,7 +166,7 @@ describe('SqlFunction', () => {
           "separators": Array [],
           "values": Array [
             SqlMulti {
-              "arguments": SeparatedArray {
+              "args": SeparatedArray {
                 "separators": Array [
                   Separator {
                     "left": " ",
@@ -176,7 +176,7 @@ describe('SqlFunction', () => {
                 ],
                 "values": Array [
                   SqlMulti {
-                    "arguments": SeparatedArray {
+                    "args": SeparatedArray {
                       "separators": Array [
                         Separator {
                           "left": " ",
@@ -206,7 +206,7 @@ describe('SqlFunction', () => {
                     "type": "multi",
                   },
                   SqlMulti {
-                    "arguments": SeparatedArray {
+                    "args": SeparatedArray {
                       "separators": Array [
                         Separator {
                           "left": " ",
@@ -304,7 +304,7 @@ describe('SqlFunction', () => {
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
-        "arguments": SeparatedArray {
+        "args": SeparatedArray {
           "separators": Array [
             Separator {
               "left": " ",
@@ -343,7 +343,7 @@ describe('SqlFunction', () => {
               "whereKeyword": undefined,
             },
             SqlMulti {
-              "arguments": SeparatedArray {
+              "args": SeparatedArray {
                 "separators": Array [
                   Separator {
                     "left": " ",
@@ -382,7 +382,7 @@ describe('SqlFunction', () => {
                     "whereKeyword": undefined,
                   },
                   SqlMulti {
-                    "arguments": SeparatedArray {
+                    "args": SeparatedArray {
                       "separators": Array [
                         Separator {
                           "left": " ",

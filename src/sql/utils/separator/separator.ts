@@ -25,11 +25,11 @@ export class Separator {
 
   static COMMA: Separator;
 
-  static bothSeparator(separator: string) {
+  static symmetricSpace(separator: string) {
     return new Separator({ left: ' ', separator: separator, right: ' ' });
   }
 
-  static rightSeparator(separator: string) {
+  static rightSpace(separator: string) {
     return new Separator({ separator: separator, right: ' ' });
   }
 
@@ -84,4 +84,4 @@ export class Separator {
   }
 }
 
-Separator.COMMA = Separator.rightSeparator(',');
+Separator.COMMA = Separator.rightSpace(',');

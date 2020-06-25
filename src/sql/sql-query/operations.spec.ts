@@ -83,7 +83,7 @@ describe('SqlQuery operations', () => {
         COUNT(*), SUM(added) AS "Added"            
       FROM wikipedia
       GROUP BY 1, namespace, SUBSTR(cityName, 1, 2)
-      ORDER BY channel, s_namespace DESC, COUNT(*)
+      ORDER BY channel, s_namespace Desc, COUNT(*)
       LIMIT 5 
     `);
 
@@ -107,10 +107,10 @@ describe('SqlQuery operations', () => {
     });
 
     it('#getEffectiveDirectionOfOutputColumn', () => {
-      expect(query.getEffectiveDirectionOfOutputColumn('channel')).toEqual('ASC');
-      expect(query.getEffectiveDirectionOfOutputColumn('s_namespace')).toEqual('DESC');
-      expect(query.getEffectiveDirectionOfOutputColumn('Added')).toBeUndefined();
-      expect(query.getEffectiveDirectionOfOutputColumn('lol')).toBeUndefined();
+      expect(String(query.getOrderByForOutputColumn('channel'))).toEqual('channel');
+      expect(String(query.getOrderByForOutputColumn('s_namespace'))).toEqual('s_namespace Desc');
+      expect(String(query.getOrderByForOutputColumn('Added'))).toEqual('undefined');
+      expect(String(query.getOrderByForOutputColumn('lol'))).toEqual('undefined');
     });
 
     it('#getOrderedOutputColumns', () => {
@@ -167,19 +167,19 @@ describe('SqlQuery operations', () => {
     });
   });
 
-  describe.skip('#addWhere', () => {
-    it('no Where filter', () => {
+  describe('#addWhere', () => {
+    it('no initial where', () => {
       expect(
         parseSqlQuery(sane`
           SELECT *
           FROM sys."github"
         `)
-          .addWhere(`col > 1`)
+          .addToWhere(`col > 1`)
           .toString(),
       ).toEqual(sane`
         SELECT *
         FROM sys."github"
-        WHERE "col" > 1
+        WHERE col > 1
       `);
     });
 
@@ -187,13 +187,15 @@ describe('SqlQuery operations', () => {
       expect(
         parseSqlQuery(sane`
           SELECT *
-          FROM sys."github" WHERE col > 1
+          FROM sys."github"
+          WHERE col > 1
         `)
-          .addWhere(`colTwo > 2`)
+          .addToWhere(`colTwo > 2`)
           .toString(),
       ).toEqual(sane`
         SELECT *
-        FROM sys."github" WHERE col > 1
+        FROM sys."github"
+        WHERE col > 1 AND colTwo > 2
       `);
     });
 
@@ -203,11 +205,11 @@ describe('SqlQuery operations', () => {
           SELECT *
           FROM sys."github" WHERE col > 1 OR col < 5
         `)
-          .addWhere(`colTwo > 2`)
+          .addToWhere(`colTwo > 2`)
           .toString(),
       ).toEqual(sane`
         SELECT *
-        FROM sys."github" WHERE (col > 1 OR col < 5) AND "colTwo" > 2"
+        FROM sys."github" WHERE (col > 1 OR col < 5) AND colTwo > 2
       `);
     });
 
@@ -217,69 +219,69 @@ describe('SqlQuery operations', () => {
           SELECT *
           FROM sys."github" WHERE (col > 1 OR col < 5) AND colTwo > 5
         `)
-          .addWhere(`colTwo > 2`)
+          .addToWhere(`colTwo > 2`)
           .toString(),
       ).toEqual(sane`
         SELECT *
-        FROM sys."github" WHERE (col > 1 OR col < 5) AND colTwo > 5
+        FROM sys."github" WHERE (col > 1 OR col < 5) AND colTwo > 5 AND colTwo > 2
+      `);
+    });
+  });
+
+  describe('#removeOutputColumn', () => {
+    it('basic cols', () => {
+      const query = parseSqlQuery(sane`
+        SELECT col0, col1, col2 
+        FROM github
+      `);
+
+      expect(query.removeOutputColumn('col0').toString()).toEqual(sane`
+        SELECT col1, col2 
+        FROM github
+      `);
+
+      expect(query.removeOutputColumn('col1').toString()).toEqual(sane`
+        SELECT col0, col2 
+        FROM github
+      `);
+
+      expect(query.removeOutputColumn('col2').toString()).toEqual(sane`
+        SELECT col0, col1 
+        FROM github
+      `);
+    });
+
+    it(`removes from group by and ORDER BY`, () => {
+      const query = parseSqlQuery(sane`
+        SELECT col0, col1, SUM(a), col2 
+        FROM github
+        GROUP BY 1, 2, 4
+        ORDER BY 2
+      `);
+
+      expect(query.removeOutputColumn('col0').toString()).toEqual(sane`
+        SELECT col1, SUM(a), col2 
+        FROM github
+        GROUP BY 1, 3
+        ORDER BY 1
+      `);
+
+      expect(query.removeOutputColumn('col1').toString()).toEqual(sane`
+        SELECT col0, SUM(a), col2 
+        FROM github
+        GROUP BY 1, 3
+      `);
+
+      expect(query.removeOutputColumn('col2').toString()).toEqual(sane`
+        SELECT col0, col1, SUM(a) 
+        FROM github
+        GROUP BY 1, 2
+        ORDER BY 2
       `);
     });
   });
 
   describe.skip('remove functions', () => {
-    describe('#removeColumn', () => {
-      it('basic cols', () => {
-        const query = parseSqlQuery(sane`
-          SELECT col0, col1, col2 
-          FROM github
-        `);
-
-        expect(query.removeColumn('col0').toString()).toEqual(sane`
-          SELECT col1, col2 
-          FROM github
-        `);
-
-        expect(query.removeColumn('col1').toString()).toEqual(sane`
-          SELECT col0, col2 
-          FROM github
-        `);
-
-        expect(query.removeColumn('col2').toString()).toEqual(sane`
-          SELECT col0, col1 
-          FROM github
-        `);
-      });
-
-      it(`removes from group by and ORDER BY`, () => {
-        const query = parseSqlQuery(sane`
-          SELECT col0, col1, SUM(a), col2 
-          FROM github
-          GROUP BY 1, 2, 4
-          ORDER BY 2
-        `);
-
-        expect(query.removeColumn('col0').toString()).toEqual(sane`
-          SELECT col1, SUM(a), col2 
-          FROM github
-          GROUP BY 1, 3
-          ORDER BY 1
-        `);
-
-        expect(query.removeColumn('col1').toString()).toEqual(sane`
-          SELECT col0, SUM(a), col2 
-          FROM github
-          GROUP BY 1, 3
-        `);
-
-        expect(query.removeColumn('col2').toString()).toEqual(sane`
-          SELECT col0, col1, SUM(a) 
-          FROM github
-          GROUP BY 1, 2
-          ORDER BY 2
-        `);
-      });
-    });
-
     it('remove col from where', () => {
       expect(
         parseSqlQuery(sane`
@@ -287,7 +289,7 @@ describe('SqlQuery operations', () => {
           FROM sys."github"
           Where col AND col2
         `)
-          .removeFromWhere('col2')
+          .removeColumnFromWhere('col2')
           .toString(),
       ).toEqual(sane`
         SELECT col0,col1,col2
@@ -303,7 +305,7 @@ describe('SqlQuery operations', () => {
           FROM sys."github"
           Where col2 = '1'
         `)
-          .removeFromWhere('col2')
+          .removeColumnFromWhere('col2')
           .toString(),
       ).toEqual(sane`
         SELECT col0,col1,col2
@@ -318,7 +320,7 @@ describe('SqlQuery operations', () => {
           FROM sys."github"
           Where col2 > '1' AND col2 < '1'
         `)
-          .removeFromWhere('col2')
+          .removeColumnFromWhere('col2')
           .toString(),
       ).toEqual(sane`
         SELECT col0,col1,col2
@@ -334,7 +336,7 @@ describe('SqlQuery operations', () => {
           FROM sys."github"
           Where col2 > '1' AND col1 > 2 OR col2 < '1'
         `)
-          .removeFromWhere('col2')
+          .removeColumnFromWhere('col2')
           .toString(),
       ).toEqual(sane`
         SELECT col0, col1, col2
@@ -350,7 +352,7 @@ describe('SqlQuery operations', () => {
           FROM sys."github"
           Where col2 > 1
         `)
-          .removeFromWhere('col2')
+          .removeColumnFromWhere('col2')
           .toString(),
       ).toEqual(sane`
         SELECT col0,col1,col2
@@ -365,7 +367,7 @@ describe('SqlQuery operations', () => {
           FROM sys."github"
           Where col2 > 1 AND col1 > 1
         `)
-          .removeFromWhere('col2')
+          .removeColumnFromWhere('col2')
           .toString(),
       ).toEqual(sane`
         SELECT col0,col1,col2

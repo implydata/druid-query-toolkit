@@ -21,7 +21,7 @@ describe('OR expression', () => {
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
-        "arguments": SeparatedArray {
+        "args": SeparatedArray {
           "separators": Array [
             Separator {
               "left": " ",
@@ -64,7 +64,7 @@ describe('OR expression', () => {
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
-        "arguments": SeparatedArray {
+        "args": SeparatedArray {
           "separators": Array [
             Separator {
               "left": " ",
@@ -101,7 +101,7 @@ describe('OR expression', () => {
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
-        "arguments": SeparatedArray {
+        "args": SeparatedArray {
           "separators": Array [
             Separator {
               "left": " ",
@@ -144,7 +144,7 @@ describe('OR expression', () => {
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
-        "arguments": SeparatedArray {
+        "args": SeparatedArray {
           "separators": Array [
             Separator {
               "left": " ",
@@ -181,7 +181,7 @@ describe('OR expression', () => {
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
-        "arguments": SeparatedArray {
+        "args": SeparatedArray {
           "separators": Array [
             Separator {
               "left": " ",
@@ -224,7 +224,7 @@ describe('OR expression', () => {
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
-        "arguments": SeparatedArray {
+        "args": SeparatedArray {
           "separators": Array [
             Separator {
               "left": "   ",
@@ -261,7 +261,7 @@ describe('OR expression', () => {
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
-        "arguments": SeparatedArray {
+        "args": SeparatedArray {
           "separators": Array [
             Separator {
               "left": "   ",
@@ -308,7 +308,7 @@ describe('AND expression', () => {
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
-        "arguments": SeparatedArray {
+        "args": SeparatedArray {
           "separators": Array [
             Separator {
               "left": " ",
@@ -353,7 +353,7 @@ describe('AND expression', () => {
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
-        "arguments": SeparatedArray {
+        "args": SeparatedArray {
           "separators": Array [
             Separator {
               "left": " ",
@@ -392,7 +392,7 @@ describe('AND expression', () => {
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
-        "arguments": SeparatedArray {
+        "args": SeparatedArray {
           "separators": Array [
             Separator {
               "left": " ",
@@ -437,7 +437,7 @@ describe('AND expression', () => {
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
-        "arguments": SeparatedArray {
+        "args": SeparatedArray {
           "separators": Array [
             Separator {
               "left": " ",
@@ -476,7 +476,7 @@ describe('AND expression', () => {
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
-        "arguments": SeparatedArray {
+        "args": SeparatedArray {
           "separators": Array [
             Separator {
               "left": " ",
@@ -523,7 +523,7 @@ describe('Math expression', () => {
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
-        "arguments": SeparatedArray {
+        "args": SeparatedArray {
           "separators": Array [
             Separator {
               "left": " ",
@@ -562,7 +562,7 @@ describe('Math expression', () => {
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
-        "arguments": SeparatedArray {
+        "args": SeparatedArray {
           "separators": Array [
             Separator {
               "left": " ",
@@ -601,7 +601,7 @@ describe('Math expression', () => {
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
-        "arguments": SeparatedArray {
+        "args": SeparatedArray {
           "separators": Array [
             Separator {
               "left": " ",
@@ -640,7 +640,7 @@ describe('Math expression', () => {
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
-        "arguments": SeparatedArray {
+        "args": SeparatedArray {
           "separators": Array [
             Separator {
               "left": " ",
@@ -679,7 +679,7 @@ describe('Math expression', () => {
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
-        "arguments": SeparatedArray {
+        "args": SeparatedArray {
           "separators": Array [
             Separator {
               "left": " ",
@@ -724,7 +724,7 @@ describe('Math expression', () => {
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
-        "arguments": SeparatedArray {
+        "args": SeparatedArray {
           "separators": Array [
             Separator {
               "left": " ",
@@ -763,7 +763,7 @@ describe('Math expression', () => {
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
-        "arguments": SeparatedArray {
+        "args": SeparatedArray {
           "separators": Array [
             Separator {
               "left": " ",
@@ -808,7 +808,7 @@ describe('Math expression', () => {
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
-        "arguments": SeparatedArray {
+        "args": SeparatedArray {
           "separators": Array [
             Separator {
               "left": " ",
@@ -847,7 +847,7 @@ describe('Math expression', () => {
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
-        "arguments": SeparatedArray {
+        "args": SeparatedArray {
           "separators": Array [
             Separator {
               "left": " ",
@@ -892,7 +892,7 @@ describe('Math expression', () => {
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
-        "arguments": SeparatedArray {
+        "args": SeparatedArray {
           "separators": Array [
             Separator {
               "left": " ",
@@ -931,7 +931,7 @@ describe('Math expression', () => {
               "whereKeyword": undefined,
             },
             SqlMulti {
-              "arguments": SeparatedArray {
+              "args": SeparatedArray {
                 "separators": Array [
                   Separator {
                     "left": " ",
@@ -1000,7 +1000,7 @@ describe('Combined expression', () => {
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
-        "arguments": SeparatedArray {
+        "args": SeparatedArray {
           "separators": Array [
             Separator {
               "left": " ",
@@ -1020,7 +1020,7 @@ describe('Combined expression', () => {
               "type": "ref",
             },
             SqlMulti {
-              "arguments": SeparatedArray {
+              "args": SeparatedArray {
                 "separators": Array [
                   Separator {
                     "left": " ",
@@ -1057,7 +1057,7 @@ describe('Combined expression', () => {
                     "notKeyword": undefined,
                     "op": ">",
                     "rhs": SqlMulti {
-                      "arguments": SeparatedArray {
+                      "args": SeparatedArray {
                         "separators": Array [
                           Separator {
                             "left": " ",
@@ -1116,7 +1116,7 @@ describe('Combined expression', () => {
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
-        "arguments": SeparatedArray {
+        "args": SeparatedArray {
           "separators": Array [
             Separator {
               "left": " ",
@@ -1126,7 +1126,7 @@ describe('Combined expression', () => {
           ],
           "values": Array [
             SqlMulti {
-              "arguments": SeparatedArray {
+              "args": SeparatedArray {
                 "separators": Array [
                   Separator {
                     "left": " ",
@@ -1141,7 +1141,7 @@ describe('Combined expression', () => {
                       "preOp": " ",
                     },
                     "lhs": SqlMulti {
-                      "arguments": SeparatedArray {
+                      "args": SeparatedArray {
                         "separators": Array [
                           Separator {
                             "left": " ",
@@ -1232,7 +1232,7 @@ describe('Combined expression', () => {
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
-        "arguments": SeparatedArray {
+        "args": SeparatedArray {
           "separators": Array [
             Separator {
               "left": " ",
@@ -1242,7 +1242,7 @@ describe('Combined expression', () => {
           ],
           "values": Array [
             SqlMulti {
-              "arguments": SeparatedArray {
+              "args": SeparatedArray {
                 "separators": Array [
                   Separator {
                     "left": " ",
@@ -1279,7 +1279,7 @@ describe('Combined expression', () => {
                     "notKeyword": undefined,
                     "op": ">",
                     "rhs": SqlMulti {
-                      "arguments": SeparatedArray {
+                      "args": SeparatedArray {
                         "separators": Array [
                           Separator {
                             "left": " ",
@@ -1350,7 +1350,7 @@ describe('Multiple expressions', () => {
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
-        "arguments": SeparatedArray {
+        "args": SeparatedArray {
           "separators": Array [
             Separator {
               "left": " ",
@@ -1410,7 +1410,7 @@ describe('Multiple expressions', () => {
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
-        "arguments": SeparatedArray {
+        "args": SeparatedArray {
           "separators": Array [
             Separator {
               "left": " ",
@@ -1425,7 +1425,7 @@ describe('Multiple expressions', () => {
           ],
           "values": Array [
             SqlMulti {
-              "arguments": SeparatedArray {
+              "args": SeparatedArray {
                 "separators": Array [
                   Separator {
                     "left": " ",
@@ -1461,7 +1461,7 @@ describe('Multiple expressions', () => {
               "type": "multi",
             },
             SqlMulti {
-              "arguments": SeparatedArray {
+              "args": SeparatedArray {
                 "separators": Array [
                   Separator {
                     "left": " ",
@@ -1522,7 +1522,7 @@ describe('Brackets', () => {
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
-        "arguments": SeparatedArray {
+        "args": SeparatedArray {
           "separators": Array [
             Separator {
               "left": " ",
@@ -1532,7 +1532,7 @@ describe('Brackets', () => {
           ],
           "values": Array [
             SqlMulti {
-              "arguments": SeparatedArray {
+              "args": SeparatedArray {
                 "separators": Array [
                   Separator {
                     "left": " ",
@@ -1599,7 +1599,7 @@ describe('Brackets', () => {
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
-        "arguments": SeparatedArray {
+        "args": SeparatedArray {
           "separators": Array [
             Separator {
               "left": " ",
@@ -1609,7 +1609,7 @@ describe('Brackets', () => {
           ],
           "values": Array [
             SqlMulti {
-              "arguments": SeparatedArray {
+              "args": SeparatedArray {
                 "separators": Array [
                   Separator {
                     "left": " ",
@@ -1682,7 +1682,7 @@ describe('Brackets', () => {
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
-        "arguments": SeparatedArray {
+        "args": SeparatedArray {
           "separators": Array [
             Separator {
               "left": " ",
@@ -1694,7 +1694,7 @@ describe('Brackets', () => {
             SqlUnary {
               "arg": SqlUnary {
                 "arg": SqlMulti {
-                  "arguments": SeparatedArray {
+                  "args": SeparatedArray {
                     "separators": Array [
                       Separator {
                         "left": " ",
@@ -1987,7 +1987,7 @@ describe('getSqlRefs', () => {
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
-        "arguments": SeparatedArray {
+        "args": SeparatedArray {
           "separators": Array [
             Separator {
               "left": " ",
@@ -2154,7 +2154,7 @@ describe('getSqlRefs', () => {
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
-        "arguments": SeparatedArray {
+        "args": SeparatedArray {
           "separators": Array [
             Separator {
               "left": " ",

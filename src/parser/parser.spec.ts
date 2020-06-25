@@ -22,7 +22,7 @@ describe('Parser', () => {
   it('parse anything', () => {
     expect(parseSql('a OR b')).toMatchInlineSnapshot(`
       SqlMulti {
-        "arguments": SeparatedArray {
+        "args": SeparatedArray {
           "separators": Array [
             Separator {
               "left": " ",

@@ -24,7 +24,7 @@ import {
   Substitutor,
 } from '../..';
 import { parseSql } from '../../parser';
-import { deepDelete, deepSet, filterMap } from '../../utils';
+import { deepDelete, filterMap } from '../../utils';
 import { SqlBase, SqlBaseValue } from '../sql-base';
 
 import { SqlJoinPart } from './sql-join-part/sql-join-part';
@@ -207,13 +207,18 @@ export class SqlQuery extends SqlBase {
     }
 
     // GroupBy Clause
-    if (this.groupByKeyword && this.groupByExpressions) {
+    if (this.groupByKeyword) {
       rawParts.push(
         this.getInnerSpace('preGroupByKeyword', '\n'),
         this.groupByKeyword,
         this.getInnerSpace('postGroupByKeyword'),
-        this.groupByExpressions.toString(),
       );
+
+      if (this.groupByExpressions) {
+        rawParts.push(this.groupByExpressions.toString());
+      } else {
+        rawParts.push('()'); // Temp hack to allow for `GROUP BY ()`
+      }
     }
 
     // Having Clause
@@ -294,10 +299,18 @@ export class SqlQuery extends SqlBase {
     return SqlBase.fromValue(value);
   }
 
-  public changeWhereExpression(whereExpression: SqlExpression): this {
+  public changeWhereExpression(whereExpression: SqlExpression | undefined) {
     const value = this.valueOf();
+
     value.whereExpression = whereExpression;
-    return SqlBase.fromValue(value);
+    if (whereExpression) {
+      value.whereKeyword = value.whereKeyword || 'WHERE';
+    } else {
+      delete value.whereKeyword;
+      value.innerSpacing = this.getInnerSpacingWithout('preWhereKeyword', 'postWhereKeyword');
+    }
+
+    return new SqlQuery(value);
   }
 
   public changeGroupByExpressions(groupByExpressions: SeparatedArray<SqlExpression>): this {
@@ -306,10 +319,18 @@ export class SqlQuery extends SqlBase {
     return SqlBase.fromValue(value);
   }
 
-  public changeHavingExpression(havingExpression: SqlExpression): this {
+  public changeHavingExpression(havingExpression: SqlExpression | undefined) {
     const value = this.valueOf();
+
     value.havingExpression = havingExpression;
-    return SqlBase.fromValue(value);
+    if (havingExpression) {
+      value.havingKeyword = value.havingKeyword || 'HAVING';
+    } else {
+      delete value.havingKeyword;
+      value.innerSpacing = this.getInnerSpacingWithout('preHavingKeyword', 'postHavingKeyword');
+    }
+
+    return new SqlQuery(value);
   }
 
   public changeOrderByParts(orderByParts: SeparatedArray<SqlOrderByPart>): this {
@@ -341,7 +362,7 @@ export class SqlQuery extends SqlBase {
     fn: Substitutor,
     postorder: boolean,
   ): SqlQuery | undefined {
-    let ret = this;
+    let ret: SqlQuery = this;
 
     if (this.withParts) {
       const withParts = SqlBase.walkSeparatedArray(this.withParts, nextStack, fn, postorder);
@@ -439,31 +460,6 @@ export class SqlQuery extends SqlBase {
     return ret;
   }
 
-  /* ~~~~~ General Stuff ~~~~~ */
-
-  remove(column: string) {
-    return this.removeFilter(column)
-      .removeFromGroupBy(column)
-      .removeFromWhere(column)
-      .removeFromHaving(column)
-      .removeFromOrderBy(column)
-      .removeColumn(column);
-  }
-
-  removeFilter(column: string): SqlQuery {
-    let ret: SqlQuery = this;
-
-    if (this.whereExpression) {
-      ret = this.removeFromWhere(column) || ret;
-    }
-
-    if (this.havingExpression) {
-      ret = this.removeFromHaving(column) || ret;
-    }
-
-    return ret;
-  }
-
   /* ~~~~~ SELECT ~~~~~ */
 
   /**
@@ -471,6 +467,12 @@ export class SqlQuery extends SqlBase {
    */
   getOutputColumns(): string[] {
     return this.selectValues.values.map(SqlQuery.getSelectValueOutput);
+  }
+
+  getSelectIndexForOutputColumn(outputColumn: string): number {
+    return this.selectValues.values.findIndex((selectValue, i) => {
+      return SqlQuery.getSelectValueOutput(selectValue, i) === outputColumn;
+    });
   }
 
   getSelectIndexForExpression(ex: SqlExpression, allowAliasReferences: boolean): number {
@@ -526,37 +528,35 @@ export class SqlQuery extends SqlBase {
   addColumn(column: SqlBase | string, first = false) {
     const alias = SqlAlias.fromBase(typeof column === 'string' ? parseSql(column) : column);
 
-    const value = this.valueOf();
     if (first) {
-      value.selectValues = this.selectValues.addFirst(alias, Separator.COMMA);
+      return this.changeSelectValues(this.selectValues.addFirst(alias, Separator.COMMA));
     } else {
-      value.selectValues = this.selectValues.addLast(alias, Separator.COMMA);
+      return this.changeSelectValues(this.selectValues.addLast(alias, Separator.COMMA));
     }
-    return new SqlQuery(value);
   }
 
-  removeColumn(column: string) {
-    const index = this.getOutputColumns().indexOf(column);
-    if (index === -1) return this;
-    const selectValues = this.selectValues.deleteByIndex(index);
-    if (!selectValues) return this;
+  removeOutputColumn(outputColumn: string) {
+    const index = this.getSelectIndexForOutputColumn(outputColumn);
+    if (index === -1) return this; // It is not even there
+
+    const selectValue = this.selectValues.get(index);
+    const newSelectValues = this.selectValues.deleteByIndex(index);
+    if (!newSelectValues) return this; // Can not remove the last column
 
     const value = this.valueOf();
-    value.selectValues = selectValues;
+    value.selectValues = newSelectValues;
 
     const sqlIndex = index + 1;
     if (value.groupByExpressions) {
       value.groupByExpressions = value.groupByExpressions.filterMap(groupByExpression => {
-        if (
-          groupByExpression instanceof SqlLiteral &&
-          typeof groupByExpression.value === 'number'
-        ) {
-          if (groupByExpression.value > sqlIndex) {
-            return groupByExpression.increment(-1)!;
+        if (groupByExpression instanceof SqlLiteral && groupByExpression.isInteger()) {
+          if (Number(groupByExpression.value) > sqlIndex) {
+            return groupByExpression.increment(-1);
           } else if (groupByExpression.value === sqlIndex) {
             return;
           }
         }
+        if (groupByExpression.equals(selectValue.expression)) return;
         return groupByExpression;
       });
     }
@@ -564,9 +564,9 @@ export class SqlQuery extends SqlBase {
     if (value.orderByParts) {
       value.orderByParts = value.orderByParts.filterMap(orderByPart => {
         const { expression } = orderByPart;
-        if (expression instanceof SqlLiteral && typeof expression.value === 'number') {
-          if (expression.value > sqlIndex) {
-            orderByPart = deepSet(orderByPart, 'expression', expression.increment(-1));
+        if (expression instanceof SqlLiteral && expression.isInteger()) {
+          if (Number(expression.value) > sqlIndex) {
+            orderByPart = orderByPart.changeExpression(expression.increment(-1));
           } else if (expression.value === sqlIndex) {
             return;
           }
@@ -575,7 +575,6 @@ export class SqlQuery extends SqlBase {
       });
       if (!value.orderByParts) {
         delete value.orderByKeyword;
-        delete value.orderByParts;
       }
     }
 
@@ -641,26 +640,13 @@ export class SqlQuery extends SqlBase {
     return this.whereExpression || SqlLiteral.TRUE;
   }
 
-  addWhere(expressionString: string | SqlExpression) {
-    const expression: SqlExpression =
-      typeof expressionString === 'string'
-        ? parseSqlExpression(expressionString)
-        : expressionString;
-
-    const value = this.valueOf();
-
-    // If a filter exists for this column replace it otherwise add it with an and expression
-    value.whereExpression = expression;
-    // this.filterExpression
-    // ? this.filterExpression.addOrReplaceColumn(SqlBase.getColumnName(column), filter)
-    // : filter;
-
-    value.whereKeyword = value.whereKeyword || 'WHERE';
-    return new SqlQuery(value);
+  addToWhere(expressionThing: string | SqlExpression) {
+    const expression = parseSqlExpression(expressionThing);
+    return this.changeWhereExpression(SqlExpression.and(this.whereExpression, expression));
   }
 
   // Removes all filters on the specified column from the where clause
-  removeFromWhere(column: string) {
+  removeColumnFromWhere(column: string) {
     if (!this.whereExpression) return this;
 
     const value = this.valueOf();
@@ -680,6 +666,10 @@ export class SqlQuery extends SqlBase {
   }
 
   /* ~~~~~ GROUP BY ~~~~~ */
+
+  hasGroupBy(): boolean {
+    return Boolean(this.groupByKeyword);
+  }
 
   // Checks to see if a column is in the group by clause either by name or index
   hasGroupByOnColumn(column: string) {
@@ -764,11 +754,8 @@ export class SqlQuery extends SqlBase {
     return this.havingExpression || SqlLiteral.TRUE;
   }
 
-  addHaving(expressionString: SqlExpression | string) {
-    const expression: SqlExpression =
-      typeof expressionString === 'string'
-        ? parseSqlExpression(expressionString)
-        : expressionString;
+  addHaving(expressionThing: SqlExpression | string) {
+    const expression = parseSqlExpression(expressionThing);
 
     const value = this.valueOf();
 
@@ -806,7 +793,7 @@ export class SqlQuery extends SqlBase {
 
   /* ~~~~~ ORDER BY ~~~~~ */
 
-  getEffectiveDirectionOfOutputColumn(outputColumn: string): Direction | undefined {
+  getOrderByForOutputColumn(outputColumn: string): SqlOrderByPart | undefined {
     if (!this.orderByParts) return;
     const myOrderByPart = this.orderByParts.values.find(orderByPart => {
       const selectIndex = this.getSelectIndexForExpression(orderByPart.expression, true);
@@ -817,14 +804,13 @@ export class SqlQuery extends SqlBase {
       );
     });
 
-    if (!myOrderByPart) return;
-    return myOrderByPart.getEffectiveDirection();
+    return myOrderByPart;
   }
 
   getOrderedOutputColumns() {
     if (!this.orderByParts) return [];
     const outputColumns = this.getOutputColumns();
-    return outputColumns.filter(this.getEffectiveDirectionOfOutputColumn, this);
+    return outputColumns.filter(this.getOrderByForOutputColumn, this);
   }
 
   orderBy(column: string, direction?: Direction) {

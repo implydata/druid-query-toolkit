@@ -71,13 +71,22 @@ export class SeparatedArray<T> {
     const { values, separators } = this;
     const filteredValues: T[] = [];
     const filteredSeparators: SeparatorOrString[] = [];
-    for (let i = 0; i < filteredValues.length; i++) {
+    let skippedFirst = false;
+    for (let i = 0; i < values.length; i++) {
       const value = values[i];
       if (fn(value, i)) {
         filteredValues.push(value);
         if (i > 0) filteredSeparators.push(separators[i - 1]);
+      } else if (i === 0) {
+        skippedFirst = true;
       }
     }
+
+    // Remove the first separator because we skipped the first element
+    if (skippedFirst && filteredSeparators.length) {
+      filteredSeparators.shift();
+    }
+
     if (!filteredValues.length) return;
     return new SeparatedArray<T>(filteredValues, filteredSeparators);
   }
@@ -90,7 +99,7 @@ export class SeparatedArray<T> {
   }
 
   public deleteByIndex(index: number): SeparatedArray<T> | undefined {
-    return this.filter((_x, i) => i === index);
+    return this.filter((_x, i) => i !== index);
   }
 
   public addFirst(value: T, defaultSeparator: SeparatorOrString): SeparatedArray<T> {

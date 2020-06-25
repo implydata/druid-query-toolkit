@@ -16,7 +16,10 @@
     "target": "es5",
     "module": "commonjs",
     "moduleResolution": "node",
-    "lib": ["es2016", "esnext"],
+    "lib": [
+      "es2016",
+      "esnext"
+    ],
     "rootDirs": ["lib", "src"],
 
     "outDir": "build"

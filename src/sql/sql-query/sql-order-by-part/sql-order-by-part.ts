@@ -32,6 +32,18 @@ export class SqlOrderByPart extends SqlBase {
     });
   }
 
+  static normalizeDirection(direction: string | undefined): Direction {
+    if (!direction) return 'ASC';
+    return direction.toUpperCase() as Direction;
+  }
+
+  static reverseDirection(direction: string | undefined): string {
+    // Try to be mindful of capitalization
+    if (direction === 'asc') return 'desc';
+    if (direction === 'desc') return 'asc';
+    return SqlOrderByPart.normalizeDirection(direction) === 'ASC' ? 'DESC' : 'ASC';
+  }
+
   public readonly expression: SqlExpression;
   public readonly direction?: string;
 
@@ -72,7 +84,7 @@ export class SqlOrderByPart extends SqlBase {
     return SqlBase.fromValue(value);
   }
 
-  public changeDirection(direction: Direction | undefined): this {
+  public changeDirection(direction: string | undefined): this {
     const value = this.valueOf();
     if (direction) {
       value.direction = direction;
@@ -84,9 +96,11 @@ export class SqlOrderByPart extends SqlBase {
   }
 
   public getEffectiveDirection(): Direction {
-    const { direction } = this;
-    if (!direction) return 'ASC';
-    return direction.toUpperCase() as Direction;
+    return SqlOrderByPart.normalizeDirection(this.direction);
+  }
+
+  public reverseDirection(): this {
+    return this.changeDirection(SqlOrderByPart.reverseDirection(this.direction));
   }
 
   public walkInner(nextStack: SqlBase[], fn: Substitutor, postorder: boolean): SqlBase | undefined {

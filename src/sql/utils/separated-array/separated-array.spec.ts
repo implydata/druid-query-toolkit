@@ -17,12 +17,18 @@ import { Separator } from '..';
 import { SeparatedArray } from './separated-array';
 
 describe('SeparatedArray', () => {
-  it('works in basic case', () => {
-    const a = new SeparatedArray(
-      [1, 2, 3],
-      [Separator.rightSeparator(','), Separator.bothSeparator(';')],
-    );
+  const a = new SeparatedArray(
+    [1, 2, 3],
+    [Separator.rightSpace(','), Separator.symmetricSpace(';')],
+  );
 
-    expect(a.toString()).toEqual('1, 2 ; 3');
+  it('works in basic case', () => {
+    expect(String(a)).toEqual('1, 2 ; 3');
+  });
+
+  it('#deleteByIndex', () => {
+    expect(String(a.deleteByIndex(0))).toEqual('2 ; 3');
+    expect(String(a.deleteByIndex(1))).toEqual('1 ; 3');
+    expect(String(a.deleteByIndex(2))).toEqual('1, 2');
   });
 });

@@ -108,7 +108,7 @@ describe('SqlUnary', () => {
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
-        "arguments": SeparatedArray {
+        "args": SeparatedArray {
           "separators": Array [
             Separator {
               "left": " ",
@@ -234,7 +234,7 @@ describe('SqlUnary', () => {
 
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlMulti {
-        "arguments": SeparatedArray {
+        "args": SeparatedArray {
           "separators": Array [
             Separator {
               "left": " ",

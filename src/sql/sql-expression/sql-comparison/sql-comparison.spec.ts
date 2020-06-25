@@ -1044,7 +1044,7 @@ describe('SqlComparison', () => {
 
       expect(parseSql(sql)).toMatchInlineSnapshot(`
         SqlMulti {
-          "arguments": SeparatedArray {
+          "args": SeparatedArray {
             "separators": Array [
               Separator {
                 "left": " ",
@@ -1064,7 +1064,7 @@ describe('SqlComparison', () => {
                 "type": "ref",
               },
               SqlMulti {
-                "arguments": SeparatedArray {
+                "args": SeparatedArray {
                   "separators": Array [
                     Separator {
                       "left": " ",

@@ -412,7 +412,7 @@ describe('Case expression', () => {
                 "postWhenExpression": " ",
               },
               "thenExpression": SqlMulti {
-                "arguments": SeparatedArray {
+                "args": SeparatedArray {
                   "separators": Array [
                     Separator {
                       "left": " ",
@@ -450,7 +450,7 @@ describe('Case expression', () => {
               "thenKeyword": "THEN",
               "type": "whenThenPart",
               "whenExpression": SqlMulti {
-                "arguments": SeparatedArray {
+                "args": SeparatedArray {
                   "separators": Array [
                     Separator {
                       "left": " ",
@@ -869,7 +869,7 @@ describe('Case expression', () => {
                 "postWhenExpression": " ",
               },
               "thenExpression": SqlMulti {
-                "arguments": SeparatedArray {
+                "args": SeparatedArray {
                   "separators": Array [
                     Separator {
                       "left": " ",
@@ -907,7 +907,7 @@ describe('Case expression', () => {
               "thenKeyword": "THEN",
               "type": "whenThenPart",
               "whenExpression": SqlMulti {
-                "arguments": SeparatedArray {
+                "args": SeparatedArray {
                   "separators": Array [
                     Separator {
                       "left": " ",

@@ -60,6 +60,20 @@ export class SqlRef extends SqlExpression {
     });
   }
 
+  static table(
+    table?: string,
+    namespace?: string,
+    forceTableQuotes = false,
+    forceNamespaceQuotes = false,
+  ) {
+    return new SqlRef({
+      table,
+      namespace,
+      tableQuotes: forceTableQuotes || SqlRef.needsQuotes(table),
+      namespaceQuotes: forceNamespaceQuotes || SqlRef.needsQuotes(namespace),
+    });
+  }
+
   static needsQuotes(name: string | undefined): boolean {
     if (typeof name === 'undefined') return false;
     return !/^\w+$/.test(name) || SqlBase.isReservedKeyword(name);

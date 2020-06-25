@@ -43,7 +43,7 @@ export class SqlFunction extends SqlExpression {
     return new SqlFunction({
       functionName: functionName,
       decorator: decorator,
-      args: SeparatedArray.fromArray(args, Separator.rightSeparator(',')),
+      args: SeparatedArray.fromArray(args, Separator.rightSpace(',')),
       filterKeyword: filter ? SqlFunction.DEFAULT_FILTER_KEYWORD : undefined,
       whereKeyword: filter ? SqlFunction.DEFAULT_WHERE_KEYWORD : undefined,
       whereExpression: filter,
@@ -125,7 +125,7 @@ export class SqlFunction extends SqlExpression {
     return this.functionName.toUpperCase();
   }
 
-  public changeArguments(args: SeparatedArray<SqlExpression>): this {
+  public changeArgs(args: SeparatedArray<SqlExpression>): this {
     const value = this.valueOf();
     value.args = args;
     return SqlBase.fromValue(value);
@@ -155,7 +155,7 @@ export class SqlFunction extends SqlExpression {
       const args = SqlBase.walkSeparatedArray(this.args, nextStack, fn, postorder);
       if (!args) return;
       if (args !== this.args) {
-        ret = ret.changeArguments(args);
+        ret = ret.changeArgs(args);
       }
     }
 

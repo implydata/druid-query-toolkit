@@ -26,7 +26,7 @@
     if (!tail.length) return head;
     return new sql.SqlMulti({
       expressionType: expressionType,
-      arguments: new sql.SeparatedArray(makeListMap(tail, 3, head), makeSeparatorsList(tail)),
+      args: new sql.SeparatedArray(makeListMap(tail, 3, head), makeSeparatorsList(tail)),
     });
   }
 

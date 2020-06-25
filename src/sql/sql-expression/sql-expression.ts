@@ -12,10 +12,32 @@
  * limitations under the License.
  */
 
-import { Direction, SqlAlias, SqlMulti, SqlOrderByPart } from '..';
+import { SeparatedArray, Separator, SqlAlias, SqlLiteral, SqlMulti, SqlOrderByPart } from '..';
+import { filterMap } from '../../utils';
 import { SqlBase, Substitutor } from '../sql-base';
 
 export abstract class SqlExpression extends SqlBase {
+  static and(...args: (SqlExpression | undefined)[]) {
+    const compactArgs = filterMap(args, a => {
+      if (!a) return;
+      if (a instanceof SqlMulti && a.expressionType === 'OR') {
+        return a.addParens();
+      }
+      return a;
+    });
+
+    if (compactArgs.length === 0) {
+      return SqlLiteral.TRUE;
+    } else if (compactArgs.length === 1) {
+      return compactArgs[0];
+    } else {
+      return new SqlMulti({
+        expressionType: 'AND',
+        args: SeparatedArray.fromArray(compactArgs, Separator.symmetricSpace('AND')),
+      });
+    }
+  }
+
   public walkHelper(
     stack: SqlBase[],
     fn: Substitutor,
@@ -43,12 +65,12 @@ export abstract class SqlExpression extends SqlBase {
     return SqlAlias.factory(this, alias);
   }
 
-  public sort(direction: Direction | undefined): SqlOrderByPart {
+  public sort(direction: string | undefined): SqlOrderByPart {
     return SqlOrderByPart.factory(this, direction);
   }
 
-  public addExpressionToAnd(expression: SqlExpression): SqlExpression {
-    return SqlMulti.and([this, expression]);
+  public and(expression: SqlExpression): SqlExpression {
+    return SqlExpression.and(this, expression);
   }
 
   public removeColumnFromAnd(column: string): SqlExpression | undefined {
