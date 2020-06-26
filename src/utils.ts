@@ -20,10 +20,6 @@ export function isEmpty(v: any): boolean {
   return !(Array.isArray(v) ? v.length : Object.keys(v).length);
 }
 
-function isObjectOrArray(v: any): boolean {
-  return Boolean(v && typeof v === 'object');
-}
-
 export function parsePath(path: string): string[] {
   const parts: string[] = [];
   let rest = path;
@@ -52,101 +48,12 @@ export function makePath(parts: string[]): string {
   return parts.map(p => (p.includes('.') ? `{${p}}` : p)).join('.');
 }
 
-function isAppend(key: string): boolean {
-  return key === '[append]' || key === '-1';
-}
-
 export function deepGet<T extends Record<string, any>>(value: T, path: string): any {
   const parts = parsePath(path);
   for (const part of parts) {
     value = (value || {})[part];
   }
   return value;
-}
-
-export function deepSet<T extends Record<string, any>>(value: T, path: string, x: any): T {
-  const parts = parsePath(path);
-  let myKey = parts.shift() as string; // Must be defined
-  const valueCopy = shallowCopy(value);
-  if (Array.isArray(valueCopy) && isAppend(myKey)) myKey = String(valueCopy.length);
-  if (parts.length) {
-    const nextKey = parts[0];
-    const rest = makePath(parts);
-    valueCopy[myKey] = deepSet(value[myKey] || (isAppend(nextKey) ? [] : {}), rest, x);
-  } else {
-    valueCopy[myKey] = x;
-  }
-  return valueCopy;
-}
-
-export function deepDelete<T extends Record<string, any>>(value: T, path: string): T {
-  const valueCopy = shallowCopy(value);
-  const parts = parsePath(path);
-  const firstKey = parts.shift() as string; // Must be defined
-  if (parts.length) {
-    const firstKeyValue = value[firstKey];
-    if (firstKeyValue) {
-      const restPath = makePath(parts);
-      const prunedFirstKeyValue = deepDelete(value[firstKey], restPath);
-
-      if (isEmpty(prunedFirstKeyValue)) {
-        delete valueCopy[firstKey];
-      } else {
-        valueCopy[firstKey] = prunedFirstKeyValue;
-      }
-    } else {
-      delete valueCopy[firstKey];
-    }
-  } else {
-    if (Array.isArray(valueCopy) && !isNaN(Number(firstKey))) {
-      valueCopy.splice(Number(firstKey), 1);
-    } else {
-      delete valueCopy[firstKey];
-    }
-  }
-  return valueCopy;
-}
-
-export function deepMove<T extends Record<string, any>>(
-  value: T,
-  fromPath: string,
-  toPath: string,
-): T {
-  value = deepSet(value, toPath, deepGet(value, fromPath));
-  value = deepDelete(value, fromPath);
-  return value;
-}
-
-export function deepExtend<T extends Record<string, any>>(target: T, diff: Record<string, any>): T {
-  if (typeof target !== 'object') throw new TypeError(`Invalid target`);
-  if (typeof diff !== 'object') throw new TypeError(`Invalid diff`);
-
-  const newValue = shallowCopy(target);
-  for (const key in diff) {
-    const targetValue = target[key];
-    const diffValue = diff[key];
-    if (typeof diffValue === 'undefined') {
-      delete newValue[key];
-    } else {
-      if (isObjectOrArray(targetValue) && isObjectOrArray(diffValue)) {
-        newValue[key] = deepExtend(targetValue, diffValue);
-      } else {
-        newValue[key] = diffValue;
-      }
-    }
-  }
-
-  return newValue;
-}
-
-export function whitelistKeys(obj: Record<string, any>, whitelist: string[]): Record<string, any> {
-  const newObj: Record<string, any> = {};
-  for (const w of whitelist) {
-    if (Object.prototype.hasOwnProperty.call(obj, w)) {
-      newObj[w] = obj[w];
-    }
-  }
-  return newObj;
 }
 
 export function filterMap<T, Q>(xs: T[], f: (x: T, i: number) => Q | undefined): Q[] {

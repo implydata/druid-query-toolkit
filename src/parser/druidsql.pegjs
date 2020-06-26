@@ -247,7 +247,7 @@ GroupByClause = groupByKeyword:GroupByToken postGroupBy:_ groupByExpressions:(Ex
   return {
     groupByKeyword: groupByKeyword,
     postGroupBy: postGroupBy,
-    groupByExpressions: groupByExpressions === '()' ? undefined : groupByExpressions,
+    groupByExpressions: groupByExpressions === '()' ? null : groupByExpressions,
   };
 }
 
