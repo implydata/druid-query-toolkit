@@ -152,8 +152,10 @@ export class SqlRef extends SqlExpression {
   public changeColumn(column: string): SqlRef {
     const value = this.valueOf();
     value.column = column;
-    if (column) {
+    if (column && column !== '*') {
       value.quotes = value.quotes || SqlRef.needsQuotes(column);
+    } else {
+      delete value.quotes;
     }
     return SqlBase.fromValue(value);
   }
@@ -197,7 +199,7 @@ export class SqlRef extends SqlExpression {
   }
 
   public upgrade() {
-    if (this.namespace && this.table && this.column) return this;
+    if (this.namespace) return this;
 
     const value = this.valueOf();
     value.namespace = value.table;
@@ -217,12 +219,13 @@ export class SqlRef extends SqlExpression {
   }
 
   public prettyTrim(maxLength: number): SqlBase {
+    const { column, table } = this;
     let ret: SqlRef = this;
-    if (this.column) {
-      ret = ret.changeColumn(trimString(this.column, maxLength));
+    if (column && column !== '*') {
+      ret = ret.changeColumn(trimString(column, maxLength));
     }
-    if (this.table) {
-      ret = ret.changeTable(trimString(this.table, maxLength));
+    if (table) {
+      ret = ret.changeTable(trimString(table, maxLength));
     }
     return ret;
   }

@@ -43,5 +43,13 @@ describe('SqlBase', () => {
           .toString(),
       ).toEqual(`"abcd_ef..."."abcd_ef..." = 'abcd_ef...'`);
     });
+
+    it('works with COUNT(*)', () => {
+      expect(
+        parseSql(`COUNT(*)`)
+          .prettyTrim(10)
+          .toString(),
+      ).toEqual(`COUNT(*)`);
+    });
   });
 });

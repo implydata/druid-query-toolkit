@@ -12,7 +12,15 @@
  * limitations under the License.
  */
 
-import { SeparatedArray, Separator, SqlAlias, SqlLiteral, SqlMulti, SqlOrderByPart } from '..';
+import {
+  SeparatedArray,
+  Separator,
+  SqlAlias,
+  SqlComparison,
+  SqlLiteral,
+  SqlMulti,
+  SqlOrderByPart,
+} from '..';
 import { filterMap } from '../../utils';
 import { SqlBase, Substitutor } from '../sql-base';
 
@@ -67,6 +75,14 @@ export abstract class SqlExpression extends SqlBase {
 
   public sort(direction: string | undefined): SqlOrderByPart {
     return SqlOrderByPart.factory(this, direction);
+  }
+
+  public isNull(): SqlComparison {
+    return SqlComparison.isNull(this);
+  }
+
+  public isNotNull(): SqlComparison {
+    return SqlComparison.isNotNull(this);
   }
 
   public and(expression: SqlExpression): SqlExpression {

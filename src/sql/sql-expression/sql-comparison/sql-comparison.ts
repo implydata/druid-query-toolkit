@@ -100,6 +100,23 @@ export class SqlComparison extends SqlExpression {
     });
   }
 
+  static isNull(lhs: SqlExpression): SqlComparison {
+    return new SqlComparison({
+      op: 'IS',
+      lhs,
+      rhs: SqlLiteral.NULL,
+    });
+  }
+
+  static isNotNull(lhs: SqlExpression): SqlComparison {
+    return new SqlComparison({
+      op: 'IS',
+      notKeyword: 'NOT',
+      lhs,
+      rhs: SqlLiteral.NULL,
+    });
+  }
+
   public readonly op: string;
   public readonly notKeyword?: string;
   public readonly lhs: SqlExpression;
