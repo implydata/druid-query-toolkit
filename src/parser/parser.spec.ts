@@ -53,7 +53,7 @@ describe('Parser', () => {
             },
           ],
         },
-        "expressionType": "OR",
+        "expressionType": "or",
         "innerSpacing": Object {},
         "type": "multi",
       }

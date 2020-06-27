@@ -16,19 +16,23 @@ import { SqlLiteral } from '..';
 import { SqlBase, SqlBaseValue, Substitutor } from '../../sql-base';
 import { SqlExpression } from '../sql-expression';
 
+function orSpace(str: string | undefined) {
+  return typeof str === 'string' ? str : ' ';
+}
+
 export interface BetweenAndUnit {
   start: SqlLiteral;
-  preKeyword: string;
+  preKeyword?: string;
   keyword: string;
-  postKeyword: string;
+  postKeyword?: string;
   end: SqlLiteral;
 }
 
 export interface LikeEscapeUnit {
   like: SqlLiteral;
-  preEscape: string;
+  preEscape?: string;
   escapeKeyword: string;
-  postEscape: string;
+  postEscape?: string;
   escape: SqlLiteral;
 }
 
@@ -92,11 +96,17 @@ export class SqlComparison extends SqlExpression {
     });
   }
 
-  static like(lhs: SqlExpression, rhs: SqlExpression): SqlComparison {
+  static like(lhs: SqlExpression, rhs: SqlLiteral, escape: SqlLiteral): SqlComparison {
     return new SqlComparison({
       op: 'LIKE',
       lhs,
-      rhs,
+      rhs: escape
+        ? {
+            like: rhs,
+            escapeKeyword: 'ESCAPE',
+            escape: escape,
+          }
+        : rhs,
     });
   }
 
@@ -161,17 +171,17 @@ export class SqlComparison extends SqlExpression {
       if ((rhs as any).start) {
         rawParts.push(
           (rhs as BetweenAndUnit).start.toString(),
-          (rhs as BetweenAndUnit).preKeyword,
+          orSpace((rhs as BetweenAndUnit).preKeyword),
           (rhs as BetweenAndUnit).keyword,
-          (rhs as BetweenAndUnit).postKeyword,
+          orSpace((rhs as BetweenAndUnit).postKeyword),
           (rhs as BetweenAndUnit).end.toString(),
         );
       } else {
         rawParts.push(
           (rhs as LikeEscapeUnit).like.toString(),
-          (rhs as LikeEscapeUnit).preEscape,
+          orSpace((rhs as LikeEscapeUnit).preEscape),
           (rhs as LikeEscapeUnit).escapeKeyword,
-          (rhs as LikeEscapeUnit).postEscape,
+          orSpace((rhs as LikeEscapeUnit).postEscape),
           (rhs as LikeEscapeUnit).escape.toString(),
         );
       }

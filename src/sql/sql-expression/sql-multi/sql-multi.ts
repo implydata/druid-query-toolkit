@@ -16,15 +16,17 @@ import { SqlBase, SqlBaseValue, Substitutor } from '../../sql-base';
 import { SeparatedArray, Separator } from '../../utils';
 import { SqlExpression } from '../sql-expression';
 
+export type ExpressionType = 'or' | 'and' | '||' | '+' | '-' | '*' | '/';
+
 export interface SqlMultiValue extends SqlBaseValue {
-  expressionType: string;
+  expressionType: ExpressionType;
   args: SeparatedArray<SqlExpression>;
 }
 
 export class SqlMulti extends SqlExpression {
   static type = 'multi';
 
-  public readonly expressionType: string;
+  public readonly expressionType: ExpressionType;
   public readonly args: SeparatedArray<SqlExpression>;
 
   constructor(options: SqlMultiValue) {
@@ -71,7 +73,7 @@ export class SqlMulti extends SqlExpression {
   }
 
   public and(expression: SqlExpression): SqlExpression {
-    if (this.expressionType !== 'AND') {
+    if (this.expressionType !== 'and') {
       return super.and(expression);
     }
 
@@ -79,7 +81,7 @@ export class SqlMulti extends SqlExpression {
   }
 
   public removeColumnFromAnd(column: string): SqlExpression | undefined {
-    if (this.expressionType !== 'AND') {
+    if (this.expressionType !== 'and') {
       return super.removeColumnFromAnd(column);
     }
 

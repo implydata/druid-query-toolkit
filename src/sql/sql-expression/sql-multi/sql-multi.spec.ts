@@ -52,7 +52,7 @@ describe('OR expression', () => {
             },
           ],
         },
-        "expressionType": "OR",
+        "expressionType": "or",
         "innerSpacing": Object {},
         "type": "multi",
       }
@@ -89,7 +89,7 @@ describe('OR expression', () => {
             },
           ],
         },
-        "expressionType": "OR",
+        "expressionType": "or",
         "innerSpacing": Object {},
         "type": "multi",
       }
@@ -132,7 +132,7 @@ describe('OR expression', () => {
             },
           ],
         },
-        "expressionType": "OR",
+        "expressionType": "or",
         "innerSpacing": Object {},
         "type": "multi",
       }
@@ -169,7 +169,7 @@ describe('OR expression', () => {
             },
           ],
         },
-        "expressionType": "OR",
+        "expressionType": "or",
         "innerSpacing": Object {},
         "type": "multi",
       }
@@ -206,7 +206,7 @@ describe('OR expression', () => {
             },
           ],
         },
-        "expressionType": "OR",
+        "expressionType": "or",
         "innerSpacing": Object {},
         "parens": Array [
           Object {
@@ -249,7 +249,7 @@ describe('OR expression', () => {
             },
           ],
         },
-        "expressionType": "OR",
+        "expressionType": "or",
         "innerSpacing": Object {},
         "type": "multi",
       }
@@ -286,7 +286,7 @@ describe('OR expression', () => {
             },
           ],
         },
-        "expressionType": "OR",
+        "expressionType": "or",
         "innerSpacing": Object {},
         "parens": Array [
           Object {
@@ -339,7 +339,7 @@ describe('AND expression', () => {
             },
           ],
         },
-        "expressionType": "AND",
+        "expressionType": "and",
         "innerSpacing": Object {},
         "type": "multi",
       }
@@ -378,7 +378,7 @@ describe('AND expression', () => {
             },
           ],
         },
-        "expressionType": "AND",
+        "expressionType": "and",
         "innerSpacing": Object {},
         "type": "multi",
       }
@@ -423,7 +423,7 @@ describe('AND expression', () => {
             },
           ],
         },
-        "expressionType": "AND",
+        "expressionType": "and",
         "innerSpacing": Object {},
         "type": "multi",
       }
@@ -462,7 +462,7 @@ describe('AND expression', () => {
             },
           ],
         },
-        "expressionType": "AND",
+        "expressionType": "and",
         "innerSpacing": Object {},
         "type": "multi",
       }
@@ -501,7 +501,7 @@ describe('AND expression', () => {
             },
           ],
         },
-        "expressionType": "AND",
+        "expressionType": "and",
         "innerSpacing": Object {},
         "parens": Array [
           Object {
@@ -548,7 +548,7 @@ describe('Math expression', () => {
             },
           ],
         },
-        "expressionType": "Additive",
+        "expressionType": "+",
         "innerSpacing": Object {},
         "type": "multi",
       }
@@ -587,7 +587,7 @@ describe('Math expression', () => {
             },
           ],
         },
-        "expressionType": "Additive",
+        "expressionType": "-",
         "innerSpacing": Object {},
         "type": "multi",
       }
@@ -626,7 +626,7 @@ describe('Math expression', () => {
             },
           ],
         },
-        "expressionType": "Multiplicative",
+        "expressionType": "*",
         "innerSpacing": Object {},
         "type": "multi",
       }
@@ -665,7 +665,7 @@ describe('Math expression', () => {
             },
           ],
         },
-        "expressionType": "Multiplicative",
+        "expressionType": "/",
         "innerSpacing": Object {},
         "type": "multi",
       }
@@ -710,7 +710,7 @@ describe('Math expression', () => {
             },
           ],
         },
-        "expressionType": "Additive",
+        "expressionType": "+",
         "innerSpacing": Object {},
         "type": "multi",
       }
@@ -749,7 +749,7 @@ describe('Math expression', () => {
             },
           ],
         },
-        "expressionType": "Additive",
+        "expressionType": "+",
         "innerSpacing": Object {},
         "type": "multi",
       }
@@ -794,7 +794,7 @@ describe('Math expression', () => {
             },
           ],
         },
-        "expressionType": "Additive",
+        "expressionType": "+",
         "innerSpacing": Object {},
         "type": "multi",
       }
@@ -833,7 +833,7 @@ describe('Math expression', () => {
             },
           ],
         },
-        "expressionType": "Additive",
+        "expressionType": "+",
         "innerSpacing": Object {},
         "type": "multi",
       }
@@ -872,7 +872,7 @@ describe('Math expression', () => {
             },
           ],
         },
-        "expressionType": "Additive",
+        "expressionType": "+",
         "innerSpacing": Object {},
         "parens": Array [
           Object {
@@ -978,13 +978,13 @@ describe('Math expression', () => {
                   },
                 ],
               },
-              "expressionType": "Multiplicative",
+              "expressionType": "/",
               "innerSpacing": Object {},
               "type": "multi",
             },
           ],
         },
-        "expressionType": "Multiplicative",
+        "expressionType": "*",
         "innerSpacing": Object {},
         "type": "multi",
       }
@@ -1088,7 +1088,7 @@ describe('Combined expression', () => {
                           },
                         ],
                       },
-                      "expressionType": "Additive",
+                      "expressionType": "+",
                       "innerSpacing": Object {},
                       "type": "multi",
                     },
@@ -1096,13 +1096,13 @@ describe('Combined expression', () => {
                   },
                 ],
               },
-              "expressionType": "AND",
+              "expressionType": "and",
               "innerSpacing": Object {},
               "type": "multi",
             },
           ],
         },
-        "expressionType": "OR",
+        "expressionType": "or",
         "innerSpacing": Object {},
         "type": "multi",
       }
@@ -1172,7 +1172,7 @@ describe('Combined expression', () => {
                           },
                         ],
                       },
-                      "expressionType": "Additive",
+                      "expressionType": "+",
                       "innerSpacing": Object {},
                       "type": "multi",
                     },
@@ -1202,7 +1202,7 @@ describe('Combined expression', () => {
                   },
                 ],
               },
-              "expressionType": "AND",
+              "expressionType": "and",
               "innerSpacing": Object {},
               "type": "multi",
             },
@@ -1218,7 +1218,7 @@ describe('Combined expression', () => {
             },
           ],
         },
-        "expressionType": "OR",
+        "expressionType": "or",
         "innerSpacing": Object {},
         "type": "multi",
       }
@@ -1310,7 +1310,7 @@ describe('Combined expression', () => {
                           },
                         ],
                       },
-                      "expressionType": "Additive",
+                      "expressionType": "+",
                       "innerSpacing": Object {},
                       "type": "multi",
                     },
@@ -1318,7 +1318,7 @@ describe('Combined expression', () => {
                   },
                 ],
               },
-              "expressionType": "AND",
+              "expressionType": "and",
               "innerSpacing": Object {},
               "type": "multi",
             },
@@ -1334,7 +1334,7 @@ describe('Combined expression', () => {
             },
           ],
         },
-        "expressionType": "OR",
+        "expressionType": "or",
         "innerSpacing": Object {},
         "type": "multi",
       }
@@ -1396,7 +1396,7 @@ describe('Multiple expressions', () => {
             },
           ],
         },
-        "expressionType": "OR",
+        "expressionType": "or",
         "innerSpacing": Object {},
         "type": "multi",
       }
@@ -1456,7 +1456,7 @@ describe('Multiple expressions', () => {
                   },
                 ],
               },
-              "expressionType": "AND",
+              "expressionType": "and",
               "innerSpacing": Object {},
               "type": "multi",
             },
@@ -1492,7 +1492,7 @@ describe('Multiple expressions', () => {
                   },
                 ],
               },
-              "expressionType": "AND",
+              "expressionType": "and",
               "innerSpacing": Object {},
               "type": "multi",
             },
@@ -1508,7 +1508,7 @@ describe('Multiple expressions', () => {
             },
           ],
         },
-        "expressionType": "OR",
+        "expressionType": "or",
         "innerSpacing": Object {},
         "type": "multi",
       }
@@ -1563,7 +1563,7 @@ describe('Brackets', () => {
                   },
                 ],
               },
-              "expressionType": "AND",
+              "expressionType": "and",
               "innerSpacing": Object {},
               "parens": Array [
                 Object {
@@ -1585,7 +1585,7 @@ describe('Brackets', () => {
             },
           ],
         },
-        "expressionType": "OR",
+        "expressionType": "or",
         "innerSpacing": Object {},
         "type": "multi",
       }
@@ -1640,7 +1640,7 @@ describe('Brackets', () => {
                   },
                 ],
               },
-              "expressionType": "Additive",
+              "expressionType": "+",
               "innerSpacing": Object {},
               "parens": Array [
                 Object {
@@ -1662,7 +1662,7 @@ describe('Brackets', () => {
             },
           ],
         },
-        "expressionType": "OR",
+        "expressionType": "or",
         "innerSpacing": Object {},
         "parens": Array [
           Object {
@@ -1725,7 +1725,7 @@ describe('Brackets', () => {
                       },
                     ],
                   },
-                  "expressionType": "Additive",
+                  "expressionType": "+",
                   "innerSpacing": Object {},
                   "parens": Array [
                     Object {
@@ -1759,7 +1759,7 @@ describe('Brackets', () => {
             },
           ],
         },
-        "expressionType": "OR",
+        "expressionType": "or",
         "innerSpacing": Object {},
         "type": "multi",
       }
@@ -2033,7 +2033,7 @@ describe('getSqlRefs', () => {
             },
           ],
         },
-        "expressionType": "Concat",
+        "expressionType": "||",
         "innerSpacing": Object {},
         "type": "multi",
       }
@@ -2218,7 +2218,7 @@ describe('getSqlRefs', () => {
             },
           ],
         },
-        "expressionType": "AND",
+        "expressionType": "and",
         "innerSpacing": Object {},
         "type": "multi",
       }

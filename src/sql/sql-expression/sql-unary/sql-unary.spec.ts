@@ -175,7 +175,7 @@ describe('SqlUnary', () => {
             },
           ],
         },
-        "expressionType": "AND",
+        "expressionType": "and",
         "innerSpacing": Object {},
         "type": "multi",
       }
@@ -314,7 +314,7 @@ describe('SqlUnary', () => {
             },
           ],
         },
-        "expressionType": "OR",
+        "expressionType": "or",
         "innerSpacing": Object {},
         "type": "multi",
       }

@@ -376,12 +376,12 @@ Expression = OrExpression
 
 OrExpression = head:AndExpression tail:(_ OrToken _ AndExpression)*
 {
-  return maybeMakeMulti('OR', head, tail);
+  return maybeMakeMulti('or', head, tail);
 }
 
 AndExpression = head:NotExpression tail:(_ AndToken _ NotExpression)*
 {
-  return maybeMakeMulti('AND', head, tail);
+  return maybeMakeMulti('and', head, tail);
 }
 
 NotExpression = keyword:NotToken postKeyword:_ arg:NotExpression
@@ -498,22 +498,22 @@ ComparisonOpRhsNot = notKeyword:NotToken preOp:_ opRhs:(ComparisonOpRhsIn / Comp
 
 AdditionExpression = head:SubtractionExpression tail:(_ '+' _ SubtractionExpression)*
 {
-  return maybeMakeMulti('Additive', head, tail);
+  return maybeMakeMulti('+', head, tail);
 }
 
 SubtractionExpression = head:MultiplicationExpression tail:(_ $('-' !'-') _ MultiplicationExpression)*
 {
-  return maybeMakeMulti('Additive', head, tail);
+  return maybeMakeMulti('-', head, tail);
 }
 
 MultiplicationExpression = head:DivisionExpression tail:(_ '*' _ DivisionExpression)*
 {
-  return maybeMakeMulti('Multiplicative', head, tail);
+  return maybeMakeMulti('*', head, tail);
 }
 
 DivisionExpression = head:UnaryExpression tail:(_ '/' _ UnaryExpression)*
 {
-  return maybeMakeMulti('Multiplicative', head, tail);
+  return maybeMakeMulti('/', head, tail);
 }
 
 // !Number is to make sure that -3 parses as a number and not as -(3)
@@ -531,7 +531,7 @@ UnaryExpression = keyword:[+-] postKeyword:_ !Number arg:ConcatExpression
 
 ConcatExpression = head:BaseType tail:(_ '||' _ BaseType)*
 {
-  return maybeMakeMulti('Concat', head, tail);
+  return maybeMakeMulti('||', head, tail);
 }
 
 BaseType =
