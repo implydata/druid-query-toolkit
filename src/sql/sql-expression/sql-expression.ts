@@ -13,6 +13,7 @@
  */
 
 import {
+  LiteralValue,
   SeparatedArray,
   Separator,
   SqlAlias,
@@ -83,6 +84,21 @@ export abstract class SqlExpression extends SqlBase {
 
   public isNotNull(): SqlComparison {
     return SqlComparison.isNotNull(this);
+  }
+
+  public like(rhs: SqlLiteral | string, escape?: SqlLiteral | string): SqlComparison {
+    return SqlComparison.like(this, rhs, escape);
+  }
+
+  public between(start: SqlLiteral | LiteralValue, end: SqlLiteral | LiteralValue): SqlComparison {
+    return SqlComparison.between(this, start, end);
+  }
+
+  public betweenSymmetric(
+    start: SqlLiteral | LiteralValue,
+    end: SqlLiteral | LiteralValue,
+  ): SqlComparison {
+    return SqlComparison.betweenSymmetric(this, start, end);
   }
 
   public and(expression: SqlExpression): SqlExpression {

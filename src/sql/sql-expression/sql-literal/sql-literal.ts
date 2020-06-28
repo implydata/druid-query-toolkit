@@ -32,10 +32,6 @@ export class SqlLiteral extends SqlExpression {
   static TRUE: SqlLiteral;
   static ZERO: SqlLiteral;
 
-  static wrapInQuotes(thing: string, quote: string): string {
-    return `${quote}${thing}${quote}`;
-  }
-
   static factory(value: LiteralValue | SqlLiteral): SqlLiteral {
     let keyword: string | undefined;
     let stringValue: string;
@@ -123,9 +119,9 @@ export class SqlLiteral extends SqlExpression {
       retParts.push(this.stringValue);
     } else {
       if (typeof this.value === 'string') {
-        retParts.push(SqlLiteral.wrapInQuotes(this.value, "'")); // ToDo: make this smarter
+        retParts.push(SqlLiteral.escapeLiteralString(this.value));
       } else {
-        retParts.push(String(this.value)); // ToDo: make this smarter
+        retParts.push(String(this.value));
       }
     }
 

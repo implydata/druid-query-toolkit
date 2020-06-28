@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { SqlLiteral } from '..';
+import { LiteralValue, SqlLiteral } from '..';
 import { SqlBase, SqlBaseValue, Substitutor } from '../../sql-base';
 import { SqlExpression } from '../sql-expression';
 
@@ -96,20 +96,6 @@ export class SqlComparison extends SqlExpression {
     });
   }
 
-  static like(lhs: SqlExpression, rhs: SqlLiteral, escape: SqlLiteral): SqlComparison {
-    return new SqlComparison({
-      op: 'LIKE',
-      lhs,
-      rhs: escape
-        ? {
-            like: rhs,
-            escapeKeyword: 'ESCAPE',
-            escape: escape,
-          }
-        : rhs,
-    });
-  }
-
   static isNull(lhs: SqlExpression): SqlComparison {
     return new SqlComparison({
       op: 'IS',
@@ -124,6 +110,58 @@ export class SqlComparison extends SqlExpression {
       notKeyword: 'NOT',
       lhs,
       rhs: SqlLiteral.NULL,
+    });
+  }
+
+  static like(
+    lhs: SqlExpression,
+    rhs: SqlLiteral | string,
+    escape?: SqlLiteral | string,
+  ): SqlComparison {
+    const rhsLiteral = SqlLiteral.factory(rhs);
+    return new SqlComparison({
+      op: 'LIKE',
+      lhs,
+      rhs:
+        typeof escape === 'undefined'
+          ? rhsLiteral
+          : {
+              like: rhsLiteral,
+              escapeKeyword: 'ESCAPE',
+              escape: SqlLiteral.factory(escape),
+            },
+    });
+  }
+
+  static between(
+    lhs: SqlExpression,
+    start: SqlLiteral | LiteralValue,
+    end: SqlLiteral | LiteralValue,
+  ): SqlComparison {
+    return new SqlComparison({
+      op: 'BETWEEN',
+      lhs,
+      rhs: {
+        start: SqlLiteral.factory(start),
+        andKeyword: 'AND',
+        end: SqlLiteral.factory(end),
+      },
+    });
+  }
+
+  static betweenSymmetric(
+    lhs: SqlExpression,
+    start: SqlLiteral | LiteralValue,
+    end: SqlLiteral | LiteralValue,
+  ): SqlComparison {
+    return new SqlComparison({
+      op: 'BETWEEN SYMMETRIC',
+      lhs,
+      rhs: {
+        start: SqlLiteral.factory(start),
+        andKeyword: 'AND',
+        end: SqlLiteral.factory(end),
+      },
     });
   }
 
