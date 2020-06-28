@@ -74,8 +74,34 @@ export abstract class SqlExpression extends SqlBase {
     return SqlAlias.factory(this, alias);
   }
 
-  public sort(direction: string | undefined): SqlOrderByPart {
+  public toOrderByPart(direction: string | undefined): SqlOrderByPart {
     return SqlOrderByPart.factory(this, direction);
+  }
+
+  // SqlComparison
+
+  public equal(rhs: SqlExpression): SqlComparison {
+    return SqlComparison.equal(this, rhs);
+  }
+
+  public unequal(rhs: SqlExpression): SqlComparison {
+    return SqlComparison.unequal(this, rhs);
+  }
+
+  public lessThan(rhs: SqlExpression): SqlComparison {
+    return SqlComparison.lessThan(this, rhs);
+  }
+
+  public greaterThan(rhs: SqlExpression): SqlComparison {
+    return SqlComparison.greaterThan(this, rhs);
+  }
+
+  public lessThanOrEqual(rhs: SqlExpression): SqlComparison {
+    return SqlComparison.lessThanOrEqual(this, rhs);
+  }
+
+  public greaterThanOrEqual(rhs: SqlExpression): SqlComparison {
+    return SqlComparison.greaterThanOrEqual(this, rhs);
   }
 
   public isNull(): SqlComparison {
@@ -100,6 +126,8 @@ export abstract class SqlExpression extends SqlBase {
   ): SqlComparison {
     return SqlComparison.betweenSymmetric(this, start, end);
   }
+
+  // SqlMulti
 
   public and(expression: SqlExpression): SqlExpression {
     return SqlExpression.and(this, expression);
