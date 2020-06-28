@@ -22,9 +22,9 @@ function orSpace(str: string | undefined) {
 
 export interface BetweenAndUnit {
   start: SqlLiteral;
-  preKeyword?: string;
-  keyword: string;
-  postKeyword?: string;
+  preAnd?: string;
+  andKeyword: string;
+  postAnd?: string;
   end: SqlLiteral;
 }
 
@@ -171,9 +171,9 @@ export class SqlComparison extends SqlExpression {
       if ((rhs as any).start) {
         rawParts.push(
           (rhs as BetweenAndUnit).start.toString(),
-          orSpace((rhs as BetweenAndUnit).preKeyword),
-          (rhs as BetweenAndUnit).keyword,
-          orSpace((rhs as BetweenAndUnit).postKeyword),
+          orSpace((rhs as BetweenAndUnit).preAnd),
+          (rhs as BetweenAndUnit).andKeyword,
+          orSpace((rhs as BetweenAndUnit).postAnd),
           (rhs as BetweenAndUnit).end.toString(),
         );
       } else {

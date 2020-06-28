@@ -556,6 +556,7 @@ describe('SqlComparison', () => {
         "notKeyword": undefined,
         "op": "BETWEEN",
         "rhs": Object {
+          "andKeyword": "AND",
           "end": SqlRef {
             "column": "Z",
             "innerSpacing": Object {},
@@ -566,9 +567,8 @@ describe('SqlComparison', () => {
             "tableQuotes": false,
             "type": "ref",
           },
-          "keyword": "AND",
-          "postKeyword": " ",
-          "preKeyword": " ",
+          "postAnd": " ",
+          "preAnd": " ",
           "start": SqlRef {
             "column": "Y",
             "innerSpacing": Object {},
@@ -610,6 +610,7 @@ describe('SqlComparison', () => {
         "notKeyword": "NOT",
         "op": "BETWEEN",
         "rhs": Object {
+          "andKeyword": "AND",
           "end": SqlRef {
             "column": "Z",
             "innerSpacing": Object {},
@@ -620,9 +621,8 @@ describe('SqlComparison', () => {
             "tableQuotes": false,
             "type": "ref",
           },
-          "keyword": "AND",
-          "postKeyword": " ",
-          "preKeyword": " ",
+          "postAnd": " ",
+          "preAnd": " ",
           "start": SqlRef {
             "column": "Y",
             "innerSpacing": Object {},
@@ -1008,6 +1008,7 @@ describe('SqlComparison', () => {
           "notKeyword": undefined,
           "op": "BETWEEN",
           "rhs": Object {
+            "andKeyword": "AND",
             "end": SqlRef {
               "column": "Z",
               "innerSpacing": Object {},
@@ -1018,9 +1019,8 @@ describe('SqlComparison', () => {
               "tableQuotes": false,
               "type": "ref",
             },
-            "keyword": "AND",
-            "postKeyword": " ",
-            "preKeyword": " ",
+            "postAnd": " ",
+            "preAnd": " ",
             "start": SqlRef {
               "column": "Y",
               "innerSpacing": Object {},
@@ -1101,6 +1101,7 @@ describe('SqlComparison', () => {
                       "notKeyword": undefined,
                       "op": "BETWEEN",
                       "rhs": Object {
+                        "andKeyword": "AND",
                         "end": SqlRef {
                           "column": "Z",
                           "innerSpacing": Object {},
@@ -1111,9 +1112,8 @@ describe('SqlComparison', () => {
                           "tableQuotes": false,
                           "type": "ref",
                         },
-                        "keyword": "AND",
-                        "postKeyword": " ",
-                        "preKeyword": " ",
+                        "postAnd": " ",
+                        "preAnd": " ",
                         "start": SqlRef {
                           "column": "Y",
                           "innerSpacing": Object {},

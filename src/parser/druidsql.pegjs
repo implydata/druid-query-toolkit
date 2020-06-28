@@ -456,17 +456,17 @@ ComparisonOpRhsIn = op:InToken postOp:_ rhs:(SqlInArrayLiteral / SqlInParens)
   };
 }
 
-ComparisonOpRhsBetween = op:BetweenToken postOp:_ start:BaseType preKeyword:_ keyword:AndToken postKeyword:_ end:BaseType
+ComparisonOpRhsBetween = op:BetweenToken postOp:_ start:BaseType preAnd:_ andKeyword:AndToken postAnd:_ end:BaseType
 {
   return {
     op: op,
     postOp: postOp,
     rhs: {
-      start,
-      preKeyword,
-      keyword,
-      postKeyword,
-      end
+      start: start,
+      preAnd: preAnd,
+      andKeyword: andKeyword,
+      postAnd: postAnd,
+      end: end
     }
   };
 }
