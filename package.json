@@ -1,6 +1,6 @@
 {
   "name": "druid-query-toolkit",
-  "version": "0.7.19",
+  "version": "0.7.20",
   "description": "A collection of utilities for working with Druid queries",
   "main": "build/index.js",
   "typings": "build/index.d.ts",
