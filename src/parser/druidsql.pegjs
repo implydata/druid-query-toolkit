@@ -56,7 +56,7 @@ SqlQuery =
   value.selectKeyword = select.selectKeyword;
   innerSpacing.postSelect = select.postSelect;
   value.selectDecorator = select.selectDecorator;
-  value.selectValues = select.selectValues;
+  value.selectExpressions = select.selectExpressions;
   innerSpacing.postSelectDecorator = select.postSelectDecorator;
 
   if (from) {
@@ -178,15 +178,15 @@ SelectClause =
   selectKeyword:SelectToken
   postSelect:_
   selectDecorator:((AllToken / DistinctToken) _)?
-  selectValuesHead:SqlAliasExpression
-  selectValuesTail:(CommaSeparator SqlAliasExpression)*
+  selectExpressionsHead:SqlAliasExpression
+  selectExpressionsTail:(CommaSeparator SqlAliasExpression)*
 {
   return {
     selectKeyword: selectKeyword,
     postSelect: postSelect,
-    selectDecorator: selectDecorator ? selectDecorator[0] : '',
-    postSelectDecorator: selectDecorator ? selectDecorator[1] : '',
-    selectValues: makeSeparatedArray(selectValuesHead, selectValuesTail).map(SqlAlias.fromBase),
+    selectDecorator: selectDecorator ? selectDecorator[0] : undefined,
+    postSelectDecorator: selectDecorator ? selectDecorator[1] : undefined,
+    selectExpressions: makeSeparatedArray(selectExpressionsHead, selectExpressionsTail).map(SqlAlias.fromBase),
   };
 }
 

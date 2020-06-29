@@ -39,7 +39,7 @@ export interface SqlQueryValue extends SqlBaseValue {
 
   selectKeyword: string;
   selectDecorator?: string;
-  selectValues: SeparatedArray<SqlAlias>;
+  selectExpressions: SeparatedArray<SqlAlias>;
 
   fromKeyword?: string;
   tables?: SeparatedArray<SqlAlias>;
@@ -73,14 +73,14 @@ export class SqlQuery extends SqlBase {
   static factory(from: SqlBase): SqlQuery {
     return new SqlQuery({
       selectKeyword: 'SELECT',
-      selectValues: SeparatedArray.fromSingleValue(SqlAlias.STAR),
+      selectExpressions: SeparatedArray.fromSingleValue(SqlAlias.STAR),
       fromKeyword: 'FROM',
       tables: SeparatedArray.fromSingleValue(SqlAlias.fromBaseAndUpgrade(from)),
     });
   }
 
-  static getSelectValueOutput(selectValue: SqlAlias, i: number) {
-    return selectValue.getOutputName() || `EXPR$${i}`;
+  static getSelectExpressionOutput(selectExpression: SqlAlias, i: number) {
+    return selectExpression.getOutputName() || `EXPR$${i}`;
   }
 
   public readonly explainKeyword?: string;
@@ -88,7 +88,7 @@ export class SqlQuery extends SqlBase {
   public readonly withParts?: SeparatedArray<SqlWithPart>;
   public readonly selectKeyword: string;
   public readonly selectDecorator?: string;
-  public readonly selectValues: SeparatedArray<SqlAlias>;
+  public readonly selectExpressions: SeparatedArray<SqlAlias>;
   public readonly fromKeyword?: string;
   public readonly tables?: SeparatedArray<SqlAlias>;
   public readonly joinParts?: SeparatedArray<SqlJoinPart>;
@@ -114,7 +114,7 @@ export class SqlQuery extends SqlBase {
     this.withParts = options.withParts;
     this.selectKeyword = options.selectKeyword;
     this.selectDecorator = options.selectDecorator;
-    this.selectValues = options.selectValues;
+    this.selectExpressions = options.selectExpressions;
     this.fromKeyword = options.fromKeyword;
     this.tables = options.tables;
     this.joinParts = options.joinParts;
@@ -141,7 +141,7 @@ export class SqlQuery extends SqlBase {
     value.withParts = this.withParts;
     value.selectKeyword = this.selectKeyword;
     value.selectDecorator = this.selectDecorator;
-    value.selectValues = this.selectValues;
+    value.selectExpressions = this.selectExpressions;
     value.fromKeyword = this.fromKeyword;
     value.tables = this.tables;
     value.joinParts = this.joinParts;
@@ -186,7 +186,7 @@ export class SqlQuery extends SqlBase {
       rawParts.push(this.selectDecorator, this.getInnerSpace('postSelectDecorator'));
     }
 
-    rawParts.push(this.selectValues.toString());
+    rawParts.push(this.selectExpressions.toString());
 
     // From clause
     if (this.fromKeyword && this.tables) {
@@ -295,9 +295,9 @@ export class SqlQuery extends SqlBase {
     return SqlBase.fromValue(value);
   }
 
-  public changeSelectValues(selectValues: SeparatedArray<SqlAlias> | SqlAlias[]): this {
+  public changeSelectExpressions(selectExpressions: SeparatedArray<SqlAlias> | SqlAlias[]): this {
     const value = this.valueOf();
-    value.selectValues = SeparatedArray.fromArray(selectValues, Separator.COMMA);
+    value.selectExpressions = SeparatedArray.fromArray(selectExpressions, Separator.COMMA);
     return SqlBase.fromValue(value);
   }
 
@@ -429,11 +429,16 @@ export class SqlQuery extends SqlBase {
       }
     }
 
-    if (this.selectValues) {
-      const selectValues = SqlBase.walkSeparatedArray(this.selectValues, nextStack, fn, postorder);
-      if (!selectValues) return;
-      if (selectValues !== this.selectValues) {
-        ret = ret.changeSelectValues(selectValues);
+    if (this.selectExpressions) {
+      const selectExpressions = SqlBase.walkSeparatedArray(
+        this.selectExpressions,
+        nextStack,
+        fn,
+        postorder,
+      );
+      if (!selectExpressions) return;
+      if (selectExpressions !== this.selectExpressions) {
+        ret = ret.changeSelectExpressions(selectExpressions);
       }
     }
 
@@ -523,12 +528,12 @@ export class SqlQuery extends SqlBase {
    * Returns an array of the string name of all columns in the select clause
    */
   getOutputColumns(): string[] {
-    return this.selectValues.values.map(SqlQuery.getSelectValueOutput);
+    return this.selectExpressions.values.map(SqlQuery.getSelectExpressionOutput);
   }
 
   getSelectIndexForOutputColumn(outputColumn: string): number {
-    return this.selectValues.values.findIndex((selectValue, i) => {
-      return SqlQuery.getSelectValueOutput(selectValue, i) === outputColumn;
+    return this.selectExpressions.values.findIndex((selectExpression, i) => {
+      return SqlQuery.getSelectExpressionOutput(selectExpression, i) === outputColumn;
     });
   }
 
@@ -539,8 +544,8 @@ export class SqlQuery extends SqlBase {
 
     if (allowAliasReferences) {
       if (ex instanceof SqlRef) {
-        const refIdx = this.selectValues.values.findIndex((selectValue, i) => {
-          return SqlQuery.getSelectValueOutput(selectValue, i) === ex.column;
+        const refIdx = this.selectExpressions.values.findIndex((selectExpression, i) => {
+          return SqlQuery.getSelectExpressionOutput(selectExpression, i) === ex.column;
         });
         if (refIdx !== -1) {
           return refIdx;
@@ -548,19 +553,20 @@ export class SqlQuery extends SqlBase {
       }
     }
 
-    return this.selectValues.values.findIndex(selectValue => {
-      return ex.equals(selectValue.expression);
+    return this.selectExpressions.values.findIndex(selectExpression => {
+      return ex.equals(selectExpression.expression);
     });
   }
 
   isGroupedOutputColumn(outputColumn: string): boolean {
-    const { groupByExpressions, selectValues } = this;
+    const { groupByExpressions, selectExpressions } = this;
     if (!groupByExpressions) return false;
     return groupByExpressions.values.some(groupByExpression => {
       const selectIndex = this.getSelectIndexForExpression(groupByExpression, false);
       if (selectIndex === -1) return false;
       return (
-        SqlQuery.getSelectValueOutput(selectValues.get(selectIndex), selectIndex) === outputColumn
+        SqlQuery.getSelectExpressionOutput(selectExpressions.get(selectIndex), selectIndex) ===
+        outputColumn
       );
     });
   }
@@ -586,9 +592,9 @@ export class SqlQuery extends SqlBase {
     const alias = SqlAlias.fromBase(typeof column === 'string' ? parseSql(column) : column);
 
     if (first) {
-      return this.changeSelectValues(this.selectValues.addFirst(alias, Separator.COMMA));
+      return this.changeSelectExpressions(this.selectExpressions.addFirst(alias, Separator.COMMA));
     } else {
-      return this.changeSelectValues(this.selectValues.addLast(alias, Separator.COMMA));
+      return this.changeSelectExpressions(this.selectExpressions.addLast(alias, Separator.COMMA));
     }
   }
 
@@ -596,12 +602,12 @@ export class SqlQuery extends SqlBase {
     const index = this.getSelectIndexForOutputColumn(outputColumn);
     if (index === -1) return this; // It is not even there
 
-    const selectValue = this.selectValues.get(index);
-    const newSelectValues = this.selectValues.deleteByIndex(index);
-    if (!newSelectValues) return this; // Can not remove the last column
+    const selectExpression = this.selectExpressions.get(index);
+    const newSelectExpressions = this.selectExpressions.deleteByIndex(index);
+    if (!newSelectExpressions) return this; // Can not remove the last column
 
     const value = this.valueOf();
-    value.selectValues = newSelectValues;
+    value.selectExpressions = newSelectExpressions;
 
     const sqlIndex = index + 1;
     if (value.groupByExpressions) {
@@ -613,7 +619,7 @@ export class SqlQuery extends SqlBase {
             return;
           }
         }
-        if (groupByExpression.equals(selectValue.expression)) return;
+        if (groupByExpression.equals(selectExpression.expression)) return;
         return groupByExpression;
       });
     }
@@ -770,7 +776,7 @@ export class SqlQuery extends SqlBase {
   //   const value = this.valueOf();
   //
   //   value.groupByExpressions = (value.groupByExpressions || []).concat([
-  //     SqlLiteral.fromInput(value.selectValues.length),
+  //     SqlLiteral.fromInput(value.selectExpressions.length),
   //   ]);
   //   value.groupByKeyword = value.groupByKeyword || 'GROUP BY';
   //   value.groupBySeparators = this.groupByExpressions
@@ -823,7 +829,7 @@ export class SqlQuery extends SqlBase {
       const selectIndex = this.getSelectIndexForExpression(orderByPart.expression, true);
       if (selectIndex === -1) return;
       return (
-        SqlQuery.getSelectValueOutput(this.selectValues.get(selectIndex), selectIndex) ===
+        SqlQuery.getSelectExpressionOutput(this.selectExpressions.get(selectIndex), selectIndex) ===
         outputColumn
       );
     });

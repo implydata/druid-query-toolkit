@@ -271,7 +271,6 @@ describe('upgrades', () => {
           "postFrom": " ",
           "postQuery": "",
           "postSelect": " ",
-          "postSelectDecorator": "",
           "preFrom": " ",
           "preQuery": "",
         },
@@ -282,9 +281,8 @@ describe('upgrades', () => {
         "offsetValue": undefined,
         "orderByKeyword": undefined,
         "orderByParts": undefined,
-        "selectDecorator": "",
-        "selectKeyword": "select",
-        "selectValues": SeparatedArray {
+        "selectDecorator": undefined,
+        "selectExpressions": SeparatedArray {
           "separators": Array [],
           "values": Array [
             SqlAlias {
@@ -305,6 +303,7 @@ describe('upgrades', () => {
             },
           ],
         },
+        "selectKeyword": "select",
         "tables": SeparatedArray {
           "separators": Array [],
           "values": Array [

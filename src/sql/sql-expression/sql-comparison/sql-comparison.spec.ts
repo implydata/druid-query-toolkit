@@ -334,7 +334,6 @@ describe('SqlComparison', () => {
             "postLimit": " ",
             "postQuery": "",
             "postSelect": " ",
-            "postSelectDecorator": "",
             "preFrom": " ",
             "preLimit": " ",
             "preQuery": "",
@@ -358,9 +357,8 @@ describe('SqlComparison', () => {
               "rightSpacing": "",
             },
           ],
-          "selectDecorator": "",
-          "selectKeyword": "SELECT",
-          "selectValues": SeparatedArray {
+          "selectDecorator": undefined,
+          "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
               SqlAlias {
@@ -381,6 +379,7 @@ describe('SqlComparison', () => {
               },
             ],
           },
+          "selectKeyword": "SELECT",
           "tables": SeparatedArray {
             "separators": Array [],
             "values": Array [
@@ -451,7 +450,6 @@ describe('SqlComparison', () => {
             "postLimit": " ",
             "postQuery": "",
             "postSelect": " ",
-            "postSelectDecorator": "",
             "preFrom": " ",
             "preLimit": " ",
             "preQuery": "",
@@ -475,9 +473,8 @@ describe('SqlComparison', () => {
               "rightSpacing": "",
             },
           ],
-          "selectDecorator": "",
-          "selectKeyword": "SELECT",
-          "selectValues": SeparatedArray {
+          "selectDecorator": undefined,
+          "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
               SqlAlias {
@@ -498,6 +495,7 @@ describe('SqlComparison', () => {
               },
             ],
           },
+          "selectKeyword": "SELECT",
           "tables": SeparatedArray {
             "separators": Array [],
             "values": Array [

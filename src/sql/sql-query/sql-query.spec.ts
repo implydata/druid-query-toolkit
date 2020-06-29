@@ -85,7 +85,7 @@ describe('SqlQuery', () => {
 
     it('works in advanced case', () => {
       const query = SqlQuery.factory(SqlRef.table('lol'))
-        .changeSelectValues([
+        .changeSelectExpressions([
           SqlRef.factory('channel').as(),
           SqlRef.factory('page').as(),
           SqlRef.factory('user').as(),
@@ -188,7 +188,6 @@ describe('SqlQuery', () => {
           "postLimit": " ",
           "postQuery": "",
           "postSelect": " ",
-          "postSelectDecorator": "",
           "preFrom": " ",
           "preLimit": " ",
           "preQuery": "",
@@ -206,9 +205,8 @@ describe('SqlQuery', () => {
         "offsetValue": undefined,
         "orderByKeyword": undefined,
         "orderByParts": undefined,
-        "selectDecorator": "",
-        "selectKeyword": "SELECT",
-        "selectValues": SeparatedArray {
+        "selectDecorator": undefined,
+        "selectExpressions": SeparatedArray {
           "separators": Array [],
           "values": Array [
             SqlAlias {
@@ -229,6 +227,7 @@ describe('SqlQuery', () => {
             },
           ],
         },
+        "selectKeyword": "SELECT",
         "tables": SeparatedArray {
           "separators": Array [],
           "values": Array [
@@ -247,7 +246,6 @@ describe('SqlQuery', () => {
                   "postOrderBy": " ",
                   "postQuery": "",
                   "postSelect": " ",
-                  "postSelectDecorator": "",
                   "preFrom": " ",
                   "preOrderBy": " ",
                   "preQuery": "",
@@ -286,9 +284,8 @@ describe('SqlQuery', () => {
                     "rightSpacing": "",
                   },
                 ],
-                "selectDecorator": "",
-                "selectKeyword": "SELECT",
-                "selectValues": SeparatedArray {
+                "selectDecorator": undefined,
+                "selectExpressions": SeparatedArray {
                   "separators": Array [],
                   "values": Array [
                     SqlAlias {
@@ -309,6 +306,7 @@ describe('SqlQuery', () => {
                     },
                   ],
                 },
+                "selectKeyword": "SELECT",
                 "tables": SeparatedArray {
                   "separators": Array [],
                   "values": Array [
@@ -381,7 +379,6 @@ describe('SqlQuery', () => {
           "postQuery": "",
           "postSelect": "
         ",
-          "postSelectDecorator": "",
           "preFrom": "
       ",
           "preQuery": "",
@@ -393,9 +390,8 @@ describe('SqlQuery', () => {
         "offsetValue": undefined,
         "orderByKeyword": undefined,
         "orderByParts": undefined,
-        "selectDecorator": "",
-        "selectKeyword": "SELECT",
-        "selectValues": SeparatedArray {
+        "selectDecorator": undefined,
+        "selectExpressions": SeparatedArray {
           "separators": Array [
             Separator {
               "left": "",
@@ -523,6 +519,7 @@ describe('SqlQuery', () => {
             },
           ],
         },
+        "selectKeyword": "SELECT",
         "tables": SeparatedArray {
           "separators": Array [],
           "values": Array [
@@ -576,7 +573,6 @@ describe('SqlQuery', () => {
           "postFrom": " ",
           "postQuery": "",
           "postSelect": " ",
-          "postSelectDecorator": "",
           "preFrom": " ",
           "preQuery": "",
         },
@@ -587,9 +583,8 @@ describe('SqlQuery', () => {
         "offsetValue": undefined,
         "orderByKeyword": undefined,
         "orderByParts": undefined,
-        "selectDecorator": "",
-        "selectKeyword": "Select",
-        "selectValues": SeparatedArray {
+        "selectDecorator": undefined,
+        "selectExpressions": SeparatedArray {
           "separators": Array [],
           "values": Array [
             SqlAlias {
@@ -610,6 +605,7 @@ describe('SqlQuery', () => {
             },
           ],
         },
+        "selectKeyword": "Select",
         "tables": SeparatedArray {
           "separators": Array [],
           "values": Array [
@@ -664,7 +660,6 @@ describe('SqlQuery', () => {
           "postFrom": " ",
           "postQuery": "",
           "postSelect": " ",
-          "postSelectDecorator": "",
           "postWith": " ",
           "postWithQuery": "
       ",
@@ -678,9 +673,8 @@ describe('SqlQuery', () => {
         "offsetValue": undefined,
         "orderByKeyword": undefined,
         "orderByParts": undefined,
-        "selectDecorator": "",
-        "selectKeyword": "Select",
-        "selectValues": SeparatedArray {
+        "selectDecorator": undefined,
+        "selectExpressions": SeparatedArray {
           "separators": Array [],
           "values": Array [
             SqlAlias {
@@ -701,6 +695,7 @@ describe('SqlQuery', () => {
             },
           ],
         },
+        "selectKeyword": "Select",
         "tables": SeparatedArray {
           "separators": Array [],
           "values": Array [
@@ -751,7 +746,6 @@ describe('SqlQuery', () => {
                   "postFrom": "   ",
                   "postQuery": "",
                   "postSelect": " ",
-                  "postSelectDecorator": "",
                   "preFrom": "
         ",
                   "preQuery": "",
@@ -770,9 +764,8 @@ describe('SqlQuery', () => {
                     "rightSpacing": "",
                   },
                 ],
-                "selectDecorator": "",
-                "selectKeyword": "SELECT",
-                "selectValues": SeparatedArray {
+                "selectDecorator": undefined,
+                "selectExpressions": SeparatedArray {
                   "separators": Array [],
                   "values": Array [
                     SqlAlias {
@@ -793,6 +786,7 @@ describe('SqlQuery', () => {
                     },
                   ],
                 },
+                "selectKeyword": "SELECT",
                 "tables": SeparatedArray {
                   "separators": Array [],
                   "values": Array [
@@ -858,7 +852,6 @@ describe('expressions with where clause', () => {
           "postFrom": " ",
           "postQuery": "",
           "postSelect": " ",
-          "postSelectDecorator": "",
           "postWhere": " ",
           "preFrom": " ",
           "preQuery": "",
@@ -871,9 +864,8 @@ describe('expressions with where clause', () => {
         "offsetValue": undefined,
         "orderByKeyword": undefined,
         "orderByParts": undefined,
-        "selectDecorator": "",
-        "selectKeyword": "Select",
-        "selectValues": SeparatedArray {
+        "selectDecorator": undefined,
+        "selectExpressions": SeparatedArray {
           "separators": Array [],
           "values": Array [
             SqlAlias {
@@ -894,6 +886,7 @@ describe('expressions with where clause', () => {
             },
           ],
         },
+        "selectKeyword": "Select",
         "tables": SeparatedArray {
           "separators": Array [],
           "values": Array [
@@ -968,7 +961,6 @@ describe('expressions with where clause', () => {
           "postFrom": " ",
           "postQuery": "",
           "postSelect": " ",
-          "postSelectDecorator": "",
           "postWhere": " ",
           "preFrom": " ",
           "preQuery": "",
@@ -981,9 +973,8 @@ describe('expressions with where clause', () => {
         "offsetValue": undefined,
         "orderByKeyword": undefined,
         "orderByParts": undefined,
-        "selectDecorator": "",
-        "selectKeyword": "SELECT",
-        "selectValues": SeparatedArray {
+        "selectDecorator": undefined,
+        "selectExpressions": SeparatedArray {
           "separators": Array [],
           "values": Array [
             SqlAlias {
@@ -1004,6 +995,7 @@ describe('expressions with where clause', () => {
             },
           ],
         },
+        "selectKeyword": "SELECT",
         "tables": SeparatedArray {
           "separators": Array [],
           "values": Array [
@@ -1081,7 +1073,6 @@ describe('expressions with where clause', () => {
           "postFrom": " ",
           "postQuery": "",
           "postSelect": " ",
-          "postSelectDecorator": "",
           "postWhere": " ",
           "preFrom": " ",
           "preQuery": "",
@@ -1094,9 +1085,8 @@ describe('expressions with where clause', () => {
         "offsetValue": undefined,
         "orderByKeyword": undefined,
         "orderByParts": undefined,
-        "selectDecorator": "",
-        "selectKeyword": "SELECT",
-        "selectValues": SeparatedArray {
+        "selectDecorator": undefined,
+        "selectExpressions": SeparatedArray {
           "separators": Array [],
           "values": Array [
             SqlAlias {
@@ -1117,6 +1107,7 @@ describe('expressions with where clause', () => {
             },
           ],
         },
+        "selectKeyword": "SELECT",
         "tables": SeparatedArray {
           "separators": Array [],
           "values": Array [
@@ -1295,7 +1286,6 @@ describe('expressions with group by clause', () => {
           "postGroupBy": " ",
           "postQuery": "",
           "postSelect": " ",
-          "postSelectDecorator": "",
           "preFrom": " ",
           "preGroupBy": " ",
           "preQuery": "",
@@ -1307,9 +1297,8 @@ describe('expressions with group by clause', () => {
         "offsetValue": undefined,
         "orderByKeyword": undefined,
         "orderByParts": undefined,
-        "selectDecorator": "",
-        "selectKeyword": "Select",
-        "selectValues": SeparatedArray {
+        "selectDecorator": undefined,
+        "selectExpressions": SeparatedArray {
           "separators": Array [],
           "values": Array [
             SqlAlias {
@@ -1330,6 +1319,7 @@ describe('expressions with group by clause', () => {
             },
           ],
         },
+        "selectKeyword": "Select",
         "tables": SeparatedArray {
           "separators": Array [],
           "values": Array [
@@ -1394,7 +1384,6 @@ describe('expressions with group by clause', () => {
           "postGroupBy": " ",
           "postQuery": "",
           "postSelect": " ",
-          "postSelectDecorator": "",
           "preFrom": " ",
           "preGroupBy": " ",
           "preQuery": "",
@@ -1406,9 +1395,8 @@ describe('expressions with group by clause', () => {
         "offsetValue": undefined,
         "orderByKeyword": undefined,
         "orderByParts": undefined,
-        "selectDecorator": "",
-        "selectKeyword": "Select",
-        "selectValues": SeparatedArray {
+        "selectDecorator": undefined,
+        "selectExpressions": SeparatedArray {
           "separators": Array [],
           "values": Array [
             SqlAlias {
@@ -1429,6 +1417,7 @@ describe('expressions with group by clause', () => {
             },
           ],
         },
+        "selectKeyword": "Select",
         "tables": SeparatedArray {
           "separators": Array [],
           "values": Array [
@@ -1509,7 +1498,6 @@ describe('expressions with group by clause', () => {
           "postGroupBy": " ",
           "postQuery": "",
           "postSelect": " ",
-          "postSelectDecorator": "",
           "preFrom": " ",
           "preGroupBy": " ",
           "preQuery": "",
@@ -1527,9 +1515,8 @@ describe('expressions with group by clause', () => {
             "rightSpacing": "",
           },
         ],
-        "selectDecorator": "",
-        "selectKeyword": "Select",
-        "selectValues": SeparatedArray {
+        "selectDecorator": undefined,
+        "selectExpressions": SeparatedArray {
           "separators": Array [],
           "values": Array [
             SqlAlias {
@@ -1550,6 +1537,7 @@ describe('expressions with group by clause', () => {
             },
           ],
         },
+        "selectKeyword": "Select",
         "tables": SeparatedArray {
           "separators": Array [],
           "values": Array [
@@ -1627,7 +1615,6 @@ describe('expressions with having clause', () => {
           "postHaving": " ",
           "postQuery": "",
           "postSelect": " ",
-          "postSelectDecorator": "",
           "preFrom": " ",
           "preHaving": " ",
           "preQuery": "",
@@ -1639,9 +1626,8 @@ describe('expressions with having clause', () => {
         "offsetValue": undefined,
         "orderByKeyword": undefined,
         "orderByParts": undefined,
-        "selectDecorator": "",
-        "selectKeyword": "Select",
-        "selectValues": SeparatedArray {
+        "selectDecorator": undefined,
+        "selectExpressions": SeparatedArray {
           "separators": Array [],
           "values": Array [
             SqlAlias {
@@ -1662,6 +1648,7 @@ describe('expressions with having clause', () => {
             },
           ],
         },
+        "selectKeyword": "Select",
         "tables": SeparatedArray {
           "separators": Array [],
           "values": Array [
@@ -1737,7 +1724,6 @@ describe('expressions with having clause', () => {
           "postHaving": " ",
           "postQuery": "",
           "postSelect": " ",
-          "postSelectDecorator": "",
           "preFrom": " ",
           "preHaving": " ",
           "preQuery": "",
@@ -1749,9 +1735,8 @@ describe('expressions with having clause', () => {
         "offsetValue": undefined,
         "orderByKeyword": undefined,
         "orderByParts": undefined,
-        "selectDecorator": "",
-        "selectKeyword": "SELECT",
-        "selectValues": SeparatedArray {
+        "selectDecorator": undefined,
+        "selectExpressions": SeparatedArray {
           "separators": Array [],
           "values": Array [
             SqlAlias {
@@ -1772,6 +1757,7 @@ describe('expressions with having clause', () => {
             },
           ],
         },
+        "selectKeyword": "SELECT",
         "tables": SeparatedArray {
           "separators": Array [],
           "values": Array [
@@ -1934,7 +1920,6 @@ describe('expressions with having clause', () => {
           "postHaving": " ",
           "postQuery": "",
           "postSelect": " ",
-          "postSelectDecorator": "",
           "preFrom": " ",
           "preHaving": " ",
           "preQuery": "",
@@ -1946,9 +1931,8 @@ describe('expressions with having clause', () => {
         "offsetValue": undefined,
         "orderByKeyword": undefined,
         "orderByParts": undefined,
-        "selectDecorator": "",
-        "selectKeyword": "SELECT",
-        "selectValues": SeparatedArray {
+        "selectDecorator": undefined,
+        "selectExpressions": SeparatedArray {
           "separators": Array [],
           "values": Array [
             SqlAlias {
@@ -1969,6 +1953,7 @@ describe('expressions with having clause', () => {
             },
           ],
         },
+        "selectKeyword": "SELECT",
         "tables": SeparatedArray {
           "separators": Array [],
           "values": Array [
@@ -2024,7 +2009,6 @@ describe('expressions with order by clause', () => {
           "postOrderBy": " ",
           "postQuery": "",
           "postSelect": " ",
-          "postSelectDecorator": "",
           "preFrom": " ",
           "preOrderBy": " ",
           "preQuery": "",
@@ -2052,9 +2036,8 @@ describe('expressions with order by clause', () => {
             },
           ],
         },
-        "selectDecorator": "",
-        "selectKeyword": "Select",
-        "selectValues": SeparatedArray {
+        "selectDecorator": undefined,
+        "selectExpressions": SeparatedArray {
           "separators": Array [],
           "values": Array [
             SqlAlias {
@@ -2075,6 +2058,7 @@ describe('expressions with order by clause', () => {
             },
           ],
         },
+        "selectKeyword": "Select",
         "tables": SeparatedArray {
           "separators": Array [],
           "values": Array [
@@ -2125,7 +2109,6 @@ describe('expressions with order by clause', () => {
           "postOrderBy": " ",
           "postQuery": "",
           "postSelect": " ",
-          "postSelectDecorator": "",
           "preFrom": " ",
           "preOrderBy": " ",
           "preQuery": "",
@@ -2156,9 +2139,8 @@ describe('expressions with order by clause', () => {
             },
           ],
         },
-        "selectDecorator": "",
-        "selectKeyword": "Select",
-        "selectValues": SeparatedArray {
+        "selectDecorator": undefined,
+        "selectExpressions": SeparatedArray {
           "separators": Array [],
           "values": Array [
             SqlAlias {
@@ -2179,6 +2161,7 @@ describe('expressions with order by clause', () => {
             },
           ],
         },
+        "selectKeyword": "Select",
         "tables": SeparatedArray {
           "separators": Array [],
           "values": Array [
@@ -2229,7 +2212,6 @@ describe('expressions with order by clause', () => {
           "postOrderBy": " ",
           "postQuery": "",
           "postSelect": " ",
-          "postSelectDecorator": "",
           "preFrom": " ",
           "preOrderBy": " ",
           "preQuery": "",
@@ -2259,9 +2241,8 @@ describe('expressions with order by clause', () => {
             },
           ],
         },
-        "selectDecorator": "",
-        "selectKeyword": "Select",
-        "selectValues": SeparatedArray {
+        "selectDecorator": undefined,
+        "selectExpressions": SeparatedArray {
           "separators": Array [],
           "values": Array [
             SqlAlias {
@@ -2282,6 +2263,7 @@ describe('expressions with order by clause', () => {
             },
           ],
         },
+        "selectKeyword": "Select",
         "tables": SeparatedArray {
           "separators": Array [],
           "values": Array [
@@ -2332,7 +2314,6 @@ describe('expressions with order by clause', () => {
           "postOrderBy": " ",
           "postQuery": "",
           "postSelect": " ",
-          "postSelectDecorator": "",
           "preFrom": " ",
           "preOrderBy": " ",
           "preQuery": "",
@@ -2365,9 +2346,8 @@ describe('expressions with order by clause', () => {
             },
           ],
         },
-        "selectDecorator": "",
-        "selectKeyword": "Select",
-        "selectValues": SeparatedArray {
+        "selectDecorator": undefined,
+        "selectExpressions": SeparatedArray {
           "separators": Array [
             Separator {
               "left": "",
@@ -2410,6 +2390,7 @@ describe('expressions with order by clause', () => {
             },
           ],
         },
+        "selectKeyword": "Select",
         "tables": SeparatedArray {
           "separators": Array [],
           "values": Array [
@@ -2460,7 +2441,6 @@ describe('expressions with order by clause', () => {
           "postOrderBy": " ",
           "postQuery": "",
           "postSelect": " ",
-          "postSelectDecorator": "",
           "preFrom": " ",
           "preOrderBy": " ",
           "preQuery": "",
@@ -2511,9 +2491,8 @@ describe('expressions with order by clause', () => {
             },
           ],
         },
-        "selectDecorator": "",
-        "selectKeyword": "Select",
-        "selectValues": SeparatedArray {
+        "selectDecorator": undefined,
+        "selectExpressions": SeparatedArray {
           "separators": Array [],
           "values": Array [
             SqlAlias {
@@ -2534,6 +2513,7 @@ describe('expressions with order by clause', () => {
             },
           ],
         },
+        "selectKeyword": "Select",
         "tables": SeparatedArray {
           "separators": Array [],
           "values": Array [
@@ -2584,7 +2564,6 @@ describe('expressions with order by clause', () => {
           "postOrderBy": " ",
           "postQuery": "",
           "postSelect": " ",
-          "postSelectDecorator": "",
           "preFrom": " ",
           "preOrderBy": " ",
           "preQuery": "",
@@ -2637,9 +2616,8 @@ describe('expressions with order by clause', () => {
             },
           ],
         },
-        "selectDecorator": "",
-        "selectKeyword": "Select",
-        "selectValues": SeparatedArray {
+        "selectDecorator": undefined,
+        "selectExpressions": SeparatedArray {
           "separators": Array [
             Separator {
               "left": "",
@@ -2682,6 +2660,7 @@ describe('expressions with order by clause', () => {
             },
           ],
         },
+        "selectKeyword": "Select",
         "tables": SeparatedArray {
           "separators": Array [],
           "values": Array [
@@ -2734,7 +2713,6 @@ describe('expressions with limit clause', () => {
           "postLimit": " ",
           "postQuery": "",
           "postSelect": " ",
-          "postSelectDecorator": "",
           "preFrom": " ",
           "preLimit": " ",
           "preQuery": "",
@@ -2752,9 +2730,8 @@ describe('expressions with limit clause', () => {
         "offsetValue": undefined,
         "orderByKeyword": undefined,
         "orderByParts": undefined,
-        "selectDecorator": "",
-        "selectKeyword": "Select",
-        "selectValues": SeparatedArray {
+        "selectDecorator": undefined,
+        "selectExpressions": SeparatedArray {
           "separators": Array [],
           "values": Array [
             SqlAlias {
@@ -2775,6 +2752,7 @@ describe('expressions with limit clause', () => {
             },
           ],
         },
+        "selectKeyword": "Select",
         "tables": SeparatedArray {
           "separators": Array [],
           "values": Array [
@@ -2826,7 +2804,6 @@ describe('expressions with union clause', () => {
           "postFrom": " ",
           "postQuery": "",
           "postSelect": " ",
-          "postSelectDecorator": "",
           "postUnion": " ",
           "preFrom": " ",
           "preQuery": "",
@@ -2839,9 +2816,8 @@ describe('expressions with union clause', () => {
         "offsetValue": undefined,
         "orderByKeyword": undefined,
         "orderByParts": undefined,
-        "selectDecorator": "",
-        "selectKeyword": "Select",
-        "selectValues": SeparatedArray {
+        "selectDecorator": undefined,
+        "selectExpressions": SeparatedArray {
           "separators": Array [],
           "values": Array [
             SqlAlias {
@@ -2862,6 +2838,7 @@ describe('expressions with union clause', () => {
             },
           ],
         },
+        "selectKeyword": "Select",
         "tables": SeparatedArray {
           "separators": Array [],
           "values": Array [
@@ -2896,7 +2873,6 @@ describe('expressions with union clause', () => {
             "postFrom": " ",
             "postQuery": "",
             "postSelect": " ",
-            "postSelectDecorator": "",
             "preFrom": " ",
             "preQuery": "",
           },
@@ -2907,9 +2883,8 @@ describe('expressions with union clause', () => {
           "offsetValue": undefined,
           "orderByKeyword": undefined,
           "orderByParts": undefined,
-          "selectDecorator": "",
-          "selectKeyword": "select",
-          "selectValues": SeparatedArray {
+          "selectDecorator": undefined,
+          "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
               SqlAlias {
@@ -2930,6 +2905,7 @@ describe('expressions with union clause', () => {
               },
             ],
           },
+          "selectKeyword": "select",
           "tables": SeparatedArray {
             "separators": Array [],
             "values": Array [
@@ -2986,7 +2962,6 @@ describe('Join Clause', () => {
           "postFrom": " ",
           "postQuery": "",
           "postSelect": " ",
-          "postSelectDecorator": "",
           "preFrom": " ",
           "preJoin": " ",
           "preQuery": "",
@@ -3059,9 +3034,8 @@ describe('Join Clause', () => {
         "offsetValue": undefined,
         "orderByKeyword": undefined,
         "orderByParts": undefined,
-        "selectDecorator": "",
-        "selectKeyword": "Select",
-        "selectValues": SeparatedArray {
+        "selectDecorator": undefined,
+        "selectExpressions": SeparatedArray {
           "separators": Array [],
           "values": Array [
             SqlAlias {
@@ -3082,6 +3056,7 @@ describe('Join Clause', () => {
             },
           ],
         },
+        "selectKeyword": "Select",
         "tables": SeparatedArray {
           "separators": Array [],
           "values": Array [
@@ -3131,7 +3106,6 @@ describe('Join Clause', () => {
           "postFrom": " ",
           "postQuery": "",
           "postSelect": " ",
-          "postSelectDecorator": "",
           "preFrom": " ",
           "preJoin": " ",
           "preQuery": "",
@@ -3204,9 +3178,8 @@ describe('Join Clause', () => {
         "offsetValue": undefined,
         "orderByKeyword": undefined,
         "orderByParts": undefined,
-        "selectDecorator": "",
-        "selectKeyword": "Select",
-        "selectValues": SeparatedArray {
+        "selectDecorator": undefined,
+        "selectExpressions": SeparatedArray {
           "separators": Array [],
           "values": Array [
             SqlAlias {
@@ -3227,6 +3200,7 @@ describe('Join Clause', () => {
             },
           ],
         },
+        "selectKeyword": "Select",
         "tables": SeparatedArray {
           "separators": Array [],
           "values": Array [
@@ -3276,7 +3250,6 @@ describe('Join Clause', () => {
           "postFrom": " ",
           "postQuery": "",
           "postSelect": " ",
-          "postSelectDecorator": "",
           "preFrom": " ",
           "preJoin": " ",
           "preQuery": "",
@@ -3349,9 +3322,8 @@ describe('Join Clause', () => {
         "offsetValue": undefined,
         "orderByKeyword": undefined,
         "orderByParts": undefined,
-        "selectDecorator": "",
-        "selectKeyword": "Select",
-        "selectValues": SeparatedArray {
+        "selectDecorator": undefined,
+        "selectExpressions": SeparatedArray {
           "separators": Array [],
           "values": Array [
             SqlAlias {
@@ -3372,6 +3344,7 @@ describe('Join Clause', () => {
             },
           ],
         },
+        "selectKeyword": "Select",
         "tables": SeparatedArray {
           "separators": Array [],
           "values": Array [
@@ -3421,7 +3394,6 @@ describe('Join Clause', () => {
           "postFrom": " ",
           "postQuery": "",
           "postSelect": " ",
-          "postSelectDecorator": "",
           "preFrom": " ",
           "preJoin": " ",
           "preQuery": "",
@@ -3494,9 +3466,8 @@ describe('Join Clause', () => {
         "offsetValue": undefined,
         "orderByKeyword": undefined,
         "orderByParts": undefined,
-        "selectDecorator": "",
-        "selectKeyword": "Select",
-        "selectValues": SeparatedArray {
+        "selectDecorator": undefined,
+        "selectExpressions": SeparatedArray {
           "separators": Array [],
           "values": Array [
             SqlAlias {
@@ -3517,6 +3488,7 @@ describe('Join Clause', () => {
             },
           ],
         },
+        "selectKeyword": "Select",
         "tables": SeparatedArray {
           "separators": Array [],
           "values": Array [
@@ -3566,7 +3538,6 @@ describe('Join Clause', () => {
           "postFrom": " ",
           "postQuery": "",
           "postSelect": " ",
-          "postSelectDecorator": "",
           "preFrom": " ",
           "preJoin": " ",
           "preQuery": "",
@@ -3639,9 +3610,8 @@ describe('Join Clause', () => {
         "offsetValue": undefined,
         "orderByKeyword": undefined,
         "orderByParts": undefined,
-        "selectDecorator": "",
-        "selectKeyword": "Select",
-        "selectValues": SeparatedArray {
+        "selectDecorator": undefined,
+        "selectExpressions": SeparatedArray {
           "separators": Array [],
           "values": Array [
             SqlAlias {
@@ -3662,6 +3632,7 @@ describe('Join Clause', () => {
             },
           ],
         },
+        "selectKeyword": "Select",
         "tables": SeparatedArray {
           "separators": Array [],
           "values": Array [
@@ -3717,7 +3688,6 @@ describe('Queries with comments', () => {
           "postQuery": "",
           "postSelect": " -- some comment 
       ",
-          "postSelectDecorator": "",
           "preFrom": " ",
           "preQuery": "",
         },
@@ -3728,9 +3698,8 @@ describe('Queries with comments', () => {
         "offsetValue": undefined,
         "orderByKeyword": undefined,
         "orderByParts": undefined,
-        "selectDecorator": "",
-        "selectKeyword": "Select",
-        "selectValues": SeparatedArray {
+        "selectDecorator": undefined,
+        "selectExpressions": SeparatedArray {
           "separators": Array [],
           "values": Array [
             SqlAlias {
@@ -3751,6 +3720,7 @@ describe('Queries with comments', () => {
             },
           ],
         },
+        "selectKeyword": "Select",
         "tables": SeparatedArray {
           "separators": Array [],
           "values": Array [
@@ -3887,7 +3857,6 @@ describe('No spacing', () => {
           "postOrderBy": "",
           "postQuery": "",
           "postSelect": "",
-          "postSelectDecorator": "",
           "preFrom": "",
           "preGroupBy": "",
           "preOrderBy": "",
@@ -3921,9 +3890,8 @@ describe('No spacing', () => {
             },
           ],
         },
-        "selectDecorator": "",
-        "selectKeyword": "SELECT",
-        "selectValues": SeparatedArray {
+        "selectDecorator": undefined,
+        "selectExpressions": SeparatedArray {
           "separators": Array [
             Separator {
               "left": "",
@@ -4050,6 +4018,7 @@ describe('No spacing', () => {
             },
           ],
         },
+        "selectKeyword": "SELECT",
         "tables": SeparatedArray {
           "separators": Array [],
           "values": Array [
@@ -4123,7 +4092,6 @@ describe('Extra', () => {
           "postQuery": "",
           "postSelect": "
         ",
-          "postSelectDecorator": "",
           "postWhere": " ",
           "preFrom": "
       ",
@@ -4163,9 +4131,8 @@ describe('Extra', () => {
             },
           ],
         },
-        "selectDecorator": "",
-        "selectKeyword": "SELECT",
-        "selectValues": SeparatedArray {
+        "selectDecorator": undefined,
+        "selectExpressions": SeparatedArray {
           "separators": Array [
             Separator {
               "left": "",
@@ -4284,6 +4251,7 @@ describe('Extra', () => {
             },
           ],
         },
+        "selectKeyword": "SELECT",
         "tables": SeparatedArray {
           "separators": Array [],
           "values": Array [

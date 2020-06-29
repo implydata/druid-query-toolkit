@@ -32,7 +32,6 @@ describe('SqlAlias', () => {
         "innerSpacing": Object {
           "postQuery": "",
           "postSelect": " ",
-          "postSelectDecorator": "",
           "preQuery": "",
         },
         "joinParts": undefined,
@@ -42,9 +41,8 @@ describe('SqlAlias', () => {
         "offsetValue": undefined,
         "orderByKeyword": undefined,
         "orderByParts": undefined,
-        "selectDecorator": "",
-        "selectKeyword": "SELECT",
-        "selectValues": SeparatedArray {
+        "selectDecorator": undefined,
+        "selectExpressions": SeparatedArray {
           "separators": Array [],
           "values": Array [
             SqlAlias {
@@ -65,6 +63,7 @@ describe('SqlAlias', () => {
             },
           ],
         },
+        "selectKeyword": "SELECT",
         "tables": undefined,
         "type": "query",
         "unionKeyword": undefined,
@@ -93,7 +92,6 @@ describe('SqlAlias', () => {
         "innerSpacing": Object {
           "postQuery": "",
           "postSelect": " ",
-          "postSelectDecorator": "",
           "preQuery": "",
         },
         "joinParts": undefined,
@@ -103,9 +101,8 @@ describe('SqlAlias', () => {
         "offsetValue": undefined,
         "orderByKeyword": undefined,
         "orderByParts": undefined,
-        "selectDecorator": "",
-        "selectKeyword": "SELECT",
-        "selectValues": SeparatedArray {
+        "selectDecorator": undefined,
+        "selectExpressions": SeparatedArray {
           "separators": Array [],
           "values": Array [
             SqlAlias {
@@ -138,6 +135,7 @@ describe('SqlAlias', () => {
             },
           ],
         },
+        "selectKeyword": "SELECT",
         "tables": undefined,
         "type": "query",
         "unionKeyword": undefined,
@@ -166,7 +164,6 @@ describe('SqlAlias', () => {
         "innerSpacing": Object {
           "postQuery": "",
           "postSelect": " ",
-          "postSelectDecorator": "",
           "preQuery": "",
         },
         "joinParts": undefined,
@@ -176,9 +173,8 @@ describe('SqlAlias', () => {
         "offsetValue": undefined,
         "orderByKeyword": undefined,
         "orderByParts": undefined,
-        "selectDecorator": "",
-        "selectKeyword": "SELECT",
-        "selectValues": SeparatedArray {
+        "selectDecorator": undefined,
+        "selectExpressions": SeparatedArray {
           "separators": Array [],
           "values": Array [
             SqlAlias {
@@ -214,6 +210,7 @@ describe('SqlAlias', () => {
             },
           ],
         },
+        "selectKeyword": "SELECT",
         "tables": undefined,
         "type": "query",
         "unionKeyword": undefined,
@@ -242,7 +239,6 @@ describe('SqlAlias', () => {
         "innerSpacing": Object {
           "postQuery": "",
           "postSelect": " ",
-          "postSelectDecorator": "",
           "preQuery": "",
         },
         "joinParts": undefined,
@@ -252,9 +248,8 @@ describe('SqlAlias', () => {
         "offsetValue": undefined,
         "orderByKeyword": undefined,
         "orderByParts": undefined,
-        "selectDecorator": "",
-        "selectKeyword": "SELECT",
-        "selectValues": SeparatedArray {
+        "selectDecorator": undefined,
+        "selectExpressions": SeparatedArray {
           "separators": Array [],
           "values": Array [
             SqlAlias {
@@ -289,6 +284,7 @@ describe('SqlAlias', () => {
             },
           ],
         },
+        "selectKeyword": "SELECT",
         "tables": undefined,
         "type": "query",
         "unionKeyword": undefined,
