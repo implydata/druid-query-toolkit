@@ -52,7 +52,7 @@ export class SqlAlias extends SqlBase {
     return new SqlAlias({
       expression: expression,
       asKeyword: alias ? 'AS' : undefined,
-      alias: alias ? SqlRef.factoryWithQuotes(alias) : undefined,
+      alias: alias ? SqlRef.columnWithQuotes(alias) : undefined,
     });
   }
 

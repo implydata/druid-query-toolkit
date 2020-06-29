@@ -86,9 +86,9 @@ describe('SqlQuery', () => {
     it('works in advanced case', () => {
       const query = SqlQuery.factory(SqlRef.table('lol'))
         .changeSelectExpressions([
-          SqlRef.factory('channel').as(),
-          SqlRef.factory('page').as(),
-          SqlRef.factory('user').as(),
+          SqlRef.column('channel').as(),
+          SqlRef.column('page').as(),
+          SqlRef.column('user').as(),
         ])
         .changeWhereExpression(`channel  =  '#en.wikipedia'`);
 
@@ -153,7 +153,7 @@ describe('SqlQuery', () => {
           parseSql(sql).walk(x => {
             if (x instanceof SqlRef) {
               if (x.column && x.table === 't') {
-                return SqlCase.ifFactory(condition, x);
+                return SqlCase.ifThenElse(condition, x);
               }
             }
             if (x instanceof SqlFunction && x.isCountStar()) {

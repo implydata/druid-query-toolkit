@@ -692,7 +692,7 @@ export class SqlQuery extends SqlBase {
 
   replaceFrom(table: string) {
     const value = this.valueOf();
-    value.tables = SeparatedArray.fromSingleValue(SqlAlias.fromBase(SqlRef.factory(table)));
+    value.tables = SeparatedArray.fromSingleValue(SqlAlias.fromBase(SqlRef.column(table)));
     return new SqlQuery(value);
   }
 
@@ -879,7 +879,7 @@ export class SqlQuery extends SqlBase {
 
   orderBy(column: string, direction?: Direction) {
     const orderByPart = new SqlOrderByPart({
-      expression: SqlRef.factoryWithQuotes(column),
+      expression: SqlRef.columnWithQuotes(column),
       direction: direction,
     });
     const sqlIndex = this.getOutputColumns().indexOf(column) + 1;

@@ -29,7 +29,7 @@ export interface SqlCaseValue extends SqlBaseValue {
 export class SqlCase extends SqlExpression {
   static type = 'case';
 
-  static ifFactory(
+  static ifThenElse(
     conditionExpression: SqlExpression,
     thenExpression: SqlExpression,
     elseExpression?: SqlExpression,

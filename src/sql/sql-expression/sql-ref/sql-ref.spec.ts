@@ -23,7 +23,7 @@ describe('SqlRef', () => {
   });
 
   it('#factory', () => {
-    const star = SqlRef.factory('*');
+    const star = SqlRef.column('*');
 
     backAndForth(star.toString());
     expect(star.isStar()).toEqual(true);

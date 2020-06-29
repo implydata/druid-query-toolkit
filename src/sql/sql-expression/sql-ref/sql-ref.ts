@@ -30,7 +30,7 @@ export class SqlRef extends SqlExpression {
 
   static STAR: SqlRef;
 
-  static factory(
+  static column(
     column: string,
     table?: string,
     namespace?: string,
@@ -49,7 +49,7 @@ export class SqlRef extends SqlExpression {
     });
   }
 
-  static factoryWithQuotes(column: string, table?: string, namespace?: string) {
+  static columnWithQuotes(column: string, table?: string, namespace?: string) {
     return new SqlRef({
       column,
       table,

@@ -34,16 +34,30 @@ export class SqlFunction extends SqlExpression {
   static DEFAULT_FILTER_KEYWORD = 'FILTER';
   static DEFAULT_WHERE_KEYWORD = 'WHERE';
 
-  static factory(
+  static simple(
     functionName: string,
     args: SqlExpression[] | SeparatedArray<SqlExpression>,
     filter?: SqlExpression,
-    decorator?: string,
+  ) {
+    return new SqlFunction({
+      functionName: functionName,
+      args: SeparatedArray.fromArray(args, Separator.COMMA),
+      filterKeyword: filter ? SqlFunction.DEFAULT_FILTER_KEYWORD : undefined,
+      whereKeyword: filter ? SqlFunction.DEFAULT_WHERE_KEYWORD : undefined,
+      whereExpression: filter,
+    });
+  }
+
+  static decorated(
+    functionName: string,
+    decorator: string | undefined,
+    args: SqlExpression[] | SeparatedArray<SqlExpression>,
+    filter?: SqlExpression,
   ) {
     return new SqlFunction({
       functionName: functionName,
       decorator: decorator,
-      args: SeparatedArray.fromArray(args, Separator.rightSpace(',')),
+      args: SeparatedArray.fromArray(args, Separator.COMMA),
       filterKeyword: filter ? SqlFunction.DEFAULT_FILTER_KEYWORD : undefined,
       whereKeyword: filter ? SqlFunction.DEFAULT_WHERE_KEYWORD : undefined,
       whereExpression: filter,
