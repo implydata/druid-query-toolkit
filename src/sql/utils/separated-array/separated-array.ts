@@ -17,7 +17,10 @@ import { Separator } from '..';
 export type SeparatorOrString = Separator | string;
 
 export class SeparatedArray<T> {
-  static fromArray<T>(xs: T[] | SeparatedArray<T>, sep: SeparatorOrString): SeparatedArray<T> {
+  static fromArray<T>(
+    xs: readonly T[] | SeparatedArray<T>,
+    sep: SeparatorOrString,
+  ): SeparatedArray<T> {
     if (xs instanceof SeparatedArray) return xs;
     const separators: SeparatorOrString[] = [];
     for (let i = 1; i < xs.length; i++) {
@@ -30,10 +33,10 @@ export class SeparatedArray<T> {
     return new SeparatedArray<T>([x], []);
   }
 
-  public readonly values: T[];
+  public readonly values: readonly T[];
   public readonly separators: SeparatorOrString[];
 
-  constructor(values: T[], separators: SeparatorOrString[]) {
+  constructor(values: readonly T[], separators: SeparatorOrString[]) {
     if (values.length - separators.length !== 1) {
       throw new Error(
         `invalid values (${values.length}) or separator length (${separators.length})`,

@@ -571,6 +571,13 @@ export class SqlQuery extends SqlBase {
     });
   }
 
+  getGroupedSelectExpressions(): SqlAlias[] {
+    if (!this.groupByExpressions) return [];
+    return this.selectExpressions.values.filter((selectExpression, i) =>
+      this.isGroupedOutputColumn(SqlQuery.getSelectExpressionOutput(selectExpression, i)),
+    );
+  }
+
   getGroupedOutputColumns(): string[] {
     if (!this.groupByExpressions) return [];
     const outputColumns = this.getOutputColumns();
@@ -580,6 +587,13 @@ export class SqlQuery extends SqlBase {
   isAggregateOutputColumn(outputColumn: string): boolean {
     if (!this.groupByExpressions) return false;
     return !this.isGroupedOutputColumn(outputColumn);
+  }
+
+  getAggregateSelectExpressions(): SqlAlias[] {
+    if (!this.groupByExpressions) return [];
+    return this.selectExpressions.values.filter((selectExpression, i) =>
+      this.isAggregateOutputColumn(SqlQuery.getSelectExpressionOutput(selectExpression, i)),
+    );
   }
 
   getAggregateOutputColumns(): string[] {
@@ -646,6 +660,10 @@ export class SqlQuery extends SqlBase {
 
   /* ~~~~~ FROM ~~~~~ */
 
+  hasFrom(): boolean {
+    return Boolean(this.tables);
+  }
+
   getFirstTableName(): string | undefined {
     // returns the first table name
     if (!this.tables) return;
@@ -680,6 +698,10 @@ export class SqlQuery extends SqlBase {
 
   /* ~~~~~ JOIN ~~~~~ */
 
+  hasJoin(): boolean {
+    return Boolean(this.joinParts);
+  }
+
   addJoin(join: SqlJoinPart) {
     const value = this.valueOf();
     if (value.joinParts) {
@@ -698,6 +720,10 @@ export class SqlQuery extends SqlBase {
   }
 
   /* ~~~~~ WHERE ~~~~~ */
+
+  hasWhere(): boolean {
+    return Boolean(this.whereExpression);
+  }
 
   getWhereExpression(): SqlExpression {
     return this.whereExpression || SqlLiteral.TRUE;
@@ -807,6 +833,10 @@ export class SqlQuery extends SqlBase {
 
   /* ~~~~~ HAVING ~~~~~ */
 
+  hasHaving(): boolean {
+    return Boolean(this.havingExpression);
+  }
+
   getHavingExpression(): SqlExpression {
     return this.havingExpression || SqlLiteral.TRUE;
   }
@@ -822,6 +852,10 @@ export class SqlQuery extends SqlBase {
   }
 
   /* ~~~~~ ORDER BY ~~~~~ */
+
+  hasOrderBy(): boolean {
+    return Boolean(this.orderByParts);
+  }
 
   getOrderByForOutputColumn(outputColumn: string): SqlOrderByPart | undefined {
     if (!this.orderByParts) return;
@@ -901,7 +935,15 @@ export class SqlQuery extends SqlBase {
 
   /* ~~~~~ LIMIT ~~~~~ */
 
-  // Tumbleweeds live here
+  hasLimit(): boolean {
+    return Boolean(this.limitValue);
+  }
+
+  /* ~~~~~ OFFSET ~~~~~ */
+
+  hasOffset(): boolean {
+    return Boolean(this.offsetValue);
+  }
 }
 
 SqlBase.register(SqlQuery.type, SqlQuery);

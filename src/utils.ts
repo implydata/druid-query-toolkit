@@ -44,10 +44,6 @@ export function parsePath(path: string): string[] {
   return parts;
 }
 
-export function makePath(parts: string[]): string {
-  return parts.map(p => (p.includes('.') ? `{${p}}` : p)).join('.');
-}
-
 export function deepGet<T extends Record<string, any>>(value: T, path: string): any {
   const parts = parsePath(path);
   for (const part of parts) {
@@ -56,7 +52,7 @@ export function deepGet<T extends Record<string, any>>(value: T, path: string): 
   return value;
 }
 
-export function filterMap<T, Q>(xs: T[], f: (x: T, i: number) => Q | undefined): Q[] {
+export function filterMap<T, Q>(xs: readonly T[], f: (x: T, i: number) => Q | undefined): Q[] {
   return xs.map(f).filter((x: Q | undefined) => typeof x !== 'undefined') as Q[];
 }
 

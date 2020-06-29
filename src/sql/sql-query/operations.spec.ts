@@ -98,8 +98,23 @@ describe('SqlQuery operations', () => {
       expect(query.getSelectIndexForExpression(parseSqlExpression('s_namespace'), true)).toEqual(2);
     });
 
+    it('#getGroupedSelectExpressions', () => {
+      expect(query.getGroupedSelectExpressions().map(String)).toEqual([
+        'channel',
+        'SUBSTR(cityName, 1, 2)',
+        'namespace AS s_namespace',
+      ]);
+    });
+
     it('#getGroupedOutputColumns', () => {
       expect(query.getGroupedOutputColumns()).toEqual(['channel', 'EXPR$1', 's_namespace']);
+    });
+
+    it('#getAggregateSelectExpressions', () => {
+      expect(query.getAggregateSelectExpressions().map(String)).toEqual([
+        'COUNT(*)',
+        'SUM(added) AS "Added"',
+      ]);
     });
 
     it('#getAggregateOutputColumns', () => {
