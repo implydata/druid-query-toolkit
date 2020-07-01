@@ -281,7 +281,9 @@ export class SqlQuery extends SqlBase {
     return rawParts.join('');
   }
 
-  public changeWithParts(withParts: SeparatedArray<SqlWithPart> | SqlWithPart[] | undefined): this {
+  public changeWithParts(
+    withParts: SeparatedArray<SqlWithPart> | SqlWithPart[] | undefined,
+  ): SqlQuery {
     const value = this.valueOf();
     if (withParts) {
       value.withParts = SeparatedArray.fromArray(withParts, '\n');
@@ -291,16 +293,18 @@ export class SqlQuery extends SqlBase {
       delete value.withKeyword;
       value.innerSpacing = this.getInnerSpacingWithout('postWith', 'postWithQuery');
     }
-    return SqlBase.fromValue(value);
+    return new SqlQuery(value);
   }
 
-  public changeSelectExpressions(selectExpressions: SeparatedArray<SqlAlias> | SqlAlias[]): this {
+  public changeSelectExpressions(
+    selectExpressions: SeparatedArray<SqlAlias> | SqlAlias[],
+  ): SqlQuery {
     const value = this.valueOf();
     value.selectExpressions = SeparatedArray.fromArray(selectExpressions, Separator.COMMA);
-    return SqlBase.fromValue(value);
+    return new SqlQuery(value);
   }
 
-  public changeTables(tables: SeparatedArray<SqlAlias> | SqlAlias[] | undefined): this {
+  public changeTables(tables: SeparatedArray<SqlAlias> | SqlAlias[] | undefined): SqlQuery {
     const value = this.valueOf();
     if (tables) {
       value.tables = SeparatedArray.fromArray(tables, Separator.COMMA);
@@ -310,20 +314,22 @@ export class SqlQuery extends SqlBase {
       delete value.fromKeyword;
       value.innerSpacing = this.getInnerSpacingWithout('preFrom', 'postFrom');
     }
-    return SqlBase.fromValue(value);
+    return new SqlQuery(value);
   }
 
-  public changeJoinParts(joinParts: SeparatedArray<SqlJoinPart> | SqlJoinPart[] | undefined): this {
+  public changeJoinParts(
+    joinParts: SeparatedArray<SqlJoinPart> | SqlJoinPart[] | undefined,
+  ): SqlQuery {
     const value = this.valueOf();
     if (joinParts) {
       value.joinParts = SeparatedArray.fromArray(joinParts, '\n');
     } else {
       delete value.joinParts;
     }
-    return SqlBase.fromValue(value);
+    return new SqlQuery(value);
   }
 
-  public changeWhereExpression(whereExpression: SqlExpression | string | undefined) {
+  public changeWhereExpression(whereExpression: SqlExpression | string | undefined): SqlQuery {
     const value = this.valueOf();
     if (typeof whereExpression === 'undefined') {
       delete value.whereExpression;
@@ -338,7 +344,7 @@ export class SqlQuery extends SqlBase {
 
   public changeGroupByExpressions(
     groupByExpressions: SeparatedArray<SqlExpression> | SqlExpression[] | null | undefined,
-  ): this {
+  ): SqlQuery {
     const value = this.valueOf();
     if (typeof groupByExpressions === 'undefined') {
       delete value.groupByExpressions;
@@ -350,10 +356,10 @@ export class SqlQuery extends SqlBase {
         : null;
       value.groupByKeyword = value.groupByKeyword || 'GROUP BY';
     }
-    return SqlBase.fromValue(value);
+    return new SqlQuery(value);
   }
 
-  public changeHavingExpression(havingExpression: SqlExpression | string | undefined) {
+  public changeHavingExpression(havingExpression: SqlExpression | string | undefined): SqlQuery {
     const value = this.valueOf();
     if (typeof havingExpression === 'undefined') {
       delete value.havingExpression;
@@ -368,7 +374,7 @@ export class SqlQuery extends SqlBase {
 
   public changeOrderByParts(
     orderByParts: SeparatedArray<SqlOrderByPart> | SqlOrderByPart[] | undefined,
-  ): this {
+  ): SqlQuery {
     const value = this.valueOf();
     if (typeof orderByParts === 'undefined') {
       delete value.orderByParts;
@@ -378,10 +384,10 @@ export class SqlQuery extends SqlBase {
       value.orderByParts = SeparatedArray.fromArray(orderByParts, Separator.COMMA);
       value.orderByKeyword = value.orderByKeyword || 'ORDER BY';
     }
-    return SqlBase.fromValue(value);
+    return new SqlQuery(value);
   }
 
-  public changeLimitValue(limitValue: SqlLiteral | number | undefined): this {
+  public changeLimitValue(limitValue: SqlLiteral | number | undefined): SqlQuery {
     const value = this.valueOf();
     if (typeof limitValue === 'undefined') {
       delete value.limitValue;
@@ -391,10 +397,10 @@ export class SqlQuery extends SqlBase {
       value.limitValue = SqlLiteral.factory(limitValue);
       value.limitKeyword = 'LIMIT';
     }
-    return SqlBase.fromValue(value);
+    return new SqlQuery(value);
   }
 
-  public changeOffsetValue(offsetValue: SqlLiteral | number | undefined): this {
+  public changeOffsetValue(offsetValue: SqlLiteral | number | undefined): SqlQuery {
     const value = this.valueOf();
     if (typeof offsetValue === 'undefined') {
       delete value.offsetValue;
@@ -404,13 +410,20 @@ export class SqlQuery extends SqlBase {
       value.offsetValue = SqlLiteral.factory(offsetValue);
       value.offsetKeyword = 'OFFSET';
     }
-    return SqlBase.fromValue(value);
+    return new SqlQuery(value);
   }
 
-  public changeUnionQuery(unionQuery: SqlQuery): this {
+  public changeUnionQuery(unionQuery: SqlQuery | undefined): SqlQuery {
     const value = this.valueOf();
-    value.unionQuery = unionQuery;
-    return SqlBase.fromValue(value);
+    if (typeof unionQuery === 'undefined') {
+      delete value.unionQuery;
+      delete value.unionKeyword;
+      value.innerSpacing = this.getInnerSpacingWithout('preUnion', 'postUnion');
+    } else {
+      value.unionQuery = unionQuery;
+      value.unionKeyword = value.unionKeyword || 'UNION ALL';
+    }
+    return new SqlQuery(value);
   }
 
   public _walkInner(
@@ -631,18 +644,17 @@ export class SqlQuery extends SqlBase {
     }
   }
 
-  removeOutputColumn(outputColumn: string) {
-    const index = this.getSelectIndexForOutputColumn(outputColumn);
-    if (index === -1) return this; // It is not even there
+  removeSelectIndex(selectIndex: number) {
+    if (!this.isValidSelectIndex(selectIndex)) return this;
 
-    const selectExpression = this.selectExpressions.get(index);
-    const newSelectExpressions = this.selectExpressions.deleteByIndex(index);
+    const selectExpression = this.selectExpressions.get(selectIndex);
+    const newSelectExpressions = this.selectExpressions.deleteByIndex(selectIndex);
     if (!newSelectExpressions) return this; // Can not remove the last column
 
     const value = this.valueOf();
     value.selectExpressions = newSelectExpressions;
 
-    const sqlIndex = index + 1;
+    const sqlIndex = selectIndex + 1;
     if (value.groupByExpressions) {
       value.groupByExpressions = value.groupByExpressions.filterMap(groupByExpression => {
         if (groupByExpression instanceof SqlLiteral && groupByExpression.isInteger()) {
@@ -677,6 +689,10 @@ export class SqlQuery extends SqlBase {
     return new SqlQuery(value);
   }
 
+  removeOutputColumn(outputColumn: string) {
+    return this.removeSelectIndex(this.getSelectIndexForOutputColumn(outputColumn));
+  }
+
   /* ~~~~~ FROM ~~~~~ */
 
   hasFrom(): boolean {
@@ -709,12 +725,6 @@ export class SqlQuery extends SqlBase {
     })[0];
   }
 
-  replaceFrom(table: string) {
-    const value = this.valueOf();
-    value.tables = SeparatedArray.fromSingleValue(SqlAlias.fromBase(SqlRef.column(table)));
-    return new SqlQuery(value);
-  }
-
   /* ~~~~~ JOIN ~~~~~ */
 
   hasJoin(): boolean {
@@ -722,20 +732,13 @@ export class SqlQuery extends SqlBase {
   }
 
   addJoin(join: SqlJoinPart) {
-    const value = this.valueOf();
-    if (value.joinParts) {
-      value.joinParts = value.joinParts.addLast(join, '\n');
-    } else {
-      value.joinParts = SeparatedArray.fromSingleValue(join);
-    }
-    return new SqlQuery(value);
+    return this.changeJoinParts(
+      this.joinParts ? this.joinParts.addLast(join, '\n') : SeparatedArray.fromSingleValue(join),
+    );
   }
 
   removeAllJoins() {
-    const value = this.valueOf();
-    delete value.joinParts;
-    value.innerSpacing = this.getInnerSpacingWithout('preJoin');
-    return new SqlQuery(value);
+    return this.changeJoinParts(undefined);
   }
 
   /* ~~~~~ WHERE ~~~~~ */
@@ -840,7 +843,7 @@ export class SqlQuery extends SqlBase {
     });
   }
 
-  removeOrderByForSelectIndex(selectIndex: number): this {
+  removeOrderByForSelectIndex(selectIndex: number): SqlQuery {
     if (!this.orderByParts || !this.isValidSelectIndex(selectIndex)) return this;
     return this.changeOrderByParts(
       this.orderByParts.filter(orderByPart => {
@@ -853,7 +856,7 @@ export class SqlQuery extends SqlBase {
     return this.removeOrderByForSelectIndex(this.getSelectIndexForOutputColumn(outputColumn));
   }
 
-  addOrderBy(orderBy: SqlOrderByPart): this {
+  addOrderBy(orderBy: SqlOrderByPart): SqlQuery {
     return this.changeOrderByParts(
       this.orderByParts
         ? this.orderByParts.addFirst(orderBy, Separator.COMMA)
