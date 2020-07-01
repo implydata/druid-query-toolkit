@@ -16,9 +16,18 @@ function isObject(obj: unknown): boolean {
   return Object.prototype.toString.call(obj) === '[object Object]';
 }
 
+//              Matches: "2016-06-27T00:00:00.000Z"
+const FULL_ISO_REGEXP = /^\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\dZ$/;
+
+function isIsoDate(thing: unknown): boolean {
+  return (
+    typeof thing === 'string' && FULL_ISO_REGEXP.test(thing) && !isNaN(new Date(thing).valueOf())
+  );
+}
+
 export interface HeaderRows {
-  header: string[];
-  rows: any[][];
+  header: readonly string[];
+  rows: readonly any[][];
 }
 
 function isAllGranularity(granularity: unknown): boolean {
@@ -49,14 +58,52 @@ function fromObjectArray(array: Record<string, any>[], ignoreFirstEvent?: boolea
   };
 }
 
+export function detectDateColumnIndexes(data: HeaderRows): number[] {
+  const { header, rows } = data;
+  if (!rows.length) return [];
+  const indexes = header.map((_x, i) => i);
+  for (const row of rows) {
+    let i = 0;
+    while (i < indexes.length) {
+      const index = indexes[i];
+      if (isIsoDate(row[index])) {
+        i++;
+      } else {
+        indexes.splice(i, 1);
+      }
+    }
+    if (!indexes.length) break; // Don't bother scanning the rest
+  }
+  return indexes;
+}
+
+export function inflateDates(data: HeaderRows): HeaderRows {
+  const indexes = detectDateColumnIndexes(data);
+  if (!indexes.length) return data;
+
+  const { header, rows } = data;
+  return {
+    header,
+    rows: rows.map(row => {
+      row = row.slice();
+      for (const index of indexes) {
+        row[index] = new Date(row[index]);
+      }
+      return row;
+    }),
+  };
+}
+
 export function normalizeQueryResult(
   queryPayload: Record<string, unknown>,
   data: unknown,
 ): HeaderRows {
-  return normalizeQueryResultRaw(
-    data,
-    shouldIncludeTimestamp(queryPayload),
-    isFirstRowHeader(queryPayload),
+  return inflateDates(
+    normalizeQueryResultRaw(
+      data,
+      shouldIncludeTimestamp(queryPayload),
+      isFirstRowHeader(queryPayload),
+    ),
   );
 }
 
