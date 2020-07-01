@@ -86,7 +86,7 @@ export class SqlLiteral extends SqlExpression {
     return String(b).toUpperCase();
   }
 
-  static equalsLiteral(expression: SqlBase, value: number) {
+  static _equalsLiteral(expression: SqlBase, value: number) {
     return expression instanceof SqlLiteral && expression.value === value;
   }
 

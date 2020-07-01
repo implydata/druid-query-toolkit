@@ -88,7 +88,7 @@ export class SqlRef extends SqlExpression {
     }
   }
 
-  static equalsString(expression: SqlBase, stringValue: string): boolean {
+  static _equalsString(expression: SqlBase, stringValue: string): boolean {
     return (
       expression instanceof SqlRef &&
       (expression.column === stringValue ||

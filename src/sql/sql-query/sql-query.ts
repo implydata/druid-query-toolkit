@@ -17,7 +17,6 @@ import {
   SeparatedArray,
   Separator,
   SqlAlias,
-  SqlComparison,
   SqlExpression,
   SqlLiteral,
   SqlRef,
@@ -28,7 +27,7 @@ import { filterMap } from '../../utils';
 import { SqlBase, SqlBaseValue } from '../sql-base';
 
 import { SqlJoinPart } from './sql-join-part/sql-join-part';
-import { Direction, SqlOrderByPart } from './sql-order-by-part/sql-order-by-part';
+import { SqlOrderByPart } from './sql-order-by-part/sql-order-by-part';
 import { SqlWithPart } from './sql-with-part/sql-with-part';
 
 export interface SqlQueryValue extends SqlBaseValue {
@@ -524,11 +523,18 @@ export class SqlQuery extends SqlBase {
 
   /* ~~~~~ SELECT ~~~~~ */
 
-  /**
-   * Returns an array of the string name of all columns in the select clause
-   */
+  isValidSelectIndex(selectIndex: number): boolean {
+    return selectIndex >= 0 && selectIndex < this.selectExpressions.length();
+  }
+
   getOutputColumns(): string[] {
     return this.selectExpressions.values.map(SqlQuery.getSelectExpressionOutput);
+  }
+
+  getSelectIndexForColumn(column: string): number {
+    return this.selectExpressions.values.findIndex(selectExpression => {
+      return selectExpression.containsColumn(column);
+    });
   }
 
   getSelectIndexForOutputColumn(outputColumn: string): number {
@@ -538,72 +544,85 @@ export class SqlQuery extends SqlBase {
   }
 
   getSelectIndexForExpression(ex: SqlExpression, allowAliasReferences: boolean): number {
+    const { selectExpressions } = this;
+
     if (ex instanceof SqlLiteral && ex.isInteger()) {
-      return Number(ex.value) - 1;
+      const idx = Number(ex.value) - 1;
+      return this.isValidSelectIndex(idx) ? idx : -1;
     }
 
-    if (allowAliasReferences) {
-      if (ex instanceof SqlRef) {
-        const refIdx = this.selectExpressions.values.findIndex((selectExpression, i) => {
-          return SqlQuery.getSelectExpressionOutput(selectExpression, i) === ex.column;
-        });
-        if (refIdx !== -1) {
-          return refIdx;
-        }
+    if (allowAliasReferences && ex instanceof SqlRef) {
+      const refIdx = selectExpressions.values.findIndex((selectExpression, i) => {
+        return SqlQuery.getSelectExpressionOutput(selectExpression, i) === ex.column;
+      });
+      if (refIdx !== -1) {
+        return refIdx;
       }
     }
 
-    return this.selectExpressions.values.findIndex(selectExpression => {
+    return selectExpressions.values.findIndex(selectExpression => {
       return ex.equals(selectExpression.expression);
     });
   }
 
-  isGroupedOutputColumn(outputColumn: string): boolean {
-    const { groupByExpressions, selectExpressions } = this;
-    if (!groupByExpressions) return false;
+  isExprOutputColumnAtSelectIndex(selectIndex: number): boolean {
+    return !this.selectExpressions.get(selectIndex).getOutputName();
+  }
+
+  isGroupedSelectIndex(selectIndex: number): boolean {
+    const { groupByExpressions } = this;
+    if (!groupByExpressions || !this.isValidSelectIndex(selectIndex)) return false;
     return groupByExpressions.values.some(groupByExpression => {
-      const selectIndex = this.getSelectIndexForExpression(groupByExpression, false);
-      if (selectIndex === -1) return false;
-      return (
-        SqlQuery.getSelectExpressionOutput(selectExpressions.get(selectIndex), selectIndex) ===
-        outputColumn
-      );
+      return this.getSelectIndexForExpression(groupByExpression, false) === selectIndex;
     });
+  }
+
+  isGroupedOutputColumn(outputColumn: string): boolean {
+    return this.isGroupedSelectIndex(this.getSelectIndexForOutputColumn(outputColumn));
   }
 
   getGroupedSelectExpressions(): SqlAlias[] {
     if (!this.groupByExpressions) return [];
-    return this.selectExpressions.values.filter((selectExpression, i) =>
-      this.isGroupedOutputColumn(SqlQuery.getSelectExpressionOutput(selectExpression, i)),
-    );
+    return this.selectExpressions.values.filter((_selectExpression, i) => {
+      return this.isGroupedSelectIndex(i);
+    });
   }
 
   getGroupedOutputColumns(): string[] {
     if (!this.groupByExpressions) return [];
-    const outputColumns = this.getOutputColumns();
-    return outputColumns.filter(this.isGroupedOutputColumn, this);
+    return filterMap(this.selectExpressions.values, (selectExpression, i) => {
+      if (!this.isGroupedSelectIndex(i)) return;
+      return SqlQuery.getSelectExpressionOutput(selectExpression, i);
+    });
+  }
+
+  isAggregateSelectIndex(selectIndex: number): boolean {
+    const { groupByExpressions } = this;
+    if (!groupByExpressions || !this.isValidSelectIndex(selectIndex)) return false;
+    return !this.isGroupedSelectIndex(selectIndex);
   }
 
   isAggregateOutputColumn(outputColumn: string): boolean {
-    if (!this.groupByExpressions) return false;
-    return !this.isGroupedOutputColumn(outputColumn);
+    return this.isAggregateSelectIndex(this.getSelectIndexForOutputColumn(outputColumn));
   }
 
   getAggregateSelectExpressions(): SqlAlias[] {
     if (!this.groupByExpressions) return [];
-    return this.selectExpressions.values.filter((selectExpression, i) =>
-      this.isAggregateOutputColumn(SqlQuery.getSelectExpressionOutput(selectExpression, i)),
-    );
+    return this.selectExpressions.values.filter((_selectExpression, i) => {
+      return this.isAggregateSelectIndex(i);
+    });
   }
 
   getAggregateOutputColumns(): string[] {
     if (!this.groupByExpressions) return [];
-    const outputColumns = this.getOutputColumns();
-    return outputColumns.filter(this.isAggregateOutputColumn, this);
+    return filterMap(this.selectExpressions.values, (selectExpression, i) => {
+      if (!this.isAggregateSelectIndex(i)) return;
+      return SqlQuery.getSelectExpressionOutput(selectExpression, i);
+    });
   }
 
-  addColumn(column: SqlBase | string, first = false) {
-    const alias = SqlAlias.fromBase(typeof column === 'string' ? parseSql(column) : column);
+  addSelectExpression(ex: SqlBase | string, first = false) {
+    const alias = SqlAlias.fromBase(typeof ex === 'string' ? parseSql(ex) : ex);
 
     if (first) {
       return this.changeSelectExpressions(this.selectExpressions.addFirst(alias, Separator.COMMA));
@@ -737,21 +756,7 @@ export class SqlQuery extends SqlBase {
   // Removes all filters on the specified column from the where clause
   removeColumnFromWhere(column: string) {
     if (!this.whereExpression) return this;
-
-    const value = this.valueOf();
-
-    if (
-      value.whereExpression instanceof SqlComparison &&
-      value.whereExpression.containsColumn(column)
-    ) {
-      value.whereExpression = undefined;
-      value.whereKeyword = undefined;
-      value.innerSpacing = this.getInnerSpacingWithout('preWhere', 'postWhere');
-    } else {
-      value.whereExpression = this.whereExpression.removeColumnFromAnd(column);
-    }
-
-    return new SqlQuery(value);
+    return this.changeWhereExpression(this.whereExpression.removeColumnFromAnd(column));
   }
 
   /* ~~~~~ GROUP BY ~~~~~ */
@@ -760,74 +765,26 @@ export class SqlQuery extends SqlBase {
     return Boolean(this.groupByKeyword);
   }
 
-  // Checks to see if a column is in the group by clause either by name or index
-  hasGroupByOnColumn(column: string) {
-    const index = this.getOutputColumns().indexOf(column) + 1;
-    if (!this.groupByExpressions) return false;
-    return this.groupByExpressions.values.some(
-      expr => SqlRef.equalsString(expr, column) || SqlLiteral.equalsLiteral(expr, index),
-    );
-  }
-
   addToGroupBy(column: SqlBase) {
     // Adds a column with no alias to the group by clause
     // column is added to the select clause then the index is added to group by clause
-    return this.addColumn(column, true).addFirstColumnToGroupBy();
+    return this.addSelectExpression(column, true).addFirstColumnToGroupBy();
   }
 
   addFirstColumnToGroupBy() {
     // Adds the last column in the select clause to the group by clause via its index
-    const value = this.valueOf();
-
     const newGroupBy = SqlLiteral.factory(1);
-    if (this.groupByExpressions) {
-      value.groupByExpressions = this.groupByExpressions
-        .map(groupByExpression => {
-          if (groupByExpression instanceof SqlLiteral) {
-            return groupByExpression.increment() || groupByExpression;
-          }
-          return groupByExpression;
-        })
-        .addFirst(newGroupBy, Separator.COMMA);
-    } else {
-      value.groupByExpressions = SeparatedArray.fromSingleValue(newGroupBy);
-    }
-    value.groupByKeyword = value.groupByKeyword || 'GROUP BY';
-
-    return new SqlQuery(value);
-  }
-
-  // addLastColumnToGroupBy() {
-  //   // Adds the last column in the select clause to the group by clause via its index
-  //   const value = this.valueOf();
-  //
-  //   value.groupByExpressions = (value.groupByExpressions || []).concat([
-  //     SqlLiteral.fromInput(value.selectExpressions.length),
-  //   ]);
-  //   value.groupByKeyword = value.groupByKeyword || 'GROUP BY';
-  //   value.groupBySeparators = this.groupByExpressions
-  //     ? Separator.fillBetween(
-  //         value.groupBySeparators || [],
-  //         value.groupByExpressions.length,
-  //         Separator.COMMA,
-  //       )
-  //     : undefined;
-  //
-  //   return new SqlQuery(value);
-  // }
-
-  // Removes a column from the group by clause
-  removeFromGroupBy(column: string): SqlQuery {
-    if (!this.groupByExpressions) return this;
-
-    const sqlIndex = this.getSelectIndexForOutputColumn(column) + 1;
-
     return this.changeGroupByExpressions(
-      this.groupByExpressions.filter(
-        groupByExpression =>
-          SqlRef.equalsString(groupByExpression, column) ||
-          SqlLiteral.equalsLiteral(groupByExpression, sqlIndex),
-      ),
+      this.groupByExpressions
+        ? this.groupByExpressions
+            .map(groupByExpression => {
+              if (groupByExpression instanceof SqlLiteral) {
+                return groupByExpression.increment() || groupByExpression;
+              }
+              return groupByExpression;
+            })
+            .addFirst(newGroupBy, Separator.COMMA)
+        : SeparatedArray.fromSingleValue(newGroupBy),
     );
   }
 
@@ -857,79 +814,50 @@ export class SqlQuery extends SqlBase {
     return Boolean(this.orderByParts);
   }
 
-  getOrderByForOutputColumn(outputColumn: string): SqlOrderByPart | undefined {
-    if (!this.orderByParts) return;
-    const myOrderByPart = this.orderByParts.values.find(orderByPart => {
-      const selectIndex = this.getSelectIndexForExpression(orderByPart.expression, true);
-      if (selectIndex === -1) return;
-      return (
-        SqlQuery.getSelectExpressionOutput(this.selectExpressions.get(selectIndex), selectIndex) ===
-        outputColumn
-      );
+  getOrderByForSelectIndex(selectIndex: number): SqlOrderByPart | undefined {
+    if (!this.orderByParts || !this.isValidSelectIndex(selectIndex)) return;
+    return this.orderByParts.values.find(orderByPart => {
+      return this.getSelectIndexForExpression(orderByPart.expression, true) === selectIndex;
     });
+  }
 
-    return myOrderByPart;
+  getOrderByForOutputColumn(outputColumn: string): SqlOrderByPart | undefined {
+    return this.getOrderByForSelectIndex(this.getSelectIndexForOutputColumn(outputColumn));
+  }
+
+  getOrderedSelectExpressions() {
+    if (!this.orderByParts) return [];
+    return this.selectExpressions.values.filter((_selectExpression, i) => {
+      return this.getOrderByForSelectIndex(i);
+    });
   }
 
   getOrderedOutputColumns() {
     if (!this.orderByParts) return [];
-    const outputColumns = this.getOutputColumns();
-    return outputColumns.filter(this.getOrderByForOutputColumn, this);
-  }
-
-  orderBy(column: string, direction?: Direction) {
-    const orderByPart = new SqlOrderByPart({
-      expression: SqlRef.columnWithQuotes(column),
-      direction: direction,
+    return filterMap(this.selectExpressions.values, (selectExpression, i) => {
+      if (!this.getOrderByForSelectIndex(i)) return;
+      return SqlQuery.getSelectExpressionOutput(selectExpression, i);
     });
-    const sqlIndex = this.getOutputColumns().indexOf(column) + 1;
-    const value = this.valueOf();
-
-    // If already in the OrderBy
-    if (this.orderByParts) {
-      if (
-        this.orderByParts.values.some(
-          orderByPart =>
-            SqlLiteral.equalsLiteral(orderByPart.expression, sqlIndex) ||
-            SqlRef.equalsString(orderByPart.expression, column),
-        )
-      ) {
-        value.orderByParts = this.orderByParts.map(orderByPart => {
-          if (
-            (orderByPart.expression instanceof SqlLiteral &&
-              orderByPart.expression.value === sqlIndex) ||
-            SqlRef.equalsString(orderByPart.expression, column)
-          ) {
-            return orderByPart;
-          } else {
-            return orderByPart;
-          }
-        });
-      } else {
-        value.orderByParts = this.orderByParts.addFirst(orderByPart, Separator.COMMA);
-      }
-    } else {
-      value.orderByParts = SeparatedArray.fromSingleValue(orderByPart);
-    }
-
-    value.orderByKeyword = value.orderByKeyword || 'ORDER BY';
-
-    return new SqlQuery(value);
   }
 
-  removeFromOrderBy(column: string) {
-    if (!this.orderByParts) return this;
-
-    // Removes and order by unit from the order by clause
-    const sqlIndex = this.getSelectIndexForOutputColumn(column) + 1;
-
+  removeOrderByForSelectIndex(selectIndex: number): this {
+    if (!this.orderByParts || !this.isValidSelectIndex(selectIndex)) return this;
     return this.changeOrderByParts(
-      this.orderByParts.filter(unit => {
-        return (
-          SqlRef.equalsString(unit.expression, column) ||
-          SqlLiteral.equalsLiteral(unit.expression, sqlIndex)
-        );
+      this.orderByParts.filter(orderByPart => {
+        return this.getSelectIndexForExpression(orderByPart.expression, true) === selectIndex;
       }),
+    );
+  }
+
+  removeOrderByForOutputColumn(outputColumn: string) {
+    return this.removeOrderByForSelectIndex(this.getSelectIndexForOutputColumn(outputColumn));
+  }
+
+  addOrderBy(orderBy: SqlOrderByPart): this {
+    return this.changeOrderByParts(
+      this.orderByParts
+        ? this.orderByParts.addFirst(orderBy, Separator.COMMA)
+        : SeparatedArray.fromSingleValue(orderBy),
     );
   }
 

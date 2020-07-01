@@ -74,7 +74,7 @@ export abstract class SqlExpression extends SqlBase {
     return SqlAlias.factory(this, alias);
   }
 
-  public toOrderByPart(direction: string | undefined): SqlOrderByPart {
+  public toOrderByPart(direction?: string): SqlOrderByPart {
     return SqlOrderByPart.factory(this, direction);
   }
 

@@ -140,12 +140,12 @@ describe('SqlQuery operations', () => {
           SELECT *
           FROM sys."github"
         `)
-          .orderBy('col', 'DESC')
+          .addOrderBy(SqlRef.column('col').toOrderByPart('DESC'))
           .toString(),
       ).toEqual(sane`
         SELECT *
         FROM sys."github"
-        ORDER BY "col" DESC
+        ORDER BY col DESC
       `);
     });
 
@@ -156,12 +156,12 @@ describe('SqlQuery operations', () => {
           FROM sys."github"
           ORDER BY col
         `)
-          .orderBy('colTwo', 'DESC')
+          .addOrderBy(SqlRef.columnWithQuotes('colTwo').toOrderByPart('ASC'))
           .toString(),
       ).toEqual(sane`
         SELECT *
         FROM sys."github"
-        ORDER BY "colTwo" DESC, col
+        ORDER BY "colTwo" ASC, col
       `);
     });
 
@@ -172,7 +172,7 @@ describe('SqlQuery operations', () => {
           FROM sys."github"
           ORDER BY col, colTwo ASC
         `)
-          .orderBy('colThree')
+          .addOrderBy(SqlRef.columnWithQuotes('colThree').toOrderByPart())
           .toString(),
       ).toEqual(sane`
         SELECT *
@@ -444,7 +444,7 @@ describe('SqlQuery operations', () => {
           FROM sys."github"
           Order By col, 2 ASC
         `)
-          .removeFromOrderBy('col')
+          .removeOrderByForOutputColumn('col')
           .toString(),
       ).toEqual(sane`
         SELECT col0, col1, col2
@@ -460,7 +460,7 @@ describe('SqlQuery operations', () => {
           FROM sys."github"
           Order By col, col1 ASC
         `)
-          .removeFromOrderBy('col2')
+          .removeOrderByForOutputColumn('col2')
           .toString(),
       ).toEqual(sane`
         SELECT col0, col1, col2
@@ -476,7 +476,7 @@ describe('SqlQuery operations', () => {
           FROM sys."github"
           Order By col, 3 ASC
         `)
-          .removeFromOrderBy('col1')
+          .removeOrderByForOutputColumn('col1')
           .toString(),
       ).toEqual(sane`
         SELECT col0, col1, col2
@@ -492,54 +492,7 @@ describe('SqlQuery operations', () => {
           FROM sys."github"
           Order By col1
         `)
-          .removeFromOrderBy('col1')
-          .toString(),
-      ).toEqual(sane`
-        SELECT col0, col1, col2
-        FROM sys."github""
-      `);
-    });
-
-    it('remove col from group by', () => {
-      expect(
-        parseSqlQuery(sane`
-          SELECT col0, col1, col2
-          FROM sys."github"
-          Group By col, 3
-        `)
-          .removeFromGroupBy('col')
-          .toString(),
-      ).toEqual(sane`
-        SELECT col0, col1, col2
-        FROM sys."github"
-        Group By 3"
-      `);
-    });
-
-    it('remove col as number from group by', () => {
-      expect(
-        parseSqlQuery(sane`
-          SELECT col0, col1, col2
-          FROM sys."github"
-          Group By col, 3
-        `)
-          .removeFromGroupBy('col2')
-          .toString(),
-      ).toEqual(sane`
-        SELECT col0, col1, col2
-        FROM sys."github"
-        Group By col"
-      `);
-    });
-
-    it('remove only col from group by', () => {
-      expect(
-        parseSqlQuery(sane`
-          SELECT col0, col1, col2
-          FROM sys."github"
-          Group By col2
-        `)
-          .removeFromGroupBy('col2')
+          .removeOrderByForOutputColumn('col1')
           .toString(),
       ).toEqual(sane`
         SELECT col0, col1, col2
@@ -579,7 +532,7 @@ describe('SqlQuery operations', () => {
 
       expect(
         parseSqlQuery(sql)
-          .addColumn('min(col2) AS "alias"')
+          .addSelectExpression('min(col2) AS "alias"')
           .toString(),
       ).toEqual(sane`
         select col1, min(col2) AS "alias"
@@ -595,7 +548,7 @@ describe('SqlQuery operations', () => {
 
       expect(
         parseSqlQuery(sql)
-          .addColumn(`count(DISTINCT col2) AS "alias"`)
+          .addSelectExpression(`count(DISTINCT col2) AS "alias"`)
           .toString(),
       ).toEqual(sane`
         select col1, count(DISTINCT col2) AS "alias"
