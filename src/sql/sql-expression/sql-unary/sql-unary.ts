@@ -52,14 +52,14 @@ export class SqlUnary extends SqlExpression {
     return SqlBase.fromValue(value);
   }
 
-  public walkInner(
+  public _walkInner(
     nextStack: SqlBase[],
     fn: Substitutor,
     postorder: boolean,
   ): SqlExpression | undefined {
     let ret = this;
 
-    const arg = this.arg.walkHelper(nextStack, fn, postorder);
+    const arg = this.arg._walkHelper(nextStack, fn, postorder);
     if (!arg) return;
     if (arg !== this.arg) {
       ret = ret.changeArgument(arg);

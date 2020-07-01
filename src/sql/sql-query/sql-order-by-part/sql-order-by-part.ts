@@ -103,10 +103,14 @@ export class SqlOrderByPart extends SqlBase {
     return this.changeDirection(SqlOrderByPart.reverseDirection(this.direction));
   }
 
-  public walkInner(nextStack: SqlBase[], fn: Substitutor, postorder: boolean): SqlBase | undefined {
+  public _walkInner(
+    nextStack: SqlBase[],
+    fn: Substitutor,
+    postorder: boolean,
+  ): SqlBase | undefined {
     let ret = this;
 
-    const expression = this.expression.walkHelper(nextStack, fn, postorder);
+    const expression = this.expression._walkHelper(nextStack, fn, postorder);
     if (!expression) return;
     if (expression !== this.expression) {
       ret = ret.changeExpression(expression);

@@ -12,13 +12,13 @@
  * limitations under the License.
  */
 
-import { normalizeQueryResult } from './query-result-decoder';
+import { normalizeQueryResultRaw } from './query-result-decoder';
 
-describe('normalizeQueryResult', () => {
+describe('normalizeQueryResultRaw', () => {
   it('works for timeseries (no timestamp)', () => {
     const result = [{ timestamp: '2019-08-04T15:00:00.000Z', result: { count: 514, added: 1232 } }];
 
-    expect(normalizeQueryResult(result)).toMatchInlineSnapshot(`
+    expect(normalizeQueryResultRaw(result)).toMatchInlineSnapshot(`
       Object {
         "header": Array [
           "count",
@@ -40,7 +40,7 @@ describe('normalizeQueryResult', () => {
       { timestamp: '2019-08-04T16:00:00.000Z', result: { count: 15600, added: 6123934 } },
     ];
 
-    expect(normalizeQueryResult(result, true)).toMatchInlineSnapshot(`
+    expect(normalizeQueryResultRaw(result, true)).toMatchInlineSnapshot(`
       Object {
         "header": Array [
           "timestamp",
@@ -77,7 +77,7 @@ describe('normalizeQueryResult', () => {
       },
     ];
 
-    expect(normalizeQueryResult(result)).toMatchInlineSnapshot(`
+    expect(normalizeQueryResultRaw(result)).toMatchInlineSnapshot(`
       Object {
         "header": Array [
           "added",
@@ -99,7 +99,7 @@ describe('normalizeQueryResult', () => {
       }
     `);
 
-    expect(normalizeQueryResult(result, true)).toMatchInlineSnapshot(`
+    expect(normalizeQueryResultRaw(result, true)).toMatchInlineSnapshot(`
       Object {
         "header": Array [
           "timestamp",
@@ -149,7 +149,7 @@ describe('normalizeQueryResult', () => {
       },
     ];
 
-    expect(normalizeQueryResult(result)).toMatchInlineSnapshot(`
+    expect(normalizeQueryResultRaw(result)).toMatchInlineSnapshot(`
       Object {
         "header": Array [
           "d0",
@@ -194,7 +194,7 @@ describe('normalizeQueryResult', () => {
       },
     ];
 
-    expect(normalizeQueryResult(result)).toMatchInlineSnapshot(`
+    expect(normalizeQueryResultRaw(result)).toMatchInlineSnapshot(`
       Object {
         "header": Array [
           "channel",
@@ -229,7 +229,7 @@ describe('normalizeQueryResult', () => {
       }
     `);
 
-    expect(normalizeQueryResult(result, true)).toMatchInlineSnapshot(`
+    expect(normalizeQueryResultRaw(result, true)).toMatchInlineSnapshot(`
       Object {
         "header": Array [
           "timestamp",
@@ -313,7 +313,7 @@ describe('normalizeQueryResult', () => {
       },
     ];
 
-    expect(normalizeQueryResult(result, true)).toMatchInlineSnapshot(`
+    expect(normalizeQueryResultRaw(result, true)).toMatchInlineSnapshot(`
       Object {
         "header": Array [
           "timestamp",
@@ -355,7 +355,7 @@ describe('normalizeQueryResult', () => {
       },
     ];
 
-    expect(normalizeQueryResult(result)).toMatchInlineSnapshot(`
+    expect(normalizeQueryResultRaw(result)).toMatchInlineSnapshot(`
       Object {
         "header": Array [
           "__time",
@@ -397,7 +397,7 @@ describe('normalizeQueryResult', () => {
       },
     ];
 
-    expect(normalizeQueryResult(result)).toMatchInlineSnapshot(`
+    expect(normalizeQueryResultRaw(result)).toMatchInlineSnapshot(`
       Object {
         "header": Array [
           "__time",
@@ -459,7 +459,7 @@ describe('normalizeQueryResult', () => {
       },
     ];
 
-    expect(normalizeQueryResult(result)).toMatchInlineSnapshot(`
+    expect(normalizeQueryResultRaw(result)).toMatchInlineSnapshot(`
       Object {
         "header": Array [
           "timestamp",
@@ -516,7 +516,7 @@ describe('normalizeQueryResult', () => {
       },
     ];
 
-    expect(normalizeQueryResult(result)).toMatchInlineSnapshot(`
+    expect(normalizeQueryResultRaw(result)).toMatchInlineSnapshot(`
       Object {
         "header": Array [
           "dimension",
@@ -573,7 +573,7 @@ describe('normalizeQueryResult', () => {
       },
     ];
 
-    expect(normalizeQueryResult(result)).toMatchInlineSnapshot(`
+    expect(normalizeQueryResultRaw(result)).toMatchInlineSnapshot(`
       Object {
         "header": Array [
           "dimension",
@@ -612,7 +612,7 @@ describe('normalizeQueryResult', () => {
       },
     ];
 
-    expect(normalizeQueryResult(result)).toMatchInlineSnapshot(`
+    expect(normalizeQueryResultRaw(result)).toMatchInlineSnapshot(`
       Object {
         "header": Array [
           "minTime",
@@ -638,7 +638,7 @@ describe('normalizeQueryResult', () => {
       },
     ];
 
-    expect(normalizeQueryResult(result)).toMatchInlineSnapshot(`
+    expect(normalizeQueryResultRaw(result)).toMatchInlineSnapshot(`
       Object {
         "header": Array [
           "maxIngestedEventTime",
@@ -691,7 +691,7 @@ describe('normalizeQueryResult', () => {
       },
     ];
 
-    expect(normalizeQueryResult(result)).toMatchInlineSnapshot(`
+    expect(normalizeQueryResultRaw(result)).toMatchInlineSnapshot(`
       Object {
         "header": Array [
           "column",
@@ -738,7 +738,7 @@ describe('normalizeQueryResult', () => {
       ['2019-08-04T16:00:00.000Z', 15600],
     ];
 
-    expect(normalizeQueryResult(result, false, true)).toMatchInlineSnapshot(`
+    expect(normalizeQueryResultRaw(result, false, true)).toMatchInlineSnapshot(`
       Object {
         "header": Array [
           "Time",

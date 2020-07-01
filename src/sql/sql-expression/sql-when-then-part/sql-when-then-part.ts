@@ -80,16 +80,20 @@ export class SqlWhenThenPart extends SqlBase {
     return SqlBase.fromValue(value);
   }
 
-  public walkInner(nextStack: SqlBase[], fn: Substitutor, postorder: boolean): SqlBase | undefined {
+  public _walkInner(
+    nextStack: SqlBase[],
+    fn: Substitutor,
+    postorder: boolean,
+  ): SqlBase | undefined {
     let ret = this;
 
-    const whenExpression = this.whenExpression.walkHelper(nextStack, fn, postorder);
+    const whenExpression = this.whenExpression._walkHelper(nextStack, fn, postorder);
     if (!whenExpression) return;
     if (whenExpression !== this.whenExpression) {
       ret = ret.changeWhenExpression(whenExpression);
     }
 
-    const thenExpression = this.thenExpression.walkHelper(nextStack, fn, postorder);
+    const thenExpression = this.thenExpression._walkHelper(nextStack, fn, postorder);
     if (!thenExpression) return;
     if (thenExpression !== this.thenExpression) {
       ret = ret.changeThenExpression(thenExpression);

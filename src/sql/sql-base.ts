@@ -73,7 +73,7 @@ export abstract class SqlBase {
     let changed = false;
     const newA = a.map(v => {
       if (stop) return v;
-      const ret = v.walkHelper(stack, fn, postorder) as T;
+      const ret = v._walkHelper(stack, fn, postorder) as T;
       if (!ret) {
         stop = true;
         return v;
@@ -178,25 +178,25 @@ export abstract class SqlBase {
   }
 
   public walk(fn: Substitutor): SqlBase {
-    const ret = this.walkHelper([], fn, false);
+    const ret = this._walkHelper([], fn, false);
     if (!ret) return this;
     return ret;
   }
 
   public walkPostorder(fn: Substitutor): SqlBase {
-    const ret = this.walkHelper([], fn, true);
+    const ret = this._walkHelper([], fn, true);
     if (!ret) return this;
     return ret;
   }
 
-  public walkHelper(stack: SqlBase[], fn: Substitutor, postorder: boolean): SqlBase | undefined {
+  public _walkHelper(stack: SqlBase[], fn: Substitutor, postorder: boolean): SqlBase | undefined {
     if (!postorder) {
       const ret = fn(this, stack);
       if (!ret) return;
       if (ret !== this) return ret;
     }
 
-    const ret = this.walkInner(stack.concat(this), fn, postorder);
+    const ret = this._walkInner(stack.concat(this), fn, postorder);
     if (!ret) return;
     if (ret !== this) return ret;
 
@@ -209,7 +209,7 @@ export abstract class SqlBase {
     return this;
   }
 
-  public walkInner(
+  public _walkInner(
     _nextStack: SqlBase[],
     _fn: Substitutor,
     _postorder: boolean,

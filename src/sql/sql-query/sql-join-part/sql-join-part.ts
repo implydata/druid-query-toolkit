@@ -95,17 +95,21 @@ export class SqlJoinPart extends SqlBase {
     return SqlBase.fromValue(value);
   }
 
-  public walkInner(nextStack: SqlBase[], fn: Substitutor, postorder: boolean): SqlBase | undefined {
+  public _walkInner(
+    nextStack: SqlBase[],
+    fn: Substitutor,
+    postorder: boolean,
+  ): SqlBase | undefined {
     let ret = this;
 
-    const table = this.table.walkHelper(nextStack, fn, postorder);
+    const table = this.table._walkHelper(nextStack, fn, postorder);
     if (!table) return;
     if (table !== this.table) {
       ret = ret.changeJoinTable(table as SqlAlias);
     }
 
     if (this.onExpression) {
-      const onExpression = this.onExpression.walkHelper(nextStack, fn, postorder);
+      const onExpression = this.onExpression._walkHelper(nextStack, fn, postorder);
       if (!onExpression) return;
       if (onExpression !== this.onExpression) {
         ret = ret.changeOnExpression(onExpression);

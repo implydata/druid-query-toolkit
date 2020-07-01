@@ -47,12 +47,12 @@ export abstract class SqlExpression extends SqlBase {
     }
   }
 
-  public walkHelper(
+  public _walkHelper(
     stack: SqlBase[],
     fn: Substitutor,
     postorder: boolean,
   ): SqlExpression | undefined {
-    const ret = super.walkHelper(stack, fn, postorder);
+    const ret = super._walkHelper(stack, fn, postorder);
     if (!ret) return;
     if (ret === this) return this;
     if (ret instanceof SqlExpression) {
@@ -62,7 +62,7 @@ export abstract class SqlExpression extends SqlBase {
     }
   }
 
-  public walkInner(
+  public _walkInner(
     _nextStack: SqlBase[],
     _fn: Substitutor,
     _postorder: boolean,

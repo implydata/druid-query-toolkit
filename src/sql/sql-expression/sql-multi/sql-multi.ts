@@ -56,7 +56,7 @@ export class SqlMulti extends SqlExpression {
     return SqlBase.fromValue(value);
   }
 
-  public walkInner(
+  public _walkInner(
     nextStack: SqlBase[],
     fn: Substitutor,
     postorder: boolean,

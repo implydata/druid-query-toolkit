@@ -414,7 +414,7 @@ export class SqlQuery extends SqlBase {
     return SqlBase.fromValue(value);
   }
 
-  public walkInner(
+  public _walkInner(
     nextStack: SqlBase[],
     fn: Substitutor,
     postorder: boolean,
@@ -459,7 +459,7 @@ export class SqlQuery extends SqlBase {
     }
 
     if (this.whereExpression) {
-      const whereExpression = this.whereExpression.walkHelper(nextStack, fn, postorder);
+      const whereExpression = this.whereExpression._walkHelper(nextStack, fn, postorder);
       if (!whereExpression) return;
       if (whereExpression !== this.whereExpression) {
         ret = ret.changeWhereExpression(whereExpression);
@@ -480,7 +480,7 @@ export class SqlQuery extends SqlBase {
     }
 
     if (this.havingExpression) {
-      const havingExpression = this.havingExpression.walkHelper(nextStack, fn, postorder);
+      const havingExpression = this.havingExpression._walkHelper(nextStack, fn, postorder);
       if (!havingExpression) return;
       if (havingExpression !== this.havingExpression) {
         ret = ret.changeHavingExpression(havingExpression);
@@ -496,7 +496,7 @@ export class SqlQuery extends SqlBase {
     }
 
     if (this.limitValue) {
-      const limitValue = this.limitValue.walkHelper(nextStack, fn, postorder);
+      const limitValue = this.limitValue._walkHelper(nextStack, fn, postorder);
       if (!limitValue) return;
       if (limitValue !== this.limitValue) {
         ret = ret.changeLimitValue(limitValue as SqlLiteral);
@@ -504,7 +504,7 @@ export class SqlQuery extends SqlBase {
     }
 
     if (this.offsetValue) {
-      const offsetValue = this.offsetValue.walkHelper(nextStack, fn, postorder);
+      const offsetValue = this.offsetValue._walkHelper(nextStack, fn, postorder);
       if (!offsetValue) return;
       if (offsetValue !== this.offsetValue) {
         ret = ret.changeOffsetValue(offsetValue as SqlLiteral);
@@ -512,7 +512,7 @@ export class SqlQuery extends SqlBase {
     }
 
     if (this.unionQuery) {
-      const unionQuery = this.unionQuery.walkHelper(nextStack, fn, postorder);
+      const unionQuery = this.unionQuery._walkHelper(nextStack, fn, postorder);
       if (!unionQuery) return;
       if (unionQuery !== this.unionQuery) {
         ret = ret.changeUnionQuery(unionQuery as SqlQuery);

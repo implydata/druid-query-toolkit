@@ -50,6 +50,17 @@ function fromObjectArray(array: Record<string, any>[], ignoreFirstEvent?: boolea
 }
 
 export function normalizeQueryResult(
+  queryPayload: Record<string, unknown>,
+  data: unknown,
+): HeaderRows {
+  return normalizeQueryResultRaw(
+    data,
+    shouldIncludeTimestamp(queryPayload),
+    isFirstRowHeader(queryPayload),
+  );
+}
+
+export function normalizeQueryResultRaw(
   data: unknown,
   includeTimestampIfExists?: boolean,
   firstRowHeader?: boolean,
@@ -93,7 +104,7 @@ export function normalizeQueryResult(
       if (isObject(firstRowResult)) {
         // bySegment like
         if (Array.isArray(firstRowResult.results)) {
-          return normalizeQueryResult(
+          return normalizeQueryResultRaw(
             data.flatMap(d => d.result.results),
             includeTimestampIfExists,
             firstRowHeader,

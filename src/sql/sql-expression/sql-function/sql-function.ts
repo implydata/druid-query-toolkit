@@ -158,7 +158,7 @@ export class SqlFunction extends SqlExpression {
     return SqlBase.fromValue(value);
   }
 
-  public walkInner(
+  public _walkInner(
     nextStack: SqlBase[],
     fn: Substitutor,
     postorder: boolean,
@@ -174,7 +174,7 @@ export class SqlFunction extends SqlExpression {
     }
 
     if (this.whereExpression) {
-      const whereExpression = this.whereExpression.walkHelper(nextStack, fn, postorder);
+      const whereExpression = this.whereExpression._walkHelper(nextStack, fn, postorder);
       if (!whereExpression) return;
       if (whereExpression !== this.whereExpression) {
         ret = ret.changeWhereExpression(whereExpression);

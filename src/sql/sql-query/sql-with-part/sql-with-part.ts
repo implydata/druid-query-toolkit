@@ -90,10 +90,14 @@ export class SqlWithPart extends SqlBase {
     return SqlBase.fromValue(value);
   }
 
-  public walkInner(nextStack: SqlBase[], fn: Substitutor, postorder: boolean): SqlBase | undefined {
+  public _walkInner(
+    nextStack: SqlBase[],
+    fn: Substitutor,
+    postorder: boolean,
+  ): SqlBase | undefined {
     let ret = this;
 
-    const withTable = this.withTable.walkHelper(nextStack, fn, postorder);
+    const withTable = this.withTable._walkHelper(nextStack, fn, postorder);
     if (!withTable) return;
     if (withTable !== this.withTable) {
       ret = ret.changeWithTable(withTable);
@@ -107,7 +111,7 @@ export class SqlWithPart extends SqlBase {
       }
     }
 
-    const withQuery = this.withQuery.walkHelper(nextStack, fn, postorder);
+    const withQuery = this.withQuery._walkHelper(nextStack, fn, postorder);
     if (!withQuery) return;
     if (withQuery !== this.withQuery) {
       ret = ret.changeWithQuery(withQuery as SqlQuery);

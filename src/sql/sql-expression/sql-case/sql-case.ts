@@ -114,7 +114,7 @@ export class SqlCase extends SqlExpression {
     return SqlBase.fromValue(value);
   }
 
-  public walkInner(
+  public _walkInner(
     nextStack: SqlBase[],
     fn: Substitutor,
     postorder: boolean,
@@ -122,7 +122,7 @@ export class SqlCase extends SqlExpression {
     let ret = this;
 
     if (this.caseExpression) {
-      const caseExpression = this.caseExpression.walkHelper(nextStack, fn, postorder);
+      const caseExpression = this.caseExpression._walkHelper(nextStack, fn, postorder);
       if (!caseExpression) return;
       if (caseExpression !== this.caseExpression) {
         ret = ret.changeCaseExpression(caseExpression);
@@ -136,7 +136,7 @@ export class SqlCase extends SqlExpression {
     }
 
     if (this.elseExpression) {
-      const elseExpression = this.elseExpression.walkHelper(nextStack, fn, postorder);
+      const elseExpression = this.elseExpression._walkHelper(nextStack, fn, postorder);
       if (!elseExpression) return;
       if (elseExpression !== this.elseExpression) {
         ret = ret.changeElseExpression(elseExpression);

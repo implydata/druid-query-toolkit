@@ -244,21 +244,21 @@ export class SqlComparison extends SqlExpression {
     return SqlBase.fromValue(value);
   }
 
-  public walkInner(
+  public _walkInner(
     nextStack: SqlBase[],
     fn: Substitutor,
     postorder: boolean,
   ): SqlExpression | undefined {
     let ret = this;
 
-    const lhs = this.lhs.walkHelper(nextStack, fn, postorder);
+    const lhs = this.lhs._walkHelper(nextStack, fn, postorder);
     if (!lhs) return;
     if (lhs !== this.lhs) {
       ret = ret.changeLhs(lhs);
     }
 
     if (this.rhs instanceof SqlBase) {
-      const rhs = this.rhs.walkHelper(nextStack, fn, postorder);
+      const rhs = this.rhs._walkHelper(nextStack, fn, postorder);
       if (!rhs) return;
       if (rhs !== this.rhs) {
         ret = ret.changeRhs(rhs);
@@ -266,25 +266,25 @@ export class SqlComparison extends SqlExpression {
     } else {
       let newRhs: any = this.rhs;
       if (newRhs.start) {
-        const start = newRhs.start.walkHelper(nextStack, fn, postorder);
+        const start = newRhs.start._walkHelper(nextStack, fn, postorder);
         if (!start) return;
         if (start !== newRhs.start) {
           newRhs = Object.assign({}, newRhs, { start });
         }
 
-        const end = newRhs.end.walkHelper(nextStack, fn, postorder);
+        const end = newRhs.end._walkHelper(nextStack, fn, postorder);
         if (!end) return;
         if (end !== newRhs.end) {
           newRhs = Object.assign({}, newRhs, { end });
         }
       } else {
-        const like = newRhs.like.walkHelper(nextStack, fn, postorder);
+        const like = newRhs.like._walkHelper(nextStack, fn, postorder);
         if (!like) return;
         if (like !== newRhs.like) {
           newRhs = Object.assign({}, newRhs, { like });
         }
 
-        const escape = newRhs.escape.walkHelper(nextStack, fn, postorder);
+        const escape = newRhs.escape._walkHelper(nextStack, fn, postorder);
         if (!escape) return;
         if (escape !== newRhs.escape) {
           newRhs = Object.assign({}, newRhs, { escape });
