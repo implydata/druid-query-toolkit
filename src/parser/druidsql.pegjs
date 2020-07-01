@@ -63,7 +63,7 @@ SqlQuery =
     innerSpacing.preFrom = from[0];
     value.fromKeyword = from[1].fromKeyword;
     innerSpacing.postFrom = from[1].postFrom;
-    value.tables = from[1].tables;
+    value.fromExpressions = from[1].fromExpressions;
   }
 
   if (joins) {
@@ -128,13 +128,13 @@ SqlQuery =
 WithClause =
   withKeyword:WithToken
   postWith:_
-  withPartsHead:SqlWithPart
-  withPartsTail:(CommaSeparator SqlWithPart)*
+  head:SqlWithPart
+  tail:(CommaSeparator SqlWithPart)*
 {
   return {
     withKeyword: withKeyword,
     postWith: postWith,
-    withParts: makeSeparatedArray(withPartsHead, withPartsTail),
+    withParts: makeSeparatedArray(head, tail),
   };
 }
 
@@ -165,11 +165,11 @@ SqlWithPart =
   return new sql.SqlWithPart(value);
 }
 
-WithColumns = OpenParen postLeftParen:_? withColumnsHead:BaseType withColumnsTail:(CommaSeparator BaseType)* preRightParen:_? CloseParen
+WithColumns = OpenParen postLeftParen:_? head:BaseType tail:(CommaSeparator BaseType)* preRightParen:_? CloseParen
 {
   return {
     postLeftParen: postLeftParen,
-    withColumns: makeSeparatedArray(withColumnsHead, withColumnsTail),
+    withColumns: makeSeparatedArray(head, tail),
     preRightParen: preRightParen
   };
 }
@@ -178,24 +178,24 @@ SelectClause =
   selectKeyword:SelectToken
   postSelect:_
   selectDecorator:((AllToken / DistinctToken) _)?
-  selectExpressionsHead:SqlAliasExpression
-  selectExpressionsTail:(CommaSeparator SqlAliasExpression)*
+  head:SqlAliasExpression
+  tail:(CommaSeparator SqlAliasExpression)*
 {
   return {
     selectKeyword: selectKeyword,
     postSelect: postSelect,
     selectDecorator: selectDecorator ? selectDecorator[0] : undefined,
     postSelectDecorator: selectDecorator ? selectDecorator[1] : undefined,
-    selectExpressions: makeSeparatedArray(selectExpressionsHead, selectExpressionsTail).map(SqlAlias.fromBase),
+    selectExpressions: makeSeparatedArray(head, tail).map(SqlAlias.fromBase),
   };
 }
 
-FromClause = fromKeyword:FromToken postFrom:_ tableHead:SqlAlias tableTail:(CommaSeparator SqlAlias)*
+FromClause = fromKeyword:FromToken postFrom:_ head:SqlAlias tail:(CommaSeparator SqlAlias)*
 {
   return {
     fromKeyword: fromKeyword,
     postFrom: postFrom,
-    tables: makeSeparatedArray(tableHead, tableTail).map(function(table) {
+    fromExpressions: makeSeparatedArray(head, tail).map(function(table) {
       return SqlAlias.fromBaseAndUpgrade(table);
     }),
   };
@@ -265,12 +265,12 @@ HavingClause = havingKeyword:HavingToken postHaving:_ havingExpression:Expressio
   };
 }
 
-OrderByClause = orderByKeyword:OrderToken postOrderBy:_ orderByPartsHead:SqlOrderByPart orderByPartsTail:(CommaSeparator SqlOrderByPart)*
+OrderByClause = orderByKeyword:OrderToken postOrderBy:_ head:SqlOrderByPart tail:(CommaSeparator SqlOrderByPart)*
 {
   return {
     orderByKeyword: orderByKeyword,
     postOrderBy: postOrderBy,
-    orderByParts: makeSeparatedArray(orderByPartsHead, orderByPartsTail),
+    orderByParts: makeSeparatedArray(head, tail),
   };
 }
 
@@ -549,8 +549,8 @@ CaseExpression =
   caseKeyword:CaseToken
   postCase:_
   caseExpression:(Expression _)?
-  whenThenPartsHead:WhenThenPair
-  whenThenPartsTail:(_ WhenThenPair)*
+  head:WhenThenPair
+  tail:(_ WhenThenPair)*
   elseValue:(_ ElseToken _ Expression)?
   preEnd:_
   endKeyword:EndToken
@@ -558,11 +558,10 @@ CaseExpression =
   return new sql.SqlCase({
     caseKeyword: caseKeyword,
     caseExpression: caseExpression ? caseExpression[0] : undefined,
-    whenThenParts: makeSeparatedArray(whenThenPartsHead, whenThenPartsTail),
+    whenThenParts: makeSeparatedArray(head, tail),
     elseKeyword: elseValue ? elseValue[1] : undefined,
     elseExpression: elseValue ? elseValue[3] : undefined,
     endKeyword: endKeyword,
-    postWhenThenParts: whenThenPartsTail ? makeListMap(whenThenPartsTail, 0) : [],
     innerSpacing: {
       postCase: postCase,
       postCaseExpression: caseExpression ? caseExpression[1] : undefined,
@@ -650,8 +649,8 @@ GenericFunction =
   OpenParen
   postLeftParen:_
   decorator:(FunctionDecorator _)?
-  argHead:Expression?
-  argTail:(CommaSeparator Expression)*
+  head:Expression?
+  tail:(CommaSeparator Expression)*
   postArguments:_
   CloseParen
   filter:(_ Filter)?
@@ -669,8 +668,8 @@ GenericFunction =
     innerSpacing.postDecorator = decorator[1];
   }
 
-  if (argHead) {
-    value.args = makeSeparatedArray(argHead, argTail);
+  if (head) {
+    value.args = makeSeparatedArray(head, tail);
     innerSpacing.postArguments = postArguments;
   }
 
@@ -810,7 +809,7 @@ TimestampAddDiffFunction =
   OpenParen
   postLeftParen:_
   unit:TimeUnit
-  argTail:(CommaSeparator Expression)*
+  tail:(CommaSeparator Expression)*
   postArguments:_
   CloseParen
 {
@@ -822,12 +821,12 @@ TimestampAddDiffFunction =
     postLeftParen: postLeftParen,
   };
 
-  var argHead = new sql.SqlLiteral({
+  var head = new sql.SqlLiteral({
     value: unit.toUpperCase(),
     stringValue: unit,
   });
 
-  value.args = makeSeparatedArray(argHead, argTail);
+  value.args = makeSeparatedArray(head, tail);
   innerSpacing.postArguments = postArguments;
 
   return new sql.SqlFunction(value);
@@ -865,8 +864,8 @@ ArrayFunction =
   preLeftParen:_
   '['
   postLeftParen:_
-  argHead:Expression?
-  argTail:(CommaSeparator Expression)*
+  head:Expression?
+  tail:(CommaSeparator Expression)*
   postArguments:_
   ']'
 {
@@ -879,8 +878,8 @@ ArrayFunction =
     postLeftParen: postLeftParen,
   };
 
-  if (argHead) {
-    value.args = makeSeparatedArray(argHead, argTail);
+  if (head) {
+    value.args = makeSeparatedArray(head, tail);
     innerSpacing.postArguments = postArguments;
   }
 

@@ -24,6 +24,7 @@ describe('SqlAlias', () => {
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": undefined,
+        "fromExpressions": undefined,
         "fromKeyword": undefined,
         "groupByExpressions": undefined,
         "groupByKeyword": undefined,
@@ -64,7 +65,6 @@ describe('SqlAlias', () => {
           ],
         },
         "selectKeyword": "SELECT",
-        "tables": undefined,
         "type": "query",
         "unionKeyword": undefined,
         "unionQuery": undefined,
@@ -84,6 +84,7 @@ describe('SqlAlias', () => {
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": undefined,
+        "fromExpressions": undefined,
         "fromKeyword": undefined,
         "groupByExpressions": undefined,
         "groupByKeyword": undefined,
@@ -136,7 +137,6 @@ describe('SqlAlias', () => {
           ],
         },
         "selectKeyword": "SELECT",
-        "tables": undefined,
         "type": "query",
         "unionKeyword": undefined,
         "unionQuery": undefined,
@@ -156,6 +156,7 @@ describe('SqlAlias', () => {
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": undefined,
+        "fromExpressions": undefined,
         "fromKeyword": undefined,
         "groupByExpressions": undefined,
         "groupByKeyword": undefined,
@@ -211,7 +212,6 @@ describe('SqlAlias', () => {
           ],
         },
         "selectKeyword": "SELECT",
-        "tables": undefined,
         "type": "query",
         "unionKeyword": undefined,
         "unionQuery": undefined,
@@ -231,6 +231,7 @@ describe('SqlAlias', () => {
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": undefined,
+        "fromExpressions": undefined,
         "fromKeyword": undefined,
         "groupByExpressions": undefined,
         "groupByKeyword": undefined,
@@ -285,7 +286,6 @@ describe('SqlAlias', () => {
           ],
         },
         "selectKeyword": "SELECT",
-        "tables": undefined,
         "type": "query",
         "unionKeyword": undefined,
         "unionQuery": undefined,

@@ -262,6 +262,30 @@ describe('upgrades', () => {
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": undefined,
+        "fromExpressions": SeparatedArray {
+          "separators": Array [],
+          "values": Array [
+            SqlAlias {
+              "alias": undefined,
+              "asKeyword": undefined,
+              "expression": SqlRef {
+                "column": undefined,
+                "innerSpacing": Object {
+                  "postTableDot": "",
+                  "preTableDot": "",
+                },
+                "namespace": "sys",
+                "namespaceQuotes": false,
+                "quotes": false,
+                "table": "segments",
+                "tableQuotes": false,
+                "type": "ref",
+              },
+              "innerSpacing": Object {},
+              "type": "alias",
+            },
+          ],
+        },
         "fromKeyword": "from",
         "groupByExpressions": undefined,
         "groupByKeyword": undefined,
@@ -304,30 +328,6 @@ describe('upgrades', () => {
           ],
         },
         "selectKeyword": "select",
-        "tables": SeparatedArray {
-          "separators": Array [],
-          "values": Array [
-            SqlAlias {
-              "alias": undefined,
-              "asKeyword": undefined,
-              "expression": SqlRef {
-                "column": undefined,
-                "innerSpacing": Object {
-                  "postTableDot": "",
-                  "preTableDot": "",
-                },
-                "namespace": "sys",
-                "namespaceQuotes": false,
-                "quotes": false,
-                "table": "segments",
-                "tableQuotes": false,
-                "type": "ref",
-              },
-              "innerSpacing": Object {},
-              "type": "alias",
-            },
-          ],
-        },
         "type": "query",
         "unionKeyword": undefined,
         "unionQuery": undefined,

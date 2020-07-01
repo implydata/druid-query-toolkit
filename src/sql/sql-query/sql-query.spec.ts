@@ -178,57 +178,7 @@ describe('SqlQuery', () => {
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": undefined,
-        "fromKeyword": "FROM",
-        "groupByExpressions": undefined,
-        "groupByKeyword": undefined,
-        "havingExpression": undefined,
-        "havingKeyword": undefined,
-        "innerSpacing": Object {
-          "postFrom": " ",
-          "postLimit": " ",
-          "postQuery": "",
-          "postSelect": " ",
-          "preFrom": " ",
-          "preLimit": " ",
-          "preQuery": "",
-        },
-        "joinParts": undefined,
-        "limitKeyword": "LIMIT",
-        "limitValue": SqlLiteral {
-          "innerSpacing": Object {},
-          "keyword": undefined,
-          "stringValue": "2",
-          "type": "literal",
-          "value": 2,
-        },
-        "offsetKeyword": undefined,
-        "offsetValue": undefined,
-        "orderByKeyword": undefined,
-        "orderByParts": undefined,
-        "selectDecorator": undefined,
-        "selectExpressions": SeparatedArray {
-          "separators": Array [],
-          "values": Array [
-            SqlAlias {
-              "alias": undefined,
-              "asKeyword": undefined,
-              "expression": SqlRef {
-                "column": "*",
-                "innerSpacing": Object {},
-                "namespace": undefined,
-                "namespaceQuotes": false,
-                "quotes": false,
-                "table": undefined,
-                "tableQuotes": false,
-                "type": "ref",
-              },
-              "innerSpacing": Object {},
-              "type": "alias",
-            },
-          ],
-        },
-        "selectKeyword": "SELECT",
-        "tables": SeparatedArray {
+        "fromExpressions": SeparatedArray {
           "separators": Array [],
           "values": Array [
             SqlAlias {
@@ -236,6 +186,30 @@ describe('SqlQuery', () => {
               "asKeyword": undefined,
               "expression": SqlQuery {
                 "explainKeyword": undefined,
+                "fromExpressions": SeparatedArray {
+                  "separators": Array [],
+                  "values": Array [
+                    SqlAlias {
+                      "alias": undefined,
+                      "asKeyword": undefined,
+                      "expression": SqlRef {
+                        "column": undefined,
+                        "innerSpacing": Object {
+                          "postTableDot": "",
+                          "preTableDot": "",
+                        },
+                        "namespace": "druid",
+                        "namespaceQuotes": false,
+                        "quotes": false,
+                        "table": "foo",
+                        "tableQuotes": false,
+                        "type": "ref",
+                      },
+                      "innerSpacing": Object {},
+                      "type": "alias",
+                    },
+                  ],
+                },
                 "fromKeyword": "FROM",
                 "groupByExpressions": undefined,
                 "groupByKeyword": undefined,
@@ -307,30 +281,6 @@ describe('SqlQuery', () => {
                   ],
                 },
                 "selectKeyword": "SELECT",
-                "tables": SeparatedArray {
-                  "separators": Array [],
-                  "values": Array [
-                    SqlAlias {
-                      "alias": undefined,
-                      "asKeyword": undefined,
-                      "expression": SqlRef {
-                        "column": undefined,
-                        "innerSpacing": Object {
-                          "postTableDot": "",
-                          "preTableDot": "",
-                        },
-                        "namespace": "druid",
-                        "namespaceQuotes": false,
-                        "quotes": false,
-                        "table": "foo",
-                        "tableQuotes": false,
-                        "type": "ref",
-                      },
-                      "innerSpacing": Object {},
-                      "type": "alias",
-                    },
-                  ],
-                },
                 "type": "query",
                 "unionKeyword": undefined,
                 "unionQuery": undefined,
@@ -344,6 +294,56 @@ describe('SqlQuery', () => {
             },
           ],
         },
+        "fromKeyword": "FROM",
+        "groupByExpressions": undefined,
+        "groupByKeyword": undefined,
+        "havingExpression": undefined,
+        "havingKeyword": undefined,
+        "innerSpacing": Object {
+          "postFrom": " ",
+          "postLimit": " ",
+          "postQuery": "",
+          "postSelect": " ",
+          "preFrom": " ",
+          "preLimit": " ",
+          "preQuery": "",
+        },
+        "joinParts": undefined,
+        "limitKeyword": "LIMIT",
+        "limitValue": SqlLiteral {
+          "innerSpacing": Object {},
+          "keyword": undefined,
+          "stringValue": "2",
+          "type": "literal",
+          "value": 2,
+        },
+        "offsetKeyword": undefined,
+        "offsetValue": undefined,
+        "orderByKeyword": undefined,
+        "orderByParts": undefined,
+        "selectDecorator": undefined,
+        "selectExpressions": SeparatedArray {
+          "separators": Array [],
+          "values": Array [
+            SqlAlias {
+              "alias": undefined,
+              "asKeyword": undefined,
+              "expression": SqlRef {
+                "column": "*",
+                "innerSpacing": Object {},
+                "namespace": undefined,
+                "namespaceQuotes": false,
+                "quotes": false,
+                "table": undefined,
+                "tableQuotes": false,
+                "type": "ref",
+              },
+              "innerSpacing": Object {},
+              "type": "alias",
+            },
+          ],
+        },
+        "selectKeyword": "SELECT",
         "type": "query",
         "unionKeyword": undefined,
         "unionQuery": undefined,
@@ -369,6 +369,30 @@ describe('SqlQuery', () => {
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": undefined,
+        "fromExpressions": SeparatedArray {
+          "separators": Array [],
+          "values": Array [
+            SqlAlias {
+              "alias": undefined,
+              "asKeyword": undefined,
+              "expression": SqlRef {
+                "column": undefined,
+                "innerSpacing": Object {
+                  "postTableDot": "",
+                  "preTableDot": "",
+                },
+                "namespace": "sys",
+                "namespaceQuotes": false,
+                "quotes": false,
+                "table": "segments",
+                "tableQuotes": false,
+                "type": "ref",
+              },
+              "innerSpacing": Object {},
+              "type": "alias",
+            },
+          ],
+        },
         "fromKeyword": "FROM",
         "groupByExpressions": undefined,
         "groupByKeyword": undefined,
@@ -520,30 +544,6 @@ describe('SqlQuery', () => {
           ],
         },
         "selectKeyword": "SELECT",
-        "tables": SeparatedArray {
-          "separators": Array [],
-          "values": Array [
-            SqlAlias {
-              "alias": undefined,
-              "asKeyword": undefined,
-              "expression": SqlRef {
-                "column": undefined,
-                "innerSpacing": Object {
-                  "postTableDot": "",
-                  "preTableDot": "",
-                },
-                "namespace": "sys",
-                "namespaceQuotes": false,
-                "quotes": false,
-                "table": "segments",
-                "tableQuotes": false,
-                "type": "ref",
-              },
-              "innerSpacing": Object {},
-              "type": "alias",
-            },
-          ],
-        },
         "type": "query",
         "unionKeyword": undefined,
         "unionQuery": undefined,
@@ -563,6 +563,27 @@ describe('SqlQuery', () => {
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": "Explain plan for",
+        "fromExpressions": SeparatedArray {
+          "separators": Array [],
+          "values": Array [
+            SqlAlias {
+              "alias": undefined,
+              "asKeyword": undefined,
+              "expression": SqlRef {
+                "column": undefined,
+                "innerSpacing": Object {},
+                "namespace": undefined,
+                "namespaceQuotes": false,
+                "quotes": false,
+                "table": "tbl",
+                "tableQuotes": false,
+                "type": "ref",
+              },
+              "innerSpacing": Object {},
+              "type": "alias",
+            },
+          ],
+        },
         "fromKeyword": "from",
         "groupByExpressions": undefined,
         "groupByKeyword": undefined,
@@ -606,27 +627,6 @@ describe('SqlQuery', () => {
           ],
         },
         "selectKeyword": "Select",
-        "tables": SeparatedArray {
-          "separators": Array [],
-          "values": Array [
-            SqlAlias {
-              "alias": undefined,
-              "asKeyword": undefined,
-              "expression": SqlRef {
-                "column": undefined,
-                "innerSpacing": Object {},
-                "namespace": undefined,
-                "namespaceQuotes": false,
-                "quotes": false,
-                "table": "tbl",
-                "tableQuotes": false,
-                "type": "ref",
-              },
-              "innerSpacing": Object {},
-              "type": "alias",
-            },
-          ],
-        },
         "type": "query",
         "unionKeyword": undefined,
         "unionQuery": undefined,
@@ -651,6 +651,27 @@ describe('SqlQuery', () => {
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": undefined,
+        "fromExpressions": SeparatedArray {
+          "separators": Array [],
+          "values": Array [
+            SqlAlias {
+              "alias": undefined,
+              "asKeyword": undefined,
+              "expression": SqlRef {
+                "column": undefined,
+                "innerSpacing": Object {},
+                "namespace": undefined,
+                "namespaceQuotes": false,
+                "quotes": false,
+                "table": "tbl",
+                "tableQuotes": false,
+                "type": "ref",
+              },
+              "innerSpacing": Object {},
+              "type": "alias",
+            },
+          ],
+        },
         "fromKeyword": "from",
         "groupByExpressions": undefined,
         "groupByKeyword": undefined,
@@ -696,27 +717,6 @@ describe('SqlQuery', () => {
           ],
         },
         "selectKeyword": "Select",
-        "tables": SeparatedArray {
-          "separators": Array [],
-          "values": Array [
-            SqlAlias {
-              "alias": undefined,
-              "asKeyword": undefined,
-              "expression": SqlRef {
-                "column": undefined,
-                "innerSpacing": Object {},
-                "namespace": undefined,
-                "namespaceQuotes": false,
-                "quotes": false,
-                "table": "tbl",
-                "tableQuotes": false,
-                "type": "ref",
-              },
-              "innerSpacing": Object {},
-              "type": "alias",
-            },
-          ],
-        },
         "type": "query",
         "unionKeyword": undefined,
         "unionQuery": undefined,
@@ -737,6 +737,27 @@ describe('SqlQuery', () => {
               "withColumns": undefined,
               "withQuery": SqlQuery {
                 "explainKeyword": undefined,
+                "fromExpressions": SeparatedArray {
+                  "separators": Array [],
+                  "values": Array [
+                    SqlAlias {
+                      "alias": undefined,
+                      "asKeyword": undefined,
+                      "expression": SqlRef {
+                        "column": undefined,
+                        "innerSpacing": Object {},
+                        "namespace": undefined,
+                        "namespaceQuotes": false,
+                        "quotes": false,
+                        "table": "emp",
+                        "tableQuotes": false,
+                        "type": "ref",
+                      },
+                      "innerSpacing": Object {},
+                      "type": "alias",
+                    },
+                  ],
+                },
                 "fromKeyword": "FROM",
                 "groupByExpressions": undefined,
                 "groupByKeyword": undefined,
@@ -787,27 +808,6 @@ describe('SqlQuery', () => {
                   ],
                 },
                 "selectKeyword": "SELECT",
-                "tables": SeparatedArray {
-                  "separators": Array [],
-                  "values": Array [
-                    SqlAlias {
-                      "alias": undefined,
-                      "asKeyword": undefined,
-                      "expression": SqlRef {
-                        "column": undefined,
-                        "innerSpacing": Object {},
-                        "namespace": undefined,
-                        "namespaceQuotes": false,
-                        "quotes": false,
-                        "table": "emp",
-                        "tableQuotes": false,
-                        "type": "ref",
-                      },
-                      "innerSpacing": Object {},
-                      "type": "alias",
-                    },
-                  ],
-                },
                 "type": "query",
                 "unionKeyword": undefined,
                 "unionQuery": undefined,
@@ -843,6 +843,27 @@ describe('expressions with where clause', () => {
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": undefined,
+        "fromExpressions": SeparatedArray {
+          "separators": Array [],
+          "values": Array [
+            SqlAlias {
+              "alias": undefined,
+              "asKeyword": undefined,
+              "expression": SqlRef {
+                "column": undefined,
+                "innerSpacing": Object {},
+                "namespace": undefined,
+                "namespaceQuotes": false,
+                "quotes": false,
+                "table": "tbl",
+                "tableQuotes": false,
+                "type": "ref",
+              },
+              "innerSpacing": Object {},
+              "type": "alias",
+            },
+          ],
+        },
         "fromKeyword": "from",
         "groupByExpressions": undefined,
         "groupByKeyword": undefined,
@@ -887,27 +908,6 @@ describe('expressions with where clause', () => {
           ],
         },
         "selectKeyword": "Select",
-        "tables": SeparatedArray {
-          "separators": Array [],
-          "values": Array [
-            SqlAlias {
-              "alias": undefined,
-              "asKeyword": undefined,
-              "expression": SqlRef {
-                "column": undefined,
-                "innerSpacing": Object {},
-                "namespace": undefined,
-                "namespaceQuotes": false,
-                "quotes": false,
-                "table": "tbl",
-                "tableQuotes": false,
-                "type": "ref",
-              },
-              "innerSpacing": Object {},
-              "type": "alias",
-            },
-          ],
-        },
         "type": "query",
         "unionKeyword": undefined,
         "unionQuery": undefined,
@@ -952,6 +952,30 @@ describe('expressions with where clause', () => {
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": undefined,
+        "fromExpressions": SeparatedArray {
+          "separators": Array [],
+          "values": Array [
+            SqlAlias {
+              "alias": undefined,
+              "asKeyword": undefined,
+              "expression": SqlRef {
+                "column": undefined,
+                "innerSpacing": Object {
+                  "postTableDot": "",
+                  "preTableDot": "",
+                },
+                "namespace": "sys",
+                "namespaceQuotes": false,
+                "quotes": false,
+                "table": "supervisors",
+                "tableQuotes": false,
+                "type": "ref",
+              },
+              "innerSpacing": Object {},
+              "type": "alias",
+            },
+          ],
+        },
         "fromKeyword": "FROM",
         "groupByExpressions": undefined,
         "groupByKeyword": undefined,
@@ -996,30 +1020,6 @@ describe('expressions with where clause', () => {
           ],
         },
         "selectKeyword": "SELECT",
-        "tables": SeparatedArray {
-          "separators": Array [],
-          "values": Array [
-            SqlAlias {
-              "alias": undefined,
-              "asKeyword": undefined,
-              "expression": SqlRef {
-                "column": undefined,
-                "innerSpacing": Object {
-                  "postTableDot": "",
-                  "preTableDot": "",
-                },
-                "namespace": "sys",
-                "namespaceQuotes": false,
-                "quotes": false,
-                "table": "supervisors",
-                "tableQuotes": false,
-                "type": "ref",
-              },
-              "innerSpacing": Object {},
-              "type": "alias",
-            },
-          ],
-        },
         "type": "query",
         "unionKeyword": undefined,
         "unionQuery": undefined,
@@ -1064,6 +1064,30 @@ describe('expressions with where clause', () => {
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": undefined,
+        "fromExpressions": SeparatedArray {
+          "separators": Array [],
+          "values": Array [
+            SqlAlias {
+              "alias": undefined,
+              "asKeyword": undefined,
+              "expression": SqlRef {
+                "column": undefined,
+                "innerSpacing": Object {
+                  "postTableDot": "",
+                  "preTableDot": "",
+                },
+                "namespace": "sys",
+                "namespaceQuotes": false,
+                "quotes": false,
+                "table": "supervisors",
+                "tableQuotes": false,
+                "type": "ref",
+              },
+              "innerSpacing": Object {},
+              "type": "alias",
+            },
+          ],
+        },
         "fromKeyword": "FROM",
         "groupByExpressions": undefined,
         "groupByKeyword": undefined,
@@ -1108,30 +1132,6 @@ describe('expressions with where clause', () => {
           ],
         },
         "selectKeyword": "SELECT",
-        "tables": SeparatedArray {
-          "separators": Array [],
-          "values": Array [
-            SqlAlias {
-              "alias": undefined,
-              "asKeyword": undefined,
-              "expression": SqlRef {
-                "column": undefined,
-                "innerSpacing": Object {
-                  "postTableDot": "",
-                  "preTableDot": "",
-                },
-                "namespace": "sys",
-                "namespaceQuotes": false,
-                "quotes": false,
-                "table": "supervisors",
-                "tableQuotes": false,
-                "type": "ref",
-              },
-              "innerSpacing": Object {},
-              "type": "alias",
-            },
-          ],
-        },
         "type": "query",
         "unionKeyword": undefined,
         "unionQuery": undefined,
@@ -1262,6 +1262,27 @@ describe('expressions with group by clause', () => {
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": undefined,
+        "fromExpressions": SeparatedArray {
+          "separators": Array [],
+          "values": Array [
+            SqlAlias {
+              "alias": undefined,
+              "asKeyword": undefined,
+              "expression": SqlRef {
+                "column": undefined,
+                "innerSpacing": Object {},
+                "namespace": undefined,
+                "namespaceQuotes": false,
+                "quotes": false,
+                "table": "tbl",
+                "tableQuotes": false,
+                "type": "ref",
+              },
+              "innerSpacing": Object {},
+              "type": "alias",
+            },
+          ],
+        },
         "fromKeyword": "from",
         "groupByExpressions": SeparatedArray {
           "separators": Array [],
@@ -1320,27 +1341,6 @@ describe('expressions with group by clause', () => {
           ],
         },
         "selectKeyword": "Select",
-        "tables": SeparatedArray {
-          "separators": Array [],
-          "values": Array [
-            SqlAlias {
-              "alias": undefined,
-              "asKeyword": undefined,
-              "expression": SqlRef {
-                "column": undefined,
-                "innerSpacing": Object {},
-                "namespace": undefined,
-                "namespaceQuotes": false,
-                "quotes": false,
-                "table": "tbl",
-                "tableQuotes": false,
-                "type": "ref",
-              },
-              "innerSpacing": Object {},
-              "type": "alias",
-            },
-          ],
-        },
         "type": "query",
         "unionKeyword": undefined,
         "unionQuery": undefined,
@@ -1360,6 +1360,27 @@ describe('expressions with group by clause', () => {
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": undefined,
+        "fromExpressions": SeparatedArray {
+          "separators": Array [],
+          "values": Array [
+            SqlAlias {
+              "alias": undefined,
+              "asKeyword": undefined,
+              "expression": SqlRef {
+                "column": undefined,
+                "innerSpacing": Object {},
+                "namespace": undefined,
+                "namespaceQuotes": false,
+                "quotes": false,
+                "table": "tbl",
+                "tableQuotes": false,
+                "type": "ref",
+              },
+              "innerSpacing": Object {},
+              "type": "alias",
+            },
+          ],
+        },
         "fromKeyword": "from",
         "groupByExpressions": SeparatedArray {
           "separators": Array [],
@@ -1418,7 +1439,26 @@ describe('expressions with group by clause', () => {
           ],
         },
         "selectKeyword": "Select",
-        "tables": SeparatedArray {
+        "type": "query",
+        "unionKeyword": undefined,
+        "unionQuery": undefined,
+        "whereExpression": undefined,
+        "whereKeyword": undefined,
+        "withKeyword": undefined,
+        "withParts": undefined,
+      }
+    `);
+  });
+
+  it('Simple select with multiple group by clauses in brackets', () => {
+    const sql = `(Select * from tbl group by col, colTwo)`;
+
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
+      SqlQuery {
+        "explainKeyword": undefined,
+        "fromExpressions": SeparatedArray {
           "separators": Array [],
           "values": Array [
             SqlAlias {
@@ -1439,25 +1479,6 @@ describe('expressions with group by clause', () => {
             },
           ],
         },
-        "type": "query",
-        "unionKeyword": undefined,
-        "unionQuery": undefined,
-        "whereExpression": undefined,
-        "whereKeyword": undefined,
-        "withKeyword": undefined,
-        "withParts": undefined,
-      }
-    `);
-  });
-
-  it('Simple select with multiple group by clauses in brackets', () => {
-    const sql = `(Select * from tbl group by col, colTwo)`;
-
-    backAndForth(sql);
-
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
-      SqlQuery {
-        "explainKeyword": undefined,
         "fromKeyword": "from",
         "groupByExpressions": SeparatedArray {
           "separators": Array [
@@ -1538,27 +1559,6 @@ describe('expressions with group by clause', () => {
           ],
         },
         "selectKeyword": "Select",
-        "tables": SeparatedArray {
-          "separators": Array [],
-          "values": Array [
-            SqlAlias {
-              "alias": undefined,
-              "asKeyword": undefined,
-              "expression": SqlRef {
-                "column": undefined,
-                "innerSpacing": Object {},
-                "namespace": undefined,
-                "namespaceQuotes": false,
-                "quotes": false,
-                "table": "tbl",
-                "tableQuotes": false,
-                "type": "ref",
-              },
-              "innerSpacing": Object {},
-              "type": "alias",
-            },
-          ],
-        },
         "type": "query",
         "unionKeyword": undefined,
         "unionQuery": undefined,
@@ -1580,6 +1580,27 @@ describe('expressions with having clause', () => {
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": undefined,
+        "fromExpressions": SeparatedArray {
+          "separators": Array [],
+          "values": Array [
+            SqlAlias {
+              "alias": undefined,
+              "asKeyword": undefined,
+              "expression": SqlRef {
+                "column": undefined,
+                "innerSpacing": Object {},
+                "namespace": undefined,
+                "namespaceQuotes": false,
+                "quotes": false,
+                "table": "tbl",
+                "tableQuotes": false,
+                "type": "ref",
+              },
+              "innerSpacing": Object {},
+              "type": "alias",
+            },
+          ],
+        },
         "fromKeyword": "from",
         "groupByExpressions": undefined,
         "groupByKeyword": undefined,
@@ -1649,27 +1670,6 @@ describe('expressions with having clause', () => {
           ],
         },
         "selectKeyword": "Select",
-        "tables": SeparatedArray {
-          "separators": Array [],
-          "values": Array [
-            SqlAlias {
-              "alias": undefined,
-              "asKeyword": undefined,
-              "expression": SqlRef {
-                "column": undefined,
-                "innerSpacing": Object {},
-                "namespace": undefined,
-                "namespaceQuotes": false,
-                "quotes": false,
-                "table": "tbl",
-                "tableQuotes": false,
-                "type": "ref",
-              },
-              "innerSpacing": Object {},
-              "type": "alias",
-            },
-          ],
-        },
         "type": "query",
         "unionKeyword": undefined,
         "unionQuery": undefined,
@@ -1689,6 +1689,30 @@ describe('expressions with having clause', () => {
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": undefined,
+        "fromExpressions": SeparatedArray {
+          "separators": Array [],
+          "values": Array [
+            SqlAlias {
+              "alias": undefined,
+              "asKeyword": undefined,
+              "expression": SqlRef {
+                "column": undefined,
+                "innerSpacing": Object {
+                  "postTableDot": "",
+                  "preTableDot": "",
+                },
+                "namespace": "sys",
+                "namespaceQuotes": false,
+                "quotes": false,
+                "table": "supervisors",
+                "tableQuotes": false,
+                "type": "ref",
+              },
+              "innerSpacing": Object {},
+              "type": "alias",
+            },
+          ],
+        },
         "fromKeyword": "FROM",
         "groupByExpressions": undefined,
         "groupByKeyword": undefined,
@@ -1758,7 +1782,26 @@ describe('expressions with having clause', () => {
           ],
         },
         "selectKeyword": "SELECT",
-        "tables": SeparatedArray {
+        "type": "query",
+        "unionKeyword": undefined,
+        "unionQuery": undefined,
+        "whereExpression": undefined,
+        "whereKeyword": undefined,
+        "withKeyword": undefined,
+        "withParts": undefined,
+      }
+    `);
+  });
+
+  it('Simple select with many', () => {
+    const sql = `SELECT * FROM sys.supervisors HAVING healthy = 0 and col > 100 or otherColumn = 'value'`;
+
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
+      SqlQuery {
+        "explainKeyword": undefined,
+        "fromExpressions": SeparatedArray {
           "separators": Array [],
           "values": Array [
             SqlAlias {
@@ -1782,25 +1825,6 @@ describe('expressions with having clause', () => {
             },
           ],
         },
-        "type": "query",
-        "unionKeyword": undefined,
-        "unionQuery": undefined,
-        "whereExpression": undefined,
-        "whereKeyword": undefined,
-        "withKeyword": undefined,
-        "withParts": undefined,
-      }
-    `);
-  });
-
-  it('Simple select with many', () => {
-    const sql = `SELECT * FROM sys.supervisors HAVING healthy = 0 and col > 100 or otherColumn = 'value'`;
-
-    backAndForth(sql);
-
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
-      SqlQuery {
-        "explainKeyword": undefined,
         "fromKeyword": "FROM",
         "groupByExpressions": undefined,
         "groupByKeyword": undefined,
@@ -1954,30 +1978,6 @@ describe('expressions with having clause', () => {
           ],
         },
         "selectKeyword": "SELECT",
-        "tables": SeparatedArray {
-          "separators": Array [],
-          "values": Array [
-            SqlAlias {
-              "alias": undefined,
-              "asKeyword": undefined,
-              "expression": SqlRef {
-                "column": undefined,
-                "innerSpacing": Object {
-                  "postTableDot": "",
-                  "preTableDot": "",
-                },
-                "namespace": "sys",
-                "namespaceQuotes": false,
-                "quotes": false,
-                "table": "supervisors",
-                "tableQuotes": false,
-                "type": "ref",
-              },
-              "innerSpacing": Object {},
-              "type": "alias",
-            },
-          ],
-        },
         "type": "query",
         "unionKeyword": undefined,
         "unionQuery": undefined,
@@ -1999,6 +1999,27 @@ describe('expressions with order by clause', () => {
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": undefined,
+        "fromExpressions": SeparatedArray {
+          "separators": Array [],
+          "values": Array [
+            SqlAlias {
+              "alias": undefined,
+              "asKeyword": undefined,
+              "expression": SqlRef {
+                "column": undefined,
+                "innerSpacing": Object {},
+                "namespace": undefined,
+                "namespaceQuotes": false,
+                "quotes": false,
+                "table": "tbl",
+                "tableQuotes": false,
+                "type": "ref",
+              },
+              "innerSpacing": Object {},
+              "type": "alias",
+            },
+          ],
+        },
         "fromKeyword": "from",
         "groupByExpressions": undefined,
         "groupByKeyword": undefined,
@@ -2059,7 +2080,26 @@ describe('expressions with order by clause', () => {
           ],
         },
         "selectKeyword": "Select",
-        "tables": SeparatedArray {
+        "type": "query",
+        "unionKeyword": undefined,
+        "unionQuery": undefined,
+        "whereExpression": undefined,
+        "whereKeyword": undefined,
+        "withKeyword": undefined,
+        "withParts": undefined,
+      }
+    `);
+  });
+
+  it('Simple select with ref order by', () => {
+    const sql = `Select col from tbl order by col`;
+
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
+      SqlQuery {
+        "explainKeyword": undefined,
+        "fromExpressions": SeparatedArray {
           "separators": Array [],
           "values": Array [
             SqlAlias {
@@ -2080,25 +2120,6 @@ describe('expressions with order by clause', () => {
             },
           ],
         },
-        "type": "query",
-        "unionKeyword": undefined,
-        "unionQuery": undefined,
-        "whereExpression": undefined,
-        "whereKeyword": undefined,
-        "withKeyword": undefined,
-        "withParts": undefined,
-      }
-    `);
-  });
-
-  it('Simple select with ref order by', () => {
-    const sql = `Select col from tbl order by col`;
-
-    backAndForth(sql);
-
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
-      SqlQuery {
-        "explainKeyword": undefined,
         "fromKeyword": "from",
         "groupByExpressions": undefined,
         "groupByKeyword": undefined,
@@ -2162,7 +2183,26 @@ describe('expressions with order by clause', () => {
           ],
         },
         "selectKeyword": "Select",
-        "tables": SeparatedArray {
+        "type": "query",
+        "unionKeyword": undefined,
+        "unionQuery": undefined,
+        "whereExpression": undefined,
+        "whereKeyword": undefined,
+        "withKeyword": undefined,
+        "withParts": undefined,
+      }
+    `);
+  });
+
+  it('Simple select with number order by and direction', () => {
+    const sql = `Select col from tbl order by 1 Asc`;
+
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
+      SqlQuery {
+        "explainKeyword": undefined,
+        "fromExpressions": SeparatedArray {
           "separators": Array [],
           "values": Array [
             SqlAlias {
@@ -2183,25 +2223,6 @@ describe('expressions with order by clause', () => {
             },
           ],
         },
-        "type": "query",
-        "unionKeyword": undefined,
-        "unionQuery": undefined,
-        "whereExpression": undefined,
-        "whereKeyword": undefined,
-        "withKeyword": undefined,
-        "withParts": undefined,
-      }
-    `);
-  });
-
-  it('Simple select with number order by and direction', () => {
-    const sql = `Select col from tbl order by 1 Asc`;
-
-    backAndForth(sql);
-
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
-      SqlQuery {
-        "explainKeyword": undefined,
         "fromKeyword": "from",
         "groupByExpressions": undefined,
         "groupByKeyword": undefined,
@@ -2264,7 +2285,26 @@ describe('expressions with order by clause', () => {
           ],
         },
         "selectKeyword": "Select",
-        "tables": SeparatedArray {
+        "type": "query",
+        "unionKeyword": undefined,
+        "unionQuery": undefined,
+        "whereExpression": undefined,
+        "whereKeyword": undefined,
+        "withKeyword": undefined,
+        "withParts": undefined,
+      }
+    `);
+  });
+
+  it('Simple select with ref order by and direction', () => {
+    const sql = `Select col, colTwo from tbl order by col DESC`;
+
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
+      SqlQuery {
+        "explainKeyword": undefined,
+        "fromExpressions": SeparatedArray {
           "separators": Array [],
           "values": Array [
             SqlAlias {
@@ -2285,25 +2325,6 @@ describe('expressions with order by clause', () => {
             },
           ],
         },
-        "type": "query",
-        "unionKeyword": undefined,
-        "unionQuery": undefined,
-        "whereExpression": undefined,
-        "whereKeyword": undefined,
-        "withKeyword": undefined,
-        "withParts": undefined,
-      }
-    `);
-  });
-
-  it('Simple select with ref order by and direction', () => {
-    const sql = `Select col, colTwo from tbl order by col DESC`;
-
-    backAndForth(sql);
-
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
-      SqlQuery {
-        "explainKeyword": undefined,
         "fromKeyword": "from",
         "groupByExpressions": undefined,
         "groupByKeyword": undefined,
@@ -2391,7 +2412,26 @@ describe('expressions with order by clause', () => {
           ],
         },
         "selectKeyword": "Select",
-        "tables": SeparatedArray {
+        "type": "query",
+        "unionKeyword": undefined,
+        "unionQuery": undefined,
+        "whereExpression": undefined,
+        "whereKeyword": undefined,
+        "withKeyword": undefined,
+        "withParts": undefined,
+      }
+    `);
+  });
+
+  it('Simple select ordered on multiple cols 1', () => {
+    const sql = `Select col from tbl order by 1 ASC, col`;
+
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
+      SqlQuery {
+        "explainKeyword": undefined,
+        "fromExpressions": SeparatedArray {
           "separators": Array [],
           "values": Array [
             SqlAlias {
@@ -2412,25 +2452,6 @@ describe('expressions with order by clause', () => {
             },
           ],
         },
-        "type": "query",
-        "unionKeyword": undefined,
-        "unionQuery": undefined,
-        "whereExpression": undefined,
-        "whereKeyword": undefined,
-        "withKeyword": undefined,
-        "withParts": undefined,
-      }
-    `);
-  });
-
-  it('Simple select ordered on multiple cols 1', () => {
-    const sql = `Select col from tbl order by 1 ASC, col`;
-
-    backAndForth(sql);
-
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
-      SqlQuery {
-        "explainKeyword": undefined,
         "fromKeyword": "from",
         "groupByExpressions": undefined,
         "groupByKeyword": undefined,
@@ -2514,7 +2535,26 @@ describe('expressions with order by clause', () => {
           ],
         },
         "selectKeyword": "Select",
-        "tables": SeparatedArray {
+        "type": "query",
+        "unionKeyword": undefined,
+        "unionQuery": undefined,
+        "whereExpression": undefined,
+        "whereKeyword": undefined,
+        "withKeyword": undefined,
+        "withParts": undefined,
+      }
+    `);
+  });
+
+  it('Simple select ordered on multiple cols 2', () => {
+    const sql = `Select col, colTwo from tbl order by 1 ASC, col DESC`;
+
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
+      SqlQuery {
+        "explainKeyword": undefined,
+        "fromExpressions": SeparatedArray {
           "separators": Array [],
           "values": Array [
             SqlAlias {
@@ -2535,25 +2575,6 @@ describe('expressions with order by clause', () => {
             },
           ],
         },
-        "type": "query",
-        "unionKeyword": undefined,
-        "unionQuery": undefined,
-        "whereExpression": undefined,
-        "whereKeyword": undefined,
-        "withKeyword": undefined,
-        "withParts": undefined,
-      }
-    `);
-  });
-
-  it('Simple select ordered on multiple cols 2', () => {
-    const sql = `Select col, colTwo from tbl order by 1 ASC, col DESC`;
-
-    backAndForth(sql);
-
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
-      SqlQuery {
-        "explainKeyword": undefined,
         "fromKeyword": "from",
         "groupByExpressions": undefined,
         "groupByKeyword": undefined,
@@ -2661,27 +2682,6 @@ describe('expressions with order by clause', () => {
           ],
         },
         "selectKeyword": "Select",
-        "tables": SeparatedArray {
-          "separators": Array [],
-          "values": Array [
-            SqlAlias {
-              "alias": undefined,
-              "asKeyword": undefined,
-              "expression": SqlRef {
-                "column": undefined,
-                "innerSpacing": Object {},
-                "namespace": undefined,
-                "namespaceQuotes": false,
-                "quotes": false,
-                "table": "tbl",
-                "tableQuotes": false,
-                "type": "ref",
-              },
-              "innerSpacing": Object {},
-              "type": "alias",
-            },
-          ],
-        },
         "type": "query",
         "unionKeyword": undefined,
         "unionQuery": undefined,
@@ -2703,6 +2703,27 @@ describe('expressions with limit clause', () => {
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": undefined,
+        "fromExpressions": SeparatedArray {
+          "separators": Array [],
+          "values": Array [
+            SqlAlias {
+              "alias": undefined,
+              "asKeyword": undefined,
+              "expression": SqlRef {
+                "column": undefined,
+                "innerSpacing": Object {},
+                "namespace": undefined,
+                "namespaceQuotes": false,
+                "quotes": false,
+                "table": "tbl",
+                "tableQuotes": false,
+                "type": "ref",
+              },
+              "innerSpacing": Object {},
+              "type": "alias",
+            },
+          ],
+        },
         "fromKeyword": "from",
         "groupByExpressions": undefined,
         "groupByKeyword": undefined,
@@ -2753,27 +2774,6 @@ describe('expressions with limit clause', () => {
           ],
         },
         "selectKeyword": "Select",
-        "tables": SeparatedArray {
-          "separators": Array [],
-          "values": Array [
-            SqlAlias {
-              "alias": undefined,
-              "asKeyword": undefined,
-              "expression": SqlRef {
-                "column": undefined,
-                "innerSpacing": Object {},
-                "namespace": undefined,
-                "namespaceQuotes": false,
-                "quotes": false,
-                "table": "tbl",
-                "tableQuotes": false,
-                "type": "ref",
-              },
-              "innerSpacing": Object {},
-              "type": "alias",
-            },
-          ],
-        },
         "type": "query",
         "unionKeyword": undefined,
         "unionQuery": undefined,
@@ -2795,6 +2795,27 @@ describe('expressions with union clause', () => {
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": undefined,
+        "fromExpressions": SeparatedArray {
+          "separators": Array [],
+          "values": Array [
+            SqlAlias {
+              "alias": undefined,
+              "asKeyword": undefined,
+              "expression": SqlRef {
+                "column": undefined,
+                "innerSpacing": Object {},
+                "namespace": undefined,
+                "namespaceQuotes": false,
+                "quotes": false,
+                "table": "tbl",
+                "tableQuotes": false,
+                "type": "ref",
+              },
+              "innerSpacing": Object {},
+              "type": "alias",
+            },
+          ],
+        },
         "fromKeyword": "from",
         "groupByExpressions": undefined,
         "groupByKeyword": undefined,
@@ -2839,31 +2860,31 @@ describe('expressions with union clause', () => {
           ],
         },
         "selectKeyword": "Select",
-        "tables": SeparatedArray {
-          "separators": Array [],
-          "values": Array [
-            SqlAlias {
-              "alias": undefined,
-              "asKeyword": undefined,
-              "expression": SqlRef {
-                "column": undefined,
-                "innerSpacing": Object {},
-                "namespace": undefined,
-                "namespaceQuotes": false,
-                "quotes": false,
-                "table": "tbl",
-                "tableQuotes": false,
-                "type": "ref",
-              },
-              "innerSpacing": Object {},
-              "type": "alias",
-            },
-          ],
-        },
         "type": "query",
         "unionKeyword": "union all",
         "unionQuery": SqlQuery {
           "explainKeyword": undefined,
+          "fromExpressions": SeparatedArray {
+            "separators": Array [],
+            "values": Array [
+              SqlAlias {
+                "alias": undefined,
+                "asKeyword": undefined,
+                "expression": SqlRef {
+                  "column": undefined,
+                  "innerSpacing": Object {},
+                  "namespace": undefined,
+                  "namespaceQuotes": false,
+                  "quotes": false,
+                  "table": "otherTable",
+                  "tableQuotes": false,
+                  "type": "ref",
+                },
+                "innerSpacing": Object {},
+                "type": "alias",
+              },
+            ],
+          },
           "fromKeyword": "from",
           "groupByExpressions": undefined,
           "groupByKeyword": undefined,
@@ -2906,27 +2927,6 @@ describe('expressions with union clause', () => {
             ],
           },
           "selectKeyword": "select",
-          "tables": SeparatedArray {
-            "separators": Array [],
-            "values": Array [
-              SqlAlias {
-                "alias": undefined,
-                "asKeyword": undefined,
-                "expression": SqlRef {
-                  "column": undefined,
-                  "innerSpacing": Object {},
-                  "namespace": undefined,
-                  "namespaceQuotes": false,
-                  "quotes": false,
-                  "table": "otherTable",
-                  "tableQuotes": false,
-                  "type": "ref",
-                },
-                "innerSpacing": Object {},
-                "type": "alias",
-              },
-            ],
-          },
           "type": "query",
           "unionKeyword": undefined,
           "unionQuery": undefined,
@@ -2953,6 +2953,27 @@ describe('Join Clause', () => {
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": undefined,
+        "fromExpressions": SeparatedArray {
+          "separators": Array [],
+          "values": Array [
+            SqlAlias {
+              "alias": undefined,
+              "asKeyword": undefined,
+              "expression": SqlRef {
+                "column": undefined,
+                "innerSpacing": Object {},
+                "namespace": undefined,
+                "namespaceQuotes": false,
+                "quotes": false,
+                "table": "tbl",
+                "tableQuotes": false,
+                "type": "ref",
+              },
+              "innerSpacing": Object {},
+              "type": "alias",
+            },
+          ],
+        },
         "fromKeyword": "from",
         "groupByExpressions": undefined,
         "groupByKeyword": undefined,
@@ -3057,7 +3078,26 @@ describe('Join Clause', () => {
           ],
         },
         "selectKeyword": "Select",
-        "tables": SeparatedArray {
+        "type": "query",
+        "unionKeyword": undefined,
+        "unionQuery": undefined,
+        "whereExpression": undefined,
+        "whereKeyword": undefined,
+        "withKeyword": undefined,
+        "withParts": undefined,
+      }
+    `);
+  });
+
+  it('Left join', () => {
+    const sql = 'Select * from tbl Left Join anotherTable ON col = col';
+
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
+      SqlQuery {
+        "explainKeyword": undefined,
+        "fromExpressions": SeparatedArray {
           "separators": Array [],
           "values": Array [
             SqlAlias {
@@ -3078,25 +3118,6 @@ describe('Join Clause', () => {
             },
           ],
         },
-        "type": "query",
-        "unionKeyword": undefined,
-        "unionQuery": undefined,
-        "whereExpression": undefined,
-        "whereKeyword": undefined,
-        "withKeyword": undefined,
-        "withParts": undefined,
-      }
-    `);
-  });
-
-  it('Left join', () => {
-    const sql = 'Select * from tbl Left Join anotherTable ON col = col';
-
-    backAndForth(sql);
-
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
-      SqlQuery {
-        "explainKeyword": undefined,
         "fromKeyword": "from",
         "groupByExpressions": undefined,
         "groupByKeyword": undefined,
@@ -3201,7 +3222,26 @@ describe('Join Clause', () => {
           ],
         },
         "selectKeyword": "Select",
-        "tables": SeparatedArray {
+        "type": "query",
+        "unionKeyword": undefined,
+        "unionQuery": undefined,
+        "whereExpression": undefined,
+        "whereKeyword": undefined,
+        "withKeyword": undefined,
+        "withParts": undefined,
+      }
+    `);
+  });
+
+  it('Right join', () => {
+    const sql = 'Select * from tbl RIGHT Join anotherTable ON col = col';
+
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
+      SqlQuery {
+        "explainKeyword": undefined,
+        "fromExpressions": SeparatedArray {
           "separators": Array [],
           "values": Array [
             SqlAlias {
@@ -3222,25 +3262,6 @@ describe('Join Clause', () => {
             },
           ],
         },
-        "type": "query",
-        "unionKeyword": undefined,
-        "unionQuery": undefined,
-        "whereExpression": undefined,
-        "whereKeyword": undefined,
-        "withKeyword": undefined,
-        "withParts": undefined,
-      }
-    `);
-  });
-
-  it('Right join', () => {
-    const sql = 'Select * from tbl RIGHT Join anotherTable ON col = col';
-
-    backAndForth(sql);
-
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
-      SqlQuery {
-        "explainKeyword": undefined,
         "fromKeyword": "from",
         "groupByExpressions": undefined,
         "groupByKeyword": undefined,
@@ -3345,7 +3366,26 @@ describe('Join Clause', () => {
           ],
         },
         "selectKeyword": "Select",
-        "tables": SeparatedArray {
+        "type": "query",
+        "unionKeyword": undefined,
+        "unionQuery": undefined,
+        "whereExpression": undefined,
+        "whereKeyword": undefined,
+        "withKeyword": undefined,
+        "withParts": undefined,
+      }
+    `);
+  });
+
+  it('Full join', () => {
+    const sql = 'Select * from tbl FULL Join anotherTable ON col = col';
+
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
+      SqlQuery {
+        "explainKeyword": undefined,
+        "fromExpressions": SeparatedArray {
           "separators": Array [],
           "values": Array [
             SqlAlias {
@@ -3366,25 +3406,6 @@ describe('Join Clause', () => {
             },
           ],
         },
-        "type": "query",
-        "unionKeyword": undefined,
-        "unionQuery": undefined,
-        "whereExpression": undefined,
-        "whereKeyword": undefined,
-        "withKeyword": undefined,
-        "withParts": undefined,
-      }
-    `);
-  });
-
-  it('Full join', () => {
-    const sql = 'Select * from tbl FULL Join anotherTable ON col = col';
-
-    backAndForth(sql);
-
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
-      SqlQuery {
-        "explainKeyword": undefined,
         "fromKeyword": "from",
         "groupByExpressions": undefined,
         "groupByKeyword": undefined,
@@ -3489,7 +3510,26 @@ describe('Join Clause', () => {
           ],
         },
         "selectKeyword": "Select",
-        "tables": SeparatedArray {
+        "type": "query",
+        "unionKeyword": undefined,
+        "unionQuery": undefined,
+        "whereExpression": undefined,
+        "whereKeyword": undefined,
+        "withKeyword": undefined,
+        "withParts": undefined,
+      }
+    `);
+  });
+
+  it('Full Outer join', () => {
+    const sql = 'Select * from tbl FULL OUTER Join anotherTable ON col = col';
+
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
+      SqlQuery {
+        "explainKeyword": undefined,
+        "fromExpressions": SeparatedArray {
           "separators": Array [],
           "values": Array [
             SqlAlias {
@@ -3510,25 +3550,6 @@ describe('Join Clause', () => {
             },
           ],
         },
-        "type": "query",
-        "unionKeyword": undefined,
-        "unionQuery": undefined,
-        "whereExpression": undefined,
-        "whereKeyword": undefined,
-        "withKeyword": undefined,
-        "withParts": undefined,
-      }
-    `);
-  });
-
-  it('Full Outer join', () => {
-    const sql = 'Select * from tbl FULL OUTER Join anotherTable ON col = col';
-
-    backAndForth(sql);
-
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
-      SqlQuery {
-        "explainKeyword": undefined,
         "fromKeyword": "from",
         "groupByExpressions": undefined,
         "groupByKeyword": undefined,
@@ -3633,27 +3654,6 @@ describe('Join Clause', () => {
           ],
         },
         "selectKeyword": "Select",
-        "tables": SeparatedArray {
-          "separators": Array [],
-          "values": Array [
-            SqlAlias {
-              "alias": undefined,
-              "asKeyword": undefined,
-              "expression": SqlRef {
-                "column": undefined,
-                "innerSpacing": Object {},
-                "namespace": undefined,
-                "namespaceQuotes": false,
-                "quotes": false,
-                "table": "tbl",
-                "tableQuotes": false,
-                "type": "ref",
-              },
-              "innerSpacing": Object {},
-              "type": "alias",
-            },
-          ],
-        },
         "type": "query",
         "unionKeyword": undefined,
         "unionQuery": undefined,
@@ -3678,6 +3678,27 @@ describe('Queries with comments', () => {
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": undefined,
+        "fromExpressions": SeparatedArray {
+          "separators": Array [],
+          "values": Array [
+            SqlAlias {
+              "alias": undefined,
+              "asKeyword": undefined,
+              "expression": SqlRef {
+                "column": undefined,
+                "innerSpacing": Object {},
+                "namespace": undefined,
+                "namespaceQuotes": false,
+                "quotes": false,
+                "table": "tbl",
+                "tableQuotes": false,
+                "type": "ref",
+              },
+              "innerSpacing": Object {},
+              "type": "alias",
+            },
+          ],
+        },
         "fromKeyword": "from",
         "groupByExpressions": undefined,
         "groupByKeyword": undefined,
@@ -3721,27 +3742,6 @@ describe('Queries with comments', () => {
           ],
         },
         "selectKeyword": "Select",
-        "tables": SeparatedArray {
-          "separators": Array [],
-          "values": Array [
-            SqlAlias {
-              "alias": undefined,
-              "asKeyword": undefined,
-              "expression": SqlRef {
-                "column": undefined,
-                "innerSpacing": Object {},
-                "namespace": undefined,
-                "namespaceQuotes": false,
-                "quotes": false,
-                "table": "tbl",
-                "tableQuotes": false,
-                "type": "ref",
-              },
-              "innerSpacing": Object {},
-              "type": "alias",
-            },
-          ],
-        },
         "type": "query",
         "unionKeyword": undefined,
         "unionQuery": undefined,
@@ -3832,6 +3832,27 @@ describe('No spacing', () => {
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": undefined,
+        "fromExpressions": SeparatedArray {
+          "separators": Array [],
+          "values": Array [
+            SqlAlias {
+              "alias": undefined,
+              "asKeyword": undefined,
+              "expression": SqlRef {
+                "column": undefined,
+                "innerSpacing": Object {},
+                "namespace": undefined,
+                "namespaceQuotes": false,
+                "quotes": false,
+                "table": "wiki",
+                "tableQuotes": true,
+                "type": "ref",
+              },
+              "innerSpacing": Object {},
+              "type": "alias",
+            },
+          ],
+        },
         "fromKeyword": "FROM",
         "groupByExpressions": SeparatedArray {
           "separators": Array [],
@@ -4019,27 +4040,6 @@ describe('No spacing', () => {
           ],
         },
         "selectKeyword": "SELECT",
-        "tables": SeparatedArray {
-          "separators": Array [],
-          "values": Array [
-            SqlAlias {
-              "alias": undefined,
-              "asKeyword": undefined,
-              "expression": SqlRef {
-                "column": undefined,
-                "innerSpacing": Object {},
-                "namespace": undefined,
-                "namespaceQuotes": false,
-                "quotes": false,
-                "table": "wiki",
-                "tableQuotes": true,
-                "type": "ref",
-              },
-              "innerSpacing": Object {},
-              "type": "alias",
-            },
-          ],
-        },
         "type": "query",
         "unionKeyword": undefined,
         "unionQuery": undefined,
@@ -4069,6 +4069,27 @@ describe('Extra', () => {
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": undefined,
+        "fromExpressions": SeparatedArray {
+          "separators": Array [],
+          "values": Array [
+            SqlAlias {
+              "alias": undefined,
+              "asKeyword": undefined,
+              "expression": SqlRef {
+                "column": undefined,
+                "innerSpacing": Object {},
+                "namespace": undefined,
+                "namespaceQuotes": false,
+                "quotes": false,
+                "table": "wikipedia",
+                "tableQuotes": true,
+                "type": "ref",
+              },
+              "innerSpacing": Object {},
+              "type": "alias",
+            },
+          ],
+        },
         "fromKeyword": "FROM",
         "groupByExpressions": SeparatedArray {
           "separators": Array [],
@@ -4252,27 +4273,6 @@ describe('Extra', () => {
           ],
         },
         "selectKeyword": "SELECT",
-        "tables": SeparatedArray {
-          "separators": Array [],
-          "values": Array [
-            SqlAlias {
-              "alias": undefined,
-              "asKeyword": undefined,
-              "expression": SqlRef {
-                "column": undefined,
-                "innerSpacing": Object {},
-                "namespace": undefined,
-                "namespaceQuotes": false,
-                "quotes": false,
-                "table": "wikipedia",
-                "tableQuotes": true,
-                "type": "ref",
-              },
-              "innerSpacing": Object {},
-              "type": "alias",
-            },
-          ],
-        },
         "type": "query",
         "unionKeyword": undefined,
         "unionQuery": undefined,

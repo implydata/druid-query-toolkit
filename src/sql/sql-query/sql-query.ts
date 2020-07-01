@@ -41,7 +41,7 @@ export interface SqlQueryValue extends SqlBaseValue {
   selectExpressions: SeparatedArray<SqlAlias>;
 
   fromKeyword?: string;
-  tables?: SeparatedArray<SqlAlias>;
+  fromExpressions?: SeparatedArray<SqlAlias>;
   joinParts?: SeparatedArray<SqlJoinPart>;
 
   whereKeyword?: string;
@@ -74,7 +74,7 @@ export class SqlQuery extends SqlBase {
       selectKeyword: 'SELECT',
       selectExpressions: SeparatedArray.fromSingleValue(SqlAlias.STAR),
       fromKeyword: 'FROM',
-      tables: SeparatedArray.fromSingleValue(SqlAlias.fromBaseAndUpgrade(from)),
+      fromExpressions: SeparatedArray.fromSingleValue(SqlAlias.fromBaseAndUpgrade(from)),
     });
   }
 
@@ -89,7 +89,7 @@ export class SqlQuery extends SqlBase {
   public readonly selectDecorator?: string;
   public readonly selectExpressions: SeparatedArray<SqlAlias>;
   public readonly fromKeyword?: string;
-  public readonly tables?: SeparatedArray<SqlAlias>;
+  public readonly fromExpressions?: SeparatedArray<SqlAlias>;
   public readonly joinParts?: SeparatedArray<SqlJoinPart>;
   public readonly whereKeyword?: string;
   public readonly whereExpression?: SqlExpression;
@@ -115,7 +115,7 @@ export class SqlQuery extends SqlBase {
     this.selectDecorator = options.selectDecorator;
     this.selectExpressions = options.selectExpressions;
     this.fromKeyword = options.fromKeyword;
-    this.tables = options.tables;
+    this.fromExpressions = options.fromExpressions;
     this.joinParts = options.joinParts;
     this.whereKeyword = options.whereKeyword;
     this.whereExpression = options.whereExpression;
@@ -142,7 +142,7 @@ export class SqlQuery extends SqlBase {
     value.selectDecorator = this.selectDecorator;
     value.selectExpressions = this.selectExpressions;
     value.fromKeyword = this.fromKeyword;
-    value.tables = this.tables;
+    value.fromExpressions = this.fromExpressions;
     value.joinParts = this.joinParts;
     value.whereKeyword = this.whereKeyword;
     value.whereExpression = this.whereExpression;
@@ -188,12 +188,12 @@ export class SqlQuery extends SqlBase {
     rawParts.push(this.selectExpressions.toString());
 
     // From clause
-    if (this.fromKeyword && this.tables) {
+    if (this.fromKeyword && this.fromExpressions) {
       rawParts.push(
         this.getInnerSpace('preFrom', '\n'),
         this.fromKeyword,
         this.getInnerSpace('postFrom'),
-        this.tables.toString(),
+        this.fromExpressions.toString(),
       );
     }
 
@@ -304,13 +304,15 @@ export class SqlQuery extends SqlBase {
     return new SqlQuery(value);
   }
 
-  public changeTables(tables: SeparatedArray<SqlAlias> | SqlAlias[] | undefined): SqlQuery {
+  public changeFromExpressions(
+    fromExpressions: SeparatedArray<SqlAlias> | SqlAlias[] | undefined,
+  ): SqlQuery {
     const value = this.valueOf();
-    if (tables) {
-      value.tables = SeparatedArray.fromArray(tables, Separator.COMMA);
+    if (fromExpressions) {
+      value.fromExpressions = SeparatedArray.fromArray(fromExpressions, Separator.COMMA);
       value.fromKeyword = value.fromKeyword || 'FROM';
     } else {
-      delete value.tables;
+      delete value.fromExpressions;
       delete value.fromKeyword;
       value.innerSpacing = this.getInnerSpacingWithout('preFrom', 'postFrom');
     }
@@ -454,11 +456,16 @@ export class SqlQuery extends SqlBase {
       }
     }
 
-    if (this.tables) {
-      const tables = SqlBase.walkSeparatedArray(this.tables, nextStack, fn, postorder);
-      if (!tables) return;
-      if (tables !== this.tables) {
-        ret = ret.changeTables(tables);
+    if (this.fromExpressions) {
+      const fromExpressions = SqlBase.walkSeparatedArray(
+        this.fromExpressions,
+        nextStack,
+        fn,
+        postorder,
+      );
+      if (!fromExpressions) return;
+      if (fromExpressions !== this.fromExpressions) {
+        ret = ret.changeFromExpressions(fromExpressions);
       }
     }
 
@@ -696,14 +703,14 @@ export class SqlQuery extends SqlBase {
   /* ~~~~~ FROM ~~~~~ */
 
   hasFrom(): boolean {
-    return Boolean(this.tables);
+    return Boolean(this.fromExpressions);
   }
 
   getFirstTableName(): string | undefined {
     // returns the first table name
-    if (!this.tables) return;
+    if (!this.fromExpressions) return;
 
-    return filterMap(this.tables.values, table => {
+    return filterMap(this.fromExpressions.values, table => {
       const tableRef = table.expression;
       if (tableRef instanceof SqlRef) {
         return tableRef.table;
@@ -714,9 +721,9 @@ export class SqlQuery extends SqlBase {
 
   // returns the first table namespace
   getFirstSchema(): string | undefined {
-    if (!this.tables) return;
+    if (!this.fromExpressions) return;
 
-    return filterMap(this.tables.values, table => {
+    return filterMap(this.fromExpressions.values, table => {
       const tableRef = table.expression;
       if (tableRef instanceof SqlRef) {
         return tableRef.namespace;

@@ -324,6 +324,27 @@ describe('SqlComparison', () => {
         "op": "IN",
         "rhs": SqlQuery {
           "explainKeyword": undefined,
+          "fromExpressions": SeparatedArray {
+            "separators": Array [],
+            "values": Array [
+              SqlAlias {
+                "alias": undefined,
+                "asKeyword": undefined,
+                "expression": SqlRef {
+                  "column": undefined,
+                  "innerSpacing": Object {},
+                  "namespace": undefined,
+                  "namespaceQuotes": false,
+                  "quotes": false,
+                  "table": "tbl",
+                  "tableQuotes": false,
+                  "type": "ref",
+                },
+                "innerSpacing": Object {},
+                "type": "alias",
+              },
+            ],
+          },
           "fromKeyword": "FROM",
           "groupByExpressions": undefined,
           "groupByKeyword": undefined,
@@ -380,27 +401,6 @@ describe('SqlComparison', () => {
             ],
           },
           "selectKeyword": "SELECT",
-          "tables": SeparatedArray {
-            "separators": Array [],
-            "values": Array [
-              SqlAlias {
-                "alias": undefined,
-                "asKeyword": undefined,
-                "expression": SqlRef {
-                  "column": undefined,
-                  "innerSpacing": Object {},
-                  "namespace": undefined,
-                  "namespaceQuotes": false,
-                  "quotes": false,
-                  "table": "tbl",
-                  "tableQuotes": false,
-                  "type": "ref",
-                },
-                "innerSpacing": Object {},
-                "type": "alias",
-              },
-            ],
-          },
           "type": "query",
           "unionKeyword": undefined,
           "unionQuery": undefined,
@@ -440,6 +440,27 @@ describe('SqlComparison', () => {
         "op": "IN",
         "rhs": SqlQuery {
           "explainKeyword": undefined,
+          "fromExpressions": SeparatedArray {
+            "separators": Array [],
+            "values": Array [
+              SqlAlias {
+                "alias": undefined,
+                "asKeyword": undefined,
+                "expression": SqlRef {
+                  "column": undefined,
+                  "innerSpacing": Object {},
+                  "namespace": undefined,
+                  "namespaceQuotes": false,
+                  "quotes": false,
+                  "table": "tbl",
+                  "tableQuotes": false,
+                  "type": "ref",
+                },
+                "innerSpacing": Object {},
+                "type": "alias",
+              },
+            ],
+          },
           "fromKeyword": "FROM",
           "groupByExpressions": undefined,
           "groupByKeyword": undefined,
@@ -496,27 +517,6 @@ describe('SqlComparison', () => {
             ],
           },
           "selectKeyword": "SELECT",
-          "tables": SeparatedArray {
-            "separators": Array [],
-            "values": Array [
-              SqlAlias {
-                "alias": undefined,
-                "asKeyword": undefined,
-                "expression": SqlRef {
-                  "column": undefined,
-                  "innerSpacing": Object {},
-                  "namespace": undefined,
-                  "namespaceQuotes": false,
-                  "quotes": false,
-                  "table": "tbl",
-                  "tableQuotes": false,
-                  "type": "ref",
-                },
-                "innerSpacing": Object {},
-                "type": "alias",
-              },
-            ],
-          },
           "type": "query",
           "unionKeyword": undefined,
           "unionQuery": undefined,
