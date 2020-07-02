@@ -1060,35 +1060,42 @@ ArrayEntry = Number / SingleQuotedString / UnicodeString / BinaryString
 
 // ------------------------------
 
-SqlRef = tableBits:(RefPart _ "." _)? column:RefPart !"."
+SqlRef = a:RefPart b:(_ "." _ RefPart)? c:(_ "." _ RefPart)?
 {
-  return new sql.SqlRef({
-    column: column.name,
-    quotes: column.quotes,
-    table: deepGet(tableBits, '0.name'),
-    tableQuotes: deepGet(tableBits, '0.quotes'),
-    innerSpacing: {
-      preTableDot: deepGet(tableBits, '1'),
-      postTableDot: deepGet(tableBits, '3'),
-    }
-  });
-}
-/ namespaceBits:(RefPart _ "." _) tableBits:(RefPart _ "." _) column:RefPart !"."
-{
-  return new sql.SqlRef({
-    column: column.name,
-    quotes: column.quotes,
-    table: deepGet(tableBits, '0.name'),
-    tableQuotes: deepGet(tableBits, '0.quotes'),
-    namespace: deepGet(namespaceBits, '0.name'),
-    namespaceQuotes: deepGet(namespaceBits, '0.quotes'),
-    innerSpacing: {
-      preTableDot: deepGet(tableBits, '1'),
-      posTabletDot: deepGet(tableBits, '3'),
-      preNamespaceDot: deepGet(namespaceBits, '1'),
-      postNamespaceDot: deepGet(namespaceBits, '3'),
-    }
-  });
+  if (c) {
+    return new sql.SqlRef({
+      column: c[3].name,
+      quotes: c[3].quotes,
+      table: b[3].name,
+      tableQuotes: b[3].quotes,
+      namespace: a.name,
+      namespaceQuotes: a.quotes,
+      innerSpacing: {
+        preTableDot: c[0],
+        postTableDot: c[2],
+        preNamespaceDot: b[0],
+        postNamespaceDot: b[2],
+      }
+    });
+
+  } else if (b) {
+    return new sql.SqlRef({
+      column: b[3].name,
+      quotes: b[3].quotes,
+      table: a.name,
+      tableQuotes: a.quotes,
+      innerSpacing: {
+        preTableDot: b[0],
+        postTableDot: b[2],
+      }
+    });
+
+  } else {
+    return new sql.SqlRef({
+      column: a.name,
+      quotes: a.quotes,
+    });
+  }
 }
 
 RefPart = QuotedRefPart / UnquotedRefPart / Star

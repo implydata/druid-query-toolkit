@@ -202,6 +202,8 @@ describe('SqlRef', () => {
   it('without quotes + namespace + parens', () => {
     const sql = `(( "lol" . channel)   )`;
 
+    backAndForth(sql);
+
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlRef {
         "column": "channel",
@@ -227,7 +229,36 @@ describe('SqlRef', () => {
         "type": "ref",
       }
     `);
-    expect(parseSql(sql).toRawString()).toMatchInlineSnapshot(`"\\"lol\\" . channel"`);
+  });
+
+  it('column.table.namespace', () => {
+    const sql = `"lol"  .  channel  .  boo`;
+
+    backAndForth(sql);
+
+    expect(parseSql(sql)).toMatchInlineSnapshot(`
+      SqlRef {
+        "column": "boo",
+        "innerSpacing": Object {
+          "postNamespaceDot": "  ",
+          "postTableDot": "  ",
+          "preNamespaceDot": "  ",
+          "preTableDot": "  ",
+        },
+        "namespace": "lol",
+        "namespaceQuotes": true,
+        "quotes": false,
+        "table": "channel",
+        "tableQuotes": false,
+        "type": "ref",
+      }
+    `);
+  });
+
+  it('too many parts', () => {
+    const sql = `"lol" . channel.boo .moo`;
+
+    expect(() => parseSql(sql)).toThrowError();
   });
 });
 
