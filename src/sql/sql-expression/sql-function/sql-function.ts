@@ -34,6 +34,8 @@ export class SqlFunction extends SqlExpression {
   static DEFAULT_FILTER_KEYWORD = 'FILTER';
   static DEFAULT_WHERE_KEYWORD = 'WHERE';
 
+  static COUNT_STAR: SqlFunction;
+
   static simple(
     functionName: string,
     args: SqlExpression[] | SeparatedArray<SqlExpression>,
@@ -194,3 +196,5 @@ export class SqlFunction extends SqlExpression {
 }
 
 SqlBase.register(SqlFunction.type, SqlFunction);
+
+SqlFunction.COUNT_STAR = SqlFunction.simple('COUNT', [SqlRef.STAR]);

@@ -80,12 +80,12 @@ export class SqlMulti extends SqlExpression {
     return this.changeArgs(this.args.addLast(expression, Separator.symmetricSpace('AND')));
   }
 
-  public removeColumnFromAnd(column: string): SqlExpression | undefined {
+  public filterAnd(fn: (ex: SqlExpression) => boolean): SqlExpression | undefined {
     if (this.expressionType !== 'and') {
-      return super.removeColumnFromAnd(column);
+      return super.filterAnd(fn);
     }
 
-    const args = this.args.filter(a => !a.containsColumn(column));
+    const args = this.args.filter(fn);
     if (!args) return;
 
     if (args.length() === 1) {

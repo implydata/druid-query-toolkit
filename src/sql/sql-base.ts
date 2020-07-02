@@ -141,11 +141,16 @@ export abstract class SqlBase {
 
   public addParens(leftSpacing?: string, rightSpacing?: string): this {
     const value = this.valueOf();
-    value.parens = (value.parens || []).concat({
+    value.parens = (this.parens || []).concat({
       leftSpacing: leftSpacing || '',
       rightSpacing: rightSpacing || '',
     });
     return SqlBase.fromValue(value);
+  }
+
+  public ensureParens(leftSpacing?: string, rightSpacing?: string): this {
+    if (this.parens) return this;
+    return this.addParens(leftSpacing, rightSpacing);
   }
 
   public getInnerSpace(name: string, defaultSpace = ' ') {

@@ -1769,7 +1769,7 @@ describe('Brackets', () => {
   });
 });
 
-describe.skip('#removeColumnFromAnd', () => {
+describe('#removeColumnFromAnd', () => {
   it('remove from single expression not AND', () => {
     const sql = `A > 1`;
 
@@ -1780,7 +1780,7 @@ describe.skip('#removeColumnFromAnd', () => {
   it('remove from simple AND', () => {
     const sql = `A AND B`;
 
-    expect(String(parseSqlExpression(sql).removeColumnFromAnd('A'))).toEqual('A');
+    expect(String(parseSqlExpression(sql).removeColumnFromAnd('A'))).toEqual('B');
   });
 
   it('remove from single expression type multiple', () => {

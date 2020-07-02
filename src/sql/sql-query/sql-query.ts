@@ -585,8 +585,8 @@ export class SqlQuery extends SqlBase {
     });
   }
 
-  isExprOutputColumnAtSelectIndex(selectIndex: number): boolean {
-    return !this.selectExpressions.get(selectIndex).getOutputName();
+  isRealOutputColumnAtSelectIndex(selectIndex: number): boolean {
+    return Boolean(this.selectExpressions.get(selectIndex).getOutputName());
   }
 
   isGroupedSelectIndex(selectIndex: number): boolean {

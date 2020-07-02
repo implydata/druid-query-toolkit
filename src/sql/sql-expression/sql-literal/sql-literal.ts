@@ -69,6 +69,10 @@ export class SqlLiteral extends SqlExpression {
     });
   }
 
+  static index(n: number): SqlLiteral {
+    return SqlLiteral.factory(n + 1);
+  }
+
   static escapeLiteralString(str: string): string {
     return `'${str.replace(/'/g, "''")}'`;
   }

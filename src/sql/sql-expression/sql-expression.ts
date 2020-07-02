@@ -30,7 +30,7 @@ export abstract class SqlExpression extends SqlBase {
     const compactArgs = filterMap(args, a => {
       if (!a) return;
       if (a instanceof SqlMulti && a.expressionType === 'or') {
-        return a.addParens();
+        return a.ensureParens();
       }
       return a;
     });
@@ -133,8 +133,12 @@ export abstract class SqlExpression extends SqlBase {
     return SqlExpression.and(this, expression);
   }
 
-  public removeColumnFromAnd(column: string): SqlExpression | undefined {
-    if (this.containsColumn(column)) return;
+  public filterAnd(fn: (ex: SqlExpression) => boolean): SqlExpression | undefined {
+    if (!fn(this)) return;
     return this;
+  }
+
+  public removeColumnFromAnd(column: string): SqlExpression | undefined {
+    return this.filterAnd(ex => !ex.containsColumn(column));
   }
 }
