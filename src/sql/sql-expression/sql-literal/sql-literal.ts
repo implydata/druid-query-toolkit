@@ -113,7 +113,7 @@ export class SqlLiteral extends SqlExpression {
     return value;
   }
 
-  public toRawString(): string {
+  protected toRawString(): string {
     const retParts: string[] = [];
 
     if (this.keyword) {

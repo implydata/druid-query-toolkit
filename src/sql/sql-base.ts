@@ -169,7 +169,7 @@ export abstract class SqlBase {
     return ret;
   }
 
-  public abstract toRawString(): string;
+  protected abstract toRawString(): string;
 
   toString(): string {
     const { parens } = this;

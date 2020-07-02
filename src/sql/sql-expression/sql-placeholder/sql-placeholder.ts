@@ -24,7 +24,7 @@ export class SqlPlaceholder extends SqlExpression {
     super(options, SqlPlaceholder.type);
   }
 
-  public toRawString(): string {
+  protected toRawString(): string {
     return '?';
   }
 }

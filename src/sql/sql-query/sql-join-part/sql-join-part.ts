@@ -62,7 +62,7 @@ export class SqlJoinPart extends SqlBase {
     return value;
   }
 
-  public toRawString(): string {
+  protected toRawString(): string {
     const rawParts: string[] = [];
 
     if (this.joinType) {

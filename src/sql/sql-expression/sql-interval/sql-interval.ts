@@ -52,7 +52,7 @@ export class SqlInterval extends SqlExpression {
     return value;
   }
 
-  public toRawString(): string {
+  protected toRawString(): string {
     return (
       this.intervalKeyword +
       this.getInnerSpace('postIntervalKeyword') +

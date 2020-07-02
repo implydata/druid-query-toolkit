@@ -187,7 +187,7 @@ export class SqlComparison extends SqlExpression {
     return value;
   }
 
-  public toRawString(): string {
+  protected toRawString(): string {
     const { lhs, op, notKeyword, rhs } = this;
     const opIsIs = this.getEffectiveOp() === 'IS';
 

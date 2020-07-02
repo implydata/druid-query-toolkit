@@ -126,7 +126,7 @@ export class SqlRef extends SqlExpression {
     return value;
   }
 
-  public toRawString(): string {
+  protected toRawString(): string {
     return [
       SqlRef.wrapInQuotes(this.namespace, this.namespaceQuotes),
 

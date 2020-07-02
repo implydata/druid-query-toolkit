@@ -68,7 +68,7 @@ export class SqlOrderByPart extends SqlBase {
     return value;
   }
 
-  toRawString(): string {
+  protected toRawString(): string {
     const rawParts = [this.expression.toString()];
 
     if (this.direction) {

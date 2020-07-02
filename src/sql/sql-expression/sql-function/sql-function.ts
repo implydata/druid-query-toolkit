@@ -97,7 +97,7 @@ export class SqlFunction extends SqlExpression {
     return value;
   }
 
-  public toRawString(): string {
+  protected toRawString(): string {
     const { specialParen } = this;
     const rawParts: string[] = [this.functionName];
 

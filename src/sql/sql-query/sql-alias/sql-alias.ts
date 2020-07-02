@@ -75,7 +75,7 @@ export class SqlAlias extends SqlBase {
     return value as SqlAliasValue;
   }
 
-  public toRawString(): string {
+  protected toRawString(): string {
     const rawParts: string[] = [this.expression.toString()];
 
     if (this.alias) {

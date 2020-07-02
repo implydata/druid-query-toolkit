@@ -46,7 +46,7 @@ export class SqlMulti extends SqlExpression {
     return value;
   }
 
-  public toRawString(): string {
+  protected toRawString(): string {
     return this.args.toString();
   }
 
