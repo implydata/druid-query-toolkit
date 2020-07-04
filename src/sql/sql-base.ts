@@ -153,6 +153,12 @@ export abstract class SqlBase {
     return this.addParens(leftSpacing, rightSpacing);
   }
 
+  public resetInnerSpace(): this {
+    const value = this.valueOf();
+    value.innerSpacing = {};
+    return SqlBase.fromValue(value);
+  }
+
   public getInnerSpace(name: string, defaultSpace = ' ') {
     const { innerSpacing } = this;
     if (!innerSpacing) return defaultSpace;
@@ -169,11 +175,11 @@ export abstract class SqlBase {
     return ret;
   }
 
-  protected abstract toRawString(): string;
+  protected abstract _toRawString(): string;
 
   toString(): string {
     const { parens } = this;
-    let str = this.toRawString();
+    let str = this._toRawString();
     if (parens) {
       for (const paren of parens) {
         str = `(${paren.leftSpacing}${str}${paren.rightSpacing})`;
@@ -195,23 +201,23 @@ export abstract class SqlBase {
   }
 
   public _walkHelper(stack: SqlBase[], fn: Substitutor, postorder: boolean): SqlBase | undefined {
+    let ret: SqlBase | undefined = this;
+
     if (!postorder) {
-      const ret = fn(this, stack);
+      ret = fn(ret, stack);
       if (!ret) return;
-      if (ret !== this) return ret;
+      if (ret !== this) return ret; // In a preorder scan we do not want to scan replacement inner object if it has changed
     }
 
-    const ret = this._walkInner(stack.concat(this), fn, postorder);
+    ret = ret._walkInner(stack.concat(ret), fn, postorder);
     if (!ret) return;
-    if (ret !== this) return ret;
 
     if (postorder) {
-      const ret = fn(this, stack);
+      ret = fn(ret, stack);
       if (!ret) return;
-      if (ret !== this) return ret;
     }
 
-    return this;
+    return ret;
   }
 
   public _walkInner(
@@ -285,6 +291,12 @@ export abstract class SqlBase {
         return filler;
       }
       return ex;
+    });
+  }
+
+  public prettify(): SqlBase {
+    return this.walkPostorder(ex => {
+      return ex.resetInnerSpace();
     });
   }
 

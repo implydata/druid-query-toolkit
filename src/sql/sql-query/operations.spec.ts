@@ -610,4 +610,28 @@ describe('SqlQuery operations', () => {
       `);
     });
   });
+
+  describe('prettify', () => {
+    it('existing cols in group by', () => {
+      const sql = sane`
+        select   col1    ||    lol  ,   min(col1)   +   Sum(kl)  AS   aliasName
+        from tbl        
+        GROUP    BY   1
+        ORDER by   2   dESC  ,  3
+        Asc   Limit  10
+      `;
+
+      expect(
+        parseSqlQuery(sql)
+          .prettify()
+          .toString(),
+      ).toEqual(sane`
+        select col1    ||    lol  ,   min(col1)   +   Sum(kl) AS aliasName
+        from tbl
+        GROUP    BY 1
+        ORDER by 2 dESC  ,  3 Asc
+        LIMIT 10
+      `);
+    });
+  });
 });

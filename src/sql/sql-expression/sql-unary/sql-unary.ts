@@ -39,7 +39,7 @@ export class SqlUnary extends SqlExpression {
     return value;
   }
 
-  protected toRawString(): string {
+  protected _toRawString(): string {
     if (!this.arg) {
       throw new Error('Could not make raw string');
     }

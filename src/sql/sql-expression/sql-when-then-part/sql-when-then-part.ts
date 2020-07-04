@@ -56,7 +56,7 @@ export class SqlWhenThenPart extends SqlBase {
     return value;
   }
 
-  protected toRawString(): string {
+  protected _toRawString(): string {
     return [
       this.whenKeyword,
       this.getInnerSpace('postWhen'),

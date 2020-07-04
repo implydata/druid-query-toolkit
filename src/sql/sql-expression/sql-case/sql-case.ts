@@ -73,7 +73,7 @@ export class SqlCase extends SqlExpression {
     return value;
   }
 
-  protected toRawString(): string {
+  protected _toRawString(): string {
     const rawParts: string[] = [this.caseKeyword.toString(), this.getInnerSpace('postCase')];
 
     if (this.caseExpression) {

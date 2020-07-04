@@ -53,7 +53,7 @@ export class SqlWithPart extends SqlBase {
     return value;
   }
 
-  protected toRawString(): string {
+  protected _toRawString(): string {
     const rawParts: string[] = [this.withTable.toString(), this.getInnerSpace('postWithTable')];
 
     if (this.withColumns) {
