@@ -333,17 +333,15 @@ describe('SqlLiteral', () => {
     `);
   });
 
-  it('works with factory', () => {
-    expect(SqlLiteral.factory(null).toString()).toEqual('NULL');
-    expect(SqlLiteral.factory(false).toString()).toEqual('FALSE');
-    expect(SqlLiteral.factory(true).toString()).toEqual('TRUE');
-    expect(SqlLiteral.factory(1.2).toString()).toEqual('1.2');
-    expect(SqlLiteral.factory(`hello`).toString()).toEqual(`'hello'`);
-    expect(SqlLiteral.factory(`he'o`).toString()).toEqual(`'he''o'`);
-    expect(SqlLiteral.factory(new Date('2020-01-02Z')).toString()).toEqual(
-      `TIMESTAMP '2020-01-02'`,
-    );
-    expect(SqlLiteral.factory(new Date('2020-01-02T03:04:05Z')).toString()).toEqual(
+  it('works with create', () => {
+    expect(SqlLiteral.create(null).toString()).toEqual('NULL');
+    expect(SqlLiteral.create(false).toString()).toEqual('FALSE');
+    expect(SqlLiteral.create(true).toString()).toEqual('TRUE');
+    expect(SqlLiteral.create(1.2).toString()).toEqual('1.2');
+    expect(SqlLiteral.create(`hello`).toString()).toEqual(`'hello'`);
+    expect(SqlLiteral.create(`he'o`).toString()).toEqual(`'he''o'`);
+    expect(SqlLiteral.create(new Date('2020-01-02Z')).toString()).toEqual(`TIMESTAMP '2020-01-02'`);
+    expect(SqlLiteral.create(new Date('2020-01-02T03:04:05Z')).toString()).toEqual(
       `TIMESTAMP '2020-01-02 03:04:05'`,
     );
   });

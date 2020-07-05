@@ -117,8 +117,9 @@ export abstract class SqlBase {
     if (!type) throw new Error(`could not determine type`);
     this.type = type;
     this.innerSpacing = SqlBase.cleanObject(options.innerSpacing || {});
-    if (options.parens) {
-      this.parens = options.parens;
+    const { parens } = options;
+    if (parens && parens.length) {
+      this.parens = parens;
     }
   }
 
@@ -153,10 +154,29 @@ export abstract class SqlBase {
     return this.addParens(leftSpacing, rightSpacing);
   }
 
+  public removeParenSpaces(): this {
+    if (!this.parens) return this;
+    const value = this.valueOf();
+    value.parens = this.parens.map(() => ({
+      leftSpacing: '',
+      rightSpacing: '',
+    }));
+    return SqlBase.fromValue(value);
+  }
+
   public resetInnerSpace(): this {
+    if (Object.keys(this.innerSpacing).length === 0) return this;
     const value = this.valueOf();
     value.innerSpacing = {};
     return SqlBase.fromValue(value);
+  }
+
+  public clearStaticKeywords(): this {
+    return this;
+  }
+
+  public clearSeparators(): this {
+    return this;
   }
 
   public getInnerSpace(name: string, defaultSpace = ' ') {
@@ -284,7 +304,7 @@ export abstract class SqlBase {
           if (typeof filler === 'string') {
             filler = parseSql(filler);
           } else {
-            filler = SqlLiteral.factory(filler);
+            filler = SqlLiteral.create(filler);
           }
         }
 
@@ -296,7 +316,11 @@ export abstract class SqlBase {
 
   public prettify(): SqlBase {
     return this.walkPostorder(ex => {
-      return ex.resetInnerSpace();
+      return ex
+        .resetInnerSpace()
+        .clearStaticKeywords()
+        .clearSeparators()
+        .removeParenSpaces();
     });
   }
 

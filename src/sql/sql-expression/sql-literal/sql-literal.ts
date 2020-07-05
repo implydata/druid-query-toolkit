@@ -32,7 +32,7 @@ export class SqlLiteral extends SqlExpression {
   static TRUE: SqlLiteral;
   static ZERO: SqlLiteral;
 
-  static factory(value: LiteralValue | SqlLiteral): SqlLiteral {
+  static create(value: LiteralValue | SqlLiteral): SqlLiteral {
     if (value instanceof SqlLiteral) return value;
 
     let keyword: string | undefined;
@@ -70,7 +70,7 @@ export class SqlLiteral extends SqlExpression {
   }
 
   static index(n: number): SqlLiteral {
-    return SqlLiteral.factory(n + 1);
+    return SqlLiteral.create(n + 1);
   }
 
   static escapeLiteralString(str: string): string {
@@ -144,7 +144,7 @@ export class SqlLiteral extends SqlExpression {
 
   public prettyTrim(maxLength: number): SqlBase {
     if (typeof this.value === 'string') {
-      return SqlLiteral.factory(trimString(this.value, maxLength));
+      return SqlLiteral.create(trimString(this.value, maxLength));
     }
     return this;
   }
@@ -157,7 +157,7 @@ export class SqlLiteral extends SqlExpression {
 
 SqlBase.register(SqlLiteral.type, SqlLiteral);
 
-SqlLiteral.NULL = SqlLiteral.factory(null);
-SqlLiteral.FALSE = SqlLiteral.factory(false);
-SqlLiteral.TRUE = SqlLiteral.factory(true);
-SqlLiteral.ZERO = SqlLiteral.factory(0);
+SqlLiteral.NULL = SqlLiteral.create(null);
+SqlLiteral.FALSE = SqlLiteral.create(false);
+SqlLiteral.TRUE = SqlLiteral.create(true);
+SqlLiteral.ZERO = SqlLiteral.create(0);

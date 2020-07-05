@@ -113,7 +113,7 @@ export class SqlFunction extends SqlExpression {
       }
 
       if (this.args) {
-        rawParts.push(this.args.toString(), this.getInnerSpace('postArguments', ''));
+        rawParts.push(this.args.toString(Separator.COMMA), this.getInnerSpace('postArguments', ''));
       }
 
       rawParts.push(specialParen === 'square' ? ']' : ')');
@@ -184,6 +184,13 @@ export class SqlFunction extends SqlExpression {
     }
 
     return ret;
+  }
+
+  public clearSeparators(): this {
+    if (!this.args) return this;
+    const value = this.valueOf();
+    value.args = this.args.clearSeparators();
+    return SqlBase.fromValue(value);
   }
 
   public isCountStar(): boolean {

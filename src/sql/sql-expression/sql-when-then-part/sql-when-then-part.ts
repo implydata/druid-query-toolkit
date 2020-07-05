@@ -25,7 +25,7 @@ export interface SqlWhenThenPartValue extends SqlBaseValue {
 export class SqlWhenThenPart extends SqlBase {
   static type = 'whenThenPart';
 
-  static factory(whenExpression: SqlExpression, thenExpression: SqlExpression): SqlWhenThenPart {
+  static create(whenExpression: SqlExpression, thenExpression: SqlExpression): SqlWhenThenPart {
     return new SqlWhenThenPart({
       whenKeyword: 'WHEN',
       whenExpression,

@@ -19,12 +19,14 @@ export type SeparatorOrString = Separator | string;
 export class SeparatedArray<T> {
   static fromArray<T>(
     xs: readonly T[] | SeparatedArray<T>,
-    sep: SeparatorOrString,
+    sep?: SeparatorOrString,
   ): SeparatedArray<T> {
     if (xs instanceof SeparatedArray) return xs;
     const separators: SeparatorOrString[] = [];
-    for (let i = 1; i < xs.length; i++) {
-      separators.push(sep);
+    if (sep) {
+      for (let i = 1; i < xs.length; i++) {
+        separators.push(sep);
+      }
     }
     return new SeparatedArray<T>(xs, separators);
   }
@@ -36,8 +38,9 @@ export class SeparatedArray<T> {
   public readonly values: readonly T[];
   public readonly separators: SeparatorOrString[];
 
-  constructor(values: readonly T[], separators: SeparatorOrString[]) {
-    if (values.length - separators.length !== 1) {
+  constructor(values: readonly T[], separators?: SeparatorOrString[]) {
+    separators = separators || [];
+    if (values.length <= separators.length) {
       throw new Error(
         `invalid values (${values.length}) or separator length (${separators.length})`,
       );
@@ -47,11 +50,12 @@ export class SeparatedArray<T> {
     this.separators = separators;
   }
 
-  public toString(): string {
+  public toString(defaultSeparator: SeparatorOrString = Separator.COMMA): string {
     const { values, separators } = this;
-    const rawParts = separators.map((separator, i) => String(values[i]) + String(separator));
-    rawParts.push(String(values[values.length - 1]));
-    return rawParts.join('');
+    const lastIndex = values.length - 1;
+    return values
+      .map((v, i) => String(v) + (i < lastIndex ? String(separators[i] || defaultSeparator) : ''))
+      .join('');
   }
 
   public length(): number {
@@ -105,15 +109,19 @@ export class SeparatedArray<T> {
     return this.filter((_x, i) => i !== index);
   }
 
-  public addFirst(value: T, defaultSeparator: SeparatorOrString): SeparatedArray<T> {
+  public addFirst(value: T): SeparatedArray<T> {
     const { values, separators } = this;
-    const separator = separators[0] || defaultSeparator;
+    const separator = separators[0];
     return new SeparatedArray<T>([value].concat(values), [separator].concat(separators));
   }
 
-  public addLast(value: T, defaultSeparator: SeparatorOrString): SeparatedArray<T> {
+  public addLast(value: T): SeparatedArray<T> {
     const { values, separators } = this;
-    const separator = separators[separators.length - 1] || defaultSeparator;
+    const separator = separators[values.length - 2];
     return new SeparatedArray<T>(values.concat([value]), separators.concat(separator));
+  }
+
+  public clearSeparators(): SeparatedArray<T> {
+    return new SeparatedArray<T>(this.values, []);
   }
 }

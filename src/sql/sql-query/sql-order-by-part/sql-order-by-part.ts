@@ -25,7 +25,7 @@ export interface SqlOrderByPartValue extends SqlBaseValue {
 export class SqlOrderByPart extends SqlBase {
   static type = 'orderByPart';
 
-  static factory(expression: SqlExpression, direction?: string) {
+  static create(expression: SqlExpression, direction?: string) {
     return new SqlOrderByPart({
       expression,
       direction,

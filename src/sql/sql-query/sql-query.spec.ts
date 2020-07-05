@@ -29,6 +29,8 @@ describe('SqlQuery', () => {
       `Select notingham from tbl`,
       `Select 3`,
       `Select * from tbl`,
+      `Select * from tbl Limit 10`,
+      `Select * from tbl Limit 10 offset 5`,
       `(Select * from tbl)`,
       `Select count(*) As sums from tbl`,
       `Select count(*) As sums from tbl GROUP BY ()`,
@@ -75,16 +77,16 @@ describe('SqlQuery', () => {
     }
   });
 
-  describe('.factory', () => {
+  describe('.create', () => {
     it('works', () => {
-      expect(String(SqlQuery.factory(SqlRef.table('lol')))).toEqual(sane`
+      expect(String(SqlQuery.create(SqlRef.table('lol')))).toEqual(sane`
         SELECT *
         FROM lol
       `);
     });
 
     it('works in advanced case', () => {
-      const query = SqlQuery.factory(SqlRef.table('lol'))
+      const query = SqlQuery.create(SqlRef.table('lol'))
         .changeSelectExpressions([
           SqlRef.column('channel').as(),
           SqlRef.column('page').as(),

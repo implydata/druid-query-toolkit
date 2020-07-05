@@ -27,7 +27,7 @@ export interface SqlJoinPartValue extends SqlBaseValue {
 export class SqlJoinPart extends SqlBase {
   static type = 'joinPart';
 
-  static factory(joinType: string, table: SqlBase, onExpression?: SqlExpression): SqlJoinPart {
+  static create(joinType: string, table: SqlBase, onExpression?: SqlExpression): SqlJoinPart {
     return new SqlJoinPart({
       joinType: joinType,
       joinKeyword: 'JOIN',

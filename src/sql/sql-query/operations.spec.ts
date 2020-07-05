@@ -581,7 +581,7 @@ describe('SqlQuery operations', () => {
       expect(
         parseSqlQuery(sql)
           .addToGroupBy(
-            SqlAlias.factory(SqlFunction.simple('min', [SqlRef.column('col1')]), 'MinColumn'),
+            SqlAlias.create(SqlFunction.simple('min', [SqlRef.column('col1')]), 'MinColumn'),
           )
           .toString(),
       ).toEqual(sane`
@@ -600,7 +600,7 @@ describe('SqlQuery operations', () => {
       expect(
         parseSqlQuery(sql)
           .addToGroupBy(
-            SqlAlias.factory(SqlFunction.simple('max', [SqlRef.column('col2')]), 'MaxColumn'),
+            SqlAlias.create(SqlFunction.simple('max', [SqlRef.column('col2')]), 'MaxColumn'),
           )
           .toString(),
       ).toEqual(sane`
@@ -612,13 +612,15 @@ describe('SqlQuery operations', () => {
   });
 
   describe('prettify', () => {
-    it('existing cols in group by', () => {
+    it('misc query', () => {
       const sql = sane`
-        select   col1    ||    lol  ,   min(col1)   +   Sum(kl)  AS   aliasName
-        from tbl        
-        GROUP    BY   1
-        ORDER by   2   dESC  ,  3
-        Asc   Limit  10
+        Select   col1    ||    lol  ,  ( Min(col1)   +   Sum(kl)  )  AS   aliasName   ,
+        Concat(   a      ,   b,          c    ),
+        Case   A   When   B   Then    C   End   As m
+        From tbl
+        Group    By   1
+        Order  By   2   Desc  ,  3
+        Asc   LimIT  12
       `;
 
       expect(
@@ -626,11 +628,11 @@ describe('SqlQuery operations', () => {
           .prettify()
           .toString(),
       ).toEqual(sane`
-        select col1    ||    lol  ,   min(col1)   +   Sum(kl) AS aliasName
-        from tbl
-        GROUP    BY 1
-        ORDER by 2 dESC  ,  3 Asc
-        LIMIT 10
+        Select col1 || lol, (Min(col1) + Sum(kl)) AS aliasName, Concat(a, b, c), Case A When B Then C End As m
+        From tbl
+        Group    By 1
+        Order  By 2 Desc, 3 Asc
+        LimIT 12
       `);
     });
   });

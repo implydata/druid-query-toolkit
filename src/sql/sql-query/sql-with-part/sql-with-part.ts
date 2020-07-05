@@ -60,7 +60,7 @@ export class SqlWithPart extends SqlBase {
       rawParts.push(
         '(',
         this.getInnerSpace('postLeftParen'),
-        this.withColumns.toString(),
+        this.withColumns.toString('\n'),
         this.getInnerSpace('preRightParen'),
         ')',
         this.getInnerSpace('postWithColumns'),
@@ -118,6 +118,13 @@ export class SqlWithPart extends SqlBase {
     }
 
     return ret;
+  }
+
+  public clearSeparators(): this {
+    if (!this.withColumns) return this;
+    const value = this.valueOf();
+    value.withColumns = this.withColumns.clearSeparators();
+    return SqlBase.fromValue(value);
   }
 }
 

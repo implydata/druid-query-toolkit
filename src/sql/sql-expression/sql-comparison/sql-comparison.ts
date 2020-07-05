@@ -118,7 +118,7 @@ export class SqlComparison extends SqlExpression {
     rhs: SqlLiteral | string,
     escape?: SqlLiteral | string,
   ): SqlComparison {
-    const rhsLiteral = SqlLiteral.factory(rhs);
+    const rhsLiteral = SqlLiteral.create(rhs);
     return new SqlComparison({
       op: 'LIKE',
       lhs,
@@ -128,7 +128,7 @@ export class SqlComparison extends SqlExpression {
           : {
               like: rhsLiteral,
               escapeKeyword: 'ESCAPE',
-              escape: SqlLiteral.factory(escape),
+              escape: SqlLiteral.create(escape),
             },
     });
   }
@@ -142,9 +142,9 @@ export class SqlComparison extends SqlExpression {
       op: 'BETWEEN',
       lhs,
       rhs: {
-        start: SqlLiteral.factory(start),
+        start: SqlLiteral.create(start),
         andKeyword: 'AND',
-        end: SqlLiteral.factory(end),
+        end: SqlLiteral.create(end),
       },
     });
   }
@@ -158,9 +158,9 @@ export class SqlComparison extends SqlExpression {
       op: 'BETWEEN SYMMETRIC',
       lhs,
       rhs: {
-        start: SqlLiteral.factory(start),
+        start: SqlLiteral.create(start),
         andKeyword: 'AND',
-        end: SqlLiteral.factory(end),
+        end: SqlLiteral.create(end),
       },
     });
   }

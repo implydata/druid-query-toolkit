@@ -47,7 +47,7 @@ export class SqlMulti extends SqlExpression {
   }
 
   protected _toRawString(): string {
-    return this.args.toString();
+    return this.args.toString(Separator.symmetricSpace(this.expressionType.toUpperCase()));
   }
 
   public changeArgs(args: SeparatedArray<SqlExpression>): this {
@@ -72,12 +72,18 @@ export class SqlMulti extends SqlExpression {
     return ret;
   }
 
+  public clearSeparators(): this {
+    const value = this.valueOf();
+    value.args = this.args.clearSeparators();
+    return SqlBase.fromValue(value);
+  }
+
   public and(expression: SqlExpression): SqlExpression {
     if (this.expressionType !== 'and') {
       return super.and(expression);
     }
 
-    return this.changeArgs(this.args.addLast(expression, Separator.symmetricSpace('AND')));
+    return this.changeArgs(this.args.addLast(expression));
   }
 
   public filterAnd(fn: (ex: SqlExpression) => boolean): SqlExpression | undefined {

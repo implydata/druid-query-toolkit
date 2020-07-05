@@ -71,11 +71,11 @@ export abstract class SqlExpression extends SqlBase {
   }
 
   public as(alias?: string) {
-    return SqlAlias.factory(this, alias);
+    return SqlAlias.create(this, alias);
   }
 
   public toOrderByPart(direction?: string): SqlOrderByPart {
-    return SqlOrderByPart.factory(this, direction);
+    return SqlOrderByPart.create(this, direction);
   }
 
   // SqlComparison

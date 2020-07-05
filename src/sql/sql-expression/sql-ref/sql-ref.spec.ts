@@ -22,7 +22,7 @@ describe('SqlRef', () => {
     expect(() => parseSql(sql)).toThrowError('Expected');
   });
 
-  it('#factory', () => {
+  it('#create', () => {
     const star = SqlRef.column('*');
 
     backAndForth(star.toString());

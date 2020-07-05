@@ -55,7 +55,7 @@ describe('Add Join', () => {
     expect(
       parseSqlQuery(`SELECT countryName from wikipedia`)
         .addJoin(
-          SqlJoinPart.factory(
+          SqlJoinPart.create(
             'LEFT',
             SqlRef.column('country', 'lookup'),
             parseSqlExpression('lookup.country.v = wikipedia.countryName'),
@@ -72,7 +72,7 @@ describe('Add Join', () => {
     expect(
       parseSqlQuery(`SELECT countryName from wikipedia`)
         .addJoin(
-          SqlJoinPart.factory(
+          SqlJoinPart.create(
             'INNER',
             SqlRef.column('country', 'lookup'),
             parseSqlExpression('lookup.country.v = wikipedia.countryName'),

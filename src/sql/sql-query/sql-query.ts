@@ -69,7 +69,7 @@ export interface SqlQueryValue extends SqlBaseValue {
 export class SqlQuery extends SqlBase {
   static type = 'query';
 
-  static factory(from: SqlBase): SqlQuery {
+  static create(from: SqlBase): SqlQuery {
     return new SqlQuery({
       selectKeyword: 'SELECT',
       selectExpressions: SeparatedArray.fromSingleValue(SqlAlias.STAR),
@@ -174,7 +174,7 @@ export class SqlQuery extends SqlBase {
       rawParts.push(
         this.withKeyword,
         this.getInnerSpace('postWith'),
-        this.withParts.toString(),
+        this.withParts.toString('\n'),
         this.getInnerSpace('postWithQuery'),
       );
     }
@@ -185,7 +185,7 @@ export class SqlQuery extends SqlBase {
       rawParts.push(this.selectDecorator, this.getInnerSpace('postSelectDecorator'));
     }
 
-    rawParts.push(this.selectExpressions.toString());
+    rawParts.push(this.selectExpressions.toString(Separator.COMMA));
 
     // From clause
     if (this.fromKeyword && this.fromExpressions) {
@@ -193,13 +193,13 @@ export class SqlQuery extends SqlBase {
         this.getInnerSpace('preFrom', '\n'),
         this.fromKeyword,
         this.getInnerSpace('postFrom'),
-        this.fromExpressions.toString(),
+        this.fromExpressions.toString(Separator.COMMA),
       );
     }
 
     // Join Clause
     if (this.joinParts) {
-      rawParts.push(this.getInnerSpace('preJoin', '\n'), this.joinParts.toString());
+      rawParts.push(this.getInnerSpace('preJoin', '\n'), this.joinParts.toString('\n'));
     }
 
     // Where Clause
@@ -221,7 +221,7 @@ export class SqlQuery extends SqlBase {
       );
 
       if (this.groupByExpressions) {
-        rawParts.push(this.groupByExpressions.toString());
+        rawParts.push(this.groupByExpressions.toString(Separator.COMMA));
       } else {
         rawParts.push('()'); // Temp hack to allow for `GROUP BY ()`
       }
@@ -243,7 +243,7 @@ export class SqlQuery extends SqlBase {
         this.getInnerSpace('preOrderBy', '\n'),
         this.orderByKeyword,
         this.getInnerSpace('postOrderBy'),
-        this.orderByParts.toString(),
+        this.orderByParts.toString(Separator.COMMA),
       );
     }
 
@@ -286,7 +286,7 @@ export class SqlQuery extends SqlBase {
   ): SqlQuery {
     const value = this.valueOf();
     if (withParts) {
-      value.withParts = SeparatedArray.fromArray(withParts, '\n');
+      value.withParts = SeparatedArray.fromArray(withParts);
       value.withKeyword = value.withKeyword || 'WITH';
     } else {
       delete value.withParts;
@@ -300,7 +300,7 @@ export class SqlQuery extends SqlBase {
     selectExpressions: SeparatedArray<SqlAlias> | SqlAlias[],
   ): SqlQuery {
     const value = this.valueOf();
-    value.selectExpressions = SeparatedArray.fromArray(selectExpressions, Separator.COMMA);
+    value.selectExpressions = SeparatedArray.fromArray(selectExpressions);
     return new SqlQuery(value);
   }
 
@@ -309,7 +309,7 @@ export class SqlQuery extends SqlBase {
   ): SqlQuery {
     const value = this.valueOf();
     if (fromExpressions) {
-      value.fromExpressions = SeparatedArray.fromArray(fromExpressions, Separator.COMMA);
+      value.fromExpressions = SeparatedArray.fromArray(fromExpressions);
       value.fromKeyword = value.fromKeyword || 'FROM';
     } else {
       delete value.fromExpressions;
@@ -324,7 +324,7 @@ export class SqlQuery extends SqlBase {
   ): SqlQuery {
     const value = this.valueOf();
     if (joinParts) {
-      value.joinParts = SeparatedArray.fromArray(joinParts, '\n');
+      value.joinParts = SeparatedArray.fromArray(joinParts);
     } else {
       delete value.joinParts;
     }
@@ -354,7 +354,7 @@ export class SqlQuery extends SqlBase {
       value.innerSpacing = this.getInnerSpacingWithout('preGroupBy', 'postGroupBy');
     } else {
       value.groupByExpressions = groupByExpressions
-        ? SeparatedArray.fromArray(groupByExpressions, Separator.COMMA)
+        ? SeparatedArray.fromArray(groupByExpressions)
         : null;
       value.groupByKeyword = value.groupByKeyword || 'GROUP BY';
     }
@@ -383,7 +383,7 @@ export class SqlQuery extends SqlBase {
       delete value.orderByKeyword;
       value.innerSpacing = this.getInnerSpacingWithout('preOrderBy', 'postOrderBy');
     } else {
-      value.orderByParts = SeparatedArray.fromArray(orderByParts, Separator.COMMA);
+      value.orderByParts = SeparatedArray.fromArray(orderByParts);
       value.orderByKeyword = value.orderByKeyword || 'ORDER BY';
     }
     return new SqlQuery(value);
@@ -396,8 +396,8 @@ export class SqlQuery extends SqlBase {
       delete value.limitKeyword;
       value.innerSpacing = this.getInnerSpacingWithout('preLimit', 'postLimit');
     } else {
-      value.limitValue = SqlLiteral.factory(limitValue);
-      value.limitKeyword = 'LIMIT';
+      value.limitValue = SqlLiteral.create(limitValue);
+      value.limitKeyword = value.limitKeyword || 'LIMIT';
     }
     return new SqlQuery(value);
   }
@@ -409,8 +409,8 @@ export class SqlQuery extends SqlBase {
       delete value.offsetKeyword;
       value.innerSpacing = this.getInnerSpacingWithout('preOffset', 'postOffset');
     } else {
-      value.offsetValue = SqlLiteral.factory(offsetValue);
-      value.offsetKeyword = 'OFFSET';
+      value.offsetValue = SqlLiteral.create(offsetValue);
+      value.offsetKeyword = value.offsetKeyword || 'OFFSET';
     }
     return new SqlQuery(value);
   }
@@ -541,6 +541,40 @@ export class SqlQuery extends SqlBase {
     return ret;
   }
 
+  public clearStaticKeywords(): this {
+    const value = this.valueOf();
+    // delete value.selectKeyword;
+    return SqlBase.fromValue(value);
+  }
+
+  public clearSeparators(): this {
+    const value = this.valueOf();
+
+    if (this.withParts) {
+      value.withParts = this.withParts.clearSeparators();
+    }
+
+    value.selectExpressions = this.selectExpressions.clearSeparators();
+
+    if (this.fromExpressions) {
+      value.fromExpressions = this.fromExpressions.clearSeparators();
+    }
+
+    if (this.joinParts) {
+      value.joinParts = this.joinParts.clearSeparators();
+    }
+
+    if (this.groupByExpressions) {
+      value.groupByExpressions = this.groupByExpressions.clearSeparators();
+    }
+
+    if (this.orderByParts) {
+      value.orderByParts = this.orderByParts.clearSeparators();
+    }
+
+    return SqlBase.fromValue(value);
+  }
+
   /* ~~~~~ SELECT ~~~~~ */
 
   isValidSelectIndex(selectIndex: number): boolean {
@@ -645,9 +679,9 @@ export class SqlQuery extends SqlBase {
     const alias = SqlAlias.fromBase(typeof ex === 'string' ? parseSql(ex) : ex);
 
     if (first) {
-      return this.changeSelectExpressions(this.selectExpressions.addFirst(alias, Separator.COMMA));
+      return this.changeSelectExpressions(this.selectExpressions.addFirst(alias));
     } else {
-      return this.changeSelectExpressions(this.selectExpressions.addLast(alias, Separator.COMMA));
+      return this.changeSelectExpressions(this.selectExpressions.addLast(alias));
     }
   }
 
@@ -740,7 +774,7 @@ export class SqlQuery extends SqlBase {
 
   addJoin(join: SqlJoinPart) {
     return this.changeJoinParts(
-      this.joinParts ? this.joinParts.addLast(join, '\n') : SeparatedArray.fromSingleValue(join),
+      this.joinParts ? this.joinParts.addLast(join) : SeparatedArray.fromSingleValue(join),
     );
   }
 
@@ -783,7 +817,7 @@ export class SqlQuery extends SqlBase {
 
   addFirstColumnToGroupBy() {
     // Adds the last column in the select clause to the group by clause via its index
-    const newGroupBy = SqlLiteral.factory(1);
+    const newGroupBy = SqlLiteral.create(1);
     return this.changeGroupByExpressions(
       this.groupByExpressions
         ? this.groupByExpressions
@@ -793,7 +827,7 @@ export class SqlQuery extends SqlBase {
               }
               return groupByExpression;
             })
-            .addFirst(newGroupBy, Separator.COMMA)
+            .addFirst(newGroupBy)
         : SeparatedArray.fromSingleValue(newGroupBy),
     );
   }
@@ -866,7 +900,7 @@ export class SqlQuery extends SqlBase {
   addOrderBy(orderBy: SqlOrderByPart): SqlQuery {
     return this.changeOrderByParts(
       this.orderByParts
-        ? this.orderByParts.addFirst(orderBy, Separator.COMMA)
+        ? this.orderByParts.addFirst(orderBy)
         : SeparatedArray.fromSingleValue(orderBy),
     );
   }

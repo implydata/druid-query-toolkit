@@ -37,7 +37,7 @@ export class SqlCase extends SqlExpression {
     return new SqlCase({
       caseKeyword: 'CASE',
       whenThenParts: SeparatedArray.fromSingleValue(
-        SqlWhenThenPart.factory(conditionExpression, thenExpression),
+        SqlWhenThenPart.create(conditionExpression, thenExpression),
       ),
       elseKeyword: elseExpression ? 'ELSE' : undefined,
       elseExpression,
@@ -80,7 +80,7 @@ export class SqlCase extends SqlExpression {
       rawParts.push(this.caseExpression.toString(), this.getInnerSpace('postCaseExpression'));
     }
 
-    rawParts.push(this.whenThenParts.toString());
+    rawParts.push(this.whenThenParts.toString(' '));
 
     if (this.elseKeyword && this.elseExpression) {
       rawParts.push(
@@ -144,6 +144,12 @@ export class SqlCase extends SqlExpression {
     }
 
     return ret;
+  }
+
+  public clearSeparators(): this {
+    const value = this.valueOf();
+    value.whenThenParts = this.whenThenParts.clearSeparators();
+    return SqlBase.fromValue(value);
   }
 }
 
