@@ -628,11 +628,11 @@ describe('SqlQuery operations', () => {
           .prettify()
           .toString(),
       ).toEqual(sane`
-        Select col1 || lol, (Min(col1) + Sum(kl)) AS aliasName, Concat(a, b, c), Case A When B Then C End As m
-        From tbl
-        Group    By 1
-        Order  By 2 Desc, 3 Asc
-        LimIT 12
+        SELECT col1 || lol, (Min(col1) + Sum(kl)) AS aliasName, Concat(a, b, c), Case A When B Then C End As m
+        FROM tbl
+        GROUP BY 1
+        ORDER BY 2 Desc, 3 Asc
+        LIMIT 12
       `);
     });
   });

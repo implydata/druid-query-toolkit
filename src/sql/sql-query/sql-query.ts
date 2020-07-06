@@ -69,6 +69,16 @@ export interface SqlQueryValue extends SqlBaseValue {
 export class SqlQuery extends SqlBase {
   static type = 'query';
 
+  static readonly DEFAULT_WITH_KEYWORD = 'WITH';
+  static readonly DEFAULT_SELECT_KEYWORD = 'SELECT';
+  static readonly DEFAULT_FROM_KEYWORD = 'FROM';
+  static readonly DEFAULT_WHERE_KEYWORD = 'WHERE';
+  static readonly DEFAULT_GROUP_BY_KEYWORD = 'GROUP BY';
+  static readonly DEFAULT_HAVING_KEYWORD = 'HAVING';
+  static readonly DEFAULT_ORDER_BY_KEYWORD = 'ORDER BY';
+  static readonly DEFAULT_LIMIT_KEYWORD = 'LIMIT';
+  static readonly DEFAULT_OFFSET_KEYWORD = 'OFFSET';
+
   static create(from: SqlBase): SqlQuery {
     return new SqlQuery({
       selectKeyword: 'SELECT',
@@ -169,10 +179,10 @@ export class SqlQuery extends SqlBase {
       rawParts.push(this.explainKeyword, this.getInnerSpace('postExplain'));
     }
 
-    // With clause
-    if (this.withKeyword && this.withParts) {
+    // WITH clause
+    if (this.withParts) {
       rawParts.push(
-        this.withKeyword,
+        this.withKeyword || SqlQuery.DEFAULT_WITH_KEYWORD,
         this.getInnerSpace('postWith'),
         this.withParts.toString('\n'),
         this.getInnerSpace('postWithQuery'),
@@ -180,7 +190,10 @@ export class SqlQuery extends SqlBase {
     }
 
     // Select clause
-    rawParts.push(this.selectKeyword, this.getInnerSpace('postSelect'));
+    rawParts.push(
+      this.selectKeyword || SqlQuery.DEFAULT_SELECT_KEYWORD,
+      this.getInnerSpace('postSelect'),
+    );
     if (this.selectDecorator) {
       rawParts.push(this.selectDecorator, this.getInnerSpace('postSelectDecorator'));
     }
@@ -188,10 +201,10 @@ export class SqlQuery extends SqlBase {
     rawParts.push(this.selectExpressions.toString(Separator.COMMA));
 
     // From clause
-    if (this.fromKeyword && this.fromExpressions) {
+    if (this.fromExpressions) {
       rawParts.push(
         this.getInnerSpace('preFrom', '\n'),
-        this.fromKeyword,
+        this.fromKeyword || SqlQuery.DEFAULT_FROM_KEYWORD,
         this.getInnerSpace('postFrom'),
         this.fromExpressions.toString(Separator.COMMA),
       );
@@ -202,21 +215,21 @@ export class SqlQuery extends SqlBase {
       rawParts.push(this.getInnerSpace('preJoin', '\n'), this.joinParts.toString('\n'));
     }
 
-    // Where Clause
-    if (this.whereKeyword && this.whereExpression) {
+    // WHERE Clause
+    if (this.whereExpression) {
       rawParts.push(
         this.getInnerSpace('preWhere', '\n'),
-        this.whereKeyword,
+        this.whereKeyword || SqlQuery.DEFAULT_WHERE_KEYWORD,
         this.getInnerSpace('postWhere'),
         this.whereExpression.toString(),
       );
     }
 
     // GROUP BY
-    if (this.groupByKeyword) {
+    if (typeof this.groupByExpressions !== 'undefined') {
       rawParts.push(
         this.getInnerSpace('preGroupBy', '\n'),
-        this.groupByKeyword,
+        this.groupByKeyword || SqlQuery.DEFAULT_GROUP_BY_KEYWORD,
         this.getInnerSpace('postGroupBy'),
       );
 
@@ -227,41 +240,41 @@ export class SqlQuery extends SqlBase {
       }
     }
 
-    // Having Clause
-    if (this.havingKeyword && this.havingExpression) {
+    // HAVING Clause
+    if (this.havingExpression) {
       rawParts.push(
         this.getInnerSpace('preHaving', '\n'),
-        this.havingKeyword,
+        this.havingKeyword || SqlQuery.DEFAULT_HAVING_KEYWORD,
         this.getInnerSpace('postHaving'),
         this.havingExpression.toString(),
       );
     }
 
-    // OrderBy Clause
-    if (this.orderByKeyword && this.orderByParts) {
+    // ORDER BY Clause
+    if (this.orderByParts) {
       rawParts.push(
         this.getInnerSpace('preOrderBy', '\n'),
-        this.orderByKeyword,
+        this.orderByKeyword || SqlQuery.DEFAULT_ORDER_BY_KEYWORD,
         this.getInnerSpace('postOrderBy'),
         this.orderByParts.toString(Separator.COMMA),
       );
     }
 
-    // Limit Clause
-    if (this.limitKeyword && this.limitValue) {
+    // LIMIT Clause
+    if (this.limitValue) {
       rawParts.push(
         this.getInnerSpace('preLimit', '\n'),
-        this.limitKeyword,
+        this.limitKeyword || SqlQuery.DEFAULT_LIMIT_KEYWORD,
         this.getInnerSpace('postLimit'),
         this.limitValue.toString(),
       );
     }
 
     // Offset Clause
-    if (this.offsetKeyword && this.offsetValue) {
+    if (this.offsetValue) {
       rawParts.push(
         this.getInnerSpace('preOffset', '\n'),
-        this.offsetKeyword,
+        this.offsetKeyword || SqlQuery.DEFAULT_OFFSET_KEYWORD,
         this.getInnerSpace('postOffset'),
         this.offsetValue.toString(),
       );
@@ -287,7 +300,6 @@ export class SqlQuery extends SqlBase {
     const value = this.valueOf();
     if (withParts) {
       value.withParts = SeparatedArray.fromArray(withParts);
-      value.withKeyword = value.withKeyword || 'WITH';
     } else {
       delete value.withParts;
       delete value.withKeyword;
@@ -310,7 +322,6 @@ export class SqlQuery extends SqlBase {
     const value = this.valueOf();
     if (fromExpressions) {
       value.fromExpressions = SeparatedArray.fromArray(fromExpressions);
-      value.fromKeyword = value.fromKeyword || 'FROM';
     } else {
       delete value.fromExpressions;
       delete value.fromKeyword;
@@ -339,7 +350,6 @@ export class SqlQuery extends SqlBase {
       value.innerSpacing = this.getInnerSpacingWithout('preWhere', 'postWhere');
     } else {
       value.whereExpression = parseSqlExpression(whereExpression);
-      value.whereKeyword = value.whereKeyword || 'WHERE';
     }
     return new SqlQuery(value);
   }
@@ -356,7 +366,6 @@ export class SqlQuery extends SqlBase {
       value.groupByExpressions = groupByExpressions
         ? SeparatedArray.fromArray(groupByExpressions)
         : null;
-      value.groupByKeyword = value.groupByKeyword || 'GROUP BY';
     }
     return new SqlQuery(value);
   }
@@ -369,7 +378,6 @@ export class SqlQuery extends SqlBase {
       value.innerSpacing = this.getInnerSpacingWithout('preHaving', 'postHaving');
     } else {
       value.havingExpression = parseSqlExpression(havingExpression);
-      value.havingKeyword = value.havingKeyword || 'HAVING';
     }
     return new SqlQuery(value);
   }
@@ -384,7 +392,6 @@ export class SqlQuery extends SqlBase {
       value.innerSpacing = this.getInnerSpacingWithout('preOrderBy', 'postOrderBy');
     } else {
       value.orderByParts = SeparatedArray.fromArray(orderByParts);
-      value.orderByKeyword = value.orderByKeyword || 'ORDER BY';
     }
     return new SqlQuery(value);
   }
@@ -397,7 +404,6 @@ export class SqlQuery extends SqlBase {
       value.innerSpacing = this.getInnerSpacingWithout('preLimit', 'postLimit');
     } else {
       value.limitValue = SqlLiteral.create(limitValue);
-      value.limitKeyword = value.limitKeyword || 'LIMIT';
     }
     return new SqlQuery(value);
   }
@@ -410,7 +416,6 @@ export class SqlQuery extends SqlBase {
       value.innerSpacing = this.getInnerSpacingWithout('preOffset', 'postOffset');
     } else {
       value.offsetValue = SqlLiteral.create(offsetValue);
-      value.offsetKeyword = value.offsetKeyword || 'OFFSET';
     }
     return new SqlQuery(value);
   }
@@ -543,7 +548,15 @@ export class SqlQuery extends SqlBase {
 
   public clearStaticKeywords(): this {
     const value = this.valueOf();
-    // delete value.selectKeyword;
+    delete value.withKeyword;
+    delete value.selectKeyword;
+    delete value.fromKeyword;
+    delete value.whereKeyword;
+    delete value.groupByKeyword;
+    delete value.havingKeyword;
+    delete value.orderByKeyword;
+    delete value.limitKeyword;
+    delete value.offsetKeyword;
     return SqlBase.fromValue(value);
   }
 
