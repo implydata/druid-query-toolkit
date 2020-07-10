@@ -13,16 +13,16 @@
  */
 
 import { SqlAlias, SqlOrderByExpression } from '..';
-import { SqlBase, SqlBaseValue, Substitutor } from '../../sql-base';
+import { SqlBase, Substitutor } from '../../sql-base';
 import { SqlLiteral } from '../../sql-expression';
 import { SeparatedArray } from '../../utils';
+import { SqlClause, SqlClauseValue } from '../sql-clause';
 
-export interface SqlOrderByClauseValue extends SqlBaseValue {
-  keyword?: string;
+export interface SqlOrderByClauseValue extends SqlClauseValue {
   expressions: SeparatedArray<SqlOrderByExpression>;
 }
 
-export class SqlOrderByClause extends SqlBase {
+export class SqlOrderByClause extends SqlClause {
   static type = 'orderByClause';
 
   static DEFAULT_KEYWORD = 'ORDER BY';
@@ -44,18 +44,15 @@ export class SqlOrderByClause extends SqlBase {
     }
   }
 
-  public readonly keyword?: string;
   public readonly expressions: SeparatedArray<SqlOrderByExpression>;
 
   constructor(options: SqlOrderByClauseValue) {
     super(options, SqlOrderByClause.type);
-    this.keyword = options.keyword;
     this.expressions = options.expressions;
   }
 
   public valueOf(): SqlOrderByClauseValue {
     const value = super.valueOf() as SqlOrderByClauseValue;
-    value.keyword = this.keyword;
     value.expressions = this.expressions;
     return value;
   }
@@ -71,12 +68,6 @@ export class SqlOrderByClause extends SqlBase {
     return rawParts.join('');
   }
 
-  public changeKeyword(keyword: string | undefined): this {
-    const value = this.valueOf();
-    value.keyword = keyword;
-    return SqlBase.fromValue(value);
-  }
-
   public changeExpressions(
     expressions: SeparatedArray<SqlOrderByExpression> | SqlOrderByExpression[],
   ): this {
@@ -89,7 +80,7 @@ export class SqlOrderByClause extends SqlBase {
     nextStack: SqlBase[],
     fn: Substitutor,
     postorder: boolean,
-  ): SqlBase | undefined {
+  ): SqlClause | undefined {
     let ret = this;
 
     const expressions = SqlBase.walkSeparatedArray(this.expressions, nextStack, fn, postorder);
@@ -99,12 +90,6 @@ export class SqlOrderByClause extends SqlBase {
     }
 
     return ret;
-  }
-
-  public clearStaticKeywords(): this {
-    const value = this.valueOf();
-    delete value.keyword;
-    return SqlBase.fromValue(value);
   }
 
   public clearSeparators(): this {

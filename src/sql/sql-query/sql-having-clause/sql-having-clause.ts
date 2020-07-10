@@ -13,15 +13,15 @@
  */
 
 import { parseSqlExpression } from '../../../parser';
-import { SqlBase, SqlBaseValue, Substitutor } from '../../sql-base';
+import { SqlBase, Substitutor } from '../../sql-base';
 import { SqlExpression } from '../../sql-expression';
+import { SqlClause, SqlClauseValue } from '../sql-clause';
 
-export interface SqlHavingClauseValue extends SqlBaseValue {
-  keyword?: string;
+export interface SqlHavingClauseValue extends SqlClauseValue {
   expression: SqlExpression;
 }
 
-export class SqlHavingClause extends SqlBase {
+export class SqlHavingClause extends SqlClause {
   static type = 'havingClause';
 
   static DEFAULT_KEYWORD = 'HAVING';
@@ -32,18 +32,15 @@ export class SqlHavingClause extends SqlBase {
     });
   }
 
-  public readonly keyword?: string;
   public readonly expression: SqlExpression;
 
   constructor(options: SqlHavingClauseValue) {
     super(options, SqlHavingClause.type);
-    this.keyword = options.keyword;
     this.expression = options.expression;
   }
 
   public valueOf(): SqlHavingClauseValue {
     const value = super.valueOf() as SqlHavingClauseValue;
-    value.keyword = this.keyword;
     value.expression = this.expression;
     return value;
   }
@@ -59,12 +56,6 @@ export class SqlHavingClause extends SqlBase {
     return rawParts.join('');
   }
 
-  public changeKeyword(keyword: string | undefined): this {
-    const value = this.valueOf();
-    value.keyword = keyword;
-    return SqlBase.fromValue(value);
-  }
-
   public changeExpression(expression: SqlExpression | string): this {
     const value = this.valueOf();
     value.expression = parseSqlExpression(expression);
@@ -75,7 +66,7 @@ export class SqlHavingClause extends SqlBase {
     nextStack: SqlBase[],
     fn: Substitutor,
     postorder: boolean,
-  ): SqlBase | undefined {
+  ): SqlClause | undefined {
     let ret = this;
 
     const expression = this.expression._walkHelper(nextStack, fn, postorder);
@@ -85,12 +76,6 @@ export class SqlHavingClause extends SqlBase {
     }
 
     return ret;
-  }
-
-  public clearStaticKeywords(): this {
-    const value = this.valueOf();
-    delete value.keyword;
-    return SqlBase.fromValue(value);
   }
 
   public removeColumnFromAnd(column: string): SqlHavingClause | undefined {

@@ -12,15 +12,16 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlBaseValue, Substitutor } from '../../sql-base';
+import { SqlBase, Substitutor } from '../../sql-base';
 import { SqlLiteral } from '../../sql-expression';
+import { SqlClause, SqlClauseValue } from '../sql-clause';
 
-export interface SqlOffsetClauseValue extends SqlBaseValue {
+export interface SqlOffsetClauseValue extends SqlClauseValue {
   keyword?: string;
   offset: SqlLiteral;
 }
 
-export class SqlOffsetClause extends SqlBase {
+export class SqlOffsetClause extends SqlClause {
   static type = 'offsetClause';
 
   static DEFAULT_KEYWORD = 'OFFSET';
@@ -31,18 +32,15 @@ export class SqlOffsetClause extends SqlBase {
     });
   }
 
-  public readonly keyword?: string;
   public readonly offset: SqlLiteral;
 
   constructor(options: SqlOffsetClauseValue) {
     super(options, SqlOffsetClause.type);
-    this.keyword = options.keyword;
     this.offset = options.offset;
   }
 
   public valueOf(): SqlOffsetClauseValue {
     const value = super.valueOf() as SqlOffsetClauseValue;
-    value.keyword = this.keyword;
     value.offset = this.offset;
     return value;
   }
@@ -58,12 +56,6 @@ export class SqlOffsetClause extends SqlBase {
     return rawParts.join('');
   }
 
-  public changeKeyword(keyword: string | undefined): this {
-    const value = this.valueOf();
-    value.keyword = keyword;
-    return SqlBase.fromValue(value);
-  }
-
   public changeOffset(offset: SqlLiteral | number): this {
     const value = this.valueOf();
     value.offset = SqlLiteral.create(offset);
@@ -74,7 +66,7 @@ export class SqlOffsetClause extends SqlBase {
     nextStack: SqlBase[],
     fn: Substitutor,
     postorder: boolean,
-  ): SqlBase | undefined {
+  ): SqlClause | undefined {
     let ret = this;
 
     const offset = this.offset._walkHelper(nextStack, fn, postorder);
@@ -84,12 +76,6 @@ export class SqlOffsetClause extends SqlBase {
     }
 
     return ret;
-  }
-
-  public clearStaticKeywords(): this {
-    const value = this.valueOf();
-    delete value.keyword;
-    return SqlBase.fromValue(value);
   }
 }
 

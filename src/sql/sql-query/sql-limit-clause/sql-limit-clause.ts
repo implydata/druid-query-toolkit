@@ -12,15 +12,16 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlBaseValue, Substitutor } from '../../sql-base';
+import { SqlBase, Substitutor } from '../../sql-base';
 import { SqlLiteral } from '../../sql-expression';
+import { SqlClause, SqlClauseValue } from '../sql-clause';
 
-export interface SqlLimitClauseValue extends SqlBaseValue {
+export interface SqlLimitClauseValue extends SqlClauseValue {
   keyword?: string;
   limit: SqlLiteral;
 }
 
-export class SqlLimitClause extends SqlBase {
+export class SqlLimitClause extends SqlClause {
   static type = 'limitClause';
 
   static DEFAULT_KEYWORD = 'LIMIT';
@@ -31,18 +32,15 @@ export class SqlLimitClause extends SqlBase {
     });
   }
 
-  public readonly keyword?: string;
   public readonly limit: SqlLiteral;
 
   constructor(options: SqlLimitClauseValue) {
     super(options, SqlLimitClause.type);
-    this.keyword = options.keyword;
     this.limit = options.limit;
   }
 
   public valueOf(): SqlLimitClauseValue {
     const value = super.valueOf() as SqlLimitClauseValue;
-    value.keyword = this.keyword;
     value.limit = this.limit;
     return value;
   }
@@ -58,12 +56,6 @@ export class SqlLimitClause extends SqlBase {
     return rawParts.join('');
   }
 
-  public changeKeyword(keyword: string | undefined): this {
-    const value = this.valueOf();
-    value.keyword = keyword;
-    return SqlBase.fromValue(value);
-  }
-
   public changeLimit(limit: SqlLiteral | number): this {
     const value = this.valueOf();
     value.limit = SqlLiteral.create(limit);
@@ -74,7 +66,7 @@ export class SqlLimitClause extends SqlBase {
     nextStack: SqlBase[],
     fn: Substitutor,
     postorder: boolean,
-  ): SqlBase | undefined {
+  ): SqlClause | undefined {
     let ret = this;
 
     const limit = this.limit._walkHelper(nextStack, fn, postorder);
@@ -84,12 +76,6 @@ export class SqlLimitClause extends SqlBase {
     }
 
     return ret;
-  }
-
-  public clearStaticKeywords(): this {
-    const value = this.valueOf();
-    delete value.keyword;
-    return SqlBase.fromValue(value);
   }
 }
 

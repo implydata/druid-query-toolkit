@@ -14,17 +14,17 @@
 
 import { SqlAlias, SqlJoinPart } from '..';
 import { filterMap } from '../../../utils';
-import { SqlBase, SqlBaseValue, Substitutor } from '../../sql-base';
+import { SqlBase, Substitutor } from '../../sql-base';
 import { SqlRef } from '../../sql-expression';
 import { SeparatedArray } from '../../utils';
+import { SqlClause, SqlClauseValue } from '../sql-clause';
 
-export interface SqlFromClauseValue extends SqlBaseValue {
-  keyword?: string;
+export interface SqlFromClauseValue extends SqlClauseValue {
   expressions: SeparatedArray<SqlAlias>;
   joinParts?: SeparatedArray<SqlJoinPart>;
 }
 
-export class SqlFromClause extends SqlBase {
+export class SqlFromClause extends SqlClause {
   static type = 'fromClause';
 
   static DEFAULT_KEYWORD = 'FROM';
@@ -35,20 +35,17 @@ export class SqlFromClause extends SqlBase {
     });
   }
 
-  public readonly keyword?: string;
   public readonly expressions: SeparatedArray<SqlAlias>;
   public readonly joinParts?: SeparatedArray<SqlJoinPart>;
 
   constructor(options: SqlFromClauseValue) {
     super(options, SqlFromClause.type);
-    this.keyword = options.keyword;
     this.expressions = options.expressions;
     this.joinParts = options.joinParts;
   }
 
   public valueOf(): SqlFromClauseValue {
     const value = super.valueOf() as SqlFromClauseValue;
-    value.keyword = this.keyword;
     value.expressions = this.expressions;
     value.joinParts = this.joinParts;
     return value;
@@ -67,12 +64,6 @@ export class SqlFromClause extends SqlBase {
     }
 
     return rawParts.join('');
-  }
-
-  public changeKeyword(keyword: string | undefined): this {
-    const value = this.valueOf();
-    value.keyword = keyword;
-    return SqlBase.fromValue(value);
   }
 
   public changeExpressions(expressions: SeparatedArray<SqlAlias> | SqlAlias[]): this {
@@ -96,7 +87,7 @@ export class SqlFromClause extends SqlBase {
     nextStack: SqlBase[],
     fn: Substitutor,
     postorder: boolean,
-  ): SqlBase | undefined {
+  ): SqlClause | undefined {
     let ret = this;
 
     const expressions = SqlBase.walkSeparatedArray(this.expressions, nextStack, fn, postorder);
@@ -114,12 +105,6 @@ export class SqlFromClause extends SqlBase {
     }
 
     return ret;
-  }
-
-  public clearStaticKeywords(): this {
-    const value = this.valueOf();
-    delete value.keyword;
-    return SqlBase.fromValue(value);
   }
 
   public clearSeparators(): this {

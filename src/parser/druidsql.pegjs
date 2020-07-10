@@ -37,7 +37,6 @@ SqlQuery =
 {
   var value = {};
   var innerSpacing = value.innerSpacing = {};
-
   innerSpacing.preQuery = preQuery;
 
   if (explainKeyword) {

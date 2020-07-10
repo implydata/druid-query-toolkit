@@ -13,15 +13,16 @@
  */
 
 import { parseSqlExpression } from '../../../parser';
-import { SqlBase, SqlBaseValue, Substitutor } from '../../sql-base';
+import { SqlBase, Substitutor } from '../../sql-base';
 import { SqlExpression } from '../../sql-expression';
+import { SqlClause, SqlClauseValue } from '../sql-clause';
 
-export interface SqlWhereClauseValue extends SqlBaseValue {
+export interface SqlWhereClauseValue extends SqlClauseValue {
   keyword?: string;
   expression: SqlExpression;
 }
 
-export class SqlWhereClause extends SqlBase {
+export class SqlWhereClause extends SqlClause {
   static type = 'whereClause';
 
   static DEFAULT_KEYWORD = 'WHERE';
@@ -33,18 +34,15 @@ export class SqlWhereClause extends SqlBase {
     });
   }
 
-  public readonly keyword?: string;
   public readonly expression: SqlExpression;
 
   constructor(options: SqlWhereClauseValue) {
     super(options, SqlWhereClause.type);
-    this.keyword = options.keyword;
     this.expression = options.expression;
   }
 
   public valueOf(): SqlWhereClauseValue {
     const value = super.valueOf() as SqlWhereClauseValue;
-    value.keyword = this.keyword;
     value.expression = this.expression;
     return value;
   }
@@ -60,12 +58,6 @@ export class SqlWhereClause extends SqlBase {
     return rawParts.join('');
   }
 
-  public changeKeyword(keyword: string | undefined): this {
-    const value = this.valueOf();
-    value.keyword = keyword;
-    return SqlBase.fromValue(value);
-  }
-
   public changeExpression(expression: SqlExpression | string): this {
     const value = this.valueOf();
     value.expression = parseSqlExpression(expression);
@@ -76,7 +68,7 @@ export class SqlWhereClause extends SqlBase {
     nextStack: SqlBase[],
     fn: Substitutor,
     postorder: boolean,
-  ): SqlBase | undefined {
+  ): SqlClause | undefined {
     let ret = this;
 
     const expression = this.expression._walkHelper(nextStack, fn, postorder);
@@ -86,12 +78,6 @@ export class SqlWhereClause extends SqlBase {
     }
 
     return ret;
-  }
-
-  public clearStaticKeywords(): this {
-    const value = this.valueOf();
-    delete value.keyword;
-    return SqlBase.fromValue(value);
   }
 
   public removeColumnFromAnd(column: string): SqlWhereClause | undefined {

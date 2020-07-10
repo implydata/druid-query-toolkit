@@ -13,16 +13,17 @@
  */
 
 import { SqlAlias } from '..';
-import { SqlBase, SqlBaseValue, Substitutor } from '../../sql-base';
+import { SqlBase, Substitutor } from '../../sql-base';
 import { SqlExpression, SqlLiteral } from '../../sql-expression';
 import { SeparatedArray } from '../../utils';
+import { SqlClause, SqlClauseValue } from '../sql-clause';
 
-export interface SqlGroupByClauseValue extends SqlBaseValue {
+export interface SqlGroupByClauseValue extends SqlClauseValue {
   keyword?: string;
   expressions?: SeparatedArray<SqlExpression>;
 }
 
-export class SqlGroupByClause extends SqlBase {
+export class SqlGroupByClause extends SqlClause {
   static type = 'groupByClause';
 
   static DEFAULT_KEYWORD = 'GROUP BY';
@@ -41,13 +42,11 @@ export class SqlGroupByClause extends SqlBase {
 
   constructor(options: SqlGroupByClauseValue) {
     super(options, SqlGroupByClause.type);
-    this.keyword = options.keyword;
     this.expressions = options.expressions;
   }
 
   public valueOf(): SqlGroupByClauseValue {
     const value = super.valueOf() as SqlGroupByClauseValue;
-    value.keyword = this.keyword;
     value.expressions = this.expressions;
     return value;
   }
@@ -61,12 +60,6 @@ export class SqlGroupByClause extends SqlBase {
     rawParts.push(this.expressions ? this.expressions.toString() : '()');
 
     return rawParts.join('');
-  }
-
-  public changeKeyword(keyword: string | undefined): this {
-    const value = this.valueOf();
-    value.keyword = keyword;
-    return SqlBase.fromValue(value);
   }
 
   public changeExpressions(
@@ -85,7 +78,7 @@ export class SqlGroupByClause extends SqlBase {
     nextStack: SqlBase[],
     fn: Substitutor,
     postorder: boolean,
-  ): SqlBase | undefined {
+  ): SqlClause | undefined {
     let ret = this;
 
     if (this.expressions) {
@@ -97,12 +90,6 @@ export class SqlGroupByClause extends SqlBase {
     }
 
     return ret;
-  }
-
-  public clearStaticKeywords(): this {
-    const value = this.valueOf();
-    delete value.keyword;
-    return SqlBase.fromValue(value);
   }
 
   public clearSeparators(): this {
