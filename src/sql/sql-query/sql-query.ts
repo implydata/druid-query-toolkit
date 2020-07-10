@@ -18,8 +18,15 @@ import {
   Separator,
   SqlAlias,
   SqlExpression,
+  SqlFromClause,
+  SqlGroupByClause,
+  SqlHavingClause,
+  SqlLimitClause,
   SqlLiteral,
+  SqlOffsetClause,
+  SqlOrderByClause,
   SqlRef,
+  SqlWhereClause,
   Substitutor,
 } from '../..';
 import { parseSql } from '../../parser';
@@ -27,7 +34,7 @@ import { filterMap } from '../../utils';
 import { SqlBase, SqlBaseValue } from '../sql-base';
 
 import { SqlJoinPart } from './sql-join-part/sql-join-part';
-import { SqlOrderByPart } from './sql-order-by-part/sql-order-by-part';
+import { SqlOrderByExpression } from './sql-order-by-expression/sql-order-by-expression';
 import { SqlWithPart } from './sql-with-part/sql-with-part';
 
 export interface SqlQueryValue extends SqlBaseValue {
@@ -36,31 +43,17 @@ export interface SqlQueryValue extends SqlBaseValue {
   withKeyword?: string;
   withParts?: SeparatedArray<SqlWithPart>;
 
-  selectKeyword: string;
+  selectKeyword?: string;
   selectDecorator?: string;
   selectExpressions: SeparatedArray<SqlAlias>;
 
-  fromKeyword?: string;
-  fromExpressions?: SeparatedArray<SqlAlias>;
-  joinParts?: SeparatedArray<SqlJoinPart>;
-
-  whereKeyword?: string;
-  whereExpression?: SqlExpression;
-
-  groupByKeyword?: string;
-  groupByExpressions?: SeparatedArray<SqlExpression> | null;
-
-  havingKeyword?: string;
-  havingExpression?: SqlExpression;
-
-  orderByKeyword?: string;
-  orderByParts?: SeparatedArray<SqlOrderByPart>;
-
-  limitKeyword?: string;
-  limitValue?: SqlLiteral;
-
-  offsetKeyword?: string;
-  offsetValue?: SqlLiteral;
+  fromClause?: SqlFromClause;
+  whereClause?: SqlWhereClause;
+  groupByClause?: SqlGroupByClause;
+  havingClause?: SqlHavingClause;
+  orderByClause?: SqlOrderByClause;
+  limitClause?: SqlLimitClause;
+  offsetClause?: SqlOffsetClause;
 
   unionKeyword?: string;
   unionQuery?: SqlQuery;
@@ -71,20 +64,13 @@ export class SqlQuery extends SqlBase {
 
   static readonly DEFAULT_WITH_KEYWORD = 'WITH';
   static readonly DEFAULT_SELECT_KEYWORD = 'SELECT';
-  static readonly DEFAULT_FROM_KEYWORD = 'FROM';
-  static readonly DEFAULT_WHERE_KEYWORD = 'WHERE';
-  static readonly DEFAULT_GROUP_BY_KEYWORD = 'GROUP BY';
-  static readonly DEFAULT_HAVING_KEYWORD = 'HAVING';
-  static readonly DEFAULT_ORDER_BY_KEYWORD = 'ORDER BY';
-  static readonly DEFAULT_LIMIT_KEYWORD = 'LIMIT';
-  static readonly DEFAULT_OFFSET_KEYWORD = 'OFFSET';
 
   static create(from: SqlBase): SqlQuery {
     return new SqlQuery({
-      selectKeyword: 'SELECT',
       selectExpressions: SeparatedArray.fromSingleValue(SqlAlias.STAR),
-      fromKeyword: 'FROM',
-      fromExpressions: SeparatedArray.fromSingleValue(SqlAlias.fromBaseAndUpgrade(from)),
+      fromClause: SqlFromClause.create(
+        SeparatedArray.fromSingleValue(SqlAlias.fromBaseAndUpgrade(from)),
+      ),
     });
   }
 
@@ -95,24 +81,16 @@ export class SqlQuery extends SqlBase {
   public readonly explainKeyword?: string;
   public readonly withKeyword?: string;
   public readonly withParts?: SeparatedArray<SqlWithPart>;
-  public readonly selectKeyword: string;
+  public readonly selectKeyword?: string;
   public readonly selectDecorator?: string;
   public readonly selectExpressions: SeparatedArray<SqlAlias>;
-  public readonly fromKeyword?: string;
-  public readonly fromExpressions?: SeparatedArray<SqlAlias>;
-  public readonly joinParts?: SeparatedArray<SqlJoinPart>;
-  public readonly whereKeyword?: string;
-  public readonly whereExpression?: SqlExpression;
-  public readonly groupByKeyword?: string;
-  public readonly groupByExpressions?: SeparatedArray<SqlExpression> | null;
-  public readonly havingKeyword?: string;
-  public readonly havingExpression?: SqlExpression;
-  public readonly orderByKeyword?: string;
-  public readonly orderByParts?: SeparatedArray<SqlOrderByPart>;
-  public readonly limitKeyword?: string;
-  public readonly limitValue?: SqlLiteral;
-  public readonly offsetKeyword?: string;
-  public readonly offsetValue?: SqlLiteral;
+  public readonly fromClause?: SqlFromClause;
+  public readonly whereClause?: SqlWhereClause;
+  public readonly groupByClause?: SqlGroupByClause;
+  public readonly havingClause?: SqlHavingClause;
+  public readonly orderByClause?: SqlOrderByClause;
+  public readonly limitClause?: SqlLimitClause;
+  public readonly offsetClause?: SqlOffsetClause;
   public readonly unionKeyword?: string;
   public readonly unionQuery?: SqlQuery;
 
@@ -124,21 +102,13 @@ export class SqlQuery extends SqlBase {
     this.selectKeyword = options.selectKeyword;
     this.selectDecorator = options.selectDecorator;
     this.selectExpressions = options.selectExpressions;
-    this.fromKeyword = options.fromKeyword;
-    this.fromExpressions = options.fromExpressions;
-    this.joinParts = options.joinParts;
-    this.whereKeyword = options.whereKeyword;
-    this.whereExpression = options.whereExpression;
-    this.groupByKeyword = options.groupByKeyword;
-    this.groupByExpressions = options.groupByExpressions;
-    this.havingKeyword = options.havingKeyword;
-    this.havingExpression = options.havingExpression;
-    this.orderByKeyword = options.orderByKeyword;
-    this.orderByParts = options.orderByParts;
-    this.limitKeyword = options.limitKeyword;
-    this.limitValue = options.limitValue;
-    this.offsetKeyword = options.offsetKeyword;
-    this.offsetValue = options.offsetValue;
+    this.fromClause = options.fromClause;
+    this.whereClause = options.whereClause;
+    this.groupByClause = options.groupByClause;
+    this.havingClause = options.havingClause;
+    this.orderByClause = options.orderByClause;
+    this.limitClause = options.limitClause;
+    this.offsetClause = options.offsetClause;
     this.unionKeyword = options.unionKeyword;
     this.unionQuery = options.unionQuery;
   }
@@ -151,21 +121,13 @@ export class SqlQuery extends SqlBase {
     value.selectKeyword = this.selectKeyword;
     value.selectDecorator = this.selectDecorator;
     value.selectExpressions = this.selectExpressions;
-    value.fromKeyword = this.fromKeyword;
-    value.fromExpressions = this.fromExpressions;
-    value.joinParts = this.joinParts;
-    value.whereKeyword = this.whereKeyword;
-    value.whereExpression = this.whereExpression;
-    value.groupByKeyword = this.groupByKeyword;
-    value.groupByExpressions = this.groupByExpressions;
-    value.havingKeyword = this.havingKeyword;
-    value.havingExpression = this.havingExpression;
-    value.orderByKeyword = this.orderByKeyword;
-    value.orderByParts = this.orderByParts;
-    value.limitKeyword = this.limitKeyword;
-    value.limitValue = this.limitValue;
-    value.offsetKeyword = this.offsetKeyword;
-    value.offsetValue = this.offsetValue;
+    value.fromClause = this.fromClause;
+    value.whereClause = this.whereClause;
+    value.groupByClause = this.groupByClause;
+    value.havingClause = this.havingClause;
+    value.orderByClause = this.orderByClause;
+    value.limitClause = this.limitClause;
+    value.offsetClause = this.offsetClause;
     value.unionKeyword = this.unionKeyword;
     value.unionQuery = this.unionQuery;
     return value;
@@ -189,7 +151,7 @@ export class SqlQuery extends SqlBase {
       );
     }
 
-    // Select clause
+    // SELECT clause
     rawParts.push(
       this.selectKeyword || SqlQuery.DEFAULT_SELECT_KEYWORD,
       this.getInnerSpace('postSelect'),
@@ -200,87 +162,34 @@ export class SqlQuery extends SqlBase {
 
     rawParts.push(this.selectExpressions.toString(Separator.COMMA));
 
-    // From clause
-    if (this.fromExpressions) {
-      rawParts.push(
-        this.getInnerSpace('preFrom', '\n'),
-        this.fromKeyword || SqlQuery.DEFAULT_FROM_KEYWORD,
-        this.getInnerSpace('postFrom'),
-        this.fromExpressions.toString(Separator.COMMA),
-      );
+    if (this.fromClause) {
+      rawParts.push(this.getInnerSpace('preFrom', '\n'), this.fromClause.toString());
     }
 
-    // Join Clause
-    if (this.joinParts) {
-      rawParts.push(this.getInnerSpace('preJoin', '\n'), this.joinParts.toString('\n'));
+    if (this.whereClause) {
+      rawParts.push(this.getInnerSpace('preWhere', '\n'), this.whereClause.toString());
     }
 
-    // WHERE Clause
-    if (this.whereExpression) {
-      rawParts.push(
-        this.getInnerSpace('preWhere', '\n'),
-        this.whereKeyword || SqlQuery.DEFAULT_WHERE_KEYWORD,
-        this.getInnerSpace('postWhere'),
-        this.whereExpression.toString(),
-      );
+    if (this.groupByClause) {
+      rawParts.push(this.getInnerSpace('preGroupBy', '\n'), this.groupByClause.toString());
     }
 
-    // GROUP BY
-    if (typeof this.groupByExpressions !== 'undefined') {
-      rawParts.push(
-        this.getInnerSpace('preGroupBy', '\n'),
-        this.groupByKeyword || SqlQuery.DEFAULT_GROUP_BY_KEYWORD,
-        this.getInnerSpace('postGroupBy'),
-      );
-
-      if (this.groupByExpressions) {
-        rawParts.push(this.groupByExpressions.toString(Separator.COMMA));
-      } else {
-        rawParts.push('()'); // Temp hack to allow for `GROUP BY ()`
-      }
+    if (this.havingClause) {
+      rawParts.push(this.getInnerSpace('preHaving', '\n'), this.havingClause.toString());
     }
 
-    // HAVING Clause
-    if (this.havingExpression) {
-      rawParts.push(
-        this.getInnerSpace('preHaving', '\n'),
-        this.havingKeyword || SqlQuery.DEFAULT_HAVING_KEYWORD,
-        this.getInnerSpace('postHaving'),
-        this.havingExpression.toString(),
-      );
+    if (this.orderByClause) {
+      rawParts.push(this.getInnerSpace('preOrderBy', '\n'), this.orderByClause.toString());
     }
 
-    // ORDER BY Clause
-    if (this.orderByParts) {
-      rawParts.push(
-        this.getInnerSpace('preOrderBy', '\n'),
-        this.orderByKeyword || SqlQuery.DEFAULT_ORDER_BY_KEYWORD,
-        this.getInnerSpace('postOrderBy'),
-        this.orderByParts.toString(Separator.COMMA),
-      );
+    if (this.limitClause) {
+      rawParts.push(this.getInnerSpace('preLimit', '\n'), this.limitClause.toString());
     }
 
-    // LIMIT Clause
-    if (this.limitValue) {
-      rawParts.push(
-        this.getInnerSpace('preLimit', '\n'),
-        this.limitKeyword || SqlQuery.DEFAULT_LIMIT_KEYWORD,
-        this.getInnerSpace('postLimit'),
-        this.limitValue.toString(),
-      );
+    if (this.offsetClause) {
+      rawParts.push(this.getInnerSpace('preOffset', '\n'), this.offsetClause.toString());
     }
 
-    // Offset Clause
-    if (this.offsetValue) {
-      rawParts.push(
-        this.getInnerSpace('preOffset', '\n'),
-        this.offsetKeyword || SqlQuery.DEFAULT_OFFSET_KEYWORD,
-        this.getInnerSpace('postOffset'),
-        this.offsetValue.toString(),
-      );
-    }
-
-    // UNION
     if (this.unionKeyword && this.unionQuery) {
       rawParts.push(
         this.getInnerSpace('preUnion', '\n'),
@@ -316,108 +225,150 @@ export class SqlQuery extends SqlBase {
     return new SqlQuery(value);
   }
 
-  public changeFromExpressions(
-    fromExpressions: SeparatedArray<SqlAlias> | SqlAlias[] | undefined,
-  ): SqlQuery {
+  public changeFromClause(fromClause: SqlFromClause | undefined): SqlQuery {
     const value = this.valueOf();
-    if (fromExpressions) {
-      value.fromExpressions = SeparatedArray.fromArray(fromExpressions);
+    if (fromClause) {
+      value.fromClause = fromClause;
     } else {
-      delete value.fromExpressions;
-      delete value.fromKeyword;
-      value.innerSpacing = this.getInnerSpacingWithout('preFrom', 'postFrom');
+      delete value.fromClause;
+      value.innerSpacing = this.getInnerSpacingWithout('preFrom');
     }
     return new SqlQuery(value);
   }
 
-  public changeJoinParts(
-    joinParts: SeparatedArray<SqlJoinPart> | SqlJoinPart[] | undefined,
+  public changeFromExpressions(
+    fromExpressions: SeparatedArray<SqlAlias> | SqlAlias[] | undefined,
   ): SqlQuery {
+    if (!fromExpressions) return this.changeFromClause(undefined);
+    return this.changeFromClause(
+      this.fromClause
+        ? this.fromClause.changeExpressions(fromExpressions)
+        : SqlFromClause.create(fromExpressions),
+    );
+  }
+
+  public changeWhereClause(whereClause: SqlWhereClause | undefined): SqlQuery {
     const value = this.valueOf();
-    if (joinParts) {
-      value.joinParts = SeparatedArray.fromArray(joinParts);
+    if (whereClause) {
+      value.whereClause = whereClause;
     } else {
-      delete value.joinParts;
+      delete value.whereClause;
+      value.innerSpacing = this.getInnerSpacingWithout('preWhere');
     }
     return new SqlQuery(value);
   }
 
   public changeWhereExpression(whereExpression: SqlExpression | string | undefined): SqlQuery {
+    if (!whereExpression) return this.changeWhereClause(undefined);
+    return this.changeWhereClause(
+      this.whereClause
+        ? this.whereClause.changeExpression(whereExpression)
+        : SqlWhereClause.create(whereExpression),
+    );
+  }
+
+  public changeGroupByClause(groupByClause: SqlGroupByClause | undefined): SqlQuery {
     const value = this.valueOf();
-    if (typeof whereExpression === 'undefined') {
-      delete value.whereExpression;
-      delete value.whereKeyword;
-      value.innerSpacing = this.getInnerSpacingWithout('preWhere', 'postWhere');
+    if (groupByClause) {
+      value.groupByClause = groupByClause;
     } else {
-      value.whereExpression = parseSqlExpression(whereExpression);
+      delete value.groupByClause;
+      value.innerSpacing = this.getInnerSpacingWithout('preGroupBy');
     }
     return new SqlQuery(value);
   }
 
   public changeGroupByExpressions(
-    groupByExpressions: SeparatedArray<SqlExpression> | SqlExpression[] | null | undefined,
+    groupByExpressions: SeparatedArray<SqlExpression> | SqlExpression[] | undefined,
   ): SqlQuery {
+    if (typeof groupByExpressions === 'undefined') return this.changeGroupByClause(undefined);
+    return this.changeGroupByClause(
+      this.groupByClause
+        ? this.groupByClause.changeExpressions(groupByExpressions)
+        : SqlGroupByClause.create(groupByExpressions),
+    );
+  }
+
+  public changeHavingClause(havingClause: SqlHavingClause | undefined): SqlQuery {
     const value = this.valueOf();
-    if (typeof groupByExpressions === 'undefined') {
-      delete value.groupByExpressions;
-      delete value.groupByKeyword;
-      value.innerSpacing = this.getInnerSpacingWithout('preGroupBy', 'postGroupBy');
+    if (havingClause) {
+      value.havingClause = havingClause;
     } else {
-      value.groupByExpressions = groupByExpressions
-        ? SeparatedArray.fromArray(groupByExpressions)
-        : null;
+      delete value.havingClause;
+      value.innerSpacing = this.getInnerSpacingWithout('preHaving');
     }
     return new SqlQuery(value);
   }
 
   public changeHavingExpression(havingExpression: SqlExpression | string | undefined): SqlQuery {
+    if (!havingExpression) return this.changeHavingClause(undefined);
+    return this.changeHavingClause(
+      this.havingClause
+        ? this.havingClause.changeExpression(havingExpression)
+        : SqlHavingClause.create(havingExpression),
+    );
+  }
+
+  public changeOrderByClause(orderByClause: SqlOrderByClause | undefined): SqlQuery {
     const value = this.valueOf();
-    if (typeof havingExpression === 'undefined') {
-      delete value.havingExpression;
-      delete value.havingKeyword;
-      value.innerSpacing = this.getInnerSpacingWithout('preHaving', 'postHaving');
+    if (orderByClause) {
+      value.orderByClause = orderByClause;
     } else {
-      value.havingExpression = parseSqlExpression(havingExpression);
+      delete value.orderByClause;
+      value.innerSpacing = this.getInnerSpacingWithout('preOrderBy');
     }
     return new SqlQuery(value);
   }
 
-  public changeOrderByParts(
-    orderByParts: SeparatedArray<SqlOrderByPart> | SqlOrderByPart[] | undefined,
+  public changeOrderByExpressions(
+    orderByExpressions: SeparatedArray<SqlOrderByExpression> | SqlOrderByExpression[] | undefined,
   ): SqlQuery {
+    if (!orderByExpressions) return this.changeOrderByClause(undefined);
+    return this.changeOrderByClause(
+      this.orderByClause
+        ? this.orderByClause.changeExpressions(orderByExpressions)
+        : SqlOrderByClause.create(orderByExpressions),
+    );
+  }
+
+  public changeLimitClause(limitClause: SqlLimitClause | undefined): SqlQuery {
     const value = this.valueOf();
-    if (typeof orderByParts === 'undefined') {
-      delete value.orderByParts;
-      delete value.orderByKeyword;
-      value.innerSpacing = this.getInnerSpacingWithout('preOrderBy', 'postOrderBy');
+    if (limitClause) {
+      value.limitClause = limitClause;
     } else {
-      value.orderByParts = SeparatedArray.fromArray(orderByParts);
+      delete value.limitClause;
+      value.innerSpacing = this.getInnerSpacingWithout('preLimit');
     }
     return new SqlQuery(value);
   }
 
   public changeLimitValue(limitValue: SqlLiteral | number | undefined): SqlQuery {
+    if (typeof limitValue === 'undefined') return this.changeLimitClause(undefined);
+    return this.changeLimitClause(
+      this.limitClause
+        ? this.limitClause.changeLimit(limitValue)
+        : SqlLimitClause.create(limitValue),
+    );
+  }
+
+  public changeOffsetClause(offsetClause: SqlOffsetClause | undefined): SqlQuery {
     const value = this.valueOf();
-    if (typeof limitValue === 'undefined') {
-      delete value.limitValue;
-      delete value.limitKeyword;
-      value.innerSpacing = this.getInnerSpacingWithout('preLimit', 'postLimit');
+    if (offsetClause) {
+      value.offsetClause = offsetClause;
     } else {
-      value.limitValue = SqlLiteral.create(limitValue);
+      delete value.offsetClause;
+      value.innerSpacing = this.getInnerSpacingWithout('preOffset');
     }
     return new SqlQuery(value);
   }
 
   public changeOffsetValue(offsetValue: SqlLiteral | number | undefined): SqlQuery {
-    const value = this.valueOf();
-    if (typeof offsetValue === 'undefined') {
-      delete value.offsetValue;
-      delete value.offsetKeyword;
-      value.innerSpacing = this.getInnerSpacingWithout('preOffset', 'postOffset');
-    } else {
-      value.offsetValue = SqlLiteral.create(offsetValue);
-    }
-    return new SqlQuery(value);
+    if (typeof offsetValue === 'undefined') return this.changeOffsetClause(undefined);
+    return this.changeOffsetClause(
+      this.offsetClause
+        ? this.offsetClause.changeOffset(offsetValue)
+        : SqlOffsetClause.create(offsetValue),
+    );
   }
 
   public changeUnionQuery(unionQuery: SqlQuery | undefined): SqlQuery {
@@ -461,77 +412,59 @@ export class SqlQuery extends SqlBase {
       }
     }
 
-    if (this.fromExpressions) {
-      const fromExpressions = SqlBase.walkSeparatedArray(
-        this.fromExpressions,
-        nextStack,
-        fn,
-        postorder,
-      );
-      if (!fromExpressions) return;
-      if (fromExpressions !== this.fromExpressions) {
-        ret = ret.changeFromExpressions(fromExpressions);
+    if (this.fromClause) {
+      const fromClause = this.fromClause._walkHelper(nextStack, fn, postorder);
+      if (!fromClause) return;
+      if (fromClause !== this.fromClause) {
+        ret = ret.changeFromClause(fromClause as SqlFromClause);
       }
     }
 
-    if (this.joinParts) {
-      const joinParts = SqlBase.walkSeparatedArray(this.joinParts, nextStack, fn, postorder);
-      if (!joinParts) return;
-      if (joinParts !== this.joinParts) {
-        ret = ret.changeJoinParts(joinParts);
+    if (this.whereClause) {
+      const whereClause = this.whereClause._walkHelper(nextStack, fn, postorder);
+      if (!whereClause) return;
+      if (whereClause !== this.whereClause) {
+        ret = ret.changeWhereClause(whereClause as SqlWhereClause);
       }
     }
 
-    if (this.whereExpression) {
-      const whereExpression = this.whereExpression._walkHelper(nextStack, fn, postorder);
-      if (!whereExpression) return;
-      if (whereExpression !== this.whereExpression) {
-        ret = ret.changeWhereExpression(whereExpression);
+    if (this.groupByClause) {
+      const groupByClause = this.groupByClause._walkHelper(nextStack, fn, postorder);
+      if (!groupByClause) return;
+      if (groupByClause !== this.groupByClause) {
+        ret = ret.changeGroupByClause(groupByClause as SqlGroupByClause);
       }
     }
 
-    if (this.groupByExpressions) {
-      const groupByExpressions = SqlBase.walkSeparatedArray(
-        this.groupByExpressions,
-        nextStack,
-        fn,
-        postorder,
-      );
-      if (!groupByExpressions) return;
-      if (groupByExpressions !== this.groupByExpressions) {
-        ret = ret.changeGroupByExpressions(groupByExpressions);
+    if (this.havingClause) {
+      const havingClause = this.havingClause._walkHelper(nextStack, fn, postorder);
+      if (!havingClause) return;
+      if (havingClause !== this.havingClause) {
+        ret = ret.changeHavingClause(havingClause as SqlHavingClause);
       }
     }
 
-    if (this.havingExpression) {
-      const havingExpression = this.havingExpression._walkHelper(nextStack, fn, postorder);
-      if (!havingExpression) return;
-      if (havingExpression !== this.havingExpression) {
-        ret = ret.changeHavingExpression(havingExpression);
+    if (this.orderByClause) {
+      const orderByClause = this.orderByClause._walkHelper(nextStack, fn, postorder);
+      if (!orderByClause) return;
+      if (orderByClause !== this.orderByClause) {
+        ret = ret.changeOrderByClause(orderByClause as SqlOrderByClause);
       }
     }
 
-    if (this.orderByParts) {
-      const orderByParts = SqlBase.walkSeparatedArray(this.orderByParts, nextStack, fn, postorder);
-      if (!orderByParts) return;
-      if (orderByParts !== this.orderByParts) {
-        ret = ret.changeOrderByParts(orderByParts);
+    if (this.limitClause) {
+      const limitClause = this.limitClause._walkHelper(nextStack, fn, postorder);
+      if (!limitClause) return;
+      if (limitClause !== this.limitClause) {
+        ret = ret.changeLimitClause(limitClause as SqlLimitClause);
       }
     }
 
-    if (this.limitValue) {
-      const limitValue = this.limitValue._walkHelper(nextStack, fn, postorder);
-      if (!limitValue) return;
-      if (limitValue !== this.limitValue) {
-        ret = ret.changeLimitValue(limitValue as SqlLiteral);
-      }
-    }
-
-    if (this.offsetValue) {
-      const offsetValue = this.offsetValue._walkHelper(nextStack, fn, postorder);
-      if (!offsetValue) return;
-      if (offsetValue !== this.offsetValue) {
-        ret = ret.changeOffsetValue(offsetValue as SqlLiteral);
+    if (this.offsetClause) {
+      const offsetClause = this.offsetClause._walkHelper(nextStack, fn, postorder);
+      if (!offsetClause) return;
+      if (offsetClause !== this.offsetClause) {
+        ret = ret.changeOffsetClause(offsetClause as SqlOffsetClause);
       }
     }
 
@@ -550,13 +483,6 @@ export class SqlQuery extends SqlBase {
     const value = this.valueOf();
     delete value.withKeyword;
     delete value.selectKeyword;
-    delete value.fromKeyword;
-    delete value.whereKeyword;
-    delete value.groupByKeyword;
-    delete value.havingKeyword;
-    delete value.orderByKeyword;
-    delete value.limitKeyword;
-    delete value.offsetKeyword;
     return SqlBase.fromValue(value);
   }
 
@@ -568,22 +494,6 @@ export class SqlQuery extends SqlBase {
     }
 
     value.selectExpressions = this.selectExpressions.clearSeparators();
-
-    if (this.fromExpressions) {
-      value.fromExpressions = this.fromExpressions.clearSeparators();
-    }
-
-    if (this.joinParts) {
-      value.joinParts = this.joinParts.clearSeparators();
-    }
-
-    if (this.groupByExpressions) {
-      value.groupByExpressions = this.groupByExpressions.clearSeparators();
-    }
-
-    if (this.orderByParts) {
-      value.orderByParts = this.orderByParts.clearSeparators();
-    }
 
     return SqlBase.fromValue(value);
   }
@@ -637,10 +547,10 @@ export class SqlQuery extends SqlBase {
   }
 
   isGroupedSelectIndex(selectIndex: number): boolean {
-    const { groupByExpressions } = this;
-    if (!groupByExpressions || !this.isValidSelectIndex(selectIndex)) return false;
-    return groupByExpressions.values.some(groupByExpression => {
-      return this.getSelectIndexForExpression(groupByExpression, false) === selectIndex;
+    const { groupByClause } = this;
+    if (!groupByClause || !this.isValidSelectIndex(selectIndex)) return false;
+    return groupByClause.toArray().some(groupByClause => {
+      return this.getSelectIndexForExpression(groupByClause, false) === selectIndex;
     });
   }
 
@@ -649,14 +559,14 @@ export class SqlQuery extends SqlBase {
   }
 
   getGroupedSelectExpressions(): SqlAlias[] {
-    if (!this.groupByExpressions) return [];
+    if (!this.hasGroupBy()) return [];
     return this.selectExpressions.values.filter((_selectExpression, i) => {
       return this.isGroupedSelectIndex(i);
     });
   }
 
   getGroupedOutputColumns(): string[] {
-    if (!this.groupByExpressions) return [];
+    if (!this.hasGroupBy()) return [];
     return filterMap(this.selectExpressions.values, (selectExpression, i) => {
       if (!this.isGroupedSelectIndex(i)) return;
       return SqlQuery.getSelectExpressionOutput(selectExpression, i);
@@ -664,8 +574,8 @@ export class SqlQuery extends SqlBase {
   }
 
   isAggregateSelectIndex(selectIndex: number): boolean {
-    const { groupByExpressions } = this;
-    if (!groupByExpressions || !this.isValidSelectIndex(selectIndex)) return false;
+    const { groupByClause } = this;
+    if (!groupByClause || !this.isValidSelectIndex(selectIndex)) return false;
     return !this.isGroupedSelectIndex(selectIndex);
   }
 
@@ -674,14 +584,14 @@ export class SqlQuery extends SqlBase {
   }
 
   getAggregateSelectExpressions(): SqlAlias[] {
-    if (!this.groupByExpressions) return [];
+    if (!this.groupByClause) return [];
     return this.selectExpressions.values.filter((_selectExpression, i) => {
       return this.isAggregateSelectIndex(i);
     });
   }
 
   getAggregateOutputColumns(): string[] {
-    if (!this.groupByExpressions) return [];
+    if (!this.groupByClause) return [];
     return filterMap(this.selectExpressions.values, (selectExpression, i) => {
       if (!this.isAggregateSelectIndex(i)) return;
       return SqlQuery.getSelectExpressionOutput(selectExpression, i);
@@ -705,42 +615,21 @@ export class SqlQuery extends SqlBase {
     const newSelectExpressions = this.selectExpressions.deleteByIndex(selectIndex);
     if (!newSelectExpressions) return this; // Can not remove the last column
 
-    const value = this.valueOf();
-    value.selectExpressions = newSelectExpressions;
+    let ret: SqlQuery = this;
 
-    const sqlIndex = selectIndex + 1;
-    if (value.groupByExpressions) {
-      value.groupByExpressions = value.groupByExpressions.filterMap(groupByExpression => {
-        if (groupByExpression instanceof SqlLiteral && groupByExpression.isInteger()) {
-          if (Number(groupByExpression.value) > sqlIndex) {
-            return groupByExpression.increment(-1);
-          } else if (groupByExpression.value === sqlIndex) {
-            return;
-          }
-        }
-        if (groupByExpression.equals(selectExpression.expression)) return;
-        return groupByExpression;
-      });
+    if (this.groupByClause) {
+      ret = ret.changeGroupByClause(
+        this.groupByClause.removeExpression(selectExpression, selectIndex),
+      );
     }
 
-    if (value.orderByParts) {
-      value.orderByParts = value.orderByParts.filterMap(orderByPart => {
-        const { expression } = orderByPart;
-        if (expression instanceof SqlLiteral && expression.isInteger()) {
-          if (Number(expression.value) > sqlIndex) {
-            orderByPart = orderByPart.changeExpression(expression.increment(-1));
-          } else if (expression.value === sqlIndex) {
-            return;
-          }
-        }
-        return orderByPart;
-      });
-      if (!value.orderByParts) {
-        delete value.orderByKeyword;
-      }
+    if (this.orderByClause) {
+      ret = ret.changeOrderByClause(
+        this.orderByClause.removeExpression(selectExpression, selectIndex),
+      );
     }
 
-    return new SqlQuery(value);
+    return ret.changeSelectExpressions(newSelectExpressions);
   }
 
   removeOutputColumn(outputColumn: string) {
@@ -750,76 +639,66 @@ export class SqlQuery extends SqlBase {
   /* ~~~~~ FROM ~~~~~ */
 
   hasFrom(): boolean {
-    return Boolean(this.fromExpressions);
+    return Boolean(this.fromClause);
   }
 
   getFirstTableName(): string | undefined {
-    // returns the first table name
-    if (!this.fromExpressions) return;
-
-    return filterMap(this.fromExpressions.values, table => {
-      const tableRef = table.expression;
-      if (tableRef instanceof SqlRef) {
-        return tableRef.table;
-      }
-      return;
-    })[0];
+    if (!this.fromClause) return;
+    return this.fromClause.getFirstTableName();
   }
 
   // returns the first table namespace
   getFirstSchema(): string | undefined {
-    if (!this.fromExpressions) return;
-
-    return filterMap(this.fromExpressions.values, table => {
-      const tableRef = table.expression;
-      if (tableRef instanceof SqlRef) {
-        return tableRef.namespace;
-      }
-      return;
-    })[0];
+    if (!this.fromClause) return;
+    return this.fromClause.getFirstSchema();
   }
 
-  /* ~~~~~ JOIN ~~~~~ */
-
   hasJoin(): boolean {
-    return Boolean(this.joinParts);
+    if (!this.fromClause) return false;
+    return this.fromClause.hasJoin();
   }
 
   addJoin(join: SqlJoinPart) {
-    return this.changeJoinParts(
-      this.joinParts ? this.joinParts.addLast(join) : SeparatedArray.fromSingleValue(join),
-    );
+    if (!this.fromClause) return this;
+    return this.changeFromClause(this.fromClause.addJoin(join));
   }
 
   removeAllJoins() {
-    return this.changeJoinParts(undefined);
+    if (!this.fromClause) return this;
+    return this.changeFromClause(this.fromClause.changeJoinParts(undefined));
   }
 
   /* ~~~~~ WHERE ~~~~~ */
 
   hasWhere(): boolean {
-    return Boolean(this.whereExpression);
+    return Boolean(this.whereClause);
   }
 
-  getWhereExpression(): SqlExpression {
-    return this.whereExpression || SqlLiteral.TRUE;
+  getWhereExpression(): SqlExpression | undefined {
+    if (!this.whereClause) return;
+    return this.whereClause.expression;
   }
 
-  addToWhere(expressionThing: string | SqlExpression) {
+  getEffectiveWhereExpression(): SqlExpression | undefined {
+    if (!this.whereClause) return SqlLiteral.TRUE;
+    return this.whereClause.expression;
+  }
+
+  addToWhere(expressionThing: SqlExpression | string) {
     const expression = parseSqlExpression(expressionThing);
-    return this.changeWhereExpression(SqlExpression.and(this.whereExpression, expression));
+    return this.changeWhereExpression(SqlExpression.and(this.getWhereExpression(), expression));
   }
 
   // Removes all filters on the specified column from the where clause
   removeColumnFromWhere(column: string) {
-    if (!this.whereExpression) return this;
-    return this.changeWhereExpression(this.whereExpression.removeColumnFromAnd(column));
+    if (!this.whereClause) return this;
+    return this.changeWhereClause(this.whereClause.removeColumnFromAnd(column));
   }
 
   /* ~~~~~ GROUP BY ~~~~~ */
 
   hasGroupBy(): boolean {
-    return Boolean(this.groupByKeyword);
+    return Boolean(this.groupByClause);
   }
 
   addToGroupBy(column: SqlBase) {
@@ -832,8 +711,8 @@ export class SqlQuery extends SqlBase {
     // Adds the last column in the select clause to the group by clause via its index
     const newGroupBy = SqlLiteral.create(1);
     return this.changeGroupByExpressions(
-      this.groupByExpressions
-        ? this.groupByExpressions
+      this.groupByClause && this.groupByClause.expressions
+        ? this.groupByClause.expressions
             .map(groupByExpression => {
               if (groupByExpression instanceof SqlLiteral) {
                 return groupByExpression.increment() || groupByExpression;
@@ -848,49 +727,55 @@ export class SqlQuery extends SqlBase {
   /* ~~~~~ HAVING ~~~~~ */
 
   hasHaving(): boolean {
-    return Boolean(this.havingExpression);
+    return Boolean(this.havingClause);
   }
 
-  getHavingExpression(): SqlExpression {
-    return this.havingExpression || SqlLiteral.TRUE;
+  getHavingExpression(): SqlExpression | undefined {
+    if (!this.havingClause) return;
+    return this.havingClause.expression;
   }
 
-  addToHaving(expressionThing: string | SqlExpression) {
+  getEffectiveHavingExpression(): SqlExpression | undefined {
+    if (!this.havingClause) return SqlLiteral.TRUE;
+    return this.havingClause.expression;
+  }
+
+  addToHaving(expressionThing: SqlExpression | string) {
     const expression = parseSqlExpression(expressionThing);
-    return this.changeHavingExpression(SqlExpression.and(this.havingExpression, expression));
+    return this.changeHavingExpression(SqlExpression.and(this.getHavingExpression(), expression));
   }
 
   removeFromHaving(column: string) {
-    if (!this.havingExpression) return this;
-    return this.changeHavingExpression(this.havingExpression.removeColumnFromAnd(column));
+    if (!this.havingClause) return this;
+    return this.changeHavingClause(this.havingClause.removeColumnFromAnd(column));
   }
 
   /* ~~~~~ ORDER BY ~~~~~ */
 
   hasOrderBy(): boolean {
-    return Boolean(this.orderByParts);
+    return Boolean(this.orderByClause);
   }
 
-  getOrderByForSelectIndex(selectIndex: number): SqlOrderByPart | undefined {
-    if (!this.orderByParts || !this.isValidSelectIndex(selectIndex)) return;
-    return this.orderByParts.values.find(orderByPart => {
-      return this.getSelectIndexForExpression(orderByPart.expression, true) === selectIndex;
+  getOrderByForSelectIndex(selectIndex: number): SqlOrderByExpression | undefined {
+    if (!this.orderByClause || !this.isValidSelectIndex(selectIndex)) return;
+    return this.orderByClause.toArray().find(orderByExpression => {
+      return this.getSelectIndexForExpression(orderByExpression.expression, true) === selectIndex;
     });
   }
 
-  getOrderByForOutputColumn(outputColumn: string): SqlOrderByPart | undefined {
+  getOrderByForOutputColumn(outputColumn: string): SqlOrderByExpression | undefined {
     return this.getOrderByForSelectIndex(this.getSelectIndexForOutputColumn(outputColumn));
   }
 
   getOrderedSelectExpressions() {
-    if (!this.orderByParts) return [];
+    if (!this.orderByClause) return [];
     return this.selectExpressions.values.filter((_selectExpression, i) => {
       return this.getOrderByForSelectIndex(i);
     });
   }
 
   getOrderedOutputColumns() {
-    if (!this.orderByParts) return [];
+    if (!this.orderByClause) return [];
     return filterMap(this.selectExpressions.values, (selectExpression, i) => {
       if (!this.getOrderByForSelectIndex(i)) return;
       return SqlQuery.getSelectExpressionOutput(selectExpression, i);
@@ -898,10 +783,10 @@ export class SqlQuery extends SqlBase {
   }
 
   removeOrderByForSelectIndex(selectIndex: number): SqlQuery {
-    if (!this.orderByParts || !this.isValidSelectIndex(selectIndex)) return this;
-    return this.changeOrderByParts(
-      this.orderByParts.filter(orderByPart => {
-        return this.getSelectIndexForExpression(orderByPart.expression, true) === selectIndex;
+    if (!this.orderByClause || !this.isValidSelectIndex(selectIndex)) return this;
+    return this.changeOrderByExpressions(
+      this.orderByClause.expressions.filter(orderByExpression => {
+        return this.getSelectIndexForExpression(orderByExpression.expression, true) === selectIndex;
       }),
     );
   }
@@ -910,24 +795,22 @@ export class SqlQuery extends SqlBase {
     return this.removeOrderByForSelectIndex(this.getSelectIndexForOutputColumn(outputColumn));
   }
 
-  addOrderBy(orderBy: SqlOrderByPart): SqlQuery {
-    return this.changeOrderByParts(
-      this.orderByParts
-        ? this.orderByParts.addFirst(orderBy)
-        : SeparatedArray.fromSingleValue(orderBy),
+  addOrderBy(orderBy: SqlOrderByExpression): SqlQuery {
+    return this.changeOrderByClause(
+      this.orderByClause ? this.orderByClause.addFirst(orderBy) : SqlOrderByClause.create(orderBy),
     );
   }
 
   /* ~~~~~ LIMIT ~~~~~ */
 
   hasLimit(): boolean {
-    return Boolean(this.limitValue);
+    return Boolean(this.limitClause);
   }
 
   /* ~~~~~ OFFSET ~~~~~ */
 
   hasOffset(): boolean {
-    return Boolean(this.offsetValue);
+    return Boolean(this.offsetClause);
   }
 }
 

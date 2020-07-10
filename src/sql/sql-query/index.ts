@@ -13,7 +13,14 @@
  */
 
 export * from './sql-alias/sql-alias';
-export * from './sql-order-by-part/sql-order-by-part';
+export * from './sql-order-by-expression/sql-order-by-expression';
 export * from './sql-with-part/sql-with-part';
 export * from './sql-join-part/sql-join-part';
+export * from './sql-from-clause/sql-from-clause';
+export * from './sql-group-by-clause/sql-group-by-clause';
+export * from './sql-having-clause/sql-having-clause';
+export * from './sql-limit-clause/sql-limit-clause';
+export * from './sql-offset-clause/sql-offset-clause';
+export * from './sql-order-by-clause/sql-order-by-clause';
+export * from './sql-where-clause/sql-where-clause';
 export * from './sql-query';

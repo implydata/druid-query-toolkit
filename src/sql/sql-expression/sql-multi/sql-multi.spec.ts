@@ -927,8 +927,7 @@ describe('Math expression', () => {
               },
               "specialParen": undefined,
               "type": "function",
-              "whereExpression": undefined,
-              "whereKeyword": undefined,
+              "whereClause": undefined,
             },
             SqlMulti {
               "args": SeparatedArray {
@@ -973,8 +972,7 @@ describe('Math expression', () => {
                     },
                     "specialParen": undefined,
                     "type": "function",
-                    "whereExpression": undefined,
-                    "whereKeyword": undefined,
+                    "whereClause": undefined,
                   },
                 ],
               },

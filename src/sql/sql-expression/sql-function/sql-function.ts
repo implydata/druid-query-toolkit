@@ -14,6 +14,7 @@
 
 import { SqlRef } from '..';
 import { SqlBase, SqlBaseValue, Substitutor } from '../../sql-base';
+import { SqlWhereClause } from '../../sql-query';
 import { SeparatedArray, Separator } from '../../utils';
 import { SqlExpression } from '../sql-expression';
 
@@ -25,28 +26,26 @@ export interface SqlFunctionValue extends SqlBaseValue {
   decorator?: string;
   args?: SeparatedArray<SqlExpression>;
   filterKeyword?: string;
-  whereKeyword?: string;
-  whereExpression?: SqlExpression;
+  whereClause?: SqlWhereClause;
 }
 
 export class SqlFunction extends SqlExpression {
   static type = 'function';
+
   static DEFAULT_FILTER_KEYWORD = 'FILTER';
-  static DEFAULT_WHERE_KEYWORD = 'WHERE';
 
   static COUNT_STAR: SqlFunction;
 
   static simple(
     functionName: string,
     args: SqlExpression[] | SeparatedArray<SqlExpression>,
-    filter?: SqlExpression,
+    filter?: SqlWhereClause | SqlExpression,
   ) {
     return new SqlFunction({
       functionName: functionName,
       args: SeparatedArray.fromArray(args, Separator.COMMA),
       filterKeyword: filter ? SqlFunction.DEFAULT_FILTER_KEYWORD : undefined,
-      whereKeyword: filter ? SqlFunction.DEFAULT_WHERE_KEYWORD : undefined,
-      whereExpression: filter,
+      whereClause: filter ? SqlWhereClause.create(filter) : undefined,
     });
   }
 
@@ -54,15 +53,14 @@ export class SqlFunction extends SqlExpression {
     functionName: string,
     decorator: string | undefined,
     args: SqlExpression[] | SeparatedArray<SqlExpression>,
-    filter?: SqlExpression,
+    filter?: SqlWhereClause | SqlExpression,
   ) {
     return new SqlFunction({
       functionName: functionName,
       decorator: decorator,
       args: SeparatedArray.fromArray(args, Separator.COMMA),
       filterKeyword: filter ? SqlFunction.DEFAULT_FILTER_KEYWORD : undefined,
-      whereKeyword: filter ? SqlFunction.DEFAULT_WHERE_KEYWORD : undefined,
-      whereExpression: filter,
+      whereClause: filter ? SqlWhereClause.create(filter) : undefined,
     });
   }
 
@@ -71,8 +69,7 @@ export class SqlFunction extends SqlExpression {
   public readonly args?: SeparatedArray<SqlExpression>;
   public readonly decorator?: string;
   public readonly filterKeyword?: string;
-  public readonly whereKeyword?: string;
-  public readonly whereExpression?: SqlExpression;
+  public readonly whereClause?: SqlWhereClause;
 
   constructor(options: SqlFunctionValue) {
     super(options, SqlFunction.type);
@@ -81,8 +78,7 @@ export class SqlFunction extends SqlExpression {
     this.decorator = options.decorator;
     this.args = options.args;
     this.filterKeyword = options.filterKeyword;
-    this.whereKeyword = options.whereKeyword;
-    this.whereExpression = options.whereExpression;
+    this.whereClause = options.whereClause;
   }
 
   public valueOf(): SqlFunctionValue {
@@ -92,8 +88,7 @@ export class SqlFunction extends SqlExpression {
     value.decorator = this.decorator;
     value.args = this.args;
     value.filterKeyword = this.filterKeyword;
-    value.whereKeyword = this.whereKeyword;
-    value.whereExpression = this.whereExpression;
+    value.whereClause = this.whereClause;
     return value;
   }
 
@@ -118,18 +113,12 @@ export class SqlFunction extends SqlExpression {
 
       rawParts.push(specialParen === 'square' ? ']' : ')');
 
-      if (this.filterKeyword && this.whereKeyword && this.whereExpression) {
+      if (this.whereClause) {
         rawParts.push(
           this.getInnerSpace('preFilter'),
-          this.filterKeyword,
-          this.getInnerSpace('postFilterKeyword'),
-          '(',
-          this.getInnerSpace('postFilterLeftParen', ''),
-          this.whereKeyword,
-          this.getInnerSpace('postWhere'),
-          this.whereExpression.toString(),
-          this.getInnerSpace('preFilterRightParen', ''),
-          ')',
+          this.filterKeyword || SqlFunction.DEFAULT_FILTER_KEYWORD,
+          this.getInnerSpace('postFilter'),
+          this.whereClause.toString(),
         );
       }
     }
@@ -147,17 +136,24 @@ export class SqlFunction extends SqlExpression {
     return SqlBase.fromValue(value);
   }
 
-  public changeWhereExpression(whereExpression: SqlExpression): this {
+  public changeWhereClause(whereClause: SqlWhereClause | undefined): this {
     const value = this.valueOf();
-    value.whereExpression = whereExpression;
-    if (whereExpression) {
-      value.filterKeyword = value.filterKeyword || SqlFunction.DEFAULT_FILTER_KEYWORD;
-      value.whereKeyword = value.whereKeyword || SqlFunction.DEFAULT_WHERE_KEYWORD;
+    if (whereClause) {
+      value.whereClause = whereClause;
     } else {
+      delete value.whereClause;
       delete value.filterKeyword;
-      delete value.whereKeyword;
     }
     return SqlBase.fromValue(value);
+  }
+
+  public changeWhereExpression(whereExpression: SqlExpression | string | undefined): this {
+    if (!whereExpression) return this.changeWhereClause(undefined);
+    return this.changeWhereClause(
+      this.whereClause
+        ? this.whereClause.changeExpression(whereExpression)
+        : SqlWhereClause.create(whereExpression),
+    );
   }
 
   public _walkInner(
@@ -175,15 +171,21 @@ export class SqlFunction extends SqlExpression {
       }
     }
 
-    if (this.whereExpression) {
-      const whereExpression = this.whereExpression._walkHelper(nextStack, fn, postorder);
-      if (!whereExpression) return;
-      if (whereExpression !== this.whereExpression) {
-        ret = ret.changeWhereExpression(whereExpression);
+    if (this.whereClause) {
+      const whereClause = this.whereClause._walkHelper(nextStack, fn, postorder);
+      if (!whereClause) return;
+      if (whereClause !== this.whereClause) {
+        ret = ret.changeWhereClause(whereClause as SqlWhereClause);
       }
     }
 
     return ret;
+  }
+
+  public clearStaticKeywords(): this {
+    const value = this.valueOf();
+    delete value.filterKeyword;
+    return SqlBase.fromValue(value);
   }
 
   public clearSeparators(): this {

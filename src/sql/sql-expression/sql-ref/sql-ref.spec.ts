@@ -293,49 +293,49 @@ describe('upgrades', () => {
     expect(parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": undefined,
-        "fromExpressions": SeparatedArray {
-          "separators": Array [],
-          "values": Array [
-            SqlAlias {
-              "alias": undefined,
-              "asKeyword": undefined,
-              "expression": SqlRef {
-                "column": undefined,
-                "innerSpacing": Object {
-                  "postTableDot": "",
-                  "preTableDot": "",
+        "fromClause": SqlFromClause {
+          "expressions": SeparatedArray {
+            "separators": Array [],
+            "values": Array [
+              SqlAlias {
+                "alias": undefined,
+                "asKeyword": undefined,
+                "expression": SqlRef {
+                  "column": undefined,
+                  "innerSpacing": Object {
+                    "postTableDot": "",
+                    "preTableDot": "",
+                  },
+                  "namespace": "sys",
+                  "namespaceQuotes": false,
+                  "quotes": false,
+                  "table": "segments",
+                  "tableQuotes": false,
+                  "type": "ref",
                 },
-                "namespace": "sys",
-                "namespaceQuotes": false,
-                "quotes": false,
-                "table": "segments",
-                "tableQuotes": false,
-                "type": "ref",
+                "innerSpacing": Object {},
+                "type": "alias",
               },
-              "innerSpacing": Object {},
-              "type": "alias",
-            },
-          ],
+            ],
+          },
+          "innerSpacing": Object {
+            "postKeyword": " ",
+          },
+          "joinParts": undefined,
+          "keyword": "from",
+          "type": "fromClause",
         },
-        "fromKeyword": "from",
-        "groupByExpressions": undefined,
-        "groupByKeyword": undefined,
-        "havingExpression": undefined,
-        "havingKeyword": undefined,
+        "groupByClause": undefined,
+        "havingClause": undefined,
         "innerSpacing": Object {
-          "postFrom": " ",
           "postQuery": "",
           "postSelect": " ",
           "preFrom": " ",
           "preQuery": "",
         },
-        "joinParts": undefined,
-        "limitKeyword": undefined,
-        "limitValue": undefined,
-        "offsetKeyword": undefined,
-        "offsetValue": undefined,
-        "orderByKeyword": undefined,
-        "orderByParts": undefined,
+        "limitClause": undefined,
+        "offsetClause": undefined,
+        "orderByClause": undefined,
         "selectDecorator": undefined,
         "selectExpressions": SeparatedArray {
           "separators": Array [],
@@ -362,8 +362,7 @@ describe('upgrades', () => {
         "type": "query",
         "unionKeyword": undefined,
         "unionQuery": undefined,
-        "whereExpression": undefined,
-        "whereKeyword": undefined,
+        "whereClause": undefined,
         "withKeyword": undefined,
         "withParts": undefined,
       }

@@ -67,8 +67,7 @@ describe('SqlFunction', () => {
         },
         "specialParen": undefined,
         "type": "function",
-        "whereExpression": undefined,
-        "whereKeyword": undefined,
+        "whereClause": undefined,
       }
     `);
   });
@@ -105,8 +104,7 @@ describe('SqlFunction', () => {
         },
         "specialParen": undefined,
         "type": "function",
-        "whereExpression": undefined,
-        "whereKeyword": undefined,
+        "whereClause": undefined,
       }
     `);
   });
@@ -149,8 +147,7 @@ describe('SqlFunction', () => {
         ],
         "specialParen": undefined,
         "type": "function",
-        "whereExpression": undefined,
-        "whereKeyword": undefined,
+        "whereClause": undefined,
       }
     `);
   });
@@ -253,8 +250,7 @@ describe('SqlFunction', () => {
         },
         "specialParen": undefined,
         "type": "function",
-        "whereExpression": undefined,
-        "whereKeyword": undefined,
+        "whereClause": undefined,
       }
     `);
   });
@@ -291,8 +287,7 @@ describe('SqlFunction', () => {
         },
         "specialParen": undefined,
         "type": "function",
-        "whereExpression": undefined,
-        "whereKeyword": undefined,
+        "whereClause": undefined,
       }
     `);
   });
@@ -339,8 +334,7 @@ describe('SqlFunction', () => {
               },
               "specialParen": undefined,
               "type": "function",
-              "whereExpression": undefined,
-              "whereKeyword": undefined,
+              "whereClause": undefined,
             },
             SqlMulti {
               "args": SeparatedArray {
@@ -378,8 +372,7 @@ describe('SqlFunction', () => {
                     },
                     "specialParen": undefined,
                     "type": "function",
-                    "whereExpression": undefined,
-                    "whereKeyword": undefined,
+                    "whereClause": undefined,
                   },
                   SqlMulti {
                     "args": SeparatedArray {
@@ -417,8 +410,7 @@ describe('SqlFunction', () => {
                           },
                           "specialParen": undefined,
                           "type": "function",
-                          "whereExpression": undefined,
-                          "whereKeyword": undefined,
+                          "whereClause": undefined,
                         },
                         SqlLiteral {
                           "innerSpacing": Object {},
@@ -475,43 +467,52 @@ describe('SqlFunction', () => {
         "functionName": "Sum",
         "innerSpacing": Object {
           "postArguments": "",
-          "postFilterKeyword": " ",
-          "postFilterLeftParen": "",
+          "postFilter": " ",
           "postLeftParen": "",
-          "postWhere": " ",
           "preFilter": " ",
-          "preFilterRightParen": "",
           "preLeftParen": "",
         },
         "specialParen": undefined,
         "type": "function",
-        "whereExpression": SqlComparison {
+        "whereClause": SqlWhereClause {
+          "expression": SqlComparison {
+            "innerSpacing": Object {
+              "postOp": " ",
+              "preOp": " ",
+            },
+            "lhs": SqlRef {
+              "column": "val",
+              "innerSpacing": Object {},
+              "namespace": undefined,
+              "namespaceQuotes": false,
+              "quotes": false,
+              "table": undefined,
+              "tableQuotes": false,
+              "type": "ref",
+            },
+            "notKeyword": undefined,
+            "op": ">",
+            "rhs": SqlLiteral {
+              "innerSpacing": Object {},
+              "keyword": undefined,
+              "stringValue": "1",
+              "type": "literal",
+              "value": 1,
+            },
+            "type": "comparison",
+          },
           "innerSpacing": Object {
-            "postOp": " ",
-            "preOp": " ",
+            "postKeyword": " ",
           },
-          "lhs": SqlRef {
-            "column": "val",
-            "innerSpacing": Object {},
-            "namespace": undefined,
-            "namespaceQuotes": false,
-            "quotes": false,
-            "table": undefined,
-            "tableQuotes": false,
-            "type": "ref",
-          },
-          "notKeyword": undefined,
-          "op": ">",
-          "rhs": SqlLiteral {
-            "innerSpacing": Object {},
-            "keyword": undefined,
-            "stringValue": "1",
-            "type": "literal",
-            "value": 1,
-          },
-          "type": "comparison",
+          "keyword": "WHERE",
+          "parens": Array [
+            Object {
+              "leftSpacing": "",
+              "rightSpacing": "",
+            },
+          ],
+          "type": "whereClause",
         },
-        "whereKeyword": "WHERE",
       }
     `);
   });
@@ -588,8 +589,7 @@ describe('SqlFunction', () => {
         },
         "specialParen": "square",
         "type": "function",
-        "whereExpression": undefined,
-        "whereKeyword": undefined,
+        "whereClause": undefined,
       }
     `);
   });
@@ -648,8 +648,7 @@ describe('SqlFunction', () => {
         },
         "specialParen": "square",
         "type": "function",
-        "whereExpression": undefined,
-        "whereKeyword": undefined,
+        "whereClause": undefined,
       }
     `);
   });

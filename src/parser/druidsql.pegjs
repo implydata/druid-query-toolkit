@@ -26,7 +26,6 @@ SqlQuery =
   withClause:(WithClause _)?
   select:SelectClause
   from:(_ FromClause)?
-  joins:(_ JoinClauses)?
   where:(_ WhereClause)?
   groupBy:(_ GroupByClause)?
   having:(_ HavingClause)?
@@ -61,56 +60,37 @@ SqlQuery =
 
   if (from) {
     innerSpacing.preFrom = from[0];
-    value.fromKeyword = from[1].fromKeyword;
-    innerSpacing.postFrom = from[1].postFrom;
-    value.fromExpressions = from[1].fromExpressions;
-  }
-
-  if (joins) {
-    innerSpacing.preJoin = joins[0];
-    value.joinParts = joins[1];
+    value.fromClause = from[1];
   }
 
   if (where) {
     innerSpacing.preWhere = where[0];
-    value.whereKeyword = where[1].whereKeyword;
-    innerSpacing.postWhere = where[1].postWhere;
-    value.whereExpression = where[1].whereExpression;
+    value.whereClause = where[1];
   }
 
   if (groupBy) {
     innerSpacing.preGroupBy = groupBy[0];
-    value.groupByKeyword = groupBy[1].groupByKeyword;
-    innerSpacing.postGroupBy = groupBy[1].postGroupBy;
-    value.groupByExpressions = groupBy[1].groupByExpressions;
+    value.groupByClause = groupBy[1];
   }
 
   if (having) {
     innerSpacing.preHaving = having[0];
-    value.havingKeyword = having[1].havingKeyword;
-    innerSpacing.postHaving = having[1].postHaving;
-    value.havingExpression = having[1].havingExpression;
+    value.havingClause = having[1];
   }
 
   if (orderBy) {
     innerSpacing.preOrderBy = orderBy[0];
-    value.orderByKeyword = orderBy[1].orderByKeyword;
-    innerSpacing.postOrderBy = orderBy[1].postOrderBy;
-    value.orderByParts = orderBy[1].orderByParts;
+    value.orderByClause = orderBy[1];
   }
 
   if (limit) {
     innerSpacing.preLimit = limit[0];
-    value.limitKeyword = limit[1].limitKeyword;
-    innerSpacing.postLimit = limit[1].postLimit;
-    value.limitValue = limit[1].limitValue;
+    value.limitClause = limit[1];
   }
 
   if (offset) {
     innerSpacing.preOffset = offset[0];
-    value.offsetKeyword = offset[1].offsetKeyword;
-    innerSpacing.postOffset = offset[1].postOffset;
-    value.offsetValue = offset[1].offsetValue;
+    value.offsetClause = offset[1];
   }
 
   if (union) {
@@ -190,15 +170,19 @@ SelectClause =
   };
 }
 
-FromClause = fromKeyword:FromToken postFrom:_ head:SqlAlias tail:(CommaSeparator SqlAlias)*
+FromClause = keyword:FromToken postKeyword:_ head:SqlAlias tail:(CommaSeparator SqlAlias)* join:(_ JoinClauses)?
 {
-  return {
-    fromKeyword: fromKeyword,
-    postFrom: postFrom,
-    fromExpressions: makeSeparatedArray(head, tail).map(function(table) {
+  return new sql.SqlFromClause({
+    keyword: keyword,
+    expressions: makeSeparatedArray(head, tail).map(function(table) {
       return SqlAlias.fromBaseAndUpgrade(table);
     }),
-  };
+    joinParts: join ? join[1] : undefined,
+    innerSpacing: {
+      postKeyword: postKeyword,
+      preJoin: join ? join[0] : undefined,
+    },
+  });
 }
 
 JoinClauses = head:SqlJoinPart tail:(_ SqlJoinPart)*
@@ -233,22 +217,26 @@ SqlJoinPart =
   return new sql.SqlJoinPart(value);
 }
 
-WhereClause = whereKeyword:WhereToken postWhere:_ whereExpression:Expression
+WhereClause = keyword:WhereToken postKeyword:_ expression:Expression
 {
-  return {
-    whereKeyword: whereKeyword,
-    postWhere: postWhere,
-    whereExpression: whereExpression
-  };
+  return new sql.SqlWhereClause({
+    keyword: keyword,
+    expression: expression,
+    innerSpacing: {
+      postKeyword: postKeyword,
+    }
+  });
 }
 
-GroupByClause = groupByKeyword:GroupByToken postGroupBy:_ groupByExpressions:(ExpressionList / "()")
+GroupByClause = keyword:GroupByToken postKeyword:_ expressions:(ExpressionList / "()")
 {
-  return {
-    groupByKeyword: groupByKeyword,
-    postGroupBy: postGroupBy,
-    groupByExpressions: groupByExpressions === '()' ? null : groupByExpressions,
-  };
+  return new sql.SqlGroupByClause({
+    keyword: keyword,
+    expressions: expressions === '()' ? null : expressions,
+    innerSpacing: {
+      postKeyword: postKeyword,
+    }
+  });
 }
 
 ExpressionList = head:Expression tail:(CommaSeparator Expression)*
@@ -256,25 +244,29 @@ ExpressionList = head:Expression tail:(CommaSeparator Expression)*
   return makeSeparatedArray(head, tail);
 }
 
-HavingClause = havingKeyword:HavingToken postHaving:_ havingExpression:Expression
+HavingClause = keyword:HavingToken postKeyword:_ expression:Expression
 {
-  return {
-    havingKeyword: havingKeyword,
-    postHaving: postHaving,
-    havingExpression: havingExpression
-  };
+  return new sql.SqlHavingClause({
+    keyword: keyword,
+    expression: expression,
+    innerSpacing: {
+      postKeyword: postKeyword,
+    }
+  });
 }
 
-OrderByClause = orderByKeyword:OrderToken postOrderBy:_ head:SqlOrderByPart tail:(CommaSeparator SqlOrderByPart)*
+OrderByClause = keyword:OrderToken postKeyword:_ head:SqlOrderByExpression tail:(CommaSeparator SqlOrderByExpression)*
 {
-  return {
-    orderByKeyword: orderByKeyword,
-    postOrderBy: postOrderBy,
-    orderByParts: makeSeparatedArray(head, tail),
-  };
+  return new sql.SqlOrderByClause({
+    keyword: keyword,
+    expressions: makeSeparatedArray(head, tail),
+    innerSpacing: {
+      postKeyword: postKeyword,
+    },
+  });
 }
 
-SqlOrderByPart = expression:Expression direction:(_ (AscToken / DescToken))?
+SqlOrderByExpression = expression:Expression direction:(_ (AscToken / DescToken))?
 {
   var value = {
     expression: expression,
@@ -286,25 +278,29 @@ SqlOrderByPart = expression:Expression direction:(_ (AscToken / DescToken))?
     value.direction = direction[1];
   }
 
-  return new sql.SqlOrderByPart(value);
+  return new sql.SqlOrderByExpression(value);
 }
 
-LimitClause = limitKeyword:LimitToken postLimit:_ limitValue:SqlLiteral
+LimitClause = keyword:LimitToken postKeyword:_ limit:SqlLiteral
 {
-  return {
-    limitKeyword: limitKeyword,
-    postLimit: postLimit,
-    limitValue: limitValue
-  };
+  return new sql.SqlLimitClause({
+    keyword: keyword,
+    limit: limit,
+    innerSpacing: {
+      postKeyword: postKeyword,
+    },
+  });
 }
 
-OffsetClause = offsetKeyword:OffsetToken postOffset:_ offsetValue:SqlLiteral
+OffsetClause = keyword:OffsetToken postKeyword:_ offset:SqlLiteral
 {
-  return {
-    offsetKeyword: offsetKeyword,
-    postOffset: postOffset,
-    offsetValue: offsetValue
-  };
+  return new sql.SqlOffsetClause({
+    keyword: keyword,
+    offset: offset,
+    innerSpacing: {
+      postKeyword: postKeyword,
+    },
+  });
 }
 
 UnionClause = unionKeyword:UnionToken postUnion:_ unionQuery:SqlQuery
@@ -653,7 +649,7 @@ GenericFunction =
   tail:(CommaSeparator Expression)*
   postArguments:_
   CloseParen
-  filter:(_ Filter)?
+  filter:(_ FunctionFilter)?
 {
   var value = {
     functionName: functionName,
@@ -676,12 +672,8 @@ GenericFunction =
   if (filter) {
     innerSpacing.preFilter = filter[0];
     value.filterKeyword = filter[1].filterKeyword;
-    innerSpacing.postFilterKeyword = filter[1].postFilterKeyword;
-    innerSpacing.postFilterLeftParen = filter[1].postFilterLeftParen;
-    value.whereKeyword = filter[1].whereKeyword;
-    innerSpacing.postWhere = filter[1].postWhere;
-    value.whereExpression = filter[1].whereExpression;
-    innerSpacing.preFilterRightParen = filter[1].preFilterRightParen;
+    innerSpacing.postFilter = filter[1].postFilter;
+    value.whereClause = filter[1].whereClause;
   }
 
   return new sql.SqlFunction(value);
@@ -886,16 +878,12 @@ ArrayFunction =
   return new sql.SqlFunction(value);
 }
 
-Filter = filterKeyword:FilterToken postFilterKeyword:_ OpenParen postLeftParen:_ filterExpression:WhereClause preRightParen:_ CloseParen
+FunctionFilter = filterKeyword:FilterToken postFilter:_ OpenParen postLeftParen:_ whereClause:WhereClause preRightParen:_ CloseParen
 {
   return {
     filterKeyword: filterKeyword,
-    postFilterKeyword: postFilterKeyword,
-    postFilterLeftParen: postLeftParen,
-    whereKeyword: filterExpression.whereKeyword,
-    postWhere: filterExpression.postWhere,
-    whereExpression: filterExpression.whereExpression,
-    preFilterRightParen: preRightParen,
+    postFilter: postFilter,
+    whereClause: whereClause.addParens(postLeftParen, preRightParen),
   };
 }
 

@@ -20,7 +20,7 @@ import {
   SqlComparison,
   SqlLiteral,
   SqlMulti,
-  SqlOrderByPart,
+  SqlOrderByExpression,
 } from '..';
 import { filterMap } from '../../utils';
 import { SqlBase, Substitutor } from '../sql-base';
@@ -74,8 +74,8 @@ export abstract class SqlExpression extends SqlBase {
     return SqlAlias.create(this, alias);
   }
 
-  public toOrderByPart(direction?: string): SqlOrderByPart {
-    return SqlOrderByPart.create(this, direction);
+  public toOrderByPart(direction?: string): SqlOrderByExpression {
+    return SqlOrderByExpression.create(this, direction);
   }
 
   // SqlComparison

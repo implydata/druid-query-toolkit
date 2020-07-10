@@ -17,16 +17,16 @@ import { SqlExpression } from '../../sql-expression';
 
 export type Direction = 'ASC' | 'DESC';
 
-export interface SqlOrderByPartValue extends SqlBaseValue {
+export interface SqlOrderByExpressionValue extends SqlBaseValue {
   expression: SqlExpression;
   direction?: string;
 }
 
-export class SqlOrderByPart extends SqlBase {
-  static type = 'orderByPart';
+export class SqlOrderByExpression extends SqlBase {
+  static type = 'orderByExpression';
 
   static create(expression: SqlExpression, direction?: string) {
-    return new SqlOrderByPart({
+    return new SqlOrderByExpression({
       expression,
       direction,
     });
@@ -41,14 +41,14 @@ export class SqlOrderByPart extends SqlBase {
     // Try to be mindful of capitalization
     if (direction === 'asc') return 'desc';
     if (direction === 'desc') return 'asc';
-    return SqlOrderByPart.normalizeDirection(direction) === 'ASC' ? 'DESC' : 'ASC';
+    return SqlOrderByExpression.normalizeDirection(direction) === 'ASC' ? 'DESC' : 'ASC';
   }
 
   public readonly expression: SqlExpression;
   public readonly direction?: string;
 
-  constructor(options: SqlOrderByPartValue) {
-    super(options, SqlOrderByPart.type);
+  constructor(options: SqlOrderByExpressionValue) {
+    super(options, SqlOrderByExpression.type);
     this.expression = options.expression;
 
     const direction = options.direction;
@@ -61,8 +61,8 @@ export class SqlOrderByPart extends SqlBase {
     }
   }
 
-  public valueOf(): SqlOrderByPartValue {
-    const value = super.valueOf() as SqlOrderByPartValue;
+  public valueOf(): SqlOrderByExpressionValue {
+    const value = super.valueOf() as SqlOrderByExpressionValue;
     value.expression = this.expression;
     value.direction = this.direction;
     return value;
@@ -96,11 +96,11 @@ export class SqlOrderByPart extends SqlBase {
   }
 
   public getEffectiveDirection(): Direction {
-    return SqlOrderByPart.normalizeDirection(this.direction);
+    return SqlOrderByExpression.normalizeDirection(this.direction);
   }
 
   public reverseDirection(): this {
-    return this.changeDirection(SqlOrderByPart.reverseDirection(this.direction));
+    return this.changeDirection(SqlOrderByExpression.reverseDirection(this.direction));
   }
 
   public _walkInner(
@@ -120,4 +120,4 @@ export class SqlOrderByPart extends SqlBase {
   }
 }
 
-SqlBase.register(SqlOrderByPart.type, SqlOrderByPart);
+SqlBase.register(SqlOrderByExpression.type, SqlOrderByExpression);

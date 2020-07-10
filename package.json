@@ -67,6 +67,7 @@
     "awesome-code-style": "^1.4.3",
     "axios": "^0.19.2",
     "core-js": "^3.5.0",
+    "fs-extra": "^9.0.1",
     "husky": "^3.1.0",
     "jest": "^24.9.0",
     "pegjs": "^0.10.0",
