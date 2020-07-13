@@ -12,27 +12,34 @@
  * limitations under the License.
  */
 
-import { HeaderRows, inflateDates, normalizeQueryResultRaw } from './query-result-decoder';
+import { QueryResult } from './query-result';
 
-describe('QueryResultsDecoder', () => {
-  describe('inflateDates', () => {
+describe('QueryResult', () => {
+  describe('#inflateDates', () => {
     it('works', () => {
-      const data: HeaderRows = {
-        header: ['A', 'B', 'C'],
+      const data = new QueryResult({
+        header: [{ name: 'A' }, { name: 'B' }, { name: 'C' }],
         rows: [
           ['A', '2016-06-27T00:00:00.000Z', 876],
           ['J', '2016-06-27T01:00:00.000Z', 870],
           ['K', '2016-06-27T02:00:00.000Z', 960],
         ],
-      };
+      });
 
-      expect(inflateDates(data)).toMatchInlineSnapshot(`
-        Object {
+      expect(data.inflateDates()).toMatchInlineSnapshot(`
+        QueryResult {
           "header": Array [
-            "A",
-            "B",
-            "C",
+            Object {
+              "name": "A",
+            },
+            Object {
+              "name": "B",
+            },
+            Object {
+              "name": "C",
+            },
           ],
+          "query": undefined,
           "rows": Array [
             Array [
               "A",
@@ -50,29 +57,36 @@ describe('QueryResultsDecoder', () => {
               960,
             ],
           ],
+          "sqlQuery": undefined,
         }
       `);
     });
   });
 
-  describe('normalizeQueryResultRaw', () => {
+  describe('.fromRawResult', () => {
     it('works for timeseries (no timestamp)', () => {
       const result = [
         { timestamp: '2019-08-04T15:00:00.000Z', result: { count: 514, added: 1232 } },
       ];
 
-      expect(normalizeQueryResultRaw(result)).toMatchInlineSnapshot(`
-        Object {
+      expect(QueryResult.fromRawResult(result)).toMatchInlineSnapshot(`
+        QueryResult {
           "header": Array [
-            "count",
-            "added",
+            Object {
+              "name": "count",
+            },
+            Object {
+              "name": "added",
+            },
           ],
+          "query": undefined,
           "rows": Array [
             Array [
               514,
               1232,
             ],
           ],
+          "sqlQuery": undefined,
         }
       `);
     });
@@ -83,13 +97,20 @@ describe('QueryResultsDecoder', () => {
         { timestamp: '2019-08-04T16:00:00.000Z', result: { count: 15600, added: 6123934 } },
       ];
 
-      expect(normalizeQueryResultRaw(result, true)).toMatchInlineSnapshot(`
-        Object {
+      expect(QueryResult.fromRawResult(result, true)).toMatchInlineSnapshot(`
+        QueryResult {
           "header": Array [
-            "timestamp",
-            "count",
-            "added",
+            Object {
+              "name": "timestamp",
+            },
+            Object {
+              "name": "count",
+            },
+            Object {
+              "name": "added",
+            },
           ],
+          "query": undefined,
           "rows": Array [
             Array [
               "2019-08-04T15:00:00.000Z",
@@ -102,6 +123,7 @@ describe('QueryResultsDecoder', () => {
               6123934,
             ],
           ],
+          "sqlQuery": undefined,
         }
       `);
     });
@@ -120,13 +142,20 @@ describe('QueryResultsDecoder', () => {
         },
       ];
 
-      expect(normalizeQueryResultRaw(result)).toMatchInlineSnapshot(`
-        Object {
+      expect(QueryResult.fromRawResult(result)).toMatchInlineSnapshot(`
+        QueryResult {
           "header": Array [
-            "added",
-            "channel",
-            "count",
+            Object {
+              "name": "added",
+            },
+            Object {
+              "name": "channel",
+            },
+            Object {
+              "name": "count",
+            },
           ],
+          "query": undefined,
           "rows": Array [
             Array [
               2976786,
@@ -139,17 +168,27 @@ describe('QueryResultsDecoder', () => {
               2329,
             ],
           ],
+          "sqlQuery": undefined,
         }
       `);
 
-      expect(normalizeQueryResultRaw(result, true)).toMatchInlineSnapshot(`
-        Object {
+      expect(QueryResult.fromRawResult(result, true)).toMatchInlineSnapshot(`
+        QueryResult {
           "header": Array [
-            "timestamp",
-            "added",
-            "channel",
-            "count",
+            Object {
+              "name": "timestamp",
+            },
+            Object {
+              "name": "added",
+            },
+            Object {
+              "name": "channel",
+            },
+            Object {
+              "name": "count",
+            },
           ],
+          "query": undefined,
           "rows": Array [
             Array [
               "2019-08-04T16:05:29.000Z",
@@ -164,6 +203,7 @@ describe('QueryResultsDecoder', () => {
               2329,
             ],
           ],
+          "sqlQuery": undefined,
         }
       `);
     });
@@ -192,12 +232,17 @@ describe('QueryResultsDecoder', () => {
         },
       ];
 
-      expect(normalizeQueryResultRaw(result)).toMatchInlineSnapshot(`
-        Object {
+      expect(QueryResult.fromRawResult(result)).toMatchInlineSnapshot(`
+        QueryResult {
           "header": Array [
-            "d0",
-            "a0",
+            Object {
+              "name": "d0",
+            },
+            Object {
+              "name": "a0",
+            },
           ],
+          "query": undefined,
           "rows": Array [
             Array [
               "#ar.wikipedia",
@@ -208,6 +253,7 @@ describe('QueryResultsDecoder', () => {
               15,
             ],
           ],
+          "sqlQuery": undefined,
         }
       `);
     });
@@ -237,12 +283,17 @@ describe('QueryResultsDecoder', () => {
         },
       ];
 
-      expect(normalizeQueryResultRaw(result)).toMatchInlineSnapshot(`
-        Object {
+      expect(QueryResult.fromRawResult(result)).toMatchInlineSnapshot(`
+        QueryResult {
           "header": Array [
-            "channel",
-            "count",
+            Object {
+              "name": "channel",
+            },
+            Object {
+              "name": "count",
+            },
           ],
+          "query": undefined,
           "rows": Array [
             Array [
               "#en.wikipedia",
@@ -269,16 +320,24 @@ describe('QueryResultsDecoder', () => {
               782,
             ],
           ],
+          "sqlQuery": undefined,
         }
       `);
 
-      expect(normalizeQueryResultRaw(result, true)).toMatchInlineSnapshot(`
-        Object {
+      expect(QueryResult.fromRawResult(result, true)).toMatchInlineSnapshot(`
+        QueryResult {
           "header": Array [
-            "timestamp",
-            "channel",
-            "count",
+            Object {
+              "name": "timestamp",
+            },
+            Object {
+              "name": "channel",
+            },
+            Object {
+              "name": "count",
+            },
           ],
+          "query": undefined,
           "rows": Array [
             Array [
               "2019-08-04T18:00:00.000Z",
@@ -311,6 +370,7 @@ describe('QueryResultsDecoder', () => {
               782,
             ],
           ],
+          "sqlQuery": undefined,
         }
       `);
     });
@@ -356,13 +416,20 @@ describe('QueryResultsDecoder', () => {
         },
       ];
 
-      expect(normalizeQueryResultRaw(result, true)).toMatchInlineSnapshot(`
-        Object {
+      expect(QueryResult.fromRawResult(result, true)).toMatchInlineSnapshot(`
+        QueryResult {
           "header": Array [
-            "timestamp",
-            "d0",
-            "a0",
+            Object {
+              "name": "timestamp",
+            },
+            Object {
+              "name": "d0",
+            },
+            Object {
+              "name": "a0",
+            },
           ],
+          "query": undefined,
           "rows": Array [
             Array [
               "2019-08-22T02:59:20.000Z",
@@ -380,6 +447,7 @@ describe('QueryResultsDecoder', () => {
               2736,
             ],
           ],
+          "sqlQuery": undefined,
         }
       `);
     });
@@ -398,13 +466,20 @@ describe('QueryResultsDecoder', () => {
         },
       ];
 
-      expect(normalizeQueryResultRaw(result)).toMatchInlineSnapshot(`
-        Object {
+      expect(QueryResult.fromRawResult(result)).toMatchInlineSnapshot(`
+        QueryResult {
           "header": Array [
-            "__time",
-            "added",
-            "channel",
+            Object {
+              "name": "__time",
+            },
+            Object {
+              "name": "added",
+            },
+            Object {
+              "name": "channel",
+            },
           ],
+          "query": undefined,
           "rows": Array [
             Array [
               1564887701848,
@@ -422,6 +497,7 @@ describe('QueryResultsDecoder', () => {
               "#vi.wikipedia",
             ],
           ],
+          "sqlQuery": undefined,
         }
       `);
     });
@@ -440,13 +516,20 @@ describe('QueryResultsDecoder', () => {
         },
       ];
 
-      expect(normalizeQueryResultRaw(result)).toMatchInlineSnapshot(`
-        Object {
+      expect(QueryResult.fromRawResult(result)).toMatchInlineSnapshot(`
+        QueryResult {
           "header": Array [
-            "__time",
-            "added",
-            "channel",
+            Object {
+              "name": "__time",
+            },
+            Object {
+              "name": "added",
+            },
+            Object {
+              "name": "channel",
+            },
           ],
+          "query": undefined,
           "rows": Array [
             Array [
               1564887701848,
@@ -464,6 +547,7 @@ describe('QueryResultsDecoder', () => {
               "#vi.wikipedia",
             ],
           ],
+          "sqlQuery": undefined,
         }
       `);
     });
@@ -514,13 +598,20 @@ describe('QueryResultsDecoder', () => {
         },
       ];
 
-      expect(normalizeQueryResultRaw(result)).toMatchInlineSnapshot(`
-        Object {
+      expect(QueryResult.fromRawResult(result)).toMatchInlineSnapshot(`
+        QueryResult {
           "header": Array [
-            "timestamp",
-            "channel",
-            "added",
+            Object {
+              "name": "timestamp",
+            },
+            Object {
+              "name": "channel",
+            },
+            Object {
+              "name": "added",
+            },
           ],
+          "query": undefined,
           "rows": Array [
             Array [
               "2019-01-01T00:00:00.321Z",
@@ -538,6 +629,7 @@ describe('QueryResultsDecoder', () => {
               30,
             ],
           ],
+          "sqlQuery": undefined,
         }
       `);
     });
@@ -571,13 +663,20 @@ describe('QueryResultsDecoder', () => {
         },
       ];
 
-      expect(normalizeQueryResultRaw(result)).toMatchInlineSnapshot(`
-        Object {
+      expect(QueryResult.fromRawResult(result)).toMatchInlineSnapshot(`
+        QueryResult {
           "header": Array [
-            "dimension",
-            "value",
-            "count",
+            Object {
+              "name": "dimension",
+            },
+            Object {
+              "name": "value",
+            },
+            Object {
+              "name": "count",
+            },
           ],
+          "query": undefined,
           "rows": Array [
             Array [
               "dim1",
@@ -595,6 +694,7 @@ describe('QueryResultsDecoder', () => {
               1,
             ],
           ],
+          "sqlQuery": undefined,
         }
       `);
     });
@@ -628,13 +728,20 @@ describe('QueryResultsDecoder', () => {
         },
       ];
 
-      expect(normalizeQueryResultRaw(result)).toMatchInlineSnapshot(`
-        Object {
+      expect(QueryResult.fromRawResult(result)).toMatchInlineSnapshot(`
+        QueryResult {
           "header": Array [
-            "dimension",
-            "value",
-            "count",
+            Object {
+              "name": "dimension",
+            },
+            Object {
+              "name": "value",
+            },
+            Object {
+              "name": "count",
+            },
           ],
+          "query": undefined,
           "rows": Array [
             Array [
               "dim1",
@@ -652,6 +759,7 @@ describe('QueryResultsDecoder', () => {
               1,
             ],
           ],
+          "sqlQuery": undefined,
         }
       `);
     });
@@ -667,18 +775,24 @@ describe('QueryResultsDecoder', () => {
         },
       ];
 
-      expect(normalizeQueryResultRaw(result)).toMatchInlineSnapshot(`
-        Object {
+      expect(QueryResult.fromRawResult(result)).toMatchInlineSnapshot(`
+        QueryResult {
           "header": Array [
-            "minTime",
-            "maxTime",
+            Object {
+              "name": "minTime",
+            },
+            Object {
+              "name": "maxTime",
+            },
           ],
+          "query": undefined,
           "rows": Array [
             Array [
               "2013-05-09T18:24:00.000Z",
               "2013-05-09T18:37:00.000Z",
             ],
           ],
+          "sqlQuery": undefined,
         }
       `);
     });
@@ -693,16 +807,20 @@ describe('QueryResultsDecoder', () => {
         },
       ];
 
-      expect(normalizeQueryResultRaw(result)).toMatchInlineSnapshot(`
-        Object {
+      expect(QueryResult.fromRawResult(result)).toMatchInlineSnapshot(`
+        QueryResult {
           "header": Array [
-            "maxIngestedEventTime",
+            Object {
+              "name": "maxIngestedEventTime",
+            },
           ],
+          "query": undefined,
           "rows": Array [
             Array [
               "2013-05-09T18:24:09.007Z",
             ],
           ],
+          "sqlQuery": undefined,
         }
       `);
     });
@@ -746,16 +864,29 @@ describe('QueryResultsDecoder', () => {
         },
       ];
 
-      expect(normalizeQueryResultRaw(result)).toMatchInlineSnapshot(`
-        Object {
+      expect(QueryResult.fromRawResult(result)).toMatchInlineSnapshot(`
+        QueryResult {
           "header": Array [
-            "column",
-            "type",
-            "hasMultipleValues",
-            "size",
-            "cardinality",
-            "errorMessage",
+            Object {
+              "name": "column",
+            },
+            Object {
+              "name": "type",
+            },
+            Object {
+              "name": "hasMultipleValues",
+            },
+            Object {
+              "name": "size",
+            },
+            Object {
+              "name": "cardinality",
+            },
+            Object {
+              "name": "errorMessage",
+            },
           ],
+          "query": undefined,
           "rows": Array [
             Array [
               "__time",
@@ -782,6 +913,7 @@ describe('QueryResultsDecoder', () => {
               null,
             ],
           ],
+          "sqlQuery": undefined,
         }
       `);
     });
@@ -793,12 +925,17 @@ describe('QueryResultsDecoder', () => {
         ['2019-08-04T16:00:00.000Z', 15600],
       ];
 
-      expect(normalizeQueryResultRaw(result, false, true)).toMatchInlineSnapshot(`
-        Object {
+      expect(QueryResult.fromRawResult(result, false, true)).toMatchInlineSnapshot(`
+        QueryResult {
           "header": Array [
-            "Time",
-            "Count",
+            Object {
+              "name": "Time",
+            },
+            Object {
+              "name": "Count",
+            },
           ],
+          "query": undefined,
           "rows": Array [
             Array [
               "2019-08-04T15:00:00.000Z",
@@ -809,6 +946,7 @@ describe('QueryResultsDecoder', () => {
               15600,
             ],
           ],
+          "sqlQuery": undefined,
         }
       `);
     });

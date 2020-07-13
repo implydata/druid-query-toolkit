@@ -14,4 +14,4 @@
 
 export * from './parser';
 export * from './sql';
-export * from './query-result-decoder/query-result-decoder';
+export * from './query-result/query-result';
