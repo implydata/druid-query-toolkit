@@ -618,6 +618,7 @@ describe('SqlQuery operations', () => {
         Concat(   a      ,   b,          c    ),
         Case   A   When   B   Then    C   End   As m
         From tbl
+        Where   __time  Between  Timestamp  '2020-01-01'  And  Timestamp  '2020-01-02'  And   goo   is  not  Null
         Group    By   1
         Order  By   2   Desc  ,  3
         Asc   LimIT  12
@@ -628,9 +629,10 @@ describe('SqlQuery operations', () => {
           .prettify()
           .toString(),
       ).toEqual(sane`
-        SELECT col1 || lol, (Min(col1) + Sum(kl)) AS aliasName, Concat(a, b, c), Case A When B Then C End As m
+        SELECT col1 || lol, (Min(col1) + Sum(kl)) AS aliasName, Concat(a, b, c), CASE A WHEN B THEN C END As m
         FROM tbl
         GROUP BY 1
+        WHERE __time Between Timestamp '2020-01-01' AND Timestamp '2020-01-02' AND goo is not Null
         ORDER BY 2 Desc, 3 Asc
         LIMIT 12
       `);

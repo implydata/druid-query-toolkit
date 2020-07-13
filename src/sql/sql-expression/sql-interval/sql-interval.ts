@@ -17,7 +17,7 @@ import { SqlBase, SqlBaseValue } from '../../sql-base';
 import { SqlExpression } from '../sql-expression';
 
 export interface SqlIntervalValue extends SqlBaseValue {
-  intervalKeyword: string;
+  keyword?: string;
   intervalValue?: SqlLiteral;
   unitKeyword?: string;
 }
@@ -25,41 +25,54 @@ export interface SqlIntervalValue extends SqlBaseValue {
 export class SqlInterval extends SqlExpression {
   static type = 'interval';
 
+  static DEFAULT_INTERVAL_KEYWORD = 'INTERVAL';
+
   static create(unit: string, intervalValue: number) {
     return new SqlInterval({
-      intervalKeyword: 'INTERVAL',
       intervalValue: SqlLiteral.create(String(intervalValue)),
       unitKeyword: unit,
     });
   }
 
-  public readonly intervalKeyword: string;
+  public readonly keyword?: string;
   public readonly intervalValue?: SqlLiteral;
   public readonly unitKeyword?: string;
 
   constructor(options: SqlIntervalValue) {
     super(options, SqlInterval.type);
-    this.intervalKeyword = options.intervalKeyword;
+    this.keyword = options.keyword;
     this.intervalValue = options.intervalValue;
     this.unitKeyword = options.unitKeyword;
   }
 
   public valueOf(): SqlIntervalValue {
     const value = super.valueOf() as SqlIntervalValue;
-    value.intervalKeyword = this.intervalKeyword;
+    value.keyword = this.keyword;
     value.intervalValue = this.intervalValue;
     value.unitKeyword = this.unitKeyword;
     return value;
   }
 
   protected _toRawString(): string {
-    return (
-      this.intervalKeyword +
-      this.getInnerSpace('postIntervalKeyword') +
-      this.intervalValue +
-      this.getInnerSpace('postIntervalValue') +
-      this.unitKeyword
-    );
+    return [
+      this.keyword || SqlInterval.DEFAULT_INTERVAL_KEYWORD,
+      this.getInnerSpace('postIntervalKeyword'),
+      this.intervalValue,
+      this.getInnerSpace('postIntervalValue'),
+      this.unitKeyword,
+    ].join('');
+  }
+
+  public changeKeyword(keyword: string | undefined): this {
+    const value = this.valueOf();
+    value.keyword = keyword;
+    return SqlBase.fromValue(value);
+  }
+
+  public clearStaticKeywords(): this {
+    const value = this.valueOf();
+    delete value.keyword;
+    return SqlBase.fromValue(value);
   }
 }
 

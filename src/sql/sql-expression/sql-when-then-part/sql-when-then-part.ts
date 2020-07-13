@@ -16,27 +16,28 @@ import { SqlBase, SqlBaseValue, Substitutor } from '../../sql-base';
 import { SqlExpression } from '../sql-expression';
 
 export interface SqlWhenThenPartValue extends SqlBaseValue {
-  whenKeyword: string;
+  whenKeyword?: string;
   whenExpression: SqlExpression;
-  thenKeyword: string;
+  thenKeyword?: string;
   thenExpression: SqlExpression;
 }
 
 export class SqlWhenThenPart extends SqlBase {
   static type = 'whenThenPart';
 
+  static DEFAULT_WHEN_KEYWORD = 'WHEN';
+  static DEFAULT_THEN_KEYWORD = 'THEN';
+
   static create(whenExpression: SqlExpression, thenExpression: SqlExpression): SqlWhenThenPart {
     return new SqlWhenThenPart({
-      whenKeyword: 'WHEN',
       whenExpression,
-      thenKeyword: 'THEN',
       thenExpression,
     });
   }
 
-  public readonly whenKeyword: string;
+  public readonly whenKeyword?: string;
   public readonly whenExpression: SqlExpression;
-  public readonly thenKeyword: string;
+  public readonly thenKeyword?: string;
   public readonly thenExpression: SqlExpression;
 
   constructor(options: SqlWhenThenPartValue) {
@@ -58,11 +59,11 @@ export class SqlWhenThenPart extends SqlBase {
 
   protected _toRawString(): string {
     return [
-      this.whenKeyword,
+      this.whenKeyword || SqlWhenThenPart.DEFAULT_WHEN_KEYWORD,
       this.getInnerSpace('postWhen'),
       this.whenExpression.toString(),
       this.getInnerSpace('postWhenExpression'),
-      this.thenKeyword,
+      this.thenKeyword || SqlWhenThenPart.DEFAULT_THEN_KEYWORD,
       this.getInnerSpace('postThen'),
       this.thenExpression.toString(),
     ].join('');
@@ -100,6 +101,13 @@ export class SqlWhenThenPart extends SqlBase {
     }
 
     return ret;
+  }
+
+  public clearStaticKeywords(): this {
+    const value = this.valueOf();
+    delete value.whenKeyword;
+    delete value.thenKeyword;
+    return SqlBase.fromValue(value);
   }
 }
 

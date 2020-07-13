@@ -27,7 +27,6 @@ describe('SqlInterval', () => {
           "postIntervalKeyword": " ",
           "postIntervalValue": " ",
         },
-        "intervalKeyword": "INTERVAL",
         "intervalValue": SqlLiteral {
           "innerSpacing": Object {},
           "keyword": undefined,
@@ -35,6 +34,7 @@ describe('SqlInterval', () => {
           "type": "literal",
           "value": "1",
         },
+        "keyword": "INTERVAL",
         "type": "interval",
         "unitKeyword": "DAY",
       }
@@ -52,7 +52,6 @@ describe('SqlInterval', () => {
           "postIntervalKeyword": " ",
           "postIntervalValue": " ",
         },
-        "intervalKeyword": "INTERVAL",
         "intervalValue": SqlLiteral {
           "innerSpacing": Object {},
           "keyword": undefined,
@@ -60,6 +59,7 @@ describe('SqlInterval', () => {
           "type": "literal",
           "value": "1-2",
         },
+        "keyword": "INTERVAL",
         "type": "interval",
         "unitKeyword": "YEAR TO MONTH",
       }
@@ -77,7 +77,6 @@ describe('SqlInterval', () => {
           "postIntervalKeyword": " ",
           "postIntervalValue": " ",
         },
-        "intervalKeyword": "INTERVAL",
         "intervalValue": SqlLiteral {
           "innerSpacing": Object {},
           "keyword": undefined,
@@ -85,6 +84,7 @@ describe('SqlInterval', () => {
           "type": "literal",
           "value": "1-2",
         },
+        "keyword": "INTERVAL",
         "type": "interval",
         "unitKeyword": "YEAR_MONTH",
       }

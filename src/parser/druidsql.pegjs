@@ -456,13 +456,15 @@ ComparisonOpRhsBetween = op:BetweenToken postOp:_ start:BaseType preAnd:_ andKey
   return {
     op: op,
     postOp: postOp,
-    rhs: {
+    rhs: new sql.SqlBetweenAndUnit({
       start: start,
-      preAnd: preAnd,
       andKeyword: andKeyword,
-      postAnd: postAnd,
-      end: end
-    }
+      end: end,
+      innerSpacing: {
+        preAnd: preAnd,
+        postAnd: postAnd,
+      }
+    })
   };
 }
 
@@ -471,13 +473,15 @@ ComparisonOpRhsLike = op:(LikeToken / SimilarToToken) postOp:_ like:SqlLiteral e
   return {
     op: op,
     postOp: postOp,
-    rhs: escape ? {
+    rhs: escape ? new sql.SqlLikeEscapeUnit({
       like: like,
-      preEscape: escape[0],
       escapeKeyword: escape[1],
-      postEscape: escape[2],
-      escape: escape[3]
-    } : like
+      escape: escape[3],
+      innerSpacing: {
+        preEscape: escape[0],
+        postEscape: escape[2],
+      }
+    }) : like
   };
 }
 
@@ -587,14 +591,14 @@ WhenThenPair = whenKeyword:WhenToken postWhen:_ whenExpression:Expression postWh
 // ------------------------------
 
 Interval =
-  intervalKeyword:IntervalToken
+  keyword:IntervalToken
   postIntervalKeyword:_
   intervalValue:BaseType
   postIntervalValue:_
   unitKeyword:($(TimeUnit _ ToToken _ TimeUnit) / $(TimeUnit '_' TimeUnit) / TimeUnit)
 {
   return new sql.SqlInterval({
-    intervalKeyword: intervalKeyword,
+    keyword: keyword,
     intervalValue: intervalValue,
     unitKeyword: unitKeyword,
     innerSpacing: {

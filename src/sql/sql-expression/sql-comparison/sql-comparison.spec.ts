@@ -563,7 +563,7 @@ describe('SqlComparison', () => {
         },
         "notKeyword": undefined,
         "op": "BETWEEN",
-        "rhs": Object {
+        "rhs": SqlBetweenAndUnit {
           "andKeyword": "AND",
           "end": SqlRef {
             "column": "Z",
@@ -575,8 +575,10 @@ describe('SqlComparison', () => {
             "tableQuotes": false,
             "type": "ref",
           },
-          "postAnd": " ",
-          "preAnd": " ",
+          "innerSpacing": Object {
+            "postAnd": " ",
+            "preAnd": " ",
+          },
           "start": SqlRef {
             "column": "Y",
             "innerSpacing": Object {},
@@ -587,6 +589,7 @@ describe('SqlComparison', () => {
             "tableQuotes": false,
             "type": "ref",
           },
+          "type": "betweenAndUnit",
         },
         "type": "comparison",
       }
@@ -617,7 +620,7 @@ describe('SqlComparison', () => {
         },
         "notKeyword": "NOT",
         "op": "BETWEEN",
-        "rhs": Object {
+        "rhs": SqlBetweenAndUnit {
           "andKeyword": "AND",
           "end": SqlRef {
             "column": "Z",
@@ -629,8 +632,10 @@ describe('SqlComparison', () => {
             "tableQuotes": false,
             "type": "ref",
           },
-          "postAnd": " ",
-          "preAnd": " ",
+          "innerSpacing": Object {
+            "postAnd": " ",
+            "preAnd": " ",
+          },
           "start": SqlRef {
             "column": "Y",
             "innerSpacing": Object {},
@@ -641,6 +646,7 @@ describe('SqlComparison', () => {
             "tableQuotes": false,
             "type": "ref",
           },
+          "type": "betweenAndUnit",
         },
         "type": "comparison",
       }
@@ -741,7 +747,7 @@ describe('SqlComparison', () => {
         },
         "notKeyword": undefined,
         "op": "LIKE",
-        "rhs": Object {
+        "rhs": SqlLikeEscapeUnit {
           "escape": SqlLiteral {
             "innerSpacing": Object {},
             "keyword": undefined,
@@ -750,6 +756,10 @@ describe('SqlComparison', () => {
             "value": "$",
           },
           "escapeKeyword": "ESCAPE",
+          "innerSpacing": Object {
+            "postEscape": " ",
+            "preEscape": " ",
+          },
           "like": SqlLiteral {
             "innerSpacing": Object {},
             "keyword": undefined,
@@ -757,8 +767,7 @@ describe('SqlComparison', () => {
             "type": "literal",
             "value": "%A%",
           },
-          "postEscape": " ",
-          "preEscape": " ",
+          "type": "likeEscapeUnit",
         },
         "type": "comparison",
       }
@@ -789,7 +798,7 @@ describe('SqlComparison', () => {
         },
         "notKeyword": "NOT",
         "op": "LIKE",
-        "rhs": Object {
+        "rhs": SqlLikeEscapeUnit {
           "escape": SqlLiteral {
             "innerSpacing": Object {},
             "keyword": undefined,
@@ -798,6 +807,10 @@ describe('SqlComparison', () => {
             "value": "$",
           },
           "escapeKeyword": "ESCAPE",
+          "innerSpacing": Object {
+            "postEscape": " ",
+            "preEscape": " ",
+          },
           "like": SqlLiteral {
             "innerSpacing": Object {},
             "keyword": undefined,
@@ -805,8 +818,7 @@ describe('SqlComparison', () => {
             "type": "literal",
             "value": "%A%",
           },
-          "postEscape": " ",
-          "preEscape": " ",
+          "type": "likeEscapeUnit",
         },
         "type": "comparison",
       }
@@ -1015,7 +1027,7 @@ describe('SqlComparison', () => {
           },
           "notKeyword": undefined,
           "op": "BETWEEN",
-          "rhs": Object {
+          "rhs": SqlBetweenAndUnit {
             "andKeyword": "AND",
             "end": SqlRef {
               "column": "Z",
@@ -1027,8 +1039,10 @@ describe('SqlComparison', () => {
               "tableQuotes": false,
               "type": "ref",
             },
-            "postAnd": " ",
-            "preAnd": " ",
+            "innerSpacing": Object {
+              "postAnd": " ",
+              "preAnd": " ",
+            },
             "start": SqlRef {
               "column": "Y",
               "innerSpacing": Object {},
@@ -1039,6 +1053,7 @@ describe('SqlComparison', () => {
               "tableQuotes": false,
               "type": "ref",
             },
+            "type": "betweenAndUnit",
           },
           "type": "comparison",
         }
@@ -1108,7 +1123,7 @@ describe('SqlComparison', () => {
                       },
                       "notKeyword": undefined,
                       "op": "BETWEEN",
-                      "rhs": Object {
+                      "rhs": SqlBetweenAndUnit {
                         "andKeyword": "AND",
                         "end": SqlRef {
                           "column": "Z",
@@ -1120,8 +1135,10 @@ describe('SqlComparison', () => {
                           "tableQuotes": false,
                           "type": "ref",
                         },
-                        "postAnd": " ",
-                        "preAnd": " ",
+                        "innerSpacing": Object {
+                          "postAnd": " ",
+                          "preAnd": " ",
+                        },
                         "start": SqlRef {
                           "column": "Y",
                           "innerSpacing": Object {},
@@ -1132,6 +1149,7 @@ describe('SqlComparison', () => {
                           "tableQuotes": false,
                           "type": "ref",
                         },
+                        "type": "betweenAndUnit",
                       },
                       "type": "comparison",
                     },

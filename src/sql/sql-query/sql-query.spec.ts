@@ -4621,7 +4621,6 @@ describe('SqlQuery', () => {
                               "postIntervalKeyword": " ",
                               "postIntervalValue": " ",
                             },
-                            "intervalKeyword": "INTERVAL",
                             "intervalValue": SqlLiteral {
                               "innerSpacing": Object {},
                               "keyword": undefined,
@@ -4629,6 +4628,7 @@ describe('SqlQuery', () => {
                               "type": "literal",
                               "value": "1",
                             },
+                            "keyword": "INTERVAL",
                             "type": "interval",
                             "unitKeyword": "DAY",
                           },
