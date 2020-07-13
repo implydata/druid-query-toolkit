@@ -14,6 +14,7 @@
 
 import {
   parseSqlExpression,
+  parseSqlQuery,
   SeparatedArray,
   Separator,
   SqlAlias,
@@ -73,6 +74,8 @@ export class SqlQuery extends SqlBase {
       ),
     });
   }
+
+  static parse = parseSqlQuery;
 
   static getSelectExpressionOutput(selectExpression: SqlAlias, i: number) {
     return selectExpression.getOutputName() || `EXPR$${i}`;
@@ -658,6 +661,11 @@ export class SqlQuery extends SqlBase {
     return this.fromClause.hasJoin();
   }
 
+  getJoins(): readonly SqlJoinPart[] {
+    if (!this.fromClause) return [];
+    return this.fromClause.getJoins();
+  }
+
   addJoin(join: SqlJoinPart) {
     if (!this.fromClause) return this;
     return this.changeFromClause(this.fromClause.addJoin(join));
@@ -679,7 +687,7 @@ export class SqlQuery extends SqlBase {
     return this.whereClause.expression;
   }
 
-  getEffectiveWhereExpression(): SqlExpression | undefined {
+  getEffectiveWhereExpression(): SqlExpression {
     if (!this.whereClause) return SqlLiteral.TRUE;
     return this.whereClause.expression;
   }
@@ -735,7 +743,7 @@ export class SqlQuery extends SqlBase {
     return this.havingClause.expression;
   }
 
-  getEffectiveHavingExpression(): SqlExpression | undefined {
+  getEffectiveHavingExpression(): SqlExpression {
     if (!this.havingClause) return SqlLiteral.TRUE;
     return this.havingClause.expression;
   }

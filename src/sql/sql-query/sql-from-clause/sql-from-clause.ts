@@ -143,6 +143,11 @@ export class SqlFromClause extends SqlClause {
     return Boolean(this.joinParts);
   }
 
+  public getJoins(): readonly SqlJoinPart[] {
+    if (!this.joinParts) return [];
+    return this.joinParts.values;
+  }
+
   public addJoin(join: SqlJoinPart) {
     return this.changeJoinParts(
       this.joinParts ? this.joinParts.addLast(join) : SeparatedArray.fromSingleValue(join),

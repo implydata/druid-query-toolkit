@@ -22,10 +22,13 @@ import {
   SqlMulti,
   SqlOrderByExpression,
 } from '..';
+import { parseSqlExpression } from '../../parser';
 import { filterMap } from '../../utils';
 import { SqlBase, Substitutor } from '../sql-base';
 
 export abstract class SqlExpression extends SqlBase {
+  static parse = parseSqlExpression;
+
   static and(...args: (SqlExpression | undefined)[]) {
     const compactArgs = filterMap(args, a => {
       if (!a) return;
