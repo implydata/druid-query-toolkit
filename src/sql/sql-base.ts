@@ -54,8 +54,6 @@ export abstract class SqlBase {
     return Boolean(specialFunctionLookup[functionName.toUpperCase()]);
   }
 
-  static parse = parseSql;
-
   static cleanObject(obj: Record<string, any>): Record<string, string> {
     const cleanObj: Record<string, string> = {};
     for (const k in obj) {
