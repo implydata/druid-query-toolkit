@@ -40,6 +40,8 @@ describe('QueryResult', () => {
             },
           ],
           "query": undefined,
+          "queryDuration": undefined,
+          "queryId": undefined,
           "rows": Array [
             Array [
               "A",
@@ -58,6 +60,7 @@ describe('QueryResult', () => {
             ],
           ],
           "sqlQuery": undefined,
+          "sqlQueryId": undefined,
         }
       `);
     });
@@ -80,6 +83,8 @@ describe('QueryResult', () => {
             },
           ],
           "query": undefined,
+          "queryDuration": undefined,
+          "queryId": undefined,
           "rows": Array [
             Array [
               514,
@@ -87,6 +92,7 @@ describe('QueryResult', () => {
             ],
           ],
           "sqlQuery": undefined,
+          "sqlQueryId": undefined,
         }
       `);
     });
@@ -111,6 +117,8 @@ describe('QueryResult', () => {
             },
           ],
           "query": undefined,
+          "queryDuration": undefined,
+          "queryId": undefined,
           "rows": Array [
             Array [
               "2019-08-04T15:00:00.000Z",
@@ -124,6 +132,7 @@ describe('QueryResult', () => {
             ],
           ],
           "sqlQuery": undefined,
+          "sqlQueryId": undefined,
         }
       `);
     });
@@ -156,6 +165,8 @@ describe('QueryResult', () => {
             },
           ],
           "query": undefined,
+          "queryDuration": undefined,
+          "queryId": undefined,
           "rows": Array [
             Array [
               2976786,
@@ -169,6 +180,7 @@ describe('QueryResult', () => {
             ],
           ],
           "sqlQuery": undefined,
+          "sqlQueryId": undefined,
         }
       `);
 
@@ -189,6 +201,8 @@ describe('QueryResult', () => {
             },
           ],
           "query": undefined,
+          "queryDuration": undefined,
+          "queryId": undefined,
           "rows": Array [
             Array [
               "2019-08-04T16:05:29.000Z",
@@ -204,6 +218,7 @@ describe('QueryResult', () => {
             ],
           ],
           "sqlQuery": undefined,
+          "sqlQueryId": undefined,
         }
       `);
     });
@@ -243,6 +258,8 @@ describe('QueryResult', () => {
             },
           ],
           "query": undefined,
+          "queryDuration": undefined,
+          "queryId": undefined,
           "rows": Array [
             Array [
               "#ar.wikipedia",
@@ -254,6 +271,7 @@ describe('QueryResult', () => {
             ],
           ],
           "sqlQuery": undefined,
+          "sqlQueryId": undefined,
         }
       `);
     });
@@ -294,6 +312,8 @@ describe('QueryResult', () => {
             },
           ],
           "query": undefined,
+          "queryDuration": undefined,
+          "queryId": undefined,
           "rows": Array [
             Array [
               "#en.wikipedia",
@@ -321,6 +341,7 @@ describe('QueryResult', () => {
             ],
           ],
           "sqlQuery": undefined,
+          "sqlQueryId": undefined,
         }
       `);
 
@@ -338,6 +359,8 @@ describe('QueryResult', () => {
             },
           ],
           "query": undefined,
+          "queryDuration": undefined,
+          "queryId": undefined,
           "rows": Array [
             Array [
               "2019-08-04T18:00:00.000Z",
@@ -371,6 +394,7 @@ describe('QueryResult', () => {
             ],
           ],
           "sqlQuery": undefined,
+          "sqlQueryId": undefined,
         }
       `);
     });
@@ -430,6 +454,8 @@ describe('QueryResult', () => {
             },
           ],
           "query": undefined,
+          "queryDuration": undefined,
+          "queryId": undefined,
           "rows": Array [
             Array [
               "2019-08-22T02:59:20.000Z",
@@ -448,6 +474,7 @@ describe('QueryResult', () => {
             ],
           ],
           "sqlQuery": undefined,
+          "sqlQueryId": undefined,
         }
       `);
     });
@@ -480,6 +507,8 @@ describe('QueryResult', () => {
             },
           ],
           "query": undefined,
+          "queryDuration": undefined,
+          "queryId": undefined,
           "rows": Array [
             Array [
               1564887701848,
@@ -498,6 +527,7 @@ describe('QueryResult', () => {
             ],
           ],
           "sqlQuery": undefined,
+          "sqlQueryId": undefined,
         }
       `);
     });
@@ -530,6 +560,8 @@ describe('QueryResult', () => {
             },
           ],
           "query": undefined,
+          "queryDuration": undefined,
+          "queryId": undefined,
           "rows": Array [
             Array [
               1564887701848,
@@ -548,6 +580,7 @@ describe('QueryResult', () => {
             ],
           ],
           "sqlQuery": undefined,
+          "sqlQueryId": undefined,
         }
       `);
     });
@@ -612,6 +645,8 @@ describe('QueryResult', () => {
             },
           ],
           "query": undefined,
+          "queryDuration": undefined,
+          "queryId": undefined,
           "rows": Array [
             Array [
               "2019-01-01T00:00:00.321Z",
@@ -630,6 +665,7 @@ describe('QueryResult', () => {
             ],
           ],
           "sqlQuery": undefined,
+          "sqlQueryId": undefined,
         }
       `);
     });
@@ -677,6 +713,8 @@ describe('QueryResult', () => {
             },
           ],
           "query": undefined,
+          "queryDuration": undefined,
+          "queryId": undefined,
           "rows": Array [
             Array [
               "dim1",
@@ -695,6 +733,7 @@ describe('QueryResult', () => {
             ],
           ],
           "sqlQuery": undefined,
+          "sqlQueryId": undefined,
         }
       `);
     });
@@ -742,6 +781,8 @@ describe('QueryResult', () => {
             },
           ],
           "query": undefined,
+          "queryDuration": undefined,
+          "queryId": undefined,
           "rows": Array [
             Array [
               "dim1",
@@ -760,6 +801,7 @@ describe('QueryResult', () => {
             ],
           ],
           "sqlQuery": undefined,
+          "sqlQueryId": undefined,
         }
       `);
     });
@@ -786,6 +828,8 @@ describe('QueryResult', () => {
             },
           ],
           "query": undefined,
+          "queryDuration": undefined,
+          "queryId": undefined,
           "rows": Array [
             Array [
               "2013-05-09T18:24:00.000Z",
@@ -793,6 +837,7 @@ describe('QueryResult', () => {
             ],
           ],
           "sqlQuery": undefined,
+          "sqlQueryId": undefined,
         }
       `);
     });
@@ -815,12 +860,15 @@ describe('QueryResult', () => {
             },
           ],
           "query": undefined,
+          "queryDuration": undefined,
+          "queryId": undefined,
           "rows": Array [
             Array [
               "2013-05-09T18:24:09.007Z",
             ],
           ],
           "sqlQuery": undefined,
+          "sqlQueryId": undefined,
         }
       `);
     });
@@ -887,6 +935,8 @@ describe('QueryResult', () => {
             },
           ],
           "query": undefined,
+          "queryDuration": undefined,
+          "queryId": undefined,
           "rows": Array [
             Array [
               "__time",
@@ -914,6 +964,7 @@ describe('QueryResult', () => {
             ],
           ],
           "sqlQuery": undefined,
+          "sqlQueryId": undefined,
         }
       `);
     });
@@ -936,6 +987,8 @@ describe('QueryResult', () => {
             },
           ],
           "query": undefined,
+          "queryDuration": undefined,
+          "queryId": undefined,
           "rows": Array [
             Array [
               "2019-08-04T15:00:00.000Z",
@@ -947,6 +1000,7 @@ describe('QueryResult', () => {
             ],
           ],
           "sqlQuery": undefined,
+          "sqlQueryId": undefined,
         }
       `);
     });

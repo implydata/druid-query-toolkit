@@ -56,6 +56,9 @@ export interface QueryResultValue {
   rows: readonly any[][];
   query?: Record<string, unknown>;
   sqlQuery?: SqlQuery;
+  queryId?: string;
+  sqlQueryId?: string;
+  queryDuration?: number;
 }
 
 export class QueryResult {
@@ -248,14 +251,22 @@ export class QueryResult {
 
   public readonly header: readonly Column[];
   public readonly rows: readonly any[][];
+
   public readonly query?: Record<string, unknown>;
   public readonly sqlQuery?: SqlQuery;
+
+  public readonly queryId?: string;
+  public readonly sqlQueryId?: string;
+  public readonly queryDuration?: number;
 
   constructor(value: QueryResultValue) {
     this.header = value.header;
     this.rows = value.rows;
     this.query = value.query;
     this.sqlQuery = value.sqlQuery;
+    this.queryId = value.queryId;
+    this.sqlQueryId = value.sqlQueryId;
+    this.queryDuration = value.queryDuration;
   }
 
   public valueOf(): QueryResultValue {
@@ -264,7 +275,16 @@ export class QueryResult {
       rows: this.rows,
       query: this.query,
       sqlQuery: this.sqlQuery,
+      queryId: this.queryId,
+      sqlQueryId: this.sqlQueryId,
+      queryDuration: this.queryDuration,
     };
+  }
+
+  public changeQueryDuration(queryDuration: number): QueryResult {
+    const value = this.valueOf();
+    value.queryDuration = queryDuration;
+    return new QueryResult(value);
   }
 
   public attachQuery(query: Record<string, unknown>, sqlQuery?: SqlQuery): QueryResult {
@@ -272,6 +292,25 @@ export class QueryResult {
     value.query = query;
     value.sqlQuery = sqlQuery;
     return new QueryResult(value);
+  }
+
+  public attachQueryId(queryId: string, sqlQueryId?: string): QueryResult {
+    const value = this.valueOf();
+    value.queryId = queryId;
+    value.sqlQueryId = sqlQueryId;
+    return new QueryResult(value);
+  }
+
+  public getNumResults(): number {
+    return this.rows.length;
+  }
+
+  public getSqlOuterLimit(): number | undefined {
+    const { query } = this;
+    if (!query) return;
+    const { context } = query;
+    if (typeof context !== 'object') return;
+    return (context as any).sqlOuterLimit;
   }
 
   public detectDateColumnIndexes(): number[] {
