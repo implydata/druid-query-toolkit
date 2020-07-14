@@ -294,7 +294,7 @@ export class QueryResult {
     return new QueryResult(value);
   }
 
-  public attachQueryId(queryId: string, sqlQueryId?: string): QueryResult {
+  public attachQueryId(queryId: string | undefined, sqlQueryId?: string): QueryResult {
     const value = this.valueOf();
     value.queryId = queryId;
     value.sqlQueryId = sqlQueryId;

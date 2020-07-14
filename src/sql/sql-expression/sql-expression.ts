@@ -27,7 +27,9 @@ import { filterMap } from '../../utils';
 import { SqlBase, Substitutor } from '../sql-base';
 
 export abstract class SqlExpression extends SqlBase {
-  static parse = parseSqlExpression;
+  static parse(input: string | SqlExpression): SqlExpression {
+    return parseSqlExpression(input);
+  }
 
   static and(...args: (SqlExpression | undefined)[]) {
     const compactArgs = filterMap(args, a => {

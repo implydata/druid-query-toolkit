@@ -75,7 +75,9 @@ export class SqlQuery extends SqlBase {
     });
   }
 
-  static parse = parseSqlQuery;
+  static parse(input: string | SqlQuery): SqlQuery {
+    return parseSqlQuery(input);
+  }
 
   static getSelectExpressionOutput(selectExpression: SqlAlias, i: number) {
     return selectExpression.getOutputName() || `EXPR$${i}`;
