@@ -14,6 +14,7 @@
 
 import { backAndForth } from '../../../test-utils';
 import { SqlExpression } from '../sql-expression';
+
 import { SqlFunction } from './sql-function';
 
 describe('SqlFunction', () => {
