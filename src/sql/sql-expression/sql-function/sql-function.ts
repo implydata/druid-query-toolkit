@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { SqlRef } from '..';
+import { SqlLiteral, SqlRef } from '..';
 import { SqlBase, SqlBaseValue, Substitutor } from '../../sql-base';
 import { SqlWhereClause } from '../../sql-query';
 import { SeparatedArray, Separator } from '../../utils';
@@ -154,6 +154,16 @@ export class SqlFunction extends SqlExpression {
         ? this.whereClause.changeExpression(whereExpression)
         : SqlWhereClause.create(whereExpression),
     );
+  }
+
+  public getWhereExpression(): SqlExpression | undefined {
+    const { whereClause } = this;
+    if (!whereClause) return;
+    return whereClause.expression;
+  }
+
+  public getEffectiveWhereExpression(): SqlExpression {
+    return this.getWhereExpression() || SqlLiteral.TRUE;
   }
 
   public _walkInner(
