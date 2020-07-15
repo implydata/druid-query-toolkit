@@ -12,15 +12,7 @@
  * limitations under the License.
  */
 
-import {
-  parseSql,
-  parseSqlExpression,
-  parseSqlQuery,
-  SqlCase,
-  SqlFunction,
-  SqlQuery,
-  SqlRef,
-} from '../../index';
+import { SqlCase, SqlExpression, SqlFunction, SqlQuery, SqlRef } from '../../index';
 import { backAndForth, sane } from '../../test-utils';
 
 describe('SqlQuery', () => {
@@ -68,7 +60,7 @@ describe('SqlQuery', () => {
     for (const sql of queries) {
       let didNotError = false;
       try {
-        parseSqlQuery(sql);
+        SqlQuery.parse(sql);
         didNotError = true;
       } catch {}
       if (didNotError) {
@@ -102,8 +94,16 @@ describe('SqlQuery', () => {
     });
   });
 
+  describe('.parse', () => {
+    it('parse queries only', () => {
+      expect(() => SqlQuery.parse('a OR b')).toThrowErrorMatchingInlineSnapshot(
+        `"Provided SQL was not a query"`,
+      );
+    });
+  });
+
   describe('#walk', () => {
-    const sqlMaster = parseSql(sane`
+    const sqlMaster = SqlQuery.parseSql(sane`
       SELECT
         datasource d,
         SUM("size") AS total_size,
@@ -345,12 +345,12 @@ describe('SqlQuery', () => {
   it('does a replace with an if', () => {
     const sql = `SUM(t.added) / COUNT(DISTINCT t."user") + COUNT(*)`;
 
-    const condition = parseSqlExpression(
+    const condition = SqlExpression.parse(
       `__time BETWEEN TIMESTAMP '2020-01-01 01:00:00' AND TIMESTAMP '2020-01-01 02:00:00'`,
     );
     expect(
       String(
-        parseSql(sql).walk(x => {
+        SqlExpression.parse(sql).walk(x => {
           if (x instanceof SqlRef) {
             if (x.column && x.table === 't') {
               return SqlCase.ifThenElse(condition, x);
@@ -374,7 +374,7 @@ describe('SqlQuery', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": undefined,
         "fromClause": SqlFromClause {
@@ -575,7 +575,7 @@ describe('SqlQuery', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": undefined,
         "fromClause": SqlFromClause {
@@ -766,7 +766,7 @@ describe('SqlQuery', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": "Explain plan for",
         "fromClause": SqlFromClause {
@@ -853,7 +853,7 @@ describe('SqlQuery', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": undefined,
         "fromClause": SqlFromClause {
@@ -1042,7 +1042,7 @@ describe('SqlQuery', () => {
 
       backAndForth(sql);
 
-      expect(parseSql(sql)).toMatchInlineSnapshot(`
+      expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "explainKeyword": undefined,
           "fromClause": SqlFromClause {
@@ -1156,7 +1156,7 @@ describe('SqlQuery', () => {
 
       backAndForth(sql);
 
-      expect(parseSql(sql)).toMatchInlineSnapshot(`
+      expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "explainKeyword": undefined,
           "fromClause": SqlFromClause {
@@ -1273,7 +1273,7 @@ describe('SqlQuery', () => {
 
       backAndForth(sql);
 
-      expect(parseSql(sql)).toMatchInlineSnapshot(`
+      expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "explainKeyword": undefined,
           "fromClause": SqlFromClause {
@@ -1476,7 +1476,7 @@ describe('SqlQuery', () => {
 
       backAndForth(sql);
 
-      expect(parseSql(sql)).toMatchInlineSnapshot(`
+      expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "explainKeyword": undefined,
           "fromClause": SqlFromClause {
@@ -1579,7 +1579,7 @@ describe('SqlQuery', () => {
 
       backAndForth(sql);
 
-      expect(parseSql(sql)).toMatchInlineSnapshot(`
+      expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "explainKeyword": undefined,
           "fromClause": SqlFromClause {
@@ -1682,7 +1682,7 @@ describe('SqlQuery', () => {
 
       backAndForth(sql);
 
-      expect(parseSql(sql)).toMatchInlineSnapshot(`
+      expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "explainKeyword": undefined,
           "fromClause": SqlFromClause {
@@ -1809,7 +1809,7 @@ describe('SqlQuery', () => {
 
       backAndForth(sql);
 
-      expect(parseSql(sql)).toMatchInlineSnapshot(`
+      expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "explainKeyword": undefined,
           "fromClause": SqlFromClause {
@@ -1923,7 +1923,7 @@ describe('SqlQuery', () => {
 
       backAndForth(sql);
 
-      expect(parseSql(sql)).toMatchInlineSnapshot(`
+      expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "explainKeyword": undefined,
           "fromClause": SqlFromClause {
@@ -2040,7 +2040,7 @@ describe('SqlQuery', () => {
 
       backAndForth(sql);
 
-      expect(parseSql(sql)).toMatchInlineSnapshot(`
+      expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "explainKeyword": undefined,
           "fromClause": SqlFromClause {
@@ -2243,7 +2243,7 @@ describe('SqlQuery', () => {
 
       backAndForth(sql);
 
-      expect(parseSql(sql)).toMatchInlineSnapshot(`
+      expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "explainKeyword": undefined,
           "fromClause": SqlFromClause {
@@ -2348,7 +2348,7 @@ describe('SqlQuery', () => {
 
       backAndForth(sql);
 
-      expect(parseSql(sql)).toMatchInlineSnapshot(`
+      expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "explainKeyword": undefined,
           "fromClause": SqlFromClause {
@@ -2456,7 +2456,7 @@ describe('SqlQuery', () => {
 
       backAndForth(sql);
 
-      expect(parseSql(sql)).toMatchInlineSnapshot(`
+      expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "explainKeyword": undefined,
           "fromClause": SqlFromClause {
@@ -2563,7 +2563,7 @@ describe('SqlQuery', () => {
 
       backAndForth(sql);
 
-      expect(parseSql(sql)).toMatchInlineSnapshot(`
+      expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "explainKeyword": undefined,
           "fromClause": SqlFromClause {
@@ -2695,7 +2695,7 @@ describe('SqlQuery', () => {
 
       backAndForth(sql);
 
-      expect(parseSql(sql)).toMatchInlineSnapshot(`
+      expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "explainKeyword": undefined,
           "fromClause": SqlFromClause {
@@ -2823,7 +2823,7 @@ describe('SqlQuery', () => {
 
       backAndForth(sql);
 
-      expect(parseSql(sql)).toMatchInlineSnapshot(`
+      expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "explainKeyword": undefined,
           "fromClause": SqlFromClause {
@@ -2977,7 +2977,7 @@ describe('SqlQuery', () => {
 
       backAndForth(sql);
 
-      expect(parseSql(sql)).toMatchInlineSnapshot(`
+      expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "explainKeyword": undefined,
           "fromClause": SqlFromClause {
@@ -3074,7 +3074,7 @@ describe('SqlQuery', () => {
 
       backAndForth(sql);
 
-      expect(parseSql(sql)).toMatchInlineSnapshot(`
+      expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "explainKeyword": undefined,
           "fromClause": SqlFromClause {
@@ -3230,7 +3230,7 @@ describe('SqlQuery', () => {
 
       backAndForth(sql);
 
-      expect(parseSql(sql)).toMatchInlineSnapshot(`
+      expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "explainKeyword": undefined,
           "fromClause": SqlFromClause {
@@ -3373,7 +3373,7 @@ describe('SqlQuery', () => {
 
       backAndForth(sql);
 
-      expect(parseSql(sql)).toMatchInlineSnapshot(`
+      expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "explainKeyword": undefined,
           "fromClause": SqlFromClause {
@@ -3516,7 +3516,7 @@ describe('SqlQuery', () => {
 
       backAndForth(sql);
 
-      expect(parseSql(sql)).toMatchInlineSnapshot(`
+      expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "explainKeyword": undefined,
           "fromClause": SqlFromClause {
@@ -3659,7 +3659,7 @@ describe('SqlQuery', () => {
 
       backAndForth(sql);
 
-      expect(parseSql(sql)).toMatchInlineSnapshot(`
+      expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "explainKeyword": undefined,
           "fromClause": SqlFromClause {
@@ -3802,7 +3802,7 @@ describe('SqlQuery', () => {
 
       backAndForth(sql);
 
-      expect(parseSql(sql)).toMatchInlineSnapshot(`
+      expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "explainKeyword": undefined,
           "fromClause": SqlFromClause {
@@ -3950,7 +3950,7 @@ describe('SqlQuery', () => {
 
       backAndForth(sql);
 
-      expect(parseSql(sql)).toMatchInlineSnapshot(`
+      expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "explainKeyword": undefined,
           "fromClause": SqlFromClause {
@@ -4103,7 +4103,7 @@ describe('SqlQuery', () => {
 
       backAndForth(sql);
 
-      expect(parseSql(sql)).toMatchInlineSnapshot(`
+      expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "explainKeyword": undefined,
           "fromClause": SqlFromClause {
@@ -4349,7 +4349,7 @@ describe('SqlQuery', () => {
 
       backAndForth(sql);
 
-      expect(parseSql(sql)).toMatchInlineSnapshot(`
+      expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "explainKeyword": undefined,
           "fromClause": SqlFromClause {

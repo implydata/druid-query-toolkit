@@ -13,8 +13,6 @@
  */
 
 import {
-  parseSqlExpression,
-  parseSqlQuery,
   SeparatedArray,
   Separator,
   SqlAlias,
@@ -76,7 +74,17 @@ export class SqlQuery extends SqlBase {
   }
 
   static parse(input: string | SqlQuery): SqlQuery {
-    return parseSqlQuery(input);
+    if (typeof input === 'string') {
+      const parsed = parseSql(input);
+      if (!(parsed instanceof SqlQuery)) {
+        throw new Error('Provided SQL was not a query');
+      }
+      return parsed;
+    } else if (input instanceof SqlQuery) {
+      return input;
+    } else {
+      throw new Error('unknown input');
+    }
   }
 
   static getSelectExpressionOutput(selectExpression: SqlAlias, i: number) {
@@ -604,7 +612,7 @@ export class SqlQuery extends SqlBase {
   }
 
   addSelectExpression(ex: SqlBase | string, first = false) {
-    const alias = SqlAlias.fromBase(typeof ex === 'string' ? parseSql(ex) : ex);
+    const alias = SqlAlias.fromBase(typeof ex === 'string' ? SqlBase.parseSql(ex) : ex);
 
     if (first) {
       return this.changeSelectExpressions(this.selectExpressions.addFirst(alias));
@@ -695,7 +703,7 @@ export class SqlQuery extends SqlBase {
   }
 
   addToWhere(expressionThing: SqlExpression | string) {
-    const expression = parseSqlExpression(expressionThing);
+    const expression = SqlExpression.parse(expressionThing);
     return this.changeWhereExpression(SqlExpression.and(this.getWhereExpression(), expression));
   }
 
@@ -751,7 +759,7 @@ export class SqlQuery extends SqlBase {
   }
 
   addToHaving(expressionThing: SqlExpression | string) {
-    const expression = parseSqlExpression(expressionThing);
+    const expression = SqlExpression.parse(expressionThing);
     return this.changeHavingExpression(SqlExpression.and(this.getHavingExpression(), expression));
   }
 

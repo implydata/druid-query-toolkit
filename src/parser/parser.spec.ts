@@ -12,11 +12,11 @@
  * limitations under the License.
  */
 
-import { parseSql, parseSqlQuery } from '.';
+import { parseSql } from '.';
 
 describe('Parser', () => {
   it('throws on invalid input', () => {
-    expect(() => parseSqlQuery('SELEC +')).toThrowError('Expected');
+    expect(() => parseSql('SELEC +')).toThrowError('Expected');
   });
 
   it('parse anything', () => {
@@ -58,11 +58,5 @@ describe('Parser', () => {
         "type": "multi",
       }
     `);
-  });
-
-  it('parse queries only', () => {
-    expect(() => parseSqlQuery('a OR b')).toThrowErrorMatchingInlineSnapshot(
-      `"Provided SQL expression was not a query"`,
-    );
   });
 });

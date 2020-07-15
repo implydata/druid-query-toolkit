@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { parseSqlExpression, parseSqlQuery, SqlJoinPart, SqlRef } from '../..';
+import { SqlExpression, SqlJoinPart, SqlQuery, SqlRef } from '../..';
 import { backAndForth, sane } from '../../test-utils';
 
 describe('parse join with lookup', () => {
@@ -53,12 +53,12 @@ describe('parse join with lookup', () => {
 describe('Add Join', () => {
   it('Add left join', () => {
     expect(
-      parseSqlQuery(`SELECT countryName from wikipedia`)
+      SqlQuery.parse(`SELECT countryName from wikipedia`)
         .addJoin(
           SqlJoinPart.create(
             'LEFT',
             SqlRef.column('country', 'lookup'),
-            parseSqlExpression('lookup.country.v = wikipedia.countryName'),
+            SqlExpression.parse('lookup.country.v = wikipedia.countryName'),
           ),
         )
         .toString(),
@@ -70,12 +70,12 @@ describe('Add Join', () => {
 
   it('Add inner join', () => {
     expect(
-      parseSqlQuery(`SELECT countryName from wikipedia`)
+      SqlQuery.parse(`SELECT countryName from wikipedia`)
         .addJoin(
           SqlJoinPart.create(
             'INNER',
             SqlRef.column('country', 'lookup'),
-            parseSqlExpression('lookup.country.v = wikipedia.countryName'),
+            SqlExpression.parse('lookup.country.v = wikipedia.countryName'),
           ),
         )
         .toString(),
@@ -89,10 +89,12 @@ describe('Add Join', () => {
 describe('Remove join', () => {
   it('Remove Join', () => {
     expect(
-      parseSqlQuery(sane`
+      SqlQuery.parse(
+        sane`
         SELECT countryName from wikipedia
         LEFT JOIN lookup.country ON lookup.country.v = wikipedia.countryName
-      `)
+      `,
+      )
         .removeAllJoins()
         .toString(),
     ).toMatchInlineSnapshot(`"SELECT countryName from wikipedia"`);
@@ -103,7 +105,7 @@ describe('Remove join', () => {
 describe('Check if column is in On expression', () => {
   it('is contained 1', () => {
     expect(
-      (parseSqlQuery(sane`
+      (SqlQuery.parse(sane`
         SELECT countryName
         from wikipedia LEFT JOIN lookup.country ON lookup.country.v = wikipedia.countryName
       `).onExpression as SqlExpression).containsColumn('v'),
@@ -112,7 +114,7 @@ describe('Check if column is in On expression', () => {
 
   it('is contained 2', () => {
     expect(
-      (parseSqlQuery(sane`
+      (SqlQuery.parse(sane`
         SELECT countryName
         from wikipedia LEFT JOIN lookup.country ON lookup.country.v = wikipedia.countryName
       `).onExpression as SqlExpression).containsColumn('countryName'),
@@ -121,7 +123,7 @@ describe('Check if column is in On expression', () => {
 
   it('is not contained', () => {
     expect(
-      (parseSqlQuery(sane`
+      (SqlQuery.parse(sane`
         SELECT countryName
         from wikipedia LEFT JOIN lookup.country ON lookup.country.v = wikipedia.countryName
       `).onExpression as SqlExpression).containsColumn('k'),

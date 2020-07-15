@@ -12,8 +12,8 @@
  * limitations under the License.
  */
 
-import { parseSql } from '../../..';
 import { backAndForth } from '../../../test-utils';
+import { SqlExpression } from '../sql-expression';
 
 describe('SqlInterval', () => {
   it('Simple function', () => {
@@ -21,7 +21,7 @@ describe('SqlInterval', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlInterval {
         "innerSpacing": Object {
           "postIntervalKeyword": " ",
@@ -46,7 +46,7 @@ describe('SqlInterval', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlInterval {
         "innerSpacing": Object {
           "postIntervalKeyword": " ",
@@ -71,7 +71,7 @@ describe('SqlInterval', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlInterval {
         "innerSpacing": Object {
           "postIntervalKeyword": " ",

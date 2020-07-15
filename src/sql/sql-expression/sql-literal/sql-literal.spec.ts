@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { parseSql, parseSqlQuery, SqlLiteral } from '../../..';
+import { SqlExpression, SqlLiteral } from '../../..';
 import { backAndForth } from '../../../test-utils';
 
 describe('SqlLiteral', () => {
@@ -44,7 +44,7 @@ describe('SqlLiteral', () => {
     for (const sql of queries) {
       let didNotError = false;
       try {
-        parseSqlQuery(sql);
+        SqlExpression.parse(sql);
         didNotError = true;
       } catch {}
       if (didNotError) {
@@ -58,7 +58,7 @@ describe('SqlLiteral', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlLiteral {
         "innerSpacing": Object {},
         "keyword": undefined,
@@ -74,7 +74,7 @@ describe('SqlLiteral', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlLiteral {
         "innerSpacing": Object {},
         "keyword": undefined,
@@ -90,7 +90,7 @@ describe('SqlLiteral', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlLiteral {
         "innerSpacing": Object {},
         "keyword": undefined,
@@ -106,7 +106,7 @@ describe('SqlLiteral', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlLiteral {
         "innerSpacing": Object {},
         "keyword": undefined,
@@ -137,7 +137,7 @@ describe('SqlLiteral', () => {
 
     for (const num in numbersToTest) {
       backAndForth(num);
-      expect((parseSql(num) as SqlLiteral).value).toEqual(parseFloat(num));
+      expect((SqlExpression.parse(num) as SqlLiteral).value).toEqual(parseFloat(num));
     }
   });
 
@@ -146,7 +146,7 @@ describe('SqlLiteral', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlLiteral {
         "innerSpacing": Object {},
         "keyword": undefined,
@@ -162,7 +162,7 @@ describe('SqlLiteral', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlLiteral {
         "innerSpacing": Object {},
         "keyword": undefined,
@@ -184,7 +184,7 @@ describe('SqlLiteral', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlLiteral {
         "innerSpacing": Object {},
         "keyword": undefined,
@@ -206,7 +206,7 @@ describe('SqlLiteral', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlLiteral {
         "innerSpacing": Object {},
         "keyword": undefined,
@@ -222,7 +222,7 @@ describe('SqlLiteral', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlLiteral {
         "innerSpacing": Object {},
         "keyword": undefined,
@@ -238,7 +238,7 @@ describe('SqlLiteral', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlLiteral {
         "innerSpacing": Object {},
         "keyword": undefined,
@@ -254,7 +254,7 @@ describe('SqlLiteral', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlLiteral {
         "innerSpacing": Object {},
         "keyword": undefined,
@@ -270,7 +270,7 @@ describe('SqlLiteral', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlLiteral {
         "innerSpacing": Object {},
         "keyword": undefined,
@@ -286,7 +286,7 @@ describe('SqlLiteral', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlLiteral {
         "innerSpacing": Object {},
         "keyword": undefined,
@@ -302,7 +302,7 @@ describe('SqlLiteral', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlLiteral {
         "innerSpacing": Object {
           "postKeyword": " ",
@@ -320,7 +320,7 @@ describe('SqlLiteral', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlLiteral {
         "innerSpacing": Object {
           "postKeyword": " ",

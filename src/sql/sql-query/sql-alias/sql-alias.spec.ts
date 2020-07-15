@@ -12,8 +12,8 @@
  * limitations under the License.
  */
 
-import { parseSql } from '../../..';
 import { backAndForth } from '../../../test-utils';
+import { SqlQuery } from '../sql-query';
 
 describe('SqlAlias', () => {
   it('works in no alias case', () => {
@@ -21,7 +21,7 @@ describe('SqlAlias', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlQuery.parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": undefined,
         "fromClause": undefined,
@@ -73,7 +73,7 @@ describe('SqlAlias', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlQuery.parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": undefined,
         "fromClause": undefined,
@@ -137,7 +137,7 @@ describe('SqlAlias', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlQuery.parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": undefined,
         "fromClause": undefined,
@@ -204,7 +204,7 @@ describe('SqlAlias', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlQuery.parseSql(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": undefined,
         "fromClause": undefined,

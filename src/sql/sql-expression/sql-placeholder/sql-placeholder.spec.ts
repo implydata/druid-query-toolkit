@@ -12,8 +12,8 @@
  * limitations under the License.
  */
 
-import { parseSql } from '../../..';
 import { backAndForth } from '../../../test-utils';
+import { SqlExpression } from '../sql-expression';
 
 describe('SqlPlaceholder', () => {
   it('works', () => {
@@ -21,7 +21,7 @@ describe('SqlPlaceholder', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlPlaceholder {
         "innerSpacing": Object {},
         "type": "placeholder",

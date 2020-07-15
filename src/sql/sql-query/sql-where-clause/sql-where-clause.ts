@@ -12,7 +12,6 @@
  * limitations under the License.
  */
 
-import { parseSqlExpression } from '../../../parser';
 import { SqlBase, Substitutor } from '../../sql-base';
 import { SqlExpression } from '../../sql-expression';
 import { SqlClause, SqlClauseValue } from '../sql-clause';
@@ -30,7 +29,7 @@ export class SqlWhereClause extends SqlClause {
   static create(expression: SqlWhereClause | SqlExpression | string): SqlWhereClause {
     if (expression instanceof SqlWhereClause) return expression;
     return new SqlWhereClause({
-      expression: parseSqlExpression(expression),
+      expression: SqlExpression.parse(expression),
     });
   }
 
@@ -60,7 +59,7 @@ export class SqlWhereClause extends SqlClause {
 
   public changeExpression(expression: SqlExpression | string): this {
     const value = this.valueOf();
-    value.expression = parseSqlExpression(expression);
+    value.expression = SqlExpression.parse(expression);
     return SqlBase.fromValue(value);
   }
 

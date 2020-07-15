@@ -165,7 +165,7 @@ SelectClause =
     postSelect: postSelect,
     selectDecorator: selectDecorator ? selectDecorator[0] : undefined,
     postSelectDecorator: selectDecorator ? selectDecorator[1] : undefined,
-    selectExpressions: makeSeparatedArray(head, tail).map(SqlAlias.fromBase),
+    selectExpressions: makeSeparatedArray(head, tail).map(sql.SqlAlias.fromBase),
   };
 }
 
@@ -173,9 +173,7 @@ FromClause = keyword:FromToken postKeyword:_ head:SqlAlias tail:(CommaSeparator 
 {
   return new sql.SqlFromClause({
     keyword: keyword,
-    expressions: makeSeparatedArray(head, tail).map(function(table) {
-      return SqlAlias.fromBaseAndUpgrade(table);
-    }),
+    expressions: makeSeparatedArray(head, tail).map(sql.SqlAlias.fromBaseAndUpgrade),
     joinParts: join ? join[1] : undefined,
     innerSpacing: {
       postKeyword: postKeyword,
@@ -200,7 +198,7 @@ SqlJoinPart =
   var value = {
     joinType: joinType,
     joinKeyword: joinKeyword,
-    table: SqlAlias.fromBaseAndUpgrade(table),
+    table: sql.SqlAlias.fromBaseAndUpgrade(table),
   };
   var innerSpacing = value.innerSpacing = {
     postJoinType: postJoinType,
@@ -682,7 +680,7 @@ GenericFunction =
   return new sql.SqlFunction(value);
 }
 
-NakedFunction = functionName:UnquotedRefPartFree &{ return SqlBase.isNakedFunction(functionName) }
+NakedFunction = functionName:UnquotedRefPartFree &{ return sql.SqlBase.isNakedFunction(functionName) }
 {
   return new sql.SqlFunction({
     functionName: functionName,
@@ -1099,7 +1097,7 @@ QuotedRefPart = ["] name:$([^"]+) ["]
   };
 }
 
-UnquotedRefPart = name:UnquotedRefPartFree !{ return SqlBase.isReservedKeyword(name) }
+UnquotedRefPart = name:UnquotedRefPartFree !{ return sql.SqlBase.isReservedKeyword(name) }
 {
   return {
     name: text(),

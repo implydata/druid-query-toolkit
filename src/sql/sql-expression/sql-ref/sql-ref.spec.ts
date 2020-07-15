@@ -12,14 +12,15 @@
  * limitations under the License.
  */
 
-import { parseSql, SqlRef } from '../../..';
 import { backAndForth } from '../../../test-utils';
+import { SqlExpression, SqlRef } from '../../sql-expression';
+import { SqlQuery } from '../../sql-query';
 
 describe('SqlRef', () => {
   it('avoids reserved', () => {
     const sql = 'From';
 
-    expect(() => parseSql(sql)).toThrowError('Expected');
+    expect(() => SqlExpression.parse(sql)).toThrowError('Expected');
   });
 
   it('#create', () => {
@@ -46,7 +47,7 @@ describe('SqlRef', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlRef {
         "column": "namespace",
         "innerSpacing": Object {
@@ -68,7 +69,7 @@ describe('SqlRef', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlRef {
         "column": "namespace",
         "innerSpacing": Object {
@@ -90,7 +91,7 @@ describe('SqlRef', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlRef {
         "column": "namespace",
         "innerSpacing": Object {
@@ -112,7 +113,7 @@ describe('SqlRef', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlRef {
         "column": "test",
         "innerSpacing": Object {},
@@ -131,7 +132,7 @@ describe('SqlRef', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlRef {
         "column": "test",
         "innerSpacing": Object {},
@@ -148,7 +149,7 @@ describe('SqlRef', () => {
   it('quotes', () => {
     const sql = `"page"`;
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlRef {
         "column": "page",
         "innerSpacing": Object {},
@@ -165,7 +166,7 @@ describe('SqlRef', () => {
   it('without quotes', () => {
     const sql = `channel`;
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlRef {
         "column": "channel",
         "innerSpacing": Object {},
@@ -182,7 +183,7 @@ describe('SqlRef', () => {
   it('without quotes + namespace', () => {
     const sql = `"lol" . channel`;
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlRef {
         "column": "channel",
         "innerSpacing": Object {
@@ -204,7 +205,7 @@ describe('SqlRef', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlRef {
         "column": "channel",
         "innerSpacing": Object {
@@ -236,7 +237,7 @@ describe('SqlRef', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlRef {
         "column": "boo",
         "innerSpacing": Object {
@@ -258,7 +259,7 @@ describe('SqlRef', () => {
   it('too many parts', () => {
     const sql = `"lol" . channel.boo .moo`;
 
-    expect(() => parseSql(sql)).toThrowError();
+    expect(() => SqlExpression.parse(sql)).toThrowError();
   });
 });
 
@@ -266,9 +267,9 @@ describe('upgrades', () => {
   it('Ref with double quotes upgraded', () => {
     const sql = `"namespace"."table"`;
 
-    expect((parseSql(sql) as SqlRef).upgrade().toString()).toEqual(sql);
+    expect((SqlExpression.parse(sql) as SqlRef).upgrade().toString()).toEqual(sql);
 
-    expect((parseSql(sql) as SqlRef).upgrade()).toMatchInlineSnapshot(`
+    expect((SqlExpression.parse(sql) as SqlRef).upgrade()).toMatchInlineSnapshot(`
       SqlRef {
         "column": undefined,
         "innerSpacing": Object {
@@ -290,7 +291,7 @@ describe('upgrades', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "explainKeyword": undefined,
         "fromClause": SqlFromClause {

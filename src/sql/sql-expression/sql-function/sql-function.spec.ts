@@ -12,8 +12,8 @@
  * limitations under the License.
  */
 
-import { parseSql } from '../../..';
 import { backAndForth } from '../../../test-utils';
+import { SqlExpression } from '../sql-expression';
 
 describe('SqlFunction', () => {
   it('things that work', () => {
@@ -55,7 +55,7 @@ describe('SqlFunction', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlFunction {
         "args": undefined,
         "decorator": undefined,
@@ -77,7 +77,7 @@ describe('SqlFunction', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlFunction {
         "args": SeparatedArray {
           "separators": Array [],
@@ -114,7 +114,7 @@ describe('SqlFunction', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlFunction {
         "args": SeparatedArray {
           "separators": Array [],
@@ -157,7 +157,7 @@ describe('SqlFunction', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlFunction {
         "args": SeparatedArray {
           "separators": Array [],
@@ -260,7 +260,7 @@ describe('SqlFunction', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlFunction {
         "args": SeparatedArray {
           "separators": Array [],
@@ -297,7 +297,7 @@ describe('SqlFunction', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "args": SeparatedArray {
           "separators": Array [
@@ -445,7 +445,7 @@ describe('SqlFunction', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlFunction {
         "args": SeparatedArray {
           "separators": Array [],
@@ -540,7 +540,7 @@ describe('SqlFunction', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlFunction {
         "args": SeparatedArray {
           "separators": Array [
@@ -599,7 +599,7 @@ describe('SqlFunction', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlFunction {
         "args": SeparatedArray {
           "separators": Array [

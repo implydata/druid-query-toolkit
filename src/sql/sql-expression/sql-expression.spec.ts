@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { parseSqlQuery } from '../../parser';
+import { parseSql } from '../../parser';
 
 describe('SqlExpression', () => {
   it('plywood expressions should not parse', () => {
@@ -21,7 +21,7 @@ describe('SqlExpression', () => {
     for (const sql of queries) {
       let didNotError = false;
       try {
-        parseSqlQuery(sql);
+        parseSql(sql);
         didNotError = true;
       } catch {}
       if (didNotError) {

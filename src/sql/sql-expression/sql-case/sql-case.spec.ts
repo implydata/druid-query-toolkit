@@ -12,8 +12,8 @@
  * limitations under the License.
  */
 
-import { parseSql } from '../../..';
 import { backAndForth } from '../../../test-utils';
+import { SqlExpression } from '../sql-expression';
 
 describe('Case expression', () => {
   it('simple CASE Expression', () => {
@@ -21,7 +21,7 @@ describe('Case expression', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlCase {
         "caseExpression": SqlRef {
           "column": "A",
@@ -87,7 +87,7 @@ describe('Case expression', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlCase {
         "caseExpression": SqlRef {
           "column": "A",
@@ -164,7 +164,7 @@ describe('Case expression', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlCase {
         "caseExpression": SqlRef {
           "column": "A",
@@ -230,7 +230,7 @@ describe('Case expression', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlCase {
         "caseExpression": SqlRef {
           "column": "A",
@@ -302,7 +302,7 @@ describe('Case expression', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlCase {
         "caseExpression": SqlRef {
           "column": "A",
@@ -374,7 +374,7 @@ describe('Case expression', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlCase {
         "caseExpression": SqlRef {
           "column": "A",
@@ -498,7 +498,7 @@ describe('Case expression', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlCase {
         "caseExpression": undefined,
         "caseKeyword": "CASE",
@@ -554,7 +554,7 @@ describe('Case expression', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlCase {
         "caseExpression": undefined,
         "caseKeyword": "CASE",
@@ -621,7 +621,7 @@ describe('Case expression', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlCase {
         "caseExpression": SqlRef {
           "column": "A",
@@ -687,7 +687,7 @@ describe('Case expression', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlCase {
         "caseExpression": SqlRef {
           "column": "A",
@@ -759,7 +759,7 @@ describe('Case expression', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlCase {
         "caseExpression": SqlRef {
           "column": "A",
@@ -831,7 +831,7 @@ describe('Case expression', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlCase {
         "caseExpression": SqlRef {
           "column": "A",
@@ -955,7 +955,7 @@ describe('Case expression', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlCase {
         "caseExpression": SqlRef {
           "column": "runner_status",

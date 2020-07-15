@@ -12,40 +12,48 @@
  * limitations under the License.
  */
 
-import { parseSqlExpression, parseSqlQuery, SqlAlias, SqlFunction, SqlRef } from '../..';
+import { SqlAlias, SqlExpression, SqlFunction, SqlQuery, SqlRef } from '../..';
 import { sane } from '../../test-utils';
 
 describe('SqlQuery operations', () => {
   describe('#getFirstTableName', () => {
     it('getFirstTableNames', () => {
       expect(
-        parseSqlQuery(sane`
+        SqlQuery.parse(
+          sane`
           SELECT * FROM "github"
-        `).getFirstTableName(),
+        `,
+        ).getFirstTableName(),
       ).toEqual('github');
     });
 
     it('getFirstTableName with nameSpace', () => {
       expect(
-        parseSqlQuery(sane`
+        SqlQuery.parse(
+          sane`
           SELECT * FROM sys."github"
-        `).getFirstTableName(),
+        `,
+        ).getFirstTableName(),
       ).toEqual('github');
     });
 
     it('getFirstTableName with nameSpace and alias', () => {
       expect(
-        parseSqlQuery(sane`
+        SqlQuery.parse(
+          sane`
           SELECT * FROM sys."github" as Name
-        `).getFirstTableName(),
+        `,
+        ).getFirstTableName(),
       ).toEqual('github');
     });
 
     it('getFirstTableName with multiple tables', () => {
       expect(
-        parseSqlQuery(sane`
+        SqlQuery.parse(
+          sane`
           SELECT * FROM sys."github" as test, sys.name
-        `).getFirstTableName(),
+        `,
+        ).getFirstTableName(),
       ).toEqual('github');
     });
   });
@@ -53,31 +61,37 @@ describe('SqlQuery operations', () => {
   describe('#getFirstSchema', () => {
     it('getFirstSchema', () => {
       expect(
-        parseSqlQuery(sane`
+        SqlQuery.parse(
+          sane`
           SELECT * FROM sys."github"
-        `).getFirstSchema(),
+        `,
+        ).getFirstSchema(),
       ).toEqual('sys');
     });
 
     it('getFirstSchema from SqlRef with no nameSpace', () => {
       expect(
-        parseSqlQuery(sane`
+        SqlQuery.parse(
+          sane`
           SELECT * FROM "github"
-        `).getFirstSchema(),
+        `,
+        ).getFirstSchema(),
       ).toBeUndefined();
     });
 
     it('getFirstSchema from multiple tables', () => {
       expect(
-        parseSqlQuery(sane`
+        SqlQuery.parse(
+          sane`
           SELECT * FROM "github", sys."table"
-        `).getFirstSchema(),
+        `,
+        ).getFirstSchema(),
       ).toEqual('sys');
     });
   });
 
   describe('output columns', () => {
-    const query = parseSqlQuery(sane`
+    const query = SqlQuery.parse(sane`
       SELECT
         channel, SUBSTR(cityName, 1, 2), namespace AS s_namespace,
         COUNT(*), SUM(added) AS "Added"            
@@ -88,14 +102,16 @@ describe('SqlQuery operations', () => {
     `);
 
     it('#getSelectIndexForExpression', () => {
-      expect(query.getSelectIndexForExpression(parseSqlExpression('channel'), false)).toEqual(0);
+      expect(query.getSelectIndexForExpression(SqlExpression.parse('channel'), false)).toEqual(0);
       expect(
-        query.getSelectIndexForExpression(parseSqlExpression('SUBSTR(cityName, 1, 2)'), false),
+        query.getSelectIndexForExpression(SqlExpression.parse('SUBSTR(cityName, 1, 2)'), false),
       ).toEqual(1);
-      expect(query.getSelectIndexForExpression(parseSqlExpression('s_namespace'), false)).toEqual(
+      expect(query.getSelectIndexForExpression(SqlExpression.parse('s_namespace'), false)).toEqual(
         -1,
       );
-      expect(query.getSelectIndexForExpression(parseSqlExpression('s_namespace'), true)).toEqual(2);
+      expect(query.getSelectIndexForExpression(SqlExpression.parse('s_namespace'), true)).toEqual(
+        2,
+      );
     });
 
     it('#getGroupedSelectExpressions', () => {
@@ -136,10 +152,12 @@ describe('SqlQuery operations', () => {
   describe('orderBy', () => {
     it('no ORDER BY clause', () => {
       expect(
-        parseSqlQuery(sane`
+        SqlQuery.parse(
+          sane`
           SELECT *
           FROM sys."github"
-        `)
+        `,
+        )
           .addOrderBy(SqlRef.column('col').toOrderByPart('DESC'))
           .toString(),
       ).toEqual(sane`
@@ -151,11 +169,13 @@ describe('SqlQuery operations', () => {
 
     it('add to ORDER BY clause', () => {
       expect(
-        parseSqlQuery(sane`
+        SqlQuery.parse(
+          sane`
           SELECT *
           FROM sys."github"
           ORDER BY col
-        `)
+        `,
+        )
           .addOrderBy(SqlRef.columnWithQuotes('colTwo').toOrderByPart('ASC'))
           .toString(),
       ).toEqual(sane`
@@ -167,11 +187,13 @@ describe('SqlQuery operations', () => {
 
     it('ORDER BY without direction', () => {
       expect(
-        parseSqlQuery(sane`
+        SqlQuery.parse(
+          sane`
           SELECT *
           FROM sys."github"
           ORDER BY col, colTwo ASC
-        `)
+        `,
+        )
           .addOrderBy(SqlRef.columnWithQuotes('colThree').toOrderByPart())
           .toString(),
       ).toEqual(sane`
@@ -185,10 +207,12 @@ describe('SqlQuery operations', () => {
   describe('#addWhere', () => {
     it('no initial where', () => {
       expect(
-        parseSqlQuery(sane`
+        SqlQuery.parse(
+          sane`
           SELECT *
           FROM sys."github"
-        `)
+        `,
+        )
           .addToWhere(`col > 1`)
           .toString(),
       ).toEqual(sane`
@@ -200,11 +224,13 @@ describe('SqlQuery operations', () => {
 
     it('Single Where filter value', () => {
       expect(
-        parseSqlQuery(sane`
+        SqlQuery.parse(
+          sane`
           SELECT *
           FROM sys."github"
           WHERE col > 1
-        `)
+        `,
+        )
           .addToWhere(`colTwo > 2`)
           .toString(),
       ).toEqual(sane`
@@ -216,10 +242,12 @@ describe('SqlQuery operations', () => {
 
     it('OR Where filter value', () => {
       expect(
-        parseSqlQuery(sane`
+        SqlQuery.parse(
+          sane`
           SELECT *
           FROM sys."github" WHERE col > 1 OR col < 5
-        `)
+        `,
+        )
           .addToWhere(`colTwo > 2`)
           .toString(),
       ).toEqual(sane`
@@ -230,10 +258,12 @@ describe('SqlQuery operations', () => {
 
     it('AND Where filter value', () => {
       expect(
-        parseSqlQuery(sane`
+        SqlQuery.parse(
+          sane`
           SELECT *
           FROM sys."github" WHERE (col > 1 OR col < 5) AND colTwo > 5
-        `)
+        `,
+        )
           .addToWhere(`colTwo > 2`)
           .toString(),
       ).toEqual(sane`
@@ -245,7 +275,7 @@ describe('SqlQuery operations', () => {
 
   describe('#removeOutputColumn', () => {
     it('basic cols', () => {
-      const query = parseSqlQuery(sane`
+      const query = SqlQuery.parse(sane`
         SELECT col0, col1, col2 
         FROM github
       `);
@@ -267,7 +297,7 @@ describe('SqlQuery operations', () => {
     });
 
     it(`removes from group by and ORDER BY`, () => {
-      const query = parseSqlQuery(sane`
+      const query = SqlQuery.parse(sane`
         SELECT col0, col1, SUM(a), col2 
         FROM github
         GROUP BY 1, 2, 4
@@ -299,11 +329,13 @@ describe('SqlQuery operations', () => {
   describe.skip('remove functions', () => {
     it('remove col from where', () => {
       expect(
-        parseSqlQuery(sane`
+        SqlQuery.parse(
+          sane`
           SELECT col0, col1, col2
           FROM sys."github"
           Where col AND col2
-        `)
+        `,
+        )
           .removeColumnFromWhere('col2')
           .toString(),
       ).toEqual(sane`
@@ -315,11 +347,13 @@ describe('SqlQuery operations', () => {
 
     it('remove only col from where', () => {
       expect(
-        parseSqlQuery(sane`
+        SqlQuery.parse(
+          sane`
           SELECT col0, col1, col2
           FROM sys."github"
           Where col2 = '1'
-        `)
+        `,
+        )
           .removeColumnFromWhere('col2')
           .toString(),
       ).toEqual(sane`
@@ -330,11 +364,13 @@ describe('SqlQuery operations', () => {
 
     it('remove multiple filters for the same col', () => {
       expect(
-        parseSqlQuery(sane`
+        SqlQuery.parse(
+          sane`
           SELECT col0, col1, col2
           FROM sys."github"
           Where col2 > '1' AND col2 < '1'
-        `)
+        `,
+        )
           .removeColumnFromWhere('col2')
           .toString(),
       ).toEqual(sane`
@@ -346,11 +382,13 @@ describe('SqlQuery operations', () => {
 
     it('remove multiple filters for the same col', () => {
       expect(
-        parseSqlQuery(sane`
+        SqlQuery.parse(
+          sane`
           SELECT col0, col1, col2
           FROM sys."github"
           Where col2 > '1' AND col1 > 2 OR col2 < '1'
-        `)
+        `,
+        )
           .removeColumnFromWhere('col2')
           .toString(),
       ).toEqual(sane`
@@ -362,11 +400,13 @@ describe('SqlQuery operations', () => {
 
     it('remove only comparison expression from where', () => {
       expect(
-        parseSqlQuery(sane`
+        SqlQuery.parse(
+          sane`
           SELECT col0, col1, col2
           FROM sys."github"
           Where col2 > 1
-        `)
+        `,
+        )
           .removeColumnFromWhere('col2')
           .toString(),
       ).toEqual(sane`
@@ -377,11 +417,13 @@ describe('SqlQuery operations', () => {
 
     it('remove only comparison expression from where', () => {
       expect(
-        parseSqlQuery(sane`
+        SqlQuery.parse(
+          sane`
           SELECT col0, col1, col2
           FROM sys."github"
           Where col2 > 1 AND col1 > 1
-        `)
+        `,
+        )
           .removeColumnFromWhere('col2')
           .toString(),
       ).toEqual(sane`
@@ -393,11 +435,13 @@ describe('SqlQuery operations', () => {
 
     it('remove only col from having', () => {
       expect(
-        parseSqlQuery(sane`
+        SqlQuery.parse(
+          sane`
           SELECT col0, col1, col2
           FROM sys."github"
           Having col2 > 1
-        `)
+        `,
+        )
           .removeFromHaving('col2')
           .toString(),
       ).toEqual(sane`
@@ -408,11 +452,13 @@ describe('SqlQuery operations', () => {
 
     it('remove only comparison expression from having 1', () => {
       expect(
-        parseSqlQuery(sane`
+        SqlQuery.parse(
+          sane`
           SELECT col0, col1, col2
           FROM sys."github"
           Having col2 > 1
-        `)
+        `,
+        )
           .removeFromHaving('col2')
           .toString(),
       ).toEqual(sane`
@@ -423,11 +469,13 @@ describe('SqlQuery operations', () => {
 
     it('remove only comparison expression from having 2', () => {
       expect(
-        parseSqlQuery(sane`
+        SqlQuery.parse(
+          sane`
           SELECT col0, col1, col2
           FROM sys."github"
           Having col2 > 1 AND col1 > 1
-        `)
+        `,
+        )
           .removeFromHaving('col2')
           .toString(),
       ).toEqual(sane`
@@ -439,11 +487,13 @@ describe('SqlQuery operations', () => {
 
     it('remove one numbered col from ORDER BY', () => {
       expect(
-        parseSqlQuery(sane`
+        SqlQuery.parse(
+          sane`
           SELECT col0, col1, col2
           FROM sys."github"
           Order By col, 2 ASC
-        `)
+        `,
+        )
           .removeOrderByForOutputColumn('col')
           .toString(),
       ).toEqual(sane`
@@ -455,11 +505,13 @@ describe('SqlQuery operations', () => {
 
     it('remove col not in ORDER BY', () => {
       expect(
-        parseSqlQuery(sane`
+        SqlQuery.parse(
+          sane`
           SELECT col0, col1, col2
           FROM sys."github"
           Order By col, col1 ASC
-        `)
+        `,
+        )
           .removeOrderByForOutputColumn('col2')
           .toString(),
       ).toEqual(sane`
@@ -471,11 +523,13 @@ describe('SqlQuery operations', () => {
 
     it('remove one numbered col not in ORDER BY', () => {
       expect(
-        parseSqlQuery(sane`
+        SqlQuery.parse(
+          sane`
           SELECT col0, col1, col2
           FROM sys."github"
           Order By col, 3 ASC
-        `)
+        `,
+        )
           .removeOrderByForOutputColumn('col1')
           .toString(),
       ).toEqual(sane`
@@ -487,11 +541,13 @@ describe('SqlQuery operations', () => {
 
     it('remove only col in ORDER BY', () => {
       expect(
-        parseSqlQuery(sane`
+        SqlQuery.parse(
+          sane`
           SELECT col0, col1, col2
           FROM sys."github"
           Order By col1
-        `)
+        `,
+        )
           .removeOrderByForOutputColumn('col1')
           .toString(),
       ).toEqual(sane`
@@ -509,7 +565,7 @@ describe('SqlQuery operations', () => {
         Group By col2
       `;
 
-      expect(parseSqlQuery(sql).getAggregateOutputColumns()).toEqual(['col0', 'aggregated']);
+      expect(SqlQuery.parse(sql).getAggregateOutputColumns()).toEqual(['col0', 'aggregated']);
     });
 
     it('get all aggregate cols using numbers', () => {
@@ -519,7 +575,7 @@ describe('SqlQuery operations', () => {
         Group By col2,  1, 3
       `;
 
-      expect(parseSqlQuery(sql).getAggregateOutputColumns()).toEqual(['aggregated']);
+      expect(SqlQuery.parse(sql).getAggregateOutputColumns()).toEqual(['aggregated']);
     });
   });
 
@@ -531,7 +587,7 @@ describe('SqlQuery operations', () => {
       `;
 
       expect(
-        parseSqlQuery(sql)
+        SqlQuery.parse(sql)
           .addSelectExpression('min(col2) AS "alias"')
           .toString(),
       ).toEqual(sane`
@@ -547,7 +603,7 @@ describe('SqlQuery operations', () => {
       `;
 
       expect(
-        parseSqlQuery(sql)
+        SqlQuery.parse(sql)
           .addSelectExpression(`count(DISTINCT col2) AS "alias"`)
           .toString(),
       ).toEqual(sane`
@@ -564,7 +620,7 @@ describe('SqlQuery operations', () => {
       `;
 
       expect(
-        parseSqlQuery(sql)
+        SqlQuery.parse(sql)
           .addToGroupBy(SqlRef.columnWithQuotes('col'))
           .toString(),
       ).toEqual(sane`
@@ -579,7 +635,7 @@ describe('SqlQuery operations', () => {
       `;
 
       expect(
-        parseSqlQuery(sql)
+        SqlQuery.parse(sql)
           .addToGroupBy(
             SqlAlias.create(SqlFunction.simple('min', [SqlRef.column('col1')]), 'MinColumn'),
           )
@@ -598,7 +654,7 @@ describe('SqlQuery operations', () => {
       `;
 
       expect(
-        parseSqlQuery(sql)
+        SqlQuery.parse(sql)
           .addToGroupBy(
             SqlAlias.create(SqlFunction.simple('max', [SqlRef.column('col2')]), 'MaxColumn'),
           )
@@ -625,7 +681,7 @@ describe('SqlQuery operations', () => {
       `;
 
       expect(
-        parseSqlQuery(sql)
+        SqlQuery.parse(sql)
           .prettify()
           .toString(),
       ).toEqual(sane`

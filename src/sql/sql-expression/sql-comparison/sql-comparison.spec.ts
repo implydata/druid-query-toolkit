@@ -12,8 +12,8 @@
  * limitations under the License.
  */
 
-import { parseSql } from '../../..';
 import { backAndForth } from '../../../test-utils';
+import { SqlExpression } from '../sql-expression';
 
 describe('SqlComparison', () => {
   it('things that work', () => {
@@ -81,7 +81,7 @@ describe('SqlComparison', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "innerSpacing": Object {
           "postOp": " ",
@@ -119,7 +119,7 @@ describe('SqlComparison', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "innerSpacing": Object {
           "postOp": "   ",
@@ -154,7 +154,7 @@ describe('SqlComparison', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "innerSpacing": Object {
           "postOp": "   ",
@@ -189,7 +189,7 @@ describe('SqlComparison', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "innerSpacing": Object {
           "not": "    ",
@@ -225,7 +225,7 @@ describe('SqlComparison', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "innerSpacing": Object {
           "postOp": " ",
@@ -264,7 +264,7 @@ describe('SqlComparison', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "innerSpacing": Object {
           "not": " ",
@@ -304,7 +304,7 @@ describe('SqlComparison', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "innerSpacing": Object {
           "postOp": " ",
@@ -424,7 +424,7 @@ describe('SqlComparison', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "innerSpacing": Object {
           "not": " ",
@@ -545,7 +545,7 @@ describe('SqlComparison', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "innerSpacing": Object {
           "postOp": " ",
@@ -601,7 +601,7 @@ describe('SqlComparison', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "innerSpacing": Object {
           "not": " ",
@@ -658,7 +658,7 @@ describe('SqlComparison', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "innerSpacing": Object {
           "postOp": " ",
@@ -693,7 +693,7 @@ describe('SqlComparison', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "innerSpacing": Object {
           "not": " ",
@@ -729,7 +729,7 @@ describe('SqlComparison', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "innerSpacing": Object {
           "postOp": " ",
@@ -779,7 +779,7 @@ describe('SqlComparison', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "innerSpacing": Object {
           "not": " ",
@@ -831,7 +831,7 @@ describe('SqlComparison', () => {
 
       backAndForth(sql);
 
-      expect(parseSql(sql)).toMatchInlineSnapshot(`
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
         SqlComparison {
           "innerSpacing": Object {
             "postOp": " ",
@@ -869,7 +869,7 @@ describe('SqlComparison', () => {
 
       backAndForth(sql);
 
-      expect(parseSql(sql)).toMatchInlineSnapshot(`
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
         SqlComparison {
           "innerSpacing": Object {
             "postOp": " ",
@@ -901,7 +901,7 @@ describe('SqlComparison', () => {
 
       backAndForth(sql);
 
-      expect(parseSql(sql)).toMatchInlineSnapshot(`
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
         SqlComparison {
           "innerSpacing": Object {
             "postOp": " ",
@@ -939,7 +939,7 @@ describe('SqlComparison', () => {
 
       backAndForth(sql);
 
-      expect(parseSql(sql)).toMatchInlineSnapshot(`
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
         SqlComparison {
           "innerSpacing": Object {
             "postOp": " ",
@@ -971,7 +971,7 @@ describe('SqlComparison', () => {
 
       backAndForth(sql);
 
-      expect(parseSql(sql)).toMatchInlineSnapshot(`
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
         SqlComparison {
           "innerSpacing": Object {
             "postOp": " ",
@@ -1009,7 +1009,7 @@ describe('SqlComparison', () => {
 
       backAndForth(sql);
 
-      expect(parseSql(sql)).toMatchInlineSnapshot(`
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
         SqlComparison {
           "innerSpacing": Object {
             "postOp": " ",
@@ -1065,7 +1065,7 @@ describe('SqlComparison', () => {
 
       backAndForth(sql);
 
-      expect(parseSql(sql)).toMatchInlineSnapshot(`
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
         SqlMulti {
           "args": SeparatedArray {
             "separators": Array [

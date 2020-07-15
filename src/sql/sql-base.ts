@@ -12,8 +12,8 @@
  * limitations under the License.
  */
 
-import { parseSql } from '..';
-import { dedupe, filterMap } from '../utils';
+import { parseSql } from '../parser';
+import { cleanObject, dedupe, filterMap } from '../utils';
 
 import { LiteralValue, SeparatedArray, SqlLiteral, SqlPlaceholder, SqlRef } from '.';
 import { RESERVED_KEYWORDS } from './reserved-keywords';
@@ -54,13 +54,14 @@ export abstract class SqlBase {
     return Boolean(specialFunctionLookup[functionName.toUpperCase()]);
   }
 
-  static cleanObject(obj: Record<string, any>): Record<string, string> {
-    const cleanObj: Record<string, string> = {};
-    for (const k in obj) {
-      const v = obj[k];
-      if (typeof v === 'string') cleanObj[k] = v;
+  static parseSql(input: string | SqlBase): SqlBase {
+    if (typeof input === 'string') {
+      return parseSql(input);
+    } else if (input instanceof SqlBase) {
+      return input;
+    } else {
+      throw new Error('unknown input');
     }
-    return cleanObj;
   }
 
   static walkSeparatedArray<T extends SqlBase>(
@@ -116,7 +117,7 @@ export abstract class SqlBase {
     const type = typeOverride || options.type;
     if (!type) throw new Error(`could not determine type`);
     this.type = type;
-    this.innerSpacing = SqlBase.cleanObject(options.innerSpacing || {});
+    this.innerSpacing = cleanObject(options.innerSpacing || {});
     const { parens } = options;
     if (parens && parens.length) {
       this.parens = parens;
@@ -302,7 +303,7 @@ export abstract class SqlBase {
         let filler = fillWith[i++];
         if (!(filler instanceof SqlBase)) {
           if (typeof filler === 'string') {
-            filler = parseSql(filler);
+            filler = SqlBase.parseSql(filler);
           } else {
             filler = SqlLiteral.create(filler);
           }

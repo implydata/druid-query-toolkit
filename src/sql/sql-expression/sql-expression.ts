@@ -22,13 +22,23 @@ import {
   SqlMulti,
   SqlOrderByExpression,
 } from '..';
-import { parseSqlExpression } from '../../parser';
+import { parseSql } from '../../parser';
 import { filterMap } from '../../utils';
 import { SqlBase, Substitutor } from '../sql-base';
 
 export abstract class SqlExpression extends SqlBase {
   static parse(input: string | SqlExpression): SqlExpression {
-    return parseSqlExpression(input);
+    if (typeof input === 'string') {
+      const parsed = parseSql(input);
+      if (!(parsed instanceof SqlExpression)) {
+        throw new Error('Provided SQL was not an expression');
+      }
+      return parsed;
+    } else if (input instanceof SqlExpression) {
+      return input;
+    } else {
+      throw new Error('unknown input');
+    }
   }
 
   static and(...args: (SqlExpression | undefined)[]) {

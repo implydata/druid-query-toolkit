@@ -12,8 +12,8 @@
  * limitations under the License.
  */
 
-import { parseSql } from '../../..';
 import { backAndForth } from '../../../test-utils';
+import { SqlExpression } from '../sql-expression';
 
 describe('SqlUnary', () => {
   it('minus', () => {
@@ -21,7 +21,7 @@ describe('SqlUnary', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlUnary {
         "arg": SqlRef {
           "column": "A",
@@ -47,7 +47,7 @@ describe('SqlUnary', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlUnary {
         "arg": SqlRef {
           "column": "B",
@@ -73,7 +73,7 @@ describe('SqlUnary', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlUnary {
         "arg": SqlUnary {
           "arg": SqlRef {
@@ -106,7 +106,7 @@ describe('SqlUnary', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "args": SeparatedArray {
           "separators": Array [
@@ -187,7 +187,7 @@ describe('SqlUnary', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlUnary {
         "arg": SqlComparison {
           "innerSpacing": Object {
@@ -232,7 +232,7 @@ describe('SqlUnary', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "args": SeparatedArray {
           "separators": Array [
@@ -326,7 +326,7 @@ describe('SqlUnary', () => {
 
     backAndForth(sql);
 
-    expect(parseSql(sql)).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlUnary {
         "arg": SqlUnary {
           "arg": SqlComparison {

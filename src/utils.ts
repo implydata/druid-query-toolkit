@@ -12,44 +12,13 @@
  * limitations under the License.
  */
 
-export function shallowCopy(v: any): any {
-  return Array.isArray(v) ? v.slice() : Object.assign({}, v);
-}
-
-export function isEmpty(v: any): boolean {
-  return !(Array.isArray(v) ? v.length : Object.keys(v).length);
-}
-
-export function parsePath(path: string): string[] {
-  const parts: string[] = [];
-  let rest = path;
-  while (rest) {
-    const escapedMatch = rest.match(/^\{([^{}]*)\}(?:\.(.*))?$/);
-    if (escapedMatch) {
-      parts.push(escapedMatch[1]);
-      rest = escapedMatch[2];
-      continue;
-    }
-
-    const normalMatch = rest.match(/^([^.]*)(?:\.(.*))?$/);
-    if (normalMatch) {
-      parts.push(normalMatch[1]);
-      rest = normalMatch[2];
-      continue;
-    }
-
-    throw new Error(`Could not parse path ${path}`);
+export function cleanObject(obj: Record<string, any>): Record<string, string> {
+  const cleanObj: Record<string, string> = {};
+  for (const k in obj) {
+    const v = obj[k];
+    if (typeof v === 'string') cleanObj[k] = v;
   }
-
-  return parts;
-}
-
-export function deepGet<T extends Record<string, any>>(value: T, path: string): any {
-  const parts = parsePath(path);
-  for (const part of parts) {
-    value = (value || {})[part];
-  }
-  return value;
+  return cleanObj;
 }
 
 export function filterMap<T, Q>(xs: readonly T[], f: (x: T, i: number) => Q | undefined): Q[] {

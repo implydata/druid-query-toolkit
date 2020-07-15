@@ -12,6 +12,5 @@
  * limitations under the License.
  */
 
-export * from './parser';
 export * from './sql';
 export * from './query-result/query-result';
