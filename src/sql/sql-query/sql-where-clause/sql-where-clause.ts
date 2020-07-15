@@ -33,6 +33,10 @@ export class SqlWhereClause extends SqlClause {
     });
   }
 
+  static createForFunction(expression: SqlWhereClause | SqlExpression | string): SqlWhereClause {
+    return SqlWhereClause.create(expression).addParens();
+  }
+
   public readonly expression: SqlExpression;
 
   constructor(options: SqlWhereClauseValue) {

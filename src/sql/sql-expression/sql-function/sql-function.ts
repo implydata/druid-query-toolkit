@@ -45,7 +45,7 @@ export class SqlFunction extends SqlExpression {
       functionName: functionName,
       args: SeparatedArray.fromArray(args, Separator.COMMA),
       filterKeyword: filter ? SqlFunction.DEFAULT_FILTER_KEYWORD : undefined,
-      whereClause: filter ? SqlWhereClause.create(filter) : undefined,
+      whereClause: filter ? SqlWhereClause.createForFunction(filter) : undefined,
     });
   }
 
@@ -60,7 +60,7 @@ export class SqlFunction extends SqlExpression {
       decorator: decorator,
       args: SeparatedArray.fromArray(args, Separator.COMMA),
       filterKeyword: filter ? SqlFunction.DEFAULT_FILTER_KEYWORD : undefined,
-      whereClause: filter ? SqlWhereClause.create(filter) : undefined,
+      whereClause: filter ? SqlWhereClause.createForFunction(filter) : undefined,
     });
   }
 
@@ -152,7 +152,7 @@ export class SqlFunction extends SqlExpression {
     return this.changeWhereClause(
       this.whereClause
         ? this.whereClause.changeExpression(whereExpression)
-        : SqlWhereClause.create(whereExpression),
+        : SqlWhereClause.createForFunction(whereExpression),
     );
   }
 

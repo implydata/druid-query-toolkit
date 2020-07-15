@@ -14,6 +14,7 @@
 
 import { backAndForth } from '../../../test-utils';
 import { SqlExpression } from '../sql-expression';
+import { SqlFunction } from './sql-function';
 
 describe('SqlFunction', () => {
   it('things that work', () => {
@@ -651,5 +652,21 @@ describe('SqlFunction', () => {
         "whereClause": undefined,
       }
     `);
+  });
+
+  it('Changes filter expression', () => {
+    const sql = SqlExpression.parse(
+      `SUM(t."lol") FILTER (WHERE t."country" = 'USA')`,
+    ) as SqlFunction;
+    expect(String(sql.changeWhereExpression(`t."country" = 'UK'`))).toEqual(
+      'SUM(t."lol") FILTER (WHERE t."country" = \'UK\')',
+    );
+  });
+
+  it('Creates filter expression', () => {
+    const sql = SqlExpression.parse(`SUM(t."lol")`) as SqlFunction;
+    expect(String(sql.changeWhereExpression(`t."country" = 'UK'`))).toEqual(
+      'SUM(t."lol") FILTER (WHERE t."country" = \'UK\')',
+    );
   });
 });
