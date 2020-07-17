@@ -62,7 +62,7 @@ export class SeparatedArray<T> {
     return this.values.length;
   }
 
-  public get(i: number): T {
+  public get(i: number): T | undefined {
     return this.values[i];
   }
 

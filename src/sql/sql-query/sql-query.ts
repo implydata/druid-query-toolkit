@@ -517,6 +517,10 @@ export class SqlQuery extends SqlBase {
     return selectIndex >= 0 && selectIndex < this.selectExpressions.length();
   }
 
+  getSelectExpressionForIndex(selectIndex: number): SqlAlias | undefined {
+    return this.selectExpressions.get(selectIndex);
+  }
+
   getOutputColumns(): string[] {
     return this.selectExpressions.values.map(SqlQuery.getSelectExpressionOutput);
   }
@@ -556,7 +560,9 @@ export class SqlQuery extends SqlBase {
   }
 
   isRealOutputColumnAtSelectIndex(selectIndex: number): boolean {
-    return Boolean(this.selectExpressions.get(selectIndex).getOutputName());
+    const selectExpression = this.getSelectExpressionForIndex(selectIndex);
+    if (!selectExpression) return false;
+    return Boolean(selectExpression.getOutputName());
   }
 
   isGroupedSelectIndex(selectIndex: number): boolean {
@@ -622,9 +628,9 @@ export class SqlQuery extends SqlBase {
   }
 
   removeSelectIndex(selectIndex: number) {
-    if (!this.isValidSelectIndex(selectIndex)) return this;
+    const selectExpression = this.getSelectExpressionForIndex(selectIndex);
+    if (!selectExpression) return this;
 
-    const selectExpression = this.selectExpressions.get(selectIndex);
     const newSelectExpressions = this.selectExpressions.deleteByIndex(selectIndex);
     if (!newSelectExpressions) return this; // Can not remove the last column
 
