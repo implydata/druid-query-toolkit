@@ -12,10 +12,10 @@
  * limitations under the License.
  */
 
-import { parseSql } from '../parser';
 import { cleanObject, dedupe, filterMap } from '../utils';
 
 import { LiteralValue, SeparatedArray, SqlLiteral, SqlPlaceholder, SqlRef } from '.';
+import { parseSql } from './parser';
 import { RESERVED_KEYWORDS } from './reserved-keywords';
 import { SPECIAL_FUNCTIONS } from './special-functions';
 

@@ -15,10 +15,10 @@
 const fs = require('fs');
 const peg = require('pegjs');
 
-var header = fs.readFileSync('./src/parser/druidsql.header.js', 'utf-8');
-var rules = fs.readFileSync('./src/parser/druidsql.pegjs', 'utf-8');
+const header = fs.readFileSync('./src/sql/parser/druidsql.header.js', 'utf-8');
+const rules = fs.readFileSync('./src/sql/parser/druidsql.pegjs', 'utf-8');
 
-var parser;
+let parser;
 try {
   parser = peg.generate(header + '\n\n' + rules, {
     output: 'source',
@@ -31,7 +31,7 @@ try {
 }
 
 const wrappedParser = `
-var sql = require('../sql');
+var sql = require('..');
 
 var p =
 ${parser}
@@ -41,4 +41,4 @@ exports.parseSql = function parseSql(input) {
 }
 `;
 
-fs.writeFileSync('./src/parser/index.js', wrappedParser);
+fs.writeFileSync('./src/sql/parser/index.js', wrappedParser);

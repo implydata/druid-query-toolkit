@@ -28,8 +28,8 @@ import {
   SqlWhereClause,
   Substitutor,
 } from '../..';
-import { parseSql } from '../../parser';
 import { filterMap } from '../../utils';
+import { parseSql } from '../parser';
 import { SqlBase, SqlBaseValue } from '../sql-base';
 
 import { SqlJoinPart } from './sql-join-part/sql-join-part';

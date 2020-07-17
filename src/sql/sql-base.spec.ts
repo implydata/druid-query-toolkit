@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { parseSql } from '../parser';
+import { parseSql } from './parser';
 
 describe('SqlBase', () => {
   describe('#fillPlaceholders', () => {

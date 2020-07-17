@@ -9,6 +9,6 @@
 
 /node_modules/
 /build/
-/src/parser/index.js
-/src/parser/.DS_Store
+/src/sql/parser/index.js
+/src/sql/parser/.DS_Store
 

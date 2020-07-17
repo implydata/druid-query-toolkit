@@ -22,8 +22,8 @@ import {
   SqlMulti,
   SqlOrderByExpression,
 } from '..';
-import { parseSql } from '../../parser';
 import { filterMap } from '../../utils';
+import { parseSql } from '../parser';
 import { SqlBase, Substitutor } from '../sql-base';
 
 export abstract class SqlExpression extends SqlBase {

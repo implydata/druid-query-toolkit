@@ -12,6 +12,6 @@
  * limitations under the License.
  */
 
-import { SqlBase } from '../sql';
+import { SqlBase } from '..';
 
 export function parseSql(input: string): SqlBase;
