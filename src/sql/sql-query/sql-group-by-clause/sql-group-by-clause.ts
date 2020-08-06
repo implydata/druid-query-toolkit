@@ -122,4 +122,4 @@ export class SqlGroupByClause extends SqlClause {
   }
 }
 
-SqlBase.register(SqlGroupByClause.type, SqlGroupByClause);
+SqlBase.register(SqlGroupByClause);

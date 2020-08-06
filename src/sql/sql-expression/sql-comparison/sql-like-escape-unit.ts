@@ -104,4 +104,4 @@ export class SqlLikeEscapeUnit extends SqlBase {
   }
 }
 
-SqlBase.register(SqlLikeEscapeUnit.type, SqlLikeEscapeUnit);
+SqlBase.register(SqlLikeEscapeUnit);

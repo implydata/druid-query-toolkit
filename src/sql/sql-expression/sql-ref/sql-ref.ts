@@ -231,7 +231,7 @@ export class SqlRef extends SqlExpression {
   }
 }
 
-SqlBase.register(SqlRef.type, SqlRef);
+SqlBase.register(SqlRef);
 
 SqlRef.STAR = new SqlRef({
   column: '*',

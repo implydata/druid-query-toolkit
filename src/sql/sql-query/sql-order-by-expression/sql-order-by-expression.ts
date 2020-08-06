@@ -120,4 +120,4 @@ export class SqlOrderByExpression extends SqlBase {
   }
 }
 
-SqlBase.register(SqlOrderByExpression.type, SqlOrderByExpression);
+SqlBase.register(SqlOrderByExpression);

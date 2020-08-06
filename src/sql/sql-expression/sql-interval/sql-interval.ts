@@ -76,4 +76,4 @@ export class SqlInterval extends SqlExpression {
   }
 }
 
-SqlBase.register(SqlInterval.type, SqlInterval);
+SqlBase.register(SqlInterval);

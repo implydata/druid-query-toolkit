@@ -155,7 +155,7 @@ export class SqlLiteral extends SqlExpression {
   }
 }
 
-SqlBase.register(SqlLiteral.type, SqlLiteral);
+SqlBase.register(SqlLiteral);
 
 SqlLiteral.NULL = SqlLiteral.create(null);
 SqlLiteral.FALSE = SqlLiteral.create(false);

@@ -79,4 +79,4 @@ export class SqlOffsetClause extends SqlClause {
   }
 }
 
-SqlBase.register(SqlOffsetClause.type, SqlOffsetClause);
+SqlBase.register(SqlOffsetClause);

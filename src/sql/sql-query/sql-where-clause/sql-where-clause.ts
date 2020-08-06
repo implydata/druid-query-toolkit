@@ -90,4 +90,4 @@ export class SqlWhereClause extends SqlClause {
   }
 }
 
-SqlBase.register(SqlWhereClause.type, SqlWhereClause);
+SqlBase.register(SqlWhereClause);

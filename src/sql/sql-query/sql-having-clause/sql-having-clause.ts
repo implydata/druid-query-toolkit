@@ -84,4 +84,4 @@ export class SqlHavingClause extends SqlClause {
   }
 }
 
-SqlBase.register(SqlHavingClause.type, SqlHavingClause);
+SqlBase.register(SqlHavingClause);

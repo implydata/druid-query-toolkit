@@ -110,4 +110,4 @@ export class SqlMulti extends SqlExpression {
   }
 }
 
-SqlBase.register(SqlMulti.type, SqlMulti);
+SqlBase.register(SqlMulti);

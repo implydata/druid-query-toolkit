@@ -128,4 +128,4 @@ export class SqlWithPart extends SqlBase {
   }
 }
 
-SqlBase.register(SqlWithPart.type, SqlWithPart);
+SqlBase.register(SqlWithPart);

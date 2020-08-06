@@ -164,4 +164,4 @@ export class SqlCase extends SqlExpression {
   }
 }
 
-SqlBase.register(SqlCase.type, SqlCase);
+SqlBase.register(SqlCase);

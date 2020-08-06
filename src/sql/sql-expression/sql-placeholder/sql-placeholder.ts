@@ -29,4 +29,4 @@ export class SqlPlaceholder extends SqlExpression {
   }
 }
 
-SqlBase.register(SqlPlaceholder.type, SqlPlaceholder);
+SqlBase.register(SqlPlaceholder);

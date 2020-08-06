@@ -159,4 +159,4 @@ export class SqlFromClause extends SqlClause {
   }
 }
 
-SqlBase.register(SqlFromClause.type, SqlFromClause);
+SqlBase.register(SqlFromClause);

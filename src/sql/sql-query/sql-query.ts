@@ -838,4 +838,4 @@ export class SqlQuery extends SqlBase {
   }
 }
 
-SqlBase.register(SqlQuery.type, SqlQuery);
+SqlBase.register(SqlQuery);

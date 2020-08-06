@@ -79,4 +79,4 @@ export class SqlLimitClause extends SqlClause {
   }
 }
 
-SqlBase.register(SqlLimitClause.type, SqlLimitClause);
+SqlBase.register(SqlLimitClause);

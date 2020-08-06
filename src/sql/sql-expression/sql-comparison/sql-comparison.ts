@@ -216,4 +216,4 @@ export class SqlComparison extends SqlExpression {
   }
 }
 
-SqlBase.register(SqlComparison.type, SqlComparison);
+SqlBase.register(SqlComparison);

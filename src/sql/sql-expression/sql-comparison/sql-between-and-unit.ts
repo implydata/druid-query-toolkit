@@ -104,4 +104,4 @@ export class SqlBetweenAndUnit extends SqlBase {
   }
 }
 
-SqlBase.register(SqlBetweenAndUnit.type, SqlBetweenAndUnit);
+SqlBase.register(SqlBetweenAndUnit);

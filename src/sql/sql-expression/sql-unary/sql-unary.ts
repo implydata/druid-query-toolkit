@@ -69,4 +69,4 @@ export class SqlUnary extends SqlExpression {
   }
 }
 
-SqlBase.register(SqlUnary.type, SqlUnary);
+SqlBase.register(SqlUnary);

@@ -214,6 +214,6 @@ export class SqlFunction extends SqlExpression {
   }
 }
 
-SqlBase.register(SqlFunction.type, SqlFunction);
+SqlBase.register(SqlFunction);
 
 SqlFunction.COUNT_STAR = SqlFunction.simple('COUNT', [SqlRef.STAR]);

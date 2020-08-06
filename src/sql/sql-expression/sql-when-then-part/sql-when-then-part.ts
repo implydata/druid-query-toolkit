@@ -111,4 +111,4 @@ export class SqlWhenThenPart extends SqlBase {
   }
 }
 
-SqlBase.register(SqlWhenThenPart.type, SqlWhenThenPart);
+SqlBase.register(SqlWhenThenPart);

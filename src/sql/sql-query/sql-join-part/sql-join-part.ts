@@ -120,4 +120,4 @@ export class SqlJoinPart extends SqlBase {
   }
 }
 
-SqlBase.register(SqlJoinPart.type, SqlJoinPart);
+SqlBase.register(SqlJoinPart);

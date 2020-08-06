@@ -130,4 +130,4 @@ export class SqlOrderByClause extends SqlClause {
   }
 }
 
-SqlBase.register(SqlOrderByClause.type, SqlOrderByClause);
+SqlBase.register(SqlOrderByClause);

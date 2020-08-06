@@ -129,6 +129,6 @@ export class SqlAlias extends SqlBase {
   }
 }
 
-SqlBase.register(SqlAlias.type, SqlAlias);
+SqlBase.register(SqlAlias);
 
 SqlAlias.STAR = SqlAlias.create(SqlRef.STAR);

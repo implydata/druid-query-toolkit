@@ -27,6 +27,7 @@ export interface Parens {
 export type Substitutor = (t: SqlBase, stack: SqlBase[]) => SqlBase | undefined;
 
 export type SqlType =
+  | 'base'
   | 'query'
   | 'whereClause'
   | 'orderByExpression'
@@ -69,6 +70,7 @@ for (const r of SPECIAL_FUNCTIONS) {
 }
 
 export abstract class SqlBase {
+  static type: SqlType = 'base';
   static RESERVED_KEYWORDS = RESERVED_KEYWORDS;
   static SPECIAL_FUNCTIONS = SPECIAL_FUNCTIONS;
 
@@ -118,8 +120,8 @@ export abstract class SqlBase {
   }
 
   static classMap: Record<string, typeof SqlBase> = {};
-  static register(type: SqlType, ex: typeof SqlBase): void {
-    SqlBase.classMap[type] = ex;
+  static register(ex: typeof SqlBase): void {
+    SqlBase.classMap[ex.type] = ex;
   }
 
   static getConstructorFor(type: SqlType): typeof SqlBase {
