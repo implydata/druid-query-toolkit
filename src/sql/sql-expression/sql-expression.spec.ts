@@ -13,6 +13,7 @@
  */
 
 import { parseSql } from '../parser';
+
 import { SqlExpression } from './sql-expression';
 
 describe('SqlExpression', () => {
