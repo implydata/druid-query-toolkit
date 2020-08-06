@@ -13,7 +13,7 @@
  */
 
 import { SqlAlias } from '..';
-import { SqlBase, Substitutor } from '../../sql-base';
+import { SqlBase, SqlType, Substitutor } from '../../sql-base';
 import { SqlExpression, SqlLiteral } from '../../sql-expression';
 import { SeparatedArray } from '../../utils';
 import { SqlClause, SqlClauseValue } from '../sql-clause';
@@ -24,7 +24,7 @@ export interface SqlGroupByClauseValue extends SqlClauseValue {
 }
 
 export class SqlGroupByClause extends SqlClause {
-  static type = 'groupByClause';
+  static type: SqlType = 'groupByClause';
 
   static DEFAULT_KEYWORD = 'GROUP BY';
 

@@ -13,6 +13,7 @@
  */
 
 import { parseSql } from '../parser';
+import { SqlExpression } from './sql-expression';
 
 describe('SqlExpression', () => {
   it('plywood expressions should not parse', () => {
@@ -28,5 +29,31 @@ describe('SqlExpression', () => {
         throw new Error(`should not parse: ${sql}`);
       }
     }
+  });
+
+  describe('#decomposeViaAnd', () => {
+    it('works without AND', () => {
+      expect(String(SqlExpression.parse('a = 1').decomposeViaAnd())).toEqual('a = 1');
+    });
+
+    it('works with AND', () => {
+      expect(String(SqlExpression.parse('a AND b And c').decomposeViaAnd())).toEqual('a,b,c');
+    });
+  });
+
+  describe('#filterAnd', () => {
+    it('works without AND', () => {
+      expect(String(SqlExpression.parse('a = 1').filterAnd(ex => ex.toString() !== 'b'))).toEqual(
+        'a = 1',
+      );
+
+      expect(String(SqlExpression.parse('a = 1').filterAnd(() => false))).toEqual('undefined');
+    });
+
+    it('works with AND', () => {
+      expect(
+        String(SqlExpression.parse('a AND b And c').filterAnd(ex => ex.toString() !== 'b')),
+      ).toEqual('a And c');
+    });
   });
 });

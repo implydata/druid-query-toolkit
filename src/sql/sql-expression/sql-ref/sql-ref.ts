@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlBaseValue } from '../../sql-base';
+import { SqlBase, SqlBaseValue, SqlType } from '../../sql-base';
 import { trimString } from '../../utils';
 import { SqlExpression } from '../sql-expression';
 
@@ -26,7 +26,7 @@ export interface SqlRefValue extends SqlBaseValue {
 }
 
 export class SqlRef extends SqlExpression {
-  static type = 'ref';
+  static type: SqlType = 'ref';
 
   static STAR: SqlRef;
 

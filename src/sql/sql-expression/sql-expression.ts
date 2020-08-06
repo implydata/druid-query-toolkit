@@ -62,6 +62,8 @@ export abstract class SqlExpression extends SqlBase {
     }
   }
 
+  // ------------------------------
+
   public _walkHelper(
     stack: SqlBase[],
     fn: Substitutor,
@@ -146,6 +148,10 @@ export abstract class SqlExpression extends SqlBase {
 
   public and(expression: SqlExpression): SqlExpression {
     return SqlExpression.and(this, expression);
+  }
+
+  public decomposeViaAnd(): readonly SqlExpression[] {
+    return [this];
   }
 
   public filterAnd(fn: (ex: SqlExpression) => boolean): SqlExpression | undefined {

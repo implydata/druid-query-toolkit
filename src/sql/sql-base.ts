@@ -26,8 +26,34 @@ export interface Parens {
 
 export type Substitutor = (t: SqlBase, stack: SqlBase[]) => SqlBase | undefined;
 
+export type SqlType =
+  | 'query'
+  | 'whereClause'
+  | 'orderByExpression'
+  | 'fromClause'
+  | 'offsetClause'
+  | 'orderByClause'
+  | 'havingClause'
+  | 'limitClause'
+  | 'groupByClause'
+  | 'withPart'
+  | 'joinPart'
+  | 'alias'
+  | 'betweenAndUnit'
+  | 'likeEscapeUnit'
+  | 'comparison'
+  | 'literal'
+  | 'placeholder'
+  | 'interval'
+  | 'multi'
+  | 'function'
+  | 'case'
+  | 'whenThenPart'
+  | 'ref'
+  | 'unary';
+
 export interface SqlBaseValue {
-  type?: string;
+  type?: SqlType;
   innerSpacing?: Record<string, string>;
   parens?: Parens[];
 }
@@ -92,11 +118,11 @@ export abstract class SqlBase {
   }
 
   static classMap: Record<string, typeof SqlBase> = {};
-  static register(type: string, ex: typeof SqlBase): void {
+  static register(type: SqlType, ex: typeof SqlBase): void {
     SqlBase.classMap[type] = ex;
   }
 
-  static getConstructorFor(type: string): typeof SqlBase {
+  static getConstructorFor(type: SqlType): typeof SqlBase {
     const ClassFn = SqlBase.classMap[type];
     if (!ClassFn) throw new Error(`unsupported expression type '${type}'`);
     return ClassFn;
@@ -109,11 +135,11 @@ export abstract class SqlBase {
     return new ClassFn(parameters);
   }
 
-  public type: string;
+  public type: SqlType;
   public innerSpacing: Record<string, string>;
   public parens?: Parens[];
 
-  constructor(options: SqlBaseValue, typeOverride: string) {
+  constructor(options: SqlBaseValue, typeOverride: SqlType) {
     const type = typeOverride || options.type;
     if (!type) throw new Error(`could not determine type`);
     this.type = type;

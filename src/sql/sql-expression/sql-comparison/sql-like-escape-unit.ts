@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 import { SqlLiteral } from '..';
-import { SqlBase, SqlBaseValue, Substitutor } from '../../sql-base';
+import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../../sql-base';
 
 export interface SqlLikeEscapeUnitValue extends SqlBaseValue {
   like: SqlLiteral;
@@ -21,7 +21,7 @@ export interface SqlLikeEscapeUnitValue extends SqlBaseValue {
 }
 
 export class SqlLikeEscapeUnit extends SqlBase {
-  static type = 'likeEscapeUnit';
+  static type: SqlType = 'likeEscapeUnit';
 
   static DEFAULT_ESCAPE_KEYWORD = 'AND';
 

@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlBaseValue, Substitutor } from '../../sql-base';
+import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../../sql-base';
 import { SqlExpression } from '../sql-expression';
 
 export interface UnaryExpressionValue extends SqlBaseValue {
@@ -21,7 +21,7 @@ export interface UnaryExpressionValue extends SqlBaseValue {
 }
 
 export class SqlUnary extends SqlExpression {
-  static type = 'unary';
+  static type: SqlType = 'unary';
 
   public readonly keyword: string;
   public readonly arg: SqlExpression;

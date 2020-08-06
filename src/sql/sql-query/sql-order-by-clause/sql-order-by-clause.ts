@@ -13,7 +13,7 @@
  */
 
 import { SqlAlias, SqlOrderByExpression } from '..';
-import { SqlBase, Substitutor } from '../../sql-base';
+import { SqlBase, SqlType, Substitutor } from '../../sql-base';
 import { SqlLiteral } from '../../sql-expression';
 import { SeparatedArray } from '../../utils';
 import { SqlClause, SqlClauseValue } from '../sql-clause';
@@ -23,7 +23,7 @@ export interface SqlOrderByClauseValue extends SqlClauseValue {
 }
 
 export class SqlOrderByClause extends SqlClause {
-  static type = 'orderByClause';
+  static type: SqlType = 'orderByClause';
 
   static DEFAULT_KEYWORD = 'ORDER BY';
 

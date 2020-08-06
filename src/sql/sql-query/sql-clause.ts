@@ -13,7 +13,7 @@
  */
 
 import { SqlBaseValue } from '..';
-import { SqlBase, Substitutor } from '../sql-base';
+import { SqlBase, SqlType, Substitutor } from '../sql-base';
 
 export interface SqlClauseValue extends SqlBaseValue {
   keyword?: string;
@@ -22,7 +22,7 @@ export interface SqlClauseValue extends SqlBaseValue {
 export abstract class SqlClause extends SqlBase {
   public readonly keyword?: string;
 
-  constructor(options: SqlClauseValue, typeOverride: string) {
+  constructor(options: SqlClauseValue, typeOverride: SqlType) {
     super(options, typeOverride);
     this.keyword = options.keyword;
   }

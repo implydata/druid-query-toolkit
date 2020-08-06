@@ -12,13 +12,13 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlBaseValue } from '../../sql-base';
+import { SqlBase, SqlBaseValue, SqlType } from '../../sql-base';
 import { SqlExpression } from '../sql-expression';
 
 export interface SqlPlaceholderValue extends SqlBaseValue {}
 
 export class SqlPlaceholder extends SqlExpression {
-  static type = 'placeholder';
+  static type: SqlType = 'placeholder';
 
   constructor(options: SqlPlaceholderValue = {}) {
     super(options, SqlPlaceholder.type);

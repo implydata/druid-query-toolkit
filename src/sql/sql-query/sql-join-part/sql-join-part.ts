@@ -13,7 +13,7 @@
  */
 
 import { SqlAlias } from '..';
-import { SqlBase, SqlBaseValue, Substitutor } from '../../sql-base';
+import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../../sql-base';
 import { SqlExpression } from '../../sql-expression';
 
 export interface SqlJoinPartValue extends SqlBaseValue {
@@ -25,7 +25,7 @@ export interface SqlJoinPartValue extends SqlBaseValue {
 }
 
 export class SqlJoinPart extends SqlBase {
-  static type = 'joinPart';
+  static type: SqlType = 'joinPart';
 
   static create(joinType: string, table: SqlBase, onExpression?: SqlExpression): SqlJoinPart {
     return new SqlJoinPart({

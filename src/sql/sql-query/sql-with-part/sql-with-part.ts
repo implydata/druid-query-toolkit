@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlBaseValue, Substitutor } from '../../sql-base';
+import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../../sql-base';
 import { SqlExpression, SqlRef } from '../../sql-expression';
 import { SeparatedArray } from '../../utils';
 import { SqlQuery } from '../sql-query';
@@ -26,7 +26,7 @@ export interface SqlWithPartValue extends SqlBaseValue {
 }
 
 export class SqlWithPart extends SqlBase {
-  static type = 'withPart';
+  static type: SqlType = 'withPart';
 
   public readonly withTable: SqlExpression;
   public readonly withColumns?: SeparatedArray<SqlRef>;

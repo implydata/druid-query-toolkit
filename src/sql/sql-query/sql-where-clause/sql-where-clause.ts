@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { SqlBase, Substitutor } from '../../sql-base';
+import { SqlBase, SqlType, Substitutor } from '../../sql-base';
 import { SqlExpression } from '../../sql-expression';
 import { SqlClause, SqlClauseValue } from '../sql-clause';
 
@@ -22,7 +22,7 @@ export interface SqlWhereClauseValue extends SqlClauseValue {
 }
 
 export class SqlWhereClause extends SqlClause {
-  static type = 'whereClause';
+  static type: SqlType = 'whereClause';
 
   static DEFAULT_KEYWORD = 'WHERE';
 

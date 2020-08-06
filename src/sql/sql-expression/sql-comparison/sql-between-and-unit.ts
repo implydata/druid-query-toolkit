@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 import { SqlLiteral } from '..';
-import { SqlBase, SqlBaseValue, Substitutor } from '../../sql-base';
+import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../../sql-base';
 
 export interface SqlBetweenAndUnitValue extends SqlBaseValue {
   start: SqlLiteral;
@@ -21,7 +21,7 @@ export interface SqlBetweenAndUnitValue extends SqlBaseValue {
 }
 
 export class SqlBetweenAndUnit extends SqlBase {
-  static type = 'betweenAndUnit';
+  static type: SqlType = 'betweenAndUnit';
 
   static DEFAULT_AND_KEYWORD = 'AND';
 

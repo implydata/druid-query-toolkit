@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlBaseValue, Substitutor } from '../../sql-base';
+import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../../sql-base';
 import { SqlExpression, SqlRef } from '../../sql-expression';
 import { SqlQuery } from '../sql-query';
 
@@ -23,7 +23,7 @@ export interface SqlAliasValue extends SqlBaseValue {
 }
 
 export class SqlAlias extends SqlBase {
-  static type = 'alias';
+  static type: SqlType = 'alias';
 
   static STAR: SqlAlias;
 

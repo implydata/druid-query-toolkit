@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlBaseValue, Substitutor } from '../../sql-base';
+import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../../sql-base';
 import { SeparatedArray, Separator } from '../../utils';
 import { SqlExpression } from '../sql-expression';
 
@@ -24,7 +24,7 @@ export interface SqlMultiValue extends SqlBaseValue {
 }
 
 export class SqlMulti extends SqlExpression {
-  static type = 'multi';
+  static type: SqlType = 'multi';
 
   public readonly expressionType: ExpressionType;
   public readonly args: SeparatedArray<SqlExpression>;
@@ -84,6 +84,14 @@ export class SqlMulti extends SqlExpression {
     }
 
     return this.changeArgs(this.args.addLast(expression));
+  }
+
+  public decomposeViaAnd(): readonly SqlExpression[] {
+    if (this.expressionType !== 'and') {
+      return super.decomposeViaAnd();
+    }
+
+    return this.args.values;
   }
 
   public filterAnd(fn: (ex: SqlExpression) => boolean): SqlExpression | undefined {

@@ -13,7 +13,7 @@
  */
 
 import { SqlLiteral, SqlRef } from '..';
-import { SqlBase, SqlBaseValue, Substitutor } from '../../sql-base';
+import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../../sql-base';
 import { SqlWhereClause } from '../../sql-query';
 import { SeparatedArray, Separator } from '../../utils';
 import { SqlExpression } from '../sql-expression';
@@ -30,7 +30,7 @@ export interface SqlFunctionValue extends SqlBaseValue {
 }
 
 export class SqlFunction extends SqlExpression {
-  static type = 'function';
+  static type: SqlType = 'function';
 
   static DEFAULT_FILTER_KEYWORD = 'FILTER';
 

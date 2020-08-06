@@ -30,7 +30,7 @@ import {
 } from '../..';
 import { filterMap } from '../../utils';
 import { parseSql } from '../parser';
-import { SqlBase, SqlBaseValue } from '../sql-base';
+import { SqlBase, SqlBaseValue, SqlType } from '../sql-base';
 
 import { SqlJoinPart } from './sql-join-part/sql-join-part';
 import { SqlOrderByExpression } from './sql-order-by-expression/sql-order-by-expression';
@@ -59,7 +59,7 @@ export interface SqlQueryValue extends SqlBaseValue {
 }
 
 export class SqlQuery extends SqlBase {
-  static type = 'query';
+  static type: SqlType = 'query';
 
   static readonly DEFAULT_WITH_KEYWORD = 'WITH';
   static readonly DEFAULT_SELECT_KEYWORD = 'SELECT';

@@ -13,7 +13,7 @@
  */
 
 import { LiteralValue, SqlLiteral } from '..';
-import { SqlBase, SqlBaseValue, Substitutor } from '../../sql-base';
+import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../../sql-base';
 import { SqlExpression } from '../sql-expression';
 
 import { SqlBetweenAndUnit } from './sql-between-and-unit';
@@ -27,7 +27,7 @@ export interface SqlComparisonValue extends SqlBaseValue {
 }
 
 export class SqlComparison extends SqlExpression {
-  static type = 'comparison';
+  static type: SqlType = 'comparison';
 
   static equal(lhs: SqlExpression, rhs: SqlExpression): SqlComparison {
     return new SqlComparison({

@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlBaseValue } from '../../sql-base';
+import { SqlBase, SqlBaseValue, SqlType } from '../../sql-base';
 import { trimString } from '../../utils';
 import { SqlExpression } from '../sql-expression';
 
@@ -25,7 +25,7 @@ export interface SqlLiteralValue extends SqlBaseValue {
 }
 
 export class SqlLiteral extends SqlExpression {
-  static type = 'literal';
+  static type: SqlType = 'literal';
 
   static NULL: SqlLiteral;
   static FALSE: SqlLiteral;

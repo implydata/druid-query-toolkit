@@ -14,7 +14,7 @@
 
 import { SqlAlias, SqlJoinPart } from '..';
 import { filterMap } from '../../../utils';
-import { SqlBase, Substitutor } from '../../sql-base';
+import { SqlBase, SqlType, Substitutor } from '../../sql-base';
 import { SqlRef } from '../../sql-expression';
 import { SeparatedArray } from '../../utils';
 import { SqlClause, SqlClauseValue } from '../sql-clause';
@@ -25,7 +25,7 @@ export interface SqlFromClauseValue extends SqlClauseValue {
 }
 
 export class SqlFromClause extends SqlClause {
-  static type = 'fromClause';
+  static type: SqlType = 'fromClause';
 
   static DEFAULT_KEYWORD = 'FROM';
 

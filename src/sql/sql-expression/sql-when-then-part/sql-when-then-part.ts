@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlBaseValue, Substitutor } from '../../sql-base';
+import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../../sql-base';
 import { SqlExpression } from '../sql-expression';
 
 export interface SqlWhenThenPartValue extends SqlBaseValue {
@@ -23,7 +23,7 @@ export interface SqlWhenThenPartValue extends SqlBaseValue {
 }
 
 export class SqlWhenThenPart extends SqlBase {
-  static type = 'whenThenPart';
+  static type: SqlType = 'whenThenPart';
 
   static DEFAULT_WHEN_KEYWORD = 'WHEN';
   static DEFAULT_THEN_KEYWORD = 'THEN';
