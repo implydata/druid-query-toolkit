@@ -405,10 +405,6 @@ ComparisonExpression = lhs:AdditionExpression preOp:_ opRhs:ComparisonOpRhs
 }
   / AdditionExpression
 
-/*
-  (_ (IsNotToken / IsToken) __ (NullLiteral / BooleanLiteral))
-*/
-
 ComparisonOpRhs = ComparisonOpRhsSimple / ComparisonOpRhsIs / ComparisonOpRhsIn / ComparisonOpRhsBetween / ComparisonOpRhsLike / ComparisonOpRhsNot
 
 ComparisonOpRhsSimple = op:ComparisonOperator postOp:_ rhs:AdditionExpression
@@ -449,24 +445,31 @@ ComparisonOpRhsIn = op:InToken postOp:_ rhs:(SqlInArrayLiteral / SqlInParens)
   };
 }
 
-ComparisonOpRhsBetween = op:BetweenToken postOp:_ start:BaseType preAnd:_ andKeyword:AndToken postAnd:_ end:BaseType
+ComparisonOpRhsBetween = op:BetweenToken postOp:_ symmetricKeyword:(SymmetricToken _)? start:AdditionExpression preAnd:_ andKeyword:AndToken postAnd:_ end:AdditionExpression
 {
+  var rhsValue = {
+    start: start,
+    andKeyword: andKeyword,
+    end: end,
+    innerSpacing: {
+      preAnd: preAnd,
+      postAnd: postAnd,
+    }
+  }
+
+  if (symmetricKeyword) {
+    rhsValue.symmetricKeyword = symmetricKeyword[0];
+    rhsValue.innerSpacing.postSymmetric = symmetricKeyword[1];
+  }
+
   return {
     op: op,
     postOp: postOp,
-    rhs: new sql.SqlBetweenAndUnit({
-      start: start,
-      andKeyword: andKeyword,
-      end: end,
-      innerSpacing: {
-        preAnd: preAnd,
-        postAnd: postAnd,
-      }
-    })
+    rhs: new sql.SqlBetweenAndUnit(rhsValue)
   };
 }
 
-ComparisonOpRhsLike = op:(LikeToken / SimilarToToken) postOp:_ like:SqlLiteral escape:(_ EscapeToken _ SqlLiteral)?
+ComparisonOpRhsLike = op:(LikeToken / SimilarToToken) postOp:_ like:AdditionExpression escape:(_ EscapeToken _ AdditionExpression)?
 {
   return {
     op: op,
@@ -1157,7 +1160,7 @@ AndToken = $('AND'i !IdentifierPart)
 ArrayToken = $('ARRAY'i !IdentifierPart)
 AsToken = $('AS'i !IdentifierPart)
 AscToken = $('ASC'i !IdentifierPart)
-BetweenToken = $('BETWEEN'i !IdentifierPart (__ 'SYMMETRIC'i !IdentifierPart)?)
+BetweenToken = $('BETWEEN'i !IdentifierPart)
 BothToken = $('BOTH'i !IdentifierPart)
 ByToken = $('BY'i !IdentifierPart)
 CaseToken = $('CASE'i !IdentifierPart)
@@ -1194,6 +1197,7 @@ OrderToken = $('ORDER'i !IdentifierPart __ ByToken)
 PositionToken = $('POSITION'i !IdentifierPart)
 SelectToken = $('SELECT'i !IdentifierPart)
 SimilarToToken = $('SIMILAR'i !IdentifierPart __ ToToken)
+SymmetricToken = $('SYMMETRIC'i !IdentifierPart)
 ThenToken = $('THEN'i !IdentifierPart)
 TimestampToken = $('TIMESTAMP'i !IdentifierPart)
 TimestampaddToken = $('TIMESTAMPADD'i !IdentifierPart)

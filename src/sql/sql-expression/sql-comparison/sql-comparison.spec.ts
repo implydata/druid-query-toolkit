@@ -18,6 +18,14 @@ import { SqlExpression } from '../sql-expression';
 describe('SqlComparison', () => {
   it('things that work', () => {
     const queries: string[] = [
+      '1 = 2',
+      '1 != 2',
+      '1 <> 2',
+      '1 < 2',
+      '1 > 2',
+      '1 <= 2',
+      '1 >= 2',
+
       "''  similar to ''",
       "'a' similar to 'a'",
       "'a' similar to 'b'",
@@ -589,6 +597,7 @@ describe('SqlComparison', () => {
             "tableQuotes": false,
             "type": "ref",
           },
+          "symmetricKeyword": undefined,
           "type": "betweenAndUnit",
         },
         "type": "comparison",
@@ -597,7 +606,7 @@ describe('SqlComparison', () => {
   });
 
   it('works with NOT BETWEEN', () => {
-    const sql = `X NOT BETWEEN Y AND Z`;
+    const sql = `X NOT BETWEEN SYMMETRIC Y AND Z`;
 
     backAndForth(sql);
 
@@ -634,6 +643,7 @@ describe('SqlComparison', () => {
           },
           "innerSpacing": Object {
             "postAnd": " ",
+            "postSymmetric": " ",
             "preAnd": " ",
           },
           "start": SqlRef {
@@ -646,6 +656,7 @@ describe('SqlComparison', () => {
             "tableQuotes": false,
             "type": "ref",
           },
+          "symmetricKeyword": "SYMMETRIC",
           "type": "betweenAndUnit",
         },
         "type": "comparison",
@@ -718,6 +729,129 @@ describe('SqlComparison', () => {
           "stringValue": "'%A%'",
           "type": "literal",
           "value": "%A%",
+        },
+        "type": "comparison",
+      }
+    `);
+  });
+
+  it('works with LIKE with complex match and ESCAPE', () => {
+    const sql = `X || Y NOT LIKE '%Je' || '%' ESCAPE '\\' || ''`;
+
+    backAndForth(sql);
+
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+      SqlComparison {
+        "innerSpacing": Object {
+          "not": " ",
+          "postOp": " ",
+          "preOp": " ",
+        },
+        "lhs": SqlMulti {
+          "args": SeparatedArray {
+            "separators": Array [
+              Separator {
+                "left": " ",
+                "right": " ",
+                "separator": "||",
+              },
+            ],
+            "values": Array [
+              SqlRef {
+                "column": "X",
+                "innerSpacing": Object {},
+                "namespace": undefined,
+                "namespaceQuotes": false,
+                "quotes": false,
+                "table": undefined,
+                "tableQuotes": false,
+                "type": "ref",
+              },
+              SqlRef {
+                "column": "Y",
+                "innerSpacing": Object {},
+                "namespace": undefined,
+                "namespaceQuotes": false,
+                "quotes": false,
+                "table": undefined,
+                "tableQuotes": false,
+                "type": "ref",
+              },
+            ],
+          },
+          "expressionType": "||",
+          "innerSpacing": Object {},
+          "type": "multi",
+        },
+        "notKeyword": "NOT",
+        "op": "LIKE",
+        "rhs": SqlLikeEscapeUnit {
+          "escape": SqlMulti {
+            "args": SeparatedArray {
+              "separators": Array [
+                Separator {
+                  "left": " ",
+                  "right": " ",
+                  "separator": "||",
+                },
+              ],
+              "values": Array [
+                SqlLiteral {
+                  "innerSpacing": Object {},
+                  "keyword": undefined,
+                  "stringValue": "'\\\\'",
+                  "type": "literal",
+                  "value": "\\\\",
+                },
+                SqlLiteral {
+                  "innerSpacing": Object {},
+                  "keyword": undefined,
+                  "stringValue": "''",
+                  "type": "literal",
+                  "value": "",
+                },
+              ],
+            },
+            "expressionType": "||",
+            "innerSpacing": Object {},
+            "type": "multi",
+          },
+          "escapeKeyword": "ESCAPE",
+          "innerSpacing": Object {
+            "postEscape": " ",
+            "preEscape": " ",
+          },
+          "like": SqlMulti {
+            "args": SeparatedArray {
+              "separators": Array [
+                Separator {
+                  "left": " ",
+                  "right": " ",
+                  "separator": "||",
+                },
+              ],
+              "values": Array [
+                SqlLiteral {
+                  "innerSpacing": Object {},
+                  "keyword": undefined,
+                  "stringValue": "'%Je'",
+                  "type": "literal",
+                  "value": "%Je",
+                },
+                SqlLiteral {
+                  "innerSpacing": Object {},
+                  "keyword": undefined,
+                  "stringValue": "'%'",
+                  "type": "literal",
+                  "value": "%",
+                },
+              ],
+            },
+            "expressionType": "||",
+            "innerSpacing": Object {},
+            "type": "multi",
+          },
+          "type": "likeEscapeUnit",
         },
         "type": "comparison",
       }
@@ -1053,6 +1187,7 @@ describe('SqlComparison', () => {
               "tableQuotes": false,
               "type": "ref",
             },
+            "symmetricKeyword": undefined,
             "type": "betweenAndUnit",
           },
           "type": "comparison",
@@ -1149,6 +1284,7 @@ describe('SqlComparison', () => {
                           "tableQuotes": false,
                           "type": "ref",
                         },
+                        "symmetricKeyword": undefined,
                         "type": "betweenAndUnit",
                       },
                       "type": "comparison",
@@ -1164,6 +1300,103 @@ describe('SqlComparison', () => {
           "expressionType": "or",
           "innerSpacing": Object {},
           "type": "multi",
+        }
+      `);
+    });
+
+    it('Complex Between expression', () => {
+      const sql = `X BETWEEN 1+2 AND 3+4`;
+
+      backAndForth(sql);
+
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        SqlComparison {
+          "innerSpacing": Object {
+            "postOp": " ",
+            "preOp": " ",
+          },
+          "lhs": SqlRef {
+            "column": "X",
+            "innerSpacing": Object {},
+            "namespace": undefined,
+            "namespaceQuotes": false,
+            "quotes": false,
+            "table": undefined,
+            "tableQuotes": false,
+            "type": "ref",
+          },
+          "notKeyword": undefined,
+          "op": "BETWEEN",
+          "rhs": SqlBetweenAndUnit {
+            "andKeyword": "AND",
+            "end": SqlMulti {
+              "args": SeparatedArray {
+                "separators": Array [
+                  Separator {
+                    "left": "",
+                    "right": "",
+                    "separator": "+",
+                  },
+                ],
+                "values": Array [
+                  SqlLiteral {
+                    "innerSpacing": Object {},
+                    "keyword": undefined,
+                    "stringValue": "3",
+                    "type": "literal",
+                    "value": 3,
+                  },
+                  SqlLiteral {
+                    "innerSpacing": Object {},
+                    "keyword": undefined,
+                    "stringValue": "4",
+                    "type": "literal",
+                    "value": 4,
+                  },
+                ],
+              },
+              "expressionType": "+",
+              "innerSpacing": Object {},
+              "type": "multi",
+            },
+            "innerSpacing": Object {
+              "postAnd": " ",
+              "preAnd": " ",
+            },
+            "start": SqlMulti {
+              "args": SeparatedArray {
+                "separators": Array [
+                  Separator {
+                    "left": "",
+                    "right": "",
+                    "separator": "+",
+                  },
+                ],
+                "values": Array [
+                  SqlLiteral {
+                    "innerSpacing": Object {},
+                    "keyword": undefined,
+                    "stringValue": "1",
+                    "type": "literal",
+                    "value": 1,
+                  },
+                  SqlLiteral {
+                    "innerSpacing": Object {},
+                    "keyword": undefined,
+                    "stringValue": "2",
+                    "type": "literal",
+                    "value": 2,
+                  },
+                ],
+              },
+              "expressionType": "+",
+              "innerSpacing": Object {},
+              "type": "multi",
+            },
+            "symmetricKeyword": undefined,
+            "type": "betweenAndUnit",
+          },
+          "type": "comparison",
         }
       `);
     });

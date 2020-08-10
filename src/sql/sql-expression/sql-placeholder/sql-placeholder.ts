@@ -20,6 +20,8 @@ export interface SqlPlaceholderValue extends SqlBaseValue {}
 export class SqlPlaceholder extends SqlExpression {
   static type: SqlType = 'placeholder';
 
+  static PLACEHOLDER: SqlPlaceholder;
+
   constructor(options: SqlPlaceholderValue = {}) {
     super(options, SqlPlaceholder.type);
   }
@@ -30,3 +32,5 @@ export class SqlPlaceholder extends SqlExpression {
 }
 
 SqlBase.register(SqlPlaceholder);
+
+SqlPlaceholder.PLACEHOLDER = new SqlPlaceholder();

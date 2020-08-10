@@ -16,6 +16,10 @@ import { SqlBase, SqlBaseValue, SqlType } from '../../sql-base';
 import { trimString } from '../../utils';
 import { SqlExpression } from '../sql-expression';
 
+function isDate(v: any): v is Date {
+  return Boolean(v && typeof v.toISOString === 'function');
+}
+
 export type LiteralValue = null | boolean | number | string | Date;
 
 export interface SqlLiteralValue extends SqlBaseValue {
@@ -41,7 +45,7 @@ export class SqlLiteral extends SqlExpression {
       case 'object':
         if (value === null) {
           stringValue = 'NULL';
-        } else if ((value as any).toISOString) {
+        } else if (isDate(value)) {
           keyword = 'TIMESTAMP';
           stringValue = `'${SqlLiteral.dateToTimestampValue(value)}'`;
         } else {
@@ -152,6 +156,24 @@ export class SqlLiteral extends SqlExpression {
   public isInteger(): boolean {
     const { value } = this;
     return typeof value === 'number' && isFinite(value) && Math.floor(value) === value;
+  }
+
+  getNumberValue(): number | undefined {
+    const { value } = this;
+    if (typeof value !== 'number') return;
+    return value;
+  }
+
+  getStringValue(): string | undefined {
+    const { value } = this;
+    if (typeof value !== 'string') return;
+    return value;
+  }
+
+  getDateValue(): Date | undefined {
+    const { value } = this;
+    if (!isDate(value)) return;
+    return value;
   }
 }
 

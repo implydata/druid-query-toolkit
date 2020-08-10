@@ -344,6 +344,11 @@ export class SqlQuery extends SqlBase {
     );
   }
 
+  public changeOrderByExpression(orderByExpression: SqlOrderByExpression | undefined): SqlQuery {
+    if (!orderByExpression) return this.changeOrderByClause(undefined);
+    return this.changeOrderByExpressions([orderByExpression]);
+  }
+
   public changeLimitClause(limitClause: SqlLimitClause | undefined): SqlQuery {
     const value = this.valueOf();
     if (limitClause) {
@@ -659,6 +664,16 @@ export class SqlQuery extends SqlBase {
 
   hasFrom(): boolean {
     return Boolean(this.fromClause);
+  }
+
+  getFromExpressions(): readonly SqlAlias[] {
+    if (!this.fromClause) return [];
+    return this.fromClause.expressions.values;
+  }
+
+  getFirstFromExpression(): SqlAlias | undefined {
+    if (!this.fromClause) return;
+    return this.fromClause.expressions.first();
   }
 
   getFirstTableName(): string | undefined {

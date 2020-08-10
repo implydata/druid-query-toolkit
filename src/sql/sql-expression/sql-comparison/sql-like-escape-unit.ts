@@ -11,13 +11,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { SqlLiteral } from '..';
+import { SqlExpression, SqlLiteral } from '..';
 import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../../sql-base';
 
 export interface SqlLikeEscapeUnitValue extends SqlBaseValue {
-  like: SqlLiteral;
+  like: SqlExpression;
   escapeKeyword?: string;
-  escape: SqlLiteral;
+  escape: SqlExpression;
 }
 
 export class SqlLikeEscapeUnit extends SqlBase {
@@ -25,16 +25,18 @@ export class SqlLikeEscapeUnit extends SqlBase {
 
   static DEFAULT_ESCAPE_KEYWORD = 'AND';
 
-  static create(like: SqlLiteral, escape: SqlLiteral): SqlLikeEscapeUnit {
+  static create(like: SqlExpression | string, escape: SqlExpression | string): SqlLikeEscapeUnit {
+    const likeEx: SqlExpression = typeof like === 'string' ? SqlLiteral.create(like) : like;
+    const escapeEx: SqlExpression = typeof escape === 'string' ? SqlLiteral.create(escape) : escape;
     return new SqlLikeEscapeUnit({
-      like,
-      escape,
+      like: likeEx,
+      escape: escapeEx,
     });
   }
 
-  public readonly like: SqlLiteral;
+  public readonly like: SqlExpression;
   public readonly escapeKeyword?: string;
-  public readonly escape: SqlLiteral;
+  public readonly escape: SqlExpression;
 
   constructor(options: SqlLikeEscapeUnitValue) {
     super(options, SqlLikeEscapeUnit.type);

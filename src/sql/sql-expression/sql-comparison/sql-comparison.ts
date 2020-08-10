@@ -19,6 +19,9 @@ import { SqlExpression } from '../sql-expression';
 import { SqlBetweenAndUnit } from './sql-between-and-unit';
 import { SqlLikeEscapeUnit } from './sql-like-escape-unit';
 
+export type EffectiveOp = '=' | '<>' | '<' | '>' | '<=' | '>=' | 'IS' | 'LIKE' | 'BETWEEN'; // ToDo: 'similar to' ?
+export type SpecialLikeType = 'includes' | 'prefix' | 'postfix';
+
 export interface SqlComparisonValue extends SqlBaseValue {
   op: string;
   notKeyword?: string;
@@ -86,28 +89,28 @@ export class SqlComparison extends SqlExpression {
   }
 
   static isNotNull(lhs: SqlExpression): SqlComparison {
-    return new SqlComparison({
-      op: 'IS',
-      notKeyword: 'NOT',
-      lhs,
-      rhs: SqlLiteral.NULL,
-    });
+    return SqlComparison.isNotNull(lhs).negate();
   }
 
   static like(
     lhs: SqlExpression,
-    rhs: SqlLiteral | string,
-    escape?: SqlLiteral | string,
+    rhs: SqlExpression | string,
+    escape?: SqlExpression | string,
   ): SqlComparison {
-    const rhsLiteral = SqlLiteral.create(rhs);
+    const rhsEx: SqlExpression = typeof rhs === 'string' ? SqlLiteral.create(rhs) : rhs;
     return new SqlComparison({
       op: 'LIKE',
       lhs,
-      rhs:
-        typeof escape === 'undefined'
-          ? rhsLiteral
-          : SqlLikeEscapeUnit.create(rhsLiteral, SqlLiteral.create(escape)),
+      rhs: typeof escape === 'undefined' ? rhsEx : SqlLikeEscapeUnit.create(rhsEx, escape),
     });
+  }
+
+  static notLike(
+    lhs: SqlExpression,
+    rhs: SqlExpression | string,
+    escape?: SqlExpression | string,
+  ): SqlComparison {
+    return SqlComparison.like(lhs, rhs, escape).negate();
   }
 
   static between(
@@ -128,9 +131,9 @@ export class SqlComparison extends SqlExpression {
     end: SqlLiteral | LiteralValue,
   ): SqlComparison {
     return new SqlComparison({
-      op: 'BETWEEN SYMMETRIC',
+      op: 'BETWEEN',
       lhs,
-      rhs: SqlBetweenAndUnit.create(SqlLiteral.create(start), SqlLiteral.create(end)),
+      rhs: SqlBetweenAndUnit.symmetric(SqlLiteral.create(start), SqlLiteral.create(end)),
     });
   }
 
@@ -177,8 +180,10 @@ export class SqlComparison extends SqlExpression {
     return rawParts.join('');
   }
 
-  public getEffectiveOp(): string {
-    return this.op.toUpperCase();
+  public getEffectiveOp(): EffectiveOp {
+    const { op } = this;
+    if (op === '!=') return '<>'; // Normalize inequality
+    return op.toUpperCase() as EffectiveOp;
   }
 
   public changeLhs(lhs: SqlExpression): this {
@@ -190,6 +195,44 @@ export class SqlComparison extends SqlExpression {
   public changeRhs(rhs: SqlBase): this {
     const value = this.valueOf();
     value.rhs = rhs;
+    return SqlBase.fromValue(value);
+  }
+
+  public negate(): this {
+    let { op, notKeyword } = this;
+    switch (this.getEffectiveOp()) {
+      case '=':
+        op = '!=';
+        break;
+
+      case '<>':
+        op = '=';
+        break;
+
+      case '<':
+        op = '>=';
+        break;
+
+      case '>':
+        op = '<=';
+        break;
+
+      case '<=':
+        op = '>';
+        break;
+
+      case '>=':
+        op = '<';
+        break;
+
+      default:
+        notKeyword = notKeyword ? 'NOT' : undefined;
+        break;
+    }
+
+    const value = this.valueOf();
+    value.op = op;
+    value.notKeyword = notKeyword;
     return SqlBase.fromValue(value);
   }
 
@@ -213,6 +256,32 @@ export class SqlComparison extends SqlExpression {
     }
 
     return ret;
+  }
+
+  public getLikeMatchPattern(): string | undefined {
+    if (this.getEffectiveOp() !== 'LIKE') return;
+    const { rhs } = this;
+    if (rhs instanceof SqlLiteral) {
+      return rhs.getStringValue();
+    } else if (rhs instanceof SqlLikeEscapeUnit && rhs.like instanceof SqlLiteral) {
+      return rhs.like.getStringValue();
+    }
+    return;
+  }
+
+  public getSpecialLikeType(): SpecialLikeType | undefined {
+    const likeMatchPattern = this.getLikeMatchPattern();
+    if (typeof likeMatchPattern !== 'string') return;
+    if (likeMatchPattern.endsWith('%')) {
+      if (likeMatchPattern.startsWith('%')) {
+        return 'includes'; // %blah%
+      } else {
+        return 'prefix'; // blah%
+      }
+    } else if (likeMatchPattern.startsWith('%')) {
+      return 'postfix'; // %blah
+    }
+    return;
   }
 }
 
