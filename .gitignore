@@ -8,6 +8,7 @@
 .idea/codeStyles
 
 /node_modules/
+/coverage/
 /build/
 /src/sql/parser/index.js
 /src/sql/parser/.DS_Store
