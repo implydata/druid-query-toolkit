@@ -23,7 +23,25 @@ describe('Uber Query', () => {
     SELECT
       col1 AS "Col1",
       CASE WHEN colA = 1 THEN 3 ELSE 4 END AS "SomeCase1",
-      CASE colB WHEN 1 THEN 'One' WHEN 2 THEN 'Two' ELSE 'Other' END AS "SomeCase2",
+      CASE colB WHEN 1 THEN 'One' WHEN 2 THEN 'Two' ELSE 'Other' END AS "SomeCase2",      
+      EXTRACT(EPOCH FROM "time"),
+      EXTRACT(MICROSECOND FROM "time"),
+      EXTRACT(MILLISECOND FROM "time"),
+      EXTRACT(SECOND FROM "time"),
+      EXTRACT(MINUTE FROM "time"),
+      EXTRACT(HOUR FROM "time"),
+      EXTRACT(DAY FROM "time"),
+      EXTRACT(DOW FROM "time"),
+      EXTRACT(ISODOW FROM "time"),
+      EXTRACT(DOY FROM "time"),
+      EXTRACT(WEEK FROM "time"),
+      EXTRACT(MONTH FROM "time"),
+      EXTRACT(QUARTER FROM "time"),
+      EXTRACT(YEAR FROM "time"),
+      EXTRACT(ISOYEAR FROM "time"),
+      EXTRACT(DECADE FROM "time"),
+      EXTRACT(CENTURY FROM "time"),
+      EXTRACT(MILLENNIUM FROM "time"),
       SUM(blah) FILTER (WHERE col2 = 'moon')
     FROM t1, t2 AS t2As
     LEFT JOIN t3 ON t1.col = t3.col
