@@ -17,6 +17,7 @@ import { trimString } from './general';
 describe('general', () => {
   describe('trimString', () => {
     it('works in basic case', () => {
+      expect(trimString(`abcd`, 10)).toEqual(`abcd`);
       expect(trimString(`abcd_efgh_ijkl_mnop_qrst_uvwx_yz`, 10)).toEqual(`abcd_ef...`);
       expect(trimString(`abcd_efgh_ijkl_mnop_qrst_uvwx_yz`, 1)).toEqual(`a...`);
     });

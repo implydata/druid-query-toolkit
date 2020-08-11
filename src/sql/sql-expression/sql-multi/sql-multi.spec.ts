@@ -1690,8 +1690,8 @@ describe('Brackets', () => {
           ],
           "values": Array [
             SqlUnary {
-              "arg": SqlUnary {
-                "arg": SqlMulti {
+              "argument": SqlUnary {
+                "argument": SqlMulti {
                   "args": SeparatedArray {
                     "separators": Array [
                       Separator {
@@ -1734,15 +1734,15 @@ describe('Brackets', () => {
                   "type": "multi",
                 },
                 "innerSpacing": Object {
-                  "postKeyword": " ",
+                  "postOp": " ",
                 },
-                "keyword": "NOT",
+                "op": "NOT",
                 "type": "unary",
               },
               "innerSpacing": Object {
-                "postKeyword": " ",
+                "postOp": " ",
               },
-              "keyword": "NOT",
+              "op": "NOT",
               "type": "unary",
             },
             SqlRef {

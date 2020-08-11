@@ -20,7 +20,7 @@ import { SqlBetweenAndUnit } from './sql-between-and-unit';
 import { SqlLikeEscapeUnit } from './sql-like-escape-unit';
 
 export type EffectiveOp = '=' | '<>' | '<' | '>' | '<=' | '>=' | 'IS' | 'LIKE' | 'BETWEEN'; // ToDo: 'similar to' ?
-export type SpecialLikeType = 'includes' | 'prefix' | 'postfix';
+export type SpecialLikeType = 'includes' | 'prefix' | 'postfix' | 'exact';
 
 export interface SqlComparisonValue extends SqlBaseValue {
   op: string;
@@ -32,75 +32,93 @@ export interface SqlComparisonValue extends SqlBaseValue {
 export class SqlComparison extends SqlExpression {
   static type: SqlType = 'comparison';
 
-  static equal(lhs: SqlExpression, rhs: SqlExpression): SqlComparison {
+  static equal(
+    lhs: SqlExpression | LiteralValue,
+    rhs: SqlExpression | LiteralValue,
+  ): SqlComparison {
     return new SqlComparison({
       op: '=',
-      lhs,
-      rhs,
+      lhs: SqlExpression.wrap(lhs),
+      rhs: SqlExpression.wrap(rhs),
     });
   }
 
-  static unequal(lhs: SqlExpression, rhs: SqlExpression): SqlComparison {
+  static unequal(
+    lhs: SqlExpression | LiteralValue,
+    rhs: SqlExpression | LiteralValue,
+  ): SqlComparison {
     return new SqlComparison({
       op: '!=',
-      lhs,
-      rhs,
+      lhs: SqlExpression.wrap(lhs),
+      rhs: SqlExpression.wrap(rhs),
     });
   }
 
-  static lessThan(lhs: SqlExpression, rhs: SqlExpression): SqlComparison {
+  static lessThan(
+    lhs: SqlExpression | LiteralValue,
+    rhs: SqlExpression | LiteralValue,
+  ): SqlComparison {
     return new SqlComparison({
       op: '<',
-      lhs,
-      rhs,
+      lhs: SqlExpression.wrap(lhs),
+      rhs: SqlExpression.wrap(rhs),
     });
   }
 
-  static greaterThan(lhs: SqlExpression, rhs: SqlExpression): SqlComparison {
+  static greaterThan(
+    lhs: SqlExpression | LiteralValue,
+    rhs: SqlExpression | LiteralValue,
+  ): SqlComparison {
     return new SqlComparison({
       op: '>',
-      lhs,
-      rhs,
+      lhs: SqlExpression.wrap(lhs),
+      rhs: SqlExpression.wrap(rhs),
     });
   }
 
-  static lessThanOrEqual(lhs: SqlExpression, rhs: SqlExpression): SqlComparison {
+  static lessThanOrEqual(
+    lhs: SqlExpression | LiteralValue,
+    rhs: SqlExpression | LiteralValue,
+  ): SqlComparison {
     return new SqlComparison({
       op: '<=',
-      lhs,
-      rhs,
+      lhs: SqlExpression.wrap(lhs),
+      rhs: SqlExpression.wrap(rhs),
     });
   }
 
-  static greaterThanOrEqual(lhs: SqlExpression, rhs: SqlExpression): SqlComparison {
+  static greaterThanOrEqual(
+    lhs: SqlExpression | LiteralValue,
+    rhs: SqlExpression | LiteralValue,
+  ): SqlComparison {
     return new SqlComparison({
       op: '>=',
-      lhs,
-      rhs,
+      lhs: SqlExpression.wrap(lhs),
+      rhs: SqlExpression.wrap(rhs),
     });
   }
 
-  static isNull(lhs: SqlExpression): SqlComparison {
+  static isNull(lhs: SqlExpression | LiteralValue): SqlComparison {
     return new SqlComparison({
       op: 'IS',
-      lhs,
+      lhs: SqlExpression.wrap(lhs),
       rhs: SqlLiteral.NULL,
     });
   }
 
-  static isNotNull(lhs: SqlExpression): SqlComparison {
-    return SqlComparison.isNotNull(lhs).negate();
+  static isNotNull(lhs: SqlExpression | LiteralValue): SqlComparison {
+    return SqlComparison.isNull(lhs).negate();
   }
 
   static like(
-    lhs: SqlExpression,
+    lhs: SqlExpression | string,
     rhs: SqlExpression | string,
     escape?: SqlExpression | string,
   ): SqlComparison {
-    const rhsEx: SqlExpression = typeof rhs === 'string' ? SqlLiteral.create(rhs) : rhs;
+    const rhsEx = SqlExpression.wrap(rhs);
     return new SqlComparison({
       op: 'LIKE',
-      lhs,
+      lhs: SqlExpression.wrap(lhs),
       rhs: typeof escape === 'undefined' ? rhsEx : SqlLikeEscapeUnit.create(rhsEx, escape),
     });
   }
@@ -114,26 +132,26 @@ export class SqlComparison extends SqlExpression {
   }
 
   static between(
-    lhs: SqlExpression,
-    start: SqlLiteral | LiteralValue,
-    end: SqlLiteral | LiteralValue,
+    lhs: SqlExpression | LiteralValue,
+    start: SqlExpression | LiteralValue,
+    end: SqlExpression | LiteralValue,
   ): SqlComparison {
     return new SqlComparison({
       op: 'BETWEEN',
-      lhs,
-      rhs: SqlBetweenAndUnit.create(SqlLiteral.create(start), SqlLiteral.create(end)),
+      lhs: SqlExpression.wrap(lhs),
+      rhs: SqlBetweenAndUnit.create(SqlExpression.wrap(start), SqlExpression.wrap(end)),
     });
   }
 
   static betweenSymmetric(
-    lhs: SqlExpression,
-    start: SqlLiteral | LiteralValue,
-    end: SqlLiteral | LiteralValue,
+    lhs: SqlExpression | LiteralValue,
+    start: SqlExpression | LiteralValue,
+    end: SqlExpression | LiteralValue,
   ): SqlComparison {
     return new SqlComparison({
       op: 'BETWEEN',
-      lhs,
-      rhs: SqlBetweenAndUnit.symmetric(SqlLiteral.create(start), SqlLiteral.create(end)),
+      lhs: SqlExpression.wrap(lhs),
+      rhs: SqlBetweenAndUnit.symmetric(SqlExpression.wrap(start), SqlExpression.wrap(end)),
     });
   }
 
@@ -280,8 +298,9 @@ export class SqlComparison extends SqlExpression {
       }
     } else if (likeMatchPattern.startsWith('%')) {
       return 'postfix'; // %blah
+    } else {
+      return 'exact'; // blah
     }
-    return;
   }
 }
 

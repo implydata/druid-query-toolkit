@@ -16,39 +16,36 @@ import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../../sql-base';
 import { SqlExpression } from '../sql-expression';
 
 export interface UnaryExpressionValue extends SqlBaseValue {
-  keyword: string;
-  arg: SqlExpression;
+  op: string;
+  argument: SqlExpression;
 }
 
 export class SqlUnary extends SqlExpression {
   static type: SqlType = 'unary';
 
-  public readonly keyword: string;
-  public readonly arg: SqlExpression;
+  public readonly op: string;
+  public readonly argument: SqlExpression;
 
   constructor(options: UnaryExpressionValue) {
     super(options, SqlUnary.type);
-    this.keyword = options.keyword;
-    this.arg = options.arg;
+    this.op = options.op;
+    this.argument = options.argument;
   }
 
   public valueOf(): UnaryExpressionValue {
     const value = super.valueOf() as UnaryExpressionValue;
-    value.keyword = this.keyword;
-    value.arg = this.arg;
+    value.op = this.op;
+    value.argument = this.argument;
     return value;
   }
 
   protected _toRawString(): string {
-    if (!this.arg) {
-      throw new Error('Could not make raw string');
-    }
-    return this.keyword + this.getInnerSpace('postKeyword') + this.arg.toString();
+    return [this.op, this.getInnerSpace('postOp'), this.argument.toString()].join('');
   }
 
-  public changeArgument(arg: SqlExpression): this {
+  public changeArgument(argument: SqlExpression): this {
     const value = this.valueOf();
-    value.arg = arg;
+    value.argument = argument;
     return SqlBase.fromValue(value);
   }
 
@@ -59,10 +56,10 @@ export class SqlUnary extends SqlExpression {
   ): SqlExpression | undefined {
     let ret = this;
 
-    const arg = this.arg._walkHelper(nextStack, fn, postorder);
-    if (!arg) return;
-    if (arg !== this.arg) {
-      ret = ret.changeArgument(arg);
+    const argument = this.argument._walkHelper(nextStack, fn, postorder);
+    if (!argument) return;
+    if (argument !== this.argument) {
+      ret = ret.changeArgument(argument);
     }
 
     return ret;

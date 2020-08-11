@@ -18,7 +18,7 @@ import { SqlExpression } from '../../sql-expression';
 
 export interface SqlJoinPartValue extends SqlBaseValue {
   joinType?: string;
-  joinKeyword: string;
+  joinKeyword?: string;
   table: SqlAlias;
   onKeyword?: string;
   onExpression?: SqlExpression;
@@ -27,18 +27,19 @@ export interface SqlJoinPartValue extends SqlBaseValue {
 export class SqlJoinPart extends SqlBase {
   static type: SqlType = 'joinPart';
 
+  static DEFAULT_JOIN_KEYWORD = 'JOIN';
+  static DEFAULT_ON_KEYWORD = 'ON';
+
   static create(joinType: string, table: SqlBase, onExpression?: SqlExpression): SqlJoinPart {
     return new SqlJoinPart({
       joinType: joinType,
-      joinKeyword: 'JOIN',
       table: SqlAlias.fromBase(table),
-      onKeyword: onExpression ? 'ON' : undefined,
       onExpression: onExpression,
     });
   }
 
   public readonly joinType?: string;
-  public readonly joinKeyword: string;
+  public readonly joinKeyword?: string;
   public readonly table: SqlAlias;
   public readonly onKeyword?: string;
   public readonly onExpression?: SqlExpression;
@@ -69,12 +70,16 @@ export class SqlJoinPart extends SqlBase {
       rawParts.push(this.joinType, this.getInnerSpace('postJoinType'));
     }
 
-    rawParts.push(this.joinKeyword, this.getInnerSpace('postJoinKeyword'), this.table.toString());
+    rawParts.push(
+      this.joinKeyword || SqlJoinPart.DEFAULT_JOIN_KEYWORD,
+      this.getInnerSpace('postJoinKeyword'),
+      this.table.toString(),
+    );
 
-    if (this.onKeyword && this.onExpression) {
+    if (this.onExpression) {
       rawParts.push(
         this.getInnerSpace('preOn'),
-        this.onKeyword,
+        this.onKeyword || SqlJoinPart.DEFAULT_ON_KEYWORD,
         this.getInnerSpace('postOn'),
         this.onExpression.toString(),
       );
@@ -117,6 +122,13 @@ export class SqlJoinPart extends SqlBase {
     }
 
     return ret;
+  }
+
+  public clearStaticKeywords(): this {
+    const value = this.valueOf();
+    delete value.joinKeyword;
+    delete value.onKeyword;
+    return SqlBase.fromValue(value);
   }
 }
 

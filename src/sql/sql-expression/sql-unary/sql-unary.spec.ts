@@ -23,7 +23,7 @@ describe('SqlUnary', () => {
 
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlUnary {
-        "arg": SqlRef {
+        "argument": SqlRef {
           "column": "A",
           "innerSpacing": Object {},
           "namespace": undefined,
@@ -34,9 +34,9 @@ describe('SqlUnary', () => {
           "type": "ref",
         },
         "innerSpacing": Object {
-          "postKeyword": "",
+          "postOp": "",
         },
-        "keyword": "-",
+        "op": "-",
         "type": "unary",
       }
     `);
@@ -49,7 +49,7 @@ describe('SqlUnary', () => {
 
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlUnary {
-        "arg": SqlRef {
+        "argument": SqlRef {
           "column": "B",
           "innerSpacing": Object {},
           "namespace": undefined,
@@ -60,9 +60,9 @@ describe('SqlUnary', () => {
           "type": "ref",
         },
         "innerSpacing": Object {
-          "postKeyword": " ",
+          "postOp": " ",
         },
-        "keyword": "NOT",
+        "op": "NOT",
         "type": "unary",
       }
     `);
@@ -75,8 +75,8 @@ describe('SqlUnary', () => {
 
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlUnary {
-        "arg": SqlUnary {
-          "arg": SqlRef {
+        "argument": SqlUnary {
+          "argument": SqlRef {
             "column": "B",
             "innerSpacing": Object {},
             "namespace": undefined,
@@ -87,15 +87,15 @@ describe('SqlUnary', () => {
             "type": "ref",
           },
           "innerSpacing": Object {
-            "postKeyword": " ",
+            "postOp": " ",
           },
-          "keyword": "not",
+          "op": "not",
           "type": "unary",
         },
         "innerSpacing": Object {
-          "postKeyword": " ",
+          "postOp": " ",
         },
-        "keyword": "NOT",
+        "op": "NOT",
         "type": "unary",
       }
     `);
@@ -123,7 +123,7 @@ describe('SqlUnary', () => {
           ],
           "values": Array [
             SqlUnary {
-              "arg": SqlRef {
+              "argument": SqlRef {
                 "column": "A",
                 "innerSpacing": Object {},
                 "namespace": undefined,
@@ -134,13 +134,13 @@ describe('SqlUnary', () => {
                 "type": "ref",
               },
               "innerSpacing": Object {
-                "postKeyword": " ",
+                "postOp": " ",
               },
-              "keyword": "NOT",
+              "op": "NOT",
               "type": "unary",
             },
             SqlUnary {
-              "arg": SqlRef {
+              "argument": SqlRef {
                 "column": "B",
                 "innerSpacing": Object {},
                 "namespace": undefined,
@@ -151,13 +151,13 @@ describe('SqlUnary', () => {
                 "type": "ref",
               },
               "innerSpacing": Object {
-                "postKeyword": " ",
+                "postOp": " ",
               },
-              "keyword": "NOT",
+              "op": "NOT",
               "type": "unary",
             },
             SqlUnary {
-              "arg": SqlRef {
+              "argument": SqlRef {
                 "column": "C",
                 "innerSpacing": Object {},
                 "namespace": undefined,
@@ -168,9 +168,9 @@ describe('SqlUnary', () => {
                 "type": "ref",
               },
               "innerSpacing": Object {
-                "postKeyword": " ",
+                "postOp": " ",
               },
-              "keyword": "NOT",
+              "op": "NOT",
               "type": "unary",
             },
           ],
@@ -189,7 +189,7 @@ describe('SqlUnary', () => {
 
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlUnary {
-        "arg": SqlComparison {
+        "argument": SqlComparison {
           "innerSpacing": Object {
             "postOp": " ",
             "preOp": " ",
@@ -219,9 +219,9 @@ describe('SqlUnary', () => {
           "type": "comparison",
         },
         "innerSpacing": Object {
-          "postKeyword": " ",
+          "postOp": " ",
         },
-        "keyword": "NOT",
+        "op": "NOT",
         "type": "unary",
       }
     `);
@@ -244,7 +244,7 @@ describe('SqlUnary', () => {
           ],
           "values": Array [
             SqlUnary {
-              "arg": SqlComparison {
+              "argument": SqlComparison {
                 "innerSpacing": Object {
                   "postOp": " ",
                   "preOp": " ",
@@ -274,13 +274,13 @@ describe('SqlUnary', () => {
                 "type": "comparison",
               },
               "innerSpacing": Object {
-                "postKeyword": " ",
+                "postOp": " ",
               },
-              "keyword": "NOT",
+              "op": "NOT",
               "type": "unary",
             },
             SqlUnary {
-              "arg": SqlComparison {
+              "argument": SqlComparison {
                 "innerSpacing": Object {
                   "postOp": " ",
                   "preOp": " ",
@@ -307,9 +307,9 @@ describe('SqlUnary', () => {
                 "type": "comparison",
               },
               "innerSpacing": Object {
-                "postKeyword": " ",
+                "postOp": " ",
               },
-              "keyword": "Not",
+              "op": "Not",
               "type": "unary",
             },
           ],
@@ -328,8 +328,8 @@ describe('SqlUnary', () => {
 
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlUnary {
-        "arg": SqlUnary {
-          "arg": SqlComparison {
+        "argument": SqlUnary {
+          "argument": SqlComparison {
             "innerSpacing": Object {
               "postOp": " ",
               "preOp": " ",
@@ -359,15 +359,15 @@ describe('SqlUnary', () => {
             "type": "comparison",
           },
           "innerSpacing": Object {
-            "postKeyword": " ",
+            "postOp": " ",
           },
-          "keyword": "NOT",
+          "op": "NOT",
           "type": "unary",
         },
         "innerSpacing": Object {
-          "postKeyword": " ",
+          "postOp": " ",
         },
-        "keyword": "NOT",
+        "op": "NOT",
         "type": "unary",
       }
     `);

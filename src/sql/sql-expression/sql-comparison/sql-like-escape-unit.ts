@@ -23,7 +23,7 @@ export interface SqlLikeEscapeUnitValue extends SqlBaseValue {
 export class SqlLikeEscapeUnit extends SqlBase {
   static type: SqlType = 'likeEscapeUnit';
 
-  static DEFAULT_ESCAPE_KEYWORD = 'AND';
+  static DEFAULT_ESCAPE_KEYWORD = 'ESCAPE';
 
   static create(like: SqlExpression | string, escape: SqlExpression | string): SqlLikeEscapeUnit {
     const likeEx: SqlExpression = typeof like === 'string' ? SqlLiteral.create(like) : like;

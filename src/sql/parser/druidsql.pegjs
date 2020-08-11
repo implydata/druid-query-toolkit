@@ -377,14 +377,14 @@ AndExpression = head:NotExpression tail:(_ AndToken _ NotExpression)*
   return maybeMakeMulti('and', head, tail);
 }
 
-NotExpression = keyword:NotToken postKeyword:_ arg:NotExpression
+NotExpression = op:NotToken postOp:_ argument:NotExpression
 {
   return new sql.SqlUnary({
-    keyword: keyword,
+    op: op,
+    argument: argument,
     innerSpacing: {
-      postKeyword: postKeyword
-    },
-    arg: arg
+      postOp: postOp
+    }
   });
 }
   / ComparisonExpression
@@ -517,13 +517,13 @@ DivisionExpression = head:UnaryExpression tail:(_ '/' _ UnaryExpression)*
 }
 
 // !Number is to make sure that -3 parses as a number and not as -(3)
-UnaryExpression = keyword:[+-] postKeyword:_ !Number arg:ConcatExpression
+UnaryExpression = op:[+-] postOp:_ !Number argument:ConcatExpression
 {
   return new sql.SqlUnary({
-    keyword: keyword,
-    arg: arg,
+    op: op,
+    argument: argument,
     innerSpacing: {
-      postKeyword: postKeyword
+      postOp: postOp
     }
   });
 }
@@ -1182,7 +1182,6 @@ GroupByToken = $('GROUP'i !IdentifierPart _ ByToken)
 HavingToken = $('HAVING'i !IdentifierPart)
 InToken = $('IN'i !IdentifierPart)
 IntervalToken = $('INTERVAL'i !IdentifierPart)
-IsNotToken = $('IS'i __ NotToken)
 IsToken = $('IS'i !IdentifierPart)
 JoinToken = $('JOIN'i !IdentifierPart)
 LeadingToken = $('LEADING'i !IdentifierPart)

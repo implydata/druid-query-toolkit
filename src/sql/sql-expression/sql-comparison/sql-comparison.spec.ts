@@ -1401,4 +1401,25 @@ describe('SqlComparison', () => {
       `);
     });
   });
+
+  describe('#getLikeMatchPattern', () => {
+    const x = SqlExpression.parse('x');
+
+    it('works', () => {
+      expect(x.lessThan(4).getLikeMatchPattern()).toBeUndefined();
+      expect(x.like('hello').getLikeMatchPattern()).toEqual('hello');
+    });
+  });
+
+  describe('#getSpecialLikeType', () => {
+    const x = SqlExpression.parse('x');
+
+    it('works', () => {
+      expect(x.lessThan(4).getSpecialLikeType()).toBeUndefined();
+      expect(x.like('hello').getSpecialLikeType()).toEqual('exact');
+      expect(x.like('hello%').getSpecialLikeType()).toEqual('prefix');
+      expect(x.like('%hello').getSpecialLikeType()).toEqual('postfix');
+      expect(x.like('%hello%').getSpecialLikeType()).toEqual('includes');
+    });
+  });
 });

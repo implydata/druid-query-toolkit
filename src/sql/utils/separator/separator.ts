@@ -33,46 +33,6 @@ export class Separator {
     return new Separator({ separator: separator, right: ' ' });
   }
 
-  // return a list of separators with n-1 elements in them, filed with fillWith
-  static fillBetween(existingSeparator: Separator[], listLength: number, fillWith: Separator) {
-    for (let i = existingSeparator.length; i < listLength - 1; i++) {
-      existingSeparator = existingSeparator.concat(fillWith);
-    }
-    return existingSeparator;
-  }
-
-  static filterStringFromInterfaceList<T>(
-    units: T[],
-    filter: (value: T) => boolean,
-    separators?: Separator[],
-  ) {
-    let index = -1;
-    const filteredUnits: T[] = [];
-    for (let i = 0; i < units.length; i++) {
-      const value = units[i];
-      if (filter(value)) {
-        index = i;
-      } else {
-        filteredUnits.push(value);
-      }
-    }
-
-    // If removing the 1st column remove the 1st separator
-    // i !== 0 && index === 0
-    // otherwise remove the separator before it
-    // index !== 0 && i !== index - 1
-    const filteredSeparators = separators
-      ? separators.filter(
-          (_separator, i) => (index !== 0 && i !== index - 1) || (i !== 0 && index === 0),
-        )
-      : undefined;
-
-    return {
-      units: filteredUnits.length ? filteredUnits : undefined,
-      separators: filteredSeparators,
-    };
-  }
-
   constructor(options: SeparatorValue) {
     this.left = options.left || '';
     this.right = options.right || '';

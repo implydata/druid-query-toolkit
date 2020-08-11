@@ -41,6 +41,10 @@ export abstract class SqlExpression extends SqlBase {
     }
   }
 
+  static wrap(input: SqlExpression | LiteralValue): SqlExpression {
+    return input instanceof SqlExpression ? input : SqlLiteral.create(input);
+  }
+
   static and(...args: (SqlExpression | undefined)[]) {
     const compactArgs = filterMap(args, a => {
       if (!a) return;
@@ -97,27 +101,27 @@ export abstract class SqlExpression extends SqlBase {
 
   // SqlComparison
 
-  public equal(rhs: SqlExpression): SqlComparison {
+  public equal(rhs: SqlExpression | LiteralValue): SqlComparison {
     return SqlComparison.equal(this, rhs);
   }
 
-  public unequal(rhs: SqlExpression): SqlComparison {
+  public unequal(rhs: SqlExpression | LiteralValue): SqlComparison {
     return SqlComparison.unequal(this, rhs);
   }
 
-  public lessThan(rhs: SqlExpression): SqlComparison {
+  public lessThan(rhs: SqlExpression | LiteralValue): SqlComparison {
     return SqlComparison.lessThan(this, rhs);
   }
 
-  public greaterThan(rhs: SqlExpression): SqlComparison {
+  public greaterThan(rhs: SqlExpression | LiteralValue): SqlComparison {
     return SqlComparison.greaterThan(this, rhs);
   }
 
-  public lessThanOrEqual(rhs: SqlExpression): SqlComparison {
+  public lessThanOrEqual(rhs: SqlExpression | LiteralValue): SqlComparison {
     return SqlComparison.lessThanOrEqual(this, rhs);
   }
 
-  public greaterThanOrEqual(rhs: SqlExpression): SqlComparison {
+  public greaterThanOrEqual(rhs: SqlExpression | LiteralValue): SqlComparison {
     return SqlComparison.greaterThanOrEqual(this, rhs);
   }
 
@@ -133,13 +137,16 @@ export abstract class SqlExpression extends SqlBase {
     return SqlComparison.like(this, rhs, escape);
   }
 
-  public between(start: SqlLiteral | LiteralValue, end: SqlLiteral | LiteralValue): SqlComparison {
+  public between(
+    start: SqlExpression | LiteralValue,
+    end: SqlExpression | LiteralValue,
+  ): SqlComparison {
     return SqlComparison.between(this, start, end);
   }
 
   public betweenSymmetric(
-    start: SqlLiteral | LiteralValue,
-    end: SqlLiteral | LiteralValue,
+    start: SqlExpression | LiteralValue,
+    end: SqlExpression | LiteralValue,
   ): SqlComparison {
     return SqlComparison.betweenSymmetric(this, start, end);
   }
