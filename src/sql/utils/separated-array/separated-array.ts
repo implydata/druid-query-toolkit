@@ -121,7 +121,7 @@ export class SeparatedArray<T> {
     return new SeparatedArray<T>(values.concat([value]), separators.concat(separator));
   }
 
-  public clearSeparators(): SeparatedArray<T> {
+  public clearOwnSeparators(): SeparatedArray<T> {
     return new SeparatedArray<T>(this.values, []);
   }
 }

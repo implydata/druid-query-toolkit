@@ -99,7 +99,7 @@ export class SqlLikeEscapeUnit extends SqlBase {
     return ret;
   }
 
-  public clearStaticKeywords(): this {
+  public clearOwnStaticKeywords(): this {
     const value = this.valueOf();
     delete value.escapeKeyword;
     return SqlBase.fromValue(value);

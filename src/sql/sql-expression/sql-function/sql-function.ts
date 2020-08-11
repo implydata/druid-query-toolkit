@@ -192,16 +192,16 @@ export class SqlFunction extends SqlExpression {
     return ret;
   }
 
-  public clearStaticKeywords(): this {
+  public clearOwnStaticKeywords(): this {
     const value = this.valueOf();
     delete value.filterKeyword;
     return SqlBase.fromValue(value);
   }
 
-  public clearSeparators(): this {
+  public clearOwnSeparators(): this {
     if (!this.args) return this;
     const value = this.valueOf();
-    value.args = this.args.clearSeparators();
+    value.args = this.args.clearOwnSeparators();
     return SqlBase.fromValue(value);
   }
 

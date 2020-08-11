@@ -150,13 +150,13 @@ export class SqlCase extends SqlExpression {
     return ret;
   }
 
-  public clearSeparators(): this {
+  public clearOwnSeparators(): this {
     const value = this.valueOf();
-    value.whenThenParts = this.whenThenParts.clearSeparators();
+    value.whenThenParts = this.whenThenParts.clearOwnSeparators();
     return SqlBase.fromValue(value);
   }
 
-  public clearStaticKeywords(): this {
+  public clearOwnStaticKeywords(): this {
     const value = this.valueOf();
     delete value.caseKeyword;
     delete value.endKeyword;

@@ -69,7 +69,7 @@ export class SqlInterval extends SqlExpression {
     return SqlBase.fromValue(value);
   }
 
-  public clearStaticKeywords(): this {
+  public clearOwnStaticKeywords(): this {
     const value = this.valueOf();
     delete value.keyword;
     return SqlBase.fromValue(value);

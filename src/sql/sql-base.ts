@@ -183,7 +183,7 @@ export abstract class SqlBase {
     return this.addParens(leftSpacing, rightSpacing);
   }
 
-  public removeParenSpaces(): this {
+  public removeOwnParenSpaces(): this {
     if (!this.parens) return this;
     const value = this.valueOf();
     value.parens = this.parens.map(() => ({
@@ -193,18 +193,18 @@ export abstract class SqlBase {
     return SqlBase.fromValue(value);
   }
 
-  public resetInnerSpace(): this {
+  public resetOwnInnerSpace(): this {
     if (Object.keys(this.innerSpacing).length === 0) return this;
     const value = this.valueOf();
     value.innerSpacing = {};
     return SqlBase.fromValue(value);
   }
 
-  public clearStaticKeywords(): this {
+  public clearOwnStaticKeywords(): this {
     return this;
   }
 
-  public clearSeparators(): this {
+  public clearOwnSeparators(): this {
     return this;
   }
 
@@ -346,10 +346,10 @@ export abstract class SqlBase {
   public prettify(): SqlBase {
     return this.walkPostorder(ex => {
       return ex
-        .resetInnerSpace()
-        .clearStaticKeywords()
-        .clearSeparators()
-        .removeParenSpaces();
+        .resetOwnInnerSpace()
+        .clearOwnStaticKeywords()
+        .clearOwnSeparators()
+        .removeOwnParenSpaces();
     });
   }
 

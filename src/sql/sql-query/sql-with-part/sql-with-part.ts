@@ -120,10 +120,10 @@ export class SqlWithPart extends SqlBase {
     return ret;
   }
 
-  public clearSeparators(): this {
+  public clearOwnSeparators(): this {
     if (!this.withColumns) return this;
     const value = this.valueOf();
-    value.withColumns = this.withColumns.clearSeparators();
+    value.withColumns = this.withColumns.clearOwnSeparators();
     return SqlBase.fromValue(value);
   }
 }

@@ -116,7 +116,7 @@ export class SqlBetweenAndUnit extends SqlBase {
     return ret;
   }
 
-  public clearStaticKeywords(): this {
+  public clearOwnStaticKeywords(): this {
     const value = this.valueOf();
     delete value.andKeyword;
     return SqlBase.fromValue(value);

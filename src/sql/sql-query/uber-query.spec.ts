@@ -88,7 +88,7 @@ describe('Uber Query', () => {
   it('clear static keywords', () => {
     expect(
       SqlQuery.parse(query)
-        .walkPostorder(t => t.clearStaticKeywords())
+        .walkPostorder(t => t.clearOwnStaticKeywords())
         .toString(),
     ).toEqual(query);
   });

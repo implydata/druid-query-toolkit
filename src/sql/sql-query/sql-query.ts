@@ -497,21 +497,21 @@ export class SqlQuery extends SqlBase {
     return ret;
   }
 
-  public clearStaticKeywords(): this {
+  public clearOwnStaticKeywords(): this {
     const value = this.valueOf();
     delete value.withKeyword;
     delete value.selectKeyword;
     return SqlBase.fromValue(value);
   }
 
-  public clearSeparators(): this {
+  public clearOwnSeparators(): this {
     const value = this.valueOf();
 
     if (this.withParts) {
-      value.withParts = this.withParts.clearSeparators();
+      value.withParts = this.withParts.clearOwnSeparators();
     }
 
-    value.selectExpressions = this.selectExpressions.clearSeparators();
+    value.selectExpressions = this.selectExpressions.clearOwnSeparators();
 
     return SqlBase.fromValue(value);
   }

@@ -103,7 +103,7 @@ export class SqlWhenThenPart extends SqlBase {
     return ret;
   }
 
-  public clearStaticKeywords(): this {
+  public clearOwnStaticKeywords(): this {
     const value = this.valueOf();
     delete value.whenKeyword;
     delete value.thenKeyword;
