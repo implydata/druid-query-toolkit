@@ -11,8 +11,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { SqlExpression } from '..';
-import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../../sql-base';
+
+import { SqlBase, SqlBaseValue, SqlExpression, SqlType, Substitutor } from '../..';
 
 export interface SqlBetweenAndUnitValue extends SqlBaseValue {
   symmetricKeyword?: string;

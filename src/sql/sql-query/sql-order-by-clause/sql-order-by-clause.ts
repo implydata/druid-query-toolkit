@@ -94,7 +94,7 @@ export class SqlOrderByClause extends SqlClause {
 
   public clearOwnSeparators(): this {
     const value = this.valueOf();
-    value.expressions = this.expressions.clearOwnSeparators();
+    value.expressions = this.expressions.clearSeparators();
     return SqlBase.fromValue(value);
   }
 

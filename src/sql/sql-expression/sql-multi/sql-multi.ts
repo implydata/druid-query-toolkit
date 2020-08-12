@@ -74,7 +74,7 @@ export class SqlMulti extends SqlExpression {
 
   public clearOwnSeparators(): this {
     const value = this.valueOf();
-    value.args = this.args.clearOwnSeparators();
+    value.args = this.args.clearSeparators();
     return SqlBase.fromValue(value);
   }
 

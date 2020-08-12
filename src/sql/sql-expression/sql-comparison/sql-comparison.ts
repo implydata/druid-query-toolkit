@@ -48,7 +48,7 @@ export class SqlComparison extends SqlExpression {
     rhs: SqlExpression | LiteralValue,
   ): SqlComparison {
     return new SqlComparison({
-      op: '!=',
+      op: '<>',
       lhs: SqlExpression.wrap(lhs),
       rhs: SqlExpression.wrap(rhs),
     });
@@ -143,6 +143,14 @@ export class SqlComparison extends SqlExpression {
     });
   }
 
+  static notBetween(
+    lhs: SqlExpression | LiteralValue,
+    start: SqlExpression | LiteralValue,
+    end: SqlExpression | LiteralValue,
+  ): SqlComparison {
+    return SqlComparison.between(lhs, start, end).negate();
+  }
+
   static betweenSymmetric(
     lhs: SqlExpression | LiteralValue,
     start: SqlExpression | LiteralValue,
@@ -153,6 +161,14 @@ export class SqlComparison extends SqlExpression {
       lhs: SqlExpression.wrap(lhs),
       rhs: SqlBetweenAndUnit.symmetric(SqlExpression.wrap(start), SqlExpression.wrap(end)),
     });
+  }
+
+  static notBetweenSymmetric(
+    lhs: SqlExpression | LiteralValue,
+    start: SqlExpression | LiteralValue,
+    end: SqlExpression | LiteralValue,
+  ): SqlComparison {
+    return SqlComparison.betweenSymmetric(lhs, start, end).negate();
   }
 
   public readonly op: string;
@@ -244,7 +260,7 @@ export class SqlComparison extends SqlExpression {
         break;
 
       default:
-        notKeyword = notKeyword ? 'NOT' : undefined;
+        notKeyword = notKeyword ? undefined : 'NOT';
         break;
     }
 

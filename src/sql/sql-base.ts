@@ -307,7 +307,7 @@ export abstract class SqlBase {
   }
 
   public getUsedColumns(): string[] {
-    return dedupe(filterMap(this.getSqlRefs(), x => x.column));
+    return dedupe(filterMap(this.getSqlRefs(), x => (x.isStar() ? undefined : x.column))).sort();
   }
 
   public containsColumn(column: string): boolean {

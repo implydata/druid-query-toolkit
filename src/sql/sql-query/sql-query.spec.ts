@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { SqlCase, SqlExpression, SqlFunction, SqlQuery, SqlRef } from '../../index';
+import { SqlCase, SqlExpression, SqlFunction, SqlQuery, SqlRef } from '../..';
 import { backAndForth, sane } from '../../test-utils';
 
 describe('SqlQuery', () => {

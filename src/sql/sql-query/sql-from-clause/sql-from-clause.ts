@@ -110,10 +110,10 @@ export class SqlFromClause extends SqlClause {
   public clearOwnSeparators(): this {
     const value = this.valueOf();
 
-    value.expressions = this.expressions.clearOwnSeparators();
+    value.expressions = this.expressions.clearSeparators();
 
     if (this.joinParts) {
-      value.joinParts = this.joinParts.clearOwnSeparators();
+      value.joinParts = this.joinParts.clearSeparators();
     }
 
     return SqlBase.fromValue(value);

@@ -201,7 +201,7 @@ export class SqlFunction extends SqlExpression {
   public clearOwnSeparators(): this {
     if (!this.args) return this;
     const value = this.valueOf();
-    value.args = this.args.clearOwnSeparators();
+    value.args = this.args.clearSeparatorsMatching(',');
     return SqlBase.fromValue(value);
   }
 

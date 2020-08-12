@@ -123,7 +123,7 @@ export class SqlWithPart extends SqlBase {
   public clearOwnSeparators(): this {
     if (!this.withColumns) return this;
     const value = this.valueOf();
-    value.withColumns = this.withColumns.clearOwnSeparators();
+    value.withColumns = this.withColumns.clearSeparators();
     return SqlBase.fromValue(value);
   }
 }

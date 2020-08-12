@@ -508,10 +508,10 @@ export class SqlQuery extends SqlBase {
     const value = this.valueOf();
 
     if (this.withParts) {
-      value.withParts = this.withParts.clearOwnSeparators();
+      value.withParts = this.withParts.clearSeparators();
     }
 
-    value.selectExpressions = this.selectExpressions.clearOwnSeparators();
+    value.selectExpressions = this.selectExpressions.clearSeparators();
 
     return SqlBase.fromValue(value);
   }

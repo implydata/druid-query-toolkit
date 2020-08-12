@@ -12,9 +12,8 @@
  * limitations under the License.
  */
 
+import { SqlExpression, SqlQuery, SqlRef } from '../../..';
 import { backAndForth } from '../../../test-utils';
-import { SqlExpression, SqlRef } from '../../sql-expression';
-import { SqlQuery } from '../../sql-query';
 
 describe('SqlRef', () => {
   it('avoids reserved', () => {

@@ -12,10 +12,8 @@
  * limitations under the License.
  */
 
+import { SqlExpression, SqlFunction } from '../..';
 import { backAndForth } from '../../../test-utils';
-import { SqlExpression } from '../sql-expression';
-
-import { SqlFunction } from './sql-function';
 
 describe('SqlFunction', () => {
   it('things that work', () => {
@@ -50,6 +48,11 @@ describe('SqlFunction', () => {
         throw new Error(`problem with \`${sql}\`: ${e.message}`);
       }
     }
+  });
+
+  it('is smart about clearing sepperators', () => {
+    const sql = `EXTRACT(HOUR FROM "time")`;
+    expect(String(SqlExpression.parse(sql).clearOwnSeparators())).toEqual(sql);
   });
 
   it('Function without args', () => {

@@ -36,9 +36,9 @@ export class SeparatedArray<T> {
   }
 
   public readonly values: readonly T[];
-  public readonly separators: SeparatorOrString[];
+  public readonly separators: (SeparatorOrString | undefined)[];
 
-  constructor(values: readonly T[], separators?: SeparatorOrString[]) {
+  constructor(values: readonly T[], separators?: (SeparatorOrString | undefined)[]) {
     separators = separators || [];
     if (values.length <= separators.length) {
       throw new Error(
@@ -77,7 +77,7 @@ export class SeparatedArray<T> {
   public filter(fn: (value: T, index: number) => any): SeparatedArray<T> | undefined {
     const { values, separators } = this;
     const filteredValues: T[] = [];
-    const filteredSeparators: SeparatorOrString[] = [];
+    const filteredSeparators: (SeparatorOrString | undefined)[] = [];
     let skippedFirst = false;
     for (let i = 0; i < values.length; i++) {
       const value = values[i];
@@ -121,7 +121,23 @@ export class SeparatedArray<T> {
     return new SeparatedArray<T>(values.concat([value]), separators.concat(separator));
   }
 
-  public clearOwnSeparators(): SeparatedArray<T> {
+  public clearSeparators(): SeparatedArray<T> {
     return new SeparatedArray<T>(this.values, []);
+  }
+
+  public clearSeparatorsMatching(match: string): SeparatedArray<T> {
+    let hasUnmatched = false;
+    const newSeparators: (SeparatorOrString | undefined)[] = this.separators.map(separator => {
+      if (
+        (typeof separator === 'string' && separator === match) ||
+        (separator instanceof Separator && separator.separator === match)
+      ) {
+        return;
+      } else {
+        hasUnmatched = true;
+        return separator;
+      }
+    });
+    return new SeparatedArray<T>(this.values, hasUnmatched ? newSeparators : []);
   }
 }

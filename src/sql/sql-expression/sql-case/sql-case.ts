@@ -152,7 +152,7 @@ export class SqlCase extends SqlExpression {
 
   public clearOwnSeparators(): this {
     const value = this.valueOf();
-    value.whenThenParts = this.whenThenParts.clearOwnSeparators();
+    value.whenThenParts = this.whenThenParts.clearSeparators();
     return SqlBase.fromValue(value);
   }
 

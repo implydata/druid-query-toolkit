@@ -12,9 +12,7 @@
  * limitations under the License.
  */
 
-import { parseSql } from '../parser';
-
-import { SqlExpression } from './sql-expression';
+import { SqlBase, SqlExpression, SqlRef } from '../..';
 
 describe('SqlExpression', () => {
   it('plywood expressions should not parse', () => {
@@ -23,13 +21,83 @@ describe('SqlExpression', () => {
     for (const sql of queries) {
       let didNotError = false;
       try {
-        parseSql(sql);
+        SqlBase.parseSql(sql);
         didNotError = true;
       } catch {}
       if (didNotError) {
         throw new Error(`should not parse: ${sql}`);
       }
     }
+  });
+
+  describe('factories', () => {
+    const x = SqlRef.column('x');
+    const y = SqlRef.column('y');
+
+    it('works with as', () => {
+      expect(String(x.as('lol'))).toEqual('x AS "lol"');
+    });
+
+    it('works with toOrderByPart', () => {
+      expect(String(x.toOrderByPart('DESC'))).toEqual('x DESC');
+    });
+
+    it('works with equal', () => {
+      expect(String(x.equal(y))).toEqual('x = y');
+    });
+
+    it('works with unequal', () => {
+      expect(String(x.unequal(y))).toEqual('x <> y');
+    });
+
+    it('works with lessThan', () => {
+      expect(String(x.lessThan(y))).toEqual('x < y');
+    });
+
+    it('works with greaterThan', () => {
+      expect(String(x.greaterThan(y))).toEqual('x > y');
+    });
+
+    it('works with lessThanOrEqual', () => {
+      expect(String(x.lessThanOrEqual(y))).toEqual('x <= y');
+    });
+
+    it('works with greaterThanOrEqual', () => {
+      expect(String(x.greaterThanOrEqual(y))).toEqual('x >= y');
+    });
+
+    it('works with isNull', () => {
+      expect(String(x.isNull())).toEqual('x IS NULL');
+    });
+
+    it('works with isNotNull', () => {
+      expect(String(x.isNotNull())).toEqual('x IS NOT NULL');
+    });
+
+    it('works with like', () => {
+      expect(String(x.like(y))).toEqual('x LIKE y');
+      expect(String(x.like(y, '$'))).toEqual("x LIKE y ESCAPE '$'");
+    });
+
+    it('works with between', () => {
+      expect(String(x.between(1, 5))).toEqual('x BETWEEN 1 AND 5');
+    });
+
+    it('works with notBetween', () => {
+      expect(String(x.notBetween(1, 5))).toEqual('x NOT BETWEEN 1 AND 5');
+    });
+
+    it('works with betweenSymmetric', () => {
+      expect(String(x.betweenSymmetric(5, 1))).toEqual('x BETWEEN SYMMETRIC 5 AND 1');
+    });
+
+    it('works with notBetweenSymmetric', () => {
+      expect(String(x.notBetweenSymmetric(5, 1))).toEqual('x NOT BETWEEN SYMMETRIC 5 AND 1');
+    });
+
+    it('works with and', () => {
+      expect(String(x.and(y))).toEqual('x AND y');
+    });
   });
 
   describe('#decomposeViaAnd', () => {

@@ -133,7 +133,7 @@ export abstract class SqlExpression extends SqlBase {
     return SqlComparison.isNotNull(this);
   }
 
-  public like(rhs: SqlLiteral | string, escape?: SqlLiteral | string): SqlComparison {
+  public like(rhs: SqlExpression | string, escape?: SqlExpression | string): SqlComparison {
     return SqlComparison.like(this, rhs, escape);
   }
 
@@ -144,11 +144,25 @@ export abstract class SqlExpression extends SqlBase {
     return SqlComparison.between(this, start, end);
   }
 
+  public notBetween(
+    start: SqlExpression | LiteralValue,
+    end: SqlExpression | LiteralValue,
+  ): SqlComparison {
+    return SqlComparison.notBetween(this, start, end);
+  }
+
   public betweenSymmetric(
     start: SqlExpression | LiteralValue,
     end: SqlExpression | LiteralValue,
   ): SqlComparison {
     return SqlComparison.betweenSymmetric(this, start, end);
+  }
+
+  public notBetweenSymmetric(
+    start: SqlExpression | LiteralValue,
+    end: SqlExpression | LiteralValue,
+  ): SqlComparison {
+    return SqlComparison.notBetweenSymmetric(this, start, end);
   }
 
   // SqlMulti
