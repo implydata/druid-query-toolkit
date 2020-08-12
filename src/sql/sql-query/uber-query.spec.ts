@@ -18,7 +18,7 @@ import { SqlBase } from '../sql-base';
 import { SqlQuery } from './sql-query';
 
 describe('Uber Query', () => {
-  const query = sane`
+  const sql = sane`
     WITH temp_t1 AS (SELECT * FROM blah)
     SELECT
       col1 AS "Col1",
@@ -67,34 +67,29 @@ describe('Uber Query', () => {
     OFFSET 5
   `;
 
+  let query: SqlQuery;
+  try {
+    query = SqlQuery.parse(sql);
+  } catch (e) {
+    // @ts-ignore
+    console.log(e);
+    throw e;
+  }
+
   it('works back and forth', () => {
-    try {
-      backAndForth(query);
-    } catch (e) {
-      // @ts-ignore
-      console.log(e);
-      throw e;
-    }
+    backAndForth(sql);
   });
 
   it('walk it all', () => {
-    expect(
-      SqlQuery.parse(query)
-        .walkPostorder(t => SqlBase.fromValue(t.valueOf()))
-        .toString(),
-    ).toEqual(query);
+    expect(query.walkPostorder(t => SqlBase.fromValue(t.valueOf())).toString()).toEqual(sql);
   });
 
   it('clearOwnStaticKeywords', () => {
-    expect(
-      SqlQuery.parse(query)
-        .walkPostorder(t => t.clearOwnStaticKeywords())
-        .toString(),
-    ).toEqual(query);
+    expect(query.walkPostorder(t => t.clearOwnStaticKeywords()).toString()).toEqual(sql);
   });
 
   it('.getUsedColumns', () => {
-    expect(SqlQuery.parse(query).getUsedColumns()).toEqual([
+    expect(query.getUsedColumns()).toEqual([
       'Col1',
       'blah',
       'col',
@@ -115,5 +110,27 @@ describe('Uber Query', () => {
       'temp_t1',
       'time',
     ]);
+  });
+
+  it('has everything', () => {
+    expect(query.hasFrom()).toEqual(true);
+    expect(query.hasJoin()).toEqual(true);
+    expect(query.hasWhere()).toEqual(true);
+    expect(query.hasGroupBy()).toEqual(true);
+    expect(query.hasHaving()).toEqual(true);
+    expect(query.hasOrderBy()).toEqual(true);
+    expect(query.hasLimit()).toEqual(true);
+    expect(query.hasOffset()).toEqual(true);
+  });
+
+  it('remove one thing', () => {
+    expect(query.changeFromExpressions(undefined).hasFrom()).toEqual(false);
+    // expect(query. ? .hasJoin()).toEqual(false);
+    expect(query.changeWhereExpression(undefined).hasWhere()).toEqual(false);
+    expect(query.changeGroupByExpressions(undefined).hasGroupBy()).toEqual(false);
+    expect(query.changeHavingExpression(undefined).hasHaving()).toEqual(false);
+    expect(query.changeOrderByExpressions(undefined).hasOrderBy()).toEqual(false);
+    expect(query.changeLimitValue(undefined).hasLimit()).toEqual(false);
+    expect(query.changeOffsetValue(undefined).hasOffset()).toEqual(false);
   });
 });

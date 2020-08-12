@@ -38,6 +38,8 @@ describe('SqlQuery', () => {
       `SELECT * FROM wikipedia t`,
       `SELECT t.* FROM wikipedia t`,
       `SELECT *, page FROM wikipedia t`,
+      `SELECT DISTINCT a, b FROM wikipedia t`,
+      `SELECT ALL a, b FROM wikipedia t`,
     ];
 
     for (const sql of queries) {
