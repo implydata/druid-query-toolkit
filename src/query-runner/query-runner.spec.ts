@@ -20,12 +20,15 @@ describe('QueryRunner', () => {
   let n = 100000000;
   QueryRunner.now = () => ++n;
 
-  const queryRunner = new QueryRunner(async (_payload, isSql) => {
+  const queryRunner = new QueryRunner(async (payload, isSql) => {
+    const firstParameterValue: any =
+      payload.parameters && payload.parameters.length ? payload.parameters[0].value : undefined;
+
     if (isSql) {
       return {
         data: [['channel', 'Count'], ['#en.wikipedia', 6650], ['#sh.wikipedia', 3969]],
         headers: {
-          'x-druid-sql-query-id': 'sql-query-id-yyy',
+          'x-druid-sql-query-id': firstParameterValue || 'sql-query-id-yyy',
         } as any,
       };
     } else {
@@ -764,5 +767,18 @@ describe('QueryRunner', () => {
         "sqlQueryId": "sql-query-id-yyy",
       }
     `);
+  });
+
+  it('works with a parsed SQL query', async () => {
+    const queryResult = await queryRunner.runQuery(
+      SqlQuery.parse(
+        'SELECT\n  channel, COUNT(*) AS "Count"\nFROM wikipedia\nGROUP BY 1\nORDER BY 2 DESC',
+      ),
+      {
+        lol: 'here',
+      },
+      [{ type: 'VARCHAR', value: 'test-param-value' }],
+    );
+    expect(queryResult.sqlQueryId).toEqual('test-param-value');
   });
 });

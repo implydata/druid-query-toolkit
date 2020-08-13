@@ -14,6 +14,11 @@
 
 import { QueryResult, SqlQuery } from '..';
 
+export interface QueryParameter {
+  type: string;
+  value: string | number;
+}
+
 export interface DataAndHeaders {
   data: unknown;
   headers: Record<string, string>;
@@ -39,6 +44,7 @@ export class QueryRunner {
   public async runQuery(
     query: string | SqlQuery | Record<string, any>,
     extraContext?: Record<string, any>,
+    queryParameters?: QueryParameter[],
   ): Promise<QueryResult> {
     let isSql: boolean;
     let jsonQuery: Record<string, any>;
@@ -74,6 +80,16 @@ export class QueryRunner {
     if (!QueryRunner.isEmptyContext(extraContext)) {
       jsonQuery = Object.assign({}, jsonQuery, {
         context: Object.assign({}, jsonQuery.context || {}, extraContext),
+      });
+    }
+
+    if (
+      typeof jsonQuery.query === 'string' &&
+      Array.isArray(queryParameters) &&
+      queryParameters.length
+    ) {
+      jsonQuery = Object.assign({}, jsonQuery, {
+        parameters: queryParameters,
       });
     }
 
