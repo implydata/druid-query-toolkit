@@ -56,7 +56,7 @@ export type SqlType =
 export interface SqlBaseValue {
   type?: SqlType;
   innerSpacing?: Record<string, string>;
-  parens?: Parens[];
+  parens?: readonly Parens[];
 }
 
 const reservedKeywordLookup: Record<string, boolean> = {};
@@ -139,7 +139,7 @@ export abstract class SqlBase {
 
   public type: SqlType;
   public innerSpacing: Record<string, string>;
-  public parens?: Parens[];
+  public parens?: readonly Parens[];
 
   constructor(options: SqlBaseValue, typeOverride: SqlType) {
     const type = typeOverride || options.type;
@@ -153,8 +153,10 @@ export abstract class SqlBase {
   }
 
   public valueOf() {
-    const value: SqlBaseValue = { type: this.type, innerSpacing: this.innerSpacing };
-    if (this.innerSpacing) value.innerSpacing = this.innerSpacing;
+    const value: SqlBaseValue = {
+      type: this.type,
+      innerSpacing: this.innerSpacing,
+    };
     if (this.parens) value.parens = this.parens;
     return value;
   }
@@ -169,13 +171,23 @@ export abstract class SqlBase {
     return this.toString() === other.toString();
   }
 
-  public addParens(leftSpacing?: string, rightSpacing?: string): this {
+  public getParens(): readonly Parens[] {
+    return this.parens || [];
+  }
+
+  public changeParens(parens: readonly Parens[]) {
     const value = this.valueOf();
-    value.parens = (this.parens || []).concat({
-      leftSpacing: leftSpacing || '',
-      rightSpacing: rightSpacing || '',
-    });
+    value.parens = parens;
     return SqlBase.fromValue(value);
+  }
+
+  public addParens(leftSpacing?: string, rightSpacing?: string): this {
+    return this.changeParens(
+      this.getParens().concat({
+        leftSpacing: leftSpacing || '',
+        rightSpacing: rightSpacing || '',
+      }),
+    );
   }
 
   public ensureParens(leftSpacing?: string, rightSpacing?: string): this {
@@ -185,12 +197,12 @@ export abstract class SqlBase {
 
   public removeOwnParenSpaces(): this {
     if (!this.parens) return this;
-    const value = this.valueOf();
-    value.parens = this.parens.map(() => ({
-      leftSpacing: '',
-      rightSpacing: '',
-    }));
-    return SqlBase.fromValue(value);
+    return this.changeParens(
+      this.parens.map(() => ({
+        leftSpacing: '',
+        rightSpacing: '',
+      })),
+    );
   }
 
   public resetOwnInnerSpace(): this {
