@@ -14,29 +14,29 @@
 
 import { SqlBase, SqlBaseValue, SqlExpression, SqlType, Substitutor } from '../..';
 
-export interface SqlBetweenAndUnitValue extends SqlBaseValue {
+export interface SqlBetweenAndHelperValue extends SqlBaseValue {
   symmetricKeyword?: string;
   start: SqlExpression;
   andKeyword?: string;
   end: SqlExpression;
 }
 
-export class SqlBetweenAndUnit extends SqlBase {
-  static type: SqlType = 'betweenAndUnit';
+export class SqlBetweenAndHelper extends SqlBase {
+  static type: SqlType = 'betweenAndHelper';
 
   static DEFAULT_SYMMETRIC_KEYWORD = 'SYMMETRIC';
   static DEFAULT_AND_KEYWORD = 'AND';
 
-  static create(start: SqlExpression, end: SqlExpression): SqlBetweenAndUnit {
-    return new SqlBetweenAndUnit({
+  static create(start: SqlExpression, end: SqlExpression): SqlBetweenAndHelper {
+    return new SqlBetweenAndHelper({
       start,
       end,
     });
   }
 
-  static symmetric(start: SqlExpression, end: SqlExpression): SqlBetweenAndUnit {
-    return new SqlBetweenAndUnit({
-      symmetricKeyword: SqlBetweenAndUnit.DEFAULT_SYMMETRIC_KEYWORD,
+  static symmetric(start: SqlExpression, end: SqlExpression): SqlBetweenAndHelper {
+    return new SqlBetweenAndHelper({
+      symmetricKeyword: SqlBetweenAndHelper.DEFAULT_SYMMETRIC_KEYWORD,
       start,
       end,
     });
@@ -47,16 +47,16 @@ export class SqlBetweenAndUnit extends SqlBase {
   public readonly andKeyword?: string;
   public readonly end: SqlExpression;
 
-  constructor(options: SqlBetweenAndUnitValue) {
-    super(options, SqlBetweenAndUnit.type);
+  constructor(options: SqlBetweenAndHelperValue) {
+    super(options, SqlBetweenAndHelper.type);
     this.symmetricKeyword = options.symmetricKeyword;
     this.start = options.start;
     this.andKeyword = options.andKeyword;
     this.end = options.end;
   }
 
-  public valueOf(): SqlBetweenAndUnitValue {
-    const value = super.valueOf() as SqlBetweenAndUnitValue;
+  public valueOf(): SqlBetweenAndHelperValue {
+    const value = super.valueOf() as SqlBetweenAndHelperValue;
     value.symmetricKeyword = this.symmetricKeyword;
     value.start = this.start;
     value.andKeyword = this.andKeyword;
@@ -74,7 +74,7 @@ export class SqlBetweenAndUnit extends SqlBase {
     rawParts.push(
       this.start.toString(),
       this.getInnerSpace('preAnd'),
-      this.andKeyword || SqlBetweenAndUnit.DEFAULT_AND_KEYWORD,
+      this.andKeyword || SqlBetweenAndHelper.DEFAULT_AND_KEYWORD,
       this.getInnerSpace('postAnd'),
       this.end.toString(),
     );
@@ -123,4 +123,4 @@ export class SqlBetweenAndUnit extends SqlBase {
   }
 }
 
-SqlBase.register(SqlBetweenAndUnit);
+SqlBase.register(SqlBetweenAndHelper);

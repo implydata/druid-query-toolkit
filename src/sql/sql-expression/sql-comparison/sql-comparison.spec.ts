@@ -571,7 +571,7 @@ describe('SqlComparison', () => {
         },
         "notKeyword": undefined,
         "op": "BETWEEN",
-        "rhs": SqlBetweenAndUnit {
+        "rhs": SqlBetweenAndHelper {
           "andKeyword": "AND",
           "end": SqlRef {
             "column": "Z",
@@ -598,7 +598,7 @@ describe('SqlComparison', () => {
             "type": "ref",
           },
           "symmetricKeyword": undefined,
-          "type": "betweenAndUnit",
+          "type": "betweenAndHelper",
         },
         "type": "comparison",
       }
@@ -629,7 +629,7 @@ describe('SqlComparison', () => {
         },
         "notKeyword": "NOT",
         "op": "BETWEEN",
-        "rhs": SqlBetweenAndUnit {
+        "rhs": SqlBetweenAndHelper {
           "andKeyword": "AND",
           "end": SqlRef {
             "column": "Z",
@@ -657,7 +657,7 @@ describe('SqlComparison', () => {
             "type": "ref",
           },
           "symmetricKeyword": "SYMMETRIC",
-          "type": "betweenAndUnit",
+          "type": "betweenAndHelper",
         },
         "type": "comparison",
       }
@@ -785,7 +785,7 @@ describe('SqlComparison', () => {
         },
         "notKeyword": "NOT",
         "op": "LIKE",
-        "rhs": SqlLikeEscapeUnit {
+        "rhs": SqlLikeEscapeHelper {
           "escape": SqlMulti {
             "args": SeparatedArray {
               "separators": Array [
@@ -851,7 +851,7 @@ describe('SqlComparison', () => {
             "innerSpacing": Object {},
             "type": "multi",
           },
-          "type": "likeEscapeUnit",
+          "type": "likeEscapeHelper",
         },
         "type": "comparison",
       }
@@ -881,7 +881,7 @@ describe('SqlComparison', () => {
         },
         "notKeyword": undefined,
         "op": "LIKE",
-        "rhs": SqlLikeEscapeUnit {
+        "rhs": SqlLikeEscapeHelper {
           "escape": SqlLiteral {
             "innerSpacing": Object {},
             "keyword": undefined,
@@ -901,7 +901,7 @@ describe('SqlComparison', () => {
             "type": "literal",
             "value": "%A%",
           },
-          "type": "likeEscapeUnit",
+          "type": "likeEscapeHelper",
         },
         "type": "comparison",
       }
@@ -932,7 +932,7 @@ describe('SqlComparison', () => {
         },
         "notKeyword": "NOT",
         "op": "LIKE",
-        "rhs": SqlLikeEscapeUnit {
+        "rhs": SqlLikeEscapeHelper {
           "escape": SqlLiteral {
             "innerSpacing": Object {},
             "keyword": undefined,
@@ -952,7 +952,7 @@ describe('SqlComparison', () => {
             "type": "literal",
             "value": "%A%",
           },
-          "type": "likeEscapeUnit",
+          "type": "likeEscapeHelper",
         },
         "type": "comparison",
       }
@@ -1161,7 +1161,7 @@ describe('SqlComparison', () => {
           },
           "notKeyword": undefined,
           "op": "BETWEEN",
-          "rhs": SqlBetweenAndUnit {
+          "rhs": SqlBetweenAndHelper {
             "andKeyword": "AND",
             "end": SqlRef {
               "column": "Z",
@@ -1188,7 +1188,7 @@ describe('SqlComparison', () => {
               "type": "ref",
             },
             "symmetricKeyword": undefined,
-            "type": "betweenAndUnit",
+            "type": "betweenAndHelper",
           },
           "type": "comparison",
         }
@@ -1258,7 +1258,7 @@ describe('SqlComparison', () => {
                       },
                       "notKeyword": undefined,
                       "op": "BETWEEN",
-                      "rhs": SqlBetweenAndUnit {
+                      "rhs": SqlBetweenAndHelper {
                         "andKeyword": "AND",
                         "end": SqlRef {
                           "column": "Z",
@@ -1285,7 +1285,7 @@ describe('SqlComparison', () => {
                           "type": "ref",
                         },
                         "symmetricKeyword": undefined,
-                        "type": "betweenAndUnit",
+                        "type": "betweenAndHelper",
                       },
                       "type": "comparison",
                     },
@@ -1327,7 +1327,7 @@ describe('SqlComparison', () => {
           },
           "notKeyword": undefined,
           "op": "BETWEEN",
-          "rhs": SqlBetweenAndUnit {
+          "rhs": SqlBetweenAndHelper {
             "andKeyword": "AND",
             "end": SqlMulti {
               "args": SeparatedArray {
@@ -1394,7 +1394,7 @@ describe('SqlComparison', () => {
               "type": "multi",
             },
             "symmetricKeyword": undefined,
-            "type": "betweenAndUnit",
+            "type": "betweenAndHelper",
           },
           "type": "comparison",
         }

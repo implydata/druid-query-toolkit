@@ -1824,7 +1824,7 @@ describe('getSqlRefs', () => {
   it('Only multi expressions', () => {
     const sql = `A > 1 AND D OR B OR C`;
 
-    expect(SqlExpression.parse(sql).getSqlRefs()).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql).getRefs()).toMatchInlineSnapshot(`
       Array [
         SqlRef {
           "column": "A",
@@ -1873,7 +1873,7 @@ describe('getSqlRefs', () => {
   it('includes unary expressions', () => {
     const sql = `A > 1 AND D OR B OR Not C`;
 
-    expect(SqlExpression.parse(sql).getSqlRefs()).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql).getRefs()).toMatchInlineSnapshot(`
       Array [
         SqlRef {
           "column": "A",
@@ -1922,7 +1922,7 @@ describe('getSqlRefs', () => {
   it('includes unary expressions and nested Multi Expressions', () => {
     const sql = `A > 1 AND D OR B OR Not (C Or E)`;
 
-    expect(SqlExpression.parse(sql).getSqlRefs()).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql).getRefs()).toMatchInlineSnapshot(`
       Array [
         SqlRef {
           "column": "A",

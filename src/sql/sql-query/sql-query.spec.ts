@@ -342,6 +342,23 @@ describe('SqlQuery', () => {
         'SELECT\n  _datasource_ d,\n  SUM("_size_") AS total_size,\n  CASE WHEN SUM("_size_") = 0 THEN 0 ELSE SUM("_size_") END AS avg_size,\n  CASE WHEN SUM(_num_rows_) = 0 THEN 0 ELSE SUM("_num_rows_") END AS avg_num_rows,\n  COUNT(*) AS num_segments\nFROM sys.segments\nWHERE _datasource_ IN (\'moon\', \'beam\') AND \'druid\' = _schema_ \nGROUP BY _datasource_\nHAVING _total_size_ > 100\nORDER BY _datasource_ DESC, 2 ASC\nLIMIT 100',
       ]);
     });
+
+    it('walks with stack', () => {
+      let foundStack: string[] | undefined;
+      sqlMaster.walk((x, stack) => {
+        if (String(x) === 'schema') {
+          foundStack = stack.map(String);
+        }
+        return x;
+      });
+
+      expect(foundStack).toEqual([
+        "'druid' = schema",
+        "datasource IN ('moon', 'beam') AND 'druid' = schema",
+        "WHERE datasource IN ('moon', 'beam') AND 'druid' = schema",
+        'SELECT\n  datasource d,\n  SUM("size") AS total_size,\n  CASE WHEN SUM("size") = 0 THEN 0 ELSE SUM("size") END AS avg_size,\n  CASE WHEN SUM(num_rows) = 0 THEN 0 ELSE SUM("num_rows") END AS avg_num_rows,\n  COUNT(*) AS num_segments\nFROM sys.segments\nWHERE datasource IN (\'moon\', \'beam\') AND \'druid\' = schema \nGROUP BY datasource\nHAVING total_size > 100\nORDER BY datasource DESC, 2 ASC\nLIMIT 100',
+      ]);
+    });
   });
 
   it('does a replace with an if', () => {

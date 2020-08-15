@@ -16,8 +16,8 @@ import { LiteralValue, SqlLiteral } from '..';
 import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../../sql-base';
 import { SqlExpression } from '../sql-expression';
 
-import { SqlBetweenAndUnit } from './sql-between-and-unit';
-import { SqlLikeEscapeUnit } from './sql-like-escape-unit';
+import { SqlBetweenAndHelper } from './sql-between-and-helper';
+import { SqlLikeEscapeHelper } from './sql-like-escape-helper';
 
 export type EffectiveOp = '=' | '<>' | '<' | '>' | '<=' | '>=' | 'IS' | 'LIKE' | 'BETWEEN'; // ToDo: 'similar to' ?
 export type SpecialLikeType = 'includes' | 'prefix' | 'postfix' | 'exact';
@@ -119,7 +119,7 @@ export class SqlComparison extends SqlExpression {
     return new SqlComparison({
       op: 'LIKE',
       lhs: SqlExpression.wrap(lhs),
-      rhs: typeof escape === 'undefined' ? rhsEx : SqlLikeEscapeUnit.create(rhsEx, escape),
+      rhs: typeof escape === 'undefined' ? rhsEx : SqlLikeEscapeHelper.create(rhsEx, escape),
     });
   }
 
@@ -139,7 +139,7 @@ export class SqlComparison extends SqlExpression {
     return new SqlComparison({
       op: 'BETWEEN',
       lhs: SqlExpression.wrap(lhs),
-      rhs: SqlBetweenAndUnit.create(SqlExpression.wrap(start), SqlExpression.wrap(end)),
+      rhs: SqlBetweenAndHelper.create(SqlExpression.wrap(start), SqlExpression.wrap(end)),
     });
   }
 
@@ -159,7 +159,7 @@ export class SqlComparison extends SqlExpression {
     return new SqlComparison({
       op: 'BETWEEN',
       lhs: SqlExpression.wrap(lhs),
-      rhs: SqlBetweenAndUnit.symmetric(SqlExpression.wrap(start), SqlExpression.wrap(end)),
+      rhs: SqlBetweenAndHelper.symmetric(SqlExpression.wrap(start), SqlExpression.wrap(end)),
     });
   }
 
@@ -297,7 +297,7 @@ export class SqlComparison extends SqlExpression {
     const { rhs } = this;
     if (rhs instanceof SqlLiteral) {
       return rhs.getStringValue();
-    } else if (rhs instanceof SqlLikeEscapeUnit && rhs.like instanceof SqlLiteral) {
+    } else if (rhs instanceof SqlLikeEscapeHelper && rhs.like instanceof SqlLiteral) {
       return rhs.like.getStringValue();
     }
     return;

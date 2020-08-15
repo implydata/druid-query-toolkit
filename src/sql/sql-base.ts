@@ -25,6 +25,7 @@ export interface Parens {
 }
 
 export type Substitutor = (t: SqlBase, stack: SqlBase[]) => SqlBase | undefined;
+export type Matcher = (t: SqlBase, stack: SqlBase[]) => boolean;
 
 export type SqlType =
   | 'base'
@@ -40,8 +41,8 @@ export type SqlType =
   | 'withPart'
   | 'joinPart'
   | 'alias'
-  | 'betweenAndUnit'
-  | 'likeEscapeUnit'
+  | 'betweenAndHelper'
+  | 'likeEscapeHelper'
   | 'comparison'
   | 'literal'
   | 'placeholder'
@@ -242,7 +243,7 @@ export abstract class SqlBase {
 
   protected abstract _toRawString(): string;
 
-  toString(): string {
+  public toString(): string {
     const { parens } = this;
     let str = this._toRawString();
     if (parens) {
@@ -274,7 +275,7 @@ export abstract class SqlBase {
       if (ret !== this) return ret; // In a preorder scan we do not want to scan replacement inner object if it has changed
     }
 
-    ret = ret._walkInner(stack.concat(ret), fn, postorder);
+    ret = ret._walkInner([ret].concat(stack), fn, postorder);
     if (!ret) return;
 
     if (postorder) {
@@ -293,37 +294,45 @@ export abstract class SqlBase {
     return this;
   }
 
-  public some(fn: (t: SqlBase) => boolean): boolean {
+  public isHelper(): boolean {
+    return this.type.endsWith('Helper');
+  }
+
+  public some(fn: Matcher): boolean {
     let some = false;
-    this.walk(b => {
-      some = some || fn(b);
+    this.walk((b, s) => {
+      some = some || fn(b, s);
       return some ? undefined : b;
     });
     return some;
   }
 
-  public every(fn: (t: SqlBase) => boolean): boolean {
+  public every(fn: Matcher): boolean {
     let every = true;
-    this.walk(b => {
-      every = every && fn(b);
+    this.walk((b, s) => {
+      every = every && fn(b, s);
       return every ? b : undefined;
     });
     return every;
   }
 
-  public getSqlRefs(): SqlRef[] {
-    const refs: SqlRef[] = [];
-    this.walk(t => {
-      if (t instanceof SqlRef) {
-        refs.push(t);
+  public collect(fn: Matcher): SqlBase[] {
+    const collected: SqlBase[] = [];
+    this.walk((b, s) => {
+      if (fn(b, s)) {
+        collected.push(b);
       }
-      return t;
+      return b;
     });
-    return refs;
+    return collected;
+  }
+
+  public getRefs(): SqlRef[] {
+    return this.collect(b => b instanceof SqlRef) as SqlRef[];
   }
 
   public getUsedColumns(): string[] {
-    return dedupe(filterMap(this.getSqlRefs(), x => (x.isStar() ? undefined : x.column))).sort();
+    return dedupe(filterMap(this.getRefs(), x => (x.isStar() ? undefined : x.column))).sort();
   }
 
   public contains(thing: SqlBase): boolean {
@@ -335,7 +344,7 @@ export abstract class SqlBase {
   }
 
   public getFirstColumn(): string | undefined {
-    const ref = this.getSqlRefs().find(x => !x.isStar() && x.column);
+    const ref = this.getRefs().find(x => !x.isStar() && x.column);
     if (!ref) return;
     return ref.column;
   }
