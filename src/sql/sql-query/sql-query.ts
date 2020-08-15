@@ -67,9 +67,10 @@ export class SqlQuery extends SqlBase {
   static create(from: SqlBase): SqlQuery {
     return new SqlQuery({
       selectExpressions: SeparatedArray.fromSingleValue(SqlAlias.STAR),
-      fromClause: SqlFromClause.create(
-        SeparatedArray.fromSingleValue(SqlAlias.fromBaseAndUpgrade(from)),
-      ),
+      fromClause:
+        from instanceof SqlFromClause
+          ? from
+          : SqlFromClause.create(SeparatedArray.fromSingleValue(SqlAlias.fromBaseAndUpgrade(from))),
     });
   }
 

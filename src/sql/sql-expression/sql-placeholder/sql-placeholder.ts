@@ -15,19 +15,36 @@
 import { SqlBase, SqlBaseValue, SqlType } from '../../sql-base';
 import { SqlExpression } from '../sql-expression';
 
-export interface SqlPlaceholderValue extends SqlBaseValue {}
+export interface SqlPlaceholderValue extends SqlBaseValue {
+  customPlaceholder?: string;
+}
 
 export class SqlPlaceholder extends SqlExpression {
   static type: SqlType = 'placeholder';
 
   static PLACEHOLDER: SqlPlaceholder;
 
+  public readonly customPlaceholder?: string;
+
   constructor(options: SqlPlaceholderValue = {}) {
     super(options, SqlPlaceholder.type);
+    this.customPlaceholder = options.customPlaceholder;
+  }
+
+  public valueOf(): SqlPlaceholderValue {
+    const value = super.valueOf() as SqlPlaceholderValue;
+    value.customPlaceholder = this.customPlaceholder;
+    return value;
   }
 
   protected _toRawString(): string {
-    return '?';
+    return this.customPlaceholder || '?';
+  }
+
+  public changeCustomPlaceholder(customPlaceholder: string | undefined): SqlPlaceholder {
+    const value = this.valueOf();
+    value.customPlaceholder = customPlaceholder;
+    return new SqlPlaceholder(value);
   }
 }
 

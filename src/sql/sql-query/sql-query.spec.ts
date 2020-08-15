@@ -4660,6 +4660,7 @@ describe('SqlQuery', () => {
                     "notKeyword": undefined,
                     "op": "=",
                     "rhs": SqlPlaceholder {
+                      "customPlaceholder": undefined,
                       "innerSpacing": Object {},
                       "type": "placeholder",
                     },

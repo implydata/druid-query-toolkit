@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { SqlExpression } from '../../..';
+import { SqlExpression, SqlPlaceholder } from '../../..';
 import { backAndForth } from '../../../test-utils';
 
 describe('SqlPlaceholder', () => {
@@ -23,9 +23,14 @@ describe('SqlPlaceholder', () => {
 
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlPlaceholder {
+        "customPlaceholder": undefined,
         "innerSpacing": Object {},
         "type": "placeholder",
       }
     `);
+  });
+
+  it('custom placeholder', () => {
+    expect(String(SqlPlaceholder.PLACEHOLDER.changeCustomPlaceholder('[lol]'))).toEqual('[lol]');
   });
 });

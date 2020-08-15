@@ -161,14 +161,18 @@ export abstract class SqlBase {
     return value;
   }
 
-  public equals(other: SqlBase): boolean {
-    // ToDo: make this not use toString
-    return this.toString() === other.toString();
+  public equals(other: SqlBase | undefined): boolean {
+    if (!other) return false;
+    if (this === other) return true;
+    if (this.type !== other.type) return false;
+    return this.toString() === other.toString(); // ToDo: make this not use toString
   }
 
-  public logicalEquals(other: SqlBase): boolean {
-    // ToDo: make this not use toString
-    return this.toString() === other.toString();
+  public logicalEquals(other: SqlBase | undefined): boolean {
+    if (!other) return false;
+    if (this === other) return true;
+    if (this.type !== other.type) return false;
+    return this.prettify().toString() === other.prettify().toString(); // ToDo: make this not use toString
   }
 
   public getParens(): readonly Parens[] {
@@ -322,12 +326,16 @@ export abstract class SqlBase {
     return dedupe(filterMap(this.getSqlRefs(), x => (x.isStar() ? undefined : x.column))).sort();
   }
 
+  public contains(thing: SqlBase): boolean {
+    return this.some(b => b.equals(thing));
+  }
+
   public containsColumn(column: string): boolean {
-    return Boolean(this.getSqlRefs().find(x => x.column === column));
+    return this.some(b => b instanceof SqlRef && !b.isStar() && b.column === column);
   }
 
   public getFirstColumn(): string | undefined {
-    const ref = this.getSqlRefs().find(x => x.column);
+    const ref = this.getSqlRefs().find(x => !x.isStar() && x.column);
     if (!ref) return;
     return ref.column;
   }
