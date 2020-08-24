@@ -1133,6 +1133,7 @@ describe('SqlQuery', () => {
           "unionQuery": undefined,
           "whereClause": SqlWhereClause {
             "expression": SqlComparison {
+              "decorator": undefined,
               "innerSpacing": Object {
                 "postOp": " ",
                 "preOp": " ",
@@ -1250,6 +1251,7 @@ describe('SqlQuery', () => {
           "unionQuery": undefined,
           "whereClause": SqlWhereClause {
             "expression": SqlComparison {
+              "decorator": undefined,
               "innerSpacing": Object {
                 "postOp": " ",
                 "preOp": " ",
@@ -1387,6 +1389,7 @@ describe('SqlQuery', () => {
                       ],
                       "values": Array [
                         SqlComparison {
+                          "decorator": undefined,
                           "innerSpacing": Object {
                             "postOp": " ",
                             "preOp": " ",
@@ -1413,6 +1416,7 @@ describe('SqlQuery', () => {
                           "type": "comparison",
                         },
                         SqlComparison {
+                          "decorator": undefined,
                           "innerSpacing": Object {
                             "postOp": " ",
                             "preOp": " ",
@@ -1445,6 +1449,7 @@ describe('SqlQuery', () => {
                     "type": "multi",
                   },
                   SqlComparison {
+                    "decorator": undefined,
                     "innerSpacing": Object {
                       "postOp": " ",
                       "preOp": " ",
@@ -1863,6 +1868,7 @@ describe('SqlQuery', () => {
           "groupByClause": undefined,
           "havingClause": SqlHavingClause {
             "expression": SqlComparison {
+              "decorator": undefined,
               "innerSpacing": Object {
                 "postOp": " ",
                 "preOp": " ",
@@ -1980,6 +1986,7 @@ describe('SqlQuery', () => {
           "groupByClause": undefined,
           "havingClause": SqlHavingClause {
             "expression": SqlComparison {
+              "decorator": undefined,
               "innerSpacing": Object {
                 "postOp": " ",
                 "preOp": " ",
@@ -2117,6 +2124,7 @@ describe('SqlQuery', () => {
                       ],
                       "values": Array [
                         SqlComparison {
+                          "decorator": undefined,
                           "innerSpacing": Object {
                             "postOp": " ",
                             "preOp": " ",
@@ -2143,6 +2151,7 @@ describe('SqlQuery', () => {
                           "type": "comparison",
                         },
                         SqlComparison {
+                          "decorator": undefined,
                           "innerSpacing": Object {
                             "postOp": " ",
                             "preOp": " ",
@@ -2175,6 +2184,7 @@ describe('SqlQuery', () => {
                     "type": "multi",
                   },
                   SqlComparison {
+                    "decorator": undefined,
                     "innerSpacing": Object {
                       "postOp": " ",
                       "preOp": " ",
@@ -3291,6 +3301,7 @@ describe('SqlQuery', () => {
                   "joinKeyword": "Join",
                   "joinType": "INNER",
                   "onExpression": SqlComparison {
+                    "decorator": undefined,
                     "innerSpacing": Object {
                       "postOp": " ",
                       "preOp": " ",
@@ -3434,6 +3445,7 @@ describe('SqlQuery', () => {
                   "joinKeyword": "Join",
                   "joinType": "Left",
                   "onExpression": SqlComparison {
+                    "decorator": undefined,
                     "innerSpacing": Object {
                       "postOp": " ",
                       "preOp": " ",
@@ -3577,6 +3589,7 @@ describe('SqlQuery', () => {
                   "joinKeyword": "Join",
                   "joinType": "RIGHT",
                   "onExpression": SqlComparison {
+                    "decorator": undefined,
                     "innerSpacing": Object {
                       "postOp": " ",
                       "preOp": " ",
@@ -3720,6 +3733,7 @@ describe('SqlQuery', () => {
                   "joinKeyword": "Join",
                   "joinType": "FULL",
                   "onExpression": SqlComparison {
+                    "decorator": undefined,
                     "innerSpacing": Object {
                       "postOp": " ",
                       "preOp": " ",
@@ -3863,6 +3877,7 @@ describe('SqlQuery', () => {
                   "joinKeyword": "Join",
                   "joinType": "FULL OUTER",
                   "onExpression": SqlComparison {
+                    "decorator": undefined,
                     "innerSpacing": Object {
                       "postOp": " ",
                       "preOp": " ",
@@ -4599,6 +4614,7 @@ describe('SqlQuery', () => {
                 ],
                 "values": Array [
                   SqlComparison {
+                    "decorator": undefined,
                     "innerSpacing": Object {
                       "postOp": " ",
                       "preOp": " ",
@@ -4660,6 +4676,7 @@ describe('SqlQuery', () => {
                     "type": "comparison",
                   },
                   SqlComparison {
+                    "decorator": undefined,
                     "innerSpacing": Object {
                       "postOp": " ",
                       "preOp": " ",

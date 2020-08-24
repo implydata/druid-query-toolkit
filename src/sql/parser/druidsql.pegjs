@@ -395,11 +395,13 @@ ComparisonExpression = lhs:AdditionExpression preOp:_ opRhs:ComparisonOpRhs
     lhs: lhs,
     op: opRhs.op,
     notKeyword: opRhs.notKeyword,
+    decorator: opRhs.decorator,
     rhs: opRhs.rhs,
     innerSpacing: {
       preOp: opRhs.preOp ? opRhs.preOp : preOp,
       postOp: opRhs.postOp,
-      not: opRhs.preOp ? preOp : opRhs.notSpacing
+      not: opRhs.preOp ? preOp : opRhs.notSpacing,
+      postDecorator: opRhs.postDecorator
     }
   });
 }
@@ -407,23 +409,32 @@ ComparisonExpression = lhs:AdditionExpression preOp:_ opRhs:ComparisonOpRhs
 
 ComparisonOpRhs = ComparisonOpRhsSimple / ComparisonOpRhsIs / ComparisonOpRhsIn / ComparisonOpRhsBetween / ComparisonOpRhsLike / ComparisonOpRhsNot
 
-ComparisonOpRhsSimple = op:ComparisonOperator postOp:_ rhs:AdditionExpression
+ComparisonOpRhsSimple = op:ComparisonOperator postOp:_ rhs:(AdditionExpression / (ComparisonDecorator _ SqlInParens))
 {
-  return {
+  const ret = {
     op: op,
     postOp: postOp,
-    rhs: rhs
   };
+  if (Array.isArray(rhs)) {
+    ret.decorator = rhs[0];
+    ret.postDecorator = rhs[1];
+    ret.rhs = rhs[2];
+  } else {
+    ret.rhs = rhs;
+  }
+  return ret;
 }
 
 ComparisonOperator =
   '='
-/ '!='
 / '<>'
+/ '!='
 / '>='
 / '<='
 / '<'
 / '>'
+
+ComparisonDecorator = AnyToken / AllToken / SomeToken
 
 ComparisonOpRhsIs = op:IsToken postOp:_ not:(NotToken _)? rhs:SqlLiteral
 {
@@ -1157,6 +1168,7 @@ JoinType =
 
 AllToken = $('ALL'i !IdentifierPart)
 AndToken = $('AND'i !IdentifierPart)
+AnyToken = $('ANY'i !IdentifierPart)
 ArrayToken = $('ARRAY'i !IdentifierPart)
 AsToken = $('AS'i !IdentifierPart)
 AscToken = $('ASC'i !IdentifierPart)
@@ -1196,6 +1208,7 @@ OrderToken = $('ORDER'i !IdentifierPart __ ByToken)
 PositionToken = $('POSITION'i !IdentifierPart)
 SelectToken = $('SELECT'i !IdentifierPart)
 SimilarToToken = $('SIMILAR'i !IdentifierPart __ ToToken)
+SomeToken = $('SOME'i !IdentifierPart)
 SymmetricToken = $('SYMMETRIC'i !IdentifierPart)
 ThenToken = $('THEN'i !IdentifierPart)
 TimestampToken = $('TIMESTAMP'i !IdentifierPart)

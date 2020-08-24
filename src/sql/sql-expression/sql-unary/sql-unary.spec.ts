@@ -190,6 +190,7 @@ describe('SqlUnary', () => {
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlUnary {
         "argument": SqlComparison {
+          "decorator": undefined,
           "innerSpacing": Object {
             "postOp": " ",
             "preOp": " ",
@@ -245,6 +246,7 @@ describe('SqlUnary', () => {
           "values": Array [
             SqlUnary {
               "argument": SqlComparison {
+                "decorator": undefined,
                 "innerSpacing": Object {
                   "postOp": " ",
                   "preOp": " ",
@@ -281,6 +283,7 @@ describe('SqlUnary', () => {
             },
             SqlUnary {
               "argument": SqlComparison {
+                "decorator": undefined,
                 "innerSpacing": Object {
                   "postOp": " ",
                   "preOp": " ",
@@ -330,6 +333,7 @@ describe('SqlUnary', () => {
       SqlUnary {
         "argument": SqlUnary {
           "argument": SqlComparison {
+            "decorator": undefined,
             "innerSpacing": Object {
               "postOp": " ",
               "preOp": " ",

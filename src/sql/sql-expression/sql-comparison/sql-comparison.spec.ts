@@ -26,6 +26,17 @@ describe('SqlComparison', () => {
       '1 <= 2',
       '1 >= 2',
 
+      `X = ANY (SELECT page FROM wikipedia GROUP BY 1 ORDER BY COUNT(*) DESC LIMIT 5)`,
+      `X <> any (SELECT page FROM wikipedia GROUP BY 1 ORDER BY COUNT(*) DESC LIMIT 5)`,
+      `X < ALL (SELECT page FROM wikipedia GROUP BY 1 ORDER BY COUNT(*) DESC LIMIT 5)`,
+      `X > all (SELECT page FROM wikipedia GROUP BY 1 ORDER BY COUNT(*) DESC LIMIT 5)`,
+      `X <= SOME (SELECT page FROM wikipedia GROUP BY 1 ORDER BY COUNT(*) DESC LIMIT 5)`,
+      `X >= some (SELECT page FROM wikipedia GROUP BY 1 ORDER BY COUNT(*) DESC LIMIT 5)`,
+
+      `X IN ('moon', 'beam')`,
+      `X NOT IN ('moon', 'beam')`,
+      `X IN (SELECT page FROM wikipedia GROUP BY 1 ORDER BY COUNT(*) DESC LIMIT 5)`,
+
       "''  similar to ''",
       "'a' similar to 'a'",
       "'a' similar to 'b'",
@@ -91,6 +102,7 @@ describe('SqlComparison', () => {
 
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
+        "decorator": undefined,
         "innerSpacing": Object {
           "postOp": " ",
           "preOp": " ",
@@ -129,6 +141,7 @@ describe('SqlComparison', () => {
 
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
+        "decorator": undefined,
         "innerSpacing": Object {
           "postOp": "   ",
           "preOp": "  ",
@@ -157,6 +170,194 @@ describe('SqlComparison', () => {
     `);
   });
 
+  it('works with = ANY', () => {
+    const sql = `X = ANY (SELECT page FROM wikipedia GROUP BY 1 ORDER BY COUNT(*) DESC LIMIT 5)`;
+
+    backAndForth(sql);
+
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+      SqlComparison {
+        "decorator": "ANY",
+        "innerSpacing": Object {
+          "postDecorator": " ",
+          "postOp": " ",
+          "preOp": " ",
+        },
+        "lhs": SqlRef {
+          "column": "X",
+          "innerSpacing": Object {},
+          "namespace": undefined,
+          "namespaceQuotes": false,
+          "quotes": false,
+          "table": undefined,
+          "tableQuotes": false,
+          "type": "ref",
+        },
+        "notKeyword": undefined,
+        "op": "=",
+        "rhs": SqlQuery {
+          "explainKeyword": undefined,
+          "fromClause": SqlFromClause {
+            "expressions": SeparatedArray {
+              "separators": Array [],
+              "values": Array [
+                SqlAlias {
+                  "alias": undefined,
+                  "asKeyword": undefined,
+                  "expression": SqlRef {
+                    "column": undefined,
+                    "innerSpacing": Object {},
+                    "namespace": undefined,
+                    "namespaceQuotes": false,
+                    "quotes": false,
+                    "table": "wikipedia",
+                    "tableQuotes": false,
+                    "type": "ref",
+                  },
+                  "innerSpacing": Object {},
+                  "type": "alias",
+                },
+              ],
+            },
+            "innerSpacing": Object {
+              "postKeyword": " ",
+            },
+            "joinParts": undefined,
+            "keyword": "FROM",
+            "type": "fromClause",
+          },
+          "groupByClause": SqlGroupByClause {
+            "expressions": SeparatedArray {
+              "separators": Array [],
+              "values": Array [
+                SqlLiteral {
+                  "innerSpacing": Object {},
+                  "keyword": undefined,
+                  "stringValue": "1",
+                  "type": "literal",
+                  "value": 1,
+                },
+              ],
+            },
+            "innerSpacing": Object {
+              "postKeyword": " ",
+            },
+            "keyword": "GROUP BY",
+            "type": "groupByClause",
+          },
+          "havingClause": undefined,
+          "innerSpacing": Object {
+            "postQuery": "",
+            "postSelect": " ",
+            "preFrom": " ",
+            "preGroupBy": " ",
+            "preLimit": " ",
+            "preOrderBy": " ",
+            "preQuery": "",
+          },
+          "limitClause": SqlLimitClause {
+            "innerSpacing": Object {
+              "postKeyword": " ",
+            },
+            "keyword": "LIMIT",
+            "limit": SqlLiteral {
+              "innerSpacing": Object {},
+              "keyword": undefined,
+              "stringValue": "5",
+              "type": "literal",
+              "value": 5,
+            },
+            "type": "limitClause",
+          },
+          "offsetClause": undefined,
+          "orderByClause": SqlOrderByClause {
+            "expressions": SeparatedArray {
+              "separators": Array [],
+              "values": Array [
+                SqlOrderByExpression {
+                  "direction": "DESC",
+                  "expression": SqlFunction {
+                    "args": SeparatedArray {
+                      "separators": Array [],
+                      "values": Array [
+                        SqlRef {
+                          "column": "*",
+                          "innerSpacing": Object {},
+                          "namespace": undefined,
+                          "namespaceQuotes": false,
+                          "quotes": false,
+                          "table": undefined,
+                          "tableQuotes": false,
+                          "type": "ref",
+                        },
+                      ],
+                    },
+                    "decorator": undefined,
+                    "filterKeyword": undefined,
+                    "functionName": "COUNT",
+                    "innerSpacing": Object {
+                      "postArguments": "",
+                      "postLeftParen": "",
+                      "preLeftParen": "",
+                    },
+                    "specialParen": undefined,
+                    "type": "function",
+                    "whereClause": undefined,
+                  },
+                  "innerSpacing": Object {
+                    "preDirection": " ",
+                  },
+                  "type": "orderByExpression",
+                },
+              ],
+            },
+            "innerSpacing": Object {
+              "postKeyword": " ",
+            },
+            "keyword": "ORDER BY",
+            "type": "orderByClause",
+          },
+          "parens": Array [
+            Object {
+              "leftSpacing": "",
+              "rightSpacing": "",
+            },
+          ],
+          "selectDecorator": undefined,
+          "selectExpressions": SeparatedArray {
+            "separators": Array [],
+            "values": Array [
+              SqlAlias {
+                "alias": undefined,
+                "asKeyword": undefined,
+                "expression": SqlRef {
+                  "column": "page",
+                  "innerSpacing": Object {},
+                  "namespace": undefined,
+                  "namespaceQuotes": false,
+                  "quotes": false,
+                  "table": undefined,
+                  "tableQuotes": false,
+                  "type": "ref",
+                },
+                "innerSpacing": Object {},
+                "type": "alias",
+              },
+            ],
+          },
+          "selectKeyword": "SELECT",
+          "type": "query",
+          "unionKeyword": undefined,
+          "unionQuery": undefined,
+          "whereClause": undefined,
+          "withKeyword": undefined,
+          "withParts": undefined,
+        },
+        "type": "comparison",
+      }
+    `);
+  });
+
   it('works with IS', () => {
     const sql = `X  IS   NULL`;
 
@@ -164,6 +365,7 @@ describe('SqlComparison', () => {
 
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
+        "decorator": undefined,
         "innerSpacing": Object {
           "postOp": "   ",
           "preOp": "  ",
@@ -199,6 +401,7 @@ describe('SqlComparison', () => {
 
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
+        "decorator": undefined,
         "innerSpacing": Object {
           "not": "    ",
           "postOp": "   ",
@@ -235,6 +438,7 @@ describe('SqlComparison', () => {
 
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
+        "decorator": undefined,
         "innerSpacing": Object {
           "postOp": " ",
           "preOp": " ",
@@ -274,6 +478,7 @@ describe('SqlComparison', () => {
 
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
+        "decorator": undefined,
         "innerSpacing": Object {
           "not": " ",
           "postOp": " ",
@@ -314,6 +519,7 @@ describe('SqlComparison', () => {
 
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
+        "decorator": undefined,
         "innerSpacing": Object {
           "postOp": " ",
           "preOp": " ",
@@ -434,6 +640,7 @@ describe('SqlComparison', () => {
 
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
+        "decorator": undefined,
         "innerSpacing": Object {
           "not": " ",
           "postOp": " ",
@@ -555,6 +762,7 @@ describe('SqlComparison', () => {
 
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
+        "decorator": undefined,
         "innerSpacing": Object {
           "postOp": " ",
           "preOp": " ",
@@ -612,6 +820,7 @@ describe('SqlComparison', () => {
 
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
+        "decorator": undefined,
         "innerSpacing": Object {
           "not": " ",
           "postOp": " ",
@@ -671,6 +880,7 @@ describe('SqlComparison', () => {
 
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
+        "decorator": undefined,
         "innerSpacing": Object {
           "postOp": " ",
           "preOp": " ",
@@ -706,6 +916,7 @@ describe('SqlComparison', () => {
 
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
+        "decorator": undefined,
         "innerSpacing": Object {
           "not": " ",
           "postOp": " ",
@@ -742,6 +953,7 @@ describe('SqlComparison', () => {
 
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
+        "decorator": undefined,
         "innerSpacing": Object {
           "not": " ",
           "postOp": " ",
@@ -865,6 +1077,7 @@ describe('SqlComparison', () => {
 
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
+        "decorator": undefined,
         "innerSpacing": Object {
           "postOp": " ",
           "preOp": " ",
@@ -915,6 +1128,7 @@ describe('SqlComparison', () => {
 
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
+        "decorator": undefined,
         "innerSpacing": Object {
           "not": " ",
           "postOp": " ",
@@ -967,6 +1181,7 @@ describe('SqlComparison', () => {
 
       expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
         SqlComparison {
+          "decorator": undefined,
           "innerSpacing": Object {
             "postOp": " ",
             "preOp": " ",
@@ -1005,6 +1220,7 @@ describe('SqlComparison', () => {
 
       expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
         SqlComparison {
+          "decorator": undefined,
           "innerSpacing": Object {
             "postOp": " ",
             "preOp": " ",
@@ -1037,6 +1253,7 @@ describe('SqlComparison', () => {
 
       expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
         SqlComparison {
+          "decorator": undefined,
           "innerSpacing": Object {
             "postOp": " ",
             "preOp": " ",
@@ -1075,6 +1292,7 @@ describe('SqlComparison', () => {
 
       expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
         SqlComparison {
+          "decorator": undefined,
           "innerSpacing": Object {
             "postOp": " ",
             "preOp": " ",
@@ -1107,6 +1325,7 @@ describe('SqlComparison', () => {
 
       expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
         SqlComparison {
+          "decorator": undefined,
           "innerSpacing": Object {
             "postOp": " ",
             "preOp": " ",
@@ -1145,6 +1364,7 @@ describe('SqlComparison', () => {
 
       expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
         SqlComparison {
+          "decorator": undefined,
           "innerSpacing": Object {
             "postOp": " ",
             "preOp": " ",
@@ -1242,6 +1462,7 @@ describe('SqlComparison', () => {
                       "type": "ref",
                     },
                     SqlComparison {
+                      "decorator": undefined,
                       "innerSpacing": Object {
                         "postOp": " ",
                         "preOp": " ",
@@ -1311,6 +1532,7 @@ describe('SqlComparison', () => {
 
       expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
         SqlComparison {
+          "decorator": undefined,
           "innerSpacing": Object {
             "postOp": " ",
             "preOp": " ",

@@ -1038,6 +1038,7 @@ describe('Combined expression', () => {
                     "type": "ref",
                   },
                   SqlComparison {
+                    "decorator": undefined,
                     "innerSpacing": Object {
                       "postOp": " ",
                       "preOp": " ",
@@ -1134,6 +1135,7 @@ describe('Combined expression', () => {
                 ],
                 "values": Array [
                   SqlComparison {
+                    "decorator": undefined,
                     "innerSpacing": Object {
                       "postOp": " ",
                       "preOp": " ",
@@ -1260,6 +1262,7 @@ describe('Combined expression', () => {
                     "type": "ref",
                   },
                   SqlComparison {
+                    "decorator": undefined,
                     "innerSpacing": Object {
                       "postOp": " ",
                       "preOp": " ",
@@ -2045,6 +2048,7 @@ describe('getSqlRefs', () => {
 
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
+        "decorator": undefined,
         "innerSpacing": Object {
           "postOp": " ",
           "preOp": " ",
@@ -2080,6 +2084,7 @@ describe('getSqlRefs', () => {
 
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
+        "decorator": undefined,
         "innerSpacing": Object {
           "not": " ",
           "postOp": " ",
@@ -2116,6 +2121,7 @@ describe('getSqlRefs', () => {
 
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
+        "decorator": undefined,
         "innerSpacing": Object {
           "not": " ",
           "postOp": " ",
@@ -2162,6 +2168,7 @@ describe('getSqlRefs', () => {
           ],
           "values": Array [
             SqlComparison {
+              "decorator": undefined,
               "innerSpacing": Object {
                 "not": " ",
                 "postOp": " ",
@@ -2189,6 +2196,7 @@ describe('getSqlRefs', () => {
               "type": "comparison",
             },
             SqlComparison {
+              "decorator": undefined,
               "innerSpacing": Object {
                 "postOp": " ",
                 "preOp": " ",

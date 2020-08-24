@@ -481,6 +481,7 @@ describe('SqlFunction', () => {
         "type": "function",
         "whereClause": SqlWhereClause {
           "expression": SqlComparison {
+            "decorator": undefined,
             "innerSpacing": Object {
               "postOp": " ",
               "preOp": " ",
