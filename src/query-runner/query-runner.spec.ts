@@ -50,12 +50,15 @@ describe('QueryRunner', () => {
   });
 
   it('works with rune query', async () => {
-    const queryResult = await queryRunner.runQuery(
-      { type: 'topN' },
-      {
+    const queryResult = await queryRunner.runQuery({
+      query: {
+        type: 'topN',
+      },
+      extraQueryContext: {
         lol: 'here',
       },
-    );
+    });
+
     expect(queryResult).toMatchInlineSnapshot(`
       QueryResult {
         "header": Array [
@@ -106,17 +109,18 @@ describe('QueryRunner', () => {
   });
 
   it('works with wrapped SQL query', async () => {
-    const queryResult = await queryRunner.runQuery(
-      {
+    const queryResult = await queryRunner.runQuery({
+      query: {
         query:
           'SELECT\n  channel, COUNT(*) AS "Count"\nFROM wikipedia\nGROUP BY 1\nORDER BY 2 DESC',
         resultFormat: 'array',
         header: true,
       },
-      {
+      extraQueryContext: {
         lol: 'here',
       },
-    );
+    });
+
     expect(queryResult).toMatchInlineSnapshot(`
       QueryResult {
         "header": Array [
@@ -330,12 +334,13 @@ describe('QueryRunner', () => {
   });
 
   it('works with unwraped SQL query', async () => {
-    const queryResult = await queryRunner.runQuery(
-      'SELECT\n  channel, COUNT(*) AS "Count"\nFROM wikipedia\nGROUP BY 1\nORDER BY 2 DESC',
-      {
+    const queryResult = await queryRunner.runQuery({
+      query: 'SELECT\n  channel, COUNT(*) AS "Count"\nFROM wikipedia\nGROUP BY 1\nORDER BY 2 DESC',
+      extraQueryContext: {
         lol: 'here',
       },
-    );
+    });
+
     expect(queryResult).toMatchInlineSnapshot(`
       QueryResult {
         "header": Array [
@@ -549,14 +554,14 @@ describe('QueryRunner', () => {
   });
 
   it('works with a parsed SQL query', async () => {
-    const queryResult = await queryRunner.runQuery(
-      SqlQuery.parse(
+    const queryResult = await queryRunner.runQuery({
+      query: SqlQuery.parse(
         'SELECT\n  channel, COUNT(*) AS "Count"\nFROM wikipedia\nGROUP BY 1\nORDER BY 2 DESC',
       ),
-      {
+      extraQueryContext: {
         lol: 'here',
       },
-    );
+    });
     expect(queryResult).toMatchInlineSnapshot(`
       QueryResult {
         "header": Array [
@@ -770,15 +775,16 @@ describe('QueryRunner', () => {
   });
 
   it('works with a parsed SQL query', async () => {
-    const queryResult = await queryRunner.runQuery(
-      SqlQuery.parse(
+    const queryResult = await queryRunner.runQuery({
+      query: SqlQuery.parse(
         'SELECT\n  channel, COUNT(*) AS "Count"\nFROM wikipedia\nGROUP BY 1\nORDER BY 2 DESC',
       ),
-      {
+      extraQueryContext: {
         lol: 'here',
       },
-      [{ type: 'VARCHAR', value: 'test-param-value' }],
-    );
+      queryParameters: [{ type: 'VARCHAR', value: 'test-param-value' }],
+    });
+
     expect(queryResult.sqlQueryId).toEqual('test-param-value');
   });
 });

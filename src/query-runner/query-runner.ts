@@ -14,6 +14,8 @@
 
 import { QueryResult, SqlQuery } from '..';
 
+import { CancelToken } from './cancel-token';
+
 export interface QueryParameter {
   type: string;
   value: string | number;
@@ -24,9 +26,22 @@ export interface DataAndHeaders {
   headers: Record<string, string>;
 }
 
-export type QueryExecutor = (payload: any, isSql: boolean) => Promise<DataAndHeaders>;
+export type QueryExecutor = (
+  payload: any,
+  isSql: boolean,
+  cancelToken?: CancelToken,
+) => Promise<DataAndHeaders>;
+
+export interface RunQueryOptions {
+  query: string | SqlQuery | Record<string, any>;
+  extraQueryContext?: Record<string, any>;
+  queryParameters?: QueryParameter[];
+  cancelToken?: CancelToken;
+}
 
 export class QueryRunner {
+  static defaultQueryExecutor: QueryExecutor;
+
   static now(): number {
     return Date.now();
   }
@@ -37,15 +52,16 @@ export class QueryRunner {
 
   public queryExecutor: QueryExecutor;
 
-  constructor(queryExecutor: QueryExecutor) {
-    this.queryExecutor = queryExecutor;
+  constructor(queryExecutor?: QueryExecutor) {
+    this.queryExecutor = queryExecutor || QueryRunner.defaultQueryExecutor;
+    if (!this.queryExecutor) {
+      throw new Error(`Query executor must be provided`);
+    }
   }
 
-  public async runQuery(
-    query: string | SqlQuery | Record<string, any>,
-    extraContext?: Record<string, any>,
-    queryParameters?: QueryParameter[],
-  ): Promise<QueryResult> {
+  public async runQuery(options: RunQueryOptions): Promise<QueryResult> {
+    const { query, extraQueryContext, queryParameters, cancelToken } = options;
+
     let isSql: boolean;
     let jsonQuery: Record<string, any>;
     let parsedQuery: SqlQuery | undefined;
@@ -77,9 +93,9 @@ export class QueryRunner {
       }
     }
 
-    if (!QueryRunner.isEmptyContext(extraContext)) {
+    if (!QueryRunner.isEmptyContext(extraQueryContext)) {
       jsonQuery = Object.assign({}, jsonQuery, {
-        context: Object.assign({}, jsonQuery.context || {}, extraContext),
+        context: Object.assign({}, jsonQuery.context || {}, extraQueryContext),
       });
     }
 
@@ -94,8 +110,10 @@ export class QueryRunner {
     }
 
     const startTime = QueryRunner.now();
-    const dataAndHeaders = await this.queryExecutor(jsonQuery, isSql);
+    const dataAndHeaders = await this.queryExecutor(jsonQuery, isSql, cancelToken);
     const endTime = QueryRunner.now();
+
+    if (cancelToken) cancelToken.throwIfRequested();
 
     return QueryResult.fromQueryAndRawResult(jsonQuery, dataAndHeaders.data)
       .attachQuery(jsonQuery, parsedQuery)
