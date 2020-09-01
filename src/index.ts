@@ -15,3 +15,4 @@
 export * from './sql';
 export * from './query-result/query-result';
 export * from './query-runner/query-runner';
+export * from './introspect/introspect';
