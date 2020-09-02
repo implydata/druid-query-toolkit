@@ -27,7 +27,7 @@ import {
   SqlRef,
   SqlWhereClause,
   Substitutor,
-} from '../..';
+} from '..';
 import { filterMap } from '../../utils';
 import { parseSql } from '../parser';
 import { SqlBase, SqlBaseValue, SqlType } from '../sql-base';
@@ -58,7 +58,7 @@ export interface SqlQueryValue extends SqlBaseValue {
   unionQuery?: SqlQuery;
 }
 
-export class SqlQuery extends SqlBase {
+export class SqlQuery extends SqlExpression {
   static type: SqlType = 'query';
 
   static readonly DEFAULT_WITH_KEYWORD = 'WITH';

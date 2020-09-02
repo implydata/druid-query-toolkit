@@ -108,6 +108,10 @@ describe('SqlExpression', () => {
     it('works with AND', () => {
       expect(String(SqlExpression.parse('a AND b And c').decomposeViaAnd())).toEqual('a,b,c');
     });
+
+    it('works with query', () => {
+      expect(String(SqlExpression.parse('SELECT 13').decomposeViaAnd())).toEqual('SELECT 13');
+    });
   });
 
   describe('#filterAnd', () => {

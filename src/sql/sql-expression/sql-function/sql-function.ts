@@ -13,9 +13,8 @@
  */
 
 import { SqlLiteral, SqlRef } from '..';
+import { SeparatedArray, Separator, SqlWhereClause } from '../..';
 import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../../sql-base';
-import { SqlWhereClause } from '../../sql-query';
-import { SeparatedArray, Separator } from '../../utils';
 import { SqlExpression } from '../sql-expression';
 
 export type SpecialParen = 'square' | 'none';

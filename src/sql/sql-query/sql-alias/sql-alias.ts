@@ -12,9 +12,9 @@
  * limitations under the License.
  */
 
+import { SqlQuery } from '..';
 import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../../sql-base';
 import { SqlExpression, SqlRef } from '../../sql-expression';
-import { SqlQuery } from '../sql-query';
 
 export interface SqlAliasValue extends SqlBaseValue {
   expression: SqlExpression | SqlQuery;
