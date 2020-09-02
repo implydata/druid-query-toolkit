@@ -1111,7 +1111,7 @@ QuotedRefPart = ["] name:$([^"]+) ["]
   };
 }
 
-UnquotedRefPart = name:UnquotedRefPartFree !{ return sql.SqlBase.isReservedKeyword(name) }
+UnquotedRefPart = name:UnquotedRefPartFree &{ return sql.SqlBase.isNakedRefAppropriate(name) }
 {
   return {
     name: text(),

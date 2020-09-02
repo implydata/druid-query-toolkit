@@ -79,6 +79,11 @@ export abstract class SqlBase {
     return Boolean(reservedKeywordLookup[keyword.toUpperCase()]);
   }
 
+  static isNakedRefAppropriate(word: string) {
+    if (word === 'user') return true;
+    return !SqlBase.isReservedKeyword(word);
+  }
+
   static isNakedFunction(functionName: string) {
     return Boolean(specialFunctionLookup[functionName.toUpperCase()]);
   }

@@ -15,12 +15,25 @@
 import { QueryResult } from '../query-result/query-result';
 import { SqlQuery, SqlRef } from '../sql';
 
+export interface TableInfo {
+  name: string;
+}
+
+export interface ColumnInfo {
+  name: string;
+  type: string;
+}
+
 export class Introspect {
-  static getTableListQuery(): string {
+  static getTableIntrospectionQuery(): string {
     return `SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'druid' AND TABLE_TYPE = 'TABLE'`;
   }
 
-  static getTableColumnListQuery(thing: SqlRef | string): string {
+  static decodeTableIntrospectionResult(queryResult: QueryResult): TableInfo[] {
+    return queryResult.rows.map(r => ({ name: r[0] }));
+  }
+
+  static getTableColumnIntrospectionQuery(thing: SqlRef | string): SqlQuery {
     let tableName: string;
     if (thing instanceof SqlRef) {
       if (thing.column || !thing.table) {
@@ -30,16 +43,39 @@ export class Introspect {
     } else {
       tableName = thing;
     }
-    return `SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'druid' AND TABLE_NAME = ${SqlRef.columnWithQuotes(
-      tableName,
-    )}`;
+    return SqlQuery.parse(
+      `SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'druid' AND TABLE_NAME = ${SqlRef.columnWithQuotes(
+        tableName,
+      )}`,
+    );
   }
 
-  static getQueryColumnListQuery(query: SqlQuery | string): string {
-    return `EXPLAIN PLAN FOR (${query}\n)`;
+  static decodeTableColumnIntrospectionResult(queryResult: QueryResult): ColumnInfo[] {
+    if (queryResult.getHeaderNames().join(',') !== 'COLUMN_NAME,DATA_TYPE') {
+      throw new Error('invalid result shape, bad header');
+    }
+    return queryResult.rows.map(r => ({ name: r[0], type: r[1] }));
   }
 
-  static decodeTableListResult(_queryResult: QueryResult): string[] {
-    throw new Error('ToDo');
+  static getQueryColumnIntrospectionQuery(query: SqlQuery): SqlQuery {
+    return query.makeExplain();
+  }
+
+  static decodeQueryColumnIntrospectionResult(queryResult: QueryResult): ColumnInfo[] {
+    const { rows, sqlQuery } = queryResult;
+    if (!sqlQuery) throw new Error('must have a sqlQuery');
+    if (queryResult.getHeaderNames().join(',') !== 'PLAN') {
+      throw new Error('invalid result shape, bad header');
+    }
+    if (rows.length !== 1) throw new Error('invalid result shape, bad number of results');
+
+    const plan = rows[0][0];
+    const m = plan.match(/ signature=\[\{(.*)}]/m);
+    if (!m) throw new Error('could not find signature');
+
+    const types = m[1].split(/,\s/g).map((t: string) => t.split(':')[1]);
+    const outputColumns = sqlQuery.getOutputColumns();
+    if (outputColumns.length !== types.length) throw new Error('invalid number of types');
+    return outputColumns.map((name, i) => ({ name, type: types[i] }));
   }
 }

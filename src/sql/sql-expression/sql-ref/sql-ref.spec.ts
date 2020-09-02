@@ -22,7 +22,7 @@ describe('SqlRef', () => {
     expect(() => SqlExpression.parse(sql)).toThrowError('Expected');
   });
 
-  it('#create', () => {
+  it('#column', () => {
     const star = SqlRef.column('*');
 
     backAndForth(star.toString());
@@ -39,6 +39,10 @@ describe('SqlRef', () => {
         "type": "ref",
       }
     `);
+  });
+
+  it('#column (reserved)', () => {
+    expect(String(SqlRef.column('user'))).toEqual(`"user"`);
   });
 
   it('Ref with double quotes and double quoted namespace', () => {

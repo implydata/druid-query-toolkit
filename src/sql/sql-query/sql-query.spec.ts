@@ -40,6 +40,14 @@ describe('SqlQuery', () => {
       `SELECT *, page FROM wikipedia t`,
       `SELECT DISTINCT a, b FROM wikipedia t`,
       `SELECT ALL a, b FROM wikipedia t`,
+      sane`
+        SELECT
+          flags, channel, user, page,
+          SUM(sum_added) AS Added
+        FROM wikipedia
+        GROUP BY 1, 2, 3, 4
+        ORDER BY 4 DESC
+      `,
     ];
 
     for (const sql of queries) {
@@ -57,6 +65,7 @@ describe('SqlQuery', () => {
       `Selec 3`,
       `(Select * from tbl`,
       `Select count(*) As count from tbl`,
+      // `SELECT 1 AS user`,
     ];
 
     for (const sql of queries) {

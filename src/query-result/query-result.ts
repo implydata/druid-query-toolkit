@@ -301,6 +301,10 @@ export class QueryResult {
     return new QueryResult(value);
   }
 
+  public getHeaderNames(): string[] {
+    return this.header.map(h => h.name);
+  }
+
   public getNumResults(): number {
     return this.rows.length;
   }

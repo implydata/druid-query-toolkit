@@ -517,6 +517,14 @@ export class SqlQuery extends SqlBase {
     return SqlBase.fromValue(value);
   }
 
+  /* ~~~~~ EXPLAIN ~~~~~ */
+
+  makeExplain(): SqlQuery {
+    const value = this.valueOf();
+    value.explainKeyword = 'EXPLAIN PLAN FOR';
+    return SqlBase.fromValue(value);
+  }
+
   /* ~~~~~ SELECT ~~~~~ */
 
   isValidSelectIndex(selectIndex: number): boolean {
