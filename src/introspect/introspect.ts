@@ -13,7 +13,7 @@
  */
 
 import { QueryResult } from '../query-result/query-result';
-import { SqlQuery, SqlRef } from '../sql';
+import { SqlLiteral, SqlQuery, SqlRef } from '../sql';
 
 export interface TableInfo {
   name: string;
@@ -44,7 +44,7 @@ export class Introspect {
       tableName = thing;
     }
     return SqlQuery.parse(
-      `SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'druid' AND TABLE_NAME = ${SqlRef.columnWithQuotes(
+      `SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'druid' AND TABLE_NAME = ${SqlLiteral.create(
         tableName,
       )}`,
     );
@@ -77,5 +77,19 @@ export class Introspect {
     const outputColumns = sqlQuery.getOutputColumns();
     if (outputColumns.length !== types.length) throw new Error('invalid number of types');
     return outputColumns.map((name, i) => ({ name, type: types[i] }));
+  }
+
+  static decodeColumnIntrospectionResult(queryResult: QueryResult): ColumnInfo[] {
+    const headerShape = queryResult.getHeaderNames().join(',');
+    switch (headerShape) {
+      case 'COLUMN_NAME,DATA_TYPE':
+        return Introspect.decodeTableColumnIntrospectionResult(queryResult);
+
+      case 'PLAN':
+        return Introspect.decodeQueryColumnIntrospectionResult(queryResult);
+
+      default:
+        throw new Error('unknown header shape');
+    }
   }
 }
