@@ -16,6 +16,11 @@ import { Introspect, QueryResult, SqlQuery } from '..';
 import { sane } from '../test-utils';
 
 describe('Introspect', () => {
+  const emptyQueryResult = new QueryResult({
+    header: [],
+    rows: [],
+  });
+
   it('.decodeTableColumnIntrospectionResult', () => {
     const queryResult = new QueryResult({
       header: [{ name: 'TABLE_NAME' }],
@@ -30,6 +35,8 @@ describe('Introspect', () => {
         name: 'github',
       },
     ]);
+
+    expect(Introspect.decodeTableIntrospectionResult(emptyQueryResult)).toEqual([]);
   });
 
   it('.decodeTableColumnIntrospectionResult', () => {
@@ -81,6 +88,8 @@ describe('Introspect', () => {
         type: 'VARCHAR',
       },
     ]);
+
+    expect(Introspect.decodeTableColumnIntrospectionResult(emptyQueryResult)).toEqual([]);
   });
 
   it('.decodeQueryColumnIntrospectionResult', () => {
@@ -112,5 +121,7 @@ describe('Introspect', () => {
         type: 'LONG',
       },
     ]);
+
+    expect(Introspect.decodeQueryColumnIntrospectionResult(emptyQueryResult)).toEqual([]);
   });
 });

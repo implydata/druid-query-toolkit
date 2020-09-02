@@ -305,6 +305,10 @@ export class QueryResult {
     return this.header.map(h => h.name);
   }
 
+  public isEmpty(): boolean {
+    return !this.rows.length;
+  }
+
   public getNumResults(): number {
     return this.rows.length;
   }

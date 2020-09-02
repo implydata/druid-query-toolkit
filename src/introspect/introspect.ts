@@ -30,6 +30,7 @@ export class Introspect {
   }
 
   static decodeTableIntrospectionResult(queryResult: QueryResult): TableInfo[] {
+    if (queryResult.isEmpty()) return [];
     return queryResult.rows.map(r => ({ name: r[0] }));
   }
 
@@ -51,6 +52,7 @@ export class Introspect {
   }
 
   static decodeTableColumnIntrospectionResult(queryResult: QueryResult): ColumnInfo[] {
+    if (queryResult.isEmpty()) return [];
     if (queryResult.getHeaderNames().join(',') !== 'COLUMN_NAME,DATA_TYPE') {
       throw new Error('invalid result shape, bad header');
     }
@@ -63,6 +65,7 @@ export class Introspect {
 
   static decodeQueryColumnIntrospectionResult(queryResult: QueryResult): ColumnInfo[] {
     const { rows, sqlQuery } = queryResult;
+    if (queryResult.isEmpty()) return [];
     if (!sqlQuery) throw new Error('must have a sqlQuery');
     if (queryResult.getHeaderNames().join(',') !== 'PLAN') {
       throw new Error('invalid result shape, bad header');
