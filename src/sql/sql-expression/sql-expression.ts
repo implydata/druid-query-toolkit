@@ -79,7 +79,7 @@ export abstract class SqlExpression extends SqlBase {
     if (ret instanceof SqlExpression) {
       return ret;
     } else {
-      throw new Error('must return a sql expression');
+      throw new Error('expression walker must return a SQL expression');
     }
   }
 
