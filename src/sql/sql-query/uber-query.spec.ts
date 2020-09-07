@@ -112,7 +112,8 @@ describe('Uber Query', () => {
     ]);
   });
 
-  it('has everything', () => {
+  it('has things', () => {
+    expect(query.hasStarInSelect()).toEqual(false);
     expect(query.hasFrom()).toEqual(true);
     expect(query.hasJoin()).toEqual(true);
     expect(query.hasWhere()).toEqual(true);

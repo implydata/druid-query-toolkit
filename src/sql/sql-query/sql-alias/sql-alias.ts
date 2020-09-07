@@ -127,6 +127,11 @@ export class SqlAlias extends SqlBase {
     }
     return;
   }
+
+  public isStar(): boolean {
+    const { expression } = this;
+    return expression instanceof SqlRef && expression.isStar();
+  }
 }
 
 SqlBase.register(SqlAlias);

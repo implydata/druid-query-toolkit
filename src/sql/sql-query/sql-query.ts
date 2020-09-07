@@ -531,8 +531,16 @@ export class SqlQuery extends SqlExpression {
     return selectIndex >= 0 && selectIndex < this.selectExpressions.length();
   }
 
+  getAllSelectExpressions(): readonly SqlAlias[] {
+    return this.selectExpressions.values;
+  }
+
   getSelectExpressionForIndex(selectIndex: number): SqlAlias | undefined {
     return this.selectExpressions.get(selectIndex);
+  }
+
+  hasStarInSelect(): boolean {
+    return this.selectExpressions.values.some(v => v.isStar());
   }
 
   getOutputColumns(): string[] {
