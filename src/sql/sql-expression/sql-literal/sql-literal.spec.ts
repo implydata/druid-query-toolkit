@@ -334,15 +334,30 @@ describe('SqlLiteral', () => {
   });
 
   it('works with create', () => {
-    expect(SqlLiteral.create(null).toString()).toEqual('NULL');
-    expect(SqlLiteral.create(false).toString()).toEqual('FALSE');
-    expect(SqlLiteral.create(true).toString()).toEqual('TRUE');
-    expect(SqlLiteral.create(1.2).toString()).toEqual('1.2');
-    expect(SqlLiteral.create(`hello`).toString()).toEqual(`'hello'`);
-    expect(SqlLiteral.create(`he'o`).toString()).toEqual(`'he''o'`);
-    expect(SqlLiteral.create(new Date('2020-01-02Z')).toString()).toEqual(`TIMESTAMP '2020-01-02'`);
-    expect(SqlLiteral.create(new Date('2020-01-02T03:04:05Z')).toString()).toEqual(
+    expect(String(SqlLiteral.create(null))).toEqual('NULL');
+    expect(String(SqlLiteral.create(false))).toEqual('FALSE');
+    expect(String(SqlLiteral.create(true))).toEqual('TRUE');
+    expect(String(SqlLiteral.create(1.2))).toEqual('1.2');
+    expect(String(SqlLiteral.create(`hello`))).toEqual(`'hello'`);
+    expect(String(SqlLiteral.create(`he'o`))).toEqual(`'he''o'`);
+    expect(String(SqlLiteral.create(new Date('2020-01-02Z')))).toEqual(`TIMESTAMP '2020-01-02'`);
+    expect(String(SqlLiteral.create(new Date('2020-01-02T03:04:05Z')))).toEqual(
       `TIMESTAMP '2020-01-02 03:04:05'`,
     );
+  });
+
+  it(`doesn't works with create`, () => {
+    expect(() => SqlLiteral.create([1, 2, 3] as any)).toThrow('SqlLiteral invalid object input');
+
+    expect(() => SqlLiteral.create({ lol: 1 } as any)).toThrow('SqlLiteral invalid object input');
+
+    expect(() => SqlLiteral.create((() => 1) as any)).toThrow(
+      'SqlLiteral invalid input of type function',
+    );
+  });
+
+  it('works with maybe', () => {
+    expect(String(SqlLiteral.maybe(null))).toEqual('NULL');
+    expect(String(SqlLiteral.maybe(() => 1))).toEqual('undefined');
   });
 });

@@ -49,7 +49,7 @@ export class SqlLiteral extends SqlExpression {
           keyword = 'TIMESTAMP';
           stringValue = `'${SqlLiteral.dateToTimestampValue(value)}'`;
         } else {
-          throw new TypeError('invalid input');
+          throw new TypeError('SqlLiteral invalid object input');
         }
         break;
 
@@ -64,6 +64,9 @@ export class SqlLiteral extends SqlExpression {
       case 'string':
         stringValue = SqlLiteral.escapeLiteralString(value);
         break;
+
+      default:
+        throw new TypeError(`SqlLiteral invalid input of type ${typeof value}`);
     }
 
     return new SqlLiteral({
@@ -71,6 +74,14 @@ export class SqlLiteral extends SqlExpression {
       value,
       stringValue,
     });
+  }
+
+  static maybe(value: any): SqlLiteral | undefined {
+    try {
+      return SqlLiteral.create(value);
+    } catch {
+      return;
+    }
   }
 
   static index(n: number): SqlLiteral {
