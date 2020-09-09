@@ -21,107 +21,220 @@ describe('Introspect', () => {
     rows: [],
   });
 
-  it('.decodeTableColumnIntrospectionResult', () => {
-    const queryResult = new QueryResult({
-      header: [{ name: 'TABLE_NAME' }],
-      rows: [['wikipedia'], ['github']],
+  describe('.decodeTableIntrospectionResult', () => {
+    it('works', () => {
+      const queryResult = new QueryResult({
+        header: [{ name: 'TABLE_NAME' }],
+        rows: [['wikipedia'], ['github']],
+      });
+
+      expect(Introspect.decodeTableIntrospectionResult(queryResult)).toEqual([
+        {
+          name: 'wikipedia',
+        },
+        {
+          name: 'github',
+        },
+      ]);
     });
 
-    expect(Introspect.decodeTableIntrospectionResult(queryResult)).toEqual([
-      {
-        name: 'wikipedia',
-      },
-      {
-        name: 'github',
-      },
-    ]);
-
-    expect(Introspect.decodeTableIntrospectionResult(emptyQueryResult)).toEqual([]);
-  });
-
-  it('.decodeTableColumnIntrospectionResult', () => {
-    const queryResult = new QueryResult({
-      header: [{ name: 'COLUMN_NAME' }, { name: 'DATA_TYPE' }],
-      rows: [
-        ['__time', 'TIMESTAMP'],
-        ['channel', 'VARCHAR'],
-        ['cityName', 'VARCHAR'],
-        ['comment', 'VARCHAR'],
-        ['count', 'BIGINT'],
-        ['sum_delta', 'BIGINT'],
-        ['sum_deltaBucket', 'BIGINT'],
-        ['user', 'VARCHAR'],
-      ],
+    it('works with empty result', () => {
+      expect(Introspect.decodeTableIntrospectionResult(emptyQueryResult)).toEqual([]);
     });
-
-    expect(Introspect.decodeTableColumnIntrospectionResult(queryResult)).toEqual([
-      {
-        name: '__time',
-        type: 'TIMESTAMP',
-      },
-      {
-        name: 'channel',
-        type: 'VARCHAR',
-      },
-      {
-        name: 'cityName',
-        type: 'VARCHAR',
-      },
-      {
-        name: 'comment',
-        type: 'VARCHAR',
-      },
-      {
-        name: 'count',
-        type: 'BIGINT',
-      },
-      {
-        name: 'sum_delta',
-        type: 'BIGINT',
-      },
-      {
-        name: 'sum_deltaBucket',
-        type: 'BIGINT',
-      },
-      {
-        name: 'user',
-        type: 'VARCHAR',
-      },
-    ]);
-
-    expect(Introspect.decodeTableColumnIntrospectionResult(emptyQueryResult)).toEqual([]);
   });
 
-  it('.decodeQueryColumnIntrospectionResult', () => {
-    const query = SqlQuery.parse(sane`
-      SELECT
-        cityName, COUNT(*) AS "Count"
-      FROM wikipedia
-      GROUP BY 1
-      ORDER BY 2 DESC
-    `);
-
-    const queryResult = new QueryResult({
-      sqlQuery: Introspect.getQueryColumnIntrospectionQuery(query),
-      header: [{ name: 'PLAN' }],
-      rows: [
-        [
-          'DruidQueryRel(query=[{"queryType":"groupBy","dataSource":{"type":"table","name":"wikipedia"},"intervals":{"type":"intervals","intervals":["-146136543-09-08T08:23:32.096Z/146140482-04-24T15:36:27.903Z"]},"virtualColumns":[],"filter":null,"granularity":{"type":"all"},"dimensions":[{"type":"default","dimension":"cityName","outputName":"d0","outputType":"STRING"}],"aggregations":[{"type":"count","name":"a0"}],"postAggregations":[],"having":null,"limitSpec":{"type":"default","columns":[{"dimension":"a0","direction":"descending","dimensionOrder":{"type":"numeric"}}],"limit":2147483647},"context":{"populateCache":false,"sqlQueryId":"d99b39ec-c005-4208-9bb3-7d9755c7a4f5","useApproximateCountDistinct":false,"useCache":false},"descending":false}], signature=[{d0:STRING, a0:LONG}])\n',
+  describe('.decodeTableColumnIntrospectionResult', () => {
+    it('works', () => {
+      const queryResult = new QueryResult({
+        header: [{ name: 'COLUMN_NAME' }, { name: 'DATA_TYPE' }],
+        rows: [
+          ['__time', 'TIMESTAMP'],
+          ['channel', 'VARCHAR'],
+          ['cityName', 'VARCHAR'],
+          ['comment', 'VARCHAR'],
+          ['count', 'BIGINT'],
+          ['sum_delta', 'BIGINT'],
+          ['sum_deltaBucket', 'BIGINT'],
+          ['user', 'VARCHAR'],
         ],
-      ],
+      });
+
+      expect(Introspect.decodeTableColumnIntrospectionResult(queryResult)).toEqual([
+        {
+          name: '__time',
+          type: 'TIMESTAMP',
+        },
+        {
+          name: 'channel',
+          type: 'VARCHAR',
+        },
+        {
+          name: 'cityName',
+          type: 'VARCHAR',
+        },
+        {
+          name: 'comment',
+          type: 'VARCHAR',
+        },
+        {
+          name: 'count',
+          type: 'BIGINT',
+        },
+        {
+          name: 'sum_delta',
+          type: 'BIGINT',
+        },
+        {
+          name: 'sum_deltaBucket',
+          type: 'BIGINT',
+        },
+        {
+          name: 'user',
+          type: 'VARCHAR',
+        },
+      ]);
     });
 
-    expect(Introspect.decodeQueryColumnIntrospectionResult(queryResult)).toEqual([
-      {
-        name: 'cityName',
-        type: 'STRING',
-      },
-      {
-        name: 'Count',
-        type: 'LONG',
-      },
-    ]);
+    it('works with empty result', () => {
+      expect(Introspect.decodeTableColumnIntrospectionResult(emptyQueryResult)).toEqual([]);
+    });
+  });
 
-    expect(Introspect.decodeQueryColumnIntrospectionResult(emptyQueryResult)).toEqual([]);
+  describe('.decodeColumnTypesFromPlan', () => {
+    it('works', () => {
+      const queryPlanResult = new QueryResult({
+        header: [{ name: 'PLAN' }],
+        rows: [['DruidQueryRel(query=[...\n...], signature=[{d0:STRING, a0:LONG}])\n']],
+      });
+
+      expect(Introspect.decodeColumnTypesFromPlan(queryPlanResult)).toEqual(['STRING', 'LONG']);
+    });
+
+    it('works with empty result', () => {
+      expect(Introspect.decodeColumnTypesFromPlan(emptyQueryResult)).toEqual([]);
+    });
+  });
+
+  describe('.getQueryColumnSampleQuery', () => {
+    expect(
+      String(
+        Introspect.getQueryColumnSampleQuery(
+          SqlQuery.parse(sane`
+            SELECT added + 1, * FROM "wikipedia"
+          `),
+        ),
+      ),
+    ).toEqual(sane`
+      SELECT added + 1, * FROM "wikipedia"
+      LIMIT 1
+    `);
+  });
+
+  describe('.decodeQueryColumnIntrospectionResult', () => {
+    it('works with empty result', () => {
+      expect(Introspect.decodeQueryColumnIntrospectionResult(emptyQueryResult)).toEqual([]);
+    });
+
+    it('works with all columns having good names', () => {
+      const query = SqlQuery.parse(sane`
+        SELECT
+          cityName, COUNT(*) AS "Count"
+        FROM wikipedia
+        GROUP BY 1
+        ORDER BY 2 DESC
+      `);
+
+      const queryPlanResult = new QueryResult({
+        sqlQuery: Introspect.getQueryColumnIntrospectionQuery(query),
+        header: [{ name: 'PLAN' }],
+        rows: [['DruidQueryRel(query=[...\n...], signature=[{d0:STRING, a0:LONG}])\n']],
+      });
+
+      expect(Introspect.decodeQueryColumnIntrospectionResult(queryPlanResult)).toEqual([
+        {
+          name: 'cityName',
+          type: 'STRING',
+        },
+        {
+          name: 'Count',
+          type: 'LONG',
+        },
+      ]);
+    });
+
+    it('works with some column not having good names', () => {
+      const query = SqlQuery.parse(sane`
+        SELECT
+          cityName, COUNT(*)
+        FROM wikipedia
+        GROUP BY 1
+        ORDER BY 2 DESC
+      `);
+
+      const queryPlanResult = new QueryResult({
+        sqlQuery: Introspect.getQueryColumnIntrospectionQuery(query),
+        header: [{ name: 'PLAN' }],
+        rows: [['DruidQueryRel(query=[...\n...], signature=[{d0:STRING, a0:LONG}])\n']],
+      });
+
+      expect(Introspect.decodeQueryColumnIntrospectionResult(queryPlanResult)).toEqual([
+        {
+          name: 'cityName',
+          type: 'STRING',
+        },
+      ]);
+    });
+
+    it('fails with star without sample', () => {
+      const query = SqlQuery.parse(sane`
+        SELECT cityName, * FROM wikipedia
+      `);
+
+      const queryPlanResult = new QueryResult({
+        sqlQuery: Introspect.getQueryColumnIntrospectionQuery(query),
+        header: [{ name: 'PLAN' }],
+        rows: [['DruidQueryRel(query=[...\n...], signature=[{d0:STRING, a0:LONG, a1:LONG}])\n']],
+      });
+
+      expect(() => Introspect.decodeQueryColumnIntrospectionResult(queryPlanResult)).toThrow(
+        'a query with a star must have sampleRowResult set',
+      );
+    });
+
+    it('works with star', () => {
+      const query = SqlQuery.parse(sane`
+        SELECT cityName, added + 1, * FROM wikipedia
+      `);
+
+      const queryPlanResult = new QueryResult({
+        sqlQuery: Introspect.getQueryColumnIntrospectionQuery(query),
+        header: [{ name: 'PLAN' }],
+        rows: [
+          ['DruidQueryRel(query=[...\n...], signature=[{d0:STRING, a0:LONG, a1:LONG, a1:LONG}])\n'],
+        ],
+      });
+
+      const sampleResult = new QueryResult({
+        header: [{ name: 'cityName' }, { name: 'EXPR$0' }, { name: 'delta' }, { name: 'deleted' }],
+        rows: [['SF'], [1], [4], [5]],
+      });
+
+      expect(
+        Introspect.decodeQueryColumnIntrospectionResult(queryPlanResult, sampleResult),
+      ).toEqual([
+        {
+          name: 'cityName',
+          type: 'STRING',
+        },
+        {
+          name: 'delta',
+          type: 'LONG',
+        },
+        {
+          name: 'deleted',
+          type: 'LONG',
+        },
+      ]);
+    });
   });
 });

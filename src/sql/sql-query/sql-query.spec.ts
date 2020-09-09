@@ -113,6 +113,15 @@ describe('SqlQuery', () => {
     });
   });
 
+  describe('.isPhonyOutputName', () => {
+    it('works', () => {
+      expect(SqlQuery.isPhonyOutputName('EXPR$0')).toEqual(true);
+      expect(SqlQuery.isPhonyOutputName('EXPR$12')).toEqual(true);
+      expect(SqlQuery.isPhonyOutputName('EXPR$01')).toEqual(false);
+      expect(SqlQuery.isPhonyOutputName('expr$')).toEqual(false);
+    });
+  });
+
   describe('#walk', () => {
     const sqlMaster = SqlQuery.parseSql(sane`
       SELECT

@@ -122,7 +122,7 @@ export class SqlAlias extends SqlBase {
   public getOutputName(): string | undefined {
     if (this.alias) return this.alias.getName();
     const { expression } = this;
-    if (expression instanceof SqlRef) {
+    if (expression instanceof SqlRef && !expression.isStar()) {
       return expression.getColumn();
     }
     return;

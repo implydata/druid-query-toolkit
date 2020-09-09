@@ -14,6 +14,7 @@
 
 import { QueryResult } from '../query-result/query-result';
 import { SqlLiteral, SqlQuery, SqlRef } from '../sql';
+import { filterMap } from '../utils';
 
 export interface TableInfo {
   name: string;
@@ -63,11 +64,14 @@ export class Introspect {
     return query.makeExplain();
   }
 
-  static decodeQueryColumnIntrospectionResult(queryResult: QueryResult): ColumnInfo[] {
-    const { rows, sqlQuery } = queryResult;
-    if (queryResult.isEmpty()) return [];
-    if (!sqlQuery) throw new Error('must have a sqlQuery');
-    if (queryResult.getHeaderNames().join(',') !== 'PLAN') {
+  static getQueryColumnSampleQuery(query: SqlQuery): SqlQuery {
+    return query.changeLimitValue(1);
+  }
+
+  static decodeColumnTypesFromPlan(queryPlanResult: QueryResult): string[] {
+    if (queryPlanResult.isEmpty()) return [];
+    const { rows } = queryPlanResult;
+    if (queryPlanResult.getHeaderNames().join(',') !== 'PLAN') {
       throw new Error('invalid result shape, bad header');
     }
     if (rows.length !== 1) throw new Error('invalid result shape, bad number of results');
@@ -76,20 +80,55 @@ export class Introspect {
     const m = plan.match(/ signature=\[\{(.*)}]/m);
     if (!m) throw new Error('could not find signature');
 
-    const types = m[1].split(/,\s/g).map((t: string) => t.split(':')[1]);
-    const outputColumns = sqlQuery.getOutputColumns();
-    if (outputColumns.length !== types.length) throw new Error('invalid number of types');
-    return outputColumns.map((name, i) => ({ name, type: types[i] }));
+    return m[1].split(/,\s/g).map((t: string) => t.split(':')[1]);
   }
 
-  static decodeColumnIntrospectionResult(queryResult: QueryResult): ColumnInfo[] {
+  static decodeQueryColumnIntrospectionResult(
+    queryPlanResult: QueryResult,
+    sampleRowResult?: QueryResult,
+  ): ColumnInfo[] {
+    const { sqlQuery } = queryPlanResult;
+    if (queryPlanResult.isEmpty()) return [];
+    if (!sqlQuery) throw new Error('must have a sqlQuery');
+    const types = Introspect.decodeColumnTypesFromPlan(queryPlanResult);
+
+    if (sampleRowResult) {
+      if (sampleRowResult.header.length !== types.length) {
+        throw new Error('number of columns in the sample row does not match the number of types');
+      }
+
+      return filterMap(sampleRowResult.header, (column, i) => {
+        if (SqlQuery.isPhonyOutputName(column.name)) return;
+        return { name: column.name, type: types[i] };
+      });
+    } else {
+      if (sqlQuery.hasStarInSelect()) {
+        throw new Error('a query with a star must have sampleRowResult set');
+      }
+
+      const outputColumns = sqlQuery.getOutputColumns();
+      if (outputColumns.length !== types.length) {
+        throw new Error('number of output columns does not match the number of types');
+      }
+
+      return filterMap(outputColumns, (name, i) => {
+        if (!sqlQuery.isRealOutputColumnAtSelectIndex(i)) return;
+        return { name, type: types[i] };
+      });
+    }
+  }
+
+  static decodeColumnIntrospectionResult(
+    queryResult: QueryResult,
+    sampleRowResult?: QueryResult,
+  ): ColumnInfo[] {
     const headerShape = queryResult.getHeaderNames().join(',');
     switch (headerShape) {
       case 'COLUMN_NAME,DATA_TYPE':
         return Introspect.decodeTableColumnIntrospectionResult(queryResult);
 
       case 'PLAN':
-        return Introspect.decodeQueryColumnIntrospectionResult(queryResult);
+        return Introspect.decodeQueryColumnIntrospectionResult(queryResult, sampleRowResult);
 
       default:
         throw new Error('unknown header shape');

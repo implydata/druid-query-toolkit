@@ -92,6 +92,10 @@ export class SqlQuery extends SqlExpression {
     return selectExpression.getOutputName() || `EXPR$${i}`;
   }
 
+  static isPhonyOutputName(name: string) {
+    return /^EXPR\$(?:\d|[1-9]\d*)$/.test(name);
+  }
+
   public readonly explainKeyword?: string;
   public readonly withKeyword?: string;
   public readonly withParts?: SeparatedArray<SqlWithPart>;
