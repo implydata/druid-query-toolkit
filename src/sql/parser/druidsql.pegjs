@@ -389,8 +389,11 @@ NotExpression = op:NotToken postOp:_ argument:NotExpression
 }
   / ComparisonExpression
 
-ComparisonExpression = lhs:AdditionExpression preOp:_ opRhs:ComparisonOpRhs
+ComparisonExpression = lhs:AdditionExpression rhs:(_ ComparisonOpRhs)?
 {
+  if (!rhs) return lhs;
+  var preOp = rhs[0];
+  var opRhs = rhs[1];
   return new sql.SqlComparison({
     lhs: lhs,
     op: opRhs.op,
@@ -405,7 +408,6 @@ ComparisonExpression = lhs:AdditionExpression preOp:_ opRhs:ComparisonOpRhs
     }
   });
 }
-  / AdditionExpression
 
 ComparisonOpRhs = ComparisonOpRhsSimple / ComparisonOpRhsIs / ComparisonOpRhsIn / ComparisonOpRhsBetween / ComparisonOpRhsLike / ComparisonOpRhsNot
 

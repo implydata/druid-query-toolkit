@@ -13,6 +13,7 @@
  */
 
 import { SqlBase, SqlExpression, SqlRef } from '../..';
+import { backAndForth } from '../../test-utils';
 
 describe('SqlExpression', () => {
   it('plywood expressions should not parse', () => {
@@ -127,6 +128,29 @@ describe('SqlExpression', () => {
       expect(
         String(SqlExpression.parse('a AND b And c').filterAnd(ex => ex.toString() !== 'b')),
       ).toEqual('a And c');
+    });
+  });
+
+  describe('extreme', () => {
+    it('should work for a huge flat parse', () => {
+      const sql = new Array(1000)
+        .fill('')
+        .map((_, i) => `c_id = "c${i}"`)
+        .join(' or ');
+
+      backAndForth(sql);
+    });
+
+    it('should work for lots of things in parens (left paren)', () => {
+      const sql = new Array(20).fill('').reduce((a, _, i) => `(${a} or c_id = "c${i}")`, 'X');
+
+      backAndForth(sql);
+    });
+
+    it('should work for lots of things in parens (right paren)', () => {
+      const sql = new Array(20).fill('').reduce((a, _, i) => `(c_id = "c${i}" or ${a})`, 'X');
+
+      backAndForth(sql);
     });
   });
 });
