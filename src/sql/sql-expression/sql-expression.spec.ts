@@ -142,13 +142,13 @@ describe('SqlExpression', () => {
     });
 
     it('should work for lots of things in parens (left paren)', () => {
-      const sql = new Array(20).fill('').reduce((a, _, i) => `(${a} or c_id = "c${i}")`, 'X');
+      const sql = new Array(100).fill('').reduce((a, _, i) => `(${a} or c_id = "c${i}")`, 'X');
 
       backAndForth(sql);
     });
 
     it('should work for lots of things in parens (right paren)', () => {
-      const sql = new Array(20).fill('').reduce((a, _, i) => `(c_id = "c${i}" or ${a})`, 'X');
+      const sql = new Array(100).fill('').reduce((a, _, i) => `(c_id = "c${i}" or ${a})`, 'X');
 
       backAndForth(sql);
     });
