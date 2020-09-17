@@ -62,12 +62,16 @@ export class SeparatedArray<T> {
     return this.values.length;
   }
 
-  public get(i: number): T | undefined {
-    return this.values[i];
+  public get(index: number): T | undefined {
+    return this.values[index];
   }
 
   public first(): T {
     return this.values[0];
+  }
+
+  public change(index: number, newValue: T): SeparatedArray<T> {
+    return this.map((value, i) => (i === index ? newValue : value));
   }
 
   public map<U>(callbackfn: (value: T, index: number) => U): SeparatedArray<U> {

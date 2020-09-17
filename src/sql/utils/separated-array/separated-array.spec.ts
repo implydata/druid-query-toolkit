@@ -26,6 +26,11 @@ describe('SeparatedArray', () => {
     expect(String(a)).toEqual('1, 2 ; 3');
   });
 
+  it('#change', () => {
+    expect(String(a.change(7, 7))).toEqual('1, 2 ; 3');
+    expect(String(a.change(1, 7))).toEqual('1, 7 ; 3');
+  });
+
   it('#deleteByIndex', () => {
     expect(String(a.deleteByIndex(0))).toEqual('2 ; 3');
     expect(String(a.deleteByIndex(1))).toEqual('1 ; 3');

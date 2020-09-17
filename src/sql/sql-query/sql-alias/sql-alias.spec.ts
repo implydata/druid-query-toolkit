@@ -12,256 +12,175 @@
  * limitations under the License.
  */
 
-import { SqlQuery } from '../..';
+import { SqlQuery, SqlRef } from '../..';
 import { backAndForth } from '../../../test-utils';
 
 describe('SqlAlias', () => {
-  it('works in no alias case', () => {
-    const sql = `SELECT city`;
+  describe('parses', () => {
+    it('works in no alias case', () => {
+      const sql = `SELECT city`;
 
-    backAndForth(sql);
+      backAndForth(sql);
 
-    expect(SqlQuery.parseSql(sql)).toMatchInlineSnapshot(`
-      SqlQuery {
-        "explainKeyword": undefined,
-        "fromClause": undefined,
-        "groupByClause": undefined,
-        "havingClause": undefined,
-        "innerSpacing": Object {
-          "postQuery": "",
-          "postSelect": " ",
-          "preQuery": "",
-        },
-        "limitClause": undefined,
-        "offsetClause": undefined,
-        "orderByClause": undefined,
-        "selectDecorator": undefined,
-        "selectExpressions": SeparatedArray {
-          "separators": Array [],
-          "values": Array [
-            SqlAlias {
-              "alias": undefined,
-              "asKeyword": undefined,
-              "expression": SqlRef {
-                "column": "city",
-                "innerSpacing": Object {},
-                "namespace": undefined,
-                "namespaceQuotes": false,
-                "quotes": false,
-                "table": undefined,
-                "tableQuotes": false,
-                "type": "ref",
-              },
-              "innerSpacing": Object {},
-              "type": "alias",
+      expect(SqlQuery.parse(sql)!.selectExpressions.first()).toMatchInlineSnapshot(`
+        SqlAlias {
+          "alias": undefined,
+          "asKeyword": undefined,
+          "expression": SqlRef {
+            "column": "city",
+            "innerSpacing": Object {},
+            "namespace": undefined,
+            "namespaceQuotes": false,
+            "quotes": false,
+            "table": undefined,
+            "tableQuotes": false,
+            "type": "ref",
+          },
+          "innerSpacing": Object {},
+          "type": "alias",
+        }
+      `);
+    });
+
+    it('works in basic case', () => {
+      const sql = `SELECT city AS City`;
+
+      backAndForth(sql);
+
+      expect(SqlQuery.parse(sql)!.selectExpressions.first()).toMatchInlineSnapshot(`
+        SqlAlias {
+          "alias": SqlRef {
+            "column": "City",
+            "innerSpacing": Object {},
+            "namespace": undefined,
+            "namespaceQuotes": false,
+            "quotes": false,
+            "table": undefined,
+            "tableQuotes": false,
+            "type": "ref",
+          },
+          "asKeyword": "AS",
+          "expression": SqlRef {
+            "column": "city",
+            "innerSpacing": Object {},
+            "namespace": undefined,
+            "namespaceQuotes": false,
+            "quotes": false,
+            "table": undefined,
+            "tableQuotes": false,
+            "type": "ref",
+          },
+          "innerSpacing": Object {
+            "preAlias": " ",
+            "preAs": " ",
+          },
+          "type": "alias",
+        }
+      `);
+    });
+
+    it('works with table prefix', () => {
+      const sql = `SELECT tbl.city  As   City`;
+
+      backAndForth(sql);
+
+      expect(SqlQuery.parse(sql)!.selectExpressions.first()).toMatchInlineSnapshot(`
+        SqlAlias {
+          "alias": SqlRef {
+            "column": "City",
+            "innerSpacing": Object {},
+            "namespace": undefined,
+            "namespaceQuotes": false,
+            "quotes": false,
+            "table": undefined,
+            "tableQuotes": false,
+            "type": "ref",
+          },
+          "asKeyword": "As",
+          "expression": SqlRef {
+            "column": "city",
+            "innerSpacing": Object {
+              "postTableDot": "",
+              "preTableDot": "",
             },
-          ],
-        },
-        "selectKeyword": "SELECT",
-        "type": "query",
-        "unionKeyword": undefined,
-        "unionQuery": undefined,
-        "whereClause": undefined,
-        "withKeyword": undefined,
-        "withParts": undefined,
-      }
-    `);
+            "namespace": undefined,
+            "namespaceQuotes": false,
+            "quotes": false,
+            "table": "tbl",
+            "tableQuotes": false,
+            "type": "ref",
+          },
+          "innerSpacing": Object {
+            "preAlias": "   ",
+            "preAs": "  ",
+          },
+          "type": "alias",
+        }
+      `);
+    });
+
+    it('works without AS', () => {
+      const sql = `SELECT tbl.city City`;
+
+      backAndForth(sql);
+
+      expect(SqlQuery.parse(sql)!.selectExpressions.first()).toMatchInlineSnapshot(`
+        SqlAlias {
+          "alias": SqlRef {
+            "column": "City",
+            "innerSpacing": Object {},
+            "namespace": undefined,
+            "namespaceQuotes": false,
+            "quotes": false,
+            "table": undefined,
+            "tableQuotes": false,
+            "type": "ref",
+          },
+          "asKeyword": undefined,
+          "expression": SqlRef {
+            "column": "city",
+            "innerSpacing": Object {
+              "postTableDot": "",
+              "preTableDot": "",
+            },
+            "namespace": undefined,
+            "namespaceQuotes": false,
+            "quotes": false,
+            "table": "tbl",
+            "tableQuotes": false,
+            "type": "ref",
+          },
+          "innerSpacing": Object {
+            "preAlias": " ",
+          },
+          "type": "alias",
+        }
+      `);
+    });
   });
 
-  it('works in basic case', () => {
-    const sql = `SELECT city AS City`;
+  describe('changeAliasName', () => {
+    const x = SqlRef.column('X').as('test');
+    const y = SqlRef.column('Y').as();
 
-    backAndForth(sql);
+    it('should work with undefined', () => {
+      expect(String(x.changeAliasName(undefined))).toEqual('X');
+    });
 
-    expect(SqlQuery.parseSql(sql)).toMatchInlineSnapshot(`
-      SqlQuery {
-        "explainKeyword": undefined,
-        "fromClause": undefined,
-        "groupByClause": undefined,
-        "havingClause": undefined,
-        "innerSpacing": Object {
-          "postQuery": "",
-          "postSelect": " ",
-          "preQuery": "",
-        },
-        "limitClause": undefined,
-        "offsetClause": undefined,
-        "orderByClause": undefined,
-        "selectDecorator": undefined,
-        "selectExpressions": SeparatedArray {
-          "separators": Array [],
-          "values": Array [
-            SqlAlias {
-              "alias": SqlRef {
-                "column": "City",
-                "innerSpacing": Object {},
-                "namespace": undefined,
-                "namespaceQuotes": false,
-                "quotes": false,
-                "table": undefined,
-                "tableQuotes": false,
-                "type": "ref",
-              },
-              "asKeyword": "AS",
-              "expression": SqlRef {
-                "column": "city",
-                "innerSpacing": Object {},
-                "namespace": undefined,
-                "namespaceQuotes": false,
-                "quotes": false,
-                "table": undefined,
-                "tableQuotes": false,
-                "type": "ref",
-              },
-              "innerSpacing": Object {
-                "preAlias": " ",
-                "preAs": " ",
-              },
-              "type": "alias",
-            },
-          ],
-        },
-        "selectKeyword": "SELECT",
-        "type": "query",
-        "unionKeyword": undefined,
-        "unionQuery": undefined,
-        "whereClause": undefined,
-        "withKeyword": undefined,
-        "withParts": undefined,
-      }
-    `);
-  });
+    it('should work with normal string', () => {
+      expect(String(x.changeAliasName('hello'))).toEqual('X AS hello');
+    });
 
-  it('works with table prefix', () => {
-    const sql = `SELECT tbl.city  As   City`;
+    it('should work with quotes if needed', () => {
+      expect(String(x.changeAliasName('select'))).toEqual('X AS "select"');
+    });
 
-    backAndForth(sql);
+    it('should work with quotes if forced', () => {
+      expect(String(x.changeAliasName('hello', true))).toEqual('X AS "hello"');
+    });
 
-    expect(SqlQuery.parseSql(sql)).toMatchInlineSnapshot(`
-      SqlQuery {
-        "explainKeyword": undefined,
-        "fromClause": undefined,
-        "groupByClause": undefined,
-        "havingClause": undefined,
-        "innerSpacing": Object {
-          "postQuery": "",
-          "postSelect": " ",
-          "preQuery": "",
-        },
-        "limitClause": undefined,
-        "offsetClause": undefined,
-        "orderByClause": undefined,
-        "selectDecorator": undefined,
-        "selectExpressions": SeparatedArray {
-          "separators": Array [],
-          "values": Array [
-            SqlAlias {
-              "alias": SqlRef {
-                "column": "City",
-                "innerSpacing": Object {},
-                "namespace": undefined,
-                "namespaceQuotes": false,
-                "quotes": false,
-                "table": undefined,
-                "tableQuotes": false,
-                "type": "ref",
-              },
-              "asKeyword": "As",
-              "expression": SqlRef {
-                "column": "city",
-                "innerSpacing": Object {
-                  "postTableDot": "",
-                  "preTableDot": "",
-                },
-                "namespace": undefined,
-                "namespaceQuotes": false,
-                "quotes": false,
-                "table": "tbl",
-                "tableQuotes": false,
-                "type": "ref",
-              },
-              "innerSpacing": Object {
-                "preAlias": "   ",
-                "preAs": "  ",
-              },
-              "type": "alias",
-            },
-          ],
-        },
-        "selectKeyword": "SELECT",
-        "type": "query",
-        "unionKeyword": undefined,
-        "unionQuery": undefined,
-        "whereClause": undefined,
-        "withKeyword": undefined,
-        "withParts": undefined,
-      }
-    `);
-  });
-
-  it('works without AS', () => {
-    const sql = `SELECT tbl.city City`;
-
-    backAndForth(sql);
-
-    expect(SqlQuery.parseSql(sql)).toMatchInlineSnapshot(`
-      SqlQuery {
-        "explainKeyword": undefined,
-        "fromClause": undefined,
-        "groupByClause": undefined,
-        "havingClause": undefined,
-        "innerSpacing": Object {
-          "postQuery": "",
-          "postSelect": " ",
-          "preQuery": "",
-        },
-        "limitClause": undefined,
-        "offsetClause": undefined,
-        "orderByClause": undefined,
-        "selectDecorator": undefined,
-        "selectExpressions": SeparatedArray {
-          "separators": Array [],
-          "values": Array [
-            SqlAlias {
-              "alias": SqlRef {
-                "column": "City",
-                "innerSpacing": Object {},
-                "namespace": undefined,
-                "namespaceQuotes": false,
-                "quotes": false,
-                "table": undefined,
-                "tableQuotes": false,
-                "type": "ref",
-              },
-              "asKeyword": undefined,
-              "expression": SqlRef {
-                "column": "city",
-                "innerSpacing": Object {
-                  "postTableDot": "",
-                  "preTableDot": "",
-                },
-                "namespace": undefined,
-                "namespaceQuotes": false,
-                "quotes": false,
-                "table": "tbl",
-                "tableQuotes": false,
-                "type": "ref",
-              },
-              "innerSpacing": Object {
-                "preAlias": " ",
-              },
-              "type": "alias",
-            },
-          ],
-        },
-        "selectKeyword": "SELECT",
-        "type": "query",
-        "unionKeyword": undefined,
-        "unionQuery": undefined,
-        "whereClause": undefined,
-        "withKeyword": undefined,
-        "withParts": undefined,
-      }
-    `);
+    it('should work with adding a black alias', () => {
+      expect(String(y.changeAliasName('hello'))).toEqual('Y AS hello');
+    });
   });
 });

@@ -95,6 +95,21 @@ export class SqlAlias extends SqlBase {
     return SqlBase.fromValue(value);
   }
 
+  public changeAlias(alias: SqlRef | undefined): this {
+    const value = this.valueOf();
+    value.alias = alias;
+    if (!this.alias && alias) {
+      value.asKeyword = 'AS'; // If going from un-named alias to a named alias also add the AS keyword for style
+    }
+    return SqlBase.fromValue(value);
+  }
+
+  public changeAliasName(aliasName: string | undefined, forceQuotes = false): this {
+    return this.changeAlias(
+      aliasName ? SqlRef.column(aliasName, undefined, undefined, forceQuotes) : undefined,
+    );
+  }
+
   public _walkInner(
     nextStack: SqlBase[],
     fn: Substitutor,
