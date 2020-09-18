@@ -3996,9 +3996,9 @@ describe('SqlQuery', () => {
   describe('Queries with comments', () => {
     it('single comment', () => {
       const sql = sane`
-      Select -- some comment 
-      col from tbl
-    `;
+        Select -- some comment 
+        col from tbl
+      `;
 
       backAndForth(sql);
 
@@ -4081,69 +4081,98 @@ describe('SqlQuery', () => {
 
     it('two comments', () => {
       const sql = sane`
-      Select --some comment
-        --some comment
-      col from tbl
-    `;
+        Select --some comment
+          --some comment
+        col from tbl
+      `;
 
       backAndForth(sql);
     });
 
     it('comment on new line', () => {
       const sql = sane`
-      Select
-        -- some comment
-      col from tbl
-    `;
+        Select
+          -- some comment
+        col from tbl
+      `;
 
       backAndForth(sql);
     });
 
     it('comment containing hyphens', () => {
       const sql = sane`
-      Select
-        -- some--comment
-        col from tbl
-    `;
+        Select
+          -- some--comment
+          col from tbl
+      `;
 
       backAndForth(sql);
     });
 
     it('comment with no space', () => {
       const sql = sane`
-      Select --some comment
-      col from tbl
-    `;
+        Select --some comment
+        col from tbl
+      `;
 
       backAndForth(sql);
     });
 
     it('comment with non english', () => {
       const sql = sane`
-      Select --Здравствуйте
-      col from tbl
-    `;
+        Select --Здравствуйте
+        col from tbl
+      `;
 
       backAndForth(sql);
     });
 
     it('comment at end of query', () => {
       const sql = sane`
-      Select 
-      col from tbl
-      -- comment
-    `;
+        Select 
+        col from tbl
+        -- comment
+      `;
 
       backAndForth(sql);
     });
 
     it('comment with unary negative', () => {
       const sql = sane`
-      Select 
-      col from tbl
-      -- comment
-      order by -1
-    `;
+        Select 
+        col from tbl
+        -- comment
+        order by -1
+      `;
+
+      backAndForth(sql);
+    });
+
+    it('comment with final comment with no new line', () => {
+      const sql = `Select col from tbl -- comment`;
+
+      backAndForth(sql);
+    });
+
+    it('comment with inline comments', () => {
+      const sql = sane`
+        Select 
+        col from /* This is an inline comment */ tbl
+        order by -1
+      `;
+
+      backAndForth(sql);
+    });
+
+    it('comment with multiline comments', () => {
+      const sql = sane`
+        Select 
+        col from tbl
+        /* This
+        is a multiline
+        comment */
+        order by -1
+      `;
 
       backAndForth(sql);
     });

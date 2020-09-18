@@ -1135,11 +1135,17 @@ Star = '*'
 
 IdentifierPart = [a-z_]i
 
-_ "optional whitespace" = $(Space* ("--" [^\n]* ([\n] Space*)?)*)
+_ "optional whitespace" = $(Space* ((SingleLineComment / MultiLineComment) Space*)* FinalSingleLineComment?)
 
-__ "mandatory whitespace" = $(Space+ ("--" [^\n]* ([\n] Space*)?)*)
+__ "mandatory whitespace" = $(Space _)
 
 ___ "pure whitespace" = $(Space*)
+
+SingleLineComment = $("--" [^\n]* [\n])
+
+FinalSingleLineComment = $("--" [^\n]*)
+
+MultiLineComment = $("/*" (!"*/" .)* "*/")
 
 Space = [ \t\n\r]
 
