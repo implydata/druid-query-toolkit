@@ -138,7 +138,9 @@ describe('Introspect', () => {
     it('works with all columns having good names', () => {
       const query = SqlQuery.parse(sane`
         SELECT
-          cityName, COUNT(*) AS "Count"
+          __time,
+          cityName,
+          COUNT(*) AS "Count"
         FROM wikipedia
         GROUP BY 1
         ORDER BY 2 DESC
@@ -147,10 +149,14 @@ describe('Introspect', () => {
       const queryPlanResult = new QueryResult({
         sqlQuery: Introspect.getQueryColumnIntrospectionQuery(query),
         header: [{ name: 'PLAN' }],
-        rows: [['DruidQueryRel(query=[...\n...], signature=[{d0:STRING, a0:LONG}])\n']],
+        rows: [['DruidQueryRel(query=[...\n...], signature=[{d0:LONG, d1:STRING, a0:LONG}])\n']],
       });
 
       expect(Introspect.decodeQueryColumnIntrospectionResult(queryPlanResult)).toEqual([
+        {
+          name: '__time',
+          type: 'TIMESTAMP',
+        },
         {
           name: 'cityName',
           type: 'STRING',
@@ -165,7 +171,8 @@ describe('Introspect', () => {
     it('works with some column not having good names', () => {
       const query = SqlQuery.parse(sane`
         SELECT
-          cityName, COUNT(*)
+          cityName,
+          COUNT(*)
         FROM wikipedia
         GROUP BY 1
         ORDER BY 2 DESC
@@ -203,25 +210,37 @@ describe('Introspect', () => {
 
     it('works with star', () => {
       const query = SqlQuery.parse(sane`
-        SELECT cityName, added + 1, * FROM wikipedia
+        SELECT "time", cityName, added + 1, * FROM wikipedia
       `);
 
       const queryPlanResult = new QueryResult({
         sqlQuery: Introspect.getQueryColumnIntrospectionQuery(query),
         header: [{ name: 'PLAN' }],
         rows: [
-          ['DruidQueryRel(query=[...\n...], signature=[{d0:STRING, a0:LONG, a1:LONG, a1:LONG}])\n'],
+          [
+            'DruidQueryRel(query=[...\n...], signature=[{d0:LONG, d1:STRING, a0:LONG, a1:LONG, a1:LONG}])\n',
+          ],
         ],
       });
 
       const sampleResult = new QueryResult({
-        header: [{ name: 'cityName' }, { name: 'EXPR$0' }, { name: 'delta' }, { name: 'deleted' }],
-        rows: [['SF'], [1], [4], [5]],
+        header: [
+          { name: 'time' },
+          { name: 'cityName' },
+          { name: 'EXPR$0' },
+          { name: 'delta' },
+          { name: 'deleted' },
+        ],
+        rows: [[new Date('2020-01-01T00:00:00'), 'SF', 1, 4, true]],
       });
 
       expect(
         Introspect.decodeQueryColumnIntrospectionResult(queryPlanResult, sampleResult),
       ).toEqual([
+        {
+          name: 'time',
+          type: 'TIMESTAMP',
+        },
         {
           name: 'cityName',
           type: 'STRING',
@@ -232,7 +251,7 @@ describe('Introspect', () => {
         },
         {
           name: 'deleted',
-          type: 'LONG',
+          type: 'BOOLEAN',
         },
       ]);
     });

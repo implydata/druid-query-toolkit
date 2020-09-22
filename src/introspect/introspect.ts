@@ -25,6 +25,12 @@ export interface ColumnInfo {
   type: string;
 }
 
+function guessTypeFromValue(v: any): string | undefined {
+  if (v instanceof Date) return 'TIMESTAMP';
+  if (v === true || v === false) return 'BOOLEAN';
+  return;
+}
+
 export class Introspect {
   static getTableIntrospectionQuery(): string {
     return `SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'druid' AND TABLE_TYPE = 'TABLE'`;
@@ -97,9 +103,20 @@ export class Introspect {
         throw new Error('number of columns in the sample row does not match the number of types');
       }
 
+      const sampleRow = sampleRowResult.rows[0];
       return filterMap(sampleRowResult.header, (column, i) => {
-        if (SqlQuery.isPhonyOutputName(column.name)) return;
-        return { name: column.name, type: types[i] };
+        const columnName = column.name;
+        if (SqlQuery.isPhonyOutputName(columnName)) return;
+
+        let type = sampleRow ? guessTypeFromValue(sampleRow[i]) : undefined;
+        if (!type) {
+          type = types[i];
+          if (columnName === '__time' && type === 'LONG') {
+            type = 'TIMESTAMP';
+          }
+        }
+
+        return { name: columnName, type };
       });
     } else {
       if (sqlQuery.hasStarInSelect()) {
@@ -113,7 +130,11 @@ export class Introspect {
 
       return filterMap(outputColumns, (name, i) => {
         if (!sqlQuery.isRealOutputColumnAtSelectIndex(i)) return;
-        return { name, type: types[i] };
+        let type = types[i];
+        if (name === '__time' && type === 'LONG') {
+          type = 'TIMESTAMP';
+        }
+        return { name, type };
       });
     }
   }
