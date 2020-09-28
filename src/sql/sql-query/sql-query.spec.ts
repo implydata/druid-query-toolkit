@@ -455,7 +455,7 @@ describe('SqlQuery', () => {
                       "from": "FROM",
                     },
                     "spacing": Object {
-                      "postKeyword": " ",
+                      "postFrom": " ",
                     },
                     "type": "fromClause",
                   },
@@ -554,7 +554,7 @@ describe('SqlQuery', () => {
             "from": "FROM",
           },
           "spacing": Object {
-            "postKeyword": " ",
+            "postFrom": " ",
           },
           "type": "fromClause",
         },
@@ -575,7 +575,7 @@ describe('SqlQuery', () => {
             "value": 2,
           },
           "spacing": Object {
-            "postKeyword": " ",
+            "postLimit": " ",
           },
           "type": "limitClause",
         },
@@ -666,7 +666,7 @@ describe('SqlQuery', () => {
             "from": "FROM",
           },
           "spacing": Object {
-            "postKeyword": " ",
+            "postFrom": " ",
           },
           "type": "fromClause",
         },
@@ -870,7 +870,7 @@ describe('SqlQuery', () => {
             "from": "from",
           },
           "spacing": Object {
-            "postKeyword": " ",
+            "postFrom": " ",
           },
           "type": "fromClause",
         },
@@ -968,7 +968,7 @@ describe('SqlQuery', () => {
             "from": "from",
           },
           "spacing": Object {
-            "postKeyword": " ",
+            "postFrom": " ",
           },
           "type": "fromClause",
         },
@@ -1062,7 +1062,7 @@ describe('SqlQuery', () => {
                     "from": "FROM",
                   },
                   "spacing": Object {
-                    "postKeyword": "   ",
+                    "postFrom": "   ",
                   },
                   "type": "fromClause",
                 },
@@ -1173,7 +1173,7 @@ describe('SqlQuery', () => {
               "from": "from",
             },
             "spacing": Object {
-              "postKeyword": " ",
+              "postFrom": " ",
             },
             "type": "fromClause",
           },
@@ -1252,7 +1252,7 @@ describe('SqlQuery', () => {
               "where": "where",
             },
             "spacing": Object {
-              "postKeyword": " ",
+              "postWhere": " ",
             },
             "type": "whereClause",
           },
@@ -1301,7 +1301,7 @@ describe('SqlQuery', () => {
               "from": "FROM",
             },
             "spacing": Object {
-              "postKeyword": " ",
+              "postFrom": " ",
             },
             "type": "fromClause",
           },
@@ -1380,7 +1380,7 @@ describe('SqlQuery', () => {
               "where": "WHERE",
             },
             "spacing": Object {
-              "postKeyword": " ",
+              "postWhere": " ",
             },
             "type": "whereClause",
           },
@@ -1429,7 +1429,7 @@ describe('SqlQuery', () => {
               "from": "FROM",
             },
             "spacing": Object {
-              "postKeyword": " ",
+              "postFrom": " ",
             },
             "type": "fromClause",
           },
@@ -1600,7 +1600,7 @@ describe('SqlQuery', () => {
               "where": "WHERE",
             },
             "spacing": Object {
-              "postKeyword": " ",
+              "postWhere": " ",
             },
             "type": "whereClause",
           },
@@ -1648,7 +1648,7 @@ describe('SqlQuery', () => {
               "from": "from",
             },
             "spacing": Object {
-              "postKeyword": " ",
+              "postFrom": " ",
             },
             "type": "fromClause",
           },
@@ -1762,7 +1762,7 @@ describe('SqlQuery', () => {
               "from": "from",
             },
             "spacing": Object {
-              "postKeyword": " ",
+              "postFrom": " ",
             },
             "type": "fromClause",
           },
@@ -1876,7 +1876,7 @@ describe('SqlQuery', () => {
               "from": "from",
             },
             "spacing": Object {
-              "postKeyword": " ",
+              "postFrom": " ",
             },
             "type": "fromClause",
           },
@@ -2015,7 +2015,7 @@ describe('SqlQuery', () => {
               "from": "from",
             },
             "spacing": Object {
-              "postKeyword": " ",
+              "postFrom": " ",
             },
             "type": "fromClause",
           },
@@ -2054,7 +2054,7 @@ describe('SqlQuery', () => {
               "having": "having",
             },
             "spacing": Object {
-              "postKeyword": " ",
+              "postHaving": " ",
             },
             "type": "havingClause",
           },
@@ -2143,7 +2143,7 @@ describe('SqlQuery', () => {
               "from": "FROM",
             },
             "spacing": Object {
-              "postKeyword": " ",
+              "postFrom": " ",
             },
             "type": "fromClause",
           },
@@ -2182,7 +2182,7 @@ describe('SqlQuery', () => {
               "having": "HAVING",
             },
             "spacing": Object {
-              "postKeyword": " ",
+              "postHaving": " ",
             },
             "type": "havingClause",
           },
@@ -2271,7 +2271,7 @@ describe('SqlQuery', () => {
               "from": "FROM",
             },
             "spacing": Object {
-              "postKeyword": " ",
+              "postFrom": " ",
             },
             "type": "fromClause",
           },
@@ -2402,7 +2402,7 @@ describe('SqlQuery', () => {
               "having": "HAVING",
             },
             "spacing": Object {
-              "postKeyword": " ",
+              "postHaving": " ",
             },
             "type": "havingClause",
           },
@@ -2490,7 +2490,7 @@ describe('SqlQuery', () => {
               "from": "from",
             },
             "spacing": Object {
-              "postKeyword": " ",
+              "postFrom": " ",
             },
             "type": "fromClause",
           },
@@ -2606,7 +2606,7 @@ describe('SqlQuery', () => {
               "from": "from",
             },
             "spacing": Object {
-              "postKeyword": " ",
+              "postFrom": " ",
             },
             "type": "fromClause",
           },
@@ -2726,7 +2726,7 @@ describe('SqlQuery', () => {
               "from": "from",
             },
             "spacing": Object {
-              "postKeyword": " ",
+              "postFrom": " ",
             },
             "type": "fromClause",
           },
@@ -2844,7 +2844,7 @@ describe('SqlQuery', () => {
               "from": "from",
             },
             "spacing": Object {
-              "postKeyword": " ",
+              "postFrom": " ",
             },
             "type": "fromClause",
           },
@@ -2990,7 +2990,7 @@ describe('SqlQuery', () => {
               "from": "from",
             },
             "spacing": Object {
-              "postKeyword": " ",
+              "postFrom": " ",
             },
             "type": "fromClause",
           },
@@ -3131,7 +3131,7 @@ describe('SqlQuery', () => {
               "from": "from",
             },
             "spacing": Object {
-              "postKeyword": " ",
+              "postFrom": " ",
             },
             "type": "fromClause",
           },
@@ -3300,7 +3300,7 @@ describe('SqlQuery', () => {
               "from": "from",
             },
             "spacing": Object {
-              "postKeyword": " ",
+              "postFrom": " ",
             },
             "type": "fromClause",
           },
@@ -3321,7 +3321,7 @@ describe('SqlQuery', () => {
               "value": 1,
             },
             "spacing": Object {
-              "postKeyword": " ",
+              "postLimit": " ",
             },
             "type": "limitClause",
           },
@@ -3405,7 +3405,7 @@ describe('SqlQuery', () => {
               "from": "from",
             },
             "spacing": Object {
-              "postKeyword": " ",
+              "postFrom": " ",
             },
             "type": "fromClause",
           },
@@ -3482,7 +3482,7 @@ describe('SqlQuery', () => {
                 "from": "from",
               },
               "spacing": Object {
-                "postKeyword": " ",
+                "postFrom": " ",
               },
               "type": "fromClause",
             },
@@ -3643,7 +3643,7 @@ describe('SqlQuery', () => {
               "from": "from",
             },
             "spacing": Object {
-              "postKeyword": " ",
+              "postFrom": " ",
               "preJoin": " ",
             },
             "type": "fromClause",
@@ -3800,7 +3800,7 @@ describe('SqlQuery', () => {
               "from": "from",
             },
             "spacing": Object {
-              "postKeyword": " ",
+              "postFrom": " ",
               "preJoin": " ",
             },
             "type": "fromClause",
@@ -3957,7 +3957,7 @@ describe('SqlQuery', () => {
               "from": "from",
             },
             "spacing": Object {
-              "postKeyword": " ",
+              "postFrom": " ",
               "preJoin": " ",
             },
             "type": "fromClause",
@@ -4114,7 +4114,7 @@ describe('SqlQuery', () => {
               "from": "from",
             },
             "spacing": Object {
-              "postKeyword": " ",
+              "postFrom": " ",
               "preJoin": " ",
             },
             "type": "fromClause",
@@ -4271,7 +4271,7 @@ describe('SqlQuery', () => {
               "from": "from",
             },
             "spacing": Object {
-              "postKeyword": " ",
+              "postFrom": " ",
               "preJoin": " ",
             },
             "type": "fromClause",
@@ -4364,7 +4364,7 @@ describe('SqlQuery', () => {
               "from": "from",
             },
             "spacing": Object {
-              "postKeyword": " ",
+              "postFrom": " ",
             },
             "type": "fromClause",
           },
@@ -4552,7 +4552,7 @@ describe('SqlQuery', () => {
               "from": "FROM",
             },
             "spacing": Object {
-              "postKeyword": "",
+              "postFrom": "",
             },
             "type": "fromClause",
           },
@@ -4825,7 +4825,7 @@ describe('SqlQuery', () => {
               "from": "FROM",
             },
             "spacing": Object {
-              "postKeyword": " ",
+              "postFrom": " ",
             },
             "type": "fromClause",
           },
@@ -5154,7 +5154,7 @@ describe('SqlQuery', () => {
               "where": "WHERE",
             },
             "spacing": Object {
-              "postKeyword": " ",
+              "postWhere": " ",
             },
             "type": "whereClause",
           },

@@ -59,16 +59,13 @@ export class SqlOrderByClause extends SqlClause {
   }
 
   protected _toRawString(): string {
-    const rawParts: string[] = [
+    return [
       this.getKeyword('order', SqlOrderByClause.DEFAULT_ORDER_KEYWORD),
       this.getSpace('postOrder'),
       this.getKeyword('by', SqlOrderByClause.DEFAULT_BY_KEYWORD),
       this.getSpace('postBy'),
-    ];
-
-    rawParts.push(this.expressions.toString());
-
-    return rawParts.join('');
+      this.expressions.toString(),
+    ].join('');
   }
 
   public changeExpressions(

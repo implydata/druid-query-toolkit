@@ -308,7 +308,7 @@ describe('SqlLiteral', () => {
           "timestamp": "TIMESTAMP",
         },
         "spacing": Object {
-          "postKeyword": " ",
+          "postTimestamp": " ",
         },
         "stringValue": "'2020-02-25 00:00:00'",
         "type": "literal",
@@ -328,7 +328,7 @@ describe('SqlLiteral', () => {
           "timestamp": "DATE",
         },
         "spacing": Object {
-          "postKeyword": " ",
+          "postTimestamp": " ",
         },
         "stringValue": "'2020-02-25'",
         "type": "literal",

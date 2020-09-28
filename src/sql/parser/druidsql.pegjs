@@ -177,17 +177,17 @@ SelectClause =
   };
 }
 
-FromClause = keyword:FromToken postKeyword:_ head:SqlAlias tail:(CommaSeparator SqlAlias)* join:(_ JoinClauses)?
+FromClause = from:FromToken postFrom:_ head:SqlAlias tail:(CommaSeparator SqlAlias)* join:(_ JoinClauses)?
 {
   return new sql.SqlFromClause({
     expressions: makeSeparatedArray(head, tail).map(sql.SqlAlias.fromBaseAndUpgrade),
     joinParts: join ? join[1] : undefined,
     spacing: {
-      postKeyword: postKeyword,
+      postFrom: postFrom,
       preJoin: join ? join[0] : undefined,
     },
     keywords: {
-      from: keyword,
+      from: from,
     },
   });
 }
@@ -226,15 +226,15 @@ SqlJoinPart =
   return new sql.SqlJoinPart(value);
 }
 
-WhereClause = keyword:WhereToken postKeyword:_ expression:Expression
+WhereClause = where:WhereToken postWhere:_ expression:Expression
 {
   return new sql.SqlWhereClause({
     expression: expression,
     spacing: {
-      postKeyword: postKeyword,
+      postWhere: postWhere,
     },
     keywords: {
-      where: keyword,
+      where: where,
     },
   });
 }
@@ -259,15 +259,15 @@ ExpressionList = head:Expression tail:(CommaSeparator Expression)*
   return makeSeparatedArray(head, tail);
 }
 
-HavingClause = keyword:HavingToken postKeyword:_ expression:Expression
+HavingClause = having:HavingToken postHaving:_ expression:Expression
 {
   return new sql.SqlHavingClause({
     expression: expression,
     spacing: {
-      postKeyword: postKeyword,
+      postHaving: postHaving,
     },
     keywords: {
-      having: keyword,
+      having: having,
     },
   });
 }
@@ -302,28 +302,28 @@ SqlOrderByExpression = expression:Expression direction:(_ (AscToken / DescToken)
   return new sql.SqlOrderByExpression(value);
 }
 
-LimitClause = keyword:LimitToken postKeyword:_ limit:SqlLiteral
+LimitClause = limit:LimitToken postLimit:_ limitLiteral:SqlLiteral
 {
   return new sql.SqlLimitClause({
-    limit: limit,
+    limit: limitLiteral,
     spacing: {
-      postKeyword: postKeyword,
+      postLimit: postLimit,
     },
     keywords: {
-      limit: keyword,
+      limit: limit,
     },
   });
 }
 
-OffsetClause = keyword:OffsetToken postKeyword:_ offset:SqlLiteral
+OffsetClause = offset:OffsetToken postOffset:_ offsetLiteral:SqlLiteral
 {
   return new sql.SqlOffsetClause({
-    offset: offset,
+    offset: offsetLiteral,
     spacing: {
-      postKeyword: postKeyword,
+      postOffset: postOffset,
     },
     keywords: {
-      offset: keyword,
+      offset: offset,
     },
   });
 }
@@ -599,14 +599,14 @@ BaseType =
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 
 CaseExpression =
-  caseKeyword:CaseToken
+  caseToken:CaseToken
   postCase:_
   caseExpression:(Expression _)?
   head:WhenThenPair
   tail:(_ WhenThenPair)*
   elseValue:(_ ElseToken _ Expression)?
   preEnd:_
-  endKeyword:EndToken
+  end:EndToken
 {
   return new sql.SqlCase({
     caseExpression: caseExpression ? caseExpression[0] : undefined,
@@ -620,9 +620,9 @@ CaseExpression =
       preEnd: preEnd,
     },
     keywords: {
-      'case': caseKeyword,
+      'case': caseToken,
       'else': elseValue ? elseValue[1] : undefined,
-      end: endKeyword,
+      end: end,
     },
   });
 }
@@ -643,7 +643,6 @@ WhenThenPair = whenKeyword:WhenToken postWhen:_ whenExpression:Expression postWh
     },
   });
 }
-
 
 
 // ------------------------------
@@ -1077,14 +1076,14 @@ BinaryString = "X'"i v:$([0-9A-F]i*) "'"
 
 /* Timestamp */
 
-Timestamp = keyword:(TimestampToken / DateToken) postKeyword:_ v:SingleQuotedString
+Timestamp = timestamp:(TimestampToken / DateToken) postTimestamp:_ v:SingleQuotedString
 {
   return {
     spacing: {
-      postKeyword: postKeyword
+      postTimestamp: postTimestamp,
     },
     keywords: {
-      timestamp: keyword,
+      timestamp: timestamp,
     },
     value: new Date(v.value.replace(' ', 'T') + 'Z'),
     stringValue: v.stringValue

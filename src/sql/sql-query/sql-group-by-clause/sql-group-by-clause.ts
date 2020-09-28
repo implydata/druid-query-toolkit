@@ -51,16 +51,13 @@ export class SqlGroupByClause extends SqlClause {
   }
 
   protected _toRawString(): string {
-    const rawParts: string[] = [
+    return [
       this.getKeyword('group', SqlGroupByClause.DEFAULT_GROUP_KEYWORD),
       this.getSpace('postGroup'),
       this.getKeyword('by', SqlGroupByClause.DEFAULT_BY_KEYWORD),
       this.getSpace('postBy'),
-    ];
-
-    rawParts.push(this.expressions ? this.expressions.toString() : '()');
-
-    return rawParts.join('');
+      this.expressions ? this.expressions.toString() : '()',
+    ].join('');
   }
 
   public changeExpressions(

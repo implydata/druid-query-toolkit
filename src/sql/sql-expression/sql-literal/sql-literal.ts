@@ -129,7 +129,7 @@ export class SqlLiteral extends SqlExpression {
     if (this.isDate()) {
       retParts.push(
         this.getKeyword('timestamp', SqlLiteral.DEFAULT_TIMESTAMP_KEYWORD),
-        this.getSpace('postKeyword'),
+        this.getSpace('postTimestamp'),
       );
     }
 

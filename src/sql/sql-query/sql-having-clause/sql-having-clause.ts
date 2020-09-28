@@ -45,14 +45,11 @@ export class SqlHavingClause extends SqlClause {
   }
 
   protected _toRawString(): string {
-    const rawParts: string[] = [
+    return [
       this.getKeyword('having', SqlHavingClause.DEFAULT_HAVING_KEYWORD),
-      this.getSpace('postKeyword'),
-    ];
-
-    rawParts.push(this.expression.toString());
-
-    return rawParts.join('');
+      this.getSpace('postHaving'),
+      this.expression.toString(),
+    ].join('');
   }
 
   public changeExpression(expression: SqlExpression | string): this {

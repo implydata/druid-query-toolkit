@@ -45,14 +45,11 @@ export class SqlOffsetClause extends SqlClause {
   }
 
   protected _toRawString(): string {
-    const rawParts: string[] = [
+    return [
       this.getKeyword('offset', SqlOffsetClause.DEFAULT_OFFSET_KEYWORD),
-      this.getSpace('postKeyword'),
-    ];
-
-    rawParts.push(this.offset.toString());
-
-    return rawParts.join('');
+      this.getSpace('postOffset'),
+      this.offset.toString(),
+    ].join('');
   }
 
   public changeOffset(offset: SqlLiteral | number): this {

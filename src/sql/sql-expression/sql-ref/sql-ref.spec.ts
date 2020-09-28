@@ -341,7 +341,7 @@ describe('upgrades', () => {
             "from": "from",
           },
           "spacing": Object {
-            "postKeyword": " ",
+            "postFrom": " ",
           },
           "type": "fromClause",
         },

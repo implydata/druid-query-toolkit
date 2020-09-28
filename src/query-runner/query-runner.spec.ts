@@ -186,7 +186,7 @@ describe('QueryRunner', () => {
               "from": "FROM",
             },
             "spacing": Object {
-              "postKeyword": " ",
+              "postFrom": " ",
             },
             "type": "fromClause",
           },
@@ -426,7 +426,7 @@ describe('QueryRunner', () => {
               "from": "FROM",
             },
             "spacing": Object {
-              "postKeyword": " ",
+              "postFrom": " ",
             },
             "type": "fromClause",
           },
@@ -667,7 +667,7 @@ describe('QueryRunner', () => {
               "from": "FROM",
             },
             "spacing": Object {
-              "postKeyword": " ",
+              "postFrom": " ",
             },
             "type": "fromClause",
           },

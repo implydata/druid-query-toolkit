@@ -45,14 +45,11 @@ export class SqlLimitClause extends SqlClause {
   }
 
   protected _toRawString(): string {
-    const rawParts: string[] = [
+    return [
       this.getKeyword('limit', SqlLimitClause.DEFAULT_LIMIT_KEYWORD),
-      this.getSpace('postKeyword'),
-    ];
-
-    rawParts.push(this.limit.toString());
-
-    return rawParts.join('');
+      this.getSpace('postLimit'),
+      this.limit.toString(),
+    ].join('');
   }
 
   public changeLimit(limit: SqlLiteral | number): this {

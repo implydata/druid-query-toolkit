@@ -50,14 +50,11 @@ export class SqlWhereClause extends SqlClause {
   }
 
   protected _toRawString(): string {
-    const rawParts: string[] = [
+    return [
       this.getKeyword('where', SqlWhereClause.DEFAULT_WHERE_KEYWORD),
-      this.getSpace('postKeyword'),
-    ];
-
-    rawParts.push(this.expression.toString());
-
-    return rawParts.join('');
+      this.getSpace('postWhere'),
+      this.expression.toString(),
+    ].join('');
   }
 
   public changeExpression(expression: SqlExpression | string): this {

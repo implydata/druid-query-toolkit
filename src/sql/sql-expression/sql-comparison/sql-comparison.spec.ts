@@ -228,7 +228,7 @@ describe('SqlComparison', () => {
               "from": "FROM",
             },
             "spacing": Object {
-              "postKeyword": " ",
+              "postFrom": " ",
             },
             "type": "fromClause",
           },
@@ -271,7 +271,7 @@ describe('SqlComparison', () => {
               "value": 5,
             },
             "spacing": Object {
-              "postKeyword": " ",
+              "postLimit": " ",
             },
             "type": "limitClause",
           },
@@ -602,7 +602,7 @@ describe('SqlComparison', () => {
               "from": "FROM",
             },
             "spacing": Object {
-              "postKeyword": " ",
+              "postFrom": " ",
             },
             "type": "fromClause",
           },
@@ -623,7 +623,7 @@ describe('SqlComparison', () => {
               "value": 1,
             },
             "spacing": Object {
-              "postKeyword": " ",
+              "postLimit": " ",
             },
             "type": "limitClause",
           },
@@ -735,7 +735,7 @@ describe('SqlComparison', () => {
               "from": "FROM",
             },
             "spacing": Object {
-              "postKeyword": " ",
+              "postFrom": " ",
             },
             "type": "fromClause",
           },
@@ -756,7 +756,7 @@ describe('SqlComparison', () => {
               "value": 1,
             },
             "spacing": Object {
-              "postKeyword": " ",
+              "postLimit": " ",
             },
             "type": "limitClause",
           },

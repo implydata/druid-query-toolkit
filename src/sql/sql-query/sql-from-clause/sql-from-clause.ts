@@ -54,7 +54,7 @@ export class SqlFromClause extends SqlClause {
   protected _toRawString(): string {
     const rawParts: string[] = [
       this.getKeyword('from', SqlFromClause.DEFAULT_FROM_KEYWORD),
-      this.getSpace('postKeyword'),
+      this.getSpace('postFrom'),
     ];
 
     rawParts.push(this.expressions.toString());

@@ -534,7 +534,7 @@ describe('SqlFunction', () => {
             },
           ],
           "spacing": Object {
-            "postKeyword": " ",
+            "postWhere": " ",
           },
           "type": "whereClause",
         },
