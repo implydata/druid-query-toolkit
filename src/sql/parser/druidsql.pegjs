@@ -22,7 +22,7 @@ Sql = SqlQuery / SqlAliasExpression
 
 SqlQuery =
   preQuery:_?
-  explainKeyword:(ExplainToken _)?
+  explainPlanFor:(ExplainToken __ PlanToken __ ForToken _)?
   withClause:(WithClause _)?
   select:SelectClause
   from:(_ FromClause)?
@@ -40,10 +40,14 @@ SqlQuery =
   var spacing = value.spacing = {};
   spacing.preQuery = preQuery;
 
-  if (explainKeyword) {
+  if (explainPlanFor) {
     value.explainPlanFor = true;
-    keywords.explainPlanFor = explainKeyword[0];
-    spacing.postExplain = explainKeyword[1];
+    keywords.explain = explainPlanFor[0];
+    spacing.postExplain = explainPlanFor[1];
+    keywords.plan = explainPlanFor[2];
+    spacing.postPlan = explainPlanFor[3];
+    keywords['for'] = explainPlanFor[4];
+    spacing.postFor = explainPlanFor[5];
   }
 
   if (withClause) {
@@ -1233,11 +1237,12 @@ DistinctToken = $('DISTINCT'i !IdentifierPart)
 ElseToken = $('ELSE'i !IdentifierPart)
 EndToken = $('END'i !IdentifierPart)
 EscapeToken = $('ESCAPE'i !IdentifierPart)
-ExplainToken = $('EXPLAIN'i !IdentifierPart __ 'PLAN'i !IdentifierPart __ 'FOR'i !IdentifierPart)
+ExplainToken = $('EXPLAIN'i !IdentifierPart)
 ExtractToken = $('EXTRACT'i !IdentifierPart)
 FalseToken = $('FALSE'i !IdentifierPart) { return { value: false, stringValue: text() }; }
 FilterToken= $('FILTER'i !IdentifierPart)
 FloorToken = $('FLOOR'i !IdentifierPart)
+ForToken = $('FOR'i !IdentifierPart)
 FromToken = $('FROM'i !IdentifierPart)
 GroupByToken = $('GROUP'i !IdentifierPart __ ByToken)
 HavingToken = $('HAVING'i !IdentifierPart)
@@ -1254,6 +1259,7 @@ OffsetToken = $('OFFSET'i !IdentifierPart)
 OnToken = $('ON'i !IdentifierPart)
 OrToken = $('OR'i !IdentifierPart)
 OrderToken = $('ORDER'i !IdentifierPart __ ByToken)
+PlanToken = $('PLAN'i !IdentifierPart)
 PositionToken = $('POSITION'i !IdentifierPart)
 SelectToken = $('SELECT'i !IdentifierPart)
 SimilarToToken = $('SIMILAR'i !IdentifierPart __ ToToken)

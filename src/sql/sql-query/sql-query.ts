@@ -55,7 +55,9 @@ export interface SqlQueryValue extends SqlBaseValue {
 export class SqlQuery extends SqlExpression {
   static type: SqlType = 'query';
 
-  static readonly DEFAULT_EXPLAIN_PLAN_FOR_KEYWORD = 'EXPLAIN PLAN FOR';
+  static readonly DEFAULT_EXPLAIN_KEYWORD = 'EXPLAIN';
+  static readonly DEFAULT_PLAN_KEYWORD = 'PLAN';
+  static readonly DEFAULT_FOR_KEYWORD = 'FOR';
   static readonly DEFAULT_WITH_KEYWORD = 'WITH';
   static readonly DEFAULT_SELECT_KEYWORD = 'SELECT';
   static readonly DEFAULT_UNION_KEYWORD = 'UNION ALL';
@@ -144,8 +146,12 @@ export class SqlQuery extends SqlExpression {
     // Explain clause
     if (this.explainPlanFor) {
       rawParts.push(
-        this.getKeyword('explainPlanFor', SqlQuery.DEFAULT_EXPLAIN_PLAN_FOR_KEYWORD),
+        this.getKeyword('explain', SqlQuery.DEFAULT_EXPLAIN_KEYWORD),
         this.getSpace('postExplain'),
+        this.getKeyword('plan', SqlQuery.DEFAULT_PLAN_KEYWORD),
+        this.getSpace('postPlan'),
+        this.getKeyword('for', SqlQuery.DEFAULT_FOR_KEYWORD),
+        this.getSpace('postFor'),
       );
     }
 

@@ -875,7 +875,9 @@ describe('SqlQuery', () => {
         "groupByClause": undefined,
         "havingClause": undefined,
         "keywords": Object {
-          "explainPlanFor": "Explain plan for",
+          "explain": "Explain",
+          "for": "for",
+          "plan": "plan",
           "select": "Select",
         },
         "limitClause": undefined,
@@ -907,6 +909,8 @@ describe('SqlQuery', () => {
         },
         "spacing": Object {
           "postExplain": " ",
+          "postFor": " ",
+          "postPlan": " ",
           "postQuery": "",
           "postSelect": " ",
           "preFrom": " ",
