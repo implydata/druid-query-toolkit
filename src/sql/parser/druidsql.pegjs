@@ -668,27 +668,27 @@ Interval =
 }
 
 TimeUnit =
-  'SECOND'i
-/ 'MINUTE'i
-/ 'HOUR'i
-/ 'DAY'i
-/ 'WEEK'i
-/ 'MONTH'i
-/ 'QUARTER'i
-/ 'YEAR'i
+  "SECOND"i
+/ "MINUTE"i
+/ "HOUR"i
+/ "DAY"i
+/ "WEEK"i
+/ "MONTH"i
+/ "QUARTER"i
+/ "YEAR"i
 
 TimeUnitExtra =
   TimeUnit
-/ 'EPOCH'i
-/ 'MICROSECOND'i
-/ 'MILLISECOND'i
-/ 'DOW'i
-/ 'ISODOW'i
-/ 'DOY'i
-/ 'ISOYEAR'i
-/ 'DECADE'i
-/ 'CENTURY'i
-/ 'MILLENNIUM'i
+/ "EPOCH"i
+/ "MICROSECOND"i
+/ "MILLISECOND"i
+/ "DOW"i
+/ "ISODOW"i
+/ "DOY"i
+/ "ISOYEAR"i
+/ "DECADE"i
+/ "CENTURY"i
+/ "MILLENNIUM"i
 
 Function =
   GenericFunction
@@ -1213,70 +1213,70 @@ TrimDecoratorLead =
 / TrailingToken
 
 JoinType =
-  'LEFT'i
-/ 'RIGHT'i
-/ 'INNER'i
-/ $('FULL'i _ 'OUTER'i)
-/ 'FULL'i
-/ 'CROSS'i
+  "LEFT"i
+/ "RIGHT"i
+/ "INNER"i
+/ $("FULL"i __ "OUTER"i)
+/ "FULL"i
+/ "CROSS"i
 
 /* Tokens */
 
-AllToken = $('ALL'i !IdentifierPart)
-AndToken = $('AND'i !IdentifierPart)
-AnyToken = $('ANY'i !IdentifierPart)
-ArrayToken = $('ARRAY'i !IdentifierPart)
-AsToken = $('AS'i !IdentifierPart)
-AscToken = $('ASC'i !IdentifierPart)
-BetweenToken = $('BETWEEN'i !IdentifierPart)
-BothToken = $('BOTH'i !IdentifierPart)
-ByToken = $('BY'i !IdentifierPart)
-CaseToken = $('CASE'i !IdentifierPart)
-CastToken = $('CAST'i !IdentifierPart)
-CeilToken = $('CEIL'i !IdentifierPart)
-DateToken = $('DATE'i !IdentifierPart)
-DescToken = $('DESC'i !IdentifierPart)
-DistinctToken = $('DISTINCT'i !IdentifierPart)
-ElseToken = $('ELSE'i !IdentifierPart)
-EndToken = $('END'i !IdentifierPart)
-EscapeToken = $('ESCAPE'i !IdentifierPart)
-ExplainToken = $('EXPLAIN'i !IdentifierPart)
-ExtractToken = $('EXTRACT'i !IdentifierPart)
-FalseToken = $('FALSE'i !IdentifierPart) { return { value: false, stringValue: text() }; }
-FilterToken= $('FILTER'i !IdentifierPart)
-FloorToken = $('FLOOR'i !IdentifierPart)
-ForToken = $('FOR'i !IdentifierPart)
-FromToken = $('FROM'i !IdentifierPart)
-GroupToken = $('GROUP'i !IdentifierPart)
-HavingToken = $('HAVING'i !IdentifierPart)
-InToken = $('IN'i !IdentifierPart)
-IntervalToken = $('INTERVAL'i !IdentifierPart)
-IsToken = $('IS'i !IdentifierPart)
-JoinToken = $('JOIN'i !IdentifierPart)
-LeadingToken = $('LEADING'i !IdentifierPart)
-LikeToken = $('LIKE'i !IdentifierPart)
-LimitToken = $('LIMIT'i !IdentifierPart)
-NotToken = $('NOT'i !IdentifierPart)
-NullToken = $('NULL'i !IdentifierPart) { return { value: null, stringValue: text() }; }
-OffsetToken = $('OFFSET'i !IdentifierPart)
-OnToken = $('ON'i !IdentifierPart)
-OrToken = $('OR'i !IdentifierPart)
-OrderToken = $('ORDER'i !IdentifierPart)
-PlanToken = $('PLAN'i !IdentifierPart)
-PositionToken = $('POSITION'i !IdentifierPart)
-SelectToken = $('SELECT'i !IdentifierPart)
-SimilarToToken = $('SIMILAR'i !IdentifierPart __ ToToken)
-SomeToken = $('SOME'i !IdentifierPart)
-SymmetricToken = $('SYMMETRIC'i !IdentifierPart)
-ThenToken = $('THEN'i !IdentifierPart)
-TimestampToken = $('TIMESTAMP'i !IdentifierPart)
-TimestampaddToken = $('TIMESTAMPADD'i !IdentifierPart)
-TimestampdiffToken = $('TIMESTAMPDIFF'i !IdentifierPart)
-ToToken = $('TO'i !IdentifierPart)
-TrailingToken = $('TRAILING'i !IdentifierPart)
-TrimToken = $('TRIM'i !IdentifierPart)
-TrueToken = $('TRUE'i !IdentifierPart) { return { value: true, stringValue: text() }; }
-UnionToken = $('UNION'i !IdentifierPart __ AllToken)
-WhenToken = $('WHEN'i !IdentifierPart)
-WhereToken = $('WHERE'i !IdentifierPart)
-WithToken = $('WITH'i !IdentifierPart)
+AllToken = $("ALL"i !IdentifierPart)
+AndToken = $("AND"i !IdentifierPart)
+AnyToken = $("ANY"i !IdentifierPart)
+ArrayToken = $("ARRAY"i !IdentifierPart)
+AsToken = $("AS"i !IdentifierPart)
+AscToken = $("ASC"i !IdentifierPart)
+BetweenToken = $("BETWEEN"i !IdentifierPart)
+BothToken = $("BOTH"i !IdentifierPart)
+ByToken = $("BY"i !IdentifierPart)
+CaseToken = $("CASE"i !IdentifierPart)
+CastToken = $("CAST"i !IdentifierPart)
+CeilToken = $("CEIL"i !IdentifierPart)
+DateToken = $("DATE"i !IdentifierPart)
+DescToken = $("DESC"i !IdentifierPart)
+DistinctToken = $("DISTINCT"i !IdentifierPart)
+ElseToken = $("ELSE"i !IdentifierPart)
+EndToken = $("END"i !IdentifierPart)
+EscapeToken = $("ESCAPE"i !IdentifierPart)
+ExplainToken = $("EXPLAIN"i !IdentifierPart)
+ExtractToken = $("EXTRACT"i !IdentifierPart)
+FalseToken = $("FALSE"i !IdentifierPart) { return { value: false, stringValue: text() }; }
+FilterToken= $("FILTER"i !IdentifierPart)
+FloorToken = $("FLOOR"i !IdentifierPart)
+ForToken = $("FOR"i !IdentifierPart)
+FromToken = $("FROM"i !IdentifierPart)
+GroupToken = $("GROUP"i !IdentifierPart)
+HavingToken = $("HAVING"i !IdentifierPart)
+InToken = $("IN"i !IdentifierPart)
+IntervalToken = $("INTERVAL"i !IdentifierPart)
+IsToken = $("IS"i !IdentifierPart)
+JoinToken = $("JOIN"i !IdentifierPart)
+LeadingToken = $("LEADING"i !IdentifierPart)
+LikeToken = $("LIKE"i !IdentifierPart)
+LimitToken = $("LIMIT"i !IdentifierPart)
+NotToken = $("NOT"i !IdentifierPart)
+NullToken = $("NULL"i !IdentifierPart) { return { value: null, stringValue: text() }; }
+OffsetToken = $("OFFSET"i !IdentifierPart)
+OnToken = $("ON"i !IdentifierPart)
+OrToken = $("OR"i !IdentifierPart)
+OrderToken = $("ORDER"i !IdentifierPart)
+PlanToken = $("PLAN"i !IdentifierPart)
+PositionToken = $("POSITION"i !IdentifierPart)
+SelectToken = $("SELECT"i !IdentifierPart)
+SimilarToToken = $("SIMILAR"i !IdentifierPart __ ToToken)
+SomeToken = $("SOME"i !IdentifierPart)
+SymmetricToken = $("SYMMETRIC"i !IdentifierPart)
+ThenToken = $("THEN"i !IdentifierPart)
+TimestampToken = $("TIMESTAMP"i !IdentifierPart)
+TimestampaddToken = $("TIMESTAMPADD"i !IdentifierPart)
+TimestampdiffToken = $("TIMESTAMPDIFF"i !IdentifierPart)
+ToToken = $("TO"i !IdentifierPart)
+TrailingToken = $("TRAILING"i !IdentifierPart)
+TrimToken = $("TRIM"i !IdentifierPart)
+TrueToken = $("TRUE"i !IdentifierPart) { return { value: true, stringValue: text() }; }
+UnionToken = $("UNION"i !IdentifierPart __ AllToken)
+WhenToken = $("WHEN"i !IdentifierPart)
+WhereToken = $("WHERE"i !IdentifierPart)
+WithToken = $("WITH"i !IdentifierPart)

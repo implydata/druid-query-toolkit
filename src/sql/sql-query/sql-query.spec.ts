@@ -18,7 +18,7 @@ import { backAndForth, sane } from '../../test-utils';
 describe('SqlQuery', () => {
   it('things that work', () => {
     const queries: string[] = [
-      `Select notingham from tbl`,
+      `Select nottingham from tbl`,
       `Select 3`,
       `Select * from tbl`,
       `Select * from tbl Limit 10`,
@@ -61,7 +61,7 @@ describe('SqlQuery', () => {
 
   it('things that do not work', () => {
     const queries: string[] = [
-      `Select notingham from table`,
+      `Select nottingham from table`,
       `Selec 3`,
       `(Select * from tbl`,
       `Select count(*) As count from tbl`,

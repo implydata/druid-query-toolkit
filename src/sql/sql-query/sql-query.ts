@@ -214,6 +214,7 @@ export class SqlQuery extends SqlExpression {
     }
 
     rawParts.push(this.getSpace('postQuery', ''));
+
     return rawParts.join('');
   }
 
