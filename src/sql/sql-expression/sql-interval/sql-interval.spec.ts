@@ -34,7 +34,7 @@ describe('SqlInterval', () => {
           "interval": "INTERVAL",
         },
         "spacing": Object {
-          "postIntervalKeyword": " ",
+          "postInterval": " ",
           "postIntervalValue": " ",
         },
         "type": "interval",
@@ -61,7 +61,7 @@ describe('SqlInterval', () => {
           "interval": "INTERVAL",
         },
         "spacing": Object {
-          "postIntervalKeyword": " ",
+          "postInterval": " ",
           "postIntervalValue": " ",
         },
         "type": "interval",
@@ -88,7 +88,7 @@ describe('SqlInterval', () => {
           "interval": "INTERVAL",
         },
         "spacing": Object {
-          "postIntervalKeyword": " ",
+          "postInterval": " ",
           "postIntervalValue": " ",
         },
         "type": "interval",

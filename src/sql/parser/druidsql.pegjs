@@ -627,7 +627,7 @@ CaseExpression =
   });
 }
 
-WhenThenPair = whenKeyword:WhenToken postWhen:_ whenExpression:Expression postWhenExpression:_ thenKeyword:ThenToken postThen:_ thenExpression:OrExpression
+WhenThenPair = when:WhenToken postWhen:_ whenExpression:Expression postWhenExpression:_ then:ThenToken postThen:_ thenExpression:Expression
 {
   return new sql.SqlWhenThenPart({
     whenExpression: whenExpression,
@@ -638,8 +638,8 @@ WhenThenPair = whenKeyword:WhenToken postWhen:_ whenExpression:Expression postWh
       postThen: postThen,
     },
     keywords: {
-      when: whenKeyword,
-      then: thenKeyword,
+      when: when,
+      then: then,
     },
   });
 }
@@ -648,8 +648,8 @@ WhenThenPair = whenKeyword:WhenToken postWhen:_ whenExpression:Expression postWh
 // ------------------------------
 
 Interval =
-  keyword:IntervalToken
-  postIntervalKeyword:_
+  interval:IntervalToken
+  postInterval:_
   intervalValue:BaseType
   postIntervalValue:_
   unit:($(TimeUnit _ ToToken _ TimeUnit) / $(TimeUnit '_' TimeUnit) / TimeUnit)
@@ -658,11 +658,11 @@ Interval =
     intervalValue: intervalValue,
     unit: unit,
     spacing: {
-      postIntervalKeyword: postIntervalKeyword,
+      postInterval: postInterval,
       postIntervalValue: postIntervalValue
     },
     keywords: {
-      interval: keyword,
+      interval: interval,
     }
   });
 }

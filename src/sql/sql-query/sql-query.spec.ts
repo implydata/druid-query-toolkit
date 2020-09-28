@@ -5096,7 +5096,7 @@ describe('SqlQuery', () => {
                               "interval": "INTERVAL",
                             },
                             "spacing": Object {
-                              "postIntervalKeyword": " ",
+                              "postInterval": " ",
                               "postIntervalValue": " ",
                             },
                             "type": "interval",
