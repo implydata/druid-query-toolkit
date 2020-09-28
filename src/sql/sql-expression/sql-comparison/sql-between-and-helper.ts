@@ -15,9 +15,8 @@
 import { SqlBase, SqlBaseValue, SqlExpression, SqlType, Substitutor } from '../..';
 
 export interface SqlBetweenAndHelperValue extends SqlBaseValue {
-  symmetricKeyword?: string;
+  symmetric?: boolean;
   start: SqlExpression;
-  andKeyword?: string;
   end: SqlExpression;
 }
 
@@ -36,30 +35,27 @@ export class SqlBetweenAndHelper extends SqlBase {
 
   static symmetric(start: SqlExpression, end: SqlExpression): SqlBetweenAndHelper {
     return new SqlBetweenAndHelper({
-      symmetricKeyword: SqlBetweenAndHelper.DEFAULT_SYMMETRIC_KEYWORD,
+      symmetric: true,
       start,
       end,
     });
   }
 
-  public readonly symmetricKeyword?: string;
+  public readonly symmetric?: boolean;
   public readonly start: SqlExpression;
-  public readonly andKeyword?: string;
   public readonly end: SqlExpression;
 
   constructor(options: SqlBetweenAndHelperValue) {
     super(options, SqlBetweenAndHelper.type);
-    this.symmetricKeyword = options.symmetricKeyword;
+    this.symmetric = options.symmetric;
     this.start = options.start;
-    this.andKeyword = options.andKeyword;
     this.end = options.end;
   }
 
   public valueOf(): SqlBetweenAndHelperValue {
     const value = super.valueOf() as SqlBetweenAndHelperValue;
-    value.symmetricKeyword = this.symmetricKeyword;
+    if (this.symmetric) value.symmetric = true;
     value.start = this.start;
-    value.andKeyword = this.andKeyword;
     value.end = this.end;
     return value;
   }
@@ -67,15 +63,18 @@ export class SqlBetweenAndHelper extends SqlBase {
   protected _toRawString(): string {
     const rawParts: string[] = [];
 
-    if (this.symmetricKeyword) {
-      rawParts.push(this.symmetricKeyword, this.getInnerSpace('postSymmetric'));
+    if (this.symmetric) {
+      rawParts.push(
+        this.getKeyword('symmetric', SqlBetweenAndHelper.DEFAULT_SYMMETRIC_KEYWORD),
+        this.getSpace('postSymmetric'),
+      );
     }
 
     rawParts.push(
       this.start.toString(),
-      this.getInnerSpace('preAnd'),
-      this.andKeyword || SqlBetweenAndHelper.DEFAULT_AND_KEYWORD,
-      this.getInnerSpace('postAnd'),
+      this.getSpace('preAnd'),
+      this.getKeyword('and', SqlBetweenAndHelper.DEFAULT_AND_KEYWORD),
+      this.getSpace('postAnd'),
       this.end.toString(),
     );
 
@@ -114,12 +113,6 @@ export class SqlBetweenAndHelper extends SqlBase {
     }
 
     return ret;
-  }
-
-  public clearOwnStaticKeywords(): this {
-    const value = this.valueOf();
-    delete value.andKeyword;
-    return SqlBase.fromValue(value);
   }
 }
 

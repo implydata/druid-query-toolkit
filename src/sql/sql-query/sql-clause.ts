@@ -13,26 +13,11 @@
  */
 
 import { SqlBaseValue } from '..';
-import { SqlBase, SqlType, Substitutor } from '../sql-base';
+import { SqlBase, Substitutor } from '../sql-base';
 
-export interface SqlClauseValue extends SqlBaseValue {
-  keyword?: string;
-}
+export interface SqlClauseValue extends SqlBaseValue {}
 
 export abstract class SqlClause extends SqlBase {
-  public readonly keyword?: string;
-
-  constructor(options: SqlClauseValue, typeOverride: SqlType) {
-    super(options, typeOverride);
-    this.keyword = options.keyword;
-  }
-
-  public valueOf(): SqlClauseValue {
-    const value = super.valueOf() as SqlClauseValue;
-    value.keyword = this.keyword;
-    return value;
-  }
-
   public _walkHelper(stack: SqlBase[], fn: Substitutor, postorder: boolean): SqlClause | undefined {
     const ret = super._walkHelper(stack, fn, postorder);
     if (!ret) return;
@@ -50,17 +35,5 @@ export abstract class SqlClause extends SqlBase {
     _postorder: boolean,
   ): SqlClause | undefined {
     return this;
-  }
-
-  public changeKeyword(keyword: string | undefined): this {
-    const value = this.valueOf();
-    value.keyword = keyword;
-    return SqlBase.fromValue(value);
-  }
-
-  public clearOwnStaticKeywords(): this {
-    const value = this.valueOf();
-    delete value.keyword;
-    return SqlBase.fromValue(value);
   }
 }

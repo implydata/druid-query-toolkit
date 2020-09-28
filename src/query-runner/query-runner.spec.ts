@@ -156,34 +156,38 @@ describe('QueryRunner', () => {
           ],
         ],
         "sqlQuery": SqlQuery {
-          "explainKeyword": undefined,
+          "explainPlanFor": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
               "values": Array [
                 SqlAlias {
                   "alias": undefined,
-                  "asKeyword": undefined,
+                  "as": undefined,
                   "expression": SqlRef {
                     "column": undefined,
-                    "innerSpacing": Object {},
+                    "keywords": Object {},
                     "namespace": undefined,
                     "namespaceQuotes": false,
                     "quotes": false,
+                    "spacing": Object {},
                     "table": "wikipedia",
                     "tableQuotes": false,
                     "type": "ref",
                   },
-                  "innerSpacing": Object {},
+                  "keywords": Object {},
+                  "spacing": Object {},
                   "type": "alias",
                 },
               ],
             },
-            "innerSpacing": Object {
+            "joinParts": undefined,
+            "keywords": Object {
+              "from": "FROM",
+            },
+            "spacing": Object {
               "postKeyword": " ",
             },
-            "joinParts": undefined,
-            "keyword": "FROM",
             "type": "fromClause",
           },
           "groupByClause": SqlGroupByClause {
@@ -191,32 +195,25 @@ describe('QueryRunner', () => {
               "separators": Array [],
               "values": Array [
                 SqlLiteral {
-                  "innerSpacing": Object {},
-                  "keyword": undefined,
+                  "keywords": Object {},
+                  "spacing": Object {},
                   "stringValue": "1",
                   "type": "literal",
                   "value": 1,
                 },
               ],
             },
-            "innerSpacing": Object {
+            "keywords": Object {
+              "groupBy": "GROUP BY",
+            },
+            "spacing": Object {
               "postKeyword": " ",
             },
-            "keyword": "GROUP BY",
             "type": "groupByClause",
           },
           "havingClause": undefined,
-          "innerSpacing": Object {
-            "postQuery": "",
-            "postSelect": "
-        ",
-            "preFrom": "
-      ",
-            "preGroupBy": "
-      ",
-            "preOrderBy": "
-      ",
-            "preQuery": "",
+          "keywords": Object {
+            "select": "SELECT",
           },
           "limitClause": undefined,
           "offsetClause": undefined,
@@ -227,23 +224,26 @@ describe('QueryRunner', () => {
                 SqlOrderByExpression {
                   "direction": "DESC",
                   "expression": SqlLiteral {
-                    "innerSpacing": Object {},
-                    "keyword": undefined,
+                    "keywords": Object {},
+                    "spacing": Object {},
                     "stringValue": "2",
                     "type": "literal",
                     "value": 2,
                   },
-                  "innerSpacing": Object {
+                  "keywords": Object {},
+                  "spacing": Object {
                     "preDirection": " ",
                   },
                   "type": "orderByExpression",
                 },
               ],
             },
-            "innerSpacing": Object {
+            "keywords": Object {
+              "orderBy": "ORDER BY",
+            },
+            "spacing": Object {
               "postKeyword": " ",
             },
-            "keyword": "ORDER BY",
             "type": "orderByClause",
           },
           "selectDecorator": undefined,
@@ -258,42 +258,46 @@ describe('QueryRunner', () => {
             "values": Array [
               SqlAlias {
                 "alias": undefined,
-                "asKeyword": undefined,
+                "as": undefined,
                 "expression": SqlRef {
                   "column": "channel",
-                  "innerSpacing": Object {},
+                  "keywords": Object {},
                   "namespace": undefined,
                   "namespaceQuotes": false,
                   "quotes": false,
+                  "spacing": Object {},
                   "table": undefined,
                   "tableQuotes": false,
                   "type": "ref",
                 },
-                "innerSpacing": Object {},
+                "keywords": Object {},
+                "spacing": Object {},
                 "type": "alias",
               },
               SqlAlias {
                 "alias": SqlRef {
                   "column": "Count",
-                  "innerSpacing": Object {},
+                  "keywords": Object {},
                   "namespace": undefined,
                   "namespaceQuotes": false,
                   "quotes": true,
+                  "spacing": Object {},
                   "table": undefined,
                   "tableQuotes": false,
                   "type": "ref",
                 },
-                "asKeyword": "AS",
+                "as": true,
                 "expression": SqlFunction {
                   "args": SeparatedArray {
                     "separators": Array [],
                     "values": Array [
                       SqlRef {
                         "column": "*",
-                        "innerSpacing": Object {},
+                        "keywords": Object {},
                         "namespace": undefined,
                         "namespaceQuotes": false,
                         "quotes": false,
+                        "spacing": Object {},
                         "table": undefined,
                         "tableQuotes": false,
                         "type": "ref",
@@ -301,9 +305,9 @@ describe('QueryRunner', () => {
                     ],
                   },
                   "decorator": undefined,
-                  "filterKeyword": undefined,
                   "functionName": "COUNT",
-                  "innerSpacing": Object {
+                  "keywords": Object {},
+                  "spacing": Object {
                     "postArguments": "",
                     "postLeftParen": "",
                     "preLeftParen": "",
@@ -312,7 +316,10 @@ describe('QueryRunner', () => {
                   "type": "function",
                   "whereClause": undefined,
                 },
-                "innerSpacing": Object {
+                "keywords": Object {
+                  "as": "AS",
+                },
+                "spacing": Object {
                   "preAlias": " ",
                   "preAs": " ",
                 },
@@ -320,12 +327,21 @@ describe('QueryRunner', () => {
               },
             ],
           },
-          "selectKeyword": "SELECT",
+          "spacing": Object {
+            "postQuery": "",
+            "postSelect": "
+        ",
+            "preFrom": "
+      ",
+            "preGroupBy": "
+      ",
+            "preOrderBy": "
+      ",
+            "preQuery": "",
+          },
           "type": "query",
-          "unionKeyword": undefined,
           "unionQuery": undefined,
           "whereClause": undefined,
-          "withKeyword": undefined,
           "withParts": undefined,
         },
         "sqlQueryId": "sql-query-id-yyy",
@@ -376,34 +392,38 @@ describe('QueryRunner', () => {
           ],
         ],
         "sqlQuery": SqlQuery {
-          "explainKeyword": undefined,
+          "explainPlanFor": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
               "values": Array [
                 SqlAlias {
                   "alias": undefined,
-                  "asKeyword": undefined,
+                  "as": undefined,
                   "expression": SqlRef {
                     "column": undefined,
-                    "innerSpacing": Object {},
+                    "keywords": Object {},
                     "namespace": undefined,
                     "namespaceQuotes": false,
                     "quotes": false,
+                    "spacing": Object {},
                     "table": "wikipedia",
                     "tableQuotes": false,
                     "type": "ref",
                   },
-                  "innerSpacing": Object {},
+                  "keywords": Object {},
+                  "spacing": Object {},
                   "type": "alias",
                 },
               ],
             },
-            "innerSpacing": Object {
+            "joinParts": undefined,
+            "keywords": Object {
+              "from": "FROM",
+            },
+            "spacing": Object {
               "postKeyword": " ",
             },
-            "joinParts": undefined,
-            "keyword": "FROM",
             "type": "fromClause",
           },
           "groupByClause": SqlGroupByClause {
@@ -411,32 +431,25 @@ describe('QueryRunner', () => {
               "separators": Array [],
               "values": Array [
                 SqlLiteral {
-                  "innerSpacing": Object {},
-                  "keyword": undefined,
+                  "keywords": Object {},
+                  "spacing": Object {},
                   "stringValue": "1",
                   "type": "literal",
                   "value": 1,
                 },
               ],
             },
-            "innerSpacing": Object {
+            "keywords": Object {
+              "groupBy": "GROUP BY",
+            },
+            "spacing": Object {
               "postKeyword": " ",
             },
-            "keyword": "GROUP BY",
             "type": "groupByClause",
           },
           "havingClause": undefined,
-          "innerSpacing": Object {
-            "postQuery": "",
-            "postSelect": "
-        ",
-            "preFrom": "
-      ",
-            "preGroupBy": "
-      ",
-            "preOrderBy": "
-      ",
-            "preQuery": "",
+          "keywords": Object {
+            "select": "SELECT",
           },
           "limitClause": undefined,
           "offsetClause": undefined,
@@ -447,23 +460,26 @@ describe('QueryRunner', () => {
                 SqlOrderByExpression {
                   "direction": "DESC",
                   "expression": SqlLiteral {
-                    "innerSpacing": Object {},
-                    "keyword": undefined,
+                    "keywords": Object {},
+                    "spacing": Object {},
                     "stringValue": "2",
                     "type": "literal",
                     "value": 2,
                   },
-                  "innerSpacing": Object {
+                  "keywords": Object {},
+                  "spacing": Object {
                     "preDirection": " ",
                   },
                   "type": "orderByExpression",
                 },
               ],
             },
-            "innerSpacing": Object {
+            "keywords": Object {
+              "orderBy": "ORDER BY",
+            },
+            "spacing": Object {
               "postKeyword": " ",
             },
-            "keyword": "ORDER BY",
             "type": "orderByClause",
           },
           "selectDecorator": undefined,
@@ -478,42 +494,46 @@ describe('QueryRunner', () => {
             "values": Array [
               SqlAlias {
                 "alias": undefined,
-                "asKeyword": undefined,
+                "as": undefined,
                 "expression": SqlRef {
                   "column": "channel",
-                  "innerSpacing": Object {},
+                  "keywords": Object {},
                   "namespace": undefined,
                   "namespaceQuotes": false,
                   "quotes": false,
+                  "spacing": Object {},
                   "table": undefined,
                   "tableQuotes": false,
                   "type": "ref",
                 },
-                "innerSpacing": Object {},
+                "keywords": Object {},
+                "spacing": Object {},
                 "type": "alias",
               },
               SqlAlias {
                 "alias": SqlRef {
                   "column": "Count",
-                  "innerSpacing": Object {},
+                  "keywords": Object {},
                   "namespace": undefined,
                   "namespaceQuotes": false,
                   "quotes": true,
+                  "spacing": Object {},
                   "table": undefined,
                   "tableQuotes": false,
                   "type": "ref",
                 },
-                "asKeyword": "AS",
+                "as": true,
                 "expression": SqlFunction {
                   "args": SeparatedArray {
                     "separators": Array [],
                     "values": Array [
                       SqlRef {
                         "column": "*",
-                        "innerSpacing": Object {},
+                        "keywords": Object {},
                         "namespace": undefined,
                         "namespaceQuotes": false,
                         "quotes": false,
+                        "spacing": Object {},
                         "table": undefined,
                         "tableQuotes": false,
                         "type": "ref",
@@ -521,9 +541,9 @@ describe('QueryRunner', () => {
                     ],
                   },
                   "decorator": undefined,
-                  "filterKeyword": undefined,
                   "functionName": "COUNT",
-                  "innerSpacing": Object {
+                  "keywords": Object {},
+                  "spacing": Object {
                     "postArguments": "",
                     "postLeftParen": "",
                     "preLeftParen": "",
@@ -532,7 +552,10 @@ describe('QueryRunner', () => {
                   "type": "function",
                   "whereClause": undefined,
                 },
-                "innerSpacing": Object {
+                "keywords": Object {
+                  "as": "AS",
+                },
+                "spacing": Object {
                   "preAlias": " ",
                   "preAs": " ",
                 },
@@ -540,12 +563,21 @@ describe('QueryRunner', () => {
               },
             ],
           },
-          "selectKeyword": "SELECT",
+          "spacing": Object {
+            "postQuery": "",
+            "postSelect": "
+        ",
+            "preFrom": "
+      ",
+            "preGroupBy": "
+      ",
+            "preOrderBy": "
+      ",
+            "preQuery": "",
+          },
           "type": "query",
-          "unionKeyword": undefined,
           "unionQuery": undefined,
           "whereClause": undefined,
-          "withKeyword": undefined,
           "withParts": undefined,
         },
         "sqlQueryId": "sql-query-id-yyy",
@@ -597,34 +629,38 @@ describe('QueryRunner', () => {
           ],
         ],
         "sqlQuery": SqlQuery {
-          "explainKeyword": undefined,
+          "explainPlanFor": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
               "values": Array [
                 SqlAlias {
                   "alias": undefined,
-                  "asKeyword": undefined,
+                  "as": undefined,
                   "expression": SqlRef {
                     "column": undefined,
-                    "innerSpacing": Object {},
+                    "keywords": Object {},
                     "namespace": undefined,
                     "namespaceQuotes": false,
                     "quotes": false,
+                    "spacing": Object {},
                     "table": "wikipedia",
                     "tableQuotes": false,
                     "type": "ref",
                   },
-                  "innerSpacing": Object {},
+                  "keywords": Object {},
+                  "spacing": Object {},
                   "type": "alias",
                 },
               ],
             },
-            "innerSpacing": Object {
+            "joinParts": undefined,
+            "keywords": Object {
+              "from": "FROM",
+            },
+            "spacing": Object {
               "postKeyword": " ",
             },
-            "joinParts": undefined,
-            "keyword": "FROM",
             "type": "fromClause",
           },
           "groupByClause": SqlGroupByClause {
@@ -632,32 +668,25 @@ describe('QueryRunner', () => {
               "separators": Array [],
               "values": Array [
                 SqlLiteral {
-                  "innerSpacing": Object {},
-                  "keyword": undefined,
+                  "keywords": Object {},
+                  "spacing": Object {},
                   "stringValue": "1",
                   "type": "literal",
                   "value": 1,
                 },
               ],
             },
-            "innerSpacing": Object {
+            "keywords": Object {
+              "groupBy": "GROUP BY",
+            },
+            "spacing": Object {
               "postKeyword": " ",
             },
-            "keyword": "GROUP BY",
             "type": "groupByClause",
           },
           "havingClause": undefined,
-          "innerSpacing": Object {
-            "postQuery": "",
-            "postSelect": "
-        ",
-            "preFrom": "
-      ",
-            "preGroupBy": "
-      ",
-            "preOrderBy": "
-      ",
-            "preQuery": "",
+          "keywords": Object {
+            "select": "SELECT",
           },
           "limitClause": undefined,
           "offsetClause": undefined,
@@ -668,23 +697,26 @@ describe('QueryRunner', () => {
                 SqlOrderByExpression {
                   "direction": "DESC",
                   "expression": SqlLiteral {
-                    "innerSpacing": Object {},
-                    "keyword": undefined,
+                    "keywords": Object {},
+                    "spacing": Object {},
                     "stringValue": "2",
                     "type": "literal",
                     "value": 2,
                   },
-                  "innerSpacing": Object {
+                  "keywords": Object {},
+                  "spacing": Object {
                     "preDirection": " ",
                   },
                   "type": "orderByExpression",
                 },
               ],
             },
-            "innerSpacing": Object {
+            "keywords": Object {
+              "orderBy": "ORDER BY",
+            },
+            "spacing": Object {
               "postKeyword": " ",
             },
-            "keyword": "ORDER BY",
             "type": "orderByClause",
           },
           "selectDecorator": undefined,
@@ -699,42 +731,46 @@ describe('QueryRunner', () => {
             "values": Array [
               SqlAlias {
                 "alias": undefined,
-                "asKeyword": undefined,
+                "as": undefined,
                 "expression": SqlRef {
                   "column": "channel",
-                  "innerSpacing": Object {},
+                  "keywords": Object {},
                   "namespace": undefined,
                   "namespaceQuotes": false,
                   "quotes": false,
+                  "spacing": Object {},
                   "table": undefined,
                   "tableQuotes": false,
                   "type": "ref",
                 },
-                "innerSpacing": Object {},
+                "keywords": Object {},
+                "spacing": Object {},
                 "type": "alias",
               },
               SqlAlias {
                 "alias": SqlRef {
                   "column": "Count",
-                  "innerSpacing": Object {},
+                  "keywords": Object {},
                   "namespace": undefined,
                   "namespaceQuotes": false,
                   "quotes": true,
+                  "spacing": Object {},
                   "table": undefined,
                   "tableQuotes": false,
                   "type": "ref",
                 },
-                "asKeyword": "AS",
+                "as": true,
                 "expression": SqlFunction {
                   "args": SeparatedArray {
                     "separators": Array [],
                     "values": Array [
                       SqlRef {
                         "column": "*",
-                        "innerSpacing": Object {},
+                        "keywords": Object {},
                         "namespace": undefined,
                         "namespaceQuotes": false,
                         "quotes": false,
+                        "spacing": Object {},
                         "table": undefined,
                         "tableQuotes": false,
                         "type": "ref",
@@ -742,9 +778,9 @@ describe('QueryRunner', () => {
                     ],
                   },
                   "decorator": undefined,
-                  "filterKeyword": undefined,
                   "functionName": "COUNT",
-                  "innerSpacing": Object {
+                  "keywords": Object {},
+                  "spacing": Object {
                     "postArguments": "",
                     "postLeftParen": "",
                     "preLeftParen": "",
@@ -753,7 +789,10 @@ describe('QueryRunner', () => {
                   "type": "function",
                   "whereClause": undefined,
                 },
-                "innerSpacing": Object {
+                "keywords": Object {
+                  "as": "AS",
+                },
+                "spacing": Object {
                   "preAlias": " ",
                   "preAs": " ",
                 },
@@ -761,12 +800,21 @@ describe('QueryRunner', () => {
               },
             ],
           },
-          "selectKeyword": "SELECT",
+          "spacing": Object {
+            "postQuery": "",
+            "postSelect": "
+        ",
+            "preFrom": "
+      ",
+            "preGroupBy": "
+      ",
+            "preOrderBy": "
+      ",
+            "preQuery": "",
+          },
           "type": "query",
-          "unionKeyword": undefined,
           "unionQuery": undefined,
           "whereClause": undefined,
-          "withKeyword": undefined,
           "withParts": undefined,
         },
         "sqlQueryId": "sql-query-id-yyy",

@@ -72,7 +72,7 @@ export class SqlOrderByExpression extends SqlBase {
     const rawParts = [this.expression.toString()];
 
     if (this.direction) {
-      rawParts.push(this.getInnerSpace('preDirection'), this.direction);
+      rawParts.push(this.getSpace('preDirection'), this.direction);
     }
 
     return rawParts.join('');
@@ -90,7 +90,7 @@ export class SqlOrderByExpression extends SqlBase {
       value.direction = direction;
     } else {
       delete value.direction;
-      value.innerSpacing = this.getInnerSpacingWithout('preDirection');
+      value.spacing = this.getSpacingWithout('preDirection');
     }
     return SqlBase.fromValue(value);
   }

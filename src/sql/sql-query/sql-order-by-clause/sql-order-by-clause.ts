@@ -25,7 +25,7 @@ export interface SqlOrderByClauseValue extends SqlClauseValue {
 export class SqlOrderByClause extends SqlClause {
   static type: SqlType = 'orderByClause';
 
-  static DEFAULT_KEYWORD = 'ORDER BY';
+  static DEFAULT_ORDER_BY_KEYWORD = 'ORDER BY';
 
   static create(
     expressions:
@@ -59,8 +59,8 @@ export class SqlOrderByClause extends SqlClause {
 
   protected _toRawString(): string {
     const rawParts: string[] = [
-      this.keyword || SqlOrderByClause.DEFAULT_KEYWORD,
-      this.getInnerSpace('postKeyword'),
+      this.getKeyword('orderBy', SqlOrderByClause.DEFAULT_ORDER_BY_KEYWORD),
+      this.getSpace('postKeyword'),
     ];
 
     rawParts.push(this.expressions.toString());

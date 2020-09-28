@@ -40,7 +40,7 @@ export class SqlUnary extends SqlExpression {
   }
 
   protected _toRawString(): string {
-    return [this.op, this.getInnerSpace('postOp'), this.argument.toString()].join('');
+    return [this.op, this.getSpace('postOp'), this.argument.toString()].join('');
   }
 
   public changeArgument(argument: SqlExpression): this {

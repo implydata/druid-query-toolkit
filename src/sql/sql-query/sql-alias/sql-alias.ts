@@ -18,12 +18,14 @@ import { SqlExpression, SqlRef } from '../../sql-expression';
 
 export interface SqlAliasValue extends SqlBaseValue {
   expression: SqlExpression | SqlQuery;
-  asKeyword?: string;
+  as?: boolean;
   alias?: SqlRef;
 }
 
 export class SqlAlias extends SqlBase {
   static type: SqlType = 'alias';
+
+  static DEFAULT_AS_KEYWORD = 'AS';
 
   static STAR: SqlAlias;
 
@@ -51,26 +53,26 @@ export class SqlAlias extends SqlBase {
   static create(expression: SqlExpression, alias?: string) {
     return new SqlAlias({
       expression: expression,
-      asKeyword: alias ? 'AS' : undefined,
+      as: Boolean(alias),
       alias: alias ? SqlRef.columnWithQuotes(alias) : undefined,
     });
   }
 
   public readonly expression: SqlExpression | SqlQuery;
-  public readonly asKeyword?: string;
+  public readonly as?: boolean;
   public readonly alias?: SqlRef;
 
   constructor(options: SqlAliasValue) {
     super(options, SqlAlias.type);
     this.expression = options.expression;
-    this.asKeyword = options.asKeyword;
+    this.as = options.as;
     this.alias = options.alias;
   }
 
   public valueOf() {
     const value = super.valueOf() as SqlAliasValue;
     value.expression = this.expression;
-    value.asKeyword = this.asKeyword;
+    if (this.as) value.as = true;
     value.alias = this.alias;
     return value as SqlAliasValue;
   }
@@ -79,11 +81,11 @@ export class SqlAlias extends SqlBase {
     const rawParts: string[] = [this.expression.toString()];
 
     if (this.alias) {
-      if (this.asKeyword) {
-        rawParts.push(this.getInnerSpace('preAs'), this.asKeyword);
+      if (this.as) {
+        rawParts.push(this.getSpace('preAs'), this.getKeyword('as', SqlAlias.DEFAULT_AS_KEYWORD));
       }
 
-      rawParts.push(this.getInnerSpace('preAlias'), this.alias.toString());
+      rawParts.push(this.getSpace('preAlias'), this.alias.toString());
     }
 
     return rawParts.join('');
@@ -99,7 +101,7 @@ export class SqlAlias extends SqlBase {
     const value = this.valueOf();
     value.alias = alias;
     if (!this.alias && alias) {
-      value.asKeyword = 'AS'; // If going from un-named alias to a named alias also add the AS keyword for style
+      value.as = true; // If going from un-named alias to a named alias also add the AS keyword for style
     }
     return SqlBase.fromValue(value);
   }

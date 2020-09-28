@@ -23,20 +23,22 @@ describe('SqlInterval', () => {
 
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlInterval {
-        "innerSpacing": Object {
-          "postIntervalKeyword": " ",
-          "postIntervalValue": " ",
-        },
         "intervalValue": SqlLiteral {
-          "innerSpacing": Object {},
-          "keyword": undefined,
+          "keywords": Object {},
+          "spacing": Object {},
           "stringValue": "'1'",
           "type": "literal",
           "value": "1",
         },
-        "keyword": "INTERVAL",
+        "keywords": Object {
+          "interval": "INTERVAL",
+        },
+        "spacing": Object {
+          "postIntervalKeyword": " ",
+          "postIntervalValue": " ",
+        },
         "type": "interval",
-        "unitKeyword": "DAY",
+        "unit": "DAY",
       }
     `);
   });
@@ -48,20 +50,22 @@ describe('SqlInterval', () => {
 
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlInterval {
-        "innerSpacing": Object {
-          "postIntervalKeyword": " ",
-          "postIntervalValue": " ",
-        },
         "intervalValue": SqlLiteral {
-          "innerSpacing": Object {},
-          "keyword": undefined,
+          "keywords": Object {},
+          "spacing": Object {},
           "stringValue": "'1-2'",
           "type": "literal",
           "value": "1-2",
         },
-        "keyword": "INTERVAL",
+        "keywords": Object {
+          "interval": "INTERVAL",
+        },
+        "spacing": Object {
+          "postIntervalKeyword": " ",
+          "postIntervalValue": " ",
+        },
         "type": "interval",
-        "unitKeyword": "YEAR TO MONTH",
+        "unit": "YEAR TO MONTH",
       }
     `);
   });
@@ -73,20 +77,22 @@ describe('SqlInterval', () => {
 
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlInterval {
-        "innerSpacing": Object {
-          "postIntervalKeyword": " ",
-          "postIntervalValue": " ",
-        },
         "intervalValue": SqlLiteral {
-          "innerSpacing": Object {},
-          "keyword": undefined,
+          "keywords": Object {},
+          "spacing": Object {},
           "stringValue": "'1-2'",
           "type": "literal",
           "value": "1-2",
         },
-        "keyword": "INTERVAL",
+        "keywords": Object {
+          "interval": "INTERVAL",
+        },
+        "spacing": Object {
+          "postIntervalKeyword": " ",
+          "postIntervalValue": " ",
+        },
         "type": "interval",
-        "unitKeyword": "YEAR_MONTH",
+        "unit": "YEAR_MONTH",
       }
     `);
   });

@@ -24,7 +24,7 @@ export interface SqlWhereClauseValue extends SqlClauseValue {
 export class SqlWhereClause extends SqlClause {
   static type: SqlType = 'whereClause';
 
-  static DEFAULT_KEYWORD = 'WHERE';
+  static DEFAULT_WHERE_KEYWORD = 'WHERE';
 
   static create(expression: SqlWhereClause | SqlExpression | string): SqlWhereClause {
     if (expression instanceof SqlWhereClause) return expression;
@@ -52,8 +52,8 @@ export class SqlWhereClause extends SqlClause {
 
   protected _toRawString(): string {
     const rawParts: string[] = [
-      this.keyword || SqlWhereClause.DEFAULT_KEYWORD,
-      this.getInnerSpace('postKeyword'),
+      this.getKeyword('where', SqlWhereClause.DEFAULT_WHERE_KEYWORD),
+      this.getSpace('postKeyword'),
     ];
 
     rawParts.push(this.expression.toString());

@@ -26,7 +26,7 @@ export interface SqlGroupByClauseValue extends SqlClauseValue {
 export class SqlGroupByClause extends SqlClause {
   static type: SqlType = 'groupByClause';
 
-  static DEFAULT_KEYWORD = 'GROUP BY';
+  static DEFAULT_GROUP_BY_KEYWORD = 'GROUP BY';
 
   static create(expressions: SeparatedArray<SqlExpression> | SqlExpression[]): SqlGroupByClause {
     return new SqlGroupByClause({
@@ -53,8 +53,8 @@ export class SqlGroupByClause extends SqlClause {
 
   protected _toRawString(): string {
     const rawParts: string[] = [
-      this.keyword || SqlGroupByClause.DEFAULT_KEYWORD,
-      this.getInnerSpace('postKeyword'),
+      this.getKeyword('groupBy', SqlGroupByClause.DEFAULT_GROUP_BY_KEYWORD),
+      this.getSpace('postKeyword'),
     ];
 
     rawParts.push(this.expressions ? this.expressions.toString() : '()');

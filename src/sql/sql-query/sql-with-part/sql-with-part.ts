@@ -21,17 +21,18 @@ export interface SqlWithPartValue extends SqlBaseValue {
   withTable: SqlExpression;
   withColumns?: SeparatedArray<SqlRef>;
   postWithColumns: string;
-  asKeyword: string;
+  as?: boolean;
   withQuery: SqlQuery;
 }
 
 export class SqlWithPart extends SqlBase {
   static type: SqlType = 'withPart';
 
+  static DEFAULT_AS_KEYWORD = 'AS';
+
   public readonly withTable: SqlExpression;
   public readonly withColumns?: SeparatedArray<SqlRef>;
   public readonly postWithColumns: string;
-  public readonly asKeyword: string;
   public readonly withQuery: SqlQuery;
 
   constructor(options: SqlWithPartValue) {
@@ -39,7 +40,6 @@ export class SqlWithPart extends SqlBase {
     this.withTable = options.withTable;
     this.withColumns = options.withColumns;
     this.postWithColumns = options.postWithColumns;
-    this.asKeyword = options.asKeyword;
     this.withQuery = options.withQuery;
   }
 
@@ -48,26 +48,29 @@ export class SqlWithPart extends SqlBase {
     value.withTable = this.withTable;
     value.withColumns = this.withColumns;
     value.postWithColumns = this.postWithColumns;
-    value.asKeyword = this.asKeyword;
     value.withQuery = this.withQuery;
     return value;
   }
 
   protected _toRawString(): string {
-    const rawParts: string[] = [this.withTable.toString(), this.getInnerSpace('postWithTable')];
+    const rawParts: string[] = [this.withTable.toString(), this.getSpace('postWithTable')];
 
     if (this.withColumns) {
       rawParts.push(
         '(',
-        this.getInnerSpace('postLeftParen'),
+        this.getSpace('postLeftParen'),
         this.withColumns.toString('\n'),
-        this.getInnerSpace('preRightParen'),
+        this.getSpace('preRightParen'),
         ')',
-        this.getInnerSpace('postWithColumns'),
+        this.getSpace('postWithColumns'),
       );
     }
 
-    rawParts.push(this.asKeyword, this.getInnerSpace('postAs'), this.withQuery.toString());
+    rawParts.push(
+      this.getKeyword('as', SqlWithPart.DEFAULT_AS_KEYWORD),
+      this.getSpace('postAs'),
+      this.withQuery.toString(),
+    );
 
     return rawParts.join('');
   }

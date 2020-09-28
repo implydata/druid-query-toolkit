@@ -84,8 +84,8 @@ describe('Uber Query', () => {
     expect(query.walkPostorder(t => SqlBase.fromValue(t.valueOf())).toString()).toEqual(sql);
   });
 
-  it('clearOwnStaticKeywords', () => {
-    expect(query.walkPostorder(t => t.clearOwnStaticKeywords()).toString()).toEqual(sql);
+  it('resetOwnKeywords', () => {
+    expect(query.walkPostorder(t => t.resetOwnKeywords()).toString()).toEqual(sql);
   });
 
   it('.getUsedColumns', () => {

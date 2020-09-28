@@ -25,19 +25,21 @@ describe('Case expression', () => {
       SqlCase {
         "caseExpression": SqlRef {
           "column": "A",
-          "innerSpacing": Object {},
+          "keywords": Object {},
           "namespace": undefined,
           "namespaceQuotes": false,
           "quotes": false,
+          "spacing": Object {},
           "table": undefined,
           "tableQuotes": false,
           "type": "ref",
         },
-        "caseKeyword": "CASE",
         "elseExpression": undefined,
-        "elseKeyword": undefined,
-        "endKeyword": "END",
-        "innerSpacing": Object {
+        "keywords": Object {
+          "case": "CASE",
+          "end": "END",
+        },
+        "spacing": Object {
           "postCase": " ",
           "postCaseExpression": " ",
           "preEnd": " ",
@@ -47,34 +49,38 @@ describe('Case expression', () => {
           "separators": Array [],
           "values": Array [
             SqlWhenThenPart {
-              "innerSpacing": Object {
+              "keywords": Object {
+                "then": "THEN",
+                "when": "WHEN",
+              },
+              "spacing": Object {
                 "postThen": " ",
                 "postWhen": " ",
                 "postWhenExpression": " ",
               },
               "thenExpression": SqlRef {
                 "column": "C",
-                "innerSpacing": Object {},
+                "keywords": Object {},
                 "namespace": undefined,
                 "namespaceQuotes": false,
                 "quotes": false,
+                "spacing": Object {},
                 "table": undefined,
                 "tableQuotes": false,
                 "type": "ref",
               },
-              "thenKeyword": "THEN",
               "type": "whenThenPart",
               "whenExpression": SqlRef {
                 "column": "B",
-                "innerSpacing": Object {},
+                "keywords": Object {},
                 "namespace": undefined,
                 "namespaceQuotes": false,
                 "quotes": false,
+                "spacing": Object {},
                 "table": undefined,
                 "tableQuotes": false,
                 "type": "ref",
               },
-              "whenKeyword": "WHEN",
             },
           ],
         },
@@ -91,28 +97,32 @@ describe('Case expression', () => {
       SqlCase {
         "caseExpression": SqlRef {
           "column": "A",
-          "innerSpacing": Object {},
+          "keywords": Object {},
           "namespace": undefined,
           "namespaceQuotes": false,
           "quotes": false,
+          "spacing": Object {},
           "table": undefined,
           "tableQuotes": false,
           "type": "ref",
         },
-        "caseKeyword": "CASE",
         "elseExpression": SqlRef {
           "column": "D",
-          "innerSpacing": Object {},
+          "keywords": Object {},
           "namespace": undefined,
           "namespaceQuotes": false,
           "quotes": false,
+          "spacing": Object {},
           "table": undefined,
           "tableQuotes": false,
           "type": "ref",
         },
-        "elseKeyword": "ELSE",
-        "endKeyword": "END",
-        "innerSpacing": Object {
+        "keywords": Object {
+          "case": "CASE",
+          "else": "ELSE",
+          "end": "END",
+        },
+        "spacing": Object {
           "postCase": " ",
           "postCaseExpression": " ",
           "postElse": " ",
@@ -124,34 +134,38 @@ describe('Case expression', () => {
           "separators": Array [],
           "values": Array [
             SqlWhenThenPart {
-              "innerSpacing": Object {
+              "keywords": Object {
+                "then": "THEN",
+                "when": "WHEN",
+              },
+              "spacing": Object {
                 "postThen": " ",
                 "postWhen": " ",
                 "postWhenExpression": " ",
               },
               "thenExpression": SqlRef {
                 "column": "C",
-                "innerSpacing": Object {},
+                "keywords": Object {},
                 "namespace": undefined,
                 "namespaceQuotes": false,
                 "quotes": false,
+                "spacing": Object {},
                 "table": undefined,
                 "tableQuotes": false,
                 "type": "ref",
               },
-              "thenKeyword": "THEN",
               "type": "whenThenPart",
               "whenExpression": SqlRef {
                 "column": "B",
-                "innerSpacing": Object {},
+                "keywords": Object {},
                 "namespace": undefined,
                 "namespaceQuotes": false,
                 "quotes": false,
+                "spacing": Object {},
                 "table": undefined,
                 "tableQuotes": false,
                 "type": "ref",
               },
-              "whenKeyword": "WHEN",
             },
           ],
         },
@@ -168,19 +182,21 @@ describe('Case expression', () => {
       SqlCase {
         "caseExpression": SqlRef {
           "column": "A",
-          "innerSpacing": Object {},
+          "keywords": Object {},
           "namespace": undefined,
           "namespaceQuotes": false,
           "quotes": false,
+          "spacing": Object {},
           "table": undefined,
           "tableQuotes": false,
           "type": "ref",
         },
-        "caseKeyword": "CASE",
         "elseExpression": undefined,
-        "elseKeyword": undefined,
-        "endKeyword": "END",
-        "innerSpacing": Object {
+        "keywords": Object {
+          "case": "CASE",
+          "end": "END",
+        },
+        "spacing": Object {
           "postCase": " ",
           "postCaseExpression": "  ",
           "preEnd": "      ",
@@ -190,34 +206,38 @@ describe('Case expression', () => {
           "separators": Array [],
           "values": Array [
             SqlWhenThenPart {
-              "innerSpacing": Object {
+              "keywords": Object {
+                "then": "THEN",
+                "when": "WHEN",
+              },
+              "spacing": Object {
                 "postThen": " ",
                 "postWhen": "     ",
                 "postWhenExpression": " ",
               },
               "thenExpression": SqlRef {
                 "column": "C",
-                "innerSpacing": Object {},
+                "keywords": Object {},
                 "namespace": undefined,
                 "namespaceQuotes": false,
                 "quotes": false,
+                "spacing": Object {},
                 "table": undefined,
                 "tableQuotes": false,
                 "type": "ref",
               },
-              "thenKeyword": "THEN",
               "type": "whenThenPart",
               "whenExpression": SqlRef {
                 "column": "B",
-                "innerSpacing": Object {},
+                "keywords": Object {},
                 "namespace": undefined,
                 "namespaceQuotes": false,
                 "quotes": false,
+                "spacing": Object {},
                 "table": undefined,
                 "tableQuotes": false,
                 "type": "ref",
               },
-              "whenKeyword": "WHEN",
             },
           ],
         },
@@ -234,22 +254,19 @@ describe('Case expression', () => {
       SqlCase {
         "caseExpression": SqlRef {
           "column": "A",
-          "innerSpacing": Object {},
+          "keywords": Object {},
           "namespace": undefined,
           "namespaceQuotes": false,
           "quotes": false,
+          "spacing": Object {},
           "table": undefined,
           "tableQuotes": false,
           "type": "ref",
         },
-        "caseKeyword": "CASE",
         "elseExpression": undefined,
-        "elseKeyword": undefined,
-        "endKeyword": "END",
-        "innerSpacing": Object {
-          "postCase": " ",
-          "postCaseExpression": " ",
-          "preEnd": " ",
+        "keywords": Object {
+          "case": "CASE",
+          "end": "END",
         },
         "parens": Array [
           Object {
@@ -257,39 +274,48 @@ describe('Case expression', () => {
             "rightSpacing": "",
           },
         ],
+        "spacing": Object {
+          "postCase": " ",
+          "postCaseExpression": " ",
+          "preEnd": " ",
+        },
         "type": "case",
         "whenThenParts": SeparatedArray {
           "separators": Array [],
           "values": Array [
             SqlWhenThenPart {
-              "innerSpacing": Object {
+              "keywords": Object {
+                "then": "THEN",
+                "when": "WHEN",
+              },
+              "spacing": Object {
                 "postThen": " ",
                 "postWhen": " ",
                 "postWhenExpression": " ",
               },
               "thenExpression": SqlRef {
                 "column": "C",
-                "innerSpacing": Object {},
+                "keywords": Object {},
                 "namespace": undefined,
                 "namespaceQuotes": false,
                 "quotes": false,
+                "spacing": Object {},
                 "table": undefined,
                 "tableQuotes": false,
                 "type": "ref",
               },
-              "thenKeyword": "THEN",
               "type": "whenThenPart",
               "whenExpression": SqlRef {
                 "column": "B",
-                "innerSpacing": Object {},
+                "keywords": Object {},
                 "namespace": undefined,
                 "namespaceQuotes": false,
                 "quotes": false,
+                "spacing": Object {},
                 "table": undefined,
                 "tableQuotes": false,
                 "type": "ref",
               },
-              "whenKeyword": "WHEN",
             },
           ],
         },
@@ -306,22 +332,19 @@ describe('Case expression', () => {
       SqlCase {
         "caseExpression": SqlRef {
           "column": "A",
-          "innerSpacing": Object {},
+          "keywords": Object {},
           "namespace": undefined,
           "namespaceQuotes": false,
           "quotes": false,
+          "spacing": Object {},
           "table": undefined,
           "tableQuotes": false,
           "type": "ref",
         },
-        "caseKeyword": "CASE",
         "elseExpression": undefined,
-        "elseKeyword": undefined,
-        "endKeyword": "END",
-        "innerSpacing": Object {
-          "postCase": "   ",
-          "postCaseExpression": " ",
-          "preEnd": " ",
+        "keywords": Object {
+          "case": "CASE",
+          "end": "END",
         },
         "parens": Array [
           Object {
@@ -329,39 +352,48 @@ describe('Case expression', () => {
             "rightSpacing": "  ",
           },
         ],
+        "spacing": Object {
+          "postCase": "   ",
+          "postCaseExpression": " ",
+          "preEnd": " ",
+        },
         "type": "case",
         "whenThenParts": SeparatedArray {
           "separators": Array [],
           "values": Array [
             SqlWhenThenPart {
-              "innerSpacing": Object {
+              "keywords": Object {
+                "then": "THEN",
+                "when": "WHEN",
+              },
+              "spacing": Object {
                 "postThen": " ",
                 "postWhen": "   ",
                 "postWhenExpression": " ",
               },
               "thenExpression": SqlRef {
                 "column": "C",
-                "innerSpacing": Object {},
+                "keywords": Object {},
                 "namespace": undefined,
                 "namespaceQuotes": false,
                 "quotes": false,
+                "spacing": Object {},
                 "table": undefined,
                 "tableQuotes": false,
                 "type": "ref",
               },
-              "thenKeyword": "THEN",
               "type": "whenThenPart",
               "whenExpression": SqlRef {
                 "column": "B",
-                "innerSpacing": Object {},
+                "keywords": Object {},
                 "namespace": undefined,
                 "namespaceQuotes": false,
                 "quotes": false,
+                "spacing": Object {},
                 "table": undefined,
                 "tableQuotes": false,
                 "type": "ref",
               },
-              "whenKeyword": "WHEN",
             },
           ],
         },
@@ -378,22 +410,19 @@ describe('Case expression', () => {
       SqlCase {
         "caseExpression": SqlRef {
           "column": "A",
-          "innerSpacing": Object {},
+          "keywords": Object {},
           "namespace": undefined,
           "namespaceQuotes": false,
           "quotes": false,
+          "spacing": Object {},
           "table": undefined,
           "tableQuotes": false,
           "type": "ref",
         },
-        "caseKeyword": "CASE",
         "elseExpression": undefined,
-        "elseKeyword": undefined,
-        "endKeyword": "END",
-        "innerSpacing": Object {
-          "postCase": "   ",
-          "postCaseExpression": " ",
-          "preEnd": " ",
+        "keywords": Object {
+          "case": "CASE",
+          "end": "END",
         },
         "parens": Array [
           Object {
@@ -401,12 +430,21 @@ describe('Case expression', () => {
             "rightSpacing": "  ",
           },
         ],
+        "spacing": Object {
+          "postCase": "   ",
+          "postCaseExpression": " ",
+          "preEnd": " ",
+        },
         "type": "case",
         "whenThenParts": SeparatedArray {
           "separators": Array [],
           "values": Array [
             SqlWhenThenPart {
-              "innerSpacing": Object {
+              "keywords": Object {
+                "then": "THEN",
+                "when": "WHEN",
+              },
+              "spacing": Object {
                 "postThen": " ",
                 "postWhen": "  ",
                 "postWhenExpression": " ",
@@ -423,20 +461,22 @@ describe('Case expression', () => {
                   "values": Array [
                     SqlRef {
                       "column": "C",
-                      "innerSpacing": Object {},
+                      "keywords": Object {},
                       "namespace": undefined,
                       "namespaceQuotes": false,
                       "quotes": false,
+                      "spacing": Object {},
                       "table": undefined,
                       "tableQuotes": false,
                       "type": "ref",
                     },
                     SqlRef {
                       "column": "C",
-                      "innerSpacing": Object {},
+                      "keywords": Object {},
                       "namespace": undefined,
                       "namespaceQuotes": false,
                       "quotes": false,
+                      "spacing": Object {},
                       "table": undefined,
                       "tableQuotes": false,
                       "type": "ref",
@@ -444,10 +484,10 @@ describe('Case expression', () => {
                   ],
                 },
                 "expressionType": "or",
-                "innerSpacing": Object {},
+                "keywords": Object {},
+                "spacing": Object {},
                 "type": "multi",
               },
-              "thenKeyword": "THEN",
               "type": "whenThenPart",
               "whenExpression": SqlMulti {
                 "args": SeparatedArray {
@@ -461,20 +501,22 @@ describe('Case expression', () => {
                   "values": Array [
                     SqlRef {
                       "column": "B",
-                      "innerSpacing": Object {},
+                      "keywords": Object {},
                       "namespace": undefined,
                       "namespaceQuotes": false,
                       "quotes": false,
+                      "spacing": Object {},
                       "table": undefined,
                       "tableQuotes": false,
                       "type": "ref",
                     },
                     SqlRef {
                       "column": "B",
-                      "innerSpacing": Object {},
+                      "keywords": Object {},
                       "namespace": undefined,
                       "namespaceQuotes": false,
                       "quotes": false,
+                      "spacing": Object {},
                       "table": undefined,
                       "tableQuotes": false,
                       "type": "ref",
@@ -482,10 +524,10 @@ describe('Case expression', () => {
                   ],
                 },
                 "expressionType": "and",
-                "innerSpacing": Object {},
+                "keywords": Object {},
+                "spacing": Object {},
                 "type": "multi",
               },
-              "whenKeyword": "WHEN",
             },
           ],
         },
@@ -501,11 +543,12 @@ describe('Case expression', () => {
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlCase {
         "caseExpression": undefined,
-        "caseKeyword": "CASE",
         "elseExpression": undefined,
-        "elseKeyword": undefined,
-        "endKeyword": "END",
-        "innerSpacing": Object {
+        "keywords": Object {
+          "case": "CASE",
+          "end": "END",
+        },
+        "spacing": Object {
           "postCase": " ",
           "preEnd": " ",
         },
@@ -514,34 +557,38 @@ describe('Case expression', () => {
           "separators": Array [],
           "values": Array [
             SqlWhenThenPart {
-              "innerSpacing": Object {
+              "keywords": Object {
+                "then": "THEN",
+                "when": "WHEN",
+              },
+              "spacing": Object {
                 "postThen": " ",
                 "postWhen": " ",
                 "postWhenExpression": " ",
               },
               "thenExpression": SqlRef {
                 "column": "C",
-                "innerSpacing": Object {},
+                "keywords": Object {},
                 "namespace": undefined,
                 "namespaceQuotes": false,
                 "quotes": false,
+                "spacing": Object {},
                 "table": undefined,
                 "tableQuotes": false,
                 "type": "ref",
               },
-              "thenKeyword": "THEN",
               "type": "whenThenPart",
               "whenExpression": SqlRef {
                 "column": "B",
-                "innerSpacing": Object {},
+                "keywords": Object {},
                 "namespace": undefined,
                 "namespaceQuotes": false,
                 "quotes": false,
+                "spacing": Object {},
                 "table": undefined,
                 "tableQuotes": false,
                 "type": "ref",
               },
-              "whenKeyword": "WHEN",
             },
           ],
         },
@@ -557,20 +604,23 @@ describe('Case expression', () => {
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlCase {
         "caseExpression": undefined,
-        "caseKeyword": "CASE",
         "elseExpression": SqlRef {
           "column": "D",
-          "innerSpacing": Object {},
+          "keywords": Object {},
           "namespace": undefined,
           "namespaceQuotes": false,
           "quotes": false,
+          "spacing": Object {},
           "table": undefined,
           "tableQuotes": false,
           "type": "ref",
         },
-        "elseKeyword": "ELSE",
-        "endKeyword": "END",
-        "innerSpacing": Object {
+        "keywords": Object {
+          "case": "CASE",
+          "else": "ELSE",
+          "end": "END",
+        },
+        "spacing": Object {
           "postCase": " ",
           "postElse": " ",
           "preElse": " ",
@@ -581,34 +631,38 @@ describe('Case expression', () => {
           "separators": Array [],
           "values": Array [
             SqlWhenThenPart {
-              "innerSpacing": Object {
+              "keywords": Object {
+                "then": "THEN",
+                "when": "WHEN",
+              },
+              "spacing": Object {
                 "postThen": " ",
                 "postWhen": " ",
                 "postWhenExpression": " ",
               },
               "thenExpression": SqlRef {
                 "column": "C",
-                "innerSpacing": Object {},
+                "keywords": Object {},
                 "namespace": undefined,
                 "namespaceQuotes": false,
                 "quotes": false,
+                "spacing": Object {},
                 "table": undefined,
                 "tableQuotes": false,
                 "type": "ref",
               },
-              "thenKeyword": "THEN",
               "type": "whenThenPart",
               "whenExpression": SqlRef {
                 "column": "B",
-                "innerSpacing": Object {},
+                "keywords": Object {},
                 "namespace": undefined,
                 "namespaceQuotes": false,
                 "quotes": false,
+                "spacing": Object {},
                 "table": undefined,
                 "tableQuotes": false,
                 "type": "ref",
               },
-              "whenKeyword": "WHEN",
             },
           ],
         },
@@ -625,19 +679,21 @@ describe('Case expression', () => {
       SqlCase {
         "caseExpression": SqlRef {
           "column": "A",
-          "innerSpacing": Object {},
+          "keywords": Object {},
           "namespace": undefined,
           "namespaceQuotes": false,
           "quotes": false,
+          "spacing": Object {},
           "table": undefined,
           "tableQuotes": false,
           "type": "ref",
         },
-        "caseKeyword": "CASE",
         "elseExpression": undefined,
-        "elseKeyword": undefined,
-        "endKeyword": "END",
-        "innerSpacing": Object {
+        "keywords": Object {
+          "case": "CASE",
+          "end": "END",
+        },
+        "spacing": Object {
           "postCase": " ",
           "postCaseExpression": "  ",
           "preEnd": "      ",
@@ -647,34 +703,38 @@ describe('Case expression', () => {
           "separators": Array [],
           "values": Array [
             SqlWhenThenPart {
-              "innerSpacing": Object {
+              "keywords": Object {
+                "then": "THEN",
+                "when": "WHEN",
+              },
+              "spacing": Object {
                 "postThen": " ",
                 "postWhen": "     ",
                 "postWhenExpression": " ",
               },
               "thenExpression": SqlRef {
                 "column": "C",
-                "innerSpacing": Object {},
+                "keywords": Object {},
                 "namespace": undefined,
                 "namespaceQuotes": false,
                 "quotes": false,
+                "spacing": Object {},
                 "table": undefined,
                 "tableQuotes": false,
                 "type": "ref",
               },
-              "thenKeyword": "THEN",
               "type": "whenThenPart",
               "whenExpression": SqlRef {
                 "column": "B",
-                "innerSpacing": Object {},
+                "keywords": Object {},
                 "namespace": undefined,
                 "namespaceQuotes": false,
                 "quotes": false,
+                "spacing": Object {},
                 "table": undefined,
                 "tableQuotes": false,
                 "type": "ref",
               },
-              "whenKeyword": "WHEN",
             },
           ],
         },
@@ -691,22 +751,19 @@ describe('Case expression', () => {
       SqlCase {
         "caseExpression": SqlRef {
           "column": "A",
-          "innerSpacing": Object {},
+          "keywords": Object {},
           "namespace": undefined,
           "namespaceQuotes": false,
           "quotes": false,
+          "spacing": Object {},
           "table": undefined,
           "tableQuotes": false,
           "type": "ref",
         },
-        "caseKeyword": "CASE",
         "elseExpression": undefined,
-        "elseKeyword": undefined,
-        "endKeyword": "END",
-        "innerSpacing": Object {
-          "postCase": " ",
-          "postCaseExpression": " ",
-          "preEnd": " ",
+        "keywords": Object {
+          "case": "CASE",
+          "end": "END",
         },
         "parens": Array [
           Object {
@@ -714,39 +771,48 @@ describe('Case expression', () => {
             "rightSpacing": "",
           },
         ],
+        "spacing": Object {
+          "postCase": " ",
+          "postCaseExpression": " ",
+          "preEnd": " ",
+        },
         "type": "case",
         "whenThenParts": SeparatedArray {
           "separators": Array [],
           "values": Array [
             SqlWhenThenPart {
-              "innerSpacing": Object {
+              "keywords": Object {
+                "then": "THEN",
+                "when": "WHEN",
+              },
+              "spacing": Object {
                 "postThen": " ",
                 "postWhen": " ",
                 "postWhenExpression": " ",
               },
               "thenExpression": SqlRef {
                 "column": "C",
-                "innerSpacing": Object {},
+                "keywords": Object {},
                 "namespace": undefined,
                 "namespaceQuotes": false,
                 "quotes": false,
+                "spacing": Object {},
                 "table": undefined,
                 "tableQuotes": false,
                 "type": "ref",
               },
-              "thenKeyword": "THEN",
               "type": "whenThenPart",
               "whenExpression": SqlRef {
                 "column": "B",
-                "innerSpacing": Object {},
+                "keywords": Object {},
                 "namespace": undefined,
                 "namespaceQuotes": false,
                 "quotes": false,
+                "spacing": Object {},
                 "table": undefined,
                 "tableQuotes": false,
                 "type": "ref",
               },
-              "whenKeyword": "WHEN",
             },
           ],
         },
@@ -763,22 +829,19 @@ describe('Case expression', () => {
       SqlCase {
         "caseExpression": SqlRef {
           "column": "A",
-          "innerSpacing": Object {},
+          "keywords": Object {},
           "namespace": undefined,
           "namespaceQuotes": false,
           "quotes": false,
+          "spacing": Object {},
           "table": undefined,
           "tableQuotes": false,
           "type": "ref",
         },
-        "caseKeyword": "CASE",
         "elseExpression": undefined,
-        "elseKeyword": undefined,
-        "endKeyword": "END",
-        "innerSpacing": Object {
-          "postCase": "   ",
-          "postCaseExpression": " ",
-          "preEnd": " ",
+        "keywords": Object {
+          "case": "CASE",
+          "end": "END",
         },
         "parens": Array [
           Object {
@@ -786,39 +849,48 @@ describe('Case expression', () => {
             "rightSpacing": "  ",
           },
         ],
+        "spacing": Object {
+          "postCase": "   ",
+          "postCaseExpression": " ",
+          "preEnd": " ",
+        },
         "type": "case",
         "whenThenParts": SeparatedArray {
           "separators": Array [],
           "values": Array [
             SqlWhenThenPart {
-              "innerSpacing": Object {
+              "keywords": Object {
+                "then": "THEN",
+                "when": "WHEN",
+              },
+              "spacing": Object {
                 "postThen": " ",
                 "postWhen": "   ",
                 "postWhenExpression": " ",
               },
               "thenExpression": SqlRef {
                 "column": "C",
-                "innerSpacing": Object {},
+                "keywords": Object {},
                 "namespace": undefined,
                 "namespaceQuotes": false,
                 "quotes": false,
+                "spacing": Object {},
                 "table": undefined,
                 "tableQuotes": false,
                 "type": "ref",
               },
-              "thenKeyword": "THEN",
               "type": "whenThenPart",
               "whenExpression": SqlRef {
                 "column": "B",
-                "innerSpacing": Object {},
+                "keywords": Object {},
                 "namespace": undefined,
                 "namespaceQuotes": false,
                 "quotes": false,
+                "spacing": Object {},
                 "table": undefined,
                 "tableQuotes": false,
                 "type": "ref",
               },
-              "whenKeyword": "WHEN",
             },
           ],
         },
@@ -835,22 +907,19 @@ describe('Case expression', () => {
       SqlCase {
         "caseExpression": SqlRef {
           "column": "A",
-          "innerSpacing": Object {},
+          "keywords": Object {},
           "namespace": undefined,
           "namespaceQuotes": false,
           "quotes": false,
+          "spacing": Object {},
           "table": undefined,
           "tableQuotes": false,
           "type": "ref",
         },
-        "caseKeyword": "CASE",
         "elseExpression": undefined,
-        "elseKeyword": undefined,
-        "endKeyword": "END",
-        "innerSpacing": Object {
-          "postCase": "   ",
-          "postCaseExpression": " ",
-          "preEnd": " ",
+        "keywords": Object {
+          "case": "CASE",
+          "end": "END",
         },
         "parens": Array [
           Object {
@@ -858,12 +927,21 @@ describe('Case expression', () => {
             "rightSpacing": "  ",
           },
         ],
+        "spacing": Object {
+          "postCase": "   ",
+          "postCaseExpression": " ",
+          "preEnd": " ",
+        },
         "type": "case",
         "whenThenParts": SeparatedArray {
           "separators": Array [],
           "values": Array [
             SqlWhenThenPart {
-              "innerSpacing": Object {
+              "keywords": Object {
+                "then": "THEN",
+                "when": "WHEN",
+              },
+              "spacing": Object {
                 "postThen": " ",
                 "postWhen": "  ",
                 "postWhenExpression": " ",
@@ -880,20 +958,22 @@ describe('Case expression', () => {
                   "values": Array [
                     SqlRef {
                       "column": "C",
-                      "innerSpacing": Object {},
+                      "keywords": Object {},
                       "namespace": undefined,
                       "namespaceQuotes": false,
                       "quotes": false,
+                      "spacing": Object {},
                       "table": undefined,
                       "tableQuotes": false,
                       "type": "ref",
                     },
                     SqlRef {
                       "column": "C",
-                      "innerSpacing": Object {},
+                      "keywords": Object {},
                       "namespace": undefined,
                       "namespaceQuotes": false,
                       "quotes": false,
+                      "spacing": Object {},
                       "table": undefined,
                       "tableQuotes": false,
                       "type": "ref",
@@ -901,10 +981,10 @@ describe('Case expression', () => {
                   ],
                 },
                 "expressionType": "or",
-                "innerSpacing": Object {},
+                "keywords": Object {},
+                "spacing": Object {},
                 "type": "multi",
               },
-              "thenKeyword": "THEN",
               "type": "whenThenPart",
               "whenExpression": SqlMulti {
                 "args": SeparatedArray {
@@ -918,20 +998,22 @@ describe('Case expression', () => {
                   "values": Array [
                     SqlRef {
                       "column": "B",
-                      "innerSpacing": Object {},
+                      "keywords": Object {},
                       "namespace": undefined,
                       "namespaceQuotes": false,
                       "quotes": false,
+                      "spacing": Object {},
                       "table": undefined,
                       "tableQuotes": false,
                       "type": "ref",
                     },
                     SqlRef {
                       "column": "B",
-                      "innerSpacing": Object {},
+                      "keywords": Object {},
                       "namespace": undefined,
                       "namespaceQuotes": false,
                       "quotes": false,
+                      "spacing": Object {},
                       "table": undefined,
                       "tableQuotes": false,
                       "type": "ref",
@@ -939,10 +1021,10 @@ describe('Case expression', () => {
                   ],
                 },
                 "expressionType": "and",
-                "innerSpacing": Object {},
+                "keywords": Object {},
+                "spacing": Object {},
                 "type": "multi",
               },
-              "whenKeyword": "WHEN",
             },
           ],
         },
@@ -959,25 +1041,28 @@ describe('Case expression', () => {
       SqlCase {
         "caseExpression": SqlRef {
           "column": "runner_status",
-          "innerSpacing": Object {},
+          "keywords": Object {},
           "namespace": undefined,
           "namespaceQuotes": false,
           "quotes": true,
+          "spacing": Object {},
           "table": undefined,
           "tableQuotes": false,
           "type": "ref",
         },
-        "caseKeyword": "CASE",
         "elseExpression": SqlLiteral {
-          "innerSpacing": Object {},
-          "keyword": undefined,
+          "keywords": Object {},
+          "spacing": Object {},
           "stringValue": "2",
           "type": "literal",
           "value": 2,
         },
-        "elseKeyword": "ELSE",
-        "endKeyword": "END",
-        "innerSpacing": Object {
+        "keywords": Object {
+          "case": "CASE",
+          "else": "ELSE",
+          "end": "END",
+        },
+        "spacing": Object {
           "postCase": " ",
           "postCaseExpression": " ",
           "postElse": " ",
@@ -989,28 +1074,30 @@ describe('Case expression', () => {
           "separators": Array [],
           "values": Array [
             SqlWhenThenPart {
-              "innerSpacing": Object {
+              "keywords": Object {
+                "then": "THEN",
+                "when": "WHEN",
+              },
+              "spacing": Object {
                 "postThen": " ",
                 "postWhen": " ",
                 "postWhenExpression": " ",
               },
               "thenExpression": SqlLiteral {
-                "innerSpacing": Object {},
-                "keyword": undefined,
+                "keywords": Object {},
+                "spacing": Object {},
                 "stringValue": "4",
                 "type": "literal",
                 "value": 4,
               },
-              "thenKeyword": "THEN",
               "type": "whenThenPart",
               "whenExpression": SqlLiteral {
-                "innerSpacing": Object {},
-                "keyword": undefined,
+                "keywords": Object {},
+                "spacing": Object {},
                 "stringValue": "'RUNNING'",
                 "type": "literal",
                 "value": "RUNNING",
               },
-              "whenKeyword": "WHEN",
             },
           ],
         },

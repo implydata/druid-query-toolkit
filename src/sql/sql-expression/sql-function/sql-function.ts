@@ -24,7 +24,6 @@ export interface SqlFunctionValue extends SqlBaseValue {
   specialParen?: SpecialParen;
   decorator?: string;
   args?: SeparatedArray<SqlExpression>;
-  filterKeyword?: string;
   whereClause?: SqlWhereClause;
 }
 
@@ -43,7 +42,6 @@ export class SqlFunction extends SqlExpression {
     return new SqlFunction({
       functionName: functionName,
       args: SeparatedArray.fromArray(args, Separator.COMMA),
-      filterKeyword: filter ? SqlFunction.DEFAULT_FILTER_KEYWORD : undefined,
       whereClause: filter ? SqlWhereClause.createForFunction(filter) : undefined,
     });
   }
@@ -58,7 +56,6 @@ export class SqlFunction extends SqlExpression {
       functionName: functionName,
       decorator: decorator,
       args: SeparatedArray.fromArray(args, Separator.COMMA),
-      filterKeyword: filter ? SqlFunction.DEFAULT_FILTER_KEYWORD : undefined,
       whereClause: filter ? SqlWhereClause.createForFunction(filter) : undefined,
     });
   }
@@ -67,7 +64,6 @@ export class SqlFunction extends SqlExpression {
   public readonly specialParen?: SpecialParen;
   public readonly args?: SeparatedArray<SqlExpression>;
   public readonly decorator?: string;
-  public readonly filterKeyword?: string;
   public readonly whereClause?: SqlWhereClause;
 
   constructor(options: SqlFunctionValue) {
@@ -76,7 +72,6 @@ export class SqlFunction extends SqlExpression {
     this.specialParen = options.specialParen;
     this.decorator = options.decorator;
     this.args = options.args;
-    this.filterKeyword = options.filterKeyword;
     this.whereClause = options.whereClause;
   }
 
@@ -86,7 +81,6 @@ export class SqlFunction extends SqlExpression {
     value.specialParen = this.specialParen;
     value.decorator = this.decorator;
     value.args = this.args;
-    value.filterKeyword = this.filterKeyword;
     value.whereClause = this.whereClause;
     return value;
   }
@@ -97,26 +91,26 @@ export class SqlFunction extends SqlExpression {
 
     if (specialParen !== 'none') {
       rawParts.push(
-        this.getInnerSpace('preLeftParen', ''),
+        this.getSpace('preLeftParen', ''),
         specialParen === 'square' ? '[' : '(',
-        this.getInnerSpace('postLeftParen', ''),
+        this.getSpace('postLeftParen', ''),
       );
 
       if (this.decorator) {
-        rawParts.push(this.decorator, this.getInnerSpace('postDecorator'));
+        rawParts.push(this.decorator, this.getSpace('postDecorator'));
       }
 
       if (this.args) {
-        rawParts.push(this.args.toString(Separator.COMMA), this.getInnerSpace('postArguments', ''));
+        rawParts.push(this.args.toString(Separator.COMMA), this.getSpace('postArguments', ''));
       }
 
       rawParts.push(specialParen === 'square' ? ']' : ')');
 
       if (this.whereClause) {
         rawParts.push(
-          this.getInnerSpace('preFilter'),
-          this.filterKeyword || SqlFunction.DEFAULT_FILTER_KEYWORD,
-          this.getInnerSpace('postFilter'),
+          this.getSpace('preFilter'),
+          this.getKeyword('filter', SqlFunction.DEFAULT_FILTER_KEYWORD),
+          this.getSpace('postFilter'),
           this.whereClause.toString(),
         );
       }
@@ -141,7 +135,7 @@ export class SqlFunction extends SqlExpression {
       value.whereClause = whereClause;
     } else {
       delete value.whereClause;
-      delete value.filterKeyword;
+      value.keywords = this.getKeywordsWithout('filter');
     }
     return SqlBase.fromValue(value);
   }
@@ -189,12 +183,6 @@ export class SqlFunction extends SqlExpression {
     }
 
     return ret;
-  }
-
-  public clearOwnStaticKeywords(): this {
-    const value = this.valueOf();
-    delete value.filterKeyword;
-    return SqlBase.fromValue(value);
   }
 
   public clearOwnSeparators(): this {

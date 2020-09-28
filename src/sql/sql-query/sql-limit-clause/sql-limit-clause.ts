@@ -24,7 +24,7 @@ export interface SqlLimitClauseValue extends SqlClauseValue {
 export class SqlLimitClause extends SqlClause {
   static type: SqlType = 'limitClause';
 
-  static DEFAULT_KEYWORD = 'LIMIT';
+  static DEFAULT_LIMIT_KEYWORD = 'LIMIT';
 
   static create(limit: SqlLiteral | number): SqlLimitClause {
     return new SqlLimitClause({
@@ -47,8 +47,8 @@ export class SqlLimitClause extends SqlClause {
 
   protected _toRawString(): string {
     const rawParts: string[] = [
-      this.keyword || SqlLimitClause.DEFAULT_KEYWORD,
-      this.getInnerSpace('postKeyword'),
+      this.getKeyword('limit', SqlLimitClause.DEFAULT_LIMIT_KEYWORD),
+      this.getSpace('postKeyword'),
     ];
 
     rawParts.push(this.limit.toString());

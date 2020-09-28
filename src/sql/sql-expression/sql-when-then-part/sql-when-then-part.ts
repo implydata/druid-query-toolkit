@@ -16,9 +16,7 @@ import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../../sql-base';
 import { SqlExpression } from '../sql-expression';
 
 export interface SqlWhenThenPartValue extends SqlBaseValue {
-  whenKeyword?: string;
   whenExpression: SqlExpression;
-  thenKeyword?: string;
   thenExpression: SqlExpression;
 }
 
@@ -35,36 +33,30 @@ export class SqlWhenThenPart extends SqlBase {
     });
   }
 
-  public readonly whenKeyword?: string;
   public readonly whenExpression: SqlExpression;
-  public readonly thenKeyword?: string;
   public readonly thenExpression: SqlExpression;
 
   constructor(options: SqlWhenThenPartValue) {
     super(options, SqlWhenThenPart.type);
-    this.whenKeyword = options.whenKeyword;
     this.whenExpression = options.whenExpression;
-    this.thenKeyword = options.thenKeyword;
     this.thenExpression = options.thenExpression;
   }
 
   public valueOf(): SqlWhenThenPartValue {
     const value = super.valueOf() as SqlWhenThenPartValue;
-    value.whenKeyword = this.whenKeyword;
     value.whenExpression = this.whenExpression;
-    value.thenKeyword = this.thenKeyword;
     value.thenExpression = this.thenExpression;
     return value;
   }
 
   protected _toRawString(): string {
     return [
-      this.whenKeyword || SqlWhenThenPart.DEFAULT_WHEN_KEYWORD,
-      this.getInnerSpace('postWhen'),
+      this.getKeyword('when', SqlWhenThenPart.DEFAULT_WHEN_KEYWORD),
+      this.getSpace('postWhen'),
       this.whenExpression.toString(),
-      this.getInnerSpace('postWhenExpression'),
-      this.thenKeyword || SqlWhenThenPart.DEFAULT_THEN_KEYWORD,
-      this.getInnerSpace('postThen'),
+      this.getSpace('postWhenExpression'),
+      this.getKeyword('then', SqlWhenThenPart.DEFAULT_THEN_KEYWORD),
+      this.getSpace('postThen'),
       this.thenExpression.toString(),
     ].join('');
   }
@@ -101,13 +93,6 @@ export class SqlWhenThenPart extends SqlBase {
     }
 
     return ret;
-  }
-
-  public clearOwnStaticKeywords(): this {
-    const value = this.valueOf();
-    delete value.whenKeyword;
-    delete value.thenKeyword;
-    return SqlBase.fromValue(value);
   }
 }
 

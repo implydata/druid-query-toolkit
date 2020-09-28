@@ -16,7 +16,6 @@ import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../../sql-base';
 
 export interface SqlLikeEscapeHelperValue extends SqlBaseValue {
   like: SqlExpression;
-  escapeKeyword?: string;
   escape: SqlExpression;
 }
 
@@ -35,20 +34,17 @@ export class SqlLikeEscapeHelper extends SqlBase {
   }
 
   public readonly like: SqlExpression;
-  public readonly escapeKeyword?: string;
   public readonly escape: SqlExpression;
 
   constructor(options: SqlLikeEscapeHelperValue) {
     super(options, SqlLikeEscapeHelper.type);
     this.like = options.like;
-    this.escapeKeyword = options.escapeKeyword;
     this.escape = options.escape;
   }
 
   public valueOf(): SqlLikeEscapeHelperValue {
     const value = super.valueOf() as SqlLikeEscapeHelperValue;
     value.like = this.like;
-    value.escapeKeyword = this.escapeKeyword;
     value.escape = this.escape;
     return value;
   }
@@ -56,9 +52,9 @@ export class SqlLikeEscapeHelper extends SqlBase {
   protected _toRawString(): string {
     const rawParts: string[] = [
       this.like.toString(),
-      this.getInnerSpace('preEscape'),
-      this.escapeKeyword || SqlLikeEscapeHelper.DEFAULT_ESCAPE_KEYWORD,
-      this.getInnerSpace('postEscape'),
+      this.getSpace('preEscape'),
+      this.getKeyword('escape', SqlLikeEscapeHelper.DEFAULT_ESCAPE_KEYWORD),
+      this.getSpace('postEscape'),
       this.escape.toString(),
     ];
 
@@ -97,12 +93,6 @@ export class SqlLikeEscapeHelper extends SqlBase {
     }
 
     return ret;
-  }
-
-  public clearOwnStaticKeywords(): this {
-    const value = this.valueOf();
-    delete value.escapeKeyword;
-    return SqlBase.fromValue(value);
   }
 }
 

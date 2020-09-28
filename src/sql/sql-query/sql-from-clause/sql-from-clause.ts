@@ -27,7 +27,7 @@ export interface SqlFromClauseValue extends SqlClauseValue {
 export class SqlFromClause extends SqlClause {
   static type: SqlType = 'fromClause';
 
-  static DEFAULT_KEYWORD = 'FROM';
+  static DEFAULT_FROM_KEYWORD = 'FROM';
 
   static create(expressions: SeparatedArray<SqlAlias> | SqlAlias[]): SqlFromClause {
     return new SqlFromClause({
@@ -53,14 +53,14 @@ export class SqlFromClause extends SqlClause {
 
   protected _toRawString(): string {
     const rawParts: string[] = [
-      this.keyword || SqlFromClause.DEFAULT_KEYWORD,
-      this.getInnerSpace('postKeyword'),
+      this.getKeyword('from', SqlFromClause.DEFAULT_FROM_KEYWORD),
+      this.getSpace('postKeyword'),
     ];
 
     rawParts.push(this.expressions.toString());
 
     if (this.joinParts) {
-      rawParts.push(this.getInnerSpace('preJoin', '\n'), this.joinParts.toString('\n'));
+      rawParts.push(this.getSpace('preJoin', '\n'), this.joinParts.toString('\n'));
     }
 
     return rawParts.join('');
@@ -77,7 +77,7 @@ export class SqlFromClause extends SqlClause {
     if (joinParts) {
       value.joinParts = SeparatedArray.fromArray(joinParts);
     } else {
-      value.innerSpacing = this.getInnerSpacingWithout('preJoin');
+      value.spacing = this.getSpacingWithout('preJoin');
       delete value.joinParts;
     }
     return SqlBase.fromValue(value);

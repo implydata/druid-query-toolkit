@@ -24,7 +24,7 @@ export interface SqlOffsetClauseValue extends SqlClauseValue {
 export class SqlOffsetClause extends SqlClause {
   static type: SqlType = 'offsetClause';
 
-  static DEFAULT_KEYWORD = 'OFFSET';
+  static DEFAULT_OFFSET_KEYWORD = 'OFFSET';
 
   static create(offset: SqlLiteral | number): SqlOffsetClause {
     return new SqlOffsetClause({
@@ -47,8 +47,8 @@ export class SqlOffsetClause extends SqlClause {
 
   protected _toRawString(): string {
     const rawParts: string[] = [
-      this.keyword || SqlOffsetClause.DEFAULT_KEYWORD,
-      this.getInnerSpace('postKeyword'),
+      this.getKeyword('offset', SqlOffsetClause.DEFAULT_OFFSET_KEYWORD),
+      this.getSpace('postKeyword'),
     ];
 
     rawParts.push(this.offset.toString());

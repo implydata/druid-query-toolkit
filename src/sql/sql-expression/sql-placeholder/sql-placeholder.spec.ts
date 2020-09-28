@@ -24,7 +24,8 @@ describe('SqlPlaceholder', () => {
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlPlaceholder {
         "customPlaceholder": undefined,
-        "innerSpacing": Object {},
+        "keywords": Object {},
+        "spacing": Object {},
         "type": "placeholder",
       }
     `);

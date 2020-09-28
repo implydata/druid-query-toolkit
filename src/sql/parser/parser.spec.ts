@@ -33,20 +33,22 @@ describe('Parser', () => {
           "values": Array [
             SqlRef {
               "column": "a",
-              "innerSpacing": Object {},
+              "keywords": Object {},
               "namespace": undefined,
               "namespaceQuotes": false,
               "quotes": false,
+              "spacing": Object {},
               "table": undefined,
               "tableQuotes": false,
               "type": "ref",
             },
             SqlRef {
               "column": "b",
-              "innerSpacing": Object {},
+              "keywords": Object {},
               "namespace": undefined,
               "namespaceQuotes": false,
               "quotes": false,
+              "spacing": Object {},
               "table": undefined,
               "tableQuotes": false,
               "type": "ref",
@@ -54,7 +56,8 @@ describe('Parser', () => {
           ],
         },
         "expressionType": "or",
-        "innerSpacing": Object {},
+        "keywords": Object {},
+        "spacing": Object {},
         "type": "multi",
       }
     `);

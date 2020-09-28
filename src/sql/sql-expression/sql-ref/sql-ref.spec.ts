@@ -30,10 +30,11 @@ describe('SqlRef', () => {
     expect(star).toMatchInlineSnapshot(`
       SqlRef {
         "column": "*",
-        "innerSpacing": Object {},
+        "keywords": Object {},
         "namespace": undefined,
         "namespaceQuotes": false,
         "quotes": false,
+        "spacing": Object {},
         "table": undefined,
         "tableQuotes": false,
         "type": "ref",
@@ -53,13 +54,14 @@ describe('SqlRef', () => {
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlRef {
         "column": "namespace",
-        "innerSpacing": Object {
-          "postTableDot": "",
-          "preTableDot": "",
-        },
+        "keywords": Object {},
         "namespace": undefined,
         "namespaceQuotes": false,
         "quotes": true,
+        "spacing": Object {
+          "postTableDot": "",
+          "preTableDot": "",
+        },
         "table": "test",
         "tableQuotes": true,
         "type": "ref",
@@ -75,13 +77,14 @@ describe('SqlRef', () => {
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlRef {
         "column": "namespace",
-        "innerSpacing": Object {
-          "postTableDot": "",
-          "preTableDot": "",
-        },
+        "keywords": Object {},
         "namespace": undefined,
         "namespaceQuotes": false,
         "quotes": false,
+        "spacing": Object {
+          "postTableDot": "",
+          "preTableDot": "",
+        },
         "table": "test",
         "tableQuotes": true,
         "type": "ref",
@@ -97,13 +100,14 @@ describe('SqlRef', () => {
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlRef {
         "column": "namespace",
-        "innerSpacing": Object {
-          "postTableDot": "",
-          "preTableDot": "",
-        },
+        "keywords": Object {},
         "namespace": undefined,
         "namespaceQuotes": false,
         "quotes": false,
+        "spacing": Object {
+          "postTableDot": "",
+          "preTableDot": "",
+        },
         "table": "test",
         "tableQuotes": false,
         "type": "ref",
@@ -119,10 +123,11 @@ describe('SqlRef', () => {
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlRef {
         "column": "test",
-        "innerSpacing": Object {},
+        "keywords": Object {},
         "namespace": undefined,
         "namespaceQuotes": false,
         "quotes": false,
+        "spacing": Object {},
         "table": undefined,
         "tableQuotes": false,
         "type": "ref",
@@ -138,10 +143,11 @@ describe('SqlRef', () => {
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlRef {
         "column": "test",
-        "innerSpacing": Object {},
+        "keywords": Object {},
         "namespace": undefined,
         "namespaceQuotes": false,
         "quotes": true,
+        "spacing": Object {},
         "table": undefined,
         "tableQuotes": false,
         "type": "ref",
@@ -155,10 +161,11 @@ describe('SqlRef', () => {
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlRef {
         "column": "page",
-        "innerSpacing": Object {},
+        "keywords": Object {},
         "namespace": undefined,
         "namespaceQuotes": false,
         "quotes": true,
+        "spacing": Object {},
         "table": undefined,
         "tableQuotes": false,
         "type": "ref",
@@ -172,10 +179,11 @@ describe('SqlRef', () => {
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlRef {
         "column": "channel",
-        "innerSpacing": Object {},
+        "keywords": Object {},
         "namespace": undefined,
         "namespaceQuotes": false,
         "quotes": false,
+        "spacing": Object {},
         "table": undefined,
         "tableQuotes": false,
         "type": "ref",
@@ -189,13 +197,14 @@ describe('SqlRef', () => {
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlRef {
         "column": "channel",
-        "innerSpacing": Object {
-          "postTableDot": " ",
-          "preTableDot": " ",
-        },
+        "keywords": Object {},
         "namespace": undefined,
         "namespaceQuotes": false,
         "quotes": false,
+        "spacing": Object {
+          "postTableDot": " ",
+          "preTableDot": " ",
+        },
         "table": "lol",
         "tableQuotes": true,
         "type": "ref",
@@ -211,10 +220,7 @@ describe('SqlRef', () => {
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlRef {
         "column": "channel",
-        "innerSpacing": Object {
-          "postTableDot": " ",
-          "preTableDot": " ",
-        },
+        "keywords": Object {},
         "namespace": undefined,
         "namespaceQuotes": false,
         "parens": Array [
@@ -228,6 +234,10 @@ describe('SqlRef', () => {
           },
         ],
         "quotes": false,
+        "spacing": Object {
+          "postTableDot": " ",
+          "preTableDot": " ",
+        },
         "table": "lol",
         "tableQuotes": true,
         "type": "ref",
@@ -243,15 +253,16 @@ describe('SqlRef', () => {
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlRef {
         "column": "boo",
-        "innerSpacing": Object {
+        "keywords": Object {},
+        "namespace": "lol",
+        "namespaceQuotes": true,
+        "quotes": false,
+        "spacing": Object {
           "postNamespaceDot": "  ",
           "postTableDot": "  ",
           "preNamespaceDot": "  ",
           "preTableDot": "  ",
         },
-        "namespace": "lol",
-        "namespaceQuotes": true,
-        "quotes": false,
         "table": "channel",
         "tableQuotes": false,
         "type": "ref",
@@ -275,13 +286,14 @@ describe('upgrades', () => {
     expect((SqlExpression.parse(sql) as SqlRef).upgrade()).toMatchInlineSnapshot(`
       SqlRef {
         "column": undefined,
-        "innerSpacing": Object {
-          "postTableDot": "",
-          "preTableDot": "",
-        },
+        "keywords": Object {},
         "namespace": "namespace",
         "namespaceQuotes": true,
         "quotes": false,
+        "spacing": Object {
+          "postTableDot": "",
+          "preTableDot": "",
+        },
         "table": "table",
         "tableQuotes": true,
         "type": "ref",
@@ -296,46 +308,47 @@ describe('upgrades', () => {
 
     expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
       SqlQuery {
-        "explainKeyword": undefined,
+        "explainPlanFor": undefined,
         "fromClause": SqlFromClause {
           "expressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
               SqlAlias {
                 "alias": undefined,
-                "asKeyword": undefined,
+                "as": undefined,
                 "expression": SqlRef {
                   "column": undefined,
-                  "innerSpacing": Object {
-                    "postTableDot": "",
-                    "preTableDot": "",
-                  },
+                  "keywords": Object {},
                   "namespace": "sys",
                   "namespaceQuotes": false,
                   "quotes": false,
+                  "spacing": Object {
+                    "postTableDot": "",
+                    "preTableDot": "",
+                  },
                   "table": "segments",
                   "tableQuotes": false,
                   "type": "ref",
                 },
-                "innerSpacing": Object {},
+                "keywords": Object {},
+                "spacing": Object {},
                 "type": "alias",
               },
             ],
           },
-          "innerSpacing": Object {
+          "joinParts": undefined,
+          "keywords": Object {
+            "from": "from",
+          },
+          "spacing": Object {
             "postKeyword": " ",
           },
-          "joinParts": undefined,
-          "keyword": "from",
           "type": "fromClause",
         },
         "groupByClause": undefined,
         "havingClause": undefined,
-        "innerSpacing": Object {
-          "postQuery": "",
-          "postSelect": " ",
-          "preFrom": " ",
-          "preQuery": "",
+        "keywords": Object {
+          "select": "select",
         },
         "limitClause": undefined,
         "offsetClause": undefined,
@@ -346,28 +359,33 @@ describe('upgrades', () => {
           "values": Array [
             SqlAlias {
               "alias": undefined,
-              "asKeyword": undefined,
+              "as": undefined,
               "expression": SqlRef {
                 "column": "tbl",
-                "innerSpacing": Object {},
+                "keywords": Object {},
                 "namespace": undefined,
                 "namespaceQuotes": false,
                 "quotes": false,
+                "spacing": Object {},
                 "table": undefined,
                 "tableQuotes": false,
                 "type": "ref",
               },
-              "innerSpacing": Object {},
+              "keywords": Object {},
+              "spacing": Object {},
               "type": "alias",
             },
           ],
         },
-        "selectKeyword": "select",
+        "spacing": Object {
+          "postQuery": "",
+          "postSelect": " ",
+          "preFrom": " ",
+          "preQuery": "",
+        },
         "type": "query",
-        "unionKeyword": undefined,
         "unionQuery": undefined,
         "whereClause": undefined,
-        "withKeyword": undefined,
         "withParts": undefined,
       }
     `);
