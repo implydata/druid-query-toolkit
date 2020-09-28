@@ -17,7 +17,6 @@ import { SqlExpression } from '../../sql-expression';
 import { SqlClause, SqlClauseValue } from '../sql-clause';
 
 export interface SqlWhereClauseValue extends SqlClauseValue {
-  keyword?: string;
   expression: SqlExpression;
 }
 

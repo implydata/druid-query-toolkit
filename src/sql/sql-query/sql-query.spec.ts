@@ -492,10 +492,12 @@ describe('SqlQuery', () => {
                       ],
                     },
                     "keywords": Object {
-                      "orderBy": "ORDER BY",
+                      "by": "BY",
+                      "order": "ORDER",
                     },
                     "spacing": Object {
-                      "postKeyword": " ",
+                      "postBy": " ",
+                      "postOrder": " ",
                     },
                     "type": "orderByClause",
                   },
@@ -1668,10 +1670,12 @@ describe('SqlQuery', () => {
               ],
             },
             "keywords": Object {
-              "groupBy": "group by",
+              "by": "by",
+              "group": "group",
             },
             "spacing": Object {
-              "postKeyword": " ",
+              "postBy": " ",
+              "postGroup": " ",
             },
             "type": "groupByClause",
           },
@@ -1780,10 +1784,12 @@ describe('SqlQuery', () => {
               ],
             },
             "keywords": Object {
-              "groupBy": "group by",
+              "by": "by",
+              "group": "group",
             },
             "spacing": Object {
-              "postKeyword": " ",
+              "postBy": " ",
+              "postGroup": " ",
             },
             "type": "groupByClause",
           },
@@ -1909,10 +1915,12 @@ describe('SqlQuery', () => {
               ],
             },
             "keywords": Object {
-              "groupBy": "group by",
+              "by": "by",
+              "group": "group",
             },
             "spacing": Object {
-              "postKeyword": " ",
+              "postBy": " ",
+              "postGroup": " ",
             },
             "type": "groupByClause",
           },
@@ -2513,10 +2521,12 @@ describe('SqlQuery', () => {
               ],
             },
             "keywords": Object {
-              "orderBy": "order by",
+              "by": "by",
+              "order": "order",
             },
             "spacing": Object {
-              "postKeyword": " ",
+              "postBy": " ",
+              "postOrder": " ",
             },
             "type": "orderByClause",
           },
@@ -2631,10 +2641,12 @@ describe('SqlQuery', () => {
               ],
             },
             "keywords": Object {
-              "orderBy": "order by",
+              "by": "by",
+              "order": "order",
             },
             "spacing": Object {
-              "postKeyword": " ",
+              "postBy": " ",
+              "postOrder": " ",
             },
             "type": "orderByClause",
           },
@@ -2747,10 +2759,12 @@ describe('SqlQuery', () => {
               ],
             },
             "keywords": Object {
-              "orderBy": "order by",
+              "by": "by",
+              "order": "order",
             },
             "spacing": Object {
-              "postKeyword": " ",
+              "postBy": " ",
+              "postOrder": " ",
             },
             "type": "orderByClause",
           },
@@ -2867,10 +2881,12 @@ describe('SqlQuery', () => {
               ],
             },
             "keywords": Object {
-              "orderBy": "order by",
+              "by": "by",
+              "order": "order",
             },
             "spacing": Object {
-              "postKeyword": " ",
+              "postBy": " ",
+              "postOrder": " ",
             },
             "type": "orderByClause",
           },
@@ -3030,10 +3046,12 @@ describe('SqlQuery', () => {
               ],
             },
             "keywords": Object {
-              "orderBy": "order by",
+              "by": "by",
+              "order": "order",
             },
             "spacing": Object {
-              "postKeyword": " ",
+              "postBy": " ",
+              "postOrder": " ",
             },
             "type": "orderByClause",
           },
@@ -3171,10 +3189,12 @@ describe('SqlQuery', () => {
               ],
             },
             "keywords": Object {
-              "orderBy": "order by",
+              "by": "by",
+              "order": "order",
             },
             "spacing": Object {
-              "postKeyword": " ",
+              "postBy": " ",
+              "postOrder": " ",
             },
             "type": "orderByClause",
           },
@@ -4554,10 +4574,12 @@ describe('SqlQuery', () => {
               ],
             },
             "keywords": Object {
-              "groupBy": "GROUP BY",
+              "by": "BY",
+              "group": "GROUP",
             },
             "spacing": Object {
-              "postKeyword": "",
+              "postBy": "",
+              "postGroup": " ",
             },
             "type": "groupByClause",
           },
@@ -4593,10 +4615,12 @@ describe('SqlQuery', () => {
               ],
             },
             "keywords": Object {
-              "orderBy": "ORDER BY",
+              "by": "BY",
+              "order": "ORDER",
             },
             "spacing": Object {
-              "postKeyword": "",
+              "postBy": "",
+              "postOrder": " ",
             },
             "type": "orderByClause",
           },
@@ -4819,10 +4843,12 @@ describe('SqlQuery', () => {
               ],
             },
             "keywords": Object {
-              "groupBy": "GROUP BY",
+              "by": "BY",
+              "group": "GROUP",
             },
             "spacing": Object {
-              "postKeyword": " ",
+              "postBy": " ",
+              "postGroup": " ",
             },
             "type": "groupByClause",
           },
@@ -4858,10 +4884,12 @@ describe('SqlQuery', () => {
               ],
             },
             "keywords": Object {
-              "orderBy": "ORDER BY",
+              "by": "BY",
+              "order": "ORDER",
             },
             "spacing": Object {
-              "postKeyword": " ",
+              "postBy": " ",
+              "postOrder": " ",
             },
             "type": "orderByClause",
           },

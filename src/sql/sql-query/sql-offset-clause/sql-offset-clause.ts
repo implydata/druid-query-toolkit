@@ -17,7 +17,6 @@ import { SqlLiteral } from '../../sql-expression';
 import { SqlClause, SqlClauseValue } from '../sql-clause';
 
 export interface SqlOffsetClauseValue extends SqlClauseValue {
-  keyword?: string;
   offset: SqlLiteral;
 }
 

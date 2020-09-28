@@ -17,7 +17,6 @@ import { SqlLiteral } from '../../sql-expression';
 import { SqlClause, SqlClauseValue } from '../sql-clause';
 
 export interface SqlLimitClauseValue extends SqlClauseValue {
-  keyword?: string;
   limit: SqlLiteral;
 }
 

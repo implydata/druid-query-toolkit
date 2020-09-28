@@ -204,10 +204,12 @@ describe('QueryRunner', () => {
               ],
             },
             "keywords": Object {
-              "groupBy": "GROUP BY",
+              "by": "BY",
+              "group": "GROUP",
             },
             "spacing": Object {
-              "postKeyword": " ",
+              "postBy": " ",
+              "postGroup": " ",
             },
             "type": "groupByClause",
           },
@@ -239,10 +241,12 @@ describe('QueryRunner', () => {
               ],
             },
             "keywords": Object {
-              "orderBy": "ORDER BY",
+              "by": "BY",
+              "order": "ORDER",
             },
             "spacing": Object {
-              "postKeyword": " ",
+              "postBy": " ",
+              "postOrder": " ",
             },
             "type": "orderByClause",
           },
@@ -440,10 +444,12 @@ describe('QueryRunner', () => {
               ],
             },
             "keywords": Object {
-              "groupBy": "GROUP BY",
+              "by": "BY",
+              "group": "GROUP",
             },
             "spacing": Object {
-              "postKeyword": " ",
+              "postBy": " ",
+              "postGroup": " ",
             },
             "type": "groupByClause",
           },
@@ -475,10 +481,12 @@ describe('QueryRunner', () => {
               ],
             },
             "keywords": Object {
-              "orderBy": "ORDER BY",
+              "by": "BY",
+              "order": "ORDER",
             },
             "spacing": Object {
-              "postKeyword": " ",
+              "postBy": " ",
+              "postOrder": " ",
             },
             "type": "orderByClause",
           },
@@ -677,10 +685,12 @@ describe('QueryRunner', () => {
               ],
             },
             "keywords": Object {
-              "groupBy": "GROUP BY",
+              "by": "BY",
+              "group": "GROUP",
             },
             "spacing": Object {
-              "postKeyword": " ",
+              "postBy": " ",
+              "postGroup": " ",
             },
             "type": "groupByClause",
           },
@@ -712,10 +722,12 @@ describe('QueryRunner', () => {
               ],
             },
             "keywords": Object {
-              "orderBy": "ORDER BY",
+              "by": "BY",
+              "order": "ORDER",
             },
             "spacing": Object {
-              "postKeyword": " ",
+              "postBy": " ",
+              "postOrder": " ",
             },
             "type": "orderByClause",
           },

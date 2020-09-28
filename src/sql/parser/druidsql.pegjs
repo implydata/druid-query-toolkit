@@ -239,15 +239,17 @@ WhereClause = keyword:WhereToken postKeyword:_ expression:Expression
   });
 }
 
-GroupByClause = keyword:GroupByToken postKeyword:_ expressions:(ExpressionList / "()")
+GroupByClause = group:GroupToken postGroup:__ by:ByToken postBy:_ expressions:(ExpressionList / "()")
 {
   return new sql.SqlGroupByClause({
     expressions: expressions === '()' ? null : expressions,
     spacing: {
-      postKeyword: postKeyword,
+      postGroup: postGroup,
+      postBy: postBy,
     },
     keywords: {
-      groupBy: keyword,
+      group: group,
+      by: by,
     },
   });
 }
@@ -270,15 +272,17 @@ HavingClause = keyword:HavingToken postKeyword:_ expression:Expression
   });
 }
 
-OrderByClause = keyword:OrderToken postKeyword:_ head:SqlOrderByExpression tail:(CommaSeparator SqlOrderByExpression)*
+OrderByClause = order:OrderToken postOrder:__ by:ByToken postBy:_ head:SqlOrderByExpression tail:(CommaSeparator SqlOrderByExpression)*
 {
   return new sql.SqlOrderByClause({
     expressions: makeSeparatedArray(head, tail),
     spacing: {
-      postKeyword: postKeyword,
+      postOrder: postOrder,
+      postBy: postBy,
     },
     keywords: {
-      orderBy: keyword,
+      order: order,
+      by: by,
     },
   });
 }
@@ -1244,7 +1248,7 @@ FilterToken= $('FILTER'i !IdentifierPart)
 FloorToken = $('FLOOR'i !IdentifierPart)
 ForToken = $('FOR'i !IdentifierPart)
 FromToken = $('FROM'i !IdentifierPart)
-GroupByToken = $('GROUP'i !IdentifierPart __ ByToken)
+GroupToken = $('GROUP'i !IdentifierPart)
 HavingToken = $('HAVING'i !IdentifierPart)
 InToken = $('IN'i !IdentifierPart)
 IntervalToken = $('INTERVAL'i !IdentifierPart)
@@ -1258,7 +1262,7 @@ NullToken = $('NULL'i !IdentifierPart) { return { value: null, stringValue: text
 OffsetToken = $('OFFSET'i !IdentifierPart)
 OnToken = $('ON'i !IdentifierPart)
 OrToken = $('OR'i !IdentifierPart)
-OrderToken = $('ORDER'i !IdentifierPart __ ByToken)
+OrderToken = $('ORDER'i !IdentifierPart)
 PlanToken = $('PLAN'i !IdentifierPart)
 PositionToken = $('POSITION'i !IdentifierPart)
 SelectToken = $('SELECT'i !IdentifierPart)
