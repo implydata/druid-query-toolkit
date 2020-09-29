@@ -285,10 +285,19 @@ SELECT countryName from wikipedia
 
 ## ToDo
 
-- Add support for `/* inline comments */`
 - Clean up APIs
 - `(a, b) IN (subquery)`
 - Fancy group by definitions e.g. `GROUPING SETS`, `CUBE`
+
+Fix SemiKeywords:
+    - Join type (LEFT)
+    - Comparison op (IS)
+    - Order by direction (ASC)
+    - Unary op (NOT)
+    - Function name (SUM)
+    - Function decorator (DISTINCT)
+    - Multi op (AND)
+    - Select decorator (ALL)
 
 ## License 
 

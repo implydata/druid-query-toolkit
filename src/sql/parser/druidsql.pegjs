@@ -201,7 +201,7 @@ SqlJoinPart =
   joinType:JoinType
   postJoinType:_
   joinKeyword:JoinToken
-  postJoinKeyword:_
+  postJoin:_
   table:SqlAlias
   on:(_ OnToken _ Expression)?
 {
@@ -211,7 +211,7 @@ SqlJoinPart =
   };
   var spacing = value.spacing = {
     postJoinType: postJoinType,
-    postJoinKeyword: postJoinKeyword,
+    postJoin: postJoin,
   };
   var keywords = value.keywords = {
     join: joinKeyword,

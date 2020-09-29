@@ -64,7 +64,7 @@ export class SqlJoinPart extends SqlBase {
 
     rawParts.push(
       this.getKeyword('join', SqlJoinPart.DEFAULT_JOIN_KEYWORD),
-      this.getSpace('postJoinKeyword'),
+      this.getSpace('postJoin'),
       this.table.toString(),
     );
 

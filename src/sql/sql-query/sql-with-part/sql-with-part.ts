@@ -21,7 +21,6 @@ export interface SqlWithPartValue extends SqlBaseValue {
   withTable: SqlExpression;
   withColumns?: SeparatedArray<SqlRef>;
   postWithColumns: string;
-  as?: boolean;
   withQuery: SqlQuery;
 }
 

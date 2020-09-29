@@ -3612,7 +3612,7 @@ describe('SqlQuery', () => {
                     "type": "comparison",
                   },
                   "spacing": Object {
-                    "postJoinKeyword": " ",
+                    "postJoin": " ",
                     "postJoinType": " ",
                     "postOn": " ",
                     "preOn": " ",
@@ -3769,7 +3769,7 @@ describe('SqlQuery', () => {
                     "type": "comparison",
                   },
                   "spacing": Object {
-                    "postJoinKeyword": " ",
+                    "postJoin": " ",
                     "postJoinType": " ",
                     "postOn": " ",
                     "preOn": " ",
@@ -3926,7 +3926,7 @@ describe('SqlQuery', () => {
                     "type": "comparison",
                   },
                   "spacing": Object {
-                    "postJoinKeyword": " ",
+                    "postJoin": " ",
                     "postJoinType": " ",
                     "postOn": " ",
                     "preOn": " ",
@@ -4083,7 +4083,7 @@ describe('SqlQuery', () => {
                     "type": "comparison",
                   },
                   "spacing": Object {
-                    "postJoinKeyword": " ",
+                    "postJoin": " ",
                     "postJoinType": " ",
                     "postOn": " ",
                     "preOn": " ",
@@ -4240,7 +4240,7 @@ describe('SqlQuery', () => {
                     "type": "comparison",
                   },
                   "spacing": Object {
-                    "postJoinKeyword": " ",
+                    "postJoin": " ",
                     "postJoinType": " ",
                     "postOn": " ",
                     "preOn": " ",
