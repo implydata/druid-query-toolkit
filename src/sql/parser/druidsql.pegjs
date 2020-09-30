@@ -401,12 +401,12 @@ Expression = OrExpression
 
 OrExpression = head:AndExpression tail:(_ OrToken _ AndExpression)*
 {
-  return maybeMakeMulti('or', head, tail);
+  return maybeMakeMulti('OR', head, tail);
 }
 
 AndExpression = head:NotExpression tail:(_ AndToken _ NotExpression)*
 {
-  return maybeMakeMulti('and', head, tail);
+  return maybeMakeMulti('AND', head, tail);
 }
 
 NotExpression = op:NotToken postOp:_ argument:NotExpression

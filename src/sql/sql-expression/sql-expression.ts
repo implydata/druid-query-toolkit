@@ -48,7 +48,7 @@ export abstract class SqlExpression extends SqlBase {
   static and(...args: (SqlExpression | undefined)[]) {
     const compactArgs = filterMap(args, a => {
       if (!a) return;
-      if (a instanceof SqlMulti && a.expressionType === 'or') {
+      if (a instanceof SqlMulti && a.op === 'OR') {
         return a.ensureParens();
       }
       return a;
@@ -60,7 +60,7 @@ export abstract class SqlExpression extends SqlBase {
       return compactArgs[0];
     } else {
       return new SqlMulti({
-        expressionType: 'and',
+        op: 'AND',
         args: SeparatedArray.fromArray(compactArgs, Separator.symmetricSpace('AND')),
       });
     }

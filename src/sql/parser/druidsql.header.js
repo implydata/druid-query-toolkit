@@ -22,10 +22,10 @@
     return head.concat(tail.map(function(t) { return t[index] }));
   }
 
-  function maybeMakeMulti(expressionType, head, tail) {
+  function maybeMakeMulti(op, head, tail) {
     if (!tail.length) return head;
     return new sql.SqlMulti({
-      expressionType: expressionType,
+      op: op,
       args: new sql.SeparatedArray(makeListMap(tail, 3, head), makeSeparatorsList(tail)),
     });
   }

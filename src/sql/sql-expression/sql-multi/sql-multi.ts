@@ -16,24 +16,24 @@ import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../../sql-base';
 import { SeparatedArray, Separator } from '../../utils';
 import { SqlExpression } from '../sql-expression';
 
-export type ExpressionType = 'or' | 'and' | '||' | '+' | '-' | '*' | '/';
+export type SqlMultiOp = 'OR' | 'AND' | '||' | '+' | '-' | '*' | '/';
 
 export interface SqlMultiValue extends SqlBaseValue {
-  expressionType: ExpressionType;
+  op: SqlMultiOp;
   args: SeparatedArray<SqlExpression>;
 }
 
 export class SqlMulti extends SqlExpression {
   static type: SqlType = 'multi';
 
-  public readonly expressionType: ExpressionType;
+  public readonly op: SqlMultiOp;
   public readonly args: SeparatedArray<SqlExpression>;
 
   constructor(options: SqlMultiValue) {
     super(options, SqlMulti.type);
 
-    this.expressionType = options.expressionType;
-    if (!this.expressionType) throw new Error(`must have expressionType`);
+    this.op = options.op;
+    if (!this.op) throw new Error(`must have op`);
 
     this.args = options.args;
     if (!this.args) throw new Error(`must have args`);
@@ -41,13 +41,13 @@ export class SqlMulti extends SqlExpression {
 
   public valueOf(): SqlMultiValue {
     const value = super.valueOf() as SqlMultiValue;
-    value.expressionType = this.expressionType;
+    value.op = this.op;
     value.args = this.args;
     return value;
   }
 
   protected _toRawString(): string {
-    return this.args.toString(Separator.symmetricSpace(this.expressionType.toUpperCase()));
+    return this.args.toString(Separator.symmetricSpace(SqlBase.capitalize(this.op)));
   }
 
   public changeArgs(args: SeparatedArray<SqlExpression>): this {
@@ -79,7 +79,7 @@ export class SqlMulti extends SqlExpression {
   }
 
   public and(expression: SqlExpression): SqlExpression {
-    if (this.expressionType !== 'and') {
+    if (this.op !== 'AND') {
       return super.and(expression);
     }
 
@@ -87,7 +87,7 @@ export class SqlMulti extends SqlExpression {
   }
 
   public decomposeViaAnd(): readonly SqlExpression[] {
-    if (this.expressionType !== 'and') {
+    if (this.op !== 'AND') {
       return super.decomposeViaAnd();
     }
 
@@ -95,7 +95,7 @@ export class SqlMulti extends SqlExpression {
   }
 
   public filterAnd(fn: (ex: SqlExpression) => boolean): SqlExpression | undefined {
-    if (this.expressionType !== 'and') {
+    if (this.op !== 'AND') {
       return super.filterAnd(fn);
     }
 
