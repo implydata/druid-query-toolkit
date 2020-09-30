@@ -292,11 +292,6 @@ SELECT countryName from wikipedia
 Fix SemiKeywords:
     - Join type (LEFT)
     - Comparison op (IS)
-    - Order by direction (ASC)
-    - Unary op (NOT)
-    - Function name (SUM)
-    - Function decorator (DISTINCT)
-    - Multi op (AND)
     - Select decorator (ALL)
 
 ## License 

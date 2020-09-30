@@ -87,7 +87,7 @@ export class SqlFunction extends SqlExpression {
 
   protected _toRawString(): string {
     const { specialParen } = this;
-    const rawParts: string[] = [this.functionName];
+    const rawParts: string[] = [this.getKeyword('functionName', this.functionName)];
 
     if (specialParen !== 'none') {
       rawParts.push(
@@ -97,7 +97,7 @@ export class SqlFunction extends SqlExpression {
       );
 
       if (this.decorator) {
-        rawParts.push(this.decorator, this.getSpace('postDecorator'));
+        rawParts.push(this.getKeyword('decorator', this.decorator), this.getSpace('postDecorator'));
       }
 
       if (this.args) {

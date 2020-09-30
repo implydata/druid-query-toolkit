@@ -232,7 +232,9 @@ describe('QueryRunner', () => {
                     "type": "literal",
                     "value": 2,
                   },
-                  "keywords": Object {},
+                  "keywords": Object {
+                    "direction": "DESC",
+                  },
                   "spacing": Object {
                     "preDirection": " ",
                   },
@@ -310,7 +312,9 @@ describe('QueryRunner', () => {
                   },
                   "decorator": undefined,
                   "functionName": "COUNT",
-                  "keywords": Object {},
+                  "keywords": Object {
+                    "functionName": "COUNT",
+                  },
                   "spacing": Object {
                     "postArguments": "",
                     "postLeftParen": "",
@@ -472,7 +476,9 @@ describe('QueryRunner', () => {
                     "type": "literal",
                     "value": 2,
                   },
-                  "keywords": Object {},
+                  "keywords": Object {
+                    "direction": "DESC",
+                  },
                   "spacing": Object {
                     "preDirection": " ",
                   },
@@ -550,7 +556,9 @@ describe('QueryRunner', () => {
                   },
                   "decorator": undefined,
                   "functionName": "COUNT",
-                  "keywords": Object {},
+                  "keywords": Object {
+                    "functionName": "COUNT",
+                  },
                   "spacing": Object {
                     "postArguments": "",
                     "postLeftParen": "",
@@ -713,7 +721,9 @@ describe('QueryRunner', () => {
                     "type": "literal",
                     "value": 2,
                   },
-                  "keywords": Object {},
+                  "keywords": Object {
+                    "direction": "DESC",
+                  },
                   "spacing": Object {
                     "preDirection": " ",
                   },
@@ -791,7 +801,9 @@ describe('QueryRunner', () => {
                   },
                   "decorator": undefined,
                   "functionName": "COUNT",
-                  "keywords": Object {},
+                  "keywords": Object {
+                    "functionName": "COUNT",
+                  },
                   "spacing": Object {
                     "postArguments": "",
                     "postLeftParen": "",

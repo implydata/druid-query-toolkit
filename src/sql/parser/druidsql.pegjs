@@ -293,10 +293,12 @@ SqlOrderByExpression = expression:Expression direction:(_ (AscToken / DescToken)
     expression: expression,
   };
   var spacing = value.spacing = {};
+  var keywords = value.keywords = {};
 
   if (direction) {
     spacing.preDirection = direction[0];
-    value.direction = direction[1];
+    value.direction = direction[1].toUpperCase();
+    keywords.direction = direction[1];
   }
 
   return new sql.SqlOrderByExpression(value);
@@ -412,11 +414,14 @@ AndExpression = head:NotExpression tail:(_ AndToken _ NotExpression)*
 NotExpression = op:NotToken postOp:_ argument:NotExpression
 {
   return new sql.SqlUnary({
-    op: op,
+    op: op.toUpperCase(),
     argument: argument,
     spacing: {
       postOp: postOp
-    }
+    },
+    keywords: {
+      op: op,
+    },
   });
 }
   / ComparisonExpression
@@ -577,7 +582,10 @@ UnaryExpression = op:[+-] postOp:_ !Number argument:ConcatExpression
     argument: argument,
     spacing: {
       postOp: postOp
-    }
+    },
+    keywords: {
+      op: op,
+    },
   });
 }
   / ConcatExpression
@@ -714,16 +722,19 @@ GenericFunction =
   filter:(_ FunctionFilter)?
 {
   var value = {
-    functionName: functionName,
+    functionName: functionName.toUpperCase(),
   };
   var spacing = value.spacing = {
     preLeftParen: preLeftParen,
     postLeftParen: postLeftParen,
   };
-  var keywords = value.keywords = {};
+  var keywords = value.keywords = {
+    functionName: functionName,
+  };
 
   if (decorator) {
-    value.decorator = decorator[0];
+    value.decorator = decorator[0].toUpperCase();
+    keywords.decorator = decorator[0];
     spacing.postDecorator = decorator[1];
   }
 
@@ -745,8 +756,11 @@ GenericFunction =
 NakedFunction = functionName:UnquotedRefPartFree &{ return sql.SqlBase.isNakedFunction(functionName) }
 {
   return new sql.SqlFunction({
-    functionName: functionName,
+    functionName: functionName.toUpperCase(),
     specialParen: 'none',
+    keywords: {
+      functionName: functionName,
+    }
   });
 }
 
@@ -766,13 +780,16 @@ CastFunction =
     stringValue: type,
   });
   return new sql.SqlFunction({
-    functionName: functionName,
+    functionName: functionName.toUpperCase(),
     args: new sql.SeparatedArray([expr, typeLiteral], [separator]),
     spacing: {
       preLeftParen: preLeftParen,
       postLeftParen: postLeftParen,
       postArguments: postArguments,
     },
+    keywords: {
+      functionName: functionName,
+    }
   });
 }
 
@@ -792,13 +809,16 @@ ExtractFunction =
     stringValue: unit,
   });
   return new sql.SqlFunction({
-    functionName: functionName,
+    functionName: functionName.toUpperCase(),
     args: new sql.SeparatedArray([unitLiteral, expr], [separator]),
     spacing: {
       preLeftParen: preLeftParen,
       postLeftParen: postLeftParen,
       postArguments: postArguments,
     },
+    keywords: {
+      functionName: functionName,
+    }
   });
 }
 
@@ -815,7 +835,7 @@ TrimFunction =
   CloseParen
 {
   var value = {
-    functionName: functionName,
+    functionName: functionName.toUpperCase(),
     args: new sql.SeparatedArray([expr1, expr2], [separator]),
   };
   var spacing = value.spacing = {
@@ -823,9 +843,13 @@ TrimFunction =
     postLeftParen: postLeftParen,
     postArguments: postArguments,
   };
+  var keywords = value.keywords = {
+    functionName: functionName,
+  };
 
   if (decorator) {
-    value.decorator = decorator[0];
+    value.decorator = decorator[0].toUpperCase();
+    keywords.decorator = decorator[0];
     spacing.postDecorator = decorator[1];
   }
 
@@ -848,13 +872,16 @@ FloorCeilFunction =
     stringValue: unit,
   });
   return new sql.SqlFunction({
-    functionName: functionName,
+    functionName: functionName.toUpperCase(),
     args: new sql.SeparatedArray([expr, unitLiteral], [separator]),
     spacing: {
       preLeftParen: preLeftParen,
       postLeftParen: postLeftParen,
       postArguments: postArguments,
     },
+    keywords: {
+      functionName: functionName,
+    }
   });
 }
 
@@ -869,7 +896,10 @@ TimestampAddDiffFunction =
   CloseParen
 {
   var value = {
-    functionName: functionName,
+    functionName: functionName.toUpperCase(),
+    keywords: {
+      functionName: functionName,
+    }
   };
   var spacing = value.spacing = {
     preLeftParen: preLeftParen,
@@ -904,13 +934,16 @@ PositionFunction =
     : new sql.SeparatedArray([expr1, expr2], [inSeparator])
 
   return new sql.SqlFunction({
-    functionName: functionName,
+    functionName: functionName.toUpperCase(),
     args: args,
     spacing: {
       preLeftParen: preLeftParen,
       postLeftParen: postLeftParen,
       postArguments: postArguments,
     },
+    keywords: {
+      functionName: functionName,
+    }
   });
 }
 
@@ -925,8 +958,11 @@ ArrayFunction =
   ']'
 {
   var value = {
-    functionName: functionName,
+    functionName: functionName.toUpperCase(),
     specialParen: 'square',
+    keywords: {
+      functionName: functionName,
+    }
   };
   var spacing = value.spacing = {
     preLeftParen: preLeftParen,

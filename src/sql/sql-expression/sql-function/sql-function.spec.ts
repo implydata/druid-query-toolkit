@@ -65,7 +65,9 @@ describe('SqlFunction', () => {
         "args": undefined,
         "decorator": undefined,
         "functionName": "FN",
-        "keywords": Object {},
+        "keywords": Object {
+          "functionName": "FN",
+        },
         "spacing": Object {
           "postLeftParen": "",
           "preLeftParen": "",
@@ -102,7 +104,9 @@ describe('SqlFunction', () => {
         },
         "decorator": undefined,
         "functionName": "SUM",
-        "keywords": Object {},
+        "keywords": Object {
+          "functionName": "SUM",
+        },
         "spacing": Object {
           "postArguments": "",
           "postLeftParen": "",
@@ -140,7 +144,9 @@ describe('SqlFunction', () => {
         },
         "decorator": undefined,
         "functionName": "SUM",
-        "keywords": Object {},
+        "keywords": Object {
+          "functionName": "SUM",
+        },
         "parens": Array [
           Object {
             "leftSpacing": "  ",
@@ -252,7 +258,9 @@ describe('SqlFunction', () => {
         },
         "decorator": undefined,
         "functionName": "SUM",
-        "keywords": Object {},
+        "keywords": Object {
+          "functionName": "SUM",
+        },
         "spacing": Object {
           "postArguments": "",
           "postLeftParen": " ",
@@ -290,7 +298,9 @@ describe('SqlFunction', () => {
         },
         "decorator": undefined,
         "functionName": "SUM",
-        "keywords": Object {},
+        "keywords": Object {
+          "functionName": "SUM",
+        },
         "spacing": Object {
           "postArguments": "      ",
           "postLeftParen": " ",
@@ -337,8 +347,10 @@ describe('SqlFunction', () => {
                 ],
               },
               "decorator": undefined,
-              "functionName": "Sum",
-              "keywords": Object {},
+              "functionName": "SUM",
+              "keywords": Object {
+                "functionName": "Sum",
+              },
               "spacing": Object {
                 "postArguments": "",
                 "postLeftParen": "",
@@ -377,7 +389,9 @@ describe('SqlFunction', () => {
                     },
                     "decorator": undefined,
                     "functionName": "SUM",
-                    "keywords": Object {},
+                    "keywords": Object {
+                      "functionName": "SUM",
+                    },
                     "spacing": Object {
                       "postArguments": "",
                       "postLeftParen": "",
@@ -416,7 +430,9 @@ describe('SqlFunction', () => {
                           },
                           "decorator": undefined,
                           "functionName": "SUM",
-                          "keywords": Object {},
+                          "keywords": Object {
+                            "functionName": "SUM",
+                          },
                           "spacing": Object {
                             "postArguments": "",
                             "postLeftParen": "",
@@ -481,9 +497,10 @@ describe('SqlFunction', () => {
           ],
         },
         "decorator": undefined,
-        "functionName": "Sum",
+        "functionName": "SUM",
         "keywords": Object {
           "filter": "Filter",
+          "functionName": "Sum",
         },
         "spacing": Object {
           "postArguments": "",
@@ -605,8 +622,10 @@ describe('SqlFunction', () => {
           ],
         },
         "decorator": undefined,
-        "functionName": "Array",
-        "keywords": Object {},
+        "functionName": "ARRAY",
+        "keywords": Object {
+          "functionName": "Array",
+        },
         "spacing": Object {
           "postArguments": "  ",
           "postLeftParen": " ",
@@ -664,8 +683,10 @@ describe('SqlFunction', () => {
           ],
         },
         "decorator": undefined,
-        "functionName": "Array",
-        "keywords": Object {},
+        "functionName": "ARRAY",
+        "keywords": Object {
+          "functionName": "Array",
+        },
         "spacing": Object {
           "postArguments": "",
           "postLeftParen": "",

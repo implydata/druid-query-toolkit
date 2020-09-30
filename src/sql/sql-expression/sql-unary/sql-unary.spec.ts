@@ -34,7 +34,9 @@ describe('SqlUnary', () => {
           "tableQuotes": false,
           "type": "ref",
         },
-        "keywords": Object {},
+        "keywords": Object {
+          "op": "-",
+        },
         "op": "-",
         "spacing": Object {
           "postOp": "",
@@ -62,7 +64,9 @@ describe('SqlUnary', () => {
           "tableQuotes": false,
           "type": "ref",
         },
-        "keywords": Object {},
+        "keywords": Object {
+          "op": "NOT",
+        },
         "op": "NOT",
         "spacing": Object {
           "postOp": " ",
@@ -91,14 +95,18 @@ describe('SqlUnary', () => {
             "tableQuotes": false,
             "type": "ref",
           },
-          "keywords": Object {},
-          "op": "not",
+          "keywords": Object {
+            "op": "not",
+          },
+          "op": "NOT",
           "spacing": Object {
             "postOp": " ",
           },
           "type": "unary",
         },
-        "keywords": Object {},
+        "keywords": Object {
+          "op": "NOT",
+        },
         "op": "NOT",
         "spacing": Object {
           "postOp": " ",
@@ -141,7 +149,9 @@ describe('SqlUnary', () => {
                 "tableQuotes": false,
                 "type": "ref",
               },
-              "keywords": Object {},
+              "keywords": Object {
+                "op": "NOT",
+              },
               "op": "NOT",
               "spacing": Object {
                 "postOp": " ",
@@ -160,7 +170,9 @@ describe('SqlUnary', () => {
                 "tableQuotes": false,
                 "type": "ref",
               },
-              "keywords": Object {},
+              "keywords": Object {
+                "op": "NOT",
+              },
               "op": "NOT",
               "spacing": Object {
                 "postOp": " ",
@@ -179,7 +191,9 @@ describe('SqlUnary', () => {
                 "tableQuotes": false,
                 "type": "ref",
               },
-              "keywords": Object {},
+              "keywords": Object {
+                "op": "NOT",
+              },
               "op": "NOT",
               "spacing": Object {
                 "postOp": " ",
@@ -236,7 +250,9 @@ describe('SqlUnary', () => {
           },
           "type": "comparison",
         },
-        "keywords": Object {},
+        "keywords": Object {
+          "op": "NOT",
+        },
         "op": "NOT",
         "spacing": Object {
           "postOp": " ",
@@ -296,7 +312,9 @@ describe('SqlUnary', () => {
                 },
                 "type": "comparison",
               },
-              "keywords": Object {},
+              "keywords": Object {
+                "op": "NOT",
+              },
               "op": "NOT",
               "spacing": Object {
                 "postOp": " ",
@@ -333,8 +351,10 @@ describe('SqlUnary', () => {
                 },
                 "type": "comparison",
               },
-              "keywords": Object {},
-              "op": "Not",
+              "keywords": Object {
+                "op": "Not",
+              },
+              "op": "NOT",
               "spacing": Object {
                 "postOp": " ",
               },
@@ -391,14 +411,18 @@ describe('SqlUnary', () => {
             },
             "type": "comparison",
           },
-          "keywords": Object {},
+          "keywords": Object {
+            "op": "NOT",
+          },
           "op": "NOT",
           "spacing": Object {
             "postOp": " ",
           },
           "type": "unary",
         },
-        "keywords": Object {},
+        "keywords": Object {
+          "op": "NOT",
+        },
         "op": "NOT",
         "spacing": Object {
           "postOp": " ",

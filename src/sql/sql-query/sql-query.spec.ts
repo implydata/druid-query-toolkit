@@ -483,7 +483,9 @@ describe('SqlQuery', () => {
                             "tableQuotes": false,
                             "type": "ref",
                           },
-                          "keywords": Object {},
+                          "keywords": Object {
+                            "direction": "DESC",
+                          },
                           "spacing": Object {
                             "preDirection": " ",
                           },
@@ -745,7 +747,9 @@ describe('SqlQuery', () => {
                 },
                 "decorator": undefined,
                 "functionName": "SUM",
-                "keywords": Object {},
+                "keywords": Object {
+                  "functionName": "SUM",
+                },
                 "spacing": Object {
                   "postArguments": "",
                   "postLeftParen": "",
@@ -796,7 +800,9 @@ describe('SqlQuery', () => {
                 },
                 "decorator": undefined,
                 "functionName": "COUNT",
-                "keywords": Object {},
+                "keywords": Object {
+                  "functionName": "COUNT",
+                },
                 "spacing": Object {
                   "postArguments": "",
                   "postLeftParen": "",
@@ -2742,7 +2748,7 @@ describe('SqlQuery', () => {
               "separators": Array [],
               "values": Array [
                 SqlOrderByExpression {
-                  "direction": "Asc",
+                  "direction": "ASC",
                   "expression": SqlLiteral {
                     "keywords": Object {},
                     "spacing": Object {},
@@ -2750,7 +2756,9 @@ describe('SqlQuery', () => {
                     "type": "literal",
                     "value": 1,
                   },
-                  "keywords": Object {},
+                  "keywords": Object {
+                    "direction": "Asc",
+                  },
                   "spacing": Object {
                     "preDirection": " ",
                   },
@@ -2872,7 +2880,9 @@ describe('SqlQuery', () => {
                     "tableQuotes": false,
                     "type": "ref",
                   },
-                  "keywords": Object {},
+                  "keywords": Object {
+                    "direction": "DESC",
+                  },
                   "spacing": Object {
                     "preDirection": " ",
                   },
@@ -3020,7 +3030,9 @@ describe('SqlQuery', () => {
                     "type": "literal",
                     "value": 1,
                   },
-                  "keywords": Object {},
+                  "keywords": Object {
+                    "direction": "ASC",
+                  },
                   "spacing": Object {
                     "preDirection": " ",
                   },
@@ -3161,7 +3173,9 @@ describe('SqlQuery', () => {
                     "type": "literal",
                     "value": 1,
                   },
-                  "keywords": Object {},
+                  "keywords": Object {
+                    "direction": "ASC",
+                  },
                   "spacing": Object {
                     "preDirection": " ",
                   },
@@ -3180,7 +3194,9 @@ describe('SqlQuery', () => {
                     "tableQuotes": false,
                     "type": "ref",
                   },
-                  "keywords": Object {},
+                  "keywords": Object {
+                    "direction": "DESC",
+                  },
                   "spacing": Object {
                     "preDirection": " ",
                   },
@@ -4606,7 +4622,9 @@ describe('SqlQuery', () => {
                     "tableQuotes": false,
                     "type": "ref",
                   },
-                  "keywords": Object {},
+                  "keywords": Object {
+                    "direction": "DESC",
+                  },
                   "spacing": Object {
                     "preDirection": "",
                   },
@@ -4689,7 +4707,9 @@ describe('SqlQuery', () => {
                   },
                   "decorator": undefined,
                   "functionName": "COUNT",
-                  "keywords": Object {},
+                  "keywords": Object {
+                    "functionName": "COUNT",
+                  },
                   "spacing": Object {
                     "postArguments": "",
                     "postLeftParen": "",
@@ -4740,7 +4760,10 @@ describe('SqlQuery', () => {
                   },
                   "decorator": "DISTINCT",
                   "functionName": "COUNT",
-                  "keywords": Object {},
+                  "keywords": Object {
+                    "decorator": "DISTINCT",
+                    "functionName": "COUNT",
+                  },
                   "spacing": Object {
                     "postArguments": "",
                     "postDecorator": "",
@@ -4875,7 +4898,9 @@ describe('SqlQuery', () => {
                     "tableQuotes": false,
                     "type": "ref",
                   },
-                  "keywords": Object {},
+                  "keywords": Object {
+                    "direction": "DESC",
+                  },
                   "spacing": Object {
                     "preDirection": " ",
                   },
@@ -4949,7 +4974,9 @@ describe('SqlQuery', () => {
                   },
                   "decorator": undefined,
                   "functionName": "CAST",
-                  "keywords": Object {},
+                  "keywords": Object {
+                    "functionName": "CAST",
+                  },
                   "spacing": Object {
                     "postArguments": "",
                     "postLeftParen": "",
@@ -5000,7 +5027,9 @@ describe('SqlQuery', () => {
                   },
                   "decorator": undefined,
                   "functionName": "COUNT",
-                  "keywords": Object {},
+                  "keywords": Object {
+                    "functionName": "COUNT",
+                  },
                   "spacing": Object {
                     "postArguments": "",
                     "postLeftParen": "",
@@ -5078,7 +5107,9 @@ describe('SqlQuery', () => {
                             "args": undefined,
                             "decorator": undefined,
                             "functionName": "CURRENT_TIMESTAMP",
-                            "keywords": Object {},
+                            "keywords": Object {
+                              "functionName": "CURRENT_TIMESTAMP",
+                            },
                             "spacing": Object {},
                             "specialParen": "none",
                             "type": "function",

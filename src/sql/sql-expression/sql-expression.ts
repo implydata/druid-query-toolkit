@@ -20,6 +20,7 @@ import {
   SqlComparison,
   SqlLiteral,
   SqlMulti,
+  SqlOrderByDirection,
   SqlOrderByExpression,
 } from '..';
 import { filterMap } from '../../utils';
@@ -95,7 +96,7 @@ export abstract class SqlExpression extends SqlBase {
     return SqlAlias.create(this, alias);
   }
 
-  public toOrderByPart(direction?: string): SqlOrderByExpression {
+  public toOrderByPart(direction?: SqlOrderByDirection): SqlOrderByExpression {
     return SqlOrderByExpression.create(this, direction);
   }
 

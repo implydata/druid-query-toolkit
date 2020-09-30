@@ -301,7 +301,9 @@ describe('SqlComparison', () => {
                     },
                     "decorator": undefined,
                     "functionName": "COUNT",
-                    "keywords": Object {},
+                    "keywords": Object {
+                      "functionName": "COUNT",
+                    },
                     "spacing": Object {
                       "postArguments": "",
                       "postLeftParen": "",
@@ -311,7 +313,9 @@ describe('SqlComparison', () => {
                     "type": "function",
                     "whereClause": undefined,
                   },
-                  "keywords": Object {},
+                  "keywords": Object {
+                    "direction": "DESC",
+                  },
                   "spacing": Object {
                     "preDirection": " ",
                   },

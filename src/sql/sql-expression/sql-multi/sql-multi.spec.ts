@@ -953,7 +953,9 @@ describe('Math expression', () => {
               },
               "decorator": undefined,
               "functionName": "COUNT",
-              "keywords": Object {},
+              "keywords": Object {
+                "functionName": "COUNT",
+              },
               "spacing": Object {
                 "postArguments": "",
                 "postLeftParen": "",
@@ -999,7 +1001,9 @@ describe('Math expression', () => {
                     },
                     "decorator": undefined,
                     "functionName": "COUNT",
-                    "keywords": Object {},
+                    "keywords": Object {
+                      "functionName": "COUNT",
+                    },
                     "spacing": Object {
                       "postArguments": "",
                       "postLeftParen": "",
@@ -1825,14 +1829,18 @@ describe('Brackets', () => {
                   "spacing": Object {},
                   "type": "multi",
                 },
-                "keywords": Object {},
+                "keywords": Object {
+                  "op": "NOT",
+                },
                 "op": "NOT",
                 "spacing": Object {
                   "postOp": " ",
                 },
                 "type": "unary",
               },
-              "keywords": Object {},
+              "keywords": Object {
+                "op": "NOT",
+              },
               "op": "NOT",
               "spacing": Object {
                 "postOp": " ",

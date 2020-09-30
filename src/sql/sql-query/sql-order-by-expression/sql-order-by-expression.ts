@@ -15,37 +15,25 @@
 import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../../sql-base';
 import { SqlExpression } from '../../sql-expression';
 
-export type Direction = 'ASC' | 'DESC';
+export type SqlOrderByDirection = 'ASC' | 'DESC';
 
 export interface SqlOrderByExpressionValue extends SqlBaseValue {
   expression: SqlExpression;
-  direction?: string;
+  direction?: SqlOrderByDirection;
 }
 
 export class SqlOrderByExpression extends SqlBase {
   static type: SqlType = 'orderByExpression';
 
-  static create(expression: SqlExpression, direction?: string) {
+  static create(expression: SqlExpression, direction?: SqlOrderByDirection) {
     return new SqlOrderByExpression({
       expression,
       direction,
     });
   }
 
-  static normalizeDirection(direction: string | undefined): Direction {
-    if (!direction) return 'ASC';
-    return direction.toUpperCase() as Direction;
-  }
-
-  static reverseDirection(direction: string | undefined): string {
-    // Try to be mindful of capitalization
-    if (direction === 'asc') return 'desc';
-    if (direction === 'desc') return 'asc';
-    return SqlOrderByExpression.normalizeDirection(direction) === 'ASC' ? 'DESC' : 'ASC';
-  }
-
   public readonly expression: SqlExpression;
-  public readonly direction?: string;
+  public readonly direction?: SqlOrderByDirection;
 
   constructor(options: SqlOrderByExpressionValue) {
     super(options, SqlOrderByExpression.type);
@@ -54,8 +42,7 @@ export class SqlOrderByExpression extends SqlBase {
     const direction = options.direction;
     this.direction = direction;
     if (direction) {
-      const directionUpper = direction.toUpperCase();
-      if (directionUpper !== 'ASC' && directionUpper !== 'DESC') {
+      if (direction !== 'ASC' && direction !== 'DESC') {
         throw new Error(`invalid direction ${direction}`);
       }
     }
@@ -72,7 +59,7 @@ export class SqlOrderByExpression extends SqlBase {
     const rawParts = [this.expression.toString()];
 
     if (this.direction) {
-      rawParts.push(this.getSpace('preDirection'), this.direction);
+      rawParts.push(this.getSpace('preDirection'), this.getKeyword('direction', this.direction));
     }
 
     return rawParts.join('');
@@ -84,7 +71,7 @@ export class SqlOrderByExpression extends SqlBase {
     return SqlBase.fromValue(value);
   }
 
-  public changeDirection(direction: string | undefined): this {
+  public changeDirection(direction: SqlOrderByDirection | undefined): this {
     const value = this.valueOf();
     if (direction) {
       value.direction = direction;
@@ -92,15 +79,18 @@ export class SqlOrderByExpression extends SqlBase {
       delete value.direction;
       value.spacing = this.getSpacingWithout('preDirection');
     }
+    value.keywords = this.getKeywordsWithout('direction');
     return SqlBase.fromValue(value);
   }
 
-  public getEffectiveDirection(): Direction {
-    return SqlOrderByExpression.normalizeDirection(this.direction);
+  public getEffectiveDirection(): SqlOrderByDirection {
+    const { direction } = this;
+    if (!direction) return 'ASC';
+    return direction;
   }
 
   public reverseDirection(): this {
-    return this.changeDirection(SqlOrderByExpression.reverseDirection(this.direction));
+    return this.changeDirection(this.getEffectiveDirection() === 'ASC' ? 'DESC' : 'ASC');
   }
 
   public _walkInner(
