@@ -444,7 +444,9 @@ ComparisonExpression = lhs:AdditionExpression rhs:(_ ComparisonOpRhs)?
       postDecorator: opRhs.postDecorator
     },
     keywords: {
+      op: opRhs.opKeyword,
       not: opRhs.notKeyword,
+      decorator: opRhs.decoratorKeyword,
     },
   });
 }
@@ -454,11 +456,15 @@ ComparisonOpRhs = ComparisonOpRhsSimple / ComparisonOpRhsIs / ComparisonOpRhsIn 
 ComparisonOpRhsSimple = op:ComparisonOperator postOp:_ rhs:(AdditionExpression / (ComparisonDecorator _ SqlInParens))
 {
   const ret = {
-    op: op,
+    op: op === '!=' ? '<>' : op,
+    opKeyword: op,
     postOp: postOp,
   };
   if (Array.isArray(rhs)) {
-    ret.decorator = rhs[0];
+    var decorator = rhs[0];
+    var decoratorUpper = decorator.toUpperCase();
+    ret.decorator = decoratorUpper === 'SOME' ? 'ANY' : decoratorUpper;
+    ret.decoratorKeyword = decorator;
     ret.postDecorator = rhs[1];
     ret.rhs = rhs[2];
   } else {
@@ -481,7 +487,8 @@ ComparisonDecorator = AnyToken / AllToken / SomeToken
 ComparisonOpRhsIs = op:IsToken postOp:_ not:(NotToken _)? rhs:SqlLiteral
 {
   return {
-    op: op,
+    op: op.toUpperCase(),
+    opKeyword: op,
     postOp: postOp,
     rhs: rhs,
     notKeyword: not ? not[0] : undefined,
@@ -492,7 +499,8 @@ ComparisonOpRhsIs = op:IsToken postOp:_ not:(NotToken _)? rhs:SqlLiteral
 ComparisonOpRhsIn = op:InToken postOp:_ rhs:(SqlInArrayLiteral / SqlInParens)
 {
   return {
-    op: op,
+    op: op.toUpperCase(),
+    opKeyword: op,
     postOp: postOp,
     rhs: rhs
   };
@@ -519,7 +527,8 @@ ComparisonOpRhsBetween = op:BetweenToken postOp:_ symmetricKeyword:(SymmetricTok
   }
 
   return {
-    op: op,
+    op: op.toUpperCase(),
+    opKeyword: op,
     postOp: postOp,
     rhs: new sql.SqlBetweenAndHelper(value)
   };
@@ -528,7 +537,8 @@ ComparisonOpRhsBetween = op:BetweenToken postOp:_ symmetricKeyword:(SymmetricTok
 ComparisonOpRhsLike = op:(LikeToken / SimilarToToken) postOp:_ like:AdditionExpression escape:(_ EscapeToken _ AdditionExpression)?
 {
   return {
-    op: op,
+    op: op.toUpperCase(),
+    opKeyword: op,
     postOp: postOp,
     rhs: escape ? new sql.SqlLikeEscapeHelper({
       like: like,

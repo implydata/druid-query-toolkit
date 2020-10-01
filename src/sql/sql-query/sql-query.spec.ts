@@ -1227,7 +1227,9 @@ describe('SqlQuery', () => {
           "whereClause": SqlWhereClause {
             "expression": SqlComparison {
               "decorator": undefined,
-              "keywords": Object {},
+              "keywords": Object {
+                "op": ">",
+              },
               "lhs": SqlRef {
                 "column": "col",
                 "keywords": Object {},
@@ -1355,7 +1357,9 @@ describe('SqlQuery', () => {
           "whereClause": SqlWhereClause {
             "expression": SqlComparison {
               "decorator": undefined,
-              "keywords": Object {},
+              "keywords": Object {
+                "op": "=",
+              },
               "lhs": SqlRef {
                 "column": "healthy",
                 "keywords": Object {},
@@ -1503,7 +1507,9 @@ describe('SqlQuery', () => {
                       "values": Array [
                         SqlComparison {
                           "decorator": undefined,
-                          "keywords": Object {},
+                          "keywords": Object {
+                            "op": "=",
+                          },
                           "lhs": SqlRef {
                             "column": "healthy",
                             "keywords": Object {},
@@ -1532,7 +1538,9 @@ describe('SqlQuery', () => {
                         },
                         SqlComparison {
                           "decorator": undefined,
-                          "keywords": Object {},
+                          "keywords": Object {
+                            "op": ">",
+                          },
                           "lhs": SqlRef {
                             "column": "col",
                             "keywords": Object {},
@@ -1568,7 +1576,9 @@ describe('SqlQuery', () => {
                   },
                   SqlComparison {
                     "decorator": undefined,
-                    "keywords": Object {},
+                    "keywords": Object {
+                      "op": "=",
+                    },
                     "lhs": SqlRef {
                       "column": "otherColumn",
                       "keywords": Object {},
@@ -2029,7 +2039,9 @@ describe('SqlQuery', () => {
           "havingClause": SqlHavingClause {
             "expression": SqlComparison {
               "decorator": undefined,
-              "keywords": Object {},
+              "keywords": Object {
+                "op": ">",
+              },
               "lhs": SqlRef {
                 "column": "col",
                 "keywords": Object {},
@@ -2157,7 +2169,9 @@ describe('SqlQuery', () => {
           "havingClause": SqlHavingClause {
             "expression": SqlComparison {
               "decorator": undefined,
-              "keywords": Object {},
+              "keywords": Object {
+                "op": "=",
+              },
               "lhs": SqlRef {
                 "column": "healthy",
                 "keywords": Object {},
@@ -2305,7 +2319,9 @@ describe('SqlQuery', () => {
                       "values": Array [
                         SqlComparison {
                           "decorator": undefined,
-                          "keywords": Object {},
+                          "keywords": Object {
+                            "op": "=",
+                          },
                           "lhs": SqlRef {
                             "column": "healthy",
                             "keywords": Object {},
@@ -2334,7 +2350,9 @@ describe('SqlQuery', () => {
                         },
                         SqlComparison {
                           "decorator": undefined,
-                          "keywords": Object {},
+                          "keywords": Object {
+                            "op": ">",
+                          },
                           "lhs": SqlRef {
                             "column": "col",
                             "keywords": Object {},
@@ -2370,7 +2388,9 @@ describe('SqlQuery', () => {
                   },
                   SqlComparison {
                     "decorator": undefined,
-                    "keywords": Object {},
+                    "keywords": Object {
+                      "op": "=",
+                    },
                     "lhs": SqlRef {
                       "column": "otherColumn",
                       "keywords": Object {},
@@ -3596,7 +3616,9 @@ describe('SqlQuery', () => {
                   },
                   "onExpression": SqlComparison {
                     "decorator": undefined,
-                    "keywords": Object {},
+                    "keywords": Object {
+                      "op": "=",
+                    },
                     "lhs": SqlRef {
                       "column": "col",
                       "keywords": Object {},
@@ -3753,7 +3775,9 @@ describe('SqlQuery', () => {
                   },
                   "onExpression": SqlComparison {
                     "decorator": undefined,
-                    "keywords": Object {},
+                    "keywords": Object {
+                      "op": "=",
+                    },
                     "lhs": SqlRef {
                       "column": "col",
                       "keywords": Object {},
@@ -3910,7 +3934,9 @@ describe('SqlQuery', () => {
                   },
                   "onExpression": SqlComparison {
                     "decorator": undefined,
-                    "keywords": Object {},
+                    "keywords": Object {
+                      "op": "=",
+                    },
                     "lhs": SqlRef {
                       "column": "col",
                       "keywords": Object {},
@@ -4067,7 +4093,9 @@ describe('SqlQuery', () => {
                   },
                   "onExpression": SqlComparison {
                     "decorator": undefined,
-                    "keywords": Object {},
+                    "keywords": Object {
+                      "op": "=",
+                    },
                     "lhs": SqlRef {
                       "column": "col",
                       "keywords": Object {},
@@ -4224,7 +4252,9 @@ describe('SqlQuery', () => {
                   },
                   "onExpression": SqlComparison {
                     "decorator": undefined,
-                    "keywords": Object {},
+                    "keywords": Object {
+                      "op": "=",
+                    },
                     "lhs": SqlRef {
                       "column": "col",
                       "keywords": Object {},
@@ -5079,7 +5109,9 @@ describe('SqlQuery', () => {
                 "values": Array [
                   SqlComparison {
                     "decorator": undefined,
-                    "keywords": Object {},
+                    "keywords": Object {
+                      "op": ">=",
+                    },
                     "lhs": SqlRef {
                       "column": "__time",
                       "keywords": Object {},
@@ -5148,7 +5180,9 @@ describe('SqlQuery', () => {
                   },
                   SqlComparison {
                     "decorator": undefined,
-                    "keywords": Object {},
+                    "keywords": Object {
+                      "op": "=",
+                    },
                     "lhs": SqlRef {
                       "column": "cityName",
                       "keywords": Object {},

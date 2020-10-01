@@ -514,7 +514,9 @@ describe('SqlFunction', () => {
         "whereClause": SqlWhereClause {
           "expression": SqlComparison {
             "decorator": undefined,
-            "keywords": Object {},
+            "keywords": Object {
+              "op": ">",
+            },
             "lhs": SqlRef {
               "column": "val",
               "keywords": Object {},

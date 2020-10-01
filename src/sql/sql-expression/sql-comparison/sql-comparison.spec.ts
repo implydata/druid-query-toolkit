@@ -103,7 +103,9 @@ describe('SqlComparison', () => {
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "decorator": undefined,
-        "keywords": Object {},
+        "keywords": Object {
+          "op": ">",
+        },
         "lhs": SqlRef {
           "column": "A",
           "keywords": Object {},
@@ -145,7 +147,9 @@ describe('SqlComparison', () => {
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "decorator": undefined,
-        "keywords": Object {},
+        "keywords": Object {
+          "op": "=",
+        },
         "lhs": SqlRef {
           "column": "language",
           "keywords": Object {},
@@ -183,7 +187,10 @@ describe('SqlComparison', () => {
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "decorator": "ANY",
-        "keywords": Object {},
+        "keywords": Object {
+          "decorator": "ANY",
+          "op": "=",
+        },
         "lhs": SqlRef {
           "column": "X",
           "keywords": Object {},
@@ -395,7 +402,9 @@ describe('SqlComparison', () => {
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "decorator": undefined,
-        "keywords": Object {},
+        "keywords": Object {
+          "op": "IS",
+        },
         "lhs": SqlRef {
           "column": "X",
           "keywords": Object {},
@@ -435,6 +444,7 @@ describe('SqlComparison', () => {
         "decorator": undefined,
         "keywords": Object {
           "not": "NOT",
+          "op": "IS",
         },
         "lhs": SqlRef {
           "column": "X",
@@ -474,7 +484,9 @@ describe('SqlComparison', () => {
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "decorator": undefined,
-        "keywords": Object {},
+        "keywords": Object {
+          "op": "IN",
+        },
         "lhs": SqlRef {
           "column": "X",
           "keywords": Object {},
@@ -518,6 +530,7 @@ describe('SqlComparison', () => {
         "decorator": undefined,
         "keywords": Object {
           "not": "NOT",
+          "op": "IN",
         },
         "lhs": SqlRef {
           "column": "X",
@@ -561,7 +574,9 @@ describe('SqlComparison', () => {
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "decorator": undefined,
-        "keywords": Object {},
+        "keywords": Object {
+          "op": "IN",
+        },
         "lhs": SqlRef {
           "column": "X",
           "keywords": Object {},
@@ -694,6 +709,7 @@ describe('SqlComparison', () => {
         "decorator": undefined,
         "keywords": Object {
           "not": "NOT",
+          "op": "IN",
         },
         "lhs": SqlRef {
           "column": "X",
@@ -826,7 +842,9 @@ describe('SqlComparison', () => {
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "decorator": undefined,
-        "keywords": Object {},
+        "keywords": Object {
+          "op": "BETWEEN",
+        },
         "lhs": SqlRef {
           "column": "X",
           "keywords": Object {},
@@ -892,6 +910,7 @@ describe('SqlComparison', () => {
         "decorator": undefined,
         "keywords": Object {
           "not": "NOT",
+          "op": "BETWEEN",
         },
         "lhs": SqlRef {
           "column": "X",
@@ -959,7 +978,9 @@ describe('SqlComparison', () => {
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "decorator": undefined,
-        "keywords": Object {},
+        "keywords": Object {
+          "op": "LIKE",
+        },
         "lhs": SqlRef {
           "column": "X",
           "keywords": Object {},
@@ -999,6 +1020,7 @@ describe('SqlComparison', () => {
         "decorator": undefined,
         "keywords": Object {
           "not": "NOT",
+          "op": "LIKE",
         },
         "lhs": SqlRef {
           "column": "X",
@@ -1040,6 +1062,7 @@ describe('SqlComparison', () => {
         "decorator": undefined,
         "keywords": Object {
           "not": "NOT",
+          "op": "LIKE",
         },
         "lhs": SqlMulti {
           "args": SeparatedArray {
@@ -1172,7 +1195,9 @@ describe('SqlComparison', () => {
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "decorator": undefined,
-        "keywords": Object {},
+        "keywords": Object {
+          "op": "LIKE",
+        },
         "lhs": SqlRef {
           "column": "X",
           "keywords": Object {},
@@ -1229,6 +1254,7 @@ describe('SqlComparison', () => {
         "decorator": undefined,
         "keywords": Object {
           "not": "NOT",
+          "op": "LIKE",
         },
         "lhs": SqlRef {
           "column": "X",
@@ -1286,7 +1312,9 @@ describe('SqlComparison', () => {
       expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
         SqlComparison {
           "decorator": undefined,
-          "keywords": Object {},
+          "keywords": Object {
+            "op": ">",
+          },
           "lhs": SqlRef {
             "column": "A",
             "keywords": Object {},
@@ -1328,7 +1356,9 @@ describe('SqlComparison', () => {
       expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
         SqlComparison {
           "decorator": undefined,
-          "keywords": Object {},
+          "keywords": Object {
+            "op": ">",
+          },
           "lhs": SqlLiteral {
             "keywords": Object {},
             "spacing": Object {},
@@ -1362,7 +1392,9 @@ describe('SqlComparison', () => {
       expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
         SqlComparison {
           "decorator": undefined,
-          "keywords": Object {},
+          "keywords": Object {
+            "op": ">",
+          },
           "lhs": SqlRef {
             "column": "A",
             "keywords": Object {},
@@ -1404,7 +1436,9 @@ describe('SqlComparison', () => {
       expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
         SqlComparison {
           "decorator": undefined,
-          "keywords": Object {},
+          "keywords": Object {
+            "op": ">",
+          },
           "lhs": SqlLiteral {
             "keywords": Object {},
             "spacing": Object {},
@@ -1438,7 +1472,9 @@ describe('SqlComparison', () => {
       expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
         SqlComparison {
           "decorator": undefined,
-          "keywords": Object {},
+          "keywords": Object {
+            "op": ">",
+          },
           "lhs": SqlLiteral {
             "keywords": Object {},
             "spacing": Object {},
@@ -1478,7 +1514,9 @@ describe('SqlComparison', () => {
       expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
         SqlComparison {
           "decorator": undefined,
-          "keywords": Object {},
+          "keywords": Object {
+            "op": "BETWEEN",
+          },
           "lhs": SqlRef {
             "column": "X",
             "keywords": Object {},
@@ -1584,7 +1622,9 @@ describe('SqlComparison', () => {
                     },
                     SqlComparison {
                       "decorator": undefined,
-                      "keywords": Object {},
+                      "keywords": Object {
+                        "op": "BETWEEN",
+                      },
                       "lhs": SqlRef {
                         "column": "X",
                         "keywords": Object {},
@@ -1662,7 +1702,9 @@ describe('SqlComparison', () => {
       expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
         SqlComparison {
           "decorator": undefined,
-          "keywords": Object {},
+          "keywords": Object {
+            "op": "BETWEEN",
+          },
           "lhs": SqlRef {
             "column": "X",
             "keywords": Object {},

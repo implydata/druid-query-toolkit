@@ -687,7 +687,7 @@ describe('SqlQuery operations', () => {
       ).toEqual(sane`
         SELECT col1 || lol, (MIN(col1) + SUM(kl)) AS aliasName, CONCAT(a, b, c), CASE A WHEN B THEN C END AS m
         FROM tbl
-        WHERE __time Between TIMESTAMP '2020-01-01' AND TIMESTAMP '2020-01-02' AND goo is NOT Null AND NOT Y
+        WHERE __time BETWEEN TIMESTAMP '2020-01-01' AND TIMESTAMP '2020-01-02' AND goo IS NOT Null AND NOT Y
         GROUP BY 1
         ORDER BY 2 DESC, 3 ASC
         LIMIT 12

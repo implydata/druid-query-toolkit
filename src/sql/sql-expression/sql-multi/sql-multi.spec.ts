@@ -1082,7 +1082,9 @@ describe('Combined expression', () => {
                   },
                   SqlComparison {
                     "decorator": undefined,
-                    "keywords": Object {},
+                    "keywords": Object {
+                      "op": ">",
+                    },
                     "lhs": SqlRef {
                       "column": "C",
                       "keywords": Object {},
@@ -1186,7 +1188,9 @@ describe('Combined expression', () => {
                 "values": Array [
                   SqlComparison {
                     "decorator": undefined,
-                    "keywords": Object {},
+                    "keywords": Object {
+                      "op": ">",
+                    },
                     "lhs": SqlMulti {
                       "args": SeparatedArray {
                         "separators": Array [
@@ -1323,7 +1327,9 @@ describe('Combined expression', () => {
                   },
                   SqlComparison {
                     "decorator": undefined,
-                    "keywords": Object {},
+                    "keywords": Object {
+                      "op": ">",
+                    },
                     "lhs": SqlRef {
                       "column": "B",
                       "keywords": Object {},
@@ -2167,7 +2173,9 @@ describe('getSqlRefs', () => {
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "decorator": undefined,
-        "keywords": Object {},
+        "keywords": Object {
+          "op": "IS",
+        },
         "lhs": SqlRef {
           "column": "X",
           "keywords": Object {},
@@ -2207,6 +2215,7 @@ describe('getSqlRefs', () => {
         "decorator": undefined,
         "keywords": Object {
           "not": "NOT",
+          "op": "IS",
         },
         "lhs": SqlRef {
           "column": "X",
@@ -2248,6 +2257,7 @@ describe('getSqlRefs', () => {
         "decorator": undefined,
         "keywords": Object {
           "not": "NOT",
+          "op": "IS",
         },
         "lhs": SqlRef {
           "column": "X",
@@ -2299,6 +2309,7 @@ describe('getSqlRefs', () => {
               "decorator": undefined,
               "keywords": Object {
                 "not": "NOT",
+                "op": "IS",
               },
               "lhs": SqlRef {
                 "column": "X",
@@ -2329,7 +2340,9 @@ describe('getSqlRefs', () => {
             },
             SqlComparison {
               "decorator": undefined,
-              "keywords": Object {},
+              "keywords": Object {
+                "op": "<>",
+              },
               "lhs": SqlRef {
                 "column": "X",
                 "keywords": Object {},

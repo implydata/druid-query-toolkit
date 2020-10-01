@@ -219,7 +219,9 @@ describe('SqlUnary', () => {
       SqlUnary {
         "argument": SqlComparison {
           "decorator": undefined,
-          "keywords": Object {},
+          "keywords": Object {
+            "op": ">",
+          },
           "lhs": SqlRef {
             "column": "A",
             "keywords": Object {},
@@ -281,7 +283,9 @@ describe('SqlUnary', () => {
             SqlUnary {
               "argument": SqlComparison {
                 "decorator": undefined,
-                "keywords": Object {},
+                "keywords": Object {
+                  "op": ">",
+                },
                 "lhs": SqlRef {
                   "column": "A",
                   "keywords": Object {},
@@ -324,7 +328,9 @@ describe('SqlUnary', () => {
             SqlUnary {
               "argument": SqlComparison {
                 "decorator": undefined,
-                "keywords": Object {},
+                "keywords": Object {
+                  "op": "=",
+                },
                 "lhs": SqlRef {
                   "column": "C",
                   "keywords": Object {},
@@ -380,7 +386,9 @@ describe('SqlUnary', () => {
         "argument": SqlUnary {
           "argument": SqlComparison {
             "decorator": undefined,
-            "keywords": Object {},
+            "keywords": Object {
+              "op": ">",
+            },
             "lhs": SqlRef {
               "column": "A",
               "keywords": Object {},
