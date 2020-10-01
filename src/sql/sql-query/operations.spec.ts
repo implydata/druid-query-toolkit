@@ -674,7 +674,7 @@ describe('SqlQuery operations', () => {
         Concat(   a      ,   b,          c    ),
         Case   A   When   B   Then    C   End   As m
         From tbl
-        Where   __time  Between  Timestamp  '2020-01-01'  And  Timestamp  '2020-01-02'  And   goo   is  not  Null  aNd NoT Y
+        Where   __time  Between  Timestamp  '2020-01-01'  And  Timestamp  '2020-01-02'  And   goo   is  not  Null  aNd NoT True
         Group    By   1
         Order  By   2   Desc  ,  3
         asC   LimIT  12
@@ -687,7 +687,7 @@ describe('SqlQuery operations', () => {
       ).toEqual(sane`
         SELECT col1 || lol, (MIN(col1) + SUM(kl)) AS aliasName, CONCAT(a, b, c), CASE A WHEN B THEN C END AS m
         FROM tbl
-        WHERE __time BETWEEN TIMESTAMP '2020-01-01' AND TIMESTAMP '2020-01-02' AND goo IS NOT Null AND NOT Y
+        WHERE __time BETWEEN TIMESTAMP '2020-01-01' AND TIMESTAMP '2020-01-02' AND goo IS NOT NULL AND NOT TRUE
         GROUP BY 1
         ORDER BY 2 DESC, 3 ASC
         LIMIT 12

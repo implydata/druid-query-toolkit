@@ -289,8 +289,6 @@ SELECT countryName from wikipedia
 - `(a, b) IN (subquery)`
 - Fancy group by definitions e.g. `GROUPING SETS`, `CUBE`
 
-Fix SemiKeywords:
-  - Join type (LEFT)
 
 ## License 
 
