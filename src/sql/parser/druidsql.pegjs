@@ -219,7 +219,9 @@ SqlJoinPart =
   };
 
   if (joinType) {
-    value.joinType = joinType[0].toUpperCase();
+    var joinTypeUpper = joinType[0].toUpperCase();
+    if (/^FULL.+OUTER$/.test(joinTypeUpper)) joinTypeUpper = 'FULL OUTER';
+    value.joinType = joinTypeUpper;
     keywords.joinType = joinType[0];
     spacing.postJoinType = joinType[1];
   }
@@ -232,6 +234,14 @@ SqlJoinPart =
   }
   return new sql.SqlJoinPart(value);
 }
+
+JoinType =
+  "LEFT"i
+/ "RIGHT"i
+/ "INNER"i
+/ $("FULL"i __ "OUTER"i)
+/ "FULL"i
+/ "CROSS"i
 
 WhereClause = where:WhereToken postWhere:_ expression:Expression
 {
@@ -1264,14 +1274,6 @@ TrimDecoratorLead =
   LeadingToken
 / BothToken
 / TrailingToken
-
-JoinType =
-  "LEFT"i
-/ "RIGHT"i
-/ "INNER"i
-/ $("FULL"i __ "OUTER"i)
-/ "FULL"i
-/ "CROSS"i
 
 /* Tokens */
 
