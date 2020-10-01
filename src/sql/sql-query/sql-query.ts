@@ -36,6 +36,8 @@ import { SqlJoinPart } from './sql-join-part/sql-join-part';
 import { SqlOrderByExpression } from './sql-order-by-expression/sql-order-by-expression';
 import { SqlWithPart } from './sql-with-part/sql-with-part';
 
+const INDENT_SPACE = '\n  ';
+
 export type SqlQueryDecorator = 'ALL' | 'DISTINCT';
 
 export interface SqlQueryValue extends SqlBaseValue {
@@ -167,16 +169,23 @@ export class SqlQuery extends SqlExpression {
       );
     }
 
+    const indentSpace = this.selectExpressions.length() > 1 ? INDENT_SPACE : ' ';
+
     // SELECT clause
     rawParts.push(
       this.getKeyword('select', SqlQuery.DEFAULT_SELECT_KEYWORD),
-      this.getSpace('postSelect'),
+      this.getSpace('postSelect', this.decorator ? ' ' : indentSpace),
     );
     if (this.decorator) {
-      rawParts.push(this.getKeyword('decorator', this.decorator), this.getSpace('postDecorator'));
+      rawParts.push(
+        this.getKeyword('decorator', this.decorator),
+        this.getSpace('postDecorator', indentSpace),
+      );
     }
 
-    rawParts.push(this.selectExpressions.toString(Separator.COMMA));
+    rawParts.push(
+      this.selectExpressions.toString(new Separator({ separator: ',', right: indentSpace })),
+    );
 
     if (this.fromClause) {
       rawParts.push(this.getSpace('preFrom', '\n'), this.fromClause.toString());

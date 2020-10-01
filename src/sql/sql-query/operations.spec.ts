@@ -668,7 +668,24 @@ describe('SqlQuery operations', () => {
   });
 
   describe('prettify', () => {
-    it('misc query', () => {
+    it('misc query 1', () => {
+      const sql = sane`
+        Select  
+          Distinct col1    ||    lol
+        From tbl       
+      `;
+
+      expect(
+        SqlQuery.parse(sql)
+          .prettify()
+          .toString(),
+      ).toEqual(sane`
+        SELECT DISTINCT col1 || lol
+        FROM tbl
+      `);
+    });
+
+    it('misc query 2', () => {
       const sql = sane`
         Select   col1    ||    lol  ,  ( Min(col1)   +   Sum(kl)  )  AS   aliasName   ,
         Concat(   a      ,   b,          c    ),
@@ -685,7 +702,11 @@ describe('SqlQuery operations', () => {
           .prettify()
           .toString(),
       ).toEqual(sane`
-        SELECT col1 || lol, (MIN(col1) + SUM(kl)) AS aliasName, CONCAT(a, b, c), CASE A WHEN B THEN C END AS m
+        SELECT
+          col1 || lol,
+          (MIN(col1) + SUM(kl)) AS aliasName,
+          CONCAT(a, b, c),
+          CASE A WHEN B THEN C END AS m
         FROM tbl
         WHERE __time BETWEEN TIMESTAMP '2020-01-01' AND TIMESTAMP '2020-01-02' AND goo IS NOT NULL AND NOT TRUE
         GROUP BY 1
