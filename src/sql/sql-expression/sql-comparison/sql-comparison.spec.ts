@@ -205,6 +205,7 @@ describe('SqlComparison', () => {
         "not": false,
         "op": "=",
         "rhs": SqlQuery {
+          "decorator": undefined,
           "explainPlanFor": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
@@ -346,7 +347,6 @@ describe('SqlComparison', () => {
               "rightSpacing": "",
             },
           ],
-          "selectDecorator": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
@@ -591,6 +591,7 @@ describe('SqlComparison', () => {
         "not": false,
         "op": "IN",
         "rhs": SqlQuery {
+          "decorator": undefined,
           "explainPlanFor": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
@@ -654,7 +655,6 @@ describe('SqlComparison', () => {
               "rightSpacing": "",
             },
           ],
-          "selectDecorator": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
@@ -725,6 +725,7 @@ describe('SqlComparison', () => {
         "not": true,
         "op": "IN",
         "rhs": SqlQuery {
+          "decorator": undefined,
           "explainPlanFor": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
@@ -788,7 +789,6 @@ describe('SqlComparison', () => {
               "rightSpacing": "",
             },
           ],
-          "selectDecorator": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [

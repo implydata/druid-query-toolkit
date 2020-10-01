@@ -290,9 +290,7 @@ SELECT countryName from wikipedia
 - Fancy group by definitions e.g. `GROUPING SETS`, `CUBE`
 
 Fix SemiKeywords:
-    - Join type (LEFT)
-    - Comparison op (IS)
-    - Select decorator (ALL)
+  - Join type (LEFT)
 
 ## License 
 

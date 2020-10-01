@@ -413,6 +413,7 @@ describe('SqlQuery', () => {
 
     expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
       SqlQuery {
+        "decorator": undefined,
         "explainPlanFor": undefined,
         "fromClause": SqlFromClause {
           "expressions": SeparatedArray {
@@ -422,6 +423,7 @@ describe('SqlQuery', () => {
                 "alias": undefined,
                 "as": undefined,
                 "expression": SqlQuery {
+                  "decorator": undefined,
                   "explainPlanFor": undefined,
                   "fromClause": SqlFromClause {
                     "expressions": SeparatedArray {
@@ -509,7 +511,6 @@ describe('SqlQuery', () => {
                       "rightSpacing": "",
                     },
                   ],
-                  "selectDecorator": undefined,
                   "selectExpressions": SeparatedArray {
                     "separators": Array [],
                     "values": Array [
@@ -583,7 +584,6 @@ describe('SqlQuery', () => {
         },
         "offsetClause": undefined,
         "orderByClause": undefined,
-        "selectDecorator": undefined,
         "selectExpressions": SeparatedArray {
           "separators": Array [],
           "values": Array [
@@ -635,6 +635,7 @@ describe('SqlQuery', () => {
 
     expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
       SqlQuery {
+        "decorator": undefined,
         "explainPlanFor": undefined,
         "fromClause": SqlFromClause {
           "expressions": SeparatedArray {
@@ -680,7 +681,6 @@ describe('SqlQuery', () => {
         "limitClause": undefined,
         "offsetClause": undefined,
         "orderByClause": undefined,
-        "selectDecorator": undefined,
         "selectExpressions": SeparatedArray {
           "separators": Array [
             Separator {
@@ -846,6 +846,7 @@ describe('SqlQuery', () => {
 
     expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
       SqlQuery {
+        "decorator": undefined,
         "explainPlanFor": true,
         "fromClause": SqlFromClause {
           "expressions": SeparatedArray {
@@ -891,7 +892,6 @@ describe('SqlQuery', () => {
         "limitClause": undefined,
         "offsetClause": undefined,
         "orderByClause": undefined,
-        "selectDecorator": undefined,
         "selectExpressions": SeparatedArray {
           "separators": Array [],
           "values": Array [
@@ -944,6 +944,7 @@ describe('SqlQuery', () => {
 
     expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
       SqlQuery {
+        "decorator": undefined,
         "explainPlanFor": undefined,
         "fromClause": SqlFromClause {
           "expressions": SeparatedArray {
@@ -987,7 +988,6 @@ describe('SqlQuery', () => {
         "limitClause": undefined,
         "offsetClause": undefined,
         "orderByClause": undefined,
-        "selectDecorator": undefined,
         "selectExpressions": SeparatedArray {
           "separators": Array [],
           "values": Array [
@@ -1038,6 +1038,7 @@ describe('SqlQuery', () => {
               "type": "withPart",
               "withColumns": undefined,
               "withQuery": SqlQuery {
+                "decorator": undefined,
                 "explainPlanFor": undefined,
                 "fromClause": SqlFromClause {
                   "expressions": SeparatedArray {
@@ -1087,7 +1088,6 @@ describe('SqlQuery', () => {
                     "rightSpacing": "",
                   },
                 ],
-                "selectDecorator": undefined,
                 "selectExpressions": SeparatedArray {
                   "separators": Array [],
                   "values": Array [
@@ -1149,6 +1149,7 @@ describe('SqlQuery', () => {
 
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
+          "decorator": undefined,
           "explainPlanFor": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
@@ -1191,7 +1192,6 @@ describe('SqlQuery', () => {
           "limitClause": undefined,
           "offsetClause": undefined,
           "orderByClause": undefined,
-          "selectDecorator": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
@@ -1276,6 +1276,7 @@ describe('SqlQuery', () => {
 
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
+          "decorator": undefined,
           "explainPlanFor": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
@@ -1321,7 +1322,6 @@ describe('SqlQuery', () => {
           "limitClause": undefined,
           "offsetClause": undefined,
           "orderByClause": undefined,
-          "selectDecorator": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
@@ -1406,6 +1406,7 @@ describe('SqlQuery', () => {
 
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
+          "decorator": undefined,
           "explainPlanFor": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
@@ -1451,7 +1452,6 @@ describe('SqlQuery', () => {
           "limitClause": undefined,
           "offsetClause": undefined,
           "orderByClause": undefined,
-          "selectDecorator": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
@@ -1634,6 +1634,7 @@ describe('SqlQuery', () => {
 
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
+          "decorator": undefined,
           "explainPlanFor": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
@@ -1702,7 +1703,6 @@ describe('SqlQuery', () => {
           "limitClause": undefined,
           "offsetClause": undefined,
           "orderByClause": undefined,
-          "selectDecorator": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
@@ -1748,6 +1748,7 @@ describe('SqlQuery', () => {
 
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
+          "decorator": undefined,
           "explainPlanFor": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
@@ -1816,7 +1817,6 @@ describe('SqlQuery', () => {
           "limitClause": undefined,
           "offsetClause": undefined,
           "orderByClause": undefined,
-          "selectDecorator": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
@@ -1862,6 +1862,7 @@ describe('SqlQuery', () => {
 
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
+          "decorator": undefined,
           "explainPlanFor": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
@@ -1953,7 +1954,6 @@ describe('SqlQuery', () => {
               "rightSpacing": "",
             },
           ],
-          "selectDecorator": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
@@ -2001,6 +2001,7 @@ describe('SqlQuery', () => {
 
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
+          "decorator": undefined,
           "explainPlanFor": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
@@ -2082,7 +2083,6 @@ describe('SqlQuery', () => {
           "limitClause": undefined,
           "offsetClause": undefined,
           "orderByClause": undefined,
-          "selectDecorator": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
@@ -2128,6 +2128,7 @@ describe('SqlQuery', () => {
 
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
+          "decorator": undefined,
           "explainPlanFor": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
@@ -2212,7 +2213,6 @@ describe('SqlQuery', () => {
           "limitClause": undefined,
           "offsetClause": undefined,
           "orderByClause": undefined,
-          "selectDecorator": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
@@ -2258,6 +2258,7 @@ describe('SqlQuery', () => {
 
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
+          "decorator": undefined,
           "explainPlanFor": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
@@ -2438,7 +2439,6 @@ describe('SqlQuery', () => {
           "limitClause": undefined,
           "offsetClause": undefined,
           "orderByClause": undefined,
-          "selectDecorator": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
@@ -2486,6 +2486,7 @@ describe('SqlQuery', () => {
 
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
+          "decorator": undefined,
           "explainPlanFor": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
@@ -2556,7 +2557,6 @@ describe('SqlQuery', () => {
             },
             "type": "orderByClause",
           },
-          "selectDecorator": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
@@ -2602,6 +2602,7 @@ describe('SqlQuery', () => {
 
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
+          "decorator": undefined,
           "explainPlanFor": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
@@ -2676,7 +2677,6 @@ describe('SqlQuery', () => {
             },
             "type": "orderByClause",
           },
-          "selectDecorator": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
@@ -2722,6 +2722,7 @@ describe('SqlQuery', () => {
 
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
+          "decorator": undefined,
           "explainPlanFor": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
@@ -2796,7 +2797,6 @@ describe('SqlQuery', () => {
             },
             "type": "orderByClause",
           },
-          "selectDecorator": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
@@ -2842,6 +2842,7 @@ describe('SqlQuery', () => {
 
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
+          "decorator": undefined,
           "explainPlanFor": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
@@ -2920,7 +2921,6 @@ describe('SqlQuery', () => {
             },
             "type": "orderByClause",
           },
-          "selectDecorator": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [
               Separator {
@@ -2990,6 +2990,7 @@ describe('SqlQuery', () => {
 
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
+          "decorator": undefined,
           "explainPlanFor": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
@@ -3087,7 +3088,6 @@ describe('SqlQuery', () => {
             },
             "type": "orderByClause",
           },
-          "selectDecorator": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
@@ -3133,6 +3133,7 @@ describe('SqlQuery', () => {
 
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
+          "decorator": undefined,
           "explainPlanFor": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
@@ -3234,7 +3235,6 @@ describe('SqlQuery', () => {
             },
             "type": "orderByClause",
           },
-          "selectDecorator": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [
               Separator {
@@ -3306,6 +3306,7 @@ describe('SqlQuery', () => {
 
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
+          "decorator": undefined,
           "explainPlanFor": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
@@ -3363,7 +3364,6 @@ describe('SqlQuery', () => {
           },
           "offsetClause": undefined,
           "orderByClause": undefined,
-          "selectDecorator": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
@@ -3411,6 +3411,7 @@ describe('SqlQuery', () => {
 
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
+          "decorator": undefined,
           "explainPlanFor": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
@@ -3454,7 +3455,6 @@ describe('SqlQuery', () => {
           "limitClause": undefined,
           "offsetClause": undefined,
           "orderByClause": undefined,
-          "selectDecorator": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
@@ -3488,6 +3488,7 @@ describe('SqlQuery', () => {
           },
           "type": "query",
           "unionQuery": SqlQuery {
+            "decorator": undefined,
             "explainPlanFor": undefined,
             "fromClause": SqlFromClause {
               "expressions": SeparatedArray {
@@ -3530,7 +3531,6 @@ describe('SqlQuery', () => {
             "limitClause": undefined,
             "offsetClause": undefined,
             "orderByClause": undefined,
-            "selectDecorator": undefined,
             "selectExpressions": SeparatedArray {
               "separators": Array [],
               "values": Array [
@@ -3580,6 +3580,7 @@ describe('SqlQuery', () => {
 
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
+          "decorator": undefined,
           "explainPlanFor": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
@@ -3694,7 +3695,6 @@ describe('SqlQuery', () => {
           "limitClause": undefined,
           "offsetClause": undefined,
           "orderByClause": undefined,
-          "selectDecorator": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
@@ -3739,6 +3739,7 @@ describe('SqlQuery', () => {
 
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
+          "decorator": undefined,
           "explainPlanFor": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
@@ -3853,7 +3854,6 @@ describe('SqlQuery', () => {
           "limitClause": undefined,
           "offsetClause": undefined,
           "orderByClause": undefined,
-          "selectDecorator": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
@@ -3898,6 +3898,7 @@ describe('SqlQuery', () => {
 
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
+          "decorator": undefined,
           "explainPlanFor": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
@@ -4012,7 +4013,6 @@ describe('SqlQuery', () => {
           "limitClause": undefined,
           "offsetClause": undefined,
           "orderByClause": undefined,
-          "selectDecorator": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
@@ -4057,6 +4057,7 @@ describe('SqlQuery', () => {
 
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
+          "decorator": undefined,
           "explainPlanFor": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
@@ -4171,7 +4172,6 @@ describe('SqlQuery', () => {
           "limitClause": undefined,
           "offsetClause": undefined,
           "orderByClause": undefined,
-          "selectDecorator": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
@@ -4216,6 +4216,7 @@ describe('SqlQuery', () => {
 
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
+          "decorator": undefined,
           "explainPlanFor": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
@@ -4330,7 +4331,6 @@ describe('SqlQuery', () => {
           "limitClause": undefined,
           "offsetClause": undefined,
           "orderByClause": undefined,
-          "selectDecorator": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
@@ -4380,6 +4380,7 @@ describe('SqlQuery', () => {
 
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
+          "decorator": undefined,
           "explainPlanFor": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
@@ -4422,7 +4423,6 @@ describe('SqlQuery', () => {
           "limitClause": undefined,
           "offsetClause": undefined,
           "orderByClause": undefined,
-          "selectDecorator": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
@@ -4568,6 +4568,7 @@ describe('SqlQuery', () => {
 
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
+          "decorator": undefined,
           "explainPlanFor": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
@@ -4672,7 +4673,6 @@ describe('SqlQuery', () => {
             },
             "type": "orderByClause",
           },
-          "selectDecorator": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [
               Separator {
@@ -4848,6 +4848,7 @@ describe('SqlQuery', () => {
 
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
+          "decorator": undefined,
           "explainPlanFor": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
@@ -4948,7 +4949,6 @@ describe('SqlQuery', () => {
             },
             "type": "orderByClause",
           },
-          "selectDecorator": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [
               Separator {

@@ -36,10 +36,12 @@ import { SqlJoinPart } from './sql-join-part/sql-join-part';
 import { SqlOrderByExpression } from './sql-order-by-expression/sql-order-by-expression';
 import { SqlWithPart } from './sql-with-part/sql-with-part';
 
+export type SqlQueryDecorator = 'ALL' | 'DISTINCT';
+
 export interface SqlQueryValue extends SqlBaseValue {
   explainPlanFor?: boolean;
   withParts?: SeparatedArray<SqlWithPart>;
-  selectDecorator?: string;
+  decorator?: SqlQueryDecorator;
   selectExpressions: SeparatedArray<SqlAlias>;
 
   fromClause?: SqlFromClause;
@@ -96,7 +98,7 @@ export class SqlQuery extends SqlExpression {
 
   public readonly explainPlanFor?: boolean;
   public readonly withParts?: SeparatedArray<SqlWithPart>;
-  public readonly selectDecorator?: string;
+  public readonly decorator?: SqlQueryDecorator;
   public readonly selectExpressions: SeparatedArray<SqlAlias>;
   public readonly fromClause?: SqlFromClause;
   public readonly whereClause?: SqlWhereClause;
@@ -111,7 +113,7 @@ export class SqlQuery extends SqlExpression {
     super(options, SqlQuery.type);
     this.explainPlanFor = options.explainPlanFor;
     this.withParts = options.withParts;
-    this.selectDecorator = options.selectDecorator;
+    this.decorator = options.decorator;
     this.selectExpressions = options.selectExpressions;
     this.fromClause = options.fromClause;
     this.whereClause = options.whereClause;
@@ -127,7 +129,7 @@ export class SqlQuery extends SqlExpression {
     const value = super.valueOf() as SqlQueryValue;
     if (this.explainPlanFor) value.explainPlanFor = true;
     value.withParts = this.withParts;
-    value.selectDecorator = this.selectDecorator;
+    value.decorator = this.decorator;
     value.selectExpressions = this.selectExpressions;
     value.fromClause = this.fromClause;
     value.whereClause = this.whereClause;
@@ -170,8 +172,8 @@ export class SqlQuery extends SqlExpression {
       this.getKeyword('select', SqlQuery.DEFAULT_SELECT_KEYWORD),
       this.getSpace('postSelect'),
     );
-    if (this.selectDecorator) {
-      rawParts.push(this.selectDecorator, this.getSpace('postSelectDecorator'));
+    if (this.decorator) {
+      rawParts.push(this.getKeyword('decorator', this.decorator), this.getSpace('postDecorator'));
     }
 
     rawParts.push(this.selectExpressions.toString(Separator.COMMA));

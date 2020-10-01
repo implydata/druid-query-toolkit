@@ -59,9 +59,9 @@ SqlQuery =
 
   keywords.select = select.selectKeyword;
   spacing.postSelect = select.postSelect;
-  value.selectDecorator = select.selectDecorator;
+  value.decorator = select.decorator;
+  spacing.postDecorator = select.postDecorator;
   value.selectExpressions = select.selectExpressions;
-  spacing.postSelectDecorator = select.postSelectDecorator;
 
   if (from) {
     spacing.preFrom = from[0];
@@ -164,17 +164,21 @@ WithColumns = OpenParen postLeftParen:_? head:BaseType tail:(CommaSeparator Base
 SelectClause =
   selectKeyword:SelectToken
   postSelect:_
-  selectDecorator:((AllToken / DistinctToken) _)?
+  decorator:((AllToken / DistinctToken) _)?
   head:SqlAliasExpression
   tail:(CommaSeparator SqlAliasExpression)*
 {
-  return {
+  var ret = {
     selectKeyword: selectKeyword,
     postSelect: postSelect,
-    selectDecorator: selectDecorator ? selectDecorator[0] : undefined,
-    postSelectDecorator: selectDecorator ? selectDecorator[1] : undefined,
     selectExpressions: makeSeparatedArray(head, tail).map(sql.SqlAlias.fromBase),
   };
+  if (decorator) {
+    ret.decorator = decorator[0].toUpperCase();
+    ret.decoratorKeyword = decorator[0];
+    ret.postDecorator = decorator[1];
+  }
+  return ret;
 }
 
 FromClause = from:FromToken postFrom:_ head:SqlAlias tail:(CommaSeparator SqlAlias)* join:(_ JoinClauses)?

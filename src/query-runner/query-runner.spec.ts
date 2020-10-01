@@ -156,6 +156,7 @@ describe('QueryRunner', () => {
           ],
         ],
         "sqlQuery": SqlQuery {
+          "decorator": undefined,
           "explainPlanFor": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
@@ -252,7 +253,6 @@ describe('QueryRunner', () => {
             },
             "type": "orderByClause",
           },
-          "selectDecorator": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [
               Separator {
@@ -400,6 +400,7 @@ describe('QueryRunner', () => {
           ],
         ],
         "sqlQuery": SqlQuery {
+          "decorator": undefined,
           "explainPlanFor": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
@@ -496,7 +497,6 @@ describe('QueryRunner', () => {
             },
             "type": "orderByClause",
           },
-          "selectDecorator": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [
               Separator {
@@ -645,6 +645,7 @@ describe('QueryRunner', () => {
           ],
         ],
         "sqlQuery": SqlQuery {
+          "decorator": undefined,
           "explainPlanFor": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
@@ -741,7 +742,6 @@ describe('QueryRunner', () => {
             },
             "type": "orderByClause",
           },
-          "selectDecorator": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [
               Separator {

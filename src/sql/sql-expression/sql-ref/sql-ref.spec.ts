@@ -308,6 +308,7 @@ describe('upgrades', () => {
 
     expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
       SqlQuery {
+        "decorator": undefined,
         "explainPlanFor": undefined,
         "fromClause": SqlFromClause {
           "expressions": SeparatedArray {
@@ -353,7 +354,6 @@ describe('upgrades', () => {
         "limitClause": undefined,
         "offsetClause": undefined,
         "orderByClause": undefined,
-        "selectDecorator": undefined,
         "selectExpressions": SeparatedArray {
           "separators": Array [],
           "values": Array [
