@@ -48,6 +48,7 @@ describe('SqlQuery', () => {
         GROUP BY 1, 2, 3, 4
         ORDER BY 4 DESC
       `,
+      `SELECT w1."channel" FROM "wikipedia" w1 JOIN "wikipedia2" w2 ON w1."channel" = w2."channel"`,
     ];
 
     for (const sql of queries) {
@@ -3613,6 +3614,7 @@ describe('SqlQuery', () => {
                   "joinType": "INNER",
                   "keywords": Object {
                     "join": "Join",
+                    "joinType": "INNER",
                     "on": "ON",
                   },
                   "onExpression": SqlComparison {
@@ -3769,9 +3771,10 @@ describe('SqlQuery', () => {
               "separators": Array [],
               "values": Array [
                 SqlJoinPart {
-                  "joinType": "Left",
+                  "joinType": "LEFT",
                   "keywords": Object {
                     "join": "Join",
+                    "joinType": "Left",
                     "on": "ON",
                   },
                   "onExpression": SqlComparison {
@@ -3931,6 +3934,7 @@ describe('SqlQuery', () => {
                   "joinType": "RIGHT",
                   "keywords": Object {
                     "join": "Join",
+                    "joinType": "RIGHT",
                     "on": "ON",
                   },
                   "onExpression": SqlComparison {
@@ -4090,6 +4094,7 @@ describe('SqlQuery', () => {
                   "joinType": "FULL",
                   "keywords": Object {
                     "join": "Join",
+                    "joinType": "FULL",
                     "on": "ON",
                   },
                   "onExpression": SqlComparison {
@@ -4249,6 +4254,7 @@ describe('SqlQuery', () => {
                   "joinType": "FULL OUTER",
                   "keywords": Object {
                     "join": "Join",
+                    "joinType": "FULL OUTER",
                     "on": "ON",
                   },
                   "onExpression": SqlComparison {

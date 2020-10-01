@@ -16,8 +16,10 @@ import { SqlAlias } from '..';
 import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../../sql-base';
 import { SqlExpression } from '../../sql-expression';
 
+export type SqlJoinJoinType = 'LEFT' | 'RIGHT' | 'INNER' | 'FULL' | 'FULL OUTER' | 'CROSS';
+
 export interface SqlJoinPartValue extends SqlBaseValue {
-  joinType?: string;
+  joinType?: SqlJoinJoinType;
   table: SqlAlias;
   onExpression?: SqlExpression;
 }
@@ -28,7 +30,11 @@ export class SqlJoinPart extends SqlBase {
   static DEFAULT_JOIN_KEYWORD = 'JOIN';
   static DEFAULT_ON_KEYWORD = 'ON';
 
-  static create(joinType: string, table: SqlBase, onExpression?: SqlExpression): SqlJoinPart {
+  static create(
+    joinType: SqlJoinJoinType,
+    table: SqlBase,
+    onExpression?: SqlExpression,
+  ): SqlJoinPart {
     return new SqlJoinPart({
       joinType: joinType,
       table: SqlAlias.fromBase(table),
@@ -36,7 +42,7 @@ export class SqlJoinPart extends SqlBase {
     });
   }
 
-  public readonly joinType?: string;
+  public readonly joinType?: SqlJoinJoinType;
   public readonly table: SqlAlias;
   public readonly onExpression?: SqlExpression;
 
@@ -59,7 +65,7 @@ export class SqlJoinPart extends SqlBase {
     const rawParts: string[] = [];
 
     if (this.joinType) {
-      rawParts.push(this.joinType, this.getSpace('postJoinType'));
+      rawParts.push(this.getKeyword('joinType', this.joinType), this.getSpace('postJoinType'));
     }
 
     rawParts.push(

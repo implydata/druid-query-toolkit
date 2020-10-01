@@ -202,24 +202,27 @@ JoinClauses = head:SqlJoinPart tail:(_ SqlJoinPart)*
 }
 
 SqlJoinPart =
-  joinType:JoinType
-  postJoinType:_
-  joinKeyword:JoinToken
+  joinType:(JoinType _)?
+  join:JoinToken
   postJoin:_
   table:SqlAlias
   on:(_ OnToken _ Expression)?
 {
   var value = {
-    joinType: joinType,
     table: sql.SqlAlias.fromBaseAndUpgrade(table),
   };
   var spacing = value.spacing = {
-    postJoinType: postJoinType,
     postJoin: postJoin,
   };
   var keywords = value.keywords = {
-    join: joinKeyword,
+    join: join,
   };
+
+  if (joinType) {
+    value.joinType = joinType[0].toUpperCase();
+    keywords.joinType = joinType[0];
+    spacing.postJoinType = joinType[1];
+  }
 
   if (on) {
     spacing.preOn = on[0];
