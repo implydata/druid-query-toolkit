@@ -130,15 +130,15 @@ export class SqlRef extends SqlExpression {
     return [
       SqlRef.wrapInQuotes(this.namespace, this.namespaceQuotes),
 
-      this.getInnerSpace('preNamespaceDot', ''),
+      this.getSpace('preNamespaceDot', ''),
       this.namespace && this.table ? '.' : '',
-      this.getInnerSpace('postNamespaceDot', ''),
+      this.getSpace('postNamespaceDot', ''),
 
       SqlRef.wrapInQuotes(this.table, this.tableQuotes),
 
-      this.getInnerSpace('preTableDot', ''),
+      this.getSpace('preTableDot', ''),
       this.column && this.table ? '.' : '',
-      this.getInnerSpace('postTableDot', ''),
+      this.getSpace('postTableDot', ''),
 
       SqlRef.wrapInQuotes(this.column, this.quotes),
     ].join('');
@@ -204,13 +204,13 @@ export class SqlRef extends SqlExpression {
     const value = this.valueOf();
     value.namespace = value.table;
     value.namespaceQuotes = value.tableQuotes;
-    // value.innerSpacing.preNamespace = value.innerSpacing.preTable;
-    // value.innerSpacing.preNamespace = value.innerSpacing.postTable;
+    // value.spacing.preNamespace = value.spacing.preTable;
+    // value.spacing.preNamespace = value.spacing.postTable;
 
     value.table = value.column;
     value.tableQuotes = value.quotes;
-    // value.innerSpacing.postTable = '';
-    // value.innerSpacing.preTable = '';
+    // value.spacing.postTable = '';
+    // value.spacing.preTable = '';
 
     delete value.column;
     delete value.quotes;

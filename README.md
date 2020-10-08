@@ -285,10 +285,10 @@ SELECT countryName from wikipedia
 
 ## ToDo
 
-- Add support for `/* inline comments */`
 - Clean up APIs
 - `(a, b) IN (subquery)`
 - Fancy group by definitions e.g. `GROUPING SETS`, `CUBE`
+
 
 ## License 
 

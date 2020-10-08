@@ -64,9 +64,11 @@ describe('SqlFunction', () => {
       SqlFunction {
         "args": undefined,
         "decorator": undefined,
-        "filterKeyword": undefined,
         "functionName": "FN",
-        "innerSpacing": Object {
+        "keywords": Object {
+          "functionName": "FN",
+        },
+        "spacing": Object {
           "postLeftParen": "",
           "preLeftParen": "",
         },
@@ -89,10 +91,11 @@ describe('SqlFunction', () => {
           "values": Array [
             SqlRef {
               "column": "A",
-              "innerSpacing": Object {},
+              "keywords": Object {},
               "namespace": undefined,
               "namespaceQuotes": false,
               "quotes": false,
+              "spacing": Object {},
               "table": undefined,
               "tableQuotes": false,
               "type": "ref",
@@ -100,9 +103,11 @@ describe('SqlFunction', () => {
           ],
         },
         "decorator": undefined,
-        "filterKeyword": undefined,
         "functionName": "SUM",
-        "innerSpacing": Object {
+        "keywords": Object {
+          "functionName": "SUM",
+        },
+        "spacing": Object {
           "postArguments": "",
           "postLeftParen": "",
           "preLeftParen": "",
@@ -126,10 +131,11 @@ describe('SqlFunction', () => {
           "values": Array [
             SqlRef {
               "column": "A",
-              "innerSpacing": Object {},
+              "keywords": Object {},
               "namespace": undefined,
               "namespaceQuotes": false,
               "quotes": false,
+              "spacing": Object {},
               "table": undefined,
               "tableQuotes": false,
               "type": "ref",
@@ -137,12 +143,9 @@ describe('SqlFunction', () => {
           ],
         },
         "decorator": undefined,
-        "filterKeyword": undefined,
         "functionName": "SUM",
-        "innerSpacing": Object {
-          "postArguments": "",
-          "postLeftParen": "",
-          "preLeftParen": "",
+        "keywords": Object {
+          "functionName": "SUM",
         },
         "parens": Array [
           Object {
@@ -150,6 +153,11 @@ describe('SqlFunction', () => {
             "rightSpacing": "",
           },
         ],
+        "spacing": Object {
+          "postArguments": "",
+          "postLeftParen": "",
+          "preLeftParen": "",
+        },
         "specialParen": undefined,
         "type": "function",
         "whereClause": undefined,
@@ -188,23 +196,24 @@ describe('SqlFunction', () => {
                       ],
                       "values": Array [
                         SqlLiteral {
-                          "innerSpacing": Object {},
-                          "keyword": undefined,
+                          "keywords": Object {},
+                          "spacing": Object {},
                           "stringValue": "1",
                           "type": "literal",
                           "value": 1,
                         },
                         SqlLiteral {
-                          "innerSpacing": Object {},
-                          "keyword": undefined,
+                          "keywords": Object {},
+                          "spacing": Object {},
                           "stringValue": "2",
                           "type": "literal",
                           "value": 2,
                         },
                       ],
                     },
-                    "expressionType": "+",
-                    "innerSpacing": Object {},
+                    "keywords": Object {},
+                    "op": "+",
+                    "spacing": Object {},
                     "type": "multi",
                   },
                   SqlMulti {
@@ -218,37 +227,41 @@ describe('SqlFunction', () => {
                       ],
                       "values": Array [
                         SqlLiteral {
-                          "innerSpacing": Object {},
-                          "keyword": undefined,
+                          "keywords": Object {},
+                          "spacing": Object {},
                           "stringValue": "3",
                           "type": "literal",
                           "value": 3,
                         },
                         SqlLiteral {
-                          "innerSpacing": Object {},
-                          "keyword": undefined,
+                          "keywords": Object {},
+                          "spacing": Object {},
                           "stringValue": "2",
                           "type": "literal",
                           "value": 2,
                         },
                       ],
                     },
-                    "expressionType": "+",
-                    "innerSpacing": Object {},
+                    "keywords": Object {},
+                    "op": "+",
+                    "spacing": Object {},
                     "type": "multi",
                   },
                 ],
               },
-              "expressionType": "and",
-              "innerSpacing": Object {},
+              "keywords": Object {},
+              "op": "AND",
+              "spacing": Object {},
               "type": "multi",
             },
           ],
         },
         "decorator": undefined,
-        "filterKeyword": undefined,
         "functionName": "SUM",
-        "innerSpacing": Object {
+        "keywords": Object {
+          "functionName": "SUM",
+        },
+        "spacing": Object {
           "postArguments": "",
           "postLeftParen": " ",
           "preLeftParen": "",
@@ -272,10 +285,11 @@ describe('SqlFunction', () => {
           "values": Array [
             SqlRef {
               "column": "A",
-              "innerSpacing": Object {},
+              "keywords": Object {},
               "namespace": undefined,
               "namespaceQuotes": false,
               "quotes": false,
+              "spacing": Object {},
               "table": undefined,
               "tableQuotes": false,
               "type": "ref",
@@ -283,9 +297,11 @@ describe('SqlFunction', () => {
           ],
         },
         "decorator": undefined,
-        "filterKeyword": undefined,
         "functionName": "SUM",
-        "innerSpacing": Object {
+        "keywords": Object {
+          "functionName": "SUM",
+        },
+        "spacing": Object {
           "postArguments": "      ",
           "postLeftParen": " ",
           "preLeftParen": "",
@@ -319,10 +335,11 @@ describe('SqlFunction', () => {
                 "values": Array [
                   SqlRef {
                     "column": "A",
-                    "innerSpacing": Object {},
+                    "keywords": Object {},
                     "namespace": undefined,
                     "namespaceQuotes": false,
                     "quotes": false,
+                    "spacing": Object {},
                     "table": undefined,
                     "tableQuotes": false,
                     "type": "ref",
@@ -330,9 +347,11 @@ describe('SqlFunction', () => {
                 ],
               },
               "decorator": undefined,
-              "filterKeyword": undefined,
-              "functionName": "Sum",
-              "innerSpacing": Object {
+              "functionName": "SUM",
+              "keywords": Object {
+                "functionName": "Sum",
+              },
+              "spacing": Object {
                 "postArguments": "",
                 "postLeftParen": "",
                 "preLeftParen": "",
@@ -357,10 +376,11 @@ describe('SqlFunction', () => {
                       "values": Array [
                         SqlRef {
                           "column": "B",
-                          "innerSpacing": Object {},
+                          "keywords": Object {},
                           "namespace": undefined,
                           "namespaceQuotes": false,
                           "quotes": false,
+                          "spacing": Object {},
                           "table": undefined,
                           "tableQuotes": false,
                           "type": "ref",
@@ -368,9 +388,11 @@ describe('SqlFunction', () => {
                       ],
                     },
                     "decorator": undefined,
-                    "filterKeyword": undefined,
                     "functionName": "SUM",
-                    "innerSpacing": Object {
+                    "keywords": Object {
+                      "functionName": "SUM",
+                    },
+                    "spacing": Object {
                       "postArguments": "",
                       "postLeftParen": "",
                       "preLeftParen": "",
@@ -395,10 +417,11 @@ describe('SqlFunction', () => {
                             "values": Array [
                               SqlRef {
                                 "column": "c",
-                                "innerSpacing": Object {},
+                                "keywords": Object {},
                                 "namespace": undefined,
                                 "namespaceQuotes": false,
                                 "quotes": false,
+                                "spacing": Object {},
                                 "table": undefined,
                                 "tableQuotes": false,
                                 "type": "ref",
@@ -406,9 +429,11 @@ describe('SqlFunction', () => {
                             ],
                           },
                           "decorator": undefined,
-                          "filterKeyword": undefined,
                           "functionName": "SUM",
-                          "innerSpacing": Object {
+                          "keywords": Object {
+                            "functionName": "SUM",
+                          },
+                          "spacing": Object {
                             "postArguments": "",
                             "postLeftParen": "",
                             "preLeftParen": "",
@@ -418,28 +443,31 @@ describe('SqlFunction', () => {
                           "whereClause": undefined,
                         },
                         SqlLiteral {
-                          "innerSpacing": Object {},
-                          "keyword": undefined,
+                          "keywords": Object {},
+                          "spacing": Object {},
                           "stringValue": "4",
                           "type": "literal",
                           "value": 4,
                         },
                       ],
                     },
-                    "expressionType": "*",
-                    "innerSpacing": Object {},
+                    "keywords": Object {},
+                    "op": "*",
+                    "spacing": Object {},
                     "type": "multi",
                   },
                 ],
               },
-              "expressionType": "and",
-              "innerSpacing": Object {},
+              "keywords": Object {},
+              "op": "AND",
+              "spacing": Object {},
               "type": "multi",
             },
           ],
         },
-        "expressionType": "or",
-        "innerSpacing": Object {},
+        "keywords": Object {},
+        "op": "OR",
+        "spacing": Object {},
         "type": "multi",
       }
     `);
@@ -457,10 +485,11 @@ describe('SqlFunction', () => {
           "values": Array [
             SqlRef {
               "column": "A",
-              "innerSpacing": Object {},
+              "keywords": Object {},
               "namespace": undefined,
               "namespaceQuotes": false,
               "quotes": false,
+              "spacing": Object {},
               "table": undefined,
               "tableQuotes": false,
               "type": "ref",
@@ -468,9 +497,12 @@ describe('SqlFunction', () => {
           ],
         },
         "decorator": undefined,
-        "filterKeyword": "Filter",
-        "functionName": "Sum",
-        "innerSpacing": Object {
+        "functionName": "SUM",
+        "keywords": Object {
+          "filter": "Filter",
+          "functionName": "Sum",
+        },
+        "spacing": Object {
           "postArguments": "",
           "postFilter": " ",
           "postLeftParen": "",
@@ -482,41 +514,47 @@ describe('SqlFunction', () => {
         "whereClause": SqlWhereClause {
           "expression": SqlComparison {
             "decorator": undefined,
-            "innerSpacing": Object {
-              "postOp": " ",
-              "preOp": " ",
+            "keywords": Object {
+              "op": ">",
             },
             "lhs": SqlRef {
               "column": "val",
-              "innerSpacing": Object {},
+              "keywords": Object {},
               "namespace": undefined,
               "namespaceQuotes": false,
               "quotes": false,
+              "spacing": Object {},
               "table": undefined,
               "tableQuotes": false,
               "type": "ref",
             },
-            "notKeyword": undefined,
+            "not": false,
             "op": ">",
             "rhs": SqlLiteral {
-              "innerSpacing": Object {},
-              "keyword": undefined,
+              "keywords": Object {},
+              "spacing": Object {},
               "stringValue": "1",
               "type": "literal",
               "value": 1,
             },
+            "spacing": Object {
+              "postOp": " ",
+              "preOp": " ",
+            },
             "type": "comparison",
           },
-          "innerSpacing": Object {
-            "postKeyword": " ",
+          "keywords": Object {
+            "where": "WHERE",
           },
-          "keyword": "WHERE",
           "parens": Array [
             Object {
               "leftSpacing": "",
               "rightSpacing": "",
             },
           ],
+          "spacing": Object {
+            "postWhere": " ",
+          },
           "type": "whereClause",
         },
       }
@@ -563,22 +601,22 @@ describe('SqlFunction', () => {
           ],
           "values": Array [
             SqlLiteral {
-              "innerSpacing": Object {},
-              "keyword": undefined,
+              "keywords": Object {},
+              "spacing": Object {},
               "stringValue": "1",
               "type": "literal",
               "value": 1,
             },
             SqlLiteral {
-              "innerSpacing": Object {},
-              "keyword": undefined,
+              "keywords": Object {},
+              "spacing": Object {},
               "stringValue": "2",
               "type": "literal",
               "value": 2,
             },
             SqlLiteral {
-              "innerSpacing": Object {},
-              "keyword": undefined,
+              "keywords": Object {},
+              "spacing": Object {},
               "stringValue": "3",
               "type": "literal",
               "value": 3,
@@ -586,9 +624,11 @@ describe('SqlFunction', () => {
           ],
         },
         "decorator": undefined,
-        "filterKeyword": undefined,
-        "functionName": "Array",
-        "innerSpacing": Object {
+        "functionName": "ARRAY",
+        "keywords": Object {
+          "functionName": "Array",
+        },
+        "spacing": Object {
           "postArguments": "  ",
           "postLeftParen": " ",
           "preLeftParen": " ",
@@ -622,22 +662,22 @@ describe('SqlFunction', () => {
           ],
           "values": Array [
             SqlLiteral {
-              "innerSpacing": Object {},
-              "keyword": undefined,
+              "keywords": Object {},
+              "spacing": Object {},
               "stringValue": "'1'",
               "type": "literal",
               "value": "1",
             },
             SqlLiteral {
-              "innerSpacing": Object {},
-              "keyword": undefined,
+              "keywords": Object {},
+              "spacing": Object {},
               "stringValue": "u&'a'",
               "type": "literal",
               "value": "a",
             },
             SqlLiteral {
-              "innerSpacing": Object {},
-              "keyword": undefined,
+              "keywords": Object {},
+              "spacing": Object {},
               "stringValue": "']'",
               "type": "literal",
               "value": "]",
@@ -645,9 +685,11 @@ describe('SqlFunction', () => {
           ],
         },
         "decorator": undefined,
-        "filterKeyword": undefined,
-        "functionName": "Array",
-        "innerSpacing": Object {
+        "functionName": "ARRAY",
+        "keywords": Object {
+          "functionName": "Array",
+        },
+        "spacing": Object {
           "postArguments": "",
           "postLeftParen": "",
           "preLeftParen": "",

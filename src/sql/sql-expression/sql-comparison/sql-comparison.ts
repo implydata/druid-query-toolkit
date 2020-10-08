@@ -19,11 +19,11 @@ import { SqlExpression } from '../sql-expression';
 import { SqlBetweenAndHelper } from './sql-between-and-helper';
 import { SqlLikeEscapeHelper } from './sql-like-escape-helper';
 
-export type EffectiveOp = '=' | '<>' | '<' | '>' | '<=' | '>=' | 'IS' | 'LIKE' | 'BETWEEN'; // ToDo: 'similar to' ?
-export type EffectiveComparisonDecorator = 'ALL' | 'ANY';
+export type SqlComparisonOp = '=' | '<>' | '<' | '>' | '<=' | '>=' | 'IS' | 'LIKE' | 'BETWEEN'; // ToDo: 'similar to' ?
+export type SqlComparisonDecorator = 'ALL' | 'ANY';
 export type SpecialLikeType = 'includes' | 'prefix' | 'postfix' | 'exact';
 
-const ANTI_OP = {
+const ANTI_OP: Record<string, SqlComparisonOp> = {
   '=': '<>',
   '<>': '=',
   '<': '>=',
@@ -33,15 +33,17 @@ const ANTI_OP = {
 };
 
 export interface SqlComparisonValue extends SqlBaseValue {
-  op: string;
-  notKeyword?: string;
+  op: SqlComparisonOp;
+  not?: boolean;
   lhs: SqlExpression;
-  decorator?: string;
+  decorator?: SqlComparisonDecorator;
   rhs: SqlBase;
 }
 
 export class SqlComparison extends SqlExpression {
   static type: SqlType = 'comparison';
+
+  static DEFAULT_NOT_KEYWORD = 'NOT';
 
   static equal(
     lhs: SqlExpression | LiteralValue,
@@ -182,16 +184,16 @@ export class SqlComparison extends SqlExpression {
     return SqlComparison.betweenSymmetric(lhs, start, end).negate();
   }
 
-  public readonly op: string;
-  public readonly notKeyword?: string;
+  public readonly op: SqlComparisonOp;
+  public readonly not?: boolean;
   public readonly lhs: SqlExpression;
-  public readonly decorator?: string;
+  public readonly decorator?: SqlComparisonDecorator;
   public readonly rhs: SqlBase;
 
   constructor(options: SqlComparisonValue) {
     super(options, SqlComparison.type);
     this.op = options.op;
-    this.notKeyword = options.notKeyword;
+    this.not = options.not;
     this.lhs = options.lhs;
     this.decorator = options.decorator;
     this.rhs = options.rhs;
@@ -200,7 +202,7 @@ export class SqlComparison extends SqlExpression {
   public valueOf(): SqlComparisonValue {
     const value = super.valueOf() as SqlComparisonValue;
     value.op = this.op;
-    value.notKeyword = this.notKeyword;
+    if (this.not) value.not = true;
     value.lhs = this.lhs;
     value.decorator = this.decorator;
     value.rhs = this.rhs;
@@ -208,42 +210,34 @@ export class SqlComparison extends SqlExpression {
   }
 
   protected _toRawString(): string {
-    const { lhs, op, notKeyword, decorator, rhs } = this;
-    const opIsIs = this.getEffectiveOp() === 'IS';
+    const { lhs, op, not, decorator, rhs } = this;
+    const opIsIs = op === 'IS';
 
     const rawParts: string[] = [lhs.toString()];
 
-    if (notKeyword && !opIsIs) {
-      rawParts.push(this.getInnerSpace('not'), notKeyword);
+    if (not && !opIsIs) {
+      rawParts.push(
+        this.getSpace('not'),
+        this.getKeyword('not', SqlComparison.DEFAULT_NOT_KEYWORD),
+      );
     }
 
-    rawParts.push(this.getInnerSpace('preOp'), op, this.getInnerSpace('postOp'));
+    rawParts.push(this.getSpace('preOp'), this.getKeyword('op', op), this.getSpace('postOp'));
 
-    if (notKeyword && opIsIs) {
-      rawParts.push(notKeyword, this.getInnerSpace('not'));
+    if (not && opIsIs) {
+      rawParts.push(
+        this.getKeyword('not', SqlComparison.DEFAULT_NOT_KEYWORD),
+        this.getSpace('not'),
+      );
     }
 
     if (decorator) {
-      rawParts.push(decorator, this.getInnerSpace('postDecorator'));
+      rawParts.push(this.getKeyword('decorator', decorator), this.getSpace('postDecorator'));
     }
 
     rawParts.push(rhs.toString());
 
     return rawParts.join('');
-  }
-
-  public getEffectiveOp(): EffectiveOp {
-    const { op } = this;
-    if (op === '!=') return '<>'; // Normalize inequality
-    return op.toUpperCase() as EffectiveOp;
-  }
-
-  public getEffectiveComparisonDecorator(): EffectiveComparisonDecorator | undefined {
-    const { decorator } = this;
-    if (!decorator) return;
-    const decoratorUpper = decorator.toUpperCase();
-    if (decoratorUpper === 'SOME') return 'ANY';
-    return decoratorUpper as EffectiveComparisonDecorator;
   }
 
   public changeLhs(lhs: SqlExpression): this {
@@ -259,30 +253,32 @@ export class SqlComparison extends SqlExpression {
   }
 
   public negate(): this {
-    let { op, notKeyword, decorator } = this;
+    let { op, not, decorator } = this;
 
-    const effectiveOp = this.getEffectiveOp();
-    switch (effectiveOp) {
+    switch (op) {
       case '=':
       case '<>':
       case '<':
       case '>':
       case '<=':
       case '>=':
-        op = ANTI_OP[effectiveOp];
+        op = ANTI_OP[op];
         if (decorator) {
-          decorator = this.getEffectiveComparisonDecorator() === 'ALL' ? 'ANY' : 'ALL';
+          decorator = decorator === 'ALL' ? 'ANY' : 'ALL';
         }
         break;
 
       default:
-        notKeyword = notKeyword ? undefined : 'NOT';
+        not = !not;
         break;
     }
 
     const value = this.valueOf();
     value.op = op;
-    value.notKeyword = notKeyword;
+    value.not = not;
+    if (!value.not) {
+      value.keywords = this.getKeywordsWithout('not');
+    }
     value.decorator = decorator;
     return SqlBase.fromValue(value);
   }
@@ -310,8 +306,8 @@ export class SqlComparison extends SqlExpression {
   }
 
   public getLikeMatchPattern(): string | undefined {
-    if (this.getEffectiveOp() !== 'LIKE') return;
-    const { rhs } = this;
+    const { op, rhs } = this;
+    if (op !== 'LIKE') return;
     if (rhs instanceof SqlLiteral) {
       return rhs.getStringValue();
     } else if (rhs instanceof SqlLikeEscapeHelper && rhs.like instanceof SqlLiteral) {

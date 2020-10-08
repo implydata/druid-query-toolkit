@@ -23,13 +23,17 @@ function isDate(v: any): v is Date {
 export type LiteralValue = null | boolean | number | string | Date;
 
 export interface SqlLiteralValue extends SqlBaseValue {
-  keyword?: string;
   value: LiteralValue;
   stringValue?: string;
 }
 
 export class SqlLiteral extends SqlExpression {
   static type: SqlType = 'literal';
+
+  static DEFAULT_TIMESTAMP_KEYWORD = 'TIMESTAMP';
+  static DEFAULT_NULL_KEYWORD = 'NULL';
+  static DEFAULT_FALSE_KEYWORD = 'FALSE';
+  static DEFAULT_TRUE_KEYWORD = 'TRUE';
 
   static NULL: SqlLiteral;
   static FALSE: SqlLiteral;
@@ -39,40 +43,24 @@ export class SqlLiteral extends SqlExpression {
   static create(value: LiteralValue | SqlLiteral): SqlLiteral {
     if (value instanceof SqlLiteral) return value;
 
-    let keyword: string | undefined;
-    let stringValue: string;
     switch (typeof value) {
       case 'object':
-        if (value === null) {
-          stringValue = 'NULL';
-        } else if (isDate(value)) {
-          keyword = 'TIMESTAMP';
-          stringValue = `'${SqlLiteral.dateToTimestampValue(value)}'`;
-        } else {
+        if (value !== null && !isDate(value)) {
           throw new TypeError('SqlLiteral invalid object input');
         }
         break;
 
       case 'boolean':
-        stringValue = SqlLiteral.booleanToSql(value);
-        break;
-
       case 'number':
-        stringValue = String(value);
-        break;
-
       case 'string':
-        stringValue = SqlLiteral.escapeLiteralString(value);
-        break;
+        break; // Nothing to do here
 
       default:
         throw new TypeError(`SqlLiteral invalid input of type ${typeof value}`);
     }
 
     return new SqlLiteral({
-      keyword,
       value,
-      stringValue,
     });
   }
 
@@ -101,58 +89,82 @@ export class SqlLiteral extends SqlExpression {
       .replace(/ 00:00:00$/, '');
   }
 
-  static booleanToSql(b: boolean): string {
-    return String(b).toUpperCase();
-  }
-
   static _equalsLiteral(expression: SqlBase, value: number) {
     return expression instanceof SqlLiteral && expression.value === value;
   }
 
-  public readonly keyword?: string;
   public readonly value: LiteralValue;
   public readonly stringValue?: string;
 
   constructor(options: SqlLiteralValue) {
     super(options, SqlLiteral.type);
-    this.keyword = options.keyword;
     this.value = options.value;
     this.stringValue = options.stringValue;
   }
 
   public valueOf(): SqlLiteralValue {
     const value = super.valueOf() as SqlLiteralValue;
-    value.keyword = this.keyword;
     value.value = this.value;
     value.stringValue = this.stringValue;
     return value;
   }
 
+  public getEffectiveStringValue(): string {
+    const { value, stringValue } = this;
+    if (stringValue) return stringValue;
+
+    switch (typeof value) {
+      case 'object':
+        if (value === null) {
+          return SqlBase.capitalize(SqlLiteral.DEFAULT_NULL_KEYWORD);
+        } else if (isDate(value)) {
+          return `'${SqlLiteral.dateToTimestampValue(value)}'`;
+        }
+        break;
+
+      case 'boolean':
+        return SqlBase.capitalize(
+          value ? SqlLiteral.DEFAULT_TRUE_KEYWORD : SqlLiteral.DEFAULT_FALSE_KEYWORD,
+        );
+
+      case 'string':
+        return SqlLiteral.escapeLiteralString(value);
+    }
+
+    return String(value);
+  }
+
   protected _toRawString(): string {
     const retParts: string[] = [];
 
-    if (this.keyword) {
-      retParts.push(this.keyword, this.getInnerSpace('postKeyword'));
+    if (this.isDate()) {
+      retParts.push(
+        this.getKeyword('timestamp', SqlLiteral.DEFAULT_TIMESTAMP_KEYWORD),
+        this.getSpace('postTimestamp'),
+      );
     }
 
-    if (this.stringValue) {
-      retParts.push(this.stringValue);
-    } else {
-      if (typeof this.value === 'string') {
-        retParts.push(SqlLiteral.escapeLiteralString(this.value));
-      } else {
-        retParts.push(String(this.value));
-      }
-    }
+    retParts.push(this.getEffectiveStringValue());
 
     return retParts.join('');
   }
 
-  public increment(ammount = 1): SqlLiteral {
+  public resetOwnKeywords(): this {
+    const { value, stringValue } = this;
+    if (stringValue && (value === null || typeof value === 'boolean')) {
+      const v = this.valueOf();
+      delete v.stringValue;
+      return new SqlLiteral(v).resetOwnKeywords() as this;
+    } else {
+      return super.resetOwnKeywords();
+    }
+  }
+
+  public increment(amount = 1): SqlLiteral {
     if (!this.isInteger()) return this;
 
     const value = this.valueOf();
-    value.value = Number(this.value) + ammount;
+    value.value = Number(this.value) + amount;
     delete value.stringValue;
     return new SqlLiteral(value);
   }
@@ -167,6 +179,10 @@ export class SqlLiteral extends SqlExpression {
   public isInteger(): boolean {
     const { value } = this;
     return typeof value === 'number' && isFinite(value) && Math.floor(value) === value;
+  }
+
+  public isDate(): boolean {
+    return isDate(this.value);
   }
 
   getNumberValue(): number | undefined {

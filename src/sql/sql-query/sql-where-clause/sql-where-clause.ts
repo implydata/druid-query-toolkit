@@ -17,14 +17,13 @@ import { SqlExpression } from '../../sql-expression';
 import { SqlClause, SqlClauseValue } from '../sql-clause';
 
 export interface SqlWhereClauseValue extends SqlClauseValue {
-  keyword?: string;
   expression: SqlExpression;
 }
 
 export class SqlWhereClause extends SqlClause {
   static type: SqlType = 'whereClause';
 
-  static DEFAULT_KEYWORD = 'WHERE';
+  static DEFAULT_WHERE_KEYWORD = 'WHERE';
 
   static create(expression: SqlWhereClause | SqlExpression | string): SqlWhereClause {
     if (expression instanceof SqlWhereClause) return expression;
@@ -51,14 +50,11 @@ export class SqlWhereClause extends SqlClause {
   }
 
   protected _toRawString(): string {
-    const rawParts: string[] = [
-      this.keyword || SqlWhereClause.DEFAULT_KEYWORD,
-      this.getInnerSpace('postKeyword'),
-    ];
-
-    rawParts.push(this.expression.toString());
-
-    return rawParts.join('');
+    return [
+      this.getKeyword('where', SqlWhereClause.DEFAULT_WHERE_KEYWORD),
+      this.getSpace('postWhere'),
+      this.expression.toString(),
+    ].join('');
   }
 
   public changeExpression(expression: SqlExpression | string): this {

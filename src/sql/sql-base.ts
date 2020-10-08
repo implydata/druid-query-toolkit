@@ -24,6 +24,20 @@ export interface Parens {
   rightSpacing: string;
 }
 
+function pseudoRandomCapitalization(str: string): string {
+  const upper = str.toUpperCase();
+  const lower = str.toLowerCase();
+  let seed = 0;
+  return upper
+    .split('')
+    .map((u, i) => {
+      seed += u.charCodeAt(0);
+      seed = (457 * seed + 1279) % 3631;
+      return seed % 5 > 1 ? u : lower[i];
+    })
+    .join('');
+}
+
 export type Substitutor = (t: SqlBase, stack: SqlBase[]) => SqlBase | undefined;
 export type Matcher = (t: SqlBase, stack: SqlBase[]) => boolean;
 
@@ -56,7 +70,8 @@ export type SqlType =
 
 export interface SqlBaseValue {
   type?: SqlType;
-  innerSpacing?: Record<string, string>;
+  spacing?: Record<string, string>;
+  keywords?: Record<string, string>;
   parens?: readonly Parens[];
 }
 
@@ -95,6 +110,33 @@ export abstract class SqlBase {
       return input;
     } else {
       throw new Error('unknown input');
+    }
+  }
+
+  static capitalize: (keyword: string) => string = keyword => {
+    return keyword;
+  };
+
+  static setCapitalization(capitalization: 'upper' | 'lower' | 'title' | 'random'): void {
+    switch (capitalization) {
+      case 'upper':
+        SqlBase.capitalize = k => k;
+        break;
+
+      case 'lower':
+        SqlBase.capitalize = k => k.toLowerCase();
+        break;
+
+      case 'title':
+        SqlBase.capitalize = k => k.slice(0, 1) + k.slice(1).toLowerCase();
+        break;
+
+      case 'random':
+        SqlBase.capitalize = pseudoRandomCapitalization;
+        break;
+
+      default:
+        throw new Error(`unknown capitalization '${capitalization}'`);
     }
   }
 
@@ -144,14 +186,16 @@ export abstract class SqlBase {
   }
 
   public type: SqlType;
-  public innerSpacing: Record<string, string>;
+  public spacing: Record<string, string>;
+  public keywords: Record<string, string>;
   public parens?: readonly Parens[];
 
   constructor(options: SqlBaseValue, typeOverride: SqlType) {
     const type = typeOverride || options.type;
     if (!type) throw new Error(`could not determine type`);
     this.type = type;
-    this.innerSpacing = cleanObject(options.innerSpacing || {});
+    this.spacing = cleanObject(options.spacing || {});
+    this.keywords = cleanObject(options.keywords || {});
     const { parens } = options;
     if (parens && parens.length) {
       this.parens = parens;
@@ -161,7 +205,8 @@ export abstract class SqlBase {
   public valueOf() {
     const value: SqlBaseValue = {
       type: this.type,
-      innerSpacing: this.innerSpacing,
+      spacing: this.spacing,
+      keywords: this.keywords,
     };
     if (this.parens) value.parens = this.parens;
     return value;
@@ -215,31 +260,43 @@ export abstract class SqlBase {
     );
   }
 
-  public resetOwnInnerSpace(): this {
-    if (Object.keys(this.innerSpacing).length === 0) return this;
+  public resetOwnSpacing(): this {
+    if (Object.keys(this.spacing).length === 0) return this;
     const value = this.valueOf();
-    value.innerSpacing = {};
+    value.spacing = {};
     return SqlBase.fromValue(value);
   }
 
-  public clearOwnStaticKeywords(): this {
-    return this;
+  public resetOwnKeywords(): this {
+    if (Object.keys(this.keywords).length === 0) return this;
+    const value = this.valueOf();
+    value.keywords = {};
+    return SqlBase.fromValue(value);
   }
 
   public clearOwnSeparators(): this {
     return this;
   }
 
-  public getInnerSpace(name: string, defaultSpace = ' ') {
-    const { innerSpacing } = this;
-    if (!innerSpacing) return defaultSpace;
-    const space = innerSpacing[name];
-    if (typeof space !== 'string') return defaultSpace;
-    return space;
+  public getSpace(name: string, defaultSpace = ' ') {
+    const s = this.spacing[name];
+    return typeof s === 'string' ? s : defaultSpace;
   }
 
-  protected getInnerSpacingWithout(...toRemove: string[]) {
-    const ret = Object.assign({}, this.innerSpacing);
+  protected getSpacingWithout(...toRemove: string[]) {
+    const ret = Object.assign({}, this.spacing);
+    for (const thing of toRemove) {
+      delete ret[thing];
+    }
+    return ret;
+  }
+
+  public getKeyword(name: string, defaultKeyword: string): string {
+    return this.keywords[name] || SqlBase.capitalize(defaultKeyword);
+  }
+
+  protected getKeywordsWithout(...toRemove: string[]) {
+    const ret = Object.assign({}, this.keywords);
     for (const thing of toRemove) {
       delete ret[thing];
     }
@@ -380,8 +437,8 @@ export abstract class SqlBase {
   public prettify(): SqlBase {
     return this.walkPostorder(ex => {
       return ex
-        .resetOwnInnerSpace()
-        .clearOwnStaticKeywords()
+        .resetOwnSpacing()
+        .resetOwnKeywords()
         .clearOwnSeparators()
         .removeOwnParenSpaces();
     });

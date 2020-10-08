@@ -19,14 +19,14 @@ import { SeparatedArray } from '../../utils';
 import { SqlClause, SqlClauseValue } from '../sql-clause';
 
 export interface SqlGroupByClauseValue extends SqlClauseValue {
-  keyword?: string;
   expressions?: SeparatedArray<SqlExpression>;
 }
 
 export class SqlGroupByClause extends SqlClause {
   static type: SqlType = 'groupByClause';
 
-  static DEFAULT_KEYWORD = 'GROUP BY';
+  static DEFAULT_GROUP_KEYWORD = 'GROUP';
+  static DEFAULT_BY_KEYWORD = 'BY';
 
   static create(expressions: SeparatedArray<SqlExpression> | SqlExpression[]): SqlGroupByClause {
     return new SqlGroupByClause({
@@ -37,7 +37,6 @@ export class SqlGroupByClause extends SqlClause {
     });
   }
 
-  public readonly keyword?: string;
   public readonly expressions?: SeparatedArray<SqlExpression>;
 
   constructor(options: SqlGroupByClauseValue) {
@@ -52,14 +51,13 @@ export class SqlGroupByClause extends SqlClause {
   }
 
   protected _toRawString(): string {
-    const rawParts: string[] = [
-      this.keyword || SqlGroupByClause.DEFAULT_KEYWORD,
-      this.getInnerSpace('postKeyword'),
-    ];
-
-    rawParts.push(this.expressions ? this.expressions.toString() : '()');
-
-    return rawParts.join('');
+    return [
+      this.getKeyword('group', SqlGroupByClause.DEFAULT_GROUP_KEYWORD),
+      this.getSpace('postGroup'),
+      this.getKeyword('by', SqlGroupByClause.DEFAULT_BY_KEYWORD),
+      this.getSpace('postBy'),
+      this.expressions ? this.expressions.toString() : '()',
+    ].join('');
   }
 
   public changeExpressions(

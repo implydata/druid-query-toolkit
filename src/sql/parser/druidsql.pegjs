@@ -22,7 +22,7 @@ Sql = SqlQuery / SqlAliasExpression
 
 SqlQuery =
   preQuery:_?
-  explainKeyword:(ExplainToken _)?
+  explainPlanFor:(ExplainToken __ PlanToken __ ForToken _)?
   withClause:(WithClause _)?
   select:SelectClause
   from:(_ FromClause)?
@@ -36,70 +36,76 @@ SqlQuery =
   postQuery:EndOfQuery?
 {
   var value = {};
-  var innerSpacing = value.innerSpacing = {};
-  innerSpacing.preQuery = preQuery;
+  var keywords = value.keywords = {};
+  var spacing = value.spacing = {};
+  spacing.preQuery = preQuery;
 
-  if (explainKeyword) {
-    value.explainKeyword = explainKeyword[0];
-    innerSpacing.postExplain = explainKeyword[1];
+  if (explainPlanFor) {
+    value.explainPlanFor = true;
+    keywords.explain = explainPlanFor[0];
+    spacing.postExplain = explainPlanFor[1];
+    keywords.plan = explainPlanFor[2];
+    spacing.postPlan = explainPlanFor[3];
+    keywords['for'] = explainPlanFor[4];
+    spacing.postFor = explainPlanFor[5];
   }
 
   if (withClause) {
-    value.withKeyword = withClause[0].withKeyword;
-    innerSpacing.postWith = withClause[0].postWith;
+    keywords.with = withClause[0].withKeyword;
+    spacing.postWith = withClause[0].postWith;
     value.withParts = withClause[0].withParts;
-    innerSpacing.postWithQuery = withClause[1];
+    spacing.postWithQuery = withClause[1];
   }
 
-  value.selectKeyword = select.selectKeyword;
-  innerSpacing.postSelect = select.postSelect;
-  value.selectDecorator = select.selectDecorator;
+  keywords.select = select.selectKeyword;
+  spacing.postSelect = select.postSelect;
+  value.decorator = select.decorator;
+  spacing.postDecorator = select.postDecorator;
   value.selectExpressions = select.selectExpressions;
-  innerSpacing.postSelectDecorator = select.postSelectDecorator;
 
   if (from) {
-    innerSpacing.preFrom = from[0];
+    spacing.preFrom = from[0];
     value.fromClause = from[1];
   }
 
   if (where) {
-    innerSpacing.preWhere = where[0];
+    spacing.preWhere = where[0];
     value.whereClause = where[1];
   }
 
   if (groupBy) {
-    innerSpacing.preGroupBy = groupBy[0];
+    spacing.preGroupBy = groupBy[0];
     value.groupByClause = groupBy[1];
   }
 
   if (having) {
-    innerSpacing.preHaving = having[0];
+    spacing.preHaving = having[0];
     value.havingClause = having[1];
   }
 
   if (orderBy) {
-    innerSpacing.preOrderBy = orderBy[0];
+    spacing.preOrderBy = orderBy[0];
     value.orderByClause = orderBy[1];
   }
 
   if (limit) {
-    innerSpacing.preLimit = limit[0];
+    spacing.preLimit = limit[0];
     value.limitClause = limit[1];
   }
 
   if (offset) {
-    innerSpacing.preOffset = offset[0];
+    spacing.preOffset = offset[0];
     value.offsetClause = offset[1];
   }
 
   if (union) {
-    innerSpacing.preUnion = union[0];
-    value.unionKeyword = union[1].unionKeyword;
-    innerSpacing.postUnion = union[1].postUnion;
+    spacing.preUnion = union[0];
+    keywords.union = union[1].unionKeyword;
+    spacing.postUnion = union[1].postUnion;
     value.unionQuery = union[1].unionQuery;
   }
 
-  innerSpacing.postQuery = postQuery;
+  spacing.postQuery = postQuery;
 
   return new sql.SqlQuery(value);
 }
@@ -128,18 +134,20 @@ SqlWithPart =
 {
   var value = {
     withTable: withTable,
-    asKeyword: asKeyword,
     withQuery: withQuery,
   };
-  var innerSpacing = value.innerSpacing = {
+  var spacing = value.spacing = {
     postWithTable: postWithTable,
     postAs: postAs,
   };
+  var keywords = value.keywords = {
+    as: asKeyword,
+  };
   if (columns) {
-    innerSpacing.postLeftParen = columns[0].postLeftParen;
+    spacing.postLeftParen = columns[0].postLeftParen;
     value.withColumns = columns[0].withColumns;
-    innerSpacing.preRightParen = columns[0].preRightParen;
-    innerSpacing.postWithColumns = columns[1];
+    spacing.preRightParen = columns[0].preRightParen;
+    spacing.postWithColumns = columns[1];
   }
   return new sql.SqlWithPart(value);
 }
@@ -156,28 +164,34 @@ WithColumns = OpenParen postLeftParen:_? head:BaseType tail:(CommaSeparator Base
 SelectClause =
   selectKeyword:SelectToken
   postSelect:_
-  selectDecorator:((AllToken / DistinctToken) _)?
+  decorator:((AllToken / DistinctToken) _)?
   head:SqlAliasExpression
   tail:(CommaSeparator SqlAliasExpression)*
 {
-  return {
+  var ret = {
     selectKeyword: selectKeyword,
     postSelect: postSelect,
-    selectDecorator: selectDecorator ? selectDecorator[0] : undefined,
-    postSelectDecorator: selectDecorator ? selectDecorator[1] : undefined,
     selectExpressions: makeSeparatedArray(head, tail).map(sql.SqlAlias.fromBase),
   };
+  if (decorator) {
+    ret.decorator = decorator[0].toUpperCase();
+    ret.decoratorKeyword = decorator[0];
+    ret.postDecorator = decorator[1];
+  }
+  return ret;
 }
 
-FromClause = keyword:FromToken postKeyword:_ head:SqlAlias tail:(CommaSeparator SqlAlias)* join:(_ JoinClauses)?
+FromClause = from:FromToken postFrom:_ head:SqlAlias tail:(CommaSeparator SqlAlias)* join:(_ JoinClauses)?
 {
   return new sql.SqlFromClause({
-    keyword: keyword,
     expressions: makeSeparatedArray(head, tail).map(sql.SqlAlias.fromBaseAndUpgrade),
     joinParts: join ? join[1] : undefined,
-    innerSpacing: {
-      postKeyword: postKeyword,
+    spacing: {
+      postFrom: postFrom,
       preJoin: join ? join[0] : undefined,
+    },
+    keywords: {
+      from: from,
     },
   });
 }
@@ -188,51 +202,72 @@ JoinClauses = head:SqlJoinPart tail:(_ SqlJoinPart)*
 }
 
 SqlJoinPart =
-  joinType:JoinType
-  postJoinType:_
-  joinKeyword:JoinToken
-  postJoinKeyword:_
+  joinType:(JoinType _)?
+  join:JoinToken
+  postJoin:_
   table:SqlAlias
   on:(_ OnToken _ Expression)?
 {
   var value = {
-    joinType: joinType,
-    joinKeyword: joinKeyword,
     table: sql.SqlAlias.fromBaseAndUpgrade(table),
   };
-  var innerSpacing = value.innerSpacing = {
-    postJoinType: postJoinType,
-    postJoinKeyword: postJoinKeyword,
+  var spacing = value.spacing = {
+    postJoin: postJoin,
+  };
+  var keywords = value.keywords = {
+    join: join,
   };
 
+  if (joinType) {
+    var joinTypeUpper = joinType[0].toUpperCase();
+    if (/^FULL.+OUTER$/.test(joinTypeUpper)) joinTypeUpper = 'FULL OUTER';
+    value.joinType = joinTypeUpper;
+    keywords.joinType = joinType[0];
+    spacing.postJoinType = joinType[1];
+  }
+
   if (on) {
-    innerSpacing.preOn = on[0];
-    value.onKeyword = on[1];
-    innerSpacing.postOn = on[2];
+    spacing.preOn = on[0];
+    keywords.on = on[1];
+    spacing.postOn = on[2];
     value.onExpression = on[3];
   }
   return new sql.SqlJoinPart(value);
 }
 
-WhereClause = keyword:WhereToken postKeyword:_ expression:Expression
+JoinType =
+  "LEFT"i
+/ "RIGHT"i
+/ "INNER"i
+/ $("FULL"i __ "OUTER"i)
+/ "FULL"i
+/ "CROSS"i
+
+WhereClause = where:WhereToken postWhere:_ expression:Expression
 {
   return new sql.SqlWhereClause({
-    keyword: keyword,
     expression: expression,
-    innerSpacing: {
-      postKeyword: postKeyword,
-    }
+    spacing: {
+      postWhere: postWhere,
+    },
+    keywords: {
+      where: where,
+    },
   });
 }
 
-GroupByClause = keyword:GroupByToken postKeyword:_ expressions:(ExpressionList / "()")
+GroupByClause = group:GroupToken postGroup:__ by:ByToken postBy:_ expressions:(ExpressionList / "()")
 {
   return new sql.SqlGroupByClause({
-    keyword: keyword,
     expressions: expressions === '()' ? null : expressions,
-    innerSpacing: {
-      postKeyword: postKeyword,
-    }
+    spacing: {
+      postGroup: postGroup,
+      postBy: postBy,
+    },
+    keywords: {
+      group: group,
+      by: by,
+    },
   });
 }
 
@@ -241,24 +276,30 @@ ExpressionList = head:Expression tail:(CommaSeparator Expression)*
   return makeSeparatedArray(head, tail);
 }
 
-HavingClause = keyword:HavingToken postKeyword:_ expression:Expression
+HavingClause = having:HavingToken postHaving:_ expression:Expression
 {
   return new sql.SqlHavingClause({
-    keyword: keyword,
     expression: expression,
-    innerSpacing: {
-      postKeyword: postKeyword,
-    }
+    spacing: {
+      postHaving: postHaving,
+    },
+    keywords: {
+      having: having,
+    },
   });
 }
 
-OrderByClause = keyword:OrderToken postKeyword:_ head:SqlOrderByExpression tail:(CommaSeparator SqlOrderByExpression)*
+OrderByClause = order:OrderToken postOrder:__ by:ByToken postBy:_ head:SqlOrderByExpression tail:(CommaSeparator SqlOrderByExpression)*
 {
   return new sql.SqlOrderByClause({
-    keyword: keyword,
     expressions: makeSeparatedArray(head, tail),
-    innerSpacing: {
-      postKeyword: postKeyword,
+    spacing: {
+      postOrder: postOrder,
+      postBy: postBy,
+    },
+    keywords: {
+      order: order,
+      by: by,
     },
   });
 }
@@ -268,34 +309,40 @@ SqlOrderByExpression = expression:Expression direction:(_ (AscToken / DescToken)
   var value = {
     expression: expression,
   };
-  var innerSpacing = value.innerSpacing = {};
+  var spacing = value.spacing = {};
+  var keywords = value.keywords = {};
 
   if (direction) {
-    innerSpacing.preDirection = direction[0];
-    value.direction = direction[1];
+    spacing.preDirection = direction[0];
+    value.direction = direction[1].toUpperCase();
+    keywords.direction = direction[1];
   }
 
   return new sql.SqlOrderByExpression(value);
 }
 
-LimitClause = keyword:LimitToken postKeyword:_ limit:SqlLiteral
+LimitClause = limit:LimitToken postLimit:_ limitLiteral:SqlLiteral
 {
   return new sql.SqlLimitClause({
-    keyword: keyword,
-    limit: limit,
-    innerSpacing: {
-      postKeyword: postKeyword,
+    limit: limitLiteral,
+    spacing: {
+      postLimit: postLimit,
+    },
+    keywords: {
+      limit: limit,
     },
   });
 }
 
-OffsetClause = keyword:OffsetToken postKeyword:_ offset:SqlLiteral
+OffsetClause = offset:OffsetToken postOffset:_ offsetLiteral:SqlLiteral
 {
   return new sql.SqlOffsetClause({
-    keyword: keyword,
-    offset: offset,
-    innerSpacing: {
-      postKeyword: postKeyword,
+    offset: offsetLiteral,
+    spacing: {
+      postOffset: postOffset,
+    },
+    keywords: {
+      offset: offset,
     },
   });
 }
@@ -318,15 +365,17 @@ SqlAlias = expression:(Expression / SqlInParens) alias:((_ AsToken)? _ SqlRef)?
   }
 
   var value = { expression: expression };
-  var innerSpacing = value.innerSpacing = {};
+  var spacing = value.spacing = {};
+  var keywords = value.keywords = {};
 
   var as = alias[0];
   if (as) {
-    innerSpacing.preAs = as[0];
-    value.asKeyword = as[1];
+    value.as = true;
+    spacing.preAs = as[0];
+    keywords.as = as[1];
   }
 
-  innerSpacing.preAlias = alias[1];
+  spacing.preAlias = alias[1];
   value.alias = alias[2];
 
   return new sql.SqlAlias(value);
@@ -339,15 +388,17 @@ SqlAliasExpression = expression:Expression alias:((_ AsToken)? _ SqlRef)?
   }
 
   var value = { expression: expression };
-  var innerSpacing = value.innerSpacing = {};
+  var spacing = value.spacing = {};
+  var keywords = value.keywords = {};
 
   var as = alias[0];
   if (as) {
-    innerSpacing.preAs = as[0];
-    value.asKeyword = as[1];
+    value.as = true;
+    spacing.preAs = as[0];
+    keywords.as = as[1];
   }
 
-  innerSpacing.preAlias = alias[1];
+  spacing.preAlias = alias[1];
   value.alias = alias[2];
 
   return new sql.SqlAlias(value);
@@ -369,22 +420,25 @@ Expression = OrExpression
 
 OrExpression = head:AndExpression tail:(_ OrToken _ AndExpression)*
 {
-  return maybeMakeMulti('or', head, tail);
+  return maybeMakeMulti('OR', head, tail);
 }
 
 AndExpression = head:NotExpression tail:(_ AndToken _ NotExpression)*
 {
-  return maybeMakeMulti('and', head, tail);
+  return maybeMakeMulti('AND', head, tail);
 }
 
 NotExpression = op:NotToken postOp:_ argument:NotExpression
 {
   return new sql.SqlUnary({
-    op: op,
+    op: op.toUpperCase(),
     argument: argument,
-    innerSpacing: {
+    spacing: {
       postOp: postOp
-    }
+    },
+    keywords: {
+      op: op,
+    },
   });
 }
   / ComparisonExpression
@@ -397,15 +451,20 @@ ComparisonExpression = lhs:AdditionExpression rhs:(_ ComparisonOpRhs)?
   return new sql.SqlComparison({
     lhs: lhs,
     op: opRhs.op,
-    notKeyword: opRhs.notKeyword,
     decorator: opRhs.decorator,
     rhs: opRhs.rhs,
-    innerSpacing: {
+    not: Boolean(opRhs.notKeyword),
+    spacing: {
       preOp: opRhs.preOp ? opRhs.preOp : preOp,
       postOp: opRhs.postOp,
       not: opRhs.preOp ? preOp : opRhs.notSpacing,
       postDecorator: opRhs.postDecorator
-    }
+    },
+    keywords: {
+      op: opRhs.opKeyword,
+      not: opRhs.notKeyword,
+      decorator: opRhs.decoratorKeyword,
+    },
   });
 }
 
@@ -414,11 +473,15 @@ ComparisonOpRhs = ComparisonOpRhsSimple / ComparisonOpRhsIs / ComparisonOpRhsIn 
 ComparisonOpRhsSimple = op:ComparisonOperator postOp:_ rhs:(AdditionExpression / (ComparisonDecorator _ SqlInParens))
 {
   const ret = {
-    op: op,
+    op: op === '!=' ? '<>' : op,
+    opKeyword: op,
     postOp: postOp,
   };
   if (Array.isArray(rhs)) {
-    ret.decorator = rhs[0];
+    var decorator = rhs[0];
+    var decoratorUpper = decorator.toUpperCase();
+    ret.decorator = decoratorUpper === 'SOME' ? 'ANY' : decoratorUpper;
+    ret.decoratorKeyword = decorator;
     ret.postDecorator = rhs[1];
     ret.rhs = rhs[2];
   } else {
@@ -441,7 +504,8 @@ ComparisonDecorator = AnyToken / AllToken / SomeToken
 ComparisonOpRhsIs = op:IsToken postOp:_ not:(NotToken _)? rhs:SqlLiteral
 {
   return {
-    op: op,
+    op: op.toUpperCase(),
+    opKeyword: op,
     postOp: postOp,
     rhs: rhs,
     notKeyword: not ? not[0] : undefined,
@@ -452,7 +516,8 @@ ComparisonOpRhsIs = op:IsToken postOp:_ not:(NotToken _)? rhs:SqlLiteral
 ComparisonOpRhsIn = op:InToken postOp:_ rhs:(SqlInArrayLiteral / SqlInParens)
 {
   return {
-    op: op,
+    op: op.toUpperCase(),
+    opKeyword: op,
     postOp: postOp,
     rhs: rhs
   };
@@ -460,41 +525,48 @@ ComparisonOpRhsIn = op:InToken postOp:_ rhs:(SqlInArrayLiteral / SqlInParens)
 
 ComparisonOpRhsBetween = op:BetweenToken postOp:_ symmetricKeyword:(SymmetricToken _)? start:AdditionExpression preAnd:_ andKeyword:AndToken postAnd:_ end:AdditionExpression
 {
-  var rhsValue = {
+  var value = {
     start: start,
-    andKeyword: andKeyword,
     end: end,
-    innerSpacing: {
+    spacing: {
       preAnd: preAnd,
       postAnd: postAnd,
+    },
+    keywords: {
+      and: andKeyword,
     }
   }
 
   if (symmetricKeyword) {
-    rhsValue.symmetricKeyword = symmetricKeyword[0];
-    rhsValue.innerSpacing.postSymmetric = symmetricKeyword[1];
+    value.symmetric = true;
+    value.keywords.symmetric = symmetricKeyword[0];
+    value.spacing.postSymmetric = symmetricKeyword[1];
   }
 
   return {
-    op: op,
+    op: op.toUpperCase(),
+    opKeyword: op,
     postOp: postOp,
-    rhs: new sql.SqlBetweenAndHelper(rhsValue)
+    rhs: new sql.SqlBetweenAndHelper(value)
   };
 }
 
 ComparisonOpRhsLike = op:(LikeToken / SimilarToToken) postOp:_ like:AdditionExpression escape:(_ EscapeToken _ AdditionExpression)?
 {
   return {
-    op: op,
+    op: op.toUpperCase(),
+    opKeyword: op,
     postOp: postOp,
     rhs: escape ? new sql.SqlLikeEscapeHelper({
       like: like,
-      escapeKeyword: escape[1],
       escape: escape[3],
-      innerSpacing: {
+      spacing: {
         preEscape: escape[0],
         postEscape: escape[2],
-      }
+      },
+      keywords: {
+        escape: escape[1],
+      },
     }) : like
   };
 }
@@ -535,9 +607,12 @@ UnaryExpression = op:[+-] postOp:_ !Number argument:ConcatExpression
   return new sql.SqlUnary({
     op: op,
     argument: argument,
-    innerSpacing: {
+    spacing: {
       postOp: postOp
-    }
+    },
+    keywords: {
+      op: op,
+    },
   });
 }
   / ConcatExpression
@@ -559,91 +634,96 @@ BaseType =
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 
 CaseExpression =
-  caseKeyword:CaseToken
+  caseToken:CaseToken
   postCase:_
   caseExpression:(Expression _)?
   head:WhenThenPair
   tail:(_ WhenThenPair)*
   elseValue:(_ ElseToken _ Expression)?
   preEnd:_
-  endKeyword:EndToken
+  end:EndToken
 {
   return new sql.SqlCase({
-    caseKeyword: caseKeyword,
     caseExpression: caseExpression ? caseExpression[0] : undefined,
     whenThenParts: makeSeparatedArray(head, tail),
-    elseKeyword: elseValue ? elseValue[1] : undefined,
     elseExpression: elseValue ? elseValue[3] : undefined,
-    endKeyword: endKeyword,
-    innerSpacing: {
+    spacing: {
       postCase: postCase,
       postCaseExpression: caseExpression ? caseExpression[1] : undefined,
       preElse: elseValue ? elseValue[0] : undefined,
       postElse: elseValue ? elseValue[2] : undefined,
       preEnd: preEnd,
-    }
+    },
+    keywords: {
+      'case': caseToken,
+      'else': elseValue ? elseValue[1] : undefined,
+      end: end,
+    },
   });
 }
 
-WhenThenPair = whenKeyword:WhenToken postWhen:_ whenExpression:Expression postWhenExpression:_ thenKeyword:ThenToken postThen:_ thenExpression:OrExpression
+WhenThenPair = when:WhenToken postWhen:_ whenExpression:Expression postWhenExpression:_ then:ThenToken postThen:_ thenExpression:Expression
 {
   return new sql.SqlWhenThenPart({
-    whenKeyword: whenKeyword,
     whenExpression: whenExpression,
-    thenKeyword: thenKeyword,
     thenExpression: thenExpression,
-    innerSpacing: {
+    spacing: {
       postWhen: postWhen,
       postWhenExpression: postWhenExpression,
       postThen: postThen,
-    }
+    },
+    keywords: {
+      when: when,
+      then: then,
+    },
   });
 }
-
 
 
 // ------------------------------
 
 Interval =
-  keyword:IntervalToken
-  postIntervalKeyword:_
+  interval:IntervalToken
+  postInterval:_
   intervalValue:BaseType
   postIntervalValue:_
-  unitKeyword:($(TimeUnit _ ToToken _ TimeUnit) / $(TimeUnit '_' TimeUnit) / TimeUnit)
+  unit:($(TimeUnit _ ToToken _ TimeUnit) / $(TimeUnit '_' TimeUnit) / TimeUnit)
 {
   return new sql.SqlInterval({
-    keyword: keyword,
     intervalValue: intervalValue,
-    unitKeyword: unitKeyword,
-    innerSpacing: {
-      postIntervalKeyword: postIntervalKeyword,
+    unit: unit,
+    spacing: {
+      postInterval: postInterval,
       postIntervalValue: postIntervalValue
+    },
+    keywords: {
+      interval: interval,
     }
   });
 }
 
 TimeUnit =
-  'SECOND'i
-/ 'MINUTE'i
-/ 'HOUR'i
-/ 'DAY'i
-/ 'WEEK'i
-/ 'MONTH'i
-/ 'QUARTER'i
-/ 'YEAR'i
+  "SECOND"i
+/ "MINUTE"i
+/ "HOUR"i
+/ "DAY"i
+/ "WEEK"i
+/ "MONTH"i
+/ "QUARTER"i
+/ "YEAR"i
 
 TimeUnitExtra =
   TimeUnit
-/ 'EPOCH'i
-/ 'MICROSECOND'i
-/ 'MILLISECOND'i
-/ 'DOW'i
-/ 'ISODOW'i
-/ 'DOY'i
-/ 'ISOYEAR'i
-/ 'DECADE'i
-/ 'CENTURY'i
-/ 'MILLENNIUM'i
+/ "EPOCH"i
+/ "MICROSECOND"i
+/ "MILLISECOND"i
+/ "DOW"i
+/ "ISODOW"i
+/ "DOY"i
+/ "ISOYEAR"i
+/ "DECADE"i
+/ "CENTURY"i
+/ "MILLENNIUM"i
 
 Function =
   GenericFunction
@@ -669,27 +749,31 @@ GenericFunction =
   filter:(_ FunctionFilter)?
 {
   var value = {
-    functionName: functionName,
+    functionName: functionName.toUpperCase(),
   };
-  var innerSpacing = value.innerSpacing = {
+  var spacing = value.spacing = {
     preLeftParen: preLeftParen,
     postLeftParen: postLeftParen,
   };
+  var keywords = value.keywords = {
+    functionName: functionName,
+  };
 
   if (decorator) {
-    value.decorator = decorator[0];
-    innerSpacing.postDecorator = decorator[1];
+    value.decorator = decorator[0].toUpperCase();
+    keywords.decorator = decorator[0];
+    spacing.postDecorator = decorator[1];
   }
 
   if (head) {
     value.args = makeSeparatedArray(head, tail);
-    innerSpacing.postArguments = postArguments;
+    spacing.postArguments = postArguments;
   }
 
   if (filter) {
-    innerSpacing.preFilter = filter[0];
-    value.filterKeyword = filter[1].filterKeyword;
-    innerSpacing.postFilter = filter[1].postFilter;
+    spacing.preFilter = filter[0];
+    keywords.filter = filter[1].filterKeyword;
+    spacing.postFilter = filter[1].postFilter;
     value.whereClause = filter[1].whereClause;
   }
 
@@ -699,8 +783,11 @@ GenericFunction =
 NakedFunction = functionName:UnquotedRefPartFree &{ return sql.SqlBase.isNakedFunction(functionName) }
 {
   return new sql.SqlFunction({
-    functionName: functionName,
+    functionName: functionName.toUpperCase(),
     specialParen: 'none',
+    keywords: {
+      functionName: functionName,
+    }
   });
 }
 
@@ -720,13 +807,16 @@ CastFunction =
     stringValue: type,
   });
   return new sql.SqlFunction({
-    functionName: functionName,
+    functionName: functionName.toUpperCase(),
     args: new sql.SeparatedArray([expr, typeLiteral], [separator]),
-    innerSpacing: {
+    spacing: {
       preLeftParen: preLeftParen,
       postLeftParen: postLeftParen,
       postArguments: postArguments,
     },
+    keywords: {
+      functionName: functionName,
+    }
   });
 }
 
@@ -746,13 +836,16 @@ ExtractFunction =
     stringValue: unit,
   });
   return new sql.SqlFunction({
-    functionName: functionName,
+    functionName: functionName.toUpperCase(),
     args: new sql.SeparatedArray([unitLiteral, expr], [separator]),
-    innerSpacing: {
+    spacing: {
       preLeftParen: preLeftParen,
       postLeftParen: postLeftParen,
       postArguments: postArguments,
     },
+    keywords: {
+      functionName: functionName,
+    }
   });
 }
 
@@ -769,18 +862,22 @@ TrimFunction =
   CloseParen
 {
   var value = {
-    functionName: functionName,
+    functionName: functionName.toUpperCase(),
     args: new sql.SeparatedArray([expr1, expr2], [separator]),
   };
-  var innerSpacing = value.innerSpacing = {
+  var spacing = value.spacing = {
     preLeftParen: preLeftParen,
     postLeftParen: postLeftParen,
     postArguments: postArguments,
   };
+  var keywords = value.keywords = {
+    functionName: functionName,
+  };
 
   if (decorator) {
-    value.decorator = decorator[0];
-    innerSpacing.postDecorator = decorator[1];
+    value.decorator = decorator[0].toUpperCase();
+    keywords.decorator = decorator[0];
+    spacing.postDecorator = decorator[1];
   }
 
   return new sql.SqlFunction(value);
@@ -802,13 +899,16 @@ FloorCeilFunction =
     stringValue: unit,
   });
   return new sql.SqlFunction({
-    functionName: functionName,
+    functionName: functionName.toUpperCase(),
     args: new sql.SeparatedArray([expr, unitLiteral], [separator]),
-    innerSpacing: {
+    spacing: {
       preLeftParen: preLeftParen,
       postLeftParen: postLeftParen,
       postArguments: postArguments,
     },
+    keywords: {
+      functionName: functionName,
+    }
   });
 }
 
@@ -823,9 +923,12 @@ TimestampAddDiffFunction =
   CloseParen
 {
   var value = {
-    functionName: functionName,
+    functionName: functionName.toUpperCase(),
+    keywords: {
+      functionName: functionName,
+    }
   };
-  var innerSpacing = value.innerSpacing = {
+  var spacing = value.spacing = {
     preLeftParen: preLeftParen,
     postLeftParen: postLeftParen,
   };
@@ -836,7 +939,7 @@ TimestampAddDiffFunction =
   });
 
   value.args = makeSeparatedArray(head, tail);
-  innerSpacing.postArguments = postArguments;
+  spacing.postArguments = postArguments;
 
   return new sql.SqlFunction(value);
 }
@@ -858,13 +961,16 @@ PositionFunction =
     : new sql.SeparatedArray([expr1, expr2], [inSeparator])
 
   return new sql.SqlFunction({
-    functionName: functionName,
+    functionName: functionName.toUpperCase(),
     args: args,
-    innerSpacing: {
+    spacing: {
       preLeftParen: preLeftParen,
       postLeftParen: postLeftParen,
       postArguments: postArguments,
     },
+    keywords: {
+      functionName: functionName,
+    }
   });
 }
 
@@ -879,17 +985,20 @@ ArrayFunction =
   ']'
 {
   var value = {
-    functionName: functionName,
+    functionName: functionName.toUpperCase(),
     specialParen: 'square',
+    keywords: {
+      functionName: functionName,
+    }
   };
-  var innerSpacing = value.innerSpacing = {
+  var spacing = value.spacing = {
     preLeftParen: preLeftParen,
     postLeftParen: postLeftParen,
   };
 
   if (head) {
     value.args = makeSeparatedArray(head, tail);
-    innerSpacing.postArguments = postArguments;
+    spacing.postArguments = postArguments;
   }
 
   return new sql.SqlFunction(value);
@@ -959,7 +1068,7 @@ SqlPlaceholder = "?"
   return new sql.SqlPlaceholder();
 }
 
-SqlLiteral = lit:(NullToken / TrueToken / FalseToken / Number / SingleQuotedString / UnicodeString / CharsetString/ BinaryString / Timestamp)
+SqlLiteral = lit:(NullToken / TrueToken / FalseToken / Number / SingleQuotedString / UnicodeString / CharsetString / BinaryString / Timestamp)
 {
   return new sql.SqlLiteral(lit);
 }
@@ -1030,12 +1139,14 @@ BinaryString = "X'"i v:$([0-9A-F]i*) "'"
 
 /* Timestamp */
 
-Timestamp = keyword:(TimestampToken / DateToken) postKeyword:_ v:SingleQuotedString
+Timestamp = timestamp:(TimestampToken / DateToken) postTimestamp:_ v:SingleQuotedString
 {
   return {
-    keyword: keyword,
-    innerSpacing: {
-      postKeyword: postKeyword
+    spacing: {
+      postTimestamp: postTimestamp,
+    },
+    keywords: {
+      timestamp: timestamp,
     },
     value: new Date(v.value.replace(' ', 'T') + 'Z'),
     stringValue: v.stringValue
@@ -1075,7 +1186,7 @@ SqlRef = a:RefPart b:(_ "." _ RefPart)? c:(_ "." _ RefPart)?
       tableQuotes: b[3].quotes,
       namespace: a.name,
       namespaceQuotes: a.quotes,
-      innerSpacing: {
+      spacing: {
         preTableDot: c[0],
         postTableDot: c[2],
         preNamespaceDot: b[0],
@@ -1089,7 +1200,7 @@ SqlRef = a:RefPart b:(_ "." _ RefPart)? c:(_ "." _ RefPart)?
       quotes: b[3].quotes,
       table: a.name,
       tableQuotes: a.quotes,
-      innerSpacing: {
+      spacing: {
         preTableDot: b[0],
         postTableDot: b[2],
       }
@@ -1164,69 +1275,63 @@ TrimDecoratorLead =
 / BothToken
 / TrailingToken
 
-JoinType =
-  'LEFT'i
-/ 'RIGHT'i
-/ 'INNER'i
-/ $('FULL'i _ 'OUTER'i)
-/ 'FULL'i
-/ 'CROSS'i
-
 /* Tokens */
 
-AllToken = $('ALL'i !IdentifierPart)
-AndToken = $('AND'i !IdentifierPart)
-AnyToken = $('ANY'i !IdentifierPart)
-ArrayToken = $('ARRAY'i !IdentifierPart)
-AsToken = $('AS'i !IdentifierPart)
-AscToken = $('ASC'i !IdentifierPart)
-BetweenToken = $('BETWEEN'i !IdentifierPart)
-BothToken = $('BOTH'i !IdentifierPart)
-ByToken = $('BY'i !IdentifierPart)
-CaseToken = $('CASE'i !IdentifierPart)
-CastToken = $('CAST'i !IdentifierPart)
-CeilToken = $('CEIL'i !IdentifierPart)
-DateToken = $('DATE'i !IdentifierPart)
-DescToken = $('DESC'i !IdentifierPart)
-DistinctToken = $('DISTINCT'i !IdentifierPart)
-ElseToken = $('ELSE'i !IdentifierPart)
-EndToken = $('END'i !IdentifierPart)
-EscapeToken = $('ESCAPE'i !IdentifierPart)
-ExplainToken = $('EXPLAIN'i !IdentifierPart __ 'PLAN'i !IdentifierPart __ 'FOR'i !IdentifierPart)
-ExtractToken = $('EXTRACT'i !IdentifierPart)
-FalseToken = $('FALSE'i !IdentifierPart) { return { value: false, stringValue: text() }; }
-FilterToken= $('FILTER'i !IdentifierPart)
-FloorToken = $('FLOOR'i !IdentifierPart)
-FromToken = $('FROM'i !IdentifierPart)
-GroupByToken = $('GROUP'i !IdentifierPart _ ByToken)
-HavingToken = $('HAVING'i !IdentifierPart)
-InToken = $('IN'i !IdentifierPart)
-IntervalToken = $('INTERVAL'i !IdentifierPart)
-IsToken = $('IS'i !IdentifierPart)
-JoinToken = $('JOIN'i !IdentifierPart)
-LeadingToken = $('LEADING'i !IdentifierPart)
-LikeToken = $('LIKE'i !IdentifierPart)
-LimitToken = $('LIMIT'i !IdentifierPart)
-NotToken = $('NOT'i !IdentifierPart)
-NullToken = $('NULL'i !IdentifierPart) { return { value: null, stringValue: text() }; }
-OffsetToken = $('OFFSET'i !IdentifierPart)
-OnToken = $('ON'i !IdentifierPart)
-OrToken = $('OR'i !IdentifierPart)
-OrderToken = $('ORDER'i !IdentifierPart __ ByToken)
-PositionToken = $('POSITION'i !IdentifierPart)
-SelectToken = $('SELECT'i !IdentifierPart)
-SimilarToToken = $('SIMILAR'i !IdentifierPart __ ToToken)
-SomeToken = $('SOME'i !IdentifierPart)
-SymmetricToken = $('SYMMETRIC'i !IdentifierPart)
-ThenToken = $('THEN'i !IdentifierPart)
-TimestampToken = $('TIMESTAMP'i !IdentifierPart)
-TimestampaddToken = $('TIMESTAMPADD'i !IdentifierPart)
-TimestampdiffToken = $('TIMESTAMPDIFF'i !IdentifierPart)
-ToToken = $('TO'i !IdentifierPart)
-TrailingToken = $('TRAILING'i !IdentifierPart)
-TrimToken = $('TRIM'i !IdentifierPart)
-TrueToken = $('TRUE'i !IdentifierPart) { return { value: true, stringValue: text() }; }
-UnionToken = $('UNION'i !IdentifierPart __ AllToken)
-WhenToken = $('WHEN'i !IdentifierPart)
-WhereToken = $('WHERE'i !IdentifierPart)
-WithToken = $('WITH'i !IdentifierPart)
+AllToken = $("ALL"i !IdentifierPart)
+AndToken = $("AND"i !IdentifierPart)
+AnyToken = $("ANY"i !IdentifierPart)
+ArrayToken = $("ARRAY"i !IdentifierPart)
+AsToken = $("AS"i !IdentifierPart)
+AscToken = $("ASC"i !IdentifierPart)
+BetweenToken = $("BETWEEN"i !IdentifierPart)
+BothToken = $("BOTH"i !IdentifierPart)
+ByToken = $("BY"i !IdentifierPart)
+CaseToken = $("CASE"i !IdentifierPart)
+CastToken = $("CAST"i !IdentifierPart)
+CeilToken = $("CEIL"i !IdentifierPart)
+DateToken = $("DATE"i !IdentifierPart)
+DescToken = $("DESC"i !IdentifierPart)
+DistinctToken = $("DISTINCT"i !IdentifierPart)
+ElseToken = $("ELSE"i !IdentifierPart)
+EndToken = $("END"i !IdentifierPart)
+EscapeToken = $("ESCAPE"i !IdentifierPart)
+ExplainToken = $("EXPLAIN"i !IdentifierPart)
+ExtractToken = $("EXTRACT"i !IdentifierPart)
+FalseToken = $("FALSE"i !IdentifierPart) { return { value: false, stringValue: text() }; }
+FilterToken= $("FILTER"i !IdentifierPart)
+FloorToken = $("FLOOR"i !IdentifierPart)
+ForToken = $("FOR"i !IdentifierPart)
+FromToken = $("FROM"i !IdentifierPart)
+GroupToken = $("GROUP"i !IdentifierPart)
+HavingToken = $("HAVING"i !IdentifierPart)
+InToken = $("IN"i !IdentifierPart)
+IntervalToken = $("INTERVAL"i !IdentifierPart)
+IsToken = $("IS"i !IdentifierPart)
+JoinToken = $("JOIN"i !IdentifierPart)
+LeadingToken = $("LEADING"i !IdentifierPart)
+LikeToken = $("LIKE"i !IdentifierPart)
+LimitToken = $("LIMIT"i !IdentifierPart)
+NotToken = $("NOT"i !IdentifierPart)
+NullToken = $("NULL"i !IdentifierPart) { return { value: null, stringValue: text() }; }
+OffsetToken = $("OFFSET"i !IdentifierPart)
+OnToken = $("ON"i !IdentifierPart)
+OrToken = $("OR"i !IdentifierPart)
+OrderToken = $("ORDER"i !IdentifierPart)
+PlanToken = $("PLAN"i !IdentifierPart)
+PositionToken = $("POSITION"i !IdentifierPart)
+SelectToken = $("SELECT"i !IdentifierPart)
+SimilarToToken = $("SIMILAR"i !IdentifierPart __ ToToken)
+SomeToken = $("SOME"i !IdentifierPart)
+SymmetricToken = $("SYMMETRIC"i !IdentifierPart)
+ThenToken = $("THEN"i !IdentifierPart)
+TimestampToken = $("TIMESTAMP"i !IdentifierPart)
+TimestampaddToken = $("TIMESTAMPADD"i !IdentifierPart)
+TimestampdiffToken = $("TIMESTAMPDIFF"i !IdentifierPart)
+ToToken = $("TO"i !IdentifierPart)
+TrailingToken = $("TRAILING"i !IdentifierPart)
+TrimToken = $("TRIM"i !IdentifierPart)
+TrueToken = $("TRUE"i !IdentifierPart) { return { value: true, stringValue: text() }; }
+UnionToken = $("UNION"i !IdentifierPart __ AllToken)
+WhenToken = $("WHEN"i !IdentifierPart)
+WhereToken = $("WHERE"i !IdentifierPart)
+WithToken = $("WITH"i !IdentifierPart)

@@ -17,14 +17,13 @@ import { SqlLiteral } from '../../sql-expression';
 import { SqlClause, SqlClauseValue } from '../sql-clause';
 
 export interface SqlLimitClauseValue extends SqlClauseValue {
-  keyword?: string;
   limit: SqlLiteral;
 }
 
 export class SqlLimitClause extends SqlClause {
   static type: SqlType = 'limitClause';
 
-  static DEFAULT_KEYWORD = 'LIMIT';
+  static DEFAULT_LIMIT_KEYWORD = 'LIMIT';
 
   static create(limit: SqlLiteral | number): SqlLimitClause {
     return new SqlLimitClause({
@@ -46,14 +45,11 @@ export class SqlLimitClause extends SqlClause {
   }
 
   protected _toRawString(): string {
-    const rawParts: string[] = [
-      this.keyword || SqlLimitClause.DEFAULT_KEYWORD,
-      this.getInnerSpace('postKeyword'),
-    ];
-
-    rawParts.push(this.limit.toString());
-
-    return rawParts.join('');
+    return [
+      this.getKeyword('limit', SqlLimitClause.DEFAULT_LIMIT_KEYWORD),
+      this.getSpace('postLimit'),
+      this.limit.toString(),
+    ].join('');
   }
 
   public changeLimit(limit: SqlLiteral | number): this {

@@ -25,18 +25,20 @@ describe('SqlAlias', () => {
       expect(SqlQuery.parse(sql)!.selectExpressions.first()).toMatchInlineSnapshot(`
         SqlAlias {
           "alias": undefined,
-          "asKeyword": undefined,
+          "as": undefined,
           "expression": SqlRef {
             "column": "city",
-            "innerSpacing": Object {},
+            "keywords": Object {},
             "namespace": undefined,
             "namespaceQuotes": false,
             "quotes": false,
+            "spacing": Object {},
             "table": undefined,
             "tableQuotes": false,
             "type": "ref",
           },
-          "innerSpacing": Object {},
+          "keywords": Object {},
+          "spacing": Object {},
           "type": "alias",
         }
       `);
@@ -51,26 +53,31 @@ describe('SqlAlias', () => {
         SqlAlias {
           "alias": SqlRef {
             "column": "City",
-            "innerSpacing": Object {},
+            "keywords": Object {},
             "namespace": undefined,
             "namespaceQuotes": false,
             "quotes": false,
+            "spacing": Object {},
             "table": undefined,
             "tableQuotes": false,
             "type": "ref",
           },
-          "asKeyword": "AS",
+          "as": true,
           "expression": SqlRef {
             "column": "city",
-            "innerSpacing": Object {},
+            "keywords": Object {},
             "namespace": undefined,
             "namespaceQuotes": false,
             "quotes": false,
+            "spacing": Object {},
             "table": undefined,
             "tableQuotes": false,
             "type": "ref",
           },
-          "innerSpacing": Object {
+          "keywords": Object {
+            "as": "AS",
+          },
+          "spacing": Object {
             "preAlias": " ",
             "preAs": " ",
           },
@@ -88,29 +95,34 @@ describe('SqlAlias', () => {
         SqlAlias {
           "alias": SqlRef {
             "column": "City",
-            "innerSpacing": Object {},
+            "keywords": Object {},
             "namespace": undefined,
             "namespaceQuotes": false,
             "quotes": false,
+            "spacing": Object {},
             "table": undefined,
             "tableQuotes": false,
             "type": "ref",
           },
-          "asKeyword": "As",
+          "as": true,
           "expression": SqlRef {
             "column": "city",
-            "innerSpacing": Object {
-              "postTableDot": "",
-              "preTableDot": "",
-            },
+            "keywords": Object {},
             "namespace": undefined,
             "namespaceQuotes": false,
             "quotes": false,
+            "spacing": Object {
+              "postTableDot": "",
+              "preTableDot": "",
+            },
             "table": "tbl",
             "tableQuotes": false,
             "type": "ref",
           },
-          "innerSpacing": Object {
+          "keywords": Object {
+            "as": "As",
+          },
+          "spacing": Object {
             "preAlias": "   ",
             "preAs": "  ",
           },
@@ -128,29 +140,32 @@ describe('SqlAlias', () => {
         SqlAlias {
           "alias": SqlRef {
             "column": "City",
-            "innerSpacing": Object {},
+            "keywords": Object {},
             "namespace": undefined,
             "namespaceQuotes": false,
             "quotes": false,
+            "spacing": Object {},
             "table": undefined,
             "tableQuotes": false,
             "type": "ref",
           },
-          "asKeyword": undefined,
+          "as": undefined,
           "expression": SqlRef {
             "column": "city",
-            "innerSpacing": Object {
-              "postTableDot": "",
-              "preTableDot": "",
-            },
+            "keywords": Object {},
             "namespace": undefined,
             "namespaceQuotes": false,
             "quotes": false,
+            "spacing": Object {
+              "postTableDot": "",
+              "preTableDot": "",
+            },
             "table": "tbl",
             "tableQuotes": false,
             "type": "ref",
           },
-          "innerSpacing": Object {
+          "keywords": Object {},
+          "spacing": Object {
             "preAlias": " ",
           },
           "type": "alias",

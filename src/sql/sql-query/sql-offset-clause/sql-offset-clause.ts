@@ -17,14 +17,13 @@ import { SqlLiteral } from '../../sql-expression';
 import { SqlClause, SqlClauseValue } from '../sql-clause';
 
 export interface SqlOffsetClauseValue extends SqlClauseValue {
-  keyword?: string;
   offset: SqlLiteral;
 }
 
 export class SqlOffsetClause extends SqlClause {
   static type: SqlType = 'offsetClause';
 
-  static DEFAULT_KEYWORD = 'OFFSET';
+  static DEFAULT_OFFSET_KEYWORD = 'OFFSET';
 
   static create(offset: SqlLiteral | number): SqlOffsetClause {
     return new SqlOffsetClause({
@@ -46,14 +45,11 @@ export class SqlOffsetClause extends SqlClause {
   }
 
   protected _toRawString(): string {
-    const rawParts: string[] = [
-      this.keyword || SqlOffsetClause.DEFAULT_KEYWORD,
-      this.getInnerSpace('postKeyword'),
-    ];
-
-    rawParts.push(this.offset.toString());
-
-    return rawParts.join('');
+    return [
+      this.getKeyword('offset', SqlOffsetClause.DEFAULT_OFFSET_KEYWORD),
+      this.getSpace('postOffset'),
+      this.offset.toString(),
+    ].join('');
   }
 
   public changeOffset(offset: SqlLiteral | number): this {

@@ -103,31 +103,36 @@ describe('SqlComparison', () => {
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "decorator": undefined,
-        "innerSpacing": Object {
-          "postOp": " ",
-          "preOp": " ",
+        "keywords": Object {
+          "op": ">",
         },
         "lhs": SqlRef {
           "column": "A",
-          "innerSpacing": Object {},
+          "keywords": Object {},
           "namespace": undefined,
           "namespaceQuotes": false,
           "quotes": false,
+          "spacing": Object {},
           "table": undefined,
           "tableQuotes": false,
           "type": "ref",
         },
-        "notKeyword": undefined,
+        "not": false,
         "op": ">",
         "rhs": SqlRef {
           "column": "B",
-          "innerSpacing": Object {},
+          "keywords": Object {},
           "namespace": undefined,
           "namespaceQuotes": false,
           "quotes": false,
+          "spacing": Object {},
           "table": undefined,
           "tableQuotes": false,
           "type": "ref",
+        },
+        "spacing": Object {
+          "postOp": " ",
+          "preOp": " ",
         },
         "type": "comparison",
       }
@@ -142,28 +147,32 @@ describe('SqlComparison', () => {
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "decorator": undefined,
-        "innerSpacing": Object {
-          "postOp": "   ",
-          "preOp": "  ",
+        "keywords": Object {
+          "op": "=",
         },
         "lhs": SqlRef {
           "column": "language",
-          "innerSpacing": Object {},
+          "keywords": Object {},
           "namespace": undefined,
           "namespaceQuotes": false,
           "quotes": true,
+          "spacing": Object {},
           "table": undefined,
           "tableQuotes": false,
           "type": "ref",
         },
-        "notKeyword": undefined,
+        "not": false,
         "op": "=",
         "rhs": SqlLiteral {
-          "innerSpacing": Object {},
-          "keyword": undefined,
+          "keywords": Object {},
+          "spacing": Object {},
           "stringValue": "'xxx'",
           "type": "literal",
           "value": "xxx",
+        },
+        "spacing": Object {
+          "postOp": "   ",
+          "preOp": "  ",
         },
         "type": "comparison",
       }
@@ -178,52 +187,57 @@ describe('SqlComparison', () => {
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "decorator": "ANY",
-        "innerSpacing": Object {
-          "postDecorator": " ",
-          "postOp": " ",
-          "preOp": " ",
+        "keywords": Object {
+          "decorator": "ANY",
+          "op": "=",
         },
         "lhs": SqlRef {
           "column": "X",
-          "innerSpacing": Object {},
+          "keywords": Object {},
           "namespace": undefined,
           "namespaceQuotes": false,
           "quotes": false,
+          "spacing": Object {},
           "table": undefined,
           "tableQuotes": false,
           "type": "ref",
         },
-        "notKeyword": undefined,
+        "not": false,
         "op": "=",
         "rhs": SqlQuery {
-          "explainKeyword": undefined,
+          "decorator": undefined,
+          "explainPlanFor": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
               "values": Array [
                 SqlAlias {
                   "alias": undefined,
-                  "asKeyword": undefined,
+                  "as": undefined,
                   "expression": SqlRef {
                     "column": undefined,
-                    "innerSpacing": Object {},
+                    "keywords": Object {},
                     "namespace": undefined,
                     "namespaceQuotes": false,
                     "quotes": false,
+                    "spacing": Object {},
                     "table": "wikipedia",
                     "tableQuotes": false,
                     "type": "ref",
                   },
-                  "innerSpacing": Object {},
+                  "keywords": Object {},
+                  "spacing": Object {},
                   "type": "alias",
                 },
               ],
             },
-            "innerSpacing": Object {
-              "postKeyword": " ",
-            },
             "joinParts": undefined,
-            "keyword": "FROM",
+            "keywords": Object {
+              "from": "FROM",
+            },
+            "spacing": Object {
+              "postFrom": " ",
+            },
             "type": "fromClause",
           },
           "groupByClause": SqlGroupByClause {
@@ -231,41 +245,41 @@ describe('SqlComparison', () => {
               "separators": Array [],
               "values": Array [
                 SqlLiteral {
-                  "innerSpacing": Object {},
-                  "keyword": undefined,
+                  "keywords": Object {},
+                  "spacing": Object {},
                   "stringValue": "1",
                   "type": "literal",
                   "value": 1,
                 },
               ],
             },
-            "innerSpacing": Object {
-              "postKeyword": " ",
+            "keywords": Object {
+              "by": "BY",
+              "group": "GROUP",
             },
-            "keyword": "GROUP BY",
+            "spacing": Object {
+              "postBy": " ",
+              "postGroup": " ",
+            },
             "type": "groupByClause",
           },
           "havingClause": undefined,
-          "innerSpacing": Object {
-            "postQuery": "",
-            "postSelect": " ",
-            "preFrom": " ",
-            "preGroupBy": " ",
-            "preLimit": " ",
-            "preOrderBy": " ",
-            "preQuery": "",
+          "keywords": Object {
+            "select": "SELECT",
           },
           "limitClause": SqlLimitClause {
-            "innerSpacing": Object {
-              "postKeyword": " ",
+            "keywords": Object {
+              "limit": "LIMIT",
             },
-            "keyword": "LIMIT",
             "limit": SqlLiteral {
-              "innerSpacing": Object {},
-              "keyword": undefined,
+              "keywords": Object {},
+              "spacing": Object {},
               "stringValue": "5",
               "type": "literal",
               "value": 5,
+            },
+            "spacing": Object {
+              "postLimit": " ",
             },
             "type": "limitClause",
           },
@@ -282,10 +296,11 @@ describe('SqlComparison', () => {
                       "values": Array [
                         SqlRef {
                           "column": "*",
-                          "innerSpacing": Object {},
+                          "keywords": Object {},
                           "namespace": undefined,
                           "namespaceQuotes": false,
                           "quotes": false,
+                          "spacing": Object {},
                           "table": undefined,
                           "tableQuotes": false,
                           "type": "ref",
@@ -293,9 +308,11 @@ describe('SqlComparison', () => {
                       ],
                     },
                     "decorator": undefined,
-                    "filterKeyword": undefined,
                     "functionName": "COUNT",
-                    "innerSpacing": Object {
+                    "keywords": Object {
+                      "functionName": "COUNT",
+                    },
+                    "spacing": Object {
                       "postArguments": "",
                       "postLeftParen": "",
                       "preLeftParen": "",
@@ -304,17 +321,24 @@ describe('SqlComparison', () => {
                     "type": "function",
                     "whereClause": undefined,
                   },
-                  "innerSpacing": Object {
+                  "keywords": Object {
+                    "direction": "DESC",
+                  },
+                  "spacing": Object {
                     "preDirection": " ",
                   },
                   "type": "orderByExpression",
                 },
               ],
             },
-            "innerSpacing": Object {
-              "postKeyword": " ",
+            "keywords": Object {
+              "by": "BY",
+              "order": "ORDER",
             },
-            "keyword": "ORDER BY",
+            "spacing": Object {
+              "postBy": " ",
+              "postOrder": " ",
+            },
             "type": "orderByClause",
           },
           "parens": Array [
@@ -323,35 +347,47 @@ describe('SqlComparison', () => {
               "rightSpacing": "",
             },
           ],
-          "selectDecorator": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
               SqlAlias {
                 "alias": undefined,
-                "asKeyword": undefined,
+                "as": undefined,
                 "expression": SqlRef {
                   "column": "page",
-                  "innerSpacing": Object {},
+                  "keywords": Object {},
                   "namespace": undefined,
                   "namespaceQuotes": false,
                   "quotes": false,
+                  "spacing": Object {},
                   "table": undefined,
                   "tableQuotes": false,
                   "type": "ref",
                 },
-                "innerSpacing": Object {},
+                "keywords": Object {},
+                "spacing": Object {},
                 "type": "alias",
               },
             ],
           },
-          "selectKeyword": "SELECT",
+          "spacing": Object {
+            "postQuery": "",
+            "postSelect": " ",
+            "preFrom": " ",
+            "preGroupBy": " ",
+            "preLimit": " ",
+            "preOrderBy": " ",
+            "preQuery": "",
+          },
           "type": "query",
-          "unionKeyword": undefined,
           "unionQuery": undefined,
           "whereClause": undefined,
-          "withKeyword": undefined,
           "withParts": undefined,
+        },
+        "spacing": Object {
+          "postDecorator": " ",
+          "postOp": " ",
+          "preOp": " ",
         },
         "type": "comparison",
       }
@@ -366,28 +402,32 @@ describe('SqlComparison', () => {
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "decorator": undefined,
-        "innerSpacing": Object {
-          "postOp": "   ",
-          "preOp": "  ",
+        "keywords": Object {
+          "op": "IS",
         },
         "lhs": SqlRef {
           "column": "X",
-          "innerSpacing": Object {},
+          "keywords": Object {},
           "namespace": undefined,
           "namespaceQuotes": false,
           "quotes": false,
+          "spacing": Object {},
           "table": undefined,
           "tableQuotes": false,
           "type": "ref",
         },
-        "notKeyword": undefined,
+        "not": false,
         "op": "IS",
         "rhs": SqlLiteral {
-          "innerSpacing": Object {},
-          "keyword": undefined,
+          "keywords": Object {},
+          "spacing": Object {},
           "stringValue": "NULL",
           "type": "literal",
           "value": null,
+        },
+        "spacing": Object {
+          "postOp": "   ",
+          "preOp": "  ",
         },
         "type": "comparison",
       }
@@ -402,29 +442,34 @@ describe('SqlComparison', () => {
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "decorator": undefined,
-        "innerSpacing": Object {
-          "not": "    ",
-          "postOp": "   ",
-          "preOp": "  ",
+        "keywords": Object {
+          "not": "NOT",
+          "op": "IS",
         },
         "lhs": SqlRef {
           "column": "X",
-          "innerSpacing": Object {},
+          "keywords": Object {},
           "namespace": undefined,
           "namespaceQuotes": false,
           "quotes": false,
+          "spacing": Object {},
           "table": undefined,
           "tableQuotes": false,
           "type": "ref",
         },
-        "notKeyword": "NOT",
+        "not": true,
         "op": "IS",
         "rhs": SqlLiteral {
-          "innerSpacing": Object {},
-          "keyword": undefined,
+          "keywords": Object {},
+          "spacing": Object {},
           "stringValue": "NULL",
           "type": "literal",
           "value": null,
+        },
+        "spacing": Object {
+          "not": "    ",
+          "postOp": "   ",
+          "preOp": "  ",
         },
         "type": "comparison",
       }
@@ -439,25 +484,25 @@ describe('SqlComparison', () => {
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "decorator": undefined,
-        "innerSpacing": Object {
-          "postOp": " ",
-          "preOp": " ",
+        "keywords": Object {
+          "op": "IN",
         },
         "lhs": SqlRef {
           "column": "X",
-          "innerSpacing": Object {},
+          "keywords": Object {},
           "namespace": undefined,
           "namespaceQuotes": false,
           "quotes": false,
+          "spacing": Object {},
           "table": undefined,
           "tableQuotes": false,
           "type": "ref",
         },
-        "notKeyword": undefined,
+        "not": false,
         "op": "IN",
         "rhs": SqlLiteral {
-          "innerSpacing": Object {},
-          "keyword": undefined,
+          "keywords": Object {},
+          "spacing": Object {},
           "stringValue": "(1, 2, 3)",
           "type": "literal",
           "value": Array [
@@ -465,6 +510,10 @@ describe('SqlComparison', () => {
             2,
             3,
           ],
+        },
+        "spacing": Object {
+          "postOp": " ",
+          "preOp": " ",
         },
         "type": "comparison",
       }
@@ -479,26 +528,26 @@ describe('SqlComparison', () => {
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "decorator": undefined,
-        "innerSpacing": Object {
-          "not": " ",
-          "postOp": " ",
-          "preOp": " ",
+        "keywords": Object {
+          "not": "NOT",
+          "op": "IN",
         },
         "lhs": SqlRef {
           "column": "X",
-          "innerSpacing": Object {},
+          "keywords": Object {},
           "namespace": undefined,
           "namespaceQuotes": false,
           "quotes": false,
+          "spacing": Object {},
           "table": undefined,
           "tableQuotes": false,
           "type": "ref",
         },
-        "notKeyword": "NOT",
+        "not": true,
         "op": "IN",
         "rhs": SqlLiteral {
-          "innerSpacing": Object {},
-          "keyword": undefined,
+          "keywords": Object {},
+          "spacing": Object {},
           "stringValue": "(1, 2, 3)",
           "type": "literal",
           "value": Array [
@@ -506,6 +555,11 @@ describe('SqlComparison', () => {
             2,
             3,
           ],
+        },
+        "spacing": Object {
+          "not": " ",
+          "postOp": " ",
+          "preOp": " ",
         },
         "type": "comparison",
       }
@@ -520,73 +574,76 @@ describe('SqlComparison', () => {
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "decorator": undefined,
-        "innerSpacing": Object {
-          "postOp": " ",
-          "preOp": " ",
+        "keywords": Object {
+          "op": "IN",
         },
         "lhs": SqlRef {
           "column": "X",
-          "innerSpacing": Object {},
+          "keywords": Object {},
           "namespace": undefined,
           "namespaceQuotes": false,
           "quotes": false,
+          "spacing": Object {},
           "table": undefined,
           "tableQuotes": false,
           "type": "ref",
         },
-        "notKeyword": undefined,
+        "not": false,
         "op": "IN",
         "rhs": SqlQuery {
-          "explainKeyword": undefined,
+          "decorator": undefined,
+          "explainPlanFor": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
               "values": Array [
                 SqlAlias {
                   "alias": undefined,
-                  "asKeyword": undefined,
+                  "as": undefined,
                   "expression": SqlRef {
                     "column": undefined,
-                    "innerSpacing": Object {},
+                    "keywords": Object {},
                     "namespace": undefined,
                     "namespaceQuotes": false,
                     "quotes": false,
+                    "spacing": Object {},
                     "table": "tbl",
                     "tableQuotes": false,
                     "type": "ref",
                   },
-                  "innerSpacing": Object {},
+                  "keywords": Object {},
+                  "spacing": Object {},
                   "type": "alias",
                 },
               ],
             },
-            "innerSpacing": Object {
-              "postKeyword": " ",
-            },
             "joinParts": undefined,
-            "keyword": "FROM",
+            "keywords": Object {
+              "from": "FROM",
+            },
+            "spacing": Object {
+              "postFrom": " ",
+            },
             "type": "fromClause",
           },
           "groupByClause": undefined,
           "havingClause": undefined,
-          "innerSpacing": Object {
-            "postQuery": "",
-            "postSelect": " ",
-            "preFrom": " ",
-            "preLimit": " ",
-            "preQuery": "",
+          "keywords": Object {
+            "select": "SELECT",
           },
           "limitClause": SqlLimitClause {
-            "innerSpacing": Object {
-              "postKeyword": " ",
+            "keywords": Object {
+              "limit": "LIMIT",
             },
-            "keyword": "LIMIT",
             "limit": SqlLiteral {
-              "innerSpacing": Object {},
-              "keyword": undefined,
+              "keywords": Object {},
+              "spacing": Object {},
               "stringValue": "1",
               "type": "literal",
               "value": 1,
+            },
+            "spacing": Object {
+              "postLimit": " ",
             },
             "type": "limitClause",
           },
@@ -598,35 +655,44 @@ describe('SqlComparison', () => {
               "rightSpacing": "",
             },
           ],
-          "selectDecorator": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
               SqlAlias {
                 "alias": undefined,
-                "asKeyword": undefined,
+                "as": undefined,
                 "expression": SqlRef {
                   "column": "val",
-                  "innerSpacing": Object {},
+                  "keywords": Object {},
                   "namespace": undefined,
                   "namespaceQuotes": false,
                   "quotes": false,
+                  "spacing": Object {},
                   "table": undefined,
                   "tableQuotes": false,
                   "type": "ref",
                 },
-                "innerSpacing": Object {},
+                "keywords": Object {},
+                "spacing": Object {},
                 "type": "alias",
               },
             ],
           },
-          "selectKeyword": "SELECT",
+          "spacing": Object {
+            "postQuery": "",
+            "postSelect": " ",
+            "preFrom": " ",
+            "preLimit": " ",
+            "preQuery": "",
+          },
           "type": "query",
-          "unionKeyword": undefined,
           "unionQuery": undefined,
           "whereClause": undefined,
-          "withKeyword": undefined,
           "withParts": undefined,
+        },
+        "spacing": Object {
+          "postOp": " ",
+          "preOp": " ",
         },
         "type": "comparison",
       }
@@ -641,74 +707,77 @@ describe('SqlComparison', () => {
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "decorator": undefined,
-        "innerSpacing": Object {
-          "not": " ",
-          "postOp": " ",
-          "preOp": " ",
+        "keywords": Object {
+          "not": "NOT",
+          "op": "IN",
         },
         "lhs": SqlRef {
           "column": "X",
-          "innerSpacing": Object {},
+          "keywords": Object {},
           "namespace": undefined,
           "namespaceQuotes": false,
           "quotes": false,
+          "spacing": Object {},
           "table": undefined,
           "tableQuotes": false,
           "type": "ref",
         },
-        "notKeyword": "NOT",
+        "not": true,
         "op": "IN",
         "rhs": SqlQuery {
-          "explainKeyword": undefined,
+          "decorator": undefined,
+          "explainPlanFor": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
               "values": Array [
                 SqlAlias {
                   "alias": undefined,
-                  "asKeyword": undefined,
+                  "as": undefined,
                   "expression": SqlRef {
                     "column": undefined,
-                    "innerSpacing": Object {},
+                    "keywords": Object {},
                     "namespace": undefined,
                     "namespaceQuotes": false,
                     "quotes": false,
+                    "spacing": Object {},
                     "table": "tbl",
                     "tableQuotes": false,
                     "type": "ref",
                   },
-                  "innerSpacing": Object {},
+                  "keywords": Object {},
+                  "spacing": Object {},
                   "type": "alias",
                 },
               ],
             },
-            "innerSpacing": Object {
-              "postKeyword": " ",
-            },
             "joinParts": undefined,
-            "keyword": "FROM",
+            "keywords": Object {
+              "from": "FROM",
+            },
+            "spacing": Object {
+              "postFrom": " ",
+            },
             "type": "fromClause",
           },
           "groupByClause": undefined,
           "havingClause": undefined,
-          "innerSpacing": Object {
-            "postQuery": "",
-            "postSelect": " ",
-            "preFrom": " ",
-            "preLimit": " ",
-            "preQuery": "",
+          "keywords": Object {
+            "select": "SELECT",
           },
           "limitClause": SqlLimitClause {
-            "innerSpacing": Object {
-              "postKeyword": " ",
+            "keywords": Object {
+              "limit": "LIMIT",
             },
-            "keyword": "LIMIT",
             "limit": SqlLiteral {
-              "innerSpacing": Object {},
-              "keyword": undefined,
+              "keywords": Object {},
+              "spacing": Object {},
               "stringValue": "1",
               "type": "literal",
               "value": 1,
+            },
+            "spacing": Object {
+              "postLimit": " ",
             },
             "type": "limitClause",
           },
@@ -720,35 +789,45 @@ describe('SqlComparison', () => {
               "rightSpacing": "",
             },
           ],
-          "selectDecorator": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
               SqlAlias {
                 "alias": undefined,
-                "asKeyword": undefined,
+                "as": undefined,
                 "expression": SqlRef {
                   "column": "val",
-                  "innerSpacing": Object {},
+                  "keywords": Object {},
                   "namespace": undefined,
                   "namespaceQuotes": false,
                   "quotes": false,
+                  "spacing": Object {},
                   "table": undefined,
                   "tableQuotes": false,
                   "type": "ref",
                 },
-                "innerSpacing": Object {},
+                "keywords": Object {},
+                "spacing": Object {},
                 "type": "alias",
               },
             ],
           },
-          "selectKeyword": "SELECT",
+          "spacing": Object {
+            "postQuery": "",
+            "postSelect": " ",
+            "preFrom": " ",
+            "preLimit": " ",
+            "preQuery": "",
+          },
           "type": "query",
-          "unionKeyword": undefined,
           "unionQuery": undefined,
           "whereClause": undefined,
-          "withKeyword": undefined,
           "withParts": undefined,
+        },
+        "spacing": Object {
+          "not": " ",
+          "postOp": " ",
+          "preOp": " ",
         },
         "type": "comparison",
       }
@@ -763,50 +842,58 @@ describe('SqlComparison', () => {
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "decorator": undefined,
-        "innerSpacing": Object {
-          "postOp": " ",
-          "preOp": " ",
+        "keywords": Object {
+          "op": "BETWEEN",
         },
         "lhs": SqlRef {
           "column": "X",
-          "innerSpacing": Object {},
+          "keywords": Object {},
           "namespace": undefined,
           "namespaceQuotes": false,
           "quotes": false,
+          "spacing": Object {},
           "table": undefined,
           "tableQuotes": false,
           "type": "ref",
         },
-        "notKeyword": undefined,
+        "not": false,
         "op": "BETWEEN",
         "rhs": SqlBetweenAndHelper {
-          "andKeyword": "AND",
           "end": SqlRef {
             "column": "Z",
-            "innerSpacing": Object {},
+            "keywords": Object {},
             "namespace": undefined,
             "namespaceQuotes": false,
             "quotes": false,
+            "spacing": Object {},
             "table": undefined,
             "tableQuotes": false,
             "type": "ref",
           },
-          "innerSpacing": Object {
+          "keywords": Object {
+            "and": "AND",
+          },
+          "spacing": Object {
             "postAnd": " ",
             "preAnd": " ",
           },
           "start": SqlRef {
             "column": "Y",
-            "innerSpacing": Object {},
+            "keywords": Object {},
             "namespace": undefined,
             "namespaceQuotes": false,
             "quotes": false,
+            "spacing": Object {},
             "table": undefined,
             "tableQuotes": false,
             "type": "ref",
           },
-          "symmetricKeyword": undefined,
+          "symmetric": undefined,
           "type": "betweenAndHelper",
+        },
+        "spacing": Object {
+          "postOp": " ",
+          "preOp": " ",
         },
         "type": "comparison",
       }
@@ -821,52 +908,62 @@ describe('SqlComparison', () => {
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "decorator": undefined,
-        "innerSpacing": Object {
-          "not": " ",
-          "postOp": " ",
-          "preOp": " ",
+        "keywords": Object {
+          "not": "NOT",
+          "op": "BETWEEN",
         },
         "lhs": SqlRef {
           "column": "X",
-          "innerSpacing": Object {},
+          "keywords": Object {},
           "namespace": undefined,
           "namespaceQuotes": false,
           "quotes": false,
+          "spacing": Object {},
           "table": undefined,
           "tableQuotes": false,
           "type": "ref",
         },
-        "notKeyword": "NOT",
+        "not": true,
         "op": "BETWEEN",
         "rhs": SqlBetweenAndHelper {
-          "andKeyword": "AND",
           "end": SqlRef {
             "column": "Z",
-            "innerSpacing": Object {},
+            "keywords": Object {},
             "namespace": undefined,
             "namespaceQuotes": false,
             "quotes": false,
+            "spacing": Object {},
             "table": undefined,
             "tableQuotes": false,
             "type": "ref",
           },
-          "innerSpacing": Object {
+          "keywords": Object {
+            "and": "AND",
+            "symmetric": "SYMMETRIC",
+          },
+          "spacing": Object {
             "postAnd": " ",
             "postSymmetric": " ",
             "preAnd": " ",
           },
           "start": SqlRef {
             "column": "Y",
-            "innerSpacing": Object {},
+            "keywords": Object {},
             "namespace": undefined,
             "namespaceQuotes": false,
             "quotes": false,
+            "spacing": Object {},
             "table": undefined,
             "tableQuotes": false,
             "type": "ref",
           },
-          "symmetricKeyword": "SYMMETRIC",
+          "symmetric": true,
           "type": "betweenAndHelper",
+        },
+        "spacing": Object {
+          "not": " ",
+          "postOp": " ",
+          "preOp": " ",
         },
         "type": "comparison",
       }
@@ -881,28 +978,32 @@ describe('SqlComparison', () => {
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "decorator": undefined,
-        "innerSpacing": Object {
-          "postOp": " ",
-          "preOp": " ",
+        "keywords": Object {
+          "op": "LIKE",
         },
         "lhs": SqlRef {
           "column": "X",
-          "innerSpacing": Object {},
+          "keywords": Object {},
           "namespace": undefined,
           "namespaceQuotes": false,
           "quotes": false,
+          "spacing": Object {},
           "table": undefined,
           "tableQuotes": false,
           "type": "ref",
         },
-        "notKeyword": undefined,
+        "not": false,
         "op": "LIKE",
         "rhs": SqlLiteral {
-          "innerSpacing": Object {},
-          "keyword": undefined,
+          "keywords": Object {},
+          "spacing": Object {},
           "stringValue": "'%A%'",
           "type": "literal",
           "value": "%A%",
+        },
+        "spacing": Object {
+          "postOp": " ",
+          "preOp": " ",
         },
         "type": "comparison",
       }
@@ -917,29 +1018,34 @@ describe('SqlComparison', () => {
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "decorator": undefined,
-        "innerSpacing": Object {
-          "not": " ",
-          "postOp": " ",
-          "preOp": " ",
+        "keywords": Object {
+          "not": "NOT",
+          "op": "LIKE",
         },
         "lhs": SqlRef {
           "column": "X",
-          "innerSpacing": Object {},
+          "keywords": Object {},
           "namespace": undefined,
           "namespaceQuotes": false,
           "quotes": false,
+          "spacing": Object {},
           "table": undefined,
           "tableQuotes": false,
           "type": "ref",
         },
-        "notKeyword": "NOT",
+        "not": true,
         "op": "LIKE",
         "rhs": SqlLiteral {
-          "innerSpacing": Object {},
-          "keyword": undefined,
+          "keywords": Object {},
+          "spacing": Object {},
           "stringValue": "'%A%'",
           "type": "literal",
           "value": "%A%",
+        },
+        "spacing": Object {
+          "not": " ",
+          "postOp": " ",
+          "preOp": " ",
         },
         "type": "comparison",
       }
@@ -954,10 +1060,9 @@ describe('SqlComparison', () => {
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "decorator": undefined,
-        "innerSpacing": Object {
-          "not": " ",
-          "postOp": " ",
-          "preOp": " ",
+        "keywords": Object {
+          "not": "NOT",
+          "op": "LIKE",
         },
         "lhs": SqlMulti {
           "args": SeparatedArray {
@@ -971,31 +1076,34 @@ describe('SqlComparison', () => {
             "values": Array [
               SqlRef {
                 "column": "X",
-                "innerSpacing": Object {},
+                "keywords": Object {},
                 "namespace": undefined,
                 "namespaceQuotes": false,
                 "quotes": false,
+                "spacing": Object {},
                 "table": undefined,
                 "tableQuotes": false,
                 "type": "ref",
               },
               SqlRef {
                 "column": "Y",
-                "innerSpacing": Object {},
+                "keywords": Object {},
                 "namespace": undefined,
                 "namespaceQuotes": false,
                 "quotes": false,
+                "spacing": Object {},
                 "table": undefined,
                 "tableQuotes": false,
                 "type": "ref",
               },
             ],
           },
-          "expressionType": "||",
-          "innerSpacing": Object {},
+          "keywords": Object {},
+          "op": "||",
+          "spacing": Object {},
           "type": "multi",
         },
-        "notKeyword": "NOT",
+        "not": true,
         "op": "LIKE",
         "rhs": SqlLikeEscapeHelper {
           "escape": SqlMulti {
@@ -1009,29 +1117,28 @@ describe('SqlComparison', () => {
               ],
               "values": Array [
                 SqlLiteral {
-                  "innerSpacing": Object {},
-                  "keyword": undefined,
+                  "keywords": Object {},
+                  "spacing": Object {},
                   "stringValue": "'\\\\'",
                   "type": "literal",
                   "value": "\\\\",
                 },
                 SqlLiteral {
-                  "innerSpacing": Object {},
-                  "keyword": undefined,
+                  "keywords": Object {},
+                  "spacing": Object {},
                   "stringValue": "''",
                   "type": "literal",
                   "value": "",
                 },
               ],
             },
-            "expressionType": "||",
-            "innerSpacing": Object {},
+            "keywords": Object {},
+            "op": "||",
+            "spacing": Object {},
             "type": "multi",
           },
-          "escapeKeyword": "ESCAPE",
-          "innerSpacing": Object {
-            "postEscape": " ",
-            "preEscape": " ",
+          "keywords": Object {
+            "escape": "ESCAPE",
           },
           "like": SqlMulti {
             "args": SeparatedArray {
@@ -1044,26 +1151,36 @@ describe('SqlComparison', () => {
               ],
               "values": Array [
                 SqlLiteral {
-                  "innerSpacing": Object {},
-                  "keyword": undefined,
+                  "keywords": Object {},
+                  "spacing": Object {},
                   "stringValue": "'%Je'",
                   "type": "literal",
                   "value": "%Je",
                 },
                 SqlLiteral {
-                  "innerSpacing": Object {},
-                  "keyword": undefined,
+                  "keywords": Object {},
+                  "spacing": Object {},
                   "stringValue": "'%'",
                   "type": "literal",
                   "value": "%",
                 },
               ],
             },
-            "expressionType": "||",
-            "innerSpacing": Object {},
+            "keywords": Object {},
+            "op": "||",
+            "spacing": Object {},
             "type": "multi",
           },
+          "spacing": Object {
+            "postEscape": " ",
+            "preEscape": " ",
+          },
           "type": "likeEscapeHelper",
+        },
+        "spacing": Object {
+          "not": " ",
+          "postOp": " ",
+          "preOp": " ",
         },
         "type": "comparison",
       }
@@ -1078,43 +1195,49 @@ describe('SqlComparison', () => {
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "decorator": undefined,
-        "innerSpacing": Object {
-          "postOp": " ",
-          "preOp": " ",
+        "keywords": Object {
+          "op": "LIKE",
         },
         "lhs": SqlRef {
           "column": "X",
-          "innerSpacing": Object {},
+          "keywords": Object {},
           "namespace": undefined,
           "namespaceQuotes": false,
           "quotes": false,
+          "spacing": Object {},
           "table": undefined,
           "tableQuotes": false,
           "type": "ref",
         },
-        "notKeyword": undefined,
+        "not": false,
         "op": "LIKE",
         "rhs": SqlLikeEscapeHelper {
           "escape": SqlLiteral {
-            "innerSpacing": Object {},
-            "keyword": undefined,
+            "keywords": Object {},
+            "spacing": Object {},
             "stringValue": "'$'",
             "type": "literal",
             "value": "$",
           },
-          "escapeKeyword": "ESCAPE",
-          "innerSpacing": Object {
-            "postEscape": " ",
-            "preEscape": " ",
+          "keywords": Object {
+            "escape": "ESCAPE",
           },
           "like": SqlLiteral {
-            "innerSpacing": Object {},
-            "keyword": undefined,
+            "keywords": Object {},
+            "spacing": Object {},
             "stringValue": "'%A%'",
             "type": "literal",
             "value": "%A%",
           },
+          "spacing": Object {
+            "postEscape": " ",
+            "preEscape": " ",
+          },
           "type": "likeEscapeHelper",
+        },
+        "spacing": Object {
+          "postOp": " ",
+          "preOp": " ",
         },
         "type": "comparison",
       }
@@ -1129,44 +1252,51 @@ describe('SqlComparison', () => {
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "decorator": undefined,
-        "innerSpacing": Object {
-          "not": " ",
-          "postOp": " ",
-          "preOp": " ",
+        "keywords": Object {
+          "not": "NOT",
+          "op": "LIKE",
         },
         "lhs": SqlRef {
           "column": "X",
-          "innerSpacing": Object {},
+          "keywords": Object {},
           "namespace": undefined,
           "namespaceQuotes": false,
           "quotes": false,
+          "spacing": Object {},
           "table": undefined,
           "tableQuotes": false,
           "type": "ref",
         },
-        "notKeyword": "NOT",
+        "not": true,
         "op": "LIKE",
         "rhs": SqlLikeEscapeHelper {
           "escape": SqlLiteral {
-            "innerSpacing": Object {},
-            "keyword": undefined,
+            "keywords": Object {},
+            "spacing": Object {},
             "stringValue": "'$'",
             "type": "literal",
             "value": "$",
           },
-          "escapeKeyword": "ESCAPE",
-          "innerSpacing": Object {
-            "postEscape": " ",
-            "preEscape": " ",
+          "keywords": Object {
+            "escape": "ESCAPE",
           },
           "like": SqlLiteral {
-            "innerSpacing": Object {},
-            "keyword": undefined,
+            "keywords": Object {},
+            "spacing": Object {},
             "stringValue": "'%A%'",
             "type": "literal",
             "value": "%A%",
           },
+          "spacing": Object {
+            "postEscape": " ",
+            "preEscape": " ",
+          },
           "type": "likeEscapeHelper",
+        },
+        "spacing": Object {
+          "not": " ",
+          "postOp": " ",
+          "preOp": " ",
         },
         "type": "comparison",
       }
@@ -1182,31 +1312,36 @@ describe('SqlComparison', () => {
       expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
         SqlComparison {
           "decorator": undefined,
-          "innerSpacing": Object {
-            "postOp": " ",
-            "preOp": " ",
+          "keywords": Object {
+            "op": ">",
           },
           "lhs": SqlRef {
             "column": "A",
-            "innerSpacing": Object {},
+            "keywords": Object {},
             "namespace": undefined,
             "namespaceQuotes": false,
             "quotes": false,
+            "spacing": Object {},
             "table": undefined,
             "tableQuotes": false,
             "type": "ref",
           },
-          "notKeyword": undefined,
+          "not": false,
           "op": ">",
           "rhs": SqlRef {
             "column": "B",
-            "innerSpacing": Object {},
+            "keywords": Object {},
             "namespace": undefined,
             "namespaceQuotes": false,
             "quotes": false,
+            "spacing": Object {},
             "table": undefined,
             "tableQuotes": false,
             "type": "ref",
+          },
+          "spacing": Object {
+            "postOp": " ",
+            "preOp": " ",
           },
           "type": "comparison",
         }
@@ -1221,25 +1356,28 @@ describe('SqlComparison', () => {
       expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
         SqlComparison {
           "decorator": undefined,
-          "innerSpacing": Object {
-            "postOp": " ",
-            "preOp": " ",
+          "keywords": Object {
+            "op": ">",
           },
           "lhs": SqlLiteral {
-            "innerSpacing": Object {},
-            "keyword": undefined,
+            "keywords": Object {},
+            "spacing": Object {},
             "stringValue": "'A'",
             "type": "literal",
             "value": "A",
           },
-          "notKeyword": undefined,
+          "not": false,
           "op": ">",
           "rhs": SqlLiteral {
-            "innerSpacing": Object {},
-            "keyword": undefined,
+            "keywords": Object {},
+            "spacing": Object {},
             "stringValue": "'B'",
             "type": "literal",
             "value": "B",
+          },
+          "spacing": Object {
+            "postOp": " ",
+            "preOp": " ",
           },
           "type": "comparison",
         }
@@ -1254,31 +1392,36 @@ describe('SqlComparison', () => {
       expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
         SqlComparison {
           "decorator": undefined,
-          "innerSpacing": Object {
-            "postOp": " ",
-            "preOp": " ",
+          "keywords": Object {
+            "op": ">",
           },
           "lhs": SqlRef {
             "column": "A",
-            "innerSpacing": Object {},
+            "keywords": Object {},
             "namespace": undefined,
             "namespaceQuotes": false,
             "quotes": true,
+            "spacing": Object {},
             "table": undefined,
             "tableQuotes": false,
             "type": "ref",
           },
-          "notKeyword": undefined,
+          "not": false,
           "op": ">",
           "rhs": SqlRef {
             "column": "B",
-            "innerSpacing": Object {},
+            "keywords": Object {},
             "namespace": undefined,
             "namespaceQuotes": false,
             "quotes": true,
+            "spacing": Object {},
             "table": undefined,
             "tableQuotes": false,
             "type": "ref",
+          },
+          "spacing": Object {
+            "postOp": " ",
+            "preOp": " ",
           },
           "type": "comparison",
         }
@@ -1293,25 +1436,28 @@ describe('SqlComparison', () => {
       expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
         SqlComparison {
           "decorator": undefined,
-          "innerSpacing": Object {
-            "postOp": " ",
-            "preOp": " ",
+          "keywords": Object {
+            "op": ">",
           },
           "lhs": SqlLiteral {
-            "innerSpacing": Object {},
-            "keyword": undefined,
+            "keywords": Object {},
+            "spacing": Object {},
             "stringValue": "1",
             "type": "literal",
             "value": 1,
           },
-          "notKeyword": undefined,
+          "not": false,
           "op": ">",
           "rhs": SqlLiteral {
-            "innerSpacing": Object {},
-            "keyword": undefined,
+            "keywords": Object {},
+            "spacing": Object {},
             "stringValue": "2",
             "type": "literal",
             "value": 2,
+          },
+          "spacing": Object {
+            "postOp": " ",
+            "preOp": " ",
           },
           "type": "comparison",
         }
@@ -1326,18 +1472,17 @@ describe('SqlComparison', () => {
       expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
         SqlComparison {
           "decorator": undefined,
-          "innerSpacing": Object {
-            "postOp": " ",
-            "preOp": " ",
+          "keywords": Object {
+            "op": ">",
           },
           "lhs": SqlLiteral {
-            "innerSpacing": Object {},
-            "keyword": undefined,
+            "keywords": Object {},
+            "spacing": Object {},
             "stringValue": "1",
             "type": "literal",
             "value": 1,
           },
-          "notKeyword": undefined,
+          "not": undefined,
           "op": ">",
           "parens": Array [
             Object {
@@ -1346,11 +1491,15 @@ describe('SqlComparison', () => {
             },
           ],
           "rhs": SqlLiteral {
-            "innerSpacing": Object {},
-            "keyword": undefined,
+            "keywords": Object {},
+            "spacing": Object {},
             "stringValue": "2",
             "type": "literal",
             "value": 2,
+          },
+          "spacing": Object {
+            "postOp": " ",
+            "preOp": " ",
           },
           "type": "comparison",
         }
@@ -1365,50 +1514,58 @@ describe('SqlComparison', () => {
       expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
         SqlComparison {
           "decorator": undefined,
-          "innerSpacing": Object {
-            "postOp": " ",
-            "preOp": " ",
+          "keywords": Object {
+            "op": "BETWEEN",
           },
           "lhs": SqlRef {
             "column": "X",
-            "innerSpacing": Object {},
+            "keywords": Object {},
             "namespace": undefined,
             "namespaceQuotes": false,
             "quotes": false,
+            "spacing": Object {},
             "table": undefined,
             "tableQuotes": false,
             "type": "ref",
           },
-          "notKeyword": undefined,
+          "not": false,
           "op": "BETWEEN",
           "rhs": SqlBetweenAndHelper {
-            "andKeyword": "AND",
             "end": SqlRef {
               "column": "Z",
-              "innerSpacing": Object {},
+              "keywords": Object {},
               "namespace": undefined,
               "namespaceQuotes": false,
               "quotes": false,
+              "spacing": Object {},
               "table": undefined,
               "tableQuotes": false,
               "type": "ref",
             },
-            "innerSpacing": Object {
+            "keywords": Object {
+              "and": "AND",
+            },
+            "spacing": Object {
               "postAnd": " ",
               "preAnd": " ",
             },
             "start": SqlRef {
               "column": "Y",
-              "innerSpacing": Object {},
+              "keywords": Object {},
               "namespace": undefined,
               "namespaceQuotes": false,
               "quotes": false,
+              "spacing": Object {},
               "table": undefined,
               "tableQuotes": false,
               "type": "ref",
             },
-            "symmetricKeyword": undefined,
+            "symmetric": undefined,
             "type": "betweenAndHelper",
+          },
+          "spacing": Object {
+            "postOp": " ",
+            "preOp": " ",
           },
           "type": "comparison",
         }
@@ -1433,10 +1590,11 @@ describe('SqlComparison', () => {
             "values": Array [
               SqlRef {
                 "column": "A",
-                "innerSpacing": Object {},
+                "keywords": Object {},
                 "namespace": undefined,
                 "namespaceQuotes": false,
                 "quotes": false,
+                "spacing": Object {},
                 "table": undefined,
                 "tableQuotes": false,
                 "type": "ref",
@@ -1453,73 +1611,84 @@ describe('SqlComparison', () => {
                   "values": Array [
                     SqlRef {
                       "column": "B",
-                      "innerSpacing": Object {},
+                      "keywords": Object {},
                       "namespace": undefined,
                       "namespaceQuotes": false,
                       "quotes": false,
+                      "spacing": Object {},
                       "table": undefined,
                       "tableQuotes": false,
                       "type": "ref",
                     },
                     SqlComparison {
                       "decorator": undefined,
-                      "innerSpacing": Object {
-                        "postOp": " ",
-                        "preOp": " ",
+                      "keywords": Object {
+                        "op": "BETWEEN",
                       },
                       "lhs": SqlRef {
                         "column": "X",
-                        "innerSpacing": Object {},
+                        "keywords": Object {},
                         "namespace": undefined,
                         "namespaceQuotes": false,
                         "quotes": false,
+                        "spacing": Object {},
                         "table": undefined,
                         "tableQuotes": false,
                         "type": "ref",
                       },
-                      "notKeyword": undefined,
+                      "not": false,
                       "op": "BETWEEN",
                       "rhs": SqlBetweenAndHelper {
-                        "andKeyword": "AND",
                         "end": SqlRef {
                           "column": "Z",
-                          "innerSpacing": Object {},
+                          "keywords": Object {},
                           "namespace": undefined,
                           "namespaceQuotes": false,
                           "quotes": false,
+                          "spacing": Object {},
                           "table": undefined,
                           "tableQuotes": false,
                           "type": "ref",
                         },
-                        "innerSpacing": Object {
+                        "keywords": Object {
+                          "and": "AND",
+                        },
+                        "spacing": Object {
                           "postAnd": " ",
                           "preAnd": " ",
                         },
                         "start": SqlRef {
                           "column": "Y",
-                          "innerSpacing": Object {},
+                          "keywords": Object {},
                           "namespace": undefined,
                           "namespaceQuotes": false,
                           "quotes": false,
+                          "spacing": Object {},
                           "table": undefined,
                           "tableQuotes": false,
                           "type": "ref",
                         },
-                        "symmetricKeyword": undefined,
+                        "symmetric": undefined,
                         "type": "betweenAndHelper",
+                      },
+                      "spacing": Object {
+                        "postOp": " ",
+                        "preOp": " ",
                       },
                       "type": "comparison",
                     },
                   ],
                 },
-                "expressionType": "and",
-                "innerSpacing": Object {},
+                "keywords": Object {},
+                "op": "AND",
+                "spacing": Object {},
                 "type": "multi",
               },
             ],
           },
-          "expressionType": "or",
-          "innerSpacing": Object {},
+          "keywords": Object {},
+          "op": "OR",
+          "spacing": Object {},
           "type": "multi",
         }
       `);
@@ -1533,24 +1702,23 @@ describe('SqlComparison', () => {
       expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
         SqlComparison {
           "decorator": undefined,
-          "innerSpacing": Object {
-            "postOp": " ",
-            "preOp": " ",
+          "keywords": Object {
+            "op": "BETWEEN",
           },
           "lhs": SqlRef {
             "column": "X",
-            "innerSpacing": Object {},
+            "keywords": Object {},
             "namespace": undefined,
             "namespaceQuotes": false,
             "quotes": false,
+            "spacing": Object {},
             "table": undefined,
             "tableQuotes": false,
             "type": "ref",
           },
-          "notKeyword": undefined,
+          "not": false,
           "op": "BETWEEN",
           "rhs": SqlBetweenAndHelper {
-            "andKeyword": "AND",
             "end": SqlMulti {
               "args": SeparatedArray {
                 "separators": Array [
@@ -1562,26 +1730,30 @@ describe('SqlComparison', () => {
                 ],
                 "values": Array [
                   SqlLiteral {
-                    "innerSpacing": Object {},
-                    "keyword": undefined,
+                    "keywords": Object {},
+                    "spacing": Object {},
                     "stringValue": "3",
                     "type": "literal",
                     "value": 3,
                   },
                   SqlLiteral {
-                    "innerSpacing": Object {},
-                    "keyword": undefined,
+                    "keywords": Object {},
+                    "spacing": Object {},
                     "stringValue": "4",
                     "type": "literal",
                     "value": 4,
                   },
                 ],
               },
-              "expressionType": "+",
-              "innerSpacing": Object {},
+              "keywords": Object {},
+              "op": "+",
+              "spacing": Object {},
               "type": "multi",
             },
-            "innerSpacing": Object {
+            "keywords": Object {
+              "and": "AND",
+            },
+            "spacing": Object {
               "postAnd": " ",
               "preAnd": " ",
             },
@@ -1596,27 +1768,32 @@ describe('SqlComparison', () => {
                 ],
                 "values": Array [
                   SqlLiteral {
-                    "innerSpacing": Object {},
-                    "keyword": undefined,
+                    "keywords": Object {},
+                    "spacing": Object {},
                     "stringValue": "1",
                     "type": "literal",
                     "value": 1,
                   },
                   SqlLiteral {
-                    "innerSpacing": Object {},
-                    "keyword": undefined,
+                    "keywords": Object {},
+                    "spacing": Object {},
                     "stringValue": "2",
                     "type": "literal",
                     "value": 2,
                   },
                 ],
               },
-              "expressionType": "+",
-              "innerSpacing": Object {},
+              "keywords": Object {},
+              "op": "+",
+              "spacing": Object {},
               "type": "multi",
             },
-            "symmetricKeyword": undefined,
+            "symmetric": undefined,
             "type": "betweenAndHelper",
+          },
+          "spacing": Object {
+            "postOp": " ",
+            "preOp": " ",
           },
           "type": "comparison",
         }

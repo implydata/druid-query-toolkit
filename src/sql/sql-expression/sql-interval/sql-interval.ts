@@ -17,9 +17,8 @@ import { SqlBase, SqlBaseValue, SqlType } from '../../sql-base';
 import { SqlExpression } from '../sql-expression';
 
 export interface SqlIntervalValue extends SqlBaseValue {
-  keyword?: string;
   intervalValue?: SqlLiteral;
-  unitKeyword?: string;
+  unit?: string;
 }
 
 export class SqlInterval extends SqlExpression {
@@ -30,49 +29,34 @@ export class SqlInterval extends SqlExpression {
   static create(unit: string, intervalValue: number) {
     return new SqlInterval({
       intervalValue: SqlLiteral.create(String(intervalValue)),
-      unitKeyword: unit,
+      unit,
     });
   }
 
-  public readonly keyword?: string;
   public readonly intervalValue?: SqlLiteral;
-  public readonly unitKeyword?: string;
+  public readonly unit?: string;
 
   constructor(options: SqlIntervalValue) {
     super(options, SqlInterval.type);
-    this.keyword = options.keyword;
     this.intervalValue = options.intervalValue;
-    this.unitKeyword = options.unitKeyword;
+    this.unit = options.unit;
   }
 
   public valueOf(): SqlIntervalValue {
     const value = super.valueOf() as SqlIntervalValue;
-    value.keyword = this.keyword;
     value.intervalValue = this.intervalValue;
-    value.unitKeyword = this.unitKeyword;
+    value.unit = this.unit;
     return value;
   }
 
   protected _toRawString(): string {
     return [
-      this.keyword || SqlInterval.DEFAULT_INTERVAL_KEYWORD,
-      this.getInnerSpace('postIntervalKeyword'),
+      this.getKeyword('interval', SqlInterval.DEFAULT_INTERVAL_KEYWORD),
+      this.getSpace('postInterval'),
       this.intervalValue,
-      this.getInnerSpace('postIntervalValue'),
-      this.unitKeyword,
+      this.getSpace('postIntervalValue'),
+      this.unit,
     ].join('');
-  }
-
-  public changeKeyword(keyword: string | undefined): this {
-    const value = this.valueOf();
-    value.keyword = keyword;
-    return SqlBase.fromValue(value);
-  }
-
-  public clearOwnStaticKeywords(): this {
-    const value = this.valueOf();
-    delete value.keyword;
-    return SqlBase.fromValue(value);
   }
 }
 

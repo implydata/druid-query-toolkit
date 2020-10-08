@@ -16,11 +16,11 @@ import { SqlAlias } from '..';
 import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../../sql-base';
 import { SqlExpression } from '../../sql-expression';
 
+export type SqlJoinJoinType = 'LEFT' | 'RIGHT' | 'INNER' | 'FULL' | 'FULL OUTER' | 'CROSS';
+
 export interface SqlJoinPartValue extends SqlBaseValue {
-  joinType?: string;
-  joinKeyword?: string;
+  joinType?: SqlJoinJoinType;
   table: SqlAlias;
-  onKeyword?: string;
   onExpression?: SqlExpression;
 }
 
@@ -30,7 +30,11 @@ export class SqlJoinPart extends SqlBase {
   static DEFAULT_JOIN_KEYWORD = 'JOIN';
   static DEFAULT_ON_KEYWORD = 'ON';
 
-  static create(joinType: string, table: SqlBase, onExpression?: SqlExpression): SqlJoinPart {
+  static create(
+    joinType: SqlJoinJoinType,
+    table: SqlBase,
+    onExpression?: SqlExpression,
+  ): SqlJoinPart {
     return new SqlJoinPart({
       joinType: joinType,
       table: SqlAlias.fromBase(table),
@@ -38,27 +42,21 @@ export class SqlJoinPart extends SqlBase {
     });
   }
 
-  public readonly joinType?: string;
-  public readonly joinKeyword?: string;
+  public readonly joinType?: SqlJoinJoinType;
   public readonly table: SqlAlias;
-  public readonly onKeyword?: string;
   public readonly onExpression?: SqlExpression;
 
   constructor(options: SqlJoinPartValue) {
     super(options, SqlJoinPart.type);
     this.joinType = options.joinType;
-    this.joinKeyword = options.joinKeyword;
     this.table = options.table;
-    this.onKeyword = options.onKeyword;
     this.onExpression = options.onExpression;
   }
 
   public valueOf(): SqlJoinPartValue {
     const value = super.valueOf() as SqlJoinPartValue;
     value.joinType = this.joinType;
-    value.joinKeyword = this.joinKeyword;
     value.table = this.table;
-    value.onKeyword = this.onKeyword;
     value.onExpression = this.onExpression;
     return value;
   }
@@ -67,20 +65,20 @@ export class SqlJoinPart extends SqlBase {
     const rawParts: string[] = [];
 
     if (this.joinType) {
-      rawParts.push(this.joinType, this.getInnerSpace('postJoinType'));
+      rawParts.push(this.getKeyword('joinType', this.joinType), this.getSpace('postJoinType'));
     }
 
     rawParts.push(
-      this.joinKeyword || SqlJoinPart.DEFAULT_JOIN_KEYWORD,
-      this.getInnerSpace('postJoinKeyword'),
+      this.getKeyword('join', SqlJoinPart.DEFAULT_JOIN_KEYWORD),
+      this.getSpace('postJoin'),
       this.table.toString(),
     );
 
     if (this.onExpression) {
       rawParts.push(
-        this.getInnerSpace('preOn'),
-        this.onKeyword || SqlJoinPart.DEFAULT_ON_KEYWORD,
-        this.getInnerSpace('postOn'),
+        this.getSpace('preOn'),
+        this.getKeyword('on', SqlJoinPart.DEFAULT_ON_KEYWORD),
+        this.getSpace('postOn'),
         this.onExpression.toString(),
       );
     }
@@ -122,13 +120,6 @@ export class SqlJoinPart extends SqlBase {
     }
 
     return ret;
-  }
-
-  public clearOwnStaticKeywords(): this {
-    const value = this.valueOf();
-    delete value.joinKeyword;
-    delete value.onKeyword;
-    return SqlBase.fromValue(value);
   }
 }
 

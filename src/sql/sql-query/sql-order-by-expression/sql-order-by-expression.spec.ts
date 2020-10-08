@@ -18,10 +18,6 @@ describe('SqlOrderByExpression', () => {
   it('#getEffectiveDirection', () => {
     expect(SqlOrderByExpression.create(SqlRef.column('x')).getEffectiveDirection()).toEqual('ASC');
 
-    expect(SqlOrderByExpression.create(SqlRef.column('x'), 'Asc').getEffectiveDirection()).toEqual(
-      'ASC',
-    );
-
     expect(SqlOrderByExpression.create(SqlRef.column('x'), 'ASC').getEffectiveDirection()).toEqual(
       'ASC',
     );
@@ -37,8 +33,8 @@ describe('SqlOrderByExpression', () => {
     ).toEqual('x ASC');
 
     expect(
-      String(SqlOrderByExpression.create(SqlRef.column('x'), 'asc').reverseDirection()),
-    ).toEqual('x desc');
+      String(SqlOrderByExpression.create(SqlRef.column('x'), 'ASC').reverseDirection()),
+    ).toEqual('x DESC');
 
     expect(String(SqlOrderByExpression.create(SqlRef.column('x')).reverseDirection())).toEqual(
       'x DESC',

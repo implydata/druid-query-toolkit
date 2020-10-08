@@ -15,15 +15,17 @@
 import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../../sql-base';
 import { SqlExpression } from '../sql-expression';
 
+export type SqlUnaryOp = 'NOT' | '+' | '-';
+
 export interface UnaryExpressionValue extends SqlBaseValue {
-  op: string;
+  op: SqlUnaryOp;
   argument: SqlExpression;
 }
 
 export class SqlUnary extends SqlExpression {
   static type: SqlType = 'unary';
 
-  public readonly op: string;
+  public readonly op: SqlUnaryOp;
   public readonly argument: SqlExpression;
 
   constructor(options: UnaryExpressionValue) {
@@ -40,7 +42,9 @@ export class SqlUnary extends SqlExpression {
   }
 
   protected _toRawString(): string {
-    return [this.op, this.getInnerSpace('postOp'), this.argument.toString()].join('');
+    return [this.getKeyword('op', this.op), this.getSpace('postOp'), this.argument.toString()].join(
+      '',
+    );
   }
 
   public changeArgument(argument: SqlExpression): this {

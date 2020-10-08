@@ -591,7 +591,8 @@ describe('SqlQuery operations', () => {
           .addSelectExpression('min(col2) AS "alias"')
           .toString(),
       ).toEqual(sane`
-        select col1, min(col2) AS "alias"
+        select col1,
+          min(col2) AS "alias"
         from tbl
       `);
     });
@@ -607,7 +608,8 @@ describe('SqlQuery operations', () => {
           .addSelectExpression(`count(DISTINCT col2) AS "alias"`)
           .toString(),
       ).toEqual(sane`
-        select col1, count(DISTINCT col2) AS "alias"
+        select col1,
+          count(DISTINCT col2) AS "alias"
         from tbl
       `);
     });
@@ -624,7 +626,8 @@ describe('SqlQuery operations', () => {
           .addToGroupBy(SqlRef.columnWithQuotes('col'))
           .toString(),
       ).toEqual(sane`
-        select "col", Count(*) from tbl
+        select "col",
+          Count(*) from tbl
         GROUP BY 1
       `);
     });
@@ -641,7 +644,8 @@ describe('SqlQuery operations', () => {
           )
           .toString(),
       ).toEqual(sane`
-        select min(col1) AS "MinColumn", col1 from tbl
+        select min(col1) AS "MinColumn",
+          col1 from tbl
         GROUP BY 1
       `);
     });
@@ -668,16 +672,11 @@ describe('SqlQuery operations', () => {
   });
 
   describe('prettify', () => {
-    it('misc query', () => {
+    it('misc query 1', () => {
       const sql = sane`
-        Select   col1    ||    lol  ,  ( Min(col1)   +   Sum(kl)  )  AS   aliasName   ,
-        Concat(   a      ,   b,          c    ),
-        Case   A   When   B   Then    C   End   As m
-        From tbl
-        Where   __time  Between  Timestamp  '2020-01-01'  And  Timestamp  '2020-01-02'  And   goo   is  not  Null
-        Group    By   1
-        Order  By   2   Desc  ,  3
-        Asc   LimIT  12
+        Select  
+          Distinct col1    ||    lol
+        From tbl       
       `;
 
       expect(
@@ -685,11 +684,40 @@ describe('SqlQuery operations', () => {
           .prettify()
           .toString(),
       ).toEqual(sane`
-        SELECT col1 || lol, (Min(col1) + Sum(kl)) AS aliasName, Concat(a, b, c), CASE A WHEN B THEN C END As m
+        SELECT DISTINCT col1 || lol
         FROM tbl
-        WHERE __time Between Timestamp '2020-01-01' AND Timestamp '2020-01-02' AND goo is not Null
+      `);
+    });
+
+    it('misc query 2', () => {
+      const sql = sane`
+        Select   col1    ||    lol  ,  ( Min(col1)   +   Sum(kl)  )  AS   aliasName   ,
+        Concat(   a      ,   b,          c    ),
+        Case   A
+          When   B   Then    C
+          WheN   D   Then    E
+          End   As m
+        From tbl
+        Where   __time  Between  Timestamp  '2020-01-01'  And  Timestamp  '2020-01-02'  And   goo   is  not  Null  aNd NoT True
+        Group    By   1
+        Order  By   2   Desc  ,  3
+        asC   LimIT  12
+      `;
+
+      expect(
+        SqlQuery.parse(sql)
+          .prettify()
+          .toString(),
+      ).toEqual(sane`
+        SELECT
+          col1 || lol,
+          (MIN(col1) + SUM(kl)) AS aliasName,
+          CONCAT(a, b, c),
+          CASE A WHEN B THEN C WHEN D THEN E END AS m
+        FROM tbl
+        WHERE __time BETWEEN TIMESTAMP '2020-01-01' AND TIMESTAMP '2020-01-02' AND goo IS NOT NULL AND NOT TRUE
         GROUP BY 1
-        ORDER BY 2 Desc, 3 Asc
+        ORDER BY 2 DESC, 3 ASC
         LIMIT 12
       `);
     });

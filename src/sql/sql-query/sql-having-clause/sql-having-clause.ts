@@ -23,7 +23,7 @@ export interface SqlHavingClauseValue extends SqlClauseValue {
 export class SqlHavingClause extends SqlClause {
   static type: SqlType = 'havingClause';
 
-  static DEFAULT_KEYWORD = 'HAVING';
+  static DEFAULT_HAVING_KEYWORD = 'HAVING';
 
   static create(expression: SqlExpression | string): SqlHavingClause {
     return new SqlHavingClause({
@@ -45,14 +45,11 @@ export class SqlHavingClause extends SqlClause {
   }
 
   protected _toRawString(): string {
-    const rawParts: string[] = [
-      this.keyword || SqlHavingClause.DEFAULT_KEYWORD,
-      this.getInnerSpace('postKeyword'),
-    ];
-
-    rawParts.push(this.expression.toString());
-
-    return rawParts.join('');
+    return [
+      this.getKeyword('having', SqlHavingClause.DEFAULT_HAVING_KEYWORD),
+      this.getSpace('postHaving'),
+      this.expression.toString(),
+    ].join('');
   }
 
   public changeExpression(expression: SqlExpression | string): this {

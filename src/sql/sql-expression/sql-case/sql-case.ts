@@ -18,12 +18,9 @@ import { SeparatedArray } from '../../utils';
 import { SqlExpression } from '../sql-expression';
 
 export interface SqlCaseValue extends SqlBaseValue {
-  caseKeyword?: string;
   caseExpression?: SqlExpression;
   whenThenParts: SeparatedArray<SqlWhenThenPart>;
-  elseKeyword?: string;
   elseExpression?: SqlExpression;
-  endKeyword?: string;
 }
 
 export class SqlCase extends SqlExpression {
@@ -46,56 +43,46 @@ export class SqlCase extends SqlExpression {
     });
   }
 
-  public readonly caseKeyword?: string;
   public readonly caseExpression?: SqlExpression;
   public readonly whenThenParts: SeparatedArray<SqlWhenThenPart>;
-  public readonly elseKeyword?: string;
   public readonly elseExpression?: SqlExpression;
-  public readonly endKeyword?: string;
-
   constructor(options: SqlCaseValue) {
     super(options, SqlCase.type);
-    this.caseKeyword = options.caseKeyword;
     this.caseExpression = options.caseExpression;
     this.whenThenParts = options.whenThenParts;
-    this.elseKeyword = options.elseKeyword;
     this.elseExpression = options.elseExpression;
-    this.endKeyword = options.endKeyword;
   }
 
   public valueOf(): SqlCaseValue {
     const value = super.valueOf() as SqlCaseValue;
-    value.caseKeyword = this.caseKeyword;
     value.caseExpression = this.caseExpression;
     value.whenThenParts = this.whenThenParts;
-    value.elseKeyword = this.elseKeyword;
     value.elseExpression = this.elseExpression;
-    value.endKeyword = this.endKeyword;
     return value;
   }
 
   protected _toRawString(): string {
     const rawParts: string[] = [
-      this.caseKeyword || SqlCase.DEFAULT_CASE_KEYWORD,
-      this.getInnerSpace('postCase'),
+      this.getKeyword('case', SqlCase.DEFAULT_CASE_KEYWORD),
+      this.getSpace('postCase'),
     ];
 
     if (this.caseExpression) {
-      rawParts.push(this.caseExpression.toString(), this.getInnerSpace('postCaseExpression'));
+      rawParts.push(this.caseExpression.toString(), this.getSpace('postCaseExpression'));
     }
 
     rawParts.push(this.whenThenParts.toString(' '));
 
     if (this.elseExpression) {
       rawParts.push(
-        this.getInnerSpace('preElse'),
-        this.elseKeyword || SqlCase.DEFAULT_ELSE_KEYWORD,
-        this.getInnerSpace('postElse'),
+        this.getSpace('preElse'),
+        this.getKeyword('else', SqlCase.DEFAULT_ELSE_KEYWORD),
+        this.getSpace('postElse'),
         this.elseExpression.toString(),
       );
     }
 
-    rawParts.push(this.getInnerSpace('preEnd'), this.endKeyword || SqlCase.DEFAULT_END_KEYWORD);
+    rawParts.push(this.getSpace('preEnd'), this.getKeyword('end', SqlCase.DEFAULT_END_KEYWORD));
 
     return rawParts.join('');
   }
@@ -153,13 +140,6 @@ export class SqlCase extends SqlExpression {
   public clearOwnSeparators(): this {
     const value = this.valueOf();
     value.whenThenParts = this.whenThenParts.clearSeparators();
-    return SqlBase.fromValue(value);
-  }
-
-  public clearOwnStaticKeywords(): this {
-    const value = this.valueOf();
-    delete value.caseKeyword;
-    delete value.endKeyword;
     return SqlBase.fromValue(value);
   }
 }
