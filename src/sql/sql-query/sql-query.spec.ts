@@ -99,7 +99,10 @@ describe('SqlQuery', () => {
         .changeWhereExpression(`channel  =  '#en.wikipedia'`);
 
       expect(String(query)).toEqual(sane`
-        SELECT channel, page, "user"
+        SELECT
+          channel,
+          page,
+          "user"
         FROM lol
         WHERE channel  =  '#en.wikipedia'
       `);

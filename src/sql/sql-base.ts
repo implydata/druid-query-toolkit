@@ -24,6 +24,20 @@ export interface Parens {
   rightSpacing: string;
 }
 
+function pseudoRandomCapitalization(str: string): string {
+  const upper = str.toUpperCase();
+  const lower = str.toLowerCase();
+  let seed = 0;
+  return upper
+    .split('')
+    .map((u, i) => {
+      seed += u.charCodeAt(0);
+      seed = (457 * seed + 1279) % 3631;
+      return seed % 5 > 1 ? u : lower[i];
+    })
+    .join('');
+}
+
 export type Substitutor = (t: SqlBase, stack: SqlBase[]) => SqlBase | undefined;
 export type Matcher = (t: SqlBase, stack: SqlBase[]) => boolean;
 
@@ -102,6 +116,29 @@ export abstract class SqlBase {
   static capitalize: (keyword: string) => string = keyword => {
     return keyword;
   };
+
+  static setCapitalization(capitalization: 'upper' | 'lower' | 'title' | 'random'): void {
+    switch (capitalization) {
+      case 'upper':
+        SqlBase.capitalize = k => k;
+        break;
+
+      case 'lower':
+        SqlBase.capitalize = k => k.toLowerCase();
+        break;
+
+      case 'title':
+        SqlBase.capitalize = k => k.slice(0, 1) + k.slice(1).toLowerCase();
+        break;
+
+      case 'random':
+        SqlBase.capitalize = pseudoRandomCapitalization;
+        break;
+
+      default:
+        throw new Error(`unknown capitalization '${capitalization}'`);
+    }
+  }
 
   static walkSeparatedArray<T extends SqlBase>(
     a: SeparatedArray<T>,
