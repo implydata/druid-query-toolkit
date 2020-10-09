@@ -26,7 +26,11 @@ describe('QueryRunner', () => {
 
     if (isSql) {
       return {
-        data: [['channel', 'Count'], ['#en.wikipedia', 6650], ['#sh.wikipedia', 3969]],
+        data: [
+          ['channel', 'Count'],
+          ['#en.wikipedia', 6650],
+          ['#sh.wikipedia', 3969],
+        ],
         headers: {
           'x-druid-sql-query-id': firstParameterValue || 'sql-query-id-yyy',
         } as any,

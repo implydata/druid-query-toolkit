@@ -26,7 +26,7 @@
     "semi": true,
     "singleQuote": true,
     "printWidth": 100,
-    "endOfLine": "lf"
+    "arrowParens": "avoid"
   },
   "scripts": {
     "pretest": "npm run compile",
@@ -59,20 +59,20 @@
     "build/"
   ],
   "dependencies": {
-    "tslib": "^1.10.0"
+    "tslib": "^2.0.2"
   },
   "devDependencies": {
-    "@jest/core": "24.9.0",
-    "@types/jest": "^24.0.23",
-    "awesome-code-style": "^1.4.3",
-    "axios": "^0.19.2",
-    "core-js": "^3.5.0",
+    "@jest/core": "26.5.2",
+    "@types/jest": "^26.0.14",
+    "awesome-code-style": "^1.5.0",
+    "axios": "^0.20.0",
+    "core-js": "^3.6.5",
     "fs-extra": "^9.0.1",
-    "husky": "^3.1.0",
-    "jest": "^24.9.0",
+    "husky": "^4.3.0",
+    "jest": "^26.5.2",
     "pegjs": "^0.10.0",
-    "ts-jest": "^24.2.0",
-    "tslint": "^5.20.1",
-    "typescript": "^3.7.3"
+    "ts-jest": "^26.4.1",
+    "tslint": "^6.1.3",
+    "typescript": "^4.0.3"
   }
 }

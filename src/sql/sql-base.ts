@@ -436,11 +436,7 @@ export abstract class SqlBase {
 
   public prettify(): SqlBase {
     return this.walkPostorder(ex => {
-      return ex
-        .resetOwnSpacing()
-        .resetOwnKeywords()
-        .clearOwnSeparators()
-        .removeOwnParenSpaces();
+      return ex.resetOwnSpacing().resetOwnKeywords().clearOwnSeparators().removeOwnParenSpaces();
     });
   }
 

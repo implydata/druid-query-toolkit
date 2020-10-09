@@ -416,7 +416,10 @@ describe('QueryResult', () => {
             results: [
               {
                 timestamp: '2019-08-22T02:59:20.000Z',
-                result: [{ d0: '#en.wikipedia', a0: 42 }, { d0: '#es.wikipedia', a0: 7 }],
+                result: [
+                  { d0: '#en.wikipedia', a0: 42 },
+                  { d0: '#es.wikipedia', a0: 7 },
+                ],
               },
             ],
             segment:

@@ -17,19 +17,13 @@ import { parseSql } from './parser';
 describe('SqlBase', () => {
   describe('#fillPlaceholders', () => {
     it('works in basic case', () => {
-      expect(
-        parseSql(`? < ?`)
-          .fillPlaceholders(['A', '5'])
-          .toString(),
-      ).toEqual(`A < 5`);
+      expect(parseSql(`? < ?`).fillPlaceholders(['A', '5']).toString()).toEqual(`A < 5`);
     });
 
     it('works in missing placeholder', () => {
-      expect(
-        parseSql(`? BETWEEN ? AND ?`)
-          .fillPlaceholders(['A', '5'])
-          .toString(),
-      ).toEqual(`A BETWEEN 5 AND ?`);
+      expect(parseSql(`? BETWEEN ? AND ?`).fillPlaceholders(['A', '5']).toString()).toEqual(
+        `A BETWEEN 5 AND ?`,
+      );
     });
   });
 
@@ -45,11 +39,7 @@ describe('SqlBase', () => {
     });
 
     it('works with COUNT(*)', () => {
-      expect(
-        parseSql(`COUNT(*)`)
-          .prettyTrim(10)
-          .toString(),
-      ).toEqual(`COUNT(*)`);
+      expect(parseSql(`COUNT(*)`).prettyTrim(10).toString()).toEqual(`COUNT(*)`);
     });
   });
 });

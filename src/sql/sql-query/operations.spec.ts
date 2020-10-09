@@ -586,11 +586,8 @@ describe('SqlQuery operations', () => {
         from tbl
       `;
 
-      expect(
-        SqlQuery.parse(sql)
-          .addSelectExpression('min(col2) AS "alias"')
-          .toString(),
-      ).toEqual(sane`
+      expect(SqlQuery.parse(sql).addSelectExpression('min(col2) AS "alias"').toString())
+        .toEqual(sane`
         select col1,
           min(col2) AS "alias"
         from tbl
@@ -603,11 +600,8 @@ describe('SqlQuery operations', () => {
         from tbl
       `;
 
-      expect(
-        SqlQuery.parse(sql)
-          .addSelectExpression(`count(DISTINCT col2) AS "alias"`)
-          .toString(),
-      ).toEqual(sane`
+      expect(SqlQuery.parse(sql).addSelectExpression(`count(DISTINCT col2) AS "alias"`).toString())
+        .toEqual(sane`
         select col1,
           count(DISTINCT col2) AS "alias"
         from tbl
@@ -621,11 +615,8 @@ describe('SqlQuery operations', () => {
         select Count(*) from tbl
       `;
 
-      expect(
-        SqlQuery.parse(sql)
-          .addToGroupBy(SqlRef.columnWithQuotes('col'))
-          .toString(),
-      ).toEqual(sane`
+      expect(SqlQuery.parse(sql).addToGroupBy(SqlRef.columnWithQuotes('col')).toString())
+        .toEqual(sane`
         select "col",
           Count(*) from tbl
         GROUP BY 1
@@ -679,11 +670,7 @@ describe('SqlQuery operations', () => {
         From tbl       
       `;
 
-      expect(
-        SqlQuery.parse(sql)
-          .prettify()
-          .toString(),
-      ).toEqual(sane`
+      expect(SqlQuery.parse(sql).prettify().toString()).toEqual(sane`
         SELECT DISTINCT col1 || lol
         FROM tbl
       `);
@@ -704,11 +691,7 @@ describe('SqlQuery operations', () => {
         asC   LimIT  12
       `;
 
-      expect(
-        SqlQuery.parse(sql)
-          .prettify()
-          .toString(),
-      ).toEqual(sane`
+      expect(SqlQuery.parse(sql).prettify().toString()).toEqual(sane`
         SELECT
           col1 || lol,
           (MIN(col1) + SUM(kl)) AS aliasName,
