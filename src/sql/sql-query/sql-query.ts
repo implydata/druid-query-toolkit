@@ -155,7 +155,7 @@ export class SqlQuery extends SqlExpression {
         this.getKeyword('plan', SqlQuery.DEFAULT_PLAN_KEYWORD),
         this.getSpace('postPlan'),
         this.getKeyword('for', SqlQuery.DEFAULT_FOR_KEYWORD),
-        this.getSpace('postFor'),
+        this.getSpace('postFor', '\n'),
       );
     }
 

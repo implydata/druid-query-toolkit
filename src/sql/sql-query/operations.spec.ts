@@ -16,8 +16,23 @@ import { SqlAlias, SqlExpression, SqlFunction, SqlQuery, SqlRef } from '../..';
 import { sane } from '../../test-utils';
 
 describe('SqlQuery operations', () => {
+  describe('#makeExplain', () => {
+    it('works', () => {
+      const query = SqlQuery.parse(
+        sane`
+          SELECT __time FROM "wiki"
+        `,
+      );
+
+      expect(String(query.makeExplain())).toEqual(sane`
+        EXPLAIN PLAN FOR
+        SELECT __time FROM "wiki"
+      `);
+    });
+  });
+
   describe('#prependWith', () => {
-    it('works when there is no with', () => {
+    it('works when there is no WITH', () => {
       const withQuery = SqlQuery.parse(
         sane`
           SELECT * FROM "wikipedia"
@@ -39,7 +54,7 @@ describe('SqlQuery operations', () => {
       `);
     });
 
-    it('works when there is already a with', () => {
+    it('works when there is already a WITH', () => {
       const withQuery = SqlQuery.parse(
         sane`
           SELECT * FROM "wikipedia"
@@ -60,6 +75,30 @@ describe('SqlQuery operations', () => {
           wiki2 AS (SELECT * FROM "wikipedia"
         WHERE channel = 'he')
           wiki AS (SELECT * FROM "wiki2" WHERE channel = 'en')
+        SELECT __time FROM "wiki"
+      `);
+    });
+
+    it('works when there is an EXPLAIN', () => {
+      const withQuery = SqlQuery.parse(
+        sane`
+          SELECT * FROM "wikipedia"
+          WHERE channel = 'en'
+        `,
+      );
+
+      const query = SqlQuery.parse(
+        sane`
+          EXPLAIN PLAN FOR
+          SELECT __time FROM "wiki"
+        `,
+      );
+
+      expect(String(query.prependWith('wiki', withQuery))).toEqual(sane`
+        EXPLAIN PLAN FOR
+        WITH
+          wiki AS (SELECT * FROM "wikipedia"
+        WHERE channel = 'en')
         SELECT __time FROM "wiki"
       `);
     });
