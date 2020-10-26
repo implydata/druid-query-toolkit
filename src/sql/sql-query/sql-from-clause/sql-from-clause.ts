@@ -150,7 +150,7 @@ export class SqlFromClause extends SqlClause {
 
   public addJoin(join: SqlJoinPart) {
     return this.changeJoinParts(
-      this.joinParts ? this.joinParts.addLast(join) : SeparatedArray.fromSingleValue(join),
+      this.joinParts ? this.joinParts.append(join) : SeparatedArray.fromSingleValue(join),
     );
   }
 

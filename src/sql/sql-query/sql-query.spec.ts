@@ -1019,7 +1019,7 @@ describe('SqlQuery', () => {
           "postQuery": "",
           "postSelect": " ",
           "postWith": " ",
-          "postWithQuery": "
+          "postWithParts": "
       ",
           "preFrom": " ",
           "preQuery": "",
@@ -1034,7 +1034,6 @@ describe('SqlQuery', () => {
               "keywords": Object {
                 "as": "AS",
               },
-              "postWithColumns": undefined,
               "spacing": Object {
                 "postAs": " ",
                 "postWithTable": " ",

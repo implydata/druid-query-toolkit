@@ -54,7 +54,7 @@ SqlQuery =
     keywords.with = withClause[0].withKeyword;
     spacing.postWith = withClause[0].postWith;
     value.withParts = withClause[0].withParts;
-    spacing.postWithQuery = withClause[1];
+    spacing.postWithParts = withClause[1];
   }
 
   keywords.select = select.selectKeyword;
@@ -125,7 +125,7 @@ WithClause =
 
 
 SqlWithPart =
-  withTable:Expression
+  withTable:SqlRef
   postWithTable:_?
   columns:(WithColumns _)?
   asKeyword:AsToken

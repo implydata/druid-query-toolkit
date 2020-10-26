@@ -16,13 +16,62 @@ import { SqlAlias, SqlExpression, SqlFunction, SqlQuery, SqlRef } from '../..';
 import { sane } from '../../test-utils';
 
 describe('SqlQuery operations', () => {
+  describe('#prependWith', () => {
+    it('works when there is no with', () => {
+      const withQuery = SqlQuery.parse(
+        sane`
+          SELECT * FROM "wikipedia"
+          WHERE channel = 'en'
+        `,
+      );
+
+      const query = SqlQuery.parse(
+        sane`
+          SELECT __time FROM "wiki"
+        `,
+      );
+
+      expect(String(query.prependWith('wiki', withQuery))).toEqual(sane`
+        WITH
+          wiki AS (SELECT * FROM "wikipedia"
+        WHERE channel = 'en')
+        SELECT __time FROM "wiki"
+      `);
+    });
+
+    it('works when there is already a with', () => {
+      const withQuery = SqlQuery.parse(
+        sane`
+          SELECT * FROM "wikipedia"
+          WHERE channel = 'he'
+        `,
+      );
+
+      const query = SqlQuery.parse(
+        sane`
+          WITH
+            wiki AS (SELECT * FROM "wiki2" WHERE channel = 'en')
+          SELECT __time FROM "wiki"
+        `,
+      );
+
+      expect(String(query.prependWith('wiki2', withQuery))).toEqual(sane`
+        WITH
+          wiki2 AS (SELECT * FROM "wikipedia"
+        WHERE channel = 'he')
+          wiki AS (SELECT * FROM "wiki2" WHERE channel = 'en')
+        SELECT __time FROM "wiki"
+      `);
+    });
+  });
+
   describe('#getFirstTableName', () => {
     it('getFirstTableNames', () => {
       expect(
         SqlQuery.parse(
           sane`
-          SELECT * FROM "github"
-        `,
+            SELECT * FROM "github"
+          `,
         ).getFirstTableName(),
       ).toEqual('github');
     });
@@ -31,8 +80,8 @@ describe('SqlQuery operations', () => {
       expect(
         SqlQuery.parse(
           sane`
-          SELECT * FROM sys."github"
-        `,
+            SELECT * FROM sys."github"
+          `,
         ).getFirstTableName(),
       ).toEqual('github');
     });
@@ -41,8 +90,8 @@ describe('SqlQuery operations', () => {
       expect(
         SqlQuery.parse(
           sane`
-          SELECT * FROM sys."github" as Name
-        `,
+            SELECT * FROM sys."github" as Name
+          `,
         ).getFirstTableName(),
       ).toEqual('github');
     });
@@ -51,8 +100,8 @@ describe('SqlQuery operations', () => {
       expect(
         SqlQuery.parse(
           sane`
-          SELECT * FROM sys."github" as test, sys.name
-        `,
+            SELECT * FROM sys."github" as test, sys.name
+          `,
         ).getFirstTableName(),
       ).toEqual('github');
     });
@@ -63,8 +112,8 @@ describe('SqlQuery operations', () => {
       expect(
         SqlQuery.parse(
           sane`
-          SELECT * FROM sys."github"
-        `,
+            SELECT * FROM sys."github"
+          `,
         ).getFirstSchema(),
       ).toEqual('sys');
     });
@@ -73,8 +122,8 @@ describe('SqlQuery operations', () => {
       expect(
         SqlQuery.parse(
           sane`
-          SELECT * FROM "github"
-        `,
+            SELECT * FROM "github"
+          `,
         ).getFirstSchema(),
       ).toBeUndefined();
     });
@@ -83,8 +132,8 @@ describe('SqlQuery operations', () => {
       expect(
         SqlQuery.parse(
           sane`
-          SELECT * FROM "github", sys."table"
-        `,
+            SELECT * FROM "github", sys."table"
+          `,
         ).getFirstSchema(),
       ).toEqual('sys');
     });
@@ -154,9 +203,9 @@ describe('SqlQuery operations', () => {
       expect(
         SqlQuery.parse(
           sane`
-          SELECT *
-          FROM sys."github"
-        `,
+            SELECT *
+            FROM sys."github"
+          `,
         )
           .addOrderBy(SqlRef.column('col').toOrderByPart('DESC'))
           .toString(),
@@ -171,10 +220,10 @@ describe('SqlQuery operations', () => {
       expect(
         SqlQuery.parse(
           sane`
-          SELECT *
-          FROM sys."github"
-          ORDER BY col
-        `,
+            SELECT *
+            FROM sys."github"
+            ORDER BY col
+          `,
         )
           .addOrderBy(SqlRef.columnWithQuotes('colTwo').toOrderByPart('ASC'))
           .toString(),
@@ -189,10 +238,10 @@ describe('SqlQuery operations', () => {
       expect(
         SqlQuery.parse(
           sane`
-          SELECT *
-          FROM sys."github"
-          ORDER BY col, colTwo ASC
-        `,
+            SELECT *
+            FROM sys."github"
+            ORDER BY col, colTwo ASC
+          `,
         )
           .addOrderBy(SqlRef.columnWithQuotes('colThree').toOrderByPart())
           .toString(),
@@ -209,9 +258,9 @@ describe('SqlQuery operations', () => {
       expect(
         SqlQuery.parse(
           sane`
-          SELECT *
-          FROM sys."github"
-        `,
+            SELECT *
+            FROM sys."github"
+          `,
         )
           .addToWhere(`col > 1`)
           .toString(),
@@ -226,10 +275,10 @@ describe('SqlQuery operations', () => {
       expect(
         SqlQuery.parse(
           sane`
-          SELECT *
-          FROM sys."github"
-          WHERE col > 1
-        `,
+            SELECT *
+            FROM sys."github"
+            WHERE col > 1
+          `,
         )
           .addToWhere(`colTwo > 2`)
           .toString(),
@@ -244,9 +293,9 @@ describe('SqlQuery operations', () => {
       expect(
         SqlQuery.parse(
           sane`
-          SELECT *
-          FROM sys."github" WHERE col > 1 OR col < 5
-        `,
+            SELECT *
+            FROM sys."github" WHERE col > 1 OR col < 5
+          `,
         )
           .addToWhere(`colTwo > 2`)
           .toString(),
@@ -260,9 +309,9 @@ describe('SqlQuery operations', () => {
       expect(
         SqlQuery.parse(
           sane`
-          SELECT *
-          FROM sys."github" WHERE (col > 1 OR col < 5) AND colTwo > 5
-        `,
+            SELECT *
+            FROM sys."github" WHERE (col > 1 OR col < 5) AND colTwo > 5
+          `,
         )
           .addToWhere(`colTwo > 2`)
           .toString(),
@@ -331,10 +380,10 @@ describe('SqlQuery operations', () => {
       expect(
         SqlQuery.parse(
           sane`
-          SELECT col0, col1, col2
-          FROM sys."github"
-          Where col AND col2
-        `,
+            SELECT col0, col1, col2
+            FROM sys."github"
+            Where col AND col2
+          `,
         )
           .removeColumnFromWhere('col2')
           .toString(),
@@ -349,10 +398,10 @@ describe('SqlQuery operations', () => {
       expect(
         SqlQuery.parse(
           sane`
-          SELECT col0, col1, col2
-          FROM sys."github"
-          Where col2 = '1'
-        `,
+            SELECT col0, col1, col2
+            FROM sys."github"
+            Where col2 = '1'
+          `,
         )
           .removeColumnFromWhere('col2')
           .toString(),
@@ -366,10 +415,10 @@ describe('SqlQuery operations', () => {
       expect(
         SqlQuery.parse(
           sane`
-          SELECT col0, col1, col2
-          FROM sys."github"
-          Where col2 > '1' AND col2 < '1'
-        `,
+            SELECT col0, col1, col2
+            FROM sys."github"
+            Where col2 > '1' AND col2 < '1'
+          `,
         )
           .removeColumnFromWhere('col2')
           .toString(),
@@ -384,10 +433,10 @@ describe('SqlQuery operations', () => {
       expect(
         SqlQuery.parse(
           sane`
-          SELECT col0, col1, col2
-          FROM sys."github"
-          Where col2 > '1' AND col1 > 2 OR col2 < '1'
-        `,
+            SELECT col0, col1, col2
+            FROM sys."github"
+            Where col2 > '1' AND col1 > 2 OR col2 < '1'
+          `,
         )
           .removeColumnFromWhere('col2')
           .toString(),
@@ -402,10 +451,10 @@ describe('SqlQuery operations', () => {
       expect(
         SqlQuery.parse(
           sane`
-          SELECT col0, col1, col2
-          FROM sys."github"
-          Where col2 > 1
-        `,
+            SELECT col0, col1, col2
+            FROM sys."github"
+            Where col2 > 1
+          `,
         )
           .removeColumnFromWhere('col2')
           .toString(),
@@ -419,10 +468,10 @@ describe('SqlQuery operations', () => {
       expect(
         SqlQuery.parse(
           sane`
-          SELECT col0, col1, col2
-          FROM sys."github"
-          Where col2 > 1 AND col1 > 1
-        `,
+            SELECT col0, col1, col2
+            FROM sys."github"
+            Where col2 > 1 AND col1 > 1
+          `,
         )
           .removeColumnFromWhere('col2')
           .toString(),
@@ -437,10 +486,10 @@ describe('SqlQuery operations', () => {
       expect(
         SqlQuery.parse(
           sane`
-          SELECT col0, col1, col2
-          FROM sys."github"
-          Having col2 > 1
-        `,
+            SELECT col0, col1, col2
+            FROM sys."github"
+            Having col2 > 1
+          `,
         )
           .removeFromHaving('col2')
           .toString(),
@@ -454,10 +503,10 @@ describe('SqlQuery operations', () => {
       expect(
         SqlQuery.parse(
           sane`
-          SELECT col0, col1, col2
-          FROM sys."github"
-          Having col2 > 1
-        `,
+            SELECT col0, col1, col2
+            FROM sys."github"
+            Having col2 > 1
+          `,
         )
           .removeFromHaving('col2')
           .toString(),
@@ -471,10 +520,10 @@ describe('SqlQuery operations', () => {
       expect(
         SqlQuery.parse(
           sane`
-          SELECT col0, col1, col2
-          FROM sys."github"
-          Having col2 > 1 AND col1 > 1
-        `,
+            SELECT col0, col1, col2
+            FROM sys."github"
+            Having col2 > 1 AND col1 > 1
+          `,
         )
           .removeFromHaving('col2')
           .toString(),
@@ -489,10 +538,10 @@ describe('SqlQuery operations', () => {
       expect(
         SqlQuery.parse(
           sane`
-          SELECT col0, col1, col2
-          FROM sys."github"
-          Order By col, 2 ASC
-        `,
+            SELECT col0, col1, col2
+            FROM sys."github"
+            Order By col, 2 ASC
+          `,
         )
           .removeOrderByForOutputColumn('col')
           .toString(),
@@ -507,10 +556,10 @@ describe('SqlQuery operations', () => {
       expect(
         SqlQuery.parse(
           sane`
-          SELECT col0, col1, col2
-          FROM sys."github"
-          Order By col, col1 ASC
-        `,
+            SELECT col0, col1, col2
+            FROM sys."github"
+            Order By col, col1 ASC
+          `,
         )
           .removeOrderByForOutputColumn('col2')
           .toString(),
@@ -525,10 +574,10 @@ describe('SqlQuery operations', () => {
       expect(
         SqlQuery.parse(
           sane`
-          SELECT col0, col1, col2
-          FROM sys."github"
-          Order By col, 3 ASC
-        `,
+            SELECT col0, col1, col2
+            FROM sys."github"
+            Order By col, 3 ASC
+          `,
         )
           .removeOrderByForOutputColumn('col1')
           .toString(),
@@ -543,10 +592,10 @@ describe('SqlQuery operations', () => {
       expect(
         SqlQuery.parse(
           sane`
-          SELECT col0, col1, col2
-          FROM sys."github"
-          Order By col1
-        `,
+            SELECT col0, col1, col2
+            FROM sys."github"
+            Order By col1
+          `,
         )
           .removeOrderByForOutputColumn('col1')
           .toString(),
@@ -602,10 +651,10 @@ describe('SqlQuery operations', () => {
 
       expect(SqlQuery.parse(sql).addSelectExpression(`count(DISTINCT col2) AS "alias"`).toString())
         .toEqual(sane`
-        select col1,
-          count(DISTINCT col2) AS "alias"
-        from tbl
-      `);
+          select col1,
+            count(DISTINCT col2) AS "alias"
+          from tbl
+        `);
     });
   });
 
@@ -617,10 +666,10 @@ describe('SqlQuery operations', () => {
 
       expect(SqlQuery.parse(sql).addToGroupBy(SqlRef.columnWithQuotes('col')).toString())
         .toEqual(sane`
-        select "col",
-          Count(*) from tbl
-        GROUP BY 1
-      `);
+          select "col",
+            Count(*) from tbl
+          GROUP BY 1
+        `);
     });
 
     it('no existing col', () => {

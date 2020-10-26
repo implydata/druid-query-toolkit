@@ -83,7 +83,7 @@ export class SqlMulti extends SqlExpression {
       return super.and(expression);
     }
 
-    return this.changeArgs(this.args.addLast(expression));
+    return this.changeArgs(this.args.append(expression));
   }
 
   public decomposeViaAnd(): readonly SqlExpression[] {

@@ -163,9 +163,9 @@ export class SqlQuery extends SqlExpression {
     if (this.withParts) {
       rawParts.push(
         this.getKeyword('with', SqlQuery.DEFAULT_WITH_KEYWORD),
-        this.getSpace('postWith'),
-        this.withParts.toString('\n'),
-        this.getSpace('postWithQuery'),
+        this.getSpace('postWith', INDENT_SPACE),
+        this.withParts.toString(INDENT_SPACE),
+        this.getSpace('postWithParts', '\n'),
       );
     }
 
@@ -238,7 +238,7 @@ export class SqlQuery extends SqlExpression {
     } else {
       delete value.withParts;
       value.keywords = this.getKeywordsWithout('with');
-      value.spacing = this.getSpacingWithout('postWith', 'postWithQuery');
+      value.spacing = this.getSpacingWithout('postWith', 'postWithParts');
     }
     return new SqlQuery(value);
   }
@@ -529,6 +529,14 @@ export class SqlQuery extends SqlExpression {
     return SqlBase.fromValue(value);
   }
 
+  /* ~~~~~ WITH ~~~~~ */
+
+  prependWith(name: string, query: SqlQuery): SqlQuery {
+    const { withParts } = this;
+    const withPart = SqlWithPart.simple(name, query.ensureParens());
+    return this.changeWithParts(withParts ? withParts.prepend(withPart) : [withPart]);
+  }
+
   /* ~~~~~ SELECT ~~~~~ */
 
   isValidSelectIndex(selectIndex: number): boolean {
@@ -647,9 +655,9 @@ export class SqlQuery extends SqlExpression {
     const alias = SqlAlias.fromBase(typeof ex === 'string' ? SqlBase.parseSql(ex) : ex);
 
     if (first) {
-      return this.changeSelectExpressions(this.selectExpressions.addFirst(alias));
+      return this.changeSelectExpressions(this.selectExpressions.prepend(alias));
     } else {
-      return this.changeSelectExpressions(this.selectExpressions.addLast(alias));
+      return this.changeSelectExpressions(this.selectExpressions.append(alias));
     }
   }
 
@@ -779,7 +787,7 @@ export class SqlQuery extends SqlExpression {
               }
               return groupByExpression;
             })
-            .addFirst(newGroupBy)
+            .prepend(newGroupBy)
         : SeparatedArray.fromSingleValue(newGroupBy),
     );
   }

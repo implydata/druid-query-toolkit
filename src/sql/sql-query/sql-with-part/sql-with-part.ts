@@ -13,14 +13,13 @@
  */
 
 import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../../sql-base';
-import { SqlExpression, SqlRef } from '../../sql-expression';
+import { SqlRef } from '../../sql-expression';
 import { SeparatedArray } from '../../utils';
 import { SqlQuery } from '../sql-query';
 
 export interface SqlWithPartValue extends SqlBaseValue {
-  withTable: SqlExpression;
+  withTable: SqlRef;
   withColumns?: SeparatedArray<SqlRef>;
-  postWithColumns: string;
   withQuery: SqlQuery;
 }
 
@@ -29,16 +28,21 @@ export class SqlWithPart extends SqlBase {
 
   static DEFAULT_AS_KEYWORD = 'AS';
 
-  public readonly withTable: SqlExpression;
+  static simple(name: string, query: SqlQuery): SqlWithPart {
+    return new SqlWithPart({
+      withTable: SqlRef.column(name),
+      withQuery: query,
+    });
+  }
+
+  public readonly withTable: SqlRef;
   public readonly withColumns?: SeparatedArray<SqlRef>;
-  public readonly postWithColumns: string;
   public readonly withQuery: SqlQuery;
 
   constructor(options: SqlWithPartValue) {
     super(options, SqlWithPart.type);
     this.withTable = options.withTable;
     this.withColumns = options.withColumns;
-    this.postWithColumns = options.postWithColumns;
     this.withQuery = options.withQuery;
   }
 
@@ -46,7 +50,6 @@ export class SqlWithPart extends SqlBase {
     const value = super.valueOf() as SqlWithPartValue;
     value.withTable = this.withTable;
     value.withColumns = this.withColumns;
-    value.postWithColumns = this.postWithColumns;
     value.withQuery = this.withQuery;
     return value;
   }
@@ -74,7 +77,7 @@ export class SqlWithPart extends SqlBase {
     return rawParts.join('');
   }
 
-  public changeWithTable(withTable: SqlExpression): this {
+  public changeWithTable(withTable: SqlRef): this {
     const value = this.valueOf();
     value.withTable = withTable;
     return SqlBase.fromValue(value);
@@ -102,7 +105,7 @@ export class SqlWithPart extends SqlBase {
     const withTable = this.withTable._walkHelper(nextStack, fn, postorder);
     if (!withTable) return;
     if (withTable !== this.withTable) {
-      ret = ret.changeWithTable(withTable);
+      ret = ret.changeWithTable(withTable as SqlRef);
     }
 
     if (this.withColumns) {

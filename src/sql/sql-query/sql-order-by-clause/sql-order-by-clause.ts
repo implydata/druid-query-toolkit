@@ -103,7 +103,7 @@ export class SqlOrderByClause extends SqlClause {
   }
 
   public addFirst(orderBy: SqlOrderByExpression): SqlOrderByClause {
-    return this.changeExpressions(this.expressions.addFirst(orderBy));
+    return this.changeExpressions(this.expressions.prepend(orderBy));
   }
 
   public removeExpression(

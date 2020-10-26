@@ -113,13 +113,13 @@ export class SeparatedArray<T> {
     return this.filter((_x, i) => i !== index);
   }
 
-  public addFirst(value: T): SeparatedArray<T> {
+  public prepend(value: T): SeparatedArray<T> {
     const { values, separators } = this;
     const separator = separators[0];
     return new SeparatedArray<T>([value].concat(values), [separator].concat(separators));
   }
 
-  public addLast(value: T): SeparatedArray<T> {
+  public append(value: T): SeparatedArray<T> {
     const { values, separators } = this;
     const separator = separators[values.length - 2];
     return new SeparatedArray<T>(values.concat([value]), separators.concat(separator));
