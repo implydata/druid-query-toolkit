@@ -23,10 +23,13 @@ describe('SqlLiteral', () => {
       `FALSE`,
       `'lol'`,
       `U&'hello'`,
+      `U&'hell''o'`,
       `_latin1'hello'`,
       `_UTF8'hello'`,
+      `_UTF8'hell''o'`,
       `_l-1'hello'`,
       `_8l-1'hello'`,
+      `'don''t do it'`,
     ];
 
     for (const sql of queries) {
@@ -102,7 +105,7 @@ describe('SqlLiteral', () => {
   });
 
   it('string literal', () => {
-    const sql = `'word'`;
+    const sql = `'don''t go there'`;
 
     backAndForth(sql);
 
@@ -110,9 +113,9 @@ describe('SqlLiteral', () => {
       SqlLiteral {
         "keywords": Object {},
         "spacing": Object {},
-        "stringValue": "'word'",
+        "stringValue": "'don''t go there'",
         "type": "literal",
-        "value": "word",
+        "value": "don't go there",
       }
     `);
   });

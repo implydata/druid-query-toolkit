@@ -1105,26 +1105,26 @@ Digit = [0-9]
 
 /* Strings */
 
-SingleQuotedString = "'" v:$([^']*) "'"
+SingleQuotedString = "'" v:$(("''" / [^'])*) "'"
 {
   return {
-    value: v,
+    value: v.replace(/''/g, "'"),
     stringValue: text()
   };
 }
 
-UnicodeString = "U&'"i v:$([^']*) "'"
+UnicodeString = "U&"i v:SingleQuotedString
 {
   return {
-    value: v.replace(/\\[0-9a-f]{4}/gi, function(s) { return String.fromCharCode(parseInt(s.substr(1), 16)); }),
+    value: v.value.replace(/\\[0-9a-f]{4}/gi, function(s) { return String.fromCharCode(parseInt(s.substr(1), 16)); }),
     stringValue: text()
   };
 }
 
-CharsetString = "_" [a-z0-9]i [a-z0-9_-]i* "'" v:$([^']*) "'"
+CharsetString = "_" [a-z0-9]i [a-z0-9_-]i* v:SingleQuotedString
 {
   return {
-    value: v, // ToDo: fix this
+    value: v.value, // ToDo: fix this
     stringValue: text()
   };
 }
