@@ -61,7 +61,7 @@ export class SqlRef extends SqlExpression {
   }
 
   static table(
-    table?: string,
+    table: string,
     namespace?: string,
     forceTableQuotes = false,
     forceNamespaceQuotes = false,
@@ -165,11 +165,13 @@ export class SqlRef extends SqlExpression {
     return this.table;
   }
 
-  public changeTable(table: string): SqlRef {
+  public changeTable(table: string | undefined): SqlRef {
     const value = this.valueOf();
     value.table = table;
     if (table) {
       value.tableQuotes = value.tableQuotes || SqlRef.needsQuotes(table);
+    } else {
+      delete value.tableQuotes;
     }
     return SqlBase.fromValue(value);
   }
@@ -179,11 +181,13 @@ export class SqlRef extends SqlExpression {
     return this.namespace;
   }
 
-  public changeNamespace(namespace: string): SqlRef {
+  public changeNamespace(namespace: string | undefined): SqlRef {
     const value = this.valueOf();
     value.namespace = namespace;
     if (namespace) {
       value.namespaceQuotes = value.namespaceQuotes || SqlRef.needsQuotes(namespace);
+    } else {
+      delete value.namespaceQuotes;
     }
     return SqlBase.fromValue(value);
   }
@@ -196,6 +200,10 @@ export class SqlRef extends SqlExpression {
 
   public isStar(): boolean {
     return this.column === '*';
+  }
+
+  public isTableRef(): boolean {
+    return !this.column;
   }
 
   public upgrade() {
