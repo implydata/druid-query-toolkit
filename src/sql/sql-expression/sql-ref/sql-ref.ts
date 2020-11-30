@@ -82,7 +82,7 @@ export class SqlRef extends SqlExpression {
   static wrapInQuotes(thing: string = '', quotes = false): string {
     if (!thing) return '';
     if (quotes) {
-      return `"${thing}"`;
+      return `"${thing.replace(/"/g, '""')}"`;
     } else {
       return thing;
     }

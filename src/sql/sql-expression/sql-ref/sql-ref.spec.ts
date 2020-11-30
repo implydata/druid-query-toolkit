@@ -16,6 +16,18 @@ import { SqlExpression, SqlQuery, SqlRef } from '../../..';
 import { backAndForth } from '../../../test-utils';
 
 describe('SqlRef', () => {
+  it('things that work', () => {
+    const queries: string[] = [`hello`, `"hello"`, `"""hello"""`, `"a""b"`, `a.b`, `"a""b".c`];
+
+    for (const sql of queries) {
+      try {
+        backAndForth(sql);
+      } catch (e) {
+        throw new Error(`problem with \`${sql}\`: ${e.message}`);
+      }
+    }
+  });
+
   it('avoids reserved', () => {
     const sql = 'From';
 

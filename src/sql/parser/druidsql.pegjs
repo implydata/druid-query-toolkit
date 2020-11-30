@@ -1216,10 +1216,10 @@ SqlRef = a:RefPart b:(_ "." _ RefPart)? c:(_ "." _ RefPart)?
 
 RefPart = QuotedRefPart / UnquotedRefPart / Star
 
-QuotedRefPart = ["] name:$([^"]+) ["]
+QuotedRefPart = '"' name:$(('""' / [^"])+) '"'
 {
   return {
-    name: name,
+    name: name.replace(/""/g, '"'),
     quotes: true
   };
 }
