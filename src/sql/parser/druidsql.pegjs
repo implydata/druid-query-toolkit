@@ -1090,10 +1090,10 @@ Number "Number" =
   ((Digits Fraction?) / Fraction)
   ('e'i [+-]? Digits)?
 {
-  var n = text();
+  var str = text();
   return {
-    value: parseFloat(n),
-    stringValue: n
+    value: str.length > 15 && str.indexOf('.') === -1 ? BigInt(str) : +str,
+    stringValue: str
   };
 }
 

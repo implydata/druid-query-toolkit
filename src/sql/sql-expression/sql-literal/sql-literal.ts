@@ -20,7 +20,7 @@ function isDate(v: any): v is Date {
   return Boolean(v && typeof v.toISOString === 'function');
 }
 
-export type LiteralValue = null | boolean | number | string | Date;
+export type LiteralValue = null | boolean | number | bigint | string | Date;
 
 export interface SqlLiteralValue extends SqlBaseValue {
   value: LiteralValue;
@@ -52,6 +52,7 @@ export class SqlLiteral extends SqlExpression {
 
       case 'boolean':
       case 'number':
+      case 'bigint':
       case 'string':
         break; // Nothing to do here
 
@@ -178,16 +179,25 @@ export class SqlLiteral extends SqlExpression {
 
   public isInteger(): boolean {
     const { value } = this;
-    return typeof value === 'number' && isFinite(value) && Math.floor(value) === value;
+    switch (typeof value) {
+      case 'number':
+        return isFinite(value) && Math.floor(value) === value;
+
+      case 'bigint':
+        return true;
+
+      default:
+        return false;
+    }
   }
 
   public isDate(): boolean {
     return isDate(this.value);
   }
 
-  getNumberValue(): number | undefined {
+  getNumberValue(): number | bigint | undefined {
     const { value } = this;
-    if (typeof value !== 'number') return;
+    if (typeof value !== 'number' && typeof value !== 'bigint') return;
     return value;
   }
 

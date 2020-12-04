@@ -30,6 +30,8 @@ describe('SqlLiteral', () => {
       `_l-1'hello'`,
       `_8l-1'hello'`,
       `'don''t do it'`,
+      `123.34`,
+      `1606832560494517248`,
     ];
 
     for (const sql of queries) {
@@ -252,6 +254,22 @@ describe('SqlLiteral', () => {
     `);
   });
 
+  it('works with bigint', () => {
+    const sql = `1606832560494517248`;
+
+    backAndForth(sql);
+
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+      SqlLiteral {
+        "keywords": Object {},
+        "spacing": Object {},
+        "stringValue": "1606832560494517248",
+        "type": "literal",
+        "value": 1606832560494517248n,
+      }
+    `);
+  });
+
   it('works with string', () => {
     const sql = `'hello'`;
 
@@ -345,6 +363,7 @@ describe('SqlLiteral', () => {
     expect(String(SqlLiteral.create(false))).toEqual('FALSE');
     expect(String(SqlLiteral.create(true))).toEqual('TRUE');
     expect(String(SqlLiteral.create(1.2))).toEqual('1.2');
+    expect(String(SqlLiteral.create(BigInt(1606832560494517248)))).toEqual('1606832560494517248');
     expect(String(SqlLiteral.create(`hello`))).toEqual(`'hello'`);
     expect(String(SqlLiteral.create(`he'o`))).toEqual(`'he''o'`);
     expect(String(SqlLiteral.create(new Date('2020-01-02Z')))).toEqual(`TIMESTAMP '2020-01-02'`);
