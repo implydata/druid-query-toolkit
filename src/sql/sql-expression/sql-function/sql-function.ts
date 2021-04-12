@@ -149,6 +149,15 @@ export class SqlFunction extends SqlExpression {
     );
   }
 
+  public addWhereExpression(whereExpression: SqlExpression | string): this {
+    const { whereClause } = this;
+    return this.changeWhereClause(
+      whereClause
+        ? whereClause.changeExpression(whereClause.expression.and(whereExpression))
+        : SqlWhereClause.createForFunction(whereExpression),
+    );
+  }
+
   public getWhereExpression(): SqlExpression | undefined {
     const { whereClause } = this;
     if (!whereClause) return;

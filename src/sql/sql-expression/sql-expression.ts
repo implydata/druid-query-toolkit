@@ -46,9 +46,10 @@ export abstract class SqlExpression extends SqlBase {
     return input instanceof SqlExpression ? input : SqlLiteral.create(input);
   }
 
-  static and(...args: (SqlExpression | undefined)[]) {
+  static and(...args: (SqlExpression | string | undefined)[]) {
     const compactArgs = filterMap(args, a => {
       if (!a) return;
+      a = SqlExpression.parse(a);
       if (a instanceof SqlMulti && a.op === 'OR') {
         return a.ensureParens();
       }
@@ -168,7 +169,7 @@ export abstract class SqlExpression extends SqlBase {
 
   // SqlMulti
 
-  public and(expression: SqlExpression): SqlExpression {
+  public and(expression: SqlExpression | string): SqlExpression {
     return SqlExpression.and(this, expression);
   }
 

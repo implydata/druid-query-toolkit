@@ -701,19 +701,39 @@ describe('SqlFunction', () => {
     `);
   });
 
-  it('Changes filter expression', () => {
-    const sql = SqlExpression.parse(
-      `SUM(t."lol") FILTER (WHERE t."country" = 'USA')`,
-    ) as SqlFunction;
-    expect(String(sql.changeWhereExpression(`t."country" = 'UK'`))).toEqual(
-      'SUM(t."lol") FILTER (WHERE t."country" = \'UK\')',
-    );
+  describe('#changeWhereExpression', () => {
+    it('changes', () => {
+      const sql = SqlExpression.parse(
+        `SUM(t."lol") FILTER (WHERE t."country" = 'USA')`,
+      ) as SqlFunction;
+      expect(String(sql.changeWhereExpression(`t."country" = 'UK'`))).toEqual(
+        'SUM(t."lol") FILTER (WHERE t."country" = \'UK\')',
+      );
+    });
+
+    it('adds', () => {
+      const sql = SqlExpression.parse(`SUM(t."lol")`) as SqlFunction;
+      expect(String(sql.changeWhereExpression(`t."country" = 'UK'`))).toEqual(
+        'SUM(t."lol") FILTER (WHERE t."country" = \'UK\')',
+      );
+    });
   });
 
-  it('Creates filter expression', () => {
-    const sql = SqlExpression.parse(`SUM(t."lol")`) as SqlFunction;
-    expect(String(sql.changeWhereExpression(`t."country" = 'UK'`))).toEqual(
-      'SUM(t."lol") FILTER (WHERE t."country" = \'UK\')',
-    );
+  describe('#addWhereExpression', () => {
+    it('adds when something already exists', () => {
+      const sql = SqlExpression.parse(
+        `SUM(t."lol") FILTER (WHERE t."country" = 'USA' OR t."city" = 'SF')`,
+      ) as SqlFunction;
+      expect(String(sql.addWhereExpression(`t."browser" = 'Chrome'`))).toEqual(
+        `SUM(t."lol") FILTER (WHERE (t."country" = 'USA' OR t."city" = 'SF') AND t."browser" = 'Chrome')`,
+      );
+    });
+
+    it('adds when nothing exists', () => {
+      const sql = SqlExpression.parse(`SUM(t."lol")`) as SqlFunction;
+      expect(String(sql.changeWhereExpression(`t."browser" = 'Chrome'`))).toEqual(
+        'SUM(t."lol") FILTER (WHERE t."browser" = \'Chrome\')',
+      );
+    });
   });
 });
