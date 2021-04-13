@@ -153,4 +153,79 @@ describe('SqlExpression', () => {
       backAndForth(sql);
     });
   });
+
+  describe('addFilterToAggregations', () => {
+    const knownAggregates = ['COUNT', 'SUM', 'MIN'];
+    const filter = SqlExpression.parse(`country = 'USA'`);
+
+    it('works in a simple case', () => {
+      expect(
+        SqlExpression.parse(`SUM(x)`).addFilterToAggregations(filter, knownAggregates).toString(),
+      ).toEqual(`SUM(x) FILTER (WHERE country = 'USA')`);
+    });
+
+    it('works in a more complex case', () => {
+      expect(
+        SqlExpression.parse(`SUM(x) + COUNT(*) / MIN(CAST(y AS BIGINT))`)
+          .addFilterToAggregations(filter, knownAggregates)
+          .toString(),
+      ).toEqual(
+        `SUM(x) FILTER (WHERE country = 'USA') + COUNT(*) FILTER (WHERE country = 'USA') / MIN(CAST(y AS BIGINT)) FILTER (WHERE country = 'USA')`,
+      );
+    });
+
+    it('fails if naked reference', () => {
+      expect(() => {
+        SqlExpression.parse(`x + 1`).addFilterToAggregations(filter, knownAggregates).toString();
+      }).toThrow(`column reference outside aggregation`);
+    });
+
+    it('works when the function is not known', () => {
+      expect(
+        SqlExpression.parse(`BLAH(x)`).addFilterToAggregations(filter, knownAggregates).toString(),
+      ).toEqual(`BLAH(x) FILTER (WHERE country = 'USA')`);
+    });
+
+    it('works when two functions are not known 1', () => {
+      expect(
+        SqlExpression.parse(`FOO(BAR(x + 1) + CAST(CURRENT_TIMESTAMP AS BIGINT))`)
+          .addFilterToAggregations(filter, knownAggregates)
+          .toString(),
+      ).toEqual(
+        `FOO(BAR(x + 1) FILTER (WHERE country = 'USA') + CAST(CURRENT_TIMESTAMP AS BIGINT))`,
+      );
+    });
+
+    it('works when two functions are not known 2', () => {
+      expect(
+        SqlExpression.parse(`FOO(BAR(x + 1) + x)`)
+          .addFilterToAggregations(filter, knownAggregates)
+          .toString(),
+      ).toEqual(`FOO(BAR(x + 1) + x) FILTER (WHERE country = 'USA')`);
+    });
+
+    it('works in real case 1', () => {
+      expect(
+        SqlExpression.parse(
+          `APPROX_COUNT_DISTINCT_DS_HLL(COALESCE(t."email", t."user", 'api:' || t."id"))`,
+        )
+          .addFilterToAggregations(filter, ['APPROX_COUNT_DISTINCT_DS_HLL'])
+          .toString(),
+      ).toEqual(
+        `APPROX_COUNT_DISTINCT_DS_HLL(COALESCE(t."email", t."user", 'api:' || t."id")) FILTER (WHERE country = 'USA')`,
+      );
+    });
+
+    it('works in real case 2', () => {
+      expect(
+        SqlExpression.parse(
+          `APPROX_COUNT_DISTINCT_DS_HLL(COALESCE(t."email", t."user", 'api:' || t."id")) FILTER (WHERE 2 <> 1)`,
+        )
+          .addFilterToAggregations(filter, knownAggregates)
+          .toString(),
+      ).toEqual(
+        `APPROX_COUNT_DISTINCT_DS_HLL(COALESCE(t."email", t."user", 'api:' || t."id")) FILTER (WHERE 2 <> 1 AND country = 'USA')`,
+      );
+    });
+  });
 });

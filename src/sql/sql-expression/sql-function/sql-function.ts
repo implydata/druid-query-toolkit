@@ -168,6 +168,10 @@ export class SqlFunction extends SqlExpression {
     return this.getWhereExpression() || SqlLiteral.TRUE;
   }
 
+  public isAggregation(knownAggregations: string[]): boolean {
+    return Boolean(this.whereClause || knownAggregations.includes(this.getEffectiveFunctionName()));
+  }
+
   public _walkInner(
     nextStack: SqlBase[],
     fn: Substitutor,

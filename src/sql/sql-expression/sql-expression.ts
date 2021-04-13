@@ -18,10 +18,12 @@ import {
   Separator,
   SqlAlias,
   SqlComparison,
+  SqlFunction,
   SqlLiteral,
   SqlMulti,
   SqlOrderByDirection,
   SqlOrderByExpression,
+  SqlRef,
 } from '..';
 import { filterMap } from '../../utils';
 import { parseSql } from '../parser';
@@ -184,5 +186,37 @@ export abstract class SqlExpression extends SqlBase {
 
   public removeColumnFromAnd(column: string): SqlExpression | undefined {
     return this.filterAnd(ex => !ex.containsColumn(column));
+  }
+
+  // Logic
+
+  public addFilterToAggregations(
+    filter: SqlExpression,
+    knownAggregations: string[],
+  ): SqlExpression {
+    return this.walk(x => {
+      if (x instanceof SqlFunction) {
+        if (x.isAggregation(knownAggregations)) return x.addWhereExpression(filter);
+
+        const { args } = x;
+        if (!args) return x;
+
+        try {
+          return x.changeArgs(
+            args.map(a => {
+              return a.addFilterToAggregations(filter, knownAggregations);
+            }),
+          );
+        } catch (e) {
+          if (e.message === 'column reference outside aggregation') {
+            return x.addWhereExpression(filter);
+          }
+          throw e;
+        }
+      } else if (x instanceof SqlRef) {
+        throw new Error('column reference outside aggregation');
+      }
+      return x;
+    }) as SqlExpression;
   }
 }
