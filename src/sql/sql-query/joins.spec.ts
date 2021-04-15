@@ -17,10 +17,43 @@ import { backAndForth, sane } from '../../test-utils';
 
 describe('parse join with lookup', () => {
   it('parses a basic math expression', () => {
-    backAndForth(sane`
+    const sql = sane`
       SELECT countryName from wikipedia
-      LEFT JOIN lookup.country ON lookup.country.v = wikipedia.countryName
-    `);
+      Left JOIN lookup.country ON lookup.country.v = wikipedia.countryName
+    `;
+
+    backAndForth(sql);
+    expect(SqlQuery.parse(sql).getJoins()[0].joinType).toEqual('LEFT');
+  });
+
+  it('parses a left outer join', () => {
+    const sql = sane`
+      SELECT countryName from wikipedia
+      Left OUTER JOIN lookup.country ON lookup.country.v = wikipedia.countryName
+    `;
+
+    backAndForth(sql);
+    expect(SqlQuery.parse(sql).getJoins()[0].joinType).toEqual('LEFT');
+  });
+
+  it('parses a right outer join', () => {
+    const sql = sane`
+      SELECT countryName from wikipedia
+      Right OUTER JOIN lookup.country ON lookup.country.v = wikipedia.countryName
+    `;
+
+    backAndForth(sql);
+    expect(SqlQuery.parse(sql).getJoins()[0].joinType).toEqual('RIGHT');
+  });
+
+  it('parses a full outer join', () => {
+    const sql = sane`
+      SELECT countryName from wikipedia
+      FULL OUTER JOIN lookup.country ON lookup.country.v = wikipedia.countryName
+    `;
+
+    backAndForth(sql);
+    expect(SqlQuery.parse(sql).getJoins()[0].joinType).toEqual('FULL');
   });
 
   it('parses CROSS JOIN', () => {

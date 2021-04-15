@@ -16,7 +16,7 @@ import { SqlAlias } from '..';
 import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../../sql-base';
 import { SqlExpression } from '../../sql-expression';
 
-export type SqlJoinJoinType = 'LEFT' | 'RIGHT' | 'INNER' | 'FULL' | 'FULL OUTER' | 'CROSS';
+export type SqlJoinJoinType = 'LEFT' | 'RIGHT' | 'FULL' | 'INNER' | 'CROSS';
 
 export interface SqlJoinPartValue extends SqlBaseValue {
   joinType?: SqlJoinJoinType;

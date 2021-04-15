@@ -4253,7 +4253,7 @@ describe('SqlQuery', () => {
               "separators": Array [],
               "values": Array [
                 SqlJoinPart {
-                  "joinType": "FULL OUTER",
+                  "joinType": "FULL",
                   "keywords": Object {
                     "join": "Join",
                     "joinType": "FULL OUTER",

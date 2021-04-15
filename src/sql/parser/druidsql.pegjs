@@ -220,7 +220,8 @@ SqlJoinPart =
 
   if (joinType) {
     var joinTypeUpper = joinType[0].toUpperCase();
-    if (/^FULL.+OUTER$/.test(joinTypeUpper)) joinTypeUpper = 'FULL OUTER';
+    var m = joinTypeUpper.match(/^LEFT|RIGHT|FULL/);
+    if (m) joinTypeUpper = m[0];
     value.joinType = joinTypeUpper;
     keywords.joinType = joinType[0];
     spacing.postJoinType = joinType[1];
@@ -236,11 +237,8 @@ SqlJoinPart =
 }
 
 JoinType =
-  "LEFT"i
-/ "RIGHT"i
+  $(("LEFT"i / "RIGHT"i / "FULL"i) (__ OuterToken)?)
 / "INNER"i
-/ $("FULL"i __ "OUTER"i)
-/ "FULL"i
 / "CROSS"i
 
 WhereClause = where:WhereToken postWhere:_ expression:Expression
@@ -1317,6 +1315,7 @@ OffsetToken = $("OFFSET"i !IdentifierPart)
 OnToken = $("ON"i !IdentifierPart)
 OrToken = $("OR"i !IdentifierPart)
 OrderToken = $("ORDER"i !IdentifierPart)
+OuterToken = $("OUTER"i !IdentifierPart)
 PlanToken = $("PLAN"i !IdentifierPart)
 PositionToken = $("POSITION"i !IdentifierPart)
 SelectToken = $("SELECT"i !IdentifierPart)
