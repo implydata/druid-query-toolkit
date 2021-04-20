@@ -255,5 +255,43 @@ describe('Introspect', () => {
         },
       ]);
     });
+
+    it('works with a JOIN query', () => {
+      const query = SqlQuery.parse(sane`
+        SELECT
+          browser,
+          lookup.browser_maker.v AS "maker",
+          COUNT(*) AS "Count"
+        FROM kttm
+        LEFT JOIN lookup.browser_maker ON lookup.browser_maker.k = kttm.browser
+        GROUP BY 1, 2
+        ORDER BY 3 DESC
+      `);
+
+      const queryPlanResult = new QueryResult({
+        sqlQuery: Introspect.getQueryColumnIntrospectionQuery(query),
+        header: [{ name: 'PLAN' }],
+        rows: [
+          [
+            '\nDruidJoinQueryRel(condition=[=($4, $29)], joinType=[left], query=[{ ... }], signature=[{d0:STRING, d1:STRING, a0:LONG}]) DruidQueryRel(query=[{ ... }], signature=[{__time:LONG, adblock_list:STRING, agent_category:STRING, agent_type:STRING, browser:STRING, browser_version:STRING, city:STRING, continent:STRING, country:STRING, event_subtype:STRING, event_type:STRING, forwarded_for:STRING, language:STRING, loaded_image:STRING, number:LONG, os:STRING, path:STRING, platform:STRING, referrer:STRING, referrer_host:STRING, region:STRING, remote_address:STRING, screen:STRING, session:STRING, session_length:LONG, timezone:STRING, timezone_offset:LONG, version:STRING, window:STRING}]) DruidQueryRel(query=[{ ... }], signature=[{k:STRING, v:STRING}])\n',
+          ],
+        ],
+      });
+
+      expect(Introspect.decodeQueryColumnIntrospectionResult(queryPlanResult)).toEqual([
+        {
+          name: 'browser',
+          type: 'STRING',
+        },
+        {
+          name: 'maker',
+          type: 'STRING',
+        },
+        {
+          name: 'Count',
+          type: 'LONG',
+        },
+      ]);
+    });
   });
 });

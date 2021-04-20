@@ -83,7 +83,7 @@ export class Introspect {
     if (rows.length !== 1) throw new Error('invalid result shape, bad number of results');
 
     const plan = rows[0][0];
-    const m = plan.match(/ signature=\[\{(.*)}]/m);
+    const m = plan.match(/ signature=\[\{([\w ,:]*)}]/m);
     if (!m) throw new Error('could not find signature');
 
     return m[1].split(/,\s/g).map((t: string) => t.split(':')[1]);
