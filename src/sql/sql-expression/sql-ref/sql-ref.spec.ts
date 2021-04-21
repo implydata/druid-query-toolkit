@@ -54,8 +54,14 @@ describe('SqlRef', () => {
     `);
   });
 
-  it('#column (reserved)', () => {
-    expect(String(SqlRef.column('user'))).toEqual(`"user"`);
+  describe('#column', () => {
+    it('works with reserved word', () => {
+      expect(String(SqlRef.column('user'))).toEqual(`"user"`);
+    });
+
+    it('works with .', () => {
+      expect(String(SqlRef.column('wiki.pedia'))).toEqual(`"wiki.pedia"`);
+    });
   });
 
   it('Ref with double quotes and double quoted namespace', () => {
