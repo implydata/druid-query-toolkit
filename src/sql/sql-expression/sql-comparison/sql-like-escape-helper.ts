@@ -11,8 +11,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { SqlExpression, SqlLiteral } from '..';
 import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../../sql-base';
+import { SqlExpression, SqlLiteral } from '..';
 
 export interface SqlLikeEscapeHelperValue extends SqlBaseValue {
   like: SqlExpression;

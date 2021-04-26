@@ -94,9 +94,7 @@ export class QueryRunner {
     }
 
     if (!QueryRunner.isEmptyContext(extraQueryContext)) {
-      jsonQuery = Object.assign({}, jsonQuery, {
-        context: Object.assign({}, jsonQuery.context || {}, extraQueryContext),
-      });
+      jsonQuery = { ...jsonQuery, context: { ...(jsonQuery.context || {}), ...extraQueryContext } };
     }
 
     if (
@@ -104,9 +102,7 @@ export class QueryRunner {
       Array.isArray(queryParameters) &&
       queryParameters.length
     ) {
-      jsonQuery = Object.assign({}, jsonQuery, {
-        parameters: queryParameters,
-      });
+      jsonQuery = { ...jsonQuery, parameters: queryParameters };
     }
 
     const startTime = QueryRunner.now();

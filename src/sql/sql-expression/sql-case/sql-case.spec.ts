@@ -12,8 +12,8 @@
  * limitations under the License.
  */
 
-import { SqlExpression } from '../..';
 import { backAndForth } from '../../../test-utils';
+import { SqlExpression } from '../..';
 
 describe('Case expression', () => {
   it('simple CASE Expression', () => {

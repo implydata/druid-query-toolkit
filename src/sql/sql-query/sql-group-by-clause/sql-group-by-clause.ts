@@ -12,10 +12,10 @@
  * limitations under the License.
  */
 
-import { SqlAlias } from '..';
 import { SqlBase, SqlType, Substitutor } from '../../sql-base';
 import { SqlExpression, SqlLiteral } from '../../sql-expression';
 import { SeparatedArray } from '../../utils';
+import { SqlAlias } from '..';
 import { SqlClause, SqlClauseValue } from '../sql-clause';
 
 export interface SqlGroupByClauseValue extends SqlClauseValue {

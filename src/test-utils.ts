@@ -16,9 +16,10 @@ import { parseSql } from './sql/parser';
 
 // To be used as a tag
 export function sane(_x: TemplateStringsArray) {
+  // eslint-disable-next-line prefer-rest-params,prefer-spread
   const str = String.raw.apply(String, arguments as any);
 
-  const match = str.match(/^\n( *)/m);
+  const match = /^\n( *)/m.exec(str);
   if (!match) throw new Error('sane string must start with a \\n is:' + str);
   const spaces = match[1].length;
 

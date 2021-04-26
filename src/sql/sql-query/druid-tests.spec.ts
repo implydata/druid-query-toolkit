@@ -38,7 +38,7 @@ describe.skip('Druid test queries', () => {
                AND __time BETWEEN '1994-04-29 00:00:00' AND '2020-01-11 00:00:00' GROUP BY 1
           )
       GROUP BY 1, 2
-      
+
     `,
     sane`
       SELECT CAST(__time AS BIGINT), m1, ANY_VALUE(dim3, 100) FROM foo WHERE (CAST(TIME_FLOOR(__time, 'PT1H') AS BIGINT), m1) IN
@@ -47,7 +47,7 @@ describe.skip('Druid test queries', () => {
                AND __time BETWEEN '1994-04-29 00:00:00' AND '2020-01-11 00:00:00' GROUP BY 1
           )
       GROUP BY 1, 2
-      
+
     `,
     sane`
       SELECT exp(count(*)) + 10, sum(m2)  FROM druid.foo WHERE  dim2 = 0
@@ -334,7 +334,7 @@ describe.skip('Druid test queries', () => {
         dim1,  SUBSTRING(dim1, 2)
       FROM druid.foo
       GROUP BY dim1
-      
+
     `,
     sane`
       SELECT
@@ -471,15 +471,15 @@ describe.skip('Druid test queries', () => {
     `,
     sane`
       SELECT COALESCE(dim2, dim1), COUNT(*) FROM druid.foo GROUP BY COALESCE(dim2, dim1)
-      
+
     `,
     sane`
       SELECT COUNT(*) FROM druid.foo WHERE dim2 IS NULL
-      
+
     `,
     sane`
       SELECT COUNT(*) FROM druid.foo x, druid.foo y
-      
+
     `,
     sane`
       SELECT dim1 FROM druid.foo ORDER BY dim1
@@ -494,7 +494,7 @@ describe.skip('Druid test queries', () => {
     sane`
       SELECT foo.dim1, foo.dim2, l.k, l.v
       FROM foo INNER JOIN lookup.lookyloo l ON CHARACTER_LENGTH(foo.dim2 || l.k) > 3
-      
+
     `,
     sane`
       SELECT COUNT(distinct dim1), COUNT(distinct dim2) FROM druid.foo
@@ -674,7 +674,7 @@ describe.skip('Druid test queries', () => {
     sane`
       SELECT COUNT(*) FROM druid.foo
       WHERE __time >= 'z2000-01-01 00:00:00' AND __time < '2001-01-01 00:00:00'
-      
+
     `,
     sane`
       SELECT COUNT(*) FROM druid.foo WHERE __time = TIMESTAMP '2000-01-01 00:00:00'
@@ -819,7 +819,7 @@ describe.skip('Druid test queries', () => {
             FROM "foo"
             GROUP BY 1
         )) LIMIT 1
-      
+
     `,
     sane`
       SELECT
@@ -840,7 +840,7 @@ describe.skip('Druid test queries', () => {
       ) t2 ON (t1.dim2 = t2.dim2)
       GROUP BY t1.dim1
       ORDER BY 1
-      
+
     `,
     sane`
       SELECT SUBSTRING(t1.dim1, 1, 10), SUM(t1.cnt)
@@ -870,7 +870,7 @@ describe.skip('Druid test queries', () => {
       ) t2 ON (t1.dim2 = t2.dim2)
       GROUP BY t1.dim1
       ORDER BY 1
-      
+
     `,
     sane`
       SELECT COUNT(*)
@@ -888,7 +888,7 @@ describe.skip('Druid test queries', () => {
       WHERE SUBSTRING(dim2, 1, 1) IN (
         SELECT SUBSTRING(dim1, 1, 1) FROM druid.foo WHERE dim1 <> ''
       )
-      
+
     `,
     sane`
       SELECT
@@ -1046,7 +1046,7 @@ describe.skip('Druid test queries', () => {
       AND EXTRACT(DECADE FROM __time) = 200
       AND EXTRACT(CENTURY FROM __time) = 20
       AND EXTRACT(MILLENNIUM FROM __time) = 2
-      
+
     `,
     sane`
       SELECT COUNT(*) FROM druid.foo WHERE floor(__time TO month) = TIMESTAMP '2000-01-01 00:00:01'
@@ -1113,14 +1113,14 @@ describe.skip('Druid test queries', () => {
     sane`
       SELECT dim2, lookyloo.*
       FROM foo INNER JOIN lookup.lookyloo ON foo.dim2 = lookyloo.k
-      
+
     `,
     sane`
       SELECT dim1, dim2, l1.v, l2.v
       FROM foo
       LEFT JOIN lookup.lookyloo l1 ON foo.dim1 = l1.k
       LEFT JOIN lookup.lookyloo l2 ON foo.dim2 = l2.k
-      
+
     `,
     sane`
       SELECT dim1
@@ -1129,7 +1129,7 @@ describe.skip('Druid test queries', () => {
       INNER JOIN lookup.lookyloo l2 ON foo.dim2 = l2.k
       WHERE l.v = 'xa'
       LIMIT 100
-      
+
     `,
     sane`
       SELECT dim1
@@ -1137,7 +1137,7 @@ describe.skip('Druid test queries', () => {
       INNER JOIN lookup.lookyloo l ON foo.dim2 = l.k
       INNER JOIN lookup.lookyloo l2 ON foo.dim2 = l2.k
       WHERE l.v = 'xa'
-      
+
     `,
     sane`
       SELECT __time, cnt, dim1, dim2, dim3, m1, m2, unique_dim1
@@ -1146,7 +1146,7 @@ describe.skip('Druid test queries', () => {
       INNER JOIN lookup.lookyloo l2 ON foo.dim2 = l2.k
       WHERE l.v = 'xa'
       LIMIT 100
-      
+
     `,
     sane`
       SELECT __time, cnt, dim1, dim2, dim3, m1, m2, unique_dim1
@@ -1154,7 +1154,7 @@ describe.skip('Druid test queries', () => {
       INNER JOIN lookup.lookyloo l ON foo.dim2 = l.k
       INNER JOIN lookup.lookyloo l2 ON foo.dim2 = l2.k
       WHERE l.v = 'xa'
-      
+
     `,
     sane`
       SELECT dim1
@@ -1179,19 +1179,19 @@ describe.skip('Druid test queries', () => {
       INNER JOIN lookup.lookyloo l18 ON foo.dim2 = l18.k
       INNER JOIN lookup.lookyloo l19 ON foo.dim2 = l19.k
       WHERE l.v = 'xa'
-      
+
     `,
     sane`
       SELECT dim1, dim2, t1.v, t1.v
       FROM foo
-      INNER JOIN 
+      INNER JOIN
         (SELECT SUBSTRING(k, 1, 1) k, LATEST(v, 10) v FROM lookup.lookyloo GROUP BY 1) t1
         ON foo.dim2 = t1.k
     `,
     sane`
       SELECT dim1, dim2, t1.sk
       FROM foo
-      INNER JOIN 
+      INNER JOIN
         (SELECT k, SUBSTRING(v, 1, 3) sk FROM lookup.lookyloo) t1
         ON foo.dim2 = t1.k
     `,
@@ -1228,50 +1228,50 @@ describe.skip('Druid test queries', () => {
       SELECT foo.dim1, foo.dim2, l.k, l.v
       FROM foo, lookup.lookyloo l
       WHERE SUBSTRING(foo.dim2, 1, 1) = l.k
-      
+
     `,
     sane`
       SELECT COUNT(*)
       FROM foo, lookup.lookyloo l, numfoo
       WHERE foo.cnt = l.k AND l.k = numfoo.cnt
-      
+
     `,
     sane`
       SELECT COUNT(*)
       FROM foo
       INNER JOIN lookup.lookyloo l ON foo.cnt = l.k
       INNER JOIN numfoo ON l.k = numfoo.cnt
-      
+
     `,
     sane`
       SELECT foo.m1, l.k, l.v
       FROM foo
       INNER JOIN lookup.lookyloo l ON CAST(foo.m1 AS VARCHAR) = l.k
-      
+
     `,
     sane`
       SELECT foo.m1, l.k, l.v
       FROM foo
       INNER JOIN lookup.lookyloo l ON foo.m1 = CAST(l.k AS FLOAT)
-      
+
     `,
     sane`
       SELECT foo.m1, l.k, l.v
       FROM foo
       INNER JOIN lookup.lookyloo l ON foo.m1 = l.k
-      
+
     `,
     sane`
       SELECT foo.dim1, foo.dim2, l.k, l.v
       FROM foo
       INNER JOIN lookup.lookyloo l ON SUBSTRING(foo.dim2, 1, 1) = l.k
-      
+
     `,
     sane`
       SELECT foo.dim1, foo.dim2, l.k, l.v
       FROM foo
       INNER JOIN lookup.lookyloo l ON foo.dim2 = SUBSTRING(l.k, 1, 2)
-      
+
     `,
     sane`
       SELECT dim2, l1.v, l2.v
@@ -1543,7 +1543,7 @@ describe.skip('Druid test queries', () => {
       FROM (SELECT FLOOR(__time TO MONTH) AS gran, COALESCE(dim2, '') dim2, cnt FROM druid.foo) AS x
       GROUP BY GROUPING SETS ( (), (dim2), (gran) )
       ORDER BY SUM(cnt)
-      
+
     `,
     sane`
       SELECT dim2, gran, SUM(cnt)
@@ -1704,27 +1704,27 @@ describe.skip('Druid test queries', () => {
       SELECT RADIANS(m1 * 15)/DEGREES(m2) FROM numfoo WHERE dim1 = '1'
     `,
     sane`
-      SELECT TIMESTAMPDIFF(DAY, TIMESTAMP '1999-01-01 00:00:00', __time), 
-      TIMESTAMPDIFF(DAY, __time, DATE '2001-01-01'), 
-      TIMESTAMPDIFF(HOUR, TIMESTAMP '1999-12-31 01:00:00', __time), 
-      TIMESTAMPDIFF(MINUTE, TIMESTAMP '1999-12-31 23:58:03', __time), 
-      TIMESTAMPDIFF(SECOND, TIMESTAMP '1999-12-31 23:59:03', __time), 
-      TIMESTAMPDIFF(MONTH, TIMESTAMP '1999-11-01 00:00:00', __time), 
-      TIMESTAMPDIFF(YEAR, TIMESTAMP '1996-11-01 00:00:00', __time), 
-      TIMESTAMPDIFF(QUARTER, TIMESTAMP '1996-10-01 00:00:00', __time), 
-      TIMESTAMPDIFF(WEEK, TIMESTAMP '1998-10-01 00:00:00', __time) 
+      SELECT TIMESTAMPDIFF(DAY, TIMESTAMP '1999-01-01 00:00:00', __time),
+      TIMESTAMPDIFF(DAY, __time, DATE '2001-01-01'),
+      TIMESTAMPDIFF(HOUR, TIMESTAMP '1999-12-31 01:00:00', __time),
+      TIMESTAMPDIFF(MINUTE, TIMESTAMP '1999-12-31 23:58:03', __time),
+      TIMESTAMPDIFF(SECOND, TIMESTAMP '1999-12-31 23:59:03', __time),
+      TIMESTAMPDIFF(MONTH, TIMESTAMP '1999-11-01 00:00:00', __time),
+      TIMESTAMPDIFF(YEAR, TIMESTAMP '1996-11-01 00:00:00', __time),
+      TIMESTAMPDIFF(QUARTER, TIMESTAMP '1996-10-01 00:00:00', __time),
+      TIMESTAMPDIFF(WEEK, TIMESTAMP '1998-10-01 00:00:00', __time)
       FROM druid.foo
       LIMIT 2
     `,
     sane`
-      SELECT CEIL(TIMESTAMP '2000-01-01 00:00:00' TO DAY), 
-      CEIL(TIMESTAMP '2000-01-01 01:00:00' TO DAY) 
+      SELECT CEIL(TIMESTAMP '2000-01-01 00:00:00' TO DAY),
+      CEIL(TIMESTAMP '2000-01-01 01:00:00' TO DAY)
       FROM druid.foo
       LIMIT 1
     `,
     sane`
       SELECT NVL(dim2, dim1), COUNT(*) FROM druid.foo GROUP BY NVL(dim2, dim1)
-      
+
     `,
     sane`
       SELECT concat(dim3, 'foo'), SUM(cnt) FROM druid.numfoo GROUP BY 1 ORDER BY 2 DESC
@@ -1807,7 +1807,7 @@ describe.skip('Druid test queries', () => {
         RIGHT(dim1, 2)
       FROM druid.foo
       GROUP BY dim1
-      
+
     `,
     sane`
       SELECT dim1 FROM druid.foo GROUP BY dim1 ORDER BY dim1 DESC
@@ -1820,7 +1820,7 @@ describe.skip('Druid test queries', () => {
     `,
     sane`
       SELECT dim1 FROM foo WHERE dim1 IN (SELECT dim1 FROM foo WHERE dim1 = '10.1')
-      
+
     `,
     sane`
       SELECT REGEXP_LIKE('x', NULL)
@@ -1840,7 +1840,6 @@ describe.skip('Druid test queries', () => {
         backAndForth(sql);
       } catch (e) {
         bad++;
-        // @ts-ignore
         console.log(sql);
         // throw new Error(`problem with \`${sql}\`: ${e.message}`);
       }

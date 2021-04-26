@@ -12,6 +12,9 @@
  * limitations under the License.
  */
 
+// The order of exports in this file is significant as it resolves the circular dependencies of the files in a meaningful state.
+
+/* eslint-disable simple-import-sort/exports */
 export * from './utils';
 export * from './sql-base';
 export * from './sql-expression';

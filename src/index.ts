@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-export * from './sql';
+export * from './introspect/introspect';
 export * from './query-result/query-result';
 export * from './query-runner/query-runner';
-export * from './introspect/introspect';
+export * from './sql';

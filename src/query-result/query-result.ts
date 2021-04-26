@@ -227,7 +227,7 @@ export class QueryResult {
       // segmentMetadata like
       if (typeof firstRow.id === 'string' && isObject(firstRow.columns)) {
         const flatArray = data.flatMap(({ columns }) =>
-          Object.keys(columns).map(k => Object.assign({ column: k }, columns[k])),
+          Object.keys(columns).map(k => ({ column: k, ...columns[k] })),
         );
         return QueryResult.fromObjectArray(flatArray);
       }

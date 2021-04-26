@@ -140,7 +140,7 @@ describe('SqlLiteral', () => {
       '-5e-2',
     ];
 
-    for (const num in numbersToTest) {
+    for (const num of numbersToTest) {
       backAndForth(num);
       expect((SqlExpression.parse(num) as SqlLiteral).value).toEqual(parseFloat(num));
     }

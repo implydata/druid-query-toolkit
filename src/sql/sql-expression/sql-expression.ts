@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 
+import { filterMap } from '../../utils';
 import {
   LiteralValue,
   SeparatedArray,
@@ -25,7 +26,6 @@ import {
   SqlOrderByExpression,
   SqlRef,
 } from '..';
-import { filterMap } from '../../utils';
 import { parseSql } from '../parser';
 import { SqlBase, Substitutor } from '../sql-base';
 

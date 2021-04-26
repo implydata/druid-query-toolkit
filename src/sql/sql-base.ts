@@ -284,7 +284,7 @@ export abstract class SqlBase {
   }
 
   protected getSpacingWithout(...toRemove: string[]) {
-    const ret = Object.assign({}, this.spacing);
+    const ret = { ...this.spacing };
     for (const thing of toRemove) {
       delete ret[thing];
     }
@@ -296,7 +296,7 @@ export abstract class SqlBase {
   }
 
   protected getKeywordsWithout(...toRemove: string[]) {
-    const ret = Object.assign({}, this.keywords);
+    const ret = { ...this.keywords };
     for (const thing of toRemove) {
       delete ret[thing];
     }

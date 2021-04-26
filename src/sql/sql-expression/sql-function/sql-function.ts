@@ -12,9 +12,9 @@
  * limitations under the License.
  */
 
-import { SqlLiteral, SqlRef } from '..';
 import { SeparatedArray, Separator, SqlWhereClause } from '../..';
 import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../../sql-base';
+import { SqlLiteral, SqlRef } from '..';
 import { SqlExpression } from '../sql-expression';
 
 export type SpecialParen = 'square' | 'none';

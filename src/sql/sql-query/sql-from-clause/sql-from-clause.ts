@@ -12,11 +12,11 @@
  * limitations under the License.
  */
 
-import { SqlAlias, SqlJoinPart } from '..';
 import { filterMap } from '../../../utils';
 import { SqlBase, SqlType, Substitutor } from '../../sql-base';
 import { SqlRef } from '../../sql-expression';
 import { SeparatedArray } from '../../utils';
+import { SqlAlias, SqlJoinPart } from '..';
 import { SqlClause, SqlClauseValue } from '../sql-clause';
 
 export interface SqlFromClauseValue extends SqlClauseValue {

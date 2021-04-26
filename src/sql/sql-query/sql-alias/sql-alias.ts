@@ -12,9 +12,9 @@
  * limitations under the License.
  */
 
-import { SqlQuery } from '..';
 import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../../sql-base';
 import { SqlExpression, SqlRef } from '../../sql-expression';
+import { SqlQuery } from '..';
 
 export interface SqlAliasValue extends SqlBaseValue {
   expression: SqlExpression | SqlQuery;
@@ -74,7 +74,7 @@ export class SqlAlias extends SqlBase {
     value.expression = this.expression;
     if (this.as) value.as = true;
     value.alias = this.alias;
-    return value as SqlAliasValue;
+    return value;
   }
 
   protected _toRawString(): string {

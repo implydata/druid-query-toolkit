@@ -79,7 +79,7 @@ export class SqlRef extends SqlExpression {
     return !/^\w+$/.test(name) || SqlBase.isReservedKeyword(name);
   }
 
-  static wrapInQuotes(thing: string = '', quotes = false): string {
+  static wrapInQuotes(thing = '', quotes = false): string {
     if (!thing) return '';
     if (quotes) {
       return `"${thing.replace(/"/g, '""')}"`;

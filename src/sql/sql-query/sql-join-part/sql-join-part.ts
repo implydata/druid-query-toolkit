@@ -12,9 +12,9 @@
  * limitations under the License.
  */
 
-import { SqlAlias } from '..';
 import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../../sql-base';
 import { SqlExpression } from '../../sql-expression';
+import { SqlAlias } from '..';
 
 export type SqlJoinJoinType = 'LEFT' | 'RIGHT' | 'FULL' | 'INNER' | 'CROSS';
 

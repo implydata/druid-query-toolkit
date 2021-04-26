@@ -20,6 +20,7 @@ describe('QueryRunner', () => {
   let n = 100000000;
   QueryRunner.now = () => ++n;
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   const queryRunner = new QueryRunner(async (payload, isSql) => {
     const firstParameterValue: any =
       payload.parameters && payload.parameters.length ? payload.parameters[0].value : undefined;

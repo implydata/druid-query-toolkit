@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 
+import { filterMap } from '../../utils';
 import {
   SeparatedArray,
   Separator,
@@ -28,7 +29,6 @@ import {
   SqlWhereClause,
   Substitutor,
 } from '..';
-import { filterMap } from '../../utils';
 import { parseSql } from '../parser';
 import { SqlBase, SqlBaseValue, SqlType } from '../sql-base';
 

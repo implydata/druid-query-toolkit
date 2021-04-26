@@ -23,7 +23,7 @@ describe('Uber Query', () => {
     SELECT
       col1 AS "Col1",
       CASE WHEN colA = 1 THEN 3 ELSE 4 END AS "SomeCase1",
-      CASE colB WHEN 1 THEN 'One' WHEN 2 THEN 'Two' ELSE 'Other' END AS "SomeCase2",      
+      CASE colB WHEN 1 THEN 'One' WHEN 2 THEN 'Two' ELSE 'Other' END AS "SomeCase2",
       EXTRACT(EPOCH FROM "time"),
       EXTRACT(MICROSECOND FROM "time"),
       EXTRACT(MILLISECOND FROM "time"),
@@ -45,7 +45,7 @@ describe('Uber Query', () => {
       SUM(blah) FILTER (WHERE col2 = 'moon')
     FROM t1, t2 AS t2As
     LEFT JOIN t3 ON t1.col = t3.col
-    FULL JOIN t4 
+    FULL JOIN t4
     WHERE col1 = ?
       AND col2 <> 'B'
       AND col3 < CURRENT_TIMESTAMP - INTERVAL '1' DAY
@@ -58,11 +58,11 @@ describe('Uber Query', () => {
       AND col10 NOT BETWEEN SYMMETRIC TIMESTAMP '2020-01-01' AND TIMESTAMP '2020-01-01 02:03:04'
       AND col11 LIKE '%a%'
       AND col12 LIKE '%a%' ESCAPE 'a'
-    GROUP BY 
+    GROUP BY
       1,
       col7
     HAVING "Col1" = 'lol'
-    ORDER BY COUNT(*) DESC, 1 ASC, 4    
+    ORDER BY COUNT(*) DESC, 1 ASC, 4
     LIMIT 100
     OFFSET 5
   `;
@@ -71,7 +71,6 @@ describe('Uber Query', () => {
   try {
     query = SqlQuery.parse(sql);
   } catch (e) {
-    // @ts-ignore
     console.log(e);
     throw e;
   }

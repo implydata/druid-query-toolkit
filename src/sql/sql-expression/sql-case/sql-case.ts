@@ -12,9 +12,9 @@
  * limitations under the License.
  */
 
-import { SqlWhenThenPart } from '..';
 import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../../sql-base';
 import { SeparatedArray } from '../../utils';
+import { SqlWhenThenPart } from '..';
 import { SqlExpression } from '../sql-expression';
 
 export interface SqlCaseValue extends SqlBaseValue {

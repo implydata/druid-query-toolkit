@@ -5,6 +5,9 @@
   "main": "build/index.js",
   "typings": "build/index.d.ts",
   "homepage": "https://github.com/implydata/druid-sql-parser",
+  "engines": {
+    "node": ">=10"
+  },
   "jest": {
     "preset": "ts-jest",
     "testMatch": [
@@ -20,24 +23,19 @@
       "pre-commit": "npm run tslint-changed-only"
     }
   },
-  "prettier": {
-    "trailingComma": "all",
-    "tabWidth": 2,
-    "semi": true,
-    "singleQuote": true,
-    "printWidth": 100,
-    "arrowParens": "avoid"
-  },
+  "prettier": "@awesome-code-style/prettier-config",
   "scripts": {
     "pretest": "npm run compile",
-    "test": "npm run tslint && jest",
+    "test": "npm run eslint && npm run prettify-check && jest",
     "coverage": "jest --coverage",
     "compile": "rm -rf build/ && node script/compile-peg.js && tsc && npm run cp-parser",
     "cp-parser": "cp -r src/sql/parser build/sql/ && rm build/sql/parser/*.spec.ts",
-    "tslint": "./node_modules/.bin/tslint -c tslint.json --project tsconfig.json --formatters-dir ./node_modules/awesome-code-style/formatter 'src/**/*.ts?(x)'",
-    "tslint-fix": "npm run tslint -- --fix",
-    "tslint-changed-only": "git diff --diff-filter=ACMR --name-only | grep -E \\.tsx\\?$ | xargs ./node_modules/.bin/tslint -c tslint.json --project tsconfig.json --formatters-dir ./node_modules/awesome-code-style/formatter",
-    "tslint-fix-changed-only": "npm run tslint-changed-only -- --fix"
+    "eslint": "eslint '{src,e2e-tests}/**/*.ts?(x)'",
+    "eslint-fix": "npm run eslint -- --fix",
+    "eslint-changed-only": "git diff --diff-filter=ACMR --cached --name-only | grep -E \\.tsx\\?$ | xargs ./node_modules/.bin/eslint",
+    "eslint-fix-changed-only": "npm run eslint-changed-only -- --fix",
+    "prettify": "prettier --write '{src,e2e-tests}/**/*.{ts,tsx,scss}' './*.js'",
+    "prettify-check": "prettier --check '{src,e2e-tests}/**/*.{ts,tsx,scss}' './*.js'"
   },
   "keywords": [
     "sql",
@@ -59,20 +57,30 @@
     "build/"
   ],
   "dependencies": {
-    "tslib": "^2.0.2"
+    "tslib": "^2.2.0"
   },
   "devDependencies": {
-    "@jest/core": "26.5.2",
-    "@types/jest": "^26.0.14",
-    "awesome-code-style": "^1.5.0",
-    "axios": "^0.20.0",
-    "core-js": "^3.6.5",
-    "fs-extra": "^9.0.1",
-    "husky": "^4.3.0",
-    "jest": "^26.5.2",
+    "@awesome-code-style/eslint-config": "^3.0.0",
+    "@awesome-code-style/prettier-config": "^3.0.0",
+    "@jest/core": "26.6.3",
+    "@types/jest": "^26.0.22",
+    "@typescript-eslint/eslint-plugin": "^4.22.0",
+    "axios": "^0.21.1",
+    "core-js": "^3.11.0",
+    "eslint": "^7.24.0",
+    "eslint-config-prettier": "^8.2.0",
+    "eslint-plugin-header": "^3.1.1",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-react": "^7.23.2",
+    "eslint-plugin-react-hooks": "^4.2.0",
+    "eslint-plugin-simple-import-sort": "^7.0.0",
+    "eslint-plugin-unicorn": "^30.0.0",
+    "fs-extra": "^9.1.0",
+    "husky": "^6.0.0",
+    "jest": "^26.6.3",
     "pegjs": "^0.10.0",
-    "ts-jest": "^26.4.1",
-    "tslint": "^6.1.3",
-    "typescript": "^4.0.3"
+    "prettier": "^2.2.1",
+    "ts-jest": "^26.5.5",
+    "typescript": "^4.2.4"
   }
 }

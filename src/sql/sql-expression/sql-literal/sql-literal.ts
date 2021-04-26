@@ -120,8 +120,9 @@ export class SqlLiteral extends SqlExpression {
           return SqlBase.capitalize(SqlLiteral.DEFAULT_NULL_KEYWORD);
         } else if (isDate(value)) {
           return `'${SqlLiteral.dateToTimestampValue(value)}'`;
+        } else {
+          return String(value);
         }
-        break;
 
       case 'boolean':
         return SqlBase.capitalize(
@@ -130,9 +131,10 @@ export class SqlLiteral extends SqlExpression {
 
       case 'string':
         return SqlLiteral.escapeLiteralString(value);
-    }
 
-    return String(value);
+      default:
+        return String(value);
+    }
   }
 
   protected _toRawString(): string {

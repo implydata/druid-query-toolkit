@@ -12,10 +12,10 @@
  * limitations under the License.
  */
 
-import { SqlAlias, SqlOrderByExpression } from '..';
 import { SqlBase, SqlType, Substitutor } from '../../sql-base';
 import { SqlLiteral } from '../../sql-expression';
 import { SeparatedArray } from '../../utils';
+import { SqlAlias, SqlOrderByExpression } from '..';
 import { SqlClause, SqlClauseValue } from '../sql-clause';
 
 export interface SqlOrderByClauseValue extends SqlClauseValue {

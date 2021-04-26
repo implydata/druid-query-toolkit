@@ -12,8 +12,8 @@
  * limitations under the License.
  */
 
-import { LiteralValue, SqlLiteral } from '..';
 import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../../sql-base';
+import { LiteralValue, SqlLiteral } from '..';
 import { SqlExpression } from '../sql-expression';
 
 import { SqlBetweenAndHelper } from './sql-between-and-helper';

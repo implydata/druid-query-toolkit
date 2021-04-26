@@ -12,8 +12,8 @@
  * limitations under the License.
  */
 
-import { SqlLiteral } from '..';
 import { SqlBase, SqlBaseValue, SqlType } from '../../sql-base';
+import { SqlLiteral } from '..';
 import { SqlExpression } from '../sql-expression';
 
 export interface SqlIntervalValue extends SqlBaseValue {

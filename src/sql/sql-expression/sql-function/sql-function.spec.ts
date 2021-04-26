@@ -12,8 +12,8 @@
  * limitations under the License.
  */
 
-import { SqlExpression, SqlFunction } from '../..';
 import { backAndForth } from '../../../test-utils';
+import { SqlExpression, SqlFunction } from '../..';
 
 describe('SqlFunction', () => {
   it('things that work', () => {
