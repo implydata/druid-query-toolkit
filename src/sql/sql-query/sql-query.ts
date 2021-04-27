@@ -618,6 +618,17 @@ export class SqlQuery extends SqlExpression {
     });
   }
 
+  getGroupedExpressions(): SqlExpression[] | undefined {
+    const { groupByClause } = this;
+    if (!groupByClause) return;
+    return groupByClause.toArray().map(ex => {
+      const selectExpression = this.getSelectExpressionForIndex(
+        this.getSelectIndexForExpression(ex, true),
+      );
+      return selectExpression ? selectExpression.expression : ex;
+    });
+  }
+
   getGroupedOutputColumns(): string[] {
     if (!this.hasGroupBy()) return [];
     return filterMap(this.selectExpressions.values, (selectExpression, i) => {

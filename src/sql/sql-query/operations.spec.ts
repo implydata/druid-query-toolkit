@@ -182,11 +182,11 @@ describe('SqlQuery operations', () => {
     const query = SqlQuery.parse(sane`
       SELECT
         channel, SUBSTR(cityName, 1, 2), namespace AS s_namespace,
-        COUNT(*), SUM(added) AS "Added"            
+        COUNT(*), SUM(added) AS "Added"
       FROM wikipedia
-      GROUP BY 1, namespace, SUBSTR(cityName, 1, 2)
+      GROUP BY 1, namespace, SUBSTR(cityName, 1, 2), subspace
       ORDER BY channel, s_namespace Desc, COUNT(*)
-      LIMIT 5 
+      LIMIT 5
     `);
 
     it('#getSelectIndexForExpression', () => {
@@ -207,6 +207,15 @@ describe('SqlQuery operations', () => {
         'channel',
         'SUBSTR(cityName, 1, 2)',
         'namespace AS s_namespace',
+      ]);
+    });
+
+    it('#getGroupedExpressions', () => {
+      expect(query.getGroupedExpressions()?.map(String)).toEqual([
+        'channel',
+        'namespace',
+        'SUBSTR(cityName, 1, 2)',
+        'subspace',
       ]);
     });
 
@@ -364,49 +373,49 @@ describe('SqlQuery operations', () => {
   describe('#removeOutputColumn', () => {
     it('basic cols', () => {
       const query = SqlQuery.parse(sane`
-        SELECT col0, col1, col2 
+        SELECT col0, col1, col2
         FROM github
       `);
 
       expect(query.removeOutputColumn('col0').toString()).toEqual(sane`
-        SELECT col1, col2 
+        SELECT col1, col2
         FROM github
       `);
 
       expect(query.removeOutputColumn('col1').toString()).toEqual(sane`
-        SELECT col0, col2 
+        SELECT col0, col2
         FROM github
       `);
 
       expect(query.removeOutputColumn('col2').toString()).toEqual(sane`
-        SELECT col0, col1 
+        SELECT col0, col1
         FROM github
       `);
     });
 
     it(`removes from group by and ORDER BY`, () => {
       const query = SqlQuery.parse(sane`
-        SELECT col0, col1, SUM(a), col2 
+        SELECT col0, col1, SUM(a), col2
         FROM github
         GROUP BY 1, 2, 4
         ORDER BY 2
       `);
 
       expect(query.removeOutputColumn('col0').toString()).toEqual(sane`
-        SELECT col1, SUM(a), col2 
+        SELECT col1, SUM(a), col2
         FROM github
         GROUP BY 1, 3
         ORDER BY 1
       `);
 
       expect(query.removeOutputColumn('col1').toString()).toEqual(sane`
-        SELECT col0, SUM(a), col2 
+        SELECT col0, SUM(a), col2
         FROM github
         GROUP BY 1, 3
       `);
 
       expect(query.removeOutputColumn('col2').toString()).toEqual(sane`
-        SELECT col0, col1, SUM(a) 
+        SELECT col0, col1, SUM(a)
         FROM github
         GROUP BY 1, 2
         ORDER BY 2
@@ -732,7 +741,7 @@ describe('SqlQuery operations', () => {
     it('existing cols in group by', () => {
       const sql = sane`
         select col1, min(col1) AS aliasName
-        from tbl 
+        from tbl
         GROUP BY 2
       `;
 
@@ -744,7 +753,7 @@ describe('SqlQuery operations', () => {
           .toString(),
       ).toEqual(sane`
         select max(col2) AS "MaxColumn", col1, min(col1) AS aliasName
-        from tbl 
+        from tbl
         GROUP BY 1, 3
       `);
     });
@@ -753,9 +762,9 @@ describe('SqlQuery operations', () => {
   describe('prettify', () => {
     it('misc query 1', () => {
       const sql = sane`
-        Select  
+        Select
           Distinct col1    ||    lol
-        From tbl       
+        From tbl
       `;
 
       expect(SqlQuery.parse(sql).prettify().toString()).toEqual(sane`

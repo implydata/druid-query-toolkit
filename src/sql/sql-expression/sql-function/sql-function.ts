@@ -129,6 +129,21 @@ export class SqlFunction extends SqlExpression {
     return SqlBase.fromValue(value);
   }
 
+  public numArgs(): number {
+    return this.args?.length() || 0;
+  }
+
+  public getArg(index: number): SqlExpression | undefined {
+    return this.args?.get(index);
+  }
+
+  public getArgAsString(index: number): string | undefined {
+    const arg = this.getArg(index);
+    if (!arg) return;
+    if (!(arg instanceof SqlLiteral)) return;
+    return arg.getStringValue();
+  }
+
   public changeWhereClause(whereClause: SqlWhereClause | undefined): this {
     const value = this.valueOf();
     if (whereClause) {
