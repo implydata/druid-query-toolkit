@@ -17,12 +17,6 @@
       "<rootDir>jest-env.ts"
     ]
   },
-  "husky": {
-    "hooks": {
-      "pre-push": "npm run tslint",
-      "pre-commit": "npm run tslint-changed-only"
-    }
-  },
   "prettier": "@awesome-code-style/prettier-config",
   "scripts": {
     "pretest": "npm run compile",
@@ -35,7 +29,8 @@
     "eslint-changed-only": "git diff --diff-filter=ACMR --cached --name-only | grep -E \\.tsx\\?$ | xargs ./node_modules/.bin/eslint",
     "eslint-fix-changed-only": "npm run eslint-changed-only -- --fix",
     "prettify": "prettier --write '{src,e2e-tests}/**/*.{ts,tsx,scss}' './*.js'",
-    "prettify-check": "prettier --check '{src,e2e-tests}/**/*.{ts,tsx,scss}' './*.js'"
+    "prettify-check": "prettier --check '{src,e2e-tests}/**/*.{ts,tsx,scss}' './*.js'",
+    "prepare": "husky install"
   },
   "keywords": [
     "sql",
