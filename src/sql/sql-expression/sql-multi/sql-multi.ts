@@ -86,12 +86,10 @@ export class SqlMulti extends SqlExpression {
     return this.changeArgs(this.args.append(expression));
   }
 
-  public decomposeViaAnd(): readonly SqlExpression[] {
-    if (this.op !== 'AND') {
-      return super.decomposeViaAnd();
-    }
+  public decomposeViaAnd(): SqlExpression[] {
+    if (this.op !== 'AND') return super.decomposeViaAnd();
 
-    return this.args.values;
+    return this.args.values.flatMap(v => v.decomposeViaAnd());
   }
 
   public filterAnd(fn: (ex: SqlExpression) => boolean): SqlExpression | undefined {

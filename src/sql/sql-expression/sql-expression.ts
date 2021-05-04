@@ -175,7 +175,7 @@ export abstract class SqlExpression extends SqlBase {
     return SqlExpression.and(this, expression);
   }
 
-  public decomposeViaAnd(): readonly SqlExpression[] {
+  public decomposeViaAnd(): SqlExpression[] {
     return [this];
   }
 

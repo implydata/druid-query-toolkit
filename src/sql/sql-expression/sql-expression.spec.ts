@@ -110,6 +110,12 @@ describe('SqlExpression', () => {
       expect(String(SqlExpression.parse('a AND b And c').decomposeViaAnd())).toEqual('a,b,c');
     });
 
+    it('works with nested AND', () => {
+      expect(String(SqlExpression.parse('(a AND (b AND c)) And d').decomposeViaAnd())).toEqual(
+        'a,b,c,d',
+      );
+    });
+
     it('works with query', () => {
       expect(String(SqlExpression.parse('SELECT 13').decomposeViaAnd())).toEqual('SELECT 13');
     });
