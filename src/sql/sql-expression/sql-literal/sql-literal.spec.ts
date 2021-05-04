@@ -30,6 +30,7 @@ describe('SqlLiteral', () => {
       `_l-1'hello'`,
       `_8l-1'hello'`,
       `'don''t do it'`,
+      `17.0`,
       `123.34`,
       `1606832560494517248`,
     ];
@@ -358,28 +359,45 @@ describe('SqlLiteral', () => {
     `);
   });
 
-  it('works with create', () => {
-    expect(String(SqlLiteral.create(null))).toEqual('NULL');
-    expect(String(SqlLiteral.create(false))).toEqual('FALSE');
-    expect(String(SqlLiteral.create(true))).toEqual('TRUE');
-    expect(String(SqlLiteral.create(1.2))).toEqual('1.2');
-    expect(String(SqlLiteral.create(BigInt(1606832560494517248)))).toEqual('1606832560494517248');
-    expect(String(SqlLiteral.create(`hello`))).toEqual(`'hello'`);
-    expect(String(SqlLiteral.create(`he'o`))).toEqual(`'he''o'`);
-    expect(String(SqlLiteral.create(new Date('2020-01-02Z')))).toEqual(`TIMESTAMP '2020-01-02'`);
-    expect(String(SqlLiteral.create(new Date('2020-01-02T03:04:05Z')))).toEqual(
-      `TIMESTAMP '2020-01-02 03:04:05'`,
-    );
+  describe('.create', () => {
+    it('works with things that work', () => {
+      expect(String(SqlLiteral.create(null))).toEqual('NULL');
+      expect(String(SqlLiteral.create(false))).toEqual('FALSE');
+      expect(String(SqlLiteral.create(true))).toEqual('TRUE');
+      expect(String(SqlLiteral.create(1.2))).toEqual('1.2');
+      expect(String(SqlLiteral.create(BigInt(1606832560494517248)))).toEqual('1606832560494517248');
+      expect(String(SqlLiteral.create(`hello`))).toEqual(`'hello'`);
+      expect(String(SqlLiteral.create(`he'o`))).toEqual(`'he''o'`);
+      expect(String(SqlLiteral.create(new Date('2020-01-02Z')))).toEqual(`TIMESTAMP '2020-01-02'`);
+      expect(String(SqlLiteral.create(new Date('2020-01-02T03:04:05Z')))).toEqual(
+        `TIMESTAMP '2020-01-02 03:04:05'`,
+      );
+    });
+
+    it(`doesn't work with things that don't`, () => {
+      expect(() => SqlLiteral.create([1, 2, 3] as any)).toThrow('SqlLiteral invalid object input');
+
+      expect(() => SqlLiteral.create({ lol: 1 } as any)).toThrow('SqlLiteral invalid object input');
+
+      expect(() => SqlLiteral.create((() => 1) as any)).toThrow(
+        'SqlLiteral invalid input of type function',
+      );
+    });
   });
 
-  it(`doesn't works with create`, () => {
-    expect(() => SqlLiteral.create([1, 2, 3] as any)).toThrow('SqlLiteral invalid object input');
+  it('.double', () => {
+    expect(String(SqlLiteral.double(0))).toEqual('0.0');
+    expect(String(SqlLiteral.double(17))).toEqual('17.0');
+    expect(String(SqlLiteral.double(17.23))).toEqual('17.23');
+  });
 
-    expect(() => SqlLiteral.create({ lol: 1 } as any)).toThrow('SqlLiteral invalid object input');
-
-    expect(() => SqlLiteral.create((() => 1) as any)).toThrow(
-      'SqlLiteral invalid input of type function',
-    );
+  it('#isInteger', () => {
+    expect(SqlLiteral.double(0).isInteger()).toEqual(false);
+    expect(SqlLiteral.create(0).isInteger()).toEqual(true);
+    expect(SqlLiteral.double(17).isInteger()).toEqual(false);
+    expect(SqlLiteral.create(17).isInteger()).toEqual(true);
+    expect(SqlLiteral.double(17.23).isInteger()).toEqual(false);
+    expect(SqlLiteral.create(17.23).isInteger()).toEqual(false);
   });
 
   it('works with maybe', () => {

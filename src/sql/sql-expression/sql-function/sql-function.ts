@@ -174,9 +174,7 @@ export class SqlFunction extends SqlExpression {
   }
 
   public getWhereExpression(): SqlExpression | undefined {
-    const { whereClause } = this;
-    if (!whereClause) return;
-    return whereClause.expression;
+    return this.whereClause?.expression;
   }
 
   public getEffectiveWhereExpression(): SqlExpression {

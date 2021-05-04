@@ -20,6 +20,10 @@ function isDate(v: any): v is Date {
   return Boolean(v && typeof v.toISOString === 'function');
 }
 
+function isInterger(v: number): boolean {
+  return isFinite(v) && Math.floor(v) === v;
+}
+
 export type LiteralValue = null | boolean | number | bigint | string | Date;
 
 export interface SqlLiteralValue extends SqlBaseValue {
@@ -62,6 +66,14 @@ export class SqlLiteral extends SqlExpression {
 
     return new SqlLiteral({
       value,
+    });
+  }
+
+  static double(value: number): SqlLiteral {
+    // Make sure to record the string value of a double with a `.` even if the number itself happens to be an integer.
+    return new SqlLiteral({
+      value,
+      stringValue: isInterger(value) ? value.toFixed(1) : undefined,
     });
   }
 
@@ -163,11 +175,20 @@ export class SqlLiteral extends SqlExpression {
     }
   }
 
-  public increment(amount = 1): SqlLiteral {
-    if (!this.isInteger()) return this;
+  public isIndex(): boolean {
+    return typeof this.value === 'number';
+  }
 
+  public getIndexValue(): number {
+    const { value } = this;
+    if (typeof value !== 'number') return 0;
+    return Math.floor(value) || 0;
+  }
+
+  public incrementIndex(amount = 1): SqlLiteral {
+    if (!this.isIndex()) return this;
     const value = this.valueOf();
-    value.value = Number(this.value) + amount;
+    value.value = this.getIndexValue() + amount;
     delete value.stringValue;
     return new SqlLiteral(value);
   }
@@ -180,10 +201,13 @@ export class SqlLiteral extends SqlExpression {
   }
 
   public isInteger(): boolean {
-    const { value } = this;
+    const { value, stringValue } = this;
     switch (typeof value) {
       case 'number':
-        return isFinite(value) && Math.floor(value) === value;
+        if (typeof stringValue === 'string') {
+          return !stringValue.includes('.');
+        }
+        return isInterger(value);
 
       case 'bigint':
         return true;

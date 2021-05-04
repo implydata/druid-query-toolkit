@@ -18,19 +18,13 @@
 
 module.exports = {
   env: {
-    browser: true,
+    'shared-node-browser': true,
   },
   extends: ['@awesome-code-style'],
   parserOptions: {
     project: 'tsconfig.json',
   },
-  settings: {
-    react: {
-      version: '16.14.0',
-    },
-  },
   rules: {
     'header/header': [2, 'block', { pattern: 'Licensed under the Apache License, Version 2.0.+' }],
-    '@typescript-eslint/no-this-alias': 0,
   },
 };

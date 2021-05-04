@@ -40,6 +40,13 @@ const INDENT_SPACE = '\n  ';
 
 export type SqlQueryDecorator = 'ALL' | 'DISTINCT';
 
+export interface ExpressionInfo {
+  expression: SqlExpression;
+  selectIndex: number;
+  outputAlias?: SqlRef;
+  orderByExpression?: SqlOrderByExpression;
+}
+
 export interface SqlQueryValue extends SqlBaseValue {
   explainPlanFor?: boolean;
   withParts?: SeparatedArray<SqlWithPart>;
@@ -509,6 +516,8 @@ export class SqlQuery extends SqlExpression {
     return ret;
   }
 
+  /* ~~~~~ General stuff ~~~~~ */
+
   public clearOwnSeparators(): this {
     const value = this.valueOf();
 
@@ -574,8 +583,8 @@ export class SqlQuery extends SqlExpression {
   getSelectIndexForExpression(ex: SqlExpression, allowAliasReferences: boolean): number {
     const { selectExpressions } = this;
 
-    if (ex instanceof SqlLiteral && ex.isInteger()) {
-      const idx = Number(ex.value) - 1;
+    if (ex instanceof SqlLiteral && ex.isIndex()) {
+      const idx = ex.getIndexValue() - 1;
       return this.isValidSelectIndex(idx) ? idx : -1;
     }
 
@@ -780,6 +789,30 @@ export class SqlQuery extends SqlExpression {
     return Boolean(this.groupByClause);
   }
 
+  public getGroupingExpressionInfos(): ExpressionInfo[] {
+    const { groupByClause } = this;
+    if (!groupByClause) return [];
+
+    return groupByClause.toArray().map(ex => {
+      const selectIndex = this.getSelectIndexForExpression(ex, true);
+      if (selectIndex === -1) {
+        return {
+          expression: ex,
+          selectIndex,
+          // orderByExpression: this.getOrderByForSelectIndex(selectIndex),
+        };
+      } else {
+        const selectExpression = this.selectExpressions.get(selectIndex)!;
+        return {
+          expression: selectExpression.expression as SqlExpression,
+          selectIndex,
+          outputAlias: selectExpression.alias,
+          orderByExpression: this.getOrderByForSelectIndex(selectIndex),
+        };
+      }
+    });
+  }
+
   addToGroupBy(column: SqlBase) {
     // Adds a column with no alias to the group by clause
     // column is added to the select clause then the index is added to group by clause
@@ -794,7 +827,7 @@ export class SqlQuery extends SqlExpression {
         ? this.groupByClause.expressions
             .map(groupByExpression => {
               if (groupByExpression instanceof SqlLiteral) {
-                return groupByExpression.increment() || groupByExpression;
+                return groupByExpression.incrementIndex() || groupByExpression;
               }
               return groupByExpression;
             })

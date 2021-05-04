@@ -184,7 +184,7 @@ describe('SqlQuery operations', () => {
         channel, SUBSTR(cityName, 1, 2), namespace AS s_namespace,
         COUNT(*), SUM(added) AS "Added"
       FROM wikipedia
-      GROUP BY 1, namespace, SUBSTR(cityName, 1, 2), subspace
+      GROUP BY 1.1, namespace, SUBSTR(cityName, 1, 2), subspace -- Yes the index can be non-whole, go figure
       ORDER BY channel, s_namespace Desc, COUNT(*)
       LIMIT 5
     `);
@@ -397,7 +397,7 @@ describe('SqlQuery operations', () => {
       const query = SqlQuery.parse(sane`
         SELECT col0, col1, SUM(a), col2
         FROM github
-        GROUP BY 1, 2, 4
+        GROUP BY 1, 2.2, 4
         ORDER BY 2
       `);
 
@@ -417,7 +417,7 @@ describe('SqlQuery operations', () => {
       expect(query.removeOutputColumn('col2').toString()).toEqual(sane`
         SELECT col0, col1, SUM(a)
         FROM github
-        GROUP BY 1, 2
+        GROUP BY 1, 2.2
         ORDER BY 2
       `);
     });

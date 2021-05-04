@@ -114,10 +114,11 @@ export class SqlOrderByClause extends SqlClause {
     const sqlIndex = selectIndex + 1;
     const newExpression = this.expressions.filterMap(orderByExpression => {
       const { expression } = orderByExpression;
-      if (expression instanceof SqlLiteral && expression.isInteger()) {
-        if (Number(expression.value) > sqlIndex) {
-          orderByExpression = orderByExpression.changeExpression(expression.increment(-1));
-        } else if (expression.value === sqlIndex) {
+      if (expression instanceof SqlLiteral && expression.isIndex()) {
+        const expressionIndex = expression.getIndexValue();
+        if (expressionIndex > sqlIndex) {
+          orderByExpression = orderByExpression.changeExpression(expression.incrementIndex(-1));
+        } else if (expressionIndex === sqlIndex) {
           return;
         }
       }
