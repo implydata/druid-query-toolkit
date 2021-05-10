@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 
+import { SqlBase } from './sql';
 import { parseSql } from './sql/parser';
 
 // To be used as a tag
@@ -37,4 +38,16 @@ export function sane(_x: TemplateStringsArray) {
 
 export function backAndForth(sql: string): void {
   expect(parseSql(sql).toString()).toEqual(sql);
+}
+
+export function stringifyExpressions(v: any) {
+  return JSON.parse(
+    JSON.stringify(v, (_k: string, v: any) => {
+      if (v instanceof SqlBase) {
+        return `EX[${v}]`;
+      } else {
+        return v;
+      }
+    }),
+  );
 }

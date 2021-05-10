@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { Separator } from '..';
+import { clampIndex, insert, normalizeIndex, Separator } from '..';
 
 export type SeparatorOrString = Separator | string;
 
@@ -63,7 +63,7 @@ export class SeparatedArray<T> {
   }
 
   public get(index: number): T | undefined {
-    return this.values[index];
+    return this.values[normalizeIndex(index, this.values.length)];
   }
 
   public first(): T {
@@ -71,6 +71,7 @@ export class SeparatedArray<T> {
   }
 
   public change(index: number, newValue: T): SeparatedArray<T> {
+    index = normalizeIndex(index, this.values.length);
     return this.map((value, i) => (i === index ? newValue : value));
   }
 
@@ -109,20 +110,29 @@ export class SeparatedArray<T> {
     return this.map(callbackfn as any).filter(Boolean) as SeparatedArray<U> | undefined;
   }
 
-  public deleteByIndex(index: number): SeparatedArray<T> | undefined {
+  public remove(index: number): SeparatedArray<T> | undefined {
+    if (index < 0) index += this.values.length;
     return this.filter((_x, i) => i !== index);
   }
 
-  public prepend(value: T): SeparatedArray<T> {
+  public insert(index: number, value: T): SeparatedArray<T> {
     const { values, separators } = this;
-    const separator = separators[0];
-    return new SeparatedArray<T>([value].concat(values), [separator].concat(separators));
+    index = clampIndex(normalizeIndex(index, values.length), 0, values.length);
+
+    const sn = separators.length;
+    const separator = separators[clampIndex(index - 1, 0, sn - 1)];
+    return new SeparatedArray<T>(
+      insert(values, index, value),
+      insert(separators, Math.min(index, sn), separator),
+    );
+  }
+
+  public prepend(value: T): SeparatedArray<T> {
+    return this.insert(0, value);
   }
 
   public append(value: T): SeparatedArray<T> {
-    const { values, separators } = this;
-    const separator = separators[values.length - 2];
-    return new SeparatedArray<T>(values.concat([value]), separators.concat(separator));
+    return this.insert(Infinity, value);
   }
 
   public clearSeparators(): SeparatedArray<T> {

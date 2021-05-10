@@ -13,7 +13,7 @@
  */
 
 import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../../sql-base';
-import { SqlExpression } from '../../sql-expression';
+import { SqlExpression, SqlLiteral } from '../../sql-expression';
 
 export type SqlOrderByDirection = 'ASC' | 'DESC';
 
@@ -28,6 +28,13 @@ export class SqlOrderByExpression extends SqlBase {
   static create(expression: SqlExpression, direction?: SqlOrderByDirection) {
     return new SqlOrderByExpression({
       expression,
+      direction,
+    });
+  }
+
+  static index(value: number, direction?: SqlOrderByDirection) {
+    return new SqlOrderByExpression({
+      expression: SqlLiteral.index(value),
       direction,
     });
   }
@@ -107,6 +114,25 @@ export class SqlOrderByExpression extends SqlBase {
     }
 
     return ret;
+  }
+
+  public isIndex(): boolean {
+    const { expression } = this;
+    return expression instanceof SqlLiteral && expression.isIndex();
+  }
+
+  public getIndexValue(): number {
+    const { expression } = this;
+    return expression instanceof SqlLiteral ? expression.getIndexValue() : -1;
+  }
+
+  public incrementIndex(amount = 1): SqlOrderByExpression {
+    const { expression } = this;
+    if (expression instanceof SqlLiteral) {
+      return this.changeExpression(expression.incrementIndex(amount));
+    } else {
+      return this;
+    }
   }
 }
 

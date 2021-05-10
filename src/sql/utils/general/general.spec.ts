@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { trimString } from './general';
+import { clampIndex, insert, normalizeIndex, trimString } from './general';
 
 describe('general', () => {
   describe('trimString', () => {
@@ -20,6 +20,36 @@ describe('general', () => {
       expect(trimString(`abcd`, 10)).toEqual(`abcd`);
       expect(trimString(`abcd_efgh_ijkl_mnop_qrst_uvwx_yz`, 10)).toEqual(`abcd_ef...`);
       expect(trimString(`abcd_efgh_ijkl_mnop_qrst_uvwx_yz`, 1)).toEqual(`a...`);
+    });
+  });
+
+  describe('clampIndex', () => {
+    it('works', () => {
+      expect(clampIndex(-10, 0, 5)).toEqual(0);
+      expect(clampIndex(2, 0, 5)).toEqual(2);
+      expect(clampIndex(2.5, 0, 5)).toEqual(2);
+      expect(clampIndex(7, 0, 5)).toEqual(5);
+    });
+  });
+
+  describe('normalizeIndex', () => {
+    it('works', () => {
+      expect(normalizeIndex(1, 10)).toEqual(1);
+      expect(normalizeIndex(-1, 10)).toEqual(9);
+      expect(normalizeIndex(-100, 10)).toEqual(-90);
+    });
+  });
+
+  describe('insert', () => {
+    it('works', () => {
+      expect(insert(['a', 'b', 'c'], 0, 'x')).toEqual(['x', 'a', 'b', 'c']);
+      expect(insert(['a', 'b', 'c'], 1, 'x')).toEqual(['a', 'x', 'b', 'c']);
+      expect(insert(['a', 'b', 'c'], 2, 'x')).toEqual(['a', 'b', 'x', 'c']);
+      expect(insert(['a', 'b', 'c'], 3, 'x')).toEqual(['a', 'b', 'c', 'x']);
+      expect(insert([], 0, 'x')).toEqual(['x']);
+
+      expect(() => insert(['a', 'b', 'c'], -1, 'x')).toThrow('insert index out of bounds (-1)');
+      expect(() => insert(['a', 'b', 'c'], 4, 'x')).toThrow('insert index out of bounds (4)');
     });
   });
 });

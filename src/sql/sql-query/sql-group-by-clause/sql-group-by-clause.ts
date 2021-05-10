@@ -72,6 +72,18 @@ export class SqlGroupByClause extends SqlClause {
     return SqlBase.fromValue(value);
   }
 
+  public addExpression(
+    expression: SqlExpression,
+    where: 'start' | 'end' = 'end',
+  ): SqlGroupByClause {
+    const { expressions } = this;
+    return this.changeExpressions(
+      expressions
+        ? expressions.insert(where === 'start' ? 0 : Infinity, expression)
+        : SeparatedArray.fromSingleValue(expression),
+    );
+  }
+
   public _walkInner(
     nextStack: SqlBase[],
     fn: Substitutor,
@@ -103,18 +115,32 @@ export class SqlGroupByClause extends SqlClause {
 
   public removeExpression(selectExpression: SqlAlias, selectIndex: number): SqlGroupByClause {
     if (!this.expressions) return this;
-    const sqlIndex = selectIndex + 1;
     return this.changeExpressions(
       this.expressions.filterMap(expression => {
         if (expression instanceof SqlLiteral && expression.isIndex()) {
           const expressionIndex = expression.getIndexValue();
-          if (expressionIndex > sqlIndex) {
+          if (selectIndex < expressionIndex) {
             return expression.incrementIndex(-1);
-          } else if (expressionIndex === sqlIndex) {
+          } else if (expressionIndex === selectIndex) {
             return;
           }
         }
         if (expression.equals(selectExpression.expression)) return;
+        return expression;
+      }),
+    );
+  }
+
+  public shiftIndexes(aboveIndex: number): SqlGroupByClause {
+    if (!this.expressions) return this;
+    return this.changeExpressions(
+      this.expressions.map(expression => {
+        if (expression instanceof SqlLiteral && expression.isIndex()) {
+          const expressionIndex = expression.getIndexValue();
+          if (aboveIndex <= expressionIndex) {
+            return expression.incrementIndex();
+          }
+        }
         return expression;
       }),
     );

@@ -181,14 +181,14 @@ export class SqlLiteral extends SqlExpression {
 
   public getIndexValue(): number {
     const { value } = this;
-    if (typeof value !== 'number') return 0;
-    return Math.floor(value) || 0;
+    if (typeof value !== 'number') return -1;
+    return Math.floor(value - 1);
   }
 
   public incrementIndex(amount = 1): SqlLiteral {
     if (!this.isIndex()) return this;
     const value = this.valueOf();
-    value.value = this.getIndexValue() + amount;
+    value.value = Math.floor(this.value as number) + amount;
     delete value.stringValue;
     return new SqlLiteral(value);
   }

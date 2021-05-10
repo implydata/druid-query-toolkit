@@ -76,6 +76,14 @@ export class SqlOrderByClause extends SqlClause {
     return SqlBase.fromValue(value);
   }
 
+  public addExpression(
+    expression: SqlOrderByExpression,
+    where: 'start' | 'end' = 'end',
+  ): SqlOrderByClause {
+    const { expressions } = this;
+    return this.changeExpressions(expressions.insert(where === 'start' ? 0 : Infinity, expression));
+  }
+
   public _walkInner(
     nextStack: SqlBase[],
     fn: Substitutor,
@@ -111,14 +119,13 @@ export class SqlOrderByClause extends SqlClause {
     selectIndex: number,
   ): SqlOrderByClause | undefined {
     if (!this.expressions) return this;
-    const sqlIndex = selectIndex + 1;
     const newExpression = this.expressions.filterMap(orderByExpression => {
       const { expression } = orderByExpression;
       if (expression instanceof SqlLiteral && expression.isIndex()) {
         const expressionIndex = expression.getIndexValue();
-        if (expressionIndex > sqlIndex) {
+        if (expressionIndex > selectIndex) {
           orderByExpression = orderByExpression.changeExpression(expression.incrementIndex(-1));
-        } else if (expressionIndex === sqlIndex) {
+        } else if (expressionIndex === selectIndex) {
           return;
         }
       }
@@ -128,6 +135,21 @@ export class SqlOrderByClause extends SqlClause {
 
     if (!newExpression) return;
     return this.changeExpressions(newExpression);
+  }
+
+  public shiftIndexes(aboveIndex: number): SqlOrderByClause {
+    if (!this.expressions) return this;
+    return this.changeExpressions(
+      this.expressions.map(orderExpression => {
+        if (orderExpression.isIndex()) {
+          const orderExpressionIndex = orderExpression.getIndexValue();
+          if (aboveIndex <= orderExpressionIndex) {
+            return orderExpression.incrementIndex();
+          }
+        }
+        return orderExpression;
+      }),
+    );
   }
 }
 

@@ -16,3 +16,17 @@ export function trimString(str: string, maxLength: number): string {
   if (str.length < maxLength) return str;
   return str.substr(0, Math.max(maxLength - 3, 1)) + '...';
 }
+
+export function clampIndex(index: number, min: number, max: number): number {
+  return Math.max(min, Math.min(max, Math.floor(index)));
+}
+
+export function normalizeIndex(index: number, n: number): number {
+  return index < 0 ? index + n : index;
+}
+
+export function insert<T>(array: readonly T[], index: number, value: T): T[] {
+  const n = array.length;
+  if (index < 0 || n < index) throw new Error(`insert index out of bounds (${index})`);
+  return array.slice(0, index).concat([value], array.slice(index, n));
+}

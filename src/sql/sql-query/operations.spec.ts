@@ -12,8 +12,8 @@
  * limitations under the License.
  */
 
-import { SqlAlias, SqlExpression, SqlFunction, SqlQuery, SqlRef } from '../..';
-import { sane } from '../../test-utils';
+import { SqlExpression, SqlQuery, SqlRef } from '../..';
+import { sane, stringifyExpressions } from '../../test-utils';
 
 describe('SqlQuery operations', () => {
   describe('#makeExplain', () => {
@@ -181,11 +181,14 @@ describe('SqlQuery operations', () => {
   describe('output columns', () => {
     const query = SqlQuery.parse(sane`
       SELECT
-        channel, SUBSTR(cityName, 1, 2), namespace AS s_namespace,
-        COUNT(*), SUM(added) AS "Added"
+        channel,
+        SUBSTR(cityName, 1, 2),
+        namespace AS s_namespace,
+        COUNT(*),
+        SUM(added) AS "Added"
       FROM wikipedia
       GROUP BY 1.1, namespace, SUBSTR(cityName, 1, 2), subspace -- Yes the index can be non-whole, go figure
-      ORDER BY channel, s_namespace Desc, COUNT(*)
+      ORDER BY channel, s_namespace Desc, COUNT(*), subspace ASC
       LIMIT 5
     `);
 
@@ -210,8 +213,35 @@ describe('SqlQuery operations', () => {
       ]);
     });
 
-    it('#getGroupedExpressions', () => {
-      expect(query.getGroupedExpressions()?.map(String)).toEqual([
+    it('#getGroupingExpressionInfos', () => {
+      expect(stringifyExpressions(query.getGroupingExpressionInfos())).toEqual([
+        {
+          expression: 'EX[channel]',
+          orderByExpression: 'EX[channel]',
+          outputColumn: 'channel',
+          selectIndex: 0,
+        },
+        {
+          expression: 'EX[namespace]',
+          orderByExpression: 'EX[s_namespace Desc]',
+          outputColumn: 's_namespace',
+          selectIndex: 2,
+        },
+        {
+          expression: 'EX[SUBSTR(cityName, 1, 2)]',
+          outputColumn: 'EXPR$1',
+          selectIndex: 1,
+        },
+        {
+          expression: 'EX[subspace]',
+          orderByExpression: 'EX[subspace ASC]',
+          selectIndex: -1,
+        },
+      ]);
+    });
+
+    it('#getGroupingExpressions', () => {
+      expect(query.getGroupingExpressions()?.map(String)).toEqual([
         'channel',
         'namespace',
         'SUBSTR(cityName, 1, 2)',
@@ -310,7 +340,7 @@ describe('SqlQuery operations', () => {
             FROM sys."github"
           `,
         )
-          .addToWhere(`col > 1`)
+          .addWhere(`col > 1`)
           .toString(),
       ).toEqual(sane`
         SELECT *
@@ -328,7 +358,7 @@ describe('SqlQuery operations', () => {
             WHERE col > 1
           `,
         )
-          .addToWhere(`colTwo > 2`)
+          .addWhere(`colTwo > 2`)
           .toString(),
       ).toEqual(sane`
         SELECT *
@@ -345,7 +375,7 @@ describe('SqlQuery operations', () => {
             FROM sys."github" WHERE col > 1 OR col < 5
           `,
         )
-          .addToWhere(`colTwo > 2`)
+          .addWhere(`colTwo > 2`)
           .toString(),
       ).toEqual(sane`
         SELECT *
@@ -361,7 +391,7 @@ describe('SqlQuery operations', () => {
             FROM sys."github" WHERE (col > 1 OR col < 5) AND colTwo > 5
           `,
         )
-          .addToWhere(`colTwo > 2`)
+          .addWhere(`colTwo > 2`)
           .toString(),
       ).toEqual(sane`
         SELECT *
@@ -676,85 +706,29 @@ describe('SqlQuery operations', () => {
     });
   });
 
-  describe('addColumn', () => {
-    it('single col', () => {
-      const sql = sane`
-        select col1
-        from tbl
-      `;
-
-      expect(SqlQuery.parse(sql).addSelectExpression('min(col2) AS "alias"').toString())
-        .toEqual(sane`
-        select col1,
-          min(col2) AS "alias"
-        from tbl
-      `);
-    });
-
-    it('function with decorator', () => {
-      const sql = sane`
-        select col1
-        from tbl
-      `;
-
-      expect(SqlQuery.parse(sql).addSelectExpression(`count(DISTINCT col2) AS "alias"`).toString())
-        .toEqual(sane`
-          select col1,
-            count(DISTINCT col2) AS "alias"
-          from tbl
-        `);
-    });
-  });
-
-  describe('addToGroupBy', () => {
-    it('add simple col to group by', () => {
-      const sql = sane`
+  describe('addGroupBy', () => {
+    it('add simple expression to group by', () => {
+      const sql = SqlQuery.parse(sane`
         select Count(*) from tbl
-      `;
+      `);
 
-      expect(SqlQuery.parse(sql).addToGroupBy(SqlRef.columnWithQuotes('col')).toString())
-        .toEqual(sane`
-          select "col",
-            Count(*) from tbl
-          GROUP BY 1
-        `);
-    });
-
-    it('no existing col', () => {
-      const sql = sane`
-        select col1 from tbl
-      `;
-
-      expect(
-        SqlQuery.parse(sql)
-          .addToGroupBy(
-            SqlAlias.create(SqlFunction.simple('min', [SqlRef.column('col1')]), 'MinColumn'),
-          )
-          .toString(),
-      ).toEqual(sane`
-        select min(col1) AS "MinColumn",
-          col1 from tbl
-        GROUP BY 1
+      expect(sql.addGroupBy(SqlRef.columnWithQuotes('col')).toString()).toEqual(sane`
+        select Count(*) from tbl
+        GROUP BY "col"
       `);
     });
 
-    it('existing cols in group by', () => {
-      const sql = sane`
+    it('existing group by', () => {
+      const sql = SqlQuery.parse(sane`
         select col1, min(col1) AS aliasName
         from tbl
         GROUP BY 2
-      `;
+      `);
 
-      expect(
-        SqlQuery.parse(sql)
-          .addToGroupBy(
-            SqlAlias.create(SqlFunction.simple('max', [SqlRef.column('col2')]), 'MaxColumn'),
-          )
-          .toString(),
-      ).toEqual(sane`
-        select max(col2) AS "MaxColumn", col1, min(col1) AS aliasName
+      expect(sql.addGroupBy(`reverse(col2)`).toString()).toEqual(sane`
+        select col1, min(col1) AS aliasName
         from tbl
-        GROUP BY 1, 3
+        GROUP BY 2, reverse(col2)
       `);
     });
   });

@@ -27,13 +27,28 @@ describe('SeparatedArray', () => {
   });
 
   it('#change', () => {
-    expect(String(a.change(7, 7))).toEqual('1, 2 ; 3');
     expect(String(a.change(1, 7))).toEqual('1, 7 ; 3');
   });
 
-  it('#deleteByIndex', () => {
-    expect(String(a.deleteByIndex(0))).toEqual('2 ; 3');
-    expect(String(a.deleteByIndex(1))).toEqual('1 ; 3');
-    expect(String(a.deleteByIndex(2))).toEqual('1, 2');
+  it('#remove', () => {
+    expect(String(a.remove(0))).toEqual('2 ; 3');
+    expect(String(a.remove(1))).toEqual('1 ; 3');
+    expect(String(a.remove(2))).toEqual('1, 2');
+  });
+
+  it('#insert', () => {
+    expect(String(a.insert(0, 7))).toEqual('7, 1, 2 ; 3');
+    expect(String(a.insert(1, 7))).toEqual('1, 7, 2 ; 3');
+    expect(String(a.insert(2, 7))).toEqual('1, 2 ; 7 ; 3');
+    expect(String(a.insert(3, 7))).toEqual('1, 2 ; 3 ; 7');
+    expect(String(a.insert(4, 7))).toEqual('1, 2 ; 3 ; 7');
+  });
+
+  it('#prepend', () => {
+    expect(String(a.prepend(7))).toEqual('7, 1, 2 ; 3');
+  });
+
+  it('#append', () => {
+    expect(String(a.append(7))).toEqual('1, 2 ; 3 ; 7');
   });
 });

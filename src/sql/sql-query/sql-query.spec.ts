@@ -135,7 +135,7 @@ describe('SqlQuery', () => {
         CASE WHEN SUM(num_rows) = 0 THEN 0 ELSE SUM("num_rows") END AS avg_num_rows,
         COUNT(*) AS num_segments
       FROM sys.segments
-      WHERE datasource IN ('moon', 'beam') AND 'druid' = schema 
+      WHERE datasource IN ('moon', 'beam') AND 'druid' = schema
       GROUP BY datasource
       HAVING total_size > 100
       ORDER BY datasource DESC, 2 ASC
@@ -162,7 +162,7 @@ describe('SqlQuery', () => {
           CASE WHEN SUM(num_rows_lol) = 0 THEN 0 ELSE SUM(\\"num_rows_lol\\") END AS avg_num_rows,
           COUNT(*) AS num_segments
         FROM sys.segments
-        WHERE datasource_lol IN ('moon', 'beam') AND 'druid' = schema_lol 
+        WHERE datasource_lol IN ('moon', 'beam') AND 'druid' = schema_lol
         GROUP BY datasource_lol
         HAVING total_size_lol > 100
         ORDER BY datasource_lol DESC, 2 ASC
@@ -178,7 +178,7 @@ describe('SqlQuery', () => {
       });
 
       expect(parts).toEqual([
-        'SELECT\n  datasource d,\n  SUM("size") AS total_size,\n  CASE WHEN SUM("size") = 0 THEN 0 ELSE SUM("size") END AS avg_size,\n  CASE WHEN SUM(num_rows) = 0 THEN 0 ELSE SUM("num_rows") END AS avg_num_rows,\n  COUNT(*) AS num_segments\nFROM sys.segments\nWHERE datasource IN (\'moon\', \'beam\') AND \'druid\' = schema \nGROUP BY datasource\nHAVING total_size > 100\nORDER BY datasource DESC, 2 ASC\nLIMIT 100',
+        'SELECT\n  datasource d,\n  SUM("size") AS total_size,\n  CASE WHEN SUM("size") = 0 THEN 0 ELSE SUM("size") END AS avg_size,\n  CASE WHEN SUM(num_rows) = 0 THEN 0 ELSE SUM("num_rows") END AS avg_num_rows,\n  COUNT(*) AS num_segments\nFROM sys.segments\nWHERE datasource IN (\'moon\', \'beam\') AND \'druid\' = schema\nGROUP BY datasource\nHAVING total_size > 100\nORDER BY datasource DESC, 2 ASC\nLIMIT 100',
         'datasource d',
         'datasource',
         'SUM("size") AS total_size',
@@ -294,7 +294,7 @@ describe('SqlQuery', () => {
         'ORDER BY datasource DESC, 2 ASC',
         '100',
         'LIMIT 100',
-        'SELECT\n  datasource d,\n  SUM("size") AS total_size,\n  CASE WHEN SUM("size") = 0 THEN 0 ELSE SUM("size") END AS avg_size,\n  CASE WHEN SUM(num_rows) = 0 THEN 0 ELSE SUM("num_rows") END AS avg_num_rows,\n  COUNT(*) AS num_segments\nFROM sys.segments\nWHERE datasource IN (\'moon\', \'beam\') AND \'druid\' = schema \nGROUP BY datasource\nHAVING total_size > 100\nORDER BY datasource DESC, 2 ASC\nLIMIT 100',
+        'SELECT\n  datasource d,\n  SUM("size") AS total_size,\n  CASE WHEN SUM("size") = 0 THEN 0 ELSE SUM("size") END AS avg_size,\n  CASE WHEN SUM(num_rows) = 0 THEN 0 ELSE SUM("num_rows") END AS avg_num_rows,\n  COUNT(*) AS num_segments\nFROM sys.segments\nWHERE datasource IN (\'moon\', \'beam\') AND \'druid\' = schema\nGROUP BY datasource\nHAVING total_size > 100\nORDER BY datasource DESC, 2 ASC\nLIMIT 100',
       ]);
     });
 
@@ -361,7 +361,7 @@ describe('SqlQuery', () => {
         'ORDER BY _datasource_ DESC, 2 ASC',
         '100',
         'LIMIT 100',
-        'SELECT\n  _datasource_ d,\n  SUM("_size_") AS total_size,\n  CASE WHEN SUM("_size_") = 0 THEN 0 ELSE SUM("_size_") END AS avg_size,\n  CASE WHEN SUM(_num_rows_) = 0 THEN 0 ELSE SUM("_num_rows_") END AS avg_num_rows,\n  COUNT(*) AS num_segments\nFROM sys.segments\nWHERE _datasource_ IN (\'moon\', \'beam\') AND \'druid\' = _schema_ \nGROUP BY _datasource_\nHAVING _total_size_ > 100\nORDER BY _datasource_ DESC, 2 ASC\nLIMIT 100',
+        'SELECT\n  _datasource_ d,\n  SUM("_size_") AS total_size,\n  CASE WHEN SUM("_size_") = 0 THEN 0 ELSE SUM("_size_") END AS avg_size,\n  CASE WHEN SUM(_num_rows_) = 0 THEN 0 ELSE SUM("_num_rows_") END AS avg_num_rows,\n  COUNT(*) AS num_segments\nFROM sys.segments\nWHERE _datasource_ IN (\'moon\', \'beam\') AND \'druid\' = _schema_\nGROUP BY _datasource_\nHAVING _total_size_ > 100\nORDER BY _datasource_ DESC, 2 ASC\nLIMIT 100',
       ]);
     });
 
@@ -378,8 +378,182 @@ describe('SqlQuery', () => {
         "'druid' = schema",
         "datasource IN ('moon', 'beam') AND 'druid' = schema",
         "WHERE datasource IN ('moon', 'beam') AND 'druid' = schema",
-        'SELECT\n  datasource d,\n  SUM("size") AS total_size,\n  CASE WHEN SUM("size") = 0 THEN 0 ELSE SUM("size") END AS avg_size,\n  CASE WHEN SUM(num_rows) = 0 THEN 0 ELSE SUM("num_rows") END AS avg_num_rows,\n  COUNT(*) AS num_segments\nFROM sys.segments\nWHERE datasource IN (\'moon\', \'beam\') AND \'druid\' = schema \nGROUP BY datasource\nHAVING total_size > 100\nORDER BY datasource DESC, 2 ASC\nLIMIT 100',
+        'SELECT\n  datasource d,\n  SUM("size") AS total_size,\n  CASE WHEN SUM("size") = 0 THEN 0 ELSE SUM("size") END AS avg_size,\n  CASE WHEN SUM(num_rows) = 0 THEN 0 ELSE SUM("num_rows") END AS avg_num_rows,\n  COUNT(*) AS num_segments\nFROM sys.segments\nWHERE datasource IN (\'moon\', \'beam\') AND \'druid\' = schema\nGROUP BY datasource\nHAVING total_size > 100\nORDER BY datasource DESC, 2 ASC\nLIMIT 100',
       ]);
+    });
+  });
+
+  describe('#addSelect', () => {
+    const sql = SqlQuery.parse(sane`
+      SELECT
+        isAnonymous,
+        cityName,
+        flags,
+        COUNT(*) AS "Count",
+        SUM(added) AS "sum_added"
+      FROM wikipedia
+      GROUP BY 1, 2, 3
+      ORDER BY 4 DESC
+    `);
+
+    it('adds last', () => {
+      expect(sql.addSelect(`"new_column" AS "New column"`).toString()).toEqual(sane`
+        SELECT
+          isAnonymous,
+          cityName,
+          flags,
+          COUNT(*) AS "Count",
+          SUM(added) AS "sum_added",
+          "new_column" AS "New column"
+        FROM wikipedia
+        GROUP BY 1, 2, 3
+        ORDER BY 4 DESC
+      `);
+    });
+
+    it('adds first', () => {
+      expect(sql.addSelect(`"new_column" AS "New column"`, { insertIndex: 0 }).toString())
+        .toEqual(sane`
+        SELECT
+          "new_column" AS "New column",
+          isAnonymous,
+          cityName,
+          flags,
+          COUNT(*) AS "Count",
+          SUM(added) AS "sum_added"
+        FROM wikipedia
+        GROUP BY 2, 3, 4
+        ORDER BY 5 DESC
+      `);
+    });
+
+    it('adds grouped', () => {
+      expect(
+        sql
+          .addSelect(`UPPER(city) AS City`, { insertIndex: 'last-grouping', addToGroupBy: 'end' })
+          .toString(),
+      ).toEqual(sane`
+        SELECT
+          isAnonymous,
+          cityName,
+          flags,
+          UPPER(city) AS City,
+          COUNT(*) AS "Count",
+          SUM(added) AS "sum_added"
+        FROM wikipedia
+        GROUP BY 1, 2, 3, 4
+        ORDER BY 5 DESC
+      `);
+    });
+
+    it('adds sorted', () => {
+      expect(
+        sql
+          .addSelect(`COUNT(DISTINCT "user") AS unique_users`, {
+            insertIndex: 'last',
+            addToOrderBy: 'start',
+            direction: 'DESC',
+          })
+          .toString(),
+      ).toEqual(sane`
+        SELECT
+          isAnonymous,
+          cityName,
+          flags,
+          COUNT(*) AS "Count",
+          SUM(added) AS "sum_added",
+          COUNT(DISTINCT "user") AS unique_users
+        FROM wikipedia
+        GROUP BY 1, 2, 3
+        ORDER BY 6 DESC, 4 DESC
+      `);
+    });
+
+    it('adds grouped + sorted', () => {
+      expect(
+        sql
+          .addSelect(`UPPER(city) AS City`, {
+            insertIndex: 'last-grouping',
+            addToGroupBy: 'end',
+            addToOrderBy: 'end',
+          })
+          .toString(),
+      ).toEqual(sane`
+        SELECT
+          isAnonymous,
+          cityName,
+          flags,
+          UPPER(city) AS City,
+          COUNT(*) AS "Count",
+          SUM(added) AS "sum_added"
+        FROM wikipedia
+        GROUP BY 1, 2, 3, 4
+        ORDER BY 5 DESC, 4
+      `);
+    });
+  });
+
+  describe('#removeSelectIndex', () => {
+    const sql = SqlQuery.parse(sane`
+      SELECT
+        isAnonymous,
+        cityName,
+        flags,
+        COUNT(*) AS "Count",
+        SUM(added) AS "sum_added"
+      FROM wikipedia
+      GROUP BY 1, 2, 3
+      ORDER BY 4 DESC
+    `);
+
+    it('works', () => {
+      expect(sql.removeSelectIndex(1).toString()).toEqual(sane`
+        SELECT
+          isAnonymous,
+          flags,
+          COUNT(*) AS "Count",
+          SUM(added) AS "sum_added"
+        FROM wikipedia
+        GROUP BY 1, 2
+        ORDER BY 3 DESC
+      `);
+    });
+
+    it('eliminates order by', () => {
+      expect(sql.removeSelectIndex(3).toString()).toEqual(sane`
+        SELECT
+          isAnonymous,
+          cityName,
+          flags,
+          SUM(added) AS "sum_added"
+        FROM wikipedia
+        GROUP BY 1, 2, 3
+      `);
+    });
+  });
+
+  describe('#removeSelectIndexes', () => {
+    const sql = SqlQuery.parse(sane`
+      SELECT
+        isAnonymous,
+        cityName,
+        flags,
+        COUNT(*) AS "Count",
+        SUM(added) AS "sum_added"
+      FROM wikipedia
+      GROUP BY 1, 2, 3
+      ORDER BY 4 DESC
+    `);
+
+    it('works', () => {
+      expect(sql.removeSelectIndexes([1, 3]).toString()).toEqual(sane`
+        SELECT
+          isAnonymous,
+          flags,
+          SUM(added) AS "sum_added"
+        FROM wikipedia
+        GROUP BY 1, 2
+      `);
     });
   });
 
@@ -4380,7 +4554,7 @@ describe('SqlQuery', () => {
   describe('Queries with comments', () => {
     it('single comment', () => {
       const sql = sane`
-        Select -- some comment 
+        Select -- some comment
         col from tbl
       `;
 
@@ -4456,7 +4630,7 @@ describe('SqlQuery', () => {
           },
           "spacing": Object {
             "postQuery": "",
-            "postSelect": " -- some comment 
+            "postSelect": " -- some comment
         ",
             "preFrom": " ",
             "preQuery": "",
@@ -4519,7 +4693,7 @@ describe('SqlQuery', () => {
 
     it('comment at end of query', () => {
       const sql = sane`
-        Select 
+        Select
         col from tbl
         -- comment
       `;
@@ -4529,7 +4703,7 @@ describe('SqlQuery', () => {
 
     it('comment with unary negative', () => {
       const sql = sane`
-        Select 
+        Select
         col from tbl
         -- comment
         order by -1
@@ -4546,7 +4720,7 @@ describe('SqlQuery', () => {
 
     it('comment with inline comments', () => {
       const sql = sane`
-        Select 
+        Select
         col from /* This is an inline comment */ tbl
         order by -1
       `;
@@ -4556,7 +4730,7 @@ describe('SqlQuery', () => {
 
     it('comment with multiline comments', () => {
       const sql = sane`
-        Select 
+        Select
         col from tbl
         /* This
         is a multiline
