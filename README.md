@@ -285,9 +285,9 @@ SELECT countryName from wikipedia
 
 ## ToDo
 
-- Clean up APIs
 - `(a, b) IN (subquery)`
 - Fancy group by definitions e.g. `GROUPING SETS`, `CUBE`
+- Support `FROM "wikipedia_k" USING (k)`
 
 
 ## License 

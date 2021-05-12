@@ -16,7 +16,9 @@ import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../../sql-base';
 import { SqlExpression } from '../../sql-expression';
 import { SqlAlias } from '..';
 
-export type SqlJoinJoinType = 'LEFT' | 'RIGHT' | 'FULL' | 'INNER' | 'CROSS';
+export type SqlJoinJoinTypeWithOn = 'LEFT' | 'RIGHT' | 'FULL' | 'INNER';
+
+export type SqlJoinJoinType = SqlJoinJoinTypeWithOn | 'CROSS';
 
 export interface SqlJoinPartValue extends SqlBaseValue {
   joinType?: SqlJoinJoinType;
@@ -31,14 +33,24 @@ export class SqlJoinPart extends SqlBase {
   static DEFAULT_ON_KEYWORD = 'ON';
 
   static create(
-    joinType: SqlJoinJoinType,
+    joinType: SqlJoinJoinTypeWithOn,
     table: SqlBase,
-    onExpression?: SqlExpression,
+    onExpression: SqlExpression | SqlExpression[],
   ): SqlJoinPart {
+    if (Array.isArray(onExpression)) {
+      onExpression = SqlExpression.and(...onExpression);
+    }
     return new SqlJoinPart({
       joinType: joinType,
       table: SqlAlias.fromBase(table),
       onExpression: onExpression,
+    });
+  }
+
+  static cross(table: SqlBase): SqlJoinPart {
+    return new SqlJoinPart({
+      joinType: 'CROSS',
+      table: SqlAlias.fromBase(table),
     });
   }
 

@@ -448,4 +448,17 @@ export abstract class SqlBase {
       return ex;
     });
   }
+
+  public apply<T>(fn: (self: this) => T): T {
+    return fn(this);
+  }
+
+  public applyIf(condition: boolean, fn: (self: this) => this): this {
+    if (!condition) return this;
+    return fn(this);
+  }
+
+  public applyForEach<T>(things: T[], fn: (self: this, thing: T, index: number) => this): this {
+    return things.reduce(fn, this);
+  }
 }

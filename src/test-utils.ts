@@ -40,6 +40,11 @@ export function backAndForth(sql: string): void {
   expect(parseSql(sql).toString()).toEqual(sql);
 }
 
+export const SQL_SERIALIZER: any = {
+  test: (val: any) => val instanceof SqlBase,
+  serialize: (val: any) => val.toString(),
+};
+
 export function stringifyExpressions(v: any) {
   return JSON.parse(
     JSON.stringify(v, (_k: string, v: any) => {

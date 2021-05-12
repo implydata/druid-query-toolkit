@@ -51,6 +51,9 @@ export class SqlAlias extends SqlBase {
   }
 
   static create(expression: SqlExpression, alias?: string) {
+    if (expression.type === 'query') {
+      expression = expression.ensureParens();
+    }
     return new SqlAlias({
       expression: expression,
       as: Boolean(alias),

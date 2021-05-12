@@ -56,6 +56,7 @@ export interface AddSelectOptions {
   insertIndex?: InsertIndex;
   addToGroupBy?: 'start' | 'end';
   addToOrderBy?: 'start' | 'end';
+  orderByExpression?: SqlOrderByExpression;
   direction?: SqlOrderByDirection;
 }
 
@@ -271,6 +272,7 @@ export class SqlQuery extends SqlExpression {
   }
 
   public changeFromClause(fromClause: SqlFromClause | undefined): SqlQuery {
+    if (this.fromClause === fromClause) return this;
     const value = this.valueOf();
     if (fromClause) {
       value.fromClause = fromClause;
@@ -293,6 +295,7 @@ export class SqlQuery extends SqlExpression {
   }
 
   public changeWhereClause(whereClause: SqlWhereClause | undefined): SqlQuery {
+    if (this.whereClause === whereClause) return this;
     const value = this.valueOf();
     if (whereClause) {
       value.whereClause = whereClause;
@@ -313,6 +316,7 @@ export class SqlQuery extends SqlExpression {
   }
 
   public changeGroupByClause(groupByClause: SqlGroupByClause | undefined): SqlQuery {
+    if (this.groupByClause === groupByClause) return this;
     const value = this.valueOf();
     if (groupByClause) {
       value.groupByClause = groupByClause;
@@ -335,6 +339,7 @@ export class SqlQuery extends SqlExpression {
   }
 
   public changeHavingClause(havingClause: SqlHavingClause | undefined): SqlQuery {
+    if (this.havingClause === havingClause) return this;
     const value = this.valueOf();
     if (havingClause) {
       value.havingClause = havingClause;
@@ -355,6 +360,7 @@ export class SqlQuery extends SqlExpression {
   }
 
   public changeOrderByClause(orderByClause: SqlOrderByClause | undefined): SqlQuery {
+    if (this.orderByClause === orderByClause) return this;
     const value = this.valueOf();
     if (orderByClause) {
       value.orderByClause = orderByClause;
@@ -382,6 +388,7 @@ export class SqlQuery extends SqlExpression {
   }
 
   public changeLimitClause(limitClause: SqlLimitClause | undefined): SqlQuery {
+    if (this.limitClause === limitClause) return this;
     const value = this.valueOf();
     if (limitClause) {
       value.limitClause = limitClause;
@@ -402,6 +409,7 @@ export class SqlQuery extends SqlExpression {
   }
 
   public changeOffsetClause(offsetClause: SqlOffsetClause | undefined): SqlQuery {
+    if (this.offsetClause === offsetClause) return this;
     const value = this.valueOf();
     if (offsetClause) {
       value.offsetClause = offsetClause;
@@ -710,7 +718,7 @@ export class SqlQuery extends SqlExpression {
 
   public addSelect(ex: SqlBase | string, options: AddSelectOptions = {}) {
     const alias = SqlAlias.fromBase(typeof ex === 'string' ? SqlBase.parseSql(ex) : ex);
-    const { insertIndex, addToGroupBy, addToOrderBy, direction } = options;
+    const { insertIndex, addToGroupBy, addToOrderBy, orderByExpression, direction } = options;
     const idx = this.decodeInsertIndex(insertIndex);
 
     const selectExpressions = this.selectExpressions.insert(idx, alias);
@@ -725,7 +733,10 @@ export class SqlQuery extends SqlExpression {
 
     let orderByClause = this.orderByClause?.shiftIndexes(idx);
     if (addToOrderBy) {
-      const indexOrderBy = SqlOrderByExpression.index(idx, direction);
+      const indexOrderBy = orderByExpression
+        ? orderByExpression.changeExpression(SqlLiteral.index(idx))
+        : SqlOrderByExpression.index(idx, direction);
+
       orderByClause = orderByClause
         ? orderByClause.addExpression(indexOrderBy, addToOrderBy)
         : SqlOrderByClause.create([indexOrderBy]);
@@ -810,6 +821,26 @@ export class SqlQuery extends SqlExpression {
   public addJoin(join: SqlJoinPart) {
     if (!this.fromClause) return this;
     return this.changeFromClause(this.fromClause.addJoin(join));
+  }
+
+  public addLeftJoin(table: SqlBase, onExpression: SqlExpression | SqlExpression[]) {
+    return this.addJoin(SqlJoinPart.create('LEFT', table, onExpression));
+  }
+
+  public addRightJoin(table: SqlBase, onExpression: SqlExpression | SqlExpression[]) {
+    return this.addJoin(SqlJoinPart.create('RIGHT', table, onExpression));
+  }
+
+  public addInnerJoin(table: SqlBase, onExpression: SqlExpression | SqlExpression[]) {
+    return this.addJoin(SqlJoinPart.create('INNER', table, onExpression));
+  }
+
+  public addFullJoin(table: SqlBase, onExpression: SqlExpression | SqlExpression[]) {
+    return this.addJoin(SqlJoinPart.create('FULL', table, onExpression));
+  }
+
+  public addCrossJoin(table: SqlBase) {
+    return this.addJoin(SqlJoinPart.cross(table));
   }
 
   public removeAllJoins() {
@@ -915,6 +946,12 @@ export class SqlQuery extends SqlExpression {
 
   public hasOrderBy(): boolean {
     return Boolean(this.orderByClause);
+  }
+
+  public getOrderByExpressions(): readonly SqlOrderByExpression[] {
+    const { orderByClause } = this;
+    if (!orderByClause) return [];
+    return orderByClause.expressions.values;
   }
 
   public getOrderByForSelectIndex(selectIndex: number): SqlOrderByExpression | undefined {

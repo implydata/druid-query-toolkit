@@ -48,7 +48,7 @@ export abstract class SqlExpression extends SqlBase {
     return input instanceof SqlExpression ? input : SqlLiteral.create(input);
   }
 
-  static and(...args: (SqlExpression | string | undefined)[]) {
+  static and(...args: (SqlExpression | string | undefined)[]): SqlExpression {
     const compactArgs = filterMap(args, a => {
       if (!a) return;
       a = SqlExpression.parse(a);
