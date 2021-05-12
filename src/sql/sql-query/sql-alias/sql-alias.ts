@@ -50,14 +50,14 @@ export class SqlAlias extends SqlBase {
     throw new Error(`can not construct and alias from ${base.type}`);
   }
 
-  static create(expression: SqlExpression, alias?: string) {
+  static create(expression: SqlExpression, alias?: SqlRef | string) {
     if (expression.type === 'query') {
       expression = expression.ensureParens();
     }
     return new SqlAlias({
       expression: expression,
       as: Boolean(alias),
-      alias: alias ? SqlRef.columnWithQuotes(alias) : undefined,
+      alias: alias ? (typeof alias === 'string' ? SqlRef.column(alias) : alias) : undefined,
     });
   }
 
@@ -110,8 +110,13 @@ export class SqlAlias extends SqlBase {
   }
 
   public changeAliasName(aliasName: string | undefined, forceQuotes = false): this {
+    const { alias } = this;
     return this.changeAlias(
-      aliasName ? SqlRef.column(aliasName, undefined, undefined, forceQuotes) : undefined,
+      aliasName
+        ? alias && !forceQuotes
+          ? alias.changeColumn(aliasName)
+          : SqlRef.column(aliasName, undefined, undefined, forceQuotes)
+        : undefined,
     );
   }
 

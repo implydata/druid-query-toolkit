@@ -748,7 +748,7 @@ export class SqlQuery extends SqlExpression {
     }
   }
 
-  public addSelect(ex: SqlBase | string, options: AddSelectOptions = {}) {
+  public addSelect(ex: SqlBase | string, options: AddSelectOptions = {}): this {
     const alias = SqlAlias.fromBase(typeof ex === 'string' ? SqlBase.parseSql(ex) : ex);
     const { insertIndex, addToGroupBy, addToOrderBy, orderByExpression, direction } = options;
     const idx = this.decodeInsertIndex(insertIndex);
@@ -778,6 +778,12 @@ export class SqlQuery extends SqlExpression {
     return this.changeSelectExpressions(selectExpressions)
       .changeGroupByClause(groupByClause)
       .changeOrderByClause(orderByClause);
+  }
+
+  public changeSelect(selectIndex: number, ex: SqlBase | string): this {
+    if (!this.selectExpressions) return this;
+    const alias = SqlAlias.fromBase(typeof ex === 'string' ? SqlBase.parseSql(ex) : ex);
+    return this.changeSelectExpressions(this.selectExpressions.change(selectIndex, alias));
   }
 
   public removeSelectIndex(selectIndex: number): this {

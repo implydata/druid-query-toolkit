@@ -502,6 +502,34 @@ describe('SqlQuery', () => {
     });
   });
 
+  describe('#changeSelect', () => {
+    const sql = SqlQuery.parse(sane`
+      SELECT
+        isAnonymous,
+        cityName,
+        flags,
+        COUNT(*) AS "Count",
+        SUM(added) AS "sum_added"
+      FROM wikipedia
+      GROUP BY 1, 2, 3
+      ORDER BY 4 DESC
+    `);
+
+    it('adds last', () => {
+      expect(sql.changeSelect(2, `"new_column" AS "New column"`).toString()).toEqual(sane`
+        SELECT
+          isAnonymous,
+          cityName,
+          "new_column" AS "New column",
+          COUNT(*) AS "Count",
+          SUM(added) AS "sum_added"
+        FROM wikipedia
+        GROUP BY 1, 2, 3
+        ORDER BY 4 DESC
+      `);
+    });
+  });
+
   describe('#removeSelectIndex', () => {
     const sql = SqlQuery.parse(sane`
       SELECT

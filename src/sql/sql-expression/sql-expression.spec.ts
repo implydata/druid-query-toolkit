@@ -36,7 +36,7 @@ describe('SqlExpression', () => {
     const y = SqlRef.column('y');
 
     it('works with as', () => {
-      expect(String(x.as('lol'))).toEqual('x AS "lol"');
+      expect(String(x.as('lol'))).toEqual('x AS lol');
     });
 
     it('works with toOrderByPart', () => {
