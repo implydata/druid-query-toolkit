@@ -109,6 +109,15 @@ describe('SqlQuery', () => {
     });
   });
 
+  describe('.from', () => {
+    it('works', () => {
+      expect(String(SqlQuery.from(SqlRef.table('lol')))).toEqual(sane`
+        SELECT ...
+        FROM lol
+      `);
+    });
+  });
+
   describe('.parse', () => {
     it('parse queries only', () => {
       expect(() => SqlQuery.parse('a OR b')).toThrowErrorMatchingInlineSnapshot(
@@ -553,6 +562,15 @@ describe('SqlQuery', () => {
           SUM(added) AS "sum_added"
         FROM wikipedia
         GROUP BY 1, 2
+      `);
+    });
+
+    it('removes all', () => {
+      expect(sql.removeSelectIndexes([1, 3, 2, 0, 4]).toString()).toEqual(sane`
+        SELECT
+          ...
+        FROM wikipedia
+        GROUP BY ()
       `);
     });
   });

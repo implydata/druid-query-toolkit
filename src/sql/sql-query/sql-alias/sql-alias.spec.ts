@@ -22,7 +22,7 @@ describe('SqlAlias', () => {
 
       backAndForth(sql);
 
-      expect(SqlQuery.parse(sql)!.selectExpressions.first()).toMatchInlineSnapshot(`
+      expect(SqlQuery.parse(sql)!.getSelectExpressionForIndex(0)).toMatchInlineSnapshot(`
         SqlAlias {
           "alias": undefined,
           "as": undefined,
@@ -49,7 +49,7 @@ describe('SqlAlias', () => {
 
       backAndForth(sql);
 
-      expect(SqlQuery.parse(sql)!.selectExpressions.first()).toMatchInlineSnapshot(`
+      expect(SqlQuery.parse(sql)!.getSelectExpressionForIndex(0)).toMatchInlineSnapshot(`
         SqlAlias {
           "alias": SqlRef {
             "column": "City",
@@ -91,7 +91,7 @@ describe('SqlAlias', () => {
 
       backAndForth(sql);
 
-      expect(SqlQuery.parse(sql)!.selectExpressions.first()).toMatchInlineSnapshot(`
+      expect(SqlQuery.parse(sql)!.getSelectExpressionForIndex(0)).toMatchInlineSnapshot(`
         SqlAlias {
           "alias": SqlRef {
             "column": "City",
@@ -136,7 +136,7 @@ describe('SqlAlias', () => {
 
       backAndForth(sql);
 
-      expect(SqlQuery.parse(sql)!.selectExpressions.first()).toMatchInlineSnapshot(`
+      expect(SqlQuery.parse(sql)!.getSelectExpressionForIndex(0)).toMatchInlineSnapshot(`
         SqlAlias {
           "alias": SqlRef {
             "column": "City",
