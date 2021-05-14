@@ -13,10 +13,11 @@
  */
 
 import { SqlBase, SqlType, Substitutor } from '../../sql-base';
-import { SqlLiteral } from '../../sql-expression';
+import { SqlLiteral } from '../../sql-literal/sql-literal';
 import { SeparatedArray } from '../../utils';
-import { SqlAlias, SqlOrderByExpression } from '..';
+import { SqlAlias } from '../sql-alias/sql-alias';
 import { SqlClause, SqlClauseValue } from '../sql-clause';
+import { SqlOrderByExpression } from '../sql-order-by-expression/sql-order-by-expression';
 
 export interface SqlOrderByClauseValue extends SqlClauseValue {
   expressions: SeparatedArray<SqlOrderByExpression>;

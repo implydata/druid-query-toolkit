@@ -12,7 +12,8 @@
  * limitations under the License.
  */
 
-import { QueryResult, SqlQuery } from '..';
+import { QueryResult } from '../query-result/query-result';
+import { SqlQuery } from '../sql';
 
 import { CancelToken } from './cancel-token';
 

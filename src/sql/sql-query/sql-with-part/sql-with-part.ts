@@ -12,10 +12,10 @@
  * limitations under the License.
  */
 
+import { SqlQuery } from '../..';
 import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../../sql-base';
-import { SqlRef } from '../../sql-expression';
+import { SqlRef } from '../../sql-ref/sql-ref';
 import { SeparatedArray } from '../../utils';
-import { SqlQuery } from '../sql-query';
 
 export interface SqlWithPartValue extends SqlBaseValue {
   withTable: SqlRef;
@@ -102,10 +102,10 @@ export class SqlWithPart extends SqlBase {
   ): SqlBase | undefined {
     let ret = this;
 
-    const withTable = this.withTable._walkHelper(nextStack, fn, postorder);
+    const withTable = this.withTable._walkHelper(nextStack, fn, postorder) as SqlRef;
     if (!withTable) return;
     if (withTable !== this.withTable) {
-      ret = ret.changeWithTable(withTable as SqlRef);
+      ret = ret.changeWithTable(withTable);
     }
 
     if (this.withColumns) {

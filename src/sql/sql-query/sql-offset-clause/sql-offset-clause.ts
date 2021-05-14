@@ -13,7 +13,7 @@
  */
 
 import { SqlBase, SqlType, Substitutor } from '../../sql-base';
-import { SqlLiteral } from '../../sql-expression';
+import { SqlLiteral } from '../../sql-literal/sql-literal';
 import { SqlClause, SqlClauseValue } from '../sql-clause';
 
 export interface SqlOffsetClauseValue extends SqlClauseValue {

@@ -12,8 +12,7 @@
  * limitations under the License.
  */
 
-import { SqlBaseValue } from '..';
-import { SqlBase, Substitutor } from '../sql-base';
+import { SqlBase, SqlBaseValue, Substitutor } from '../sql-base';
 
 export interface SqlClauseValue extends SqlBaseValue {}
 

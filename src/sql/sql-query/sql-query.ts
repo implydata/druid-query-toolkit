@@ -13,30 +13,26 @@
  */
 
 import { filterMap } from '../../utils';
-import {
-  clampIndex,
-  normalizeIndex,
-  SeparatedArray,
-  Separator,
-  SqlAlias,
-  SqlExpression,
-  SqlFromClause,
-  SqlGroupByClause,
-  SqlHavingClause,
-  SqlLimitClause,
-  SqlLiteral,
-  SqlOffsetClause,
-  SqlOrderByClause,
-  SqlOrderByDirection,
-  SqlRef,
-  SqlWhereClause,
-  Substitutor,
-} from '..';
 import { parseSql } from '../parser';
-import { SqlBase, SqlBaseValue, SqlType } from '../sql-base';
+import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../sql-base';
+import { SqlExpression } from '../sql-expression';
+import { SqlLiteral } from '../sql-literal/sql-literal';
+import { SqlRef } from '../sql-ref/sql-ref';
+import { clampIndex, normalizeIndex, SeparatedArray, Separator } from '../utils';
 
+import { SqlAlias } from './sql-alias/sql-alias';
+import { SqlFromClause } from './sql-from-clause/sql-from-clause';
+import { SqlGroupByClause } from './sql-group-by-clause/sql-group-by-clause';
+import { SqlHavingClause } from './sql-having-clause/sql-having-clause';
 import { SqlJoinPart } from './sql-join-part/sql-join-part';
-import { SqlOrderByExpression } from './sql-order-by-expression/sql-order-by-expression';
+import { SqlLimitClause } from './sql-limit-clause/sql-limit-clause';
+import { SqlOffsetClause } from './sql-offset-clause/sql-offset-clause';
+import { SqlOrderByClause } from './sql-order-by-clause/sql-order-by-clause';
+import {
+  SqlOrderByDirection,
+  SqlOrderByExpression,
+} from './sql-order-by-expression/sql-order-by-expression';
+import { SqlWhereClause } from './sql-where-clause/sql-where-clause';
 import { SqlWithPart } from './sql-with-part/sql-with-part';
 
 const INDENT_SPACE = '\n  ';

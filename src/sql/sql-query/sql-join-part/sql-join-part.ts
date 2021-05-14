@@ -14,7 +14,7 @@
 
 import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../../sql-base';
 import { SqlExpression } from '../../sql-expression';
-import { SqlAlias } from '..';
+import { SqlAlias } from '../sql-alias/sql-alias';
 
 export type SqlJoinJoinTypeWithOn = 'LEFT' | 'RIGHT' | 'FULL' | 'INNER';
 

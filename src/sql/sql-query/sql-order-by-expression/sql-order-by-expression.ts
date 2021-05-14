@@ -13,7 +13,8 @@
  */
 
 import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../../sql-base';
-import { SqlExpression, SqlLiteral } from '../../sql-expression';
+import { SqlExpression } from '../../sql-expression';
+import { SqlLiteral } from '../../sql-literal/sql-literal';
 
 export type SqlOrderByDirection = 'ASC' | 'DESC';
 

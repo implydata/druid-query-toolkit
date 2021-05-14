@@ -18,4 +18,31 @@
 export * from './utils';
 export * from './sql-base';
 export * from './sql-expression';
-export * from './sql-query';
+export * from './sql-placeholder/sql-placeholder';
+export * from './sql-literal/sql-literal';
+export * from './sql-interval/sql-interval';
+export * from './sql-ref/sql-ref';
+export * from './sql-multi/sql-multi';
+export * from './sql-unary/sql-unary';
+export * from './sql-comparison/sql-between-part';
+export * from './sql-comparison/sql-like-part';
+export * from './sql-comparison/sql-comparison';
+
+export * from './sql-query/sql-alias/sql-alias';
+
+export * from './sql-query/sql-clause';
+export * from './sql-query/sql-order-by-expression/sql-order-by-expression';
+export * from './sql-query/sql-order-by-clause/sql-order-by-clause';
+export * from './sql-query/sql-with-part/sql-with-part';
+export * from './sql-query/sql-join-part/sql-join-part';
+export * from './sql-query/sql-from-clause/sql-from-clause';
+export * from './sql-query/sql-group-by-clause/sql-group-by-clause';
+export * from './sql-query/sql-where-clause/sql-where-clause';
+export * from './sql-query/sql-having-clause/sql-having-clause';
+export * from './sql-query/sql-limit-clause/sql-limit-clause';
+export * from './sql-query/sql-offset-clause/sql-offset-clause';
+
+export * from './sql-function/sql-function';
+export * from './sql-case/sql-when-then-part';
+export * from './sql-case/sql-case';
+export * from './sql-query/sql-query';

@@ -13,9 +13,10 @@
  */
 
 import { SqlBase, SqlType, Substitutor } from '../../sql-base';
-import { SqlExpression, SqlLiteral } from '../../sql-expression';
+import { SqlExpression } from '../../sql-expression';
+import { SqlLiteral } from '../../sql-literal/sql-literal';
 import { SeparatedArray } from '../../utils';
-import { SqlAlias } from '..';
+import { SqlAlias } from '../sql-alias/sql-alias';
 import { SqlClause, SqlClauseValue } from '../sql-clause';
 
 export interface SqlGroupByClauseValue extends SqlClauseValue {

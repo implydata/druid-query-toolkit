@@ -134,7 +134,7 @@ export class Introspect {
         if (name === '__time' && type === 'LONG') {
           type = 'TIMESTAMP';
         }
-        return { name, type };
+        return { name: String(name), type };
       });
     }
   }
