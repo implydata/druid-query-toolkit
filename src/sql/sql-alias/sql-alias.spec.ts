@@ -12,8 +12,8 @@
  * limitations under the License.
  */
 
-import { backAndForth } from '../../../test-utils';
 import { SqlQuery, SqlRef } from '../..';
+import { backAndForth } from '../../test-utils';
 
 describe('SqlAlias', () => {
   describe('parses', () => {

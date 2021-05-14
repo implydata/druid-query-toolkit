@@ -13,10 +13,10 @@
  */
 
 import { filterMap } from '../../../utils';
+import { SqlAlias } from '../../sql-alias/sql-alias';
 import { SqlBase, SqlType, Substitutor } from '../../sql-base';
 import { SqlRef } from '../../sql-ref/sql-ref';
 import { SeparatedArray } from '../../utils';
-import { SqlAlias } from '../sql-alias/sql-alias';
 import { SqlClause, SqlClauseValue } from '../sql-clause';
 import { SqlJoinPart } from '../sql-join-part/sql-join-part';
 

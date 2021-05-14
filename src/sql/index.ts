@@ -12,7 +12,9 @@
  * limitations under the License.
  */
 
-// The order of exports in this file is significant as it resolves the circular dependencies of the files in a meaningful state.
+// The order of exports in this file is significant as it defines what depends on what.
+// Each file can directly depend directly on any file above it.
+// Files can depend on the files below them by type only imported from the root.
 
 /* eslint-disable simple-import-sort/exports */
 export * from './utils';
@@ -27,22 +29,21 @@ export * from './sql-unary/sql-unary';
 export * from './sql-comparison/sql-between-part';
 export * from './sql-comparison/sql-like-part';
 export * from './sql-comparison/sql-comparison';
-
-export * from './sql-query/sql-alias/sql-alias';
-
-export * from './sql-query/sql-clause';
-export * from './sql-query/sql-order-by-expression/sql-order-by-expression';
-export * from './sql-query/sql-order-by-clause/sql-order-by-clause';
-export * from './sql-query/sql-with-part/sql-with-part';
-export * from './sql-query/sql-join-part/sql-join-part';
-export * from './sql-query/sql-from-clause/sql-from-clause';
-export * from './sql-query/sql-group-by-clause/sql-group-by-clause';
-export * from './sql-query/sql-where-clause/sql-where-clause';
-export * from './sql-query/sql-having-clause/sql-having-clause';
-export * from './sql-query/sql-limit-clause/sql-limit-clause';
-export * from './sql-query/sql-offset-clause/sql-offset-clause';
-
-export * from './sql-function/sql-function';
 export * from './sql-case/sql-when-then-part';
 export * from './sql-case/sql-case';
+export * from './sql-alias/sql-alias';
+
+export * from './sql-clause/sql-clause';
+export * from './sql-clause/sql-order-by-expression/sql-order-by-expression';
+export * from './sql-clause/sql-order-by-clause/sql-order-by-clause';
+export * from './sql-clause/sql-join-part/sql-join-part';
+export * from './sql-clause/sql-from-clause/sql-from-clause';
+export * from './sql-clause/sql-group-by-clause/sql-group-by-clause';
+export * from './sql-clause/sql-where-clause/sql-where-clause';
+export * from './sql-clause/sql-having-clause/sql-having-clause';
+export * from './sql-clause/sql-limit-clause/sql-limit-clause';
+export * from './sql-clause/sql-offset-clause/sql-offset-clause';
+
+export * from './sql-function/sql-function';
+export * from './sql-query/sql-with-part/sql-with-part';
 export * from './sql-query/sql-query';

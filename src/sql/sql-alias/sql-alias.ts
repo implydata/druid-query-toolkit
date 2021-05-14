@@ -12,10 +12,10 @@
  * limitations under the License.
  */
 
-import { SqlQuery } from '../..';
-import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../../sql-base';
-import { SqlExpression } from '../../sql-expression';
-import { SqlRef } from '../../sql-ref/sql-ref';
+import { SqlQuery } from '..';
+import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../sql-base';
+import { SqlExpression } from '../sql-expression';
+import { SqlRef } from '../sql-ref/sql-ref';
 
 export interface SqlAliasValue extends SqlBaseValue {
   expression: SqlExpression | SqlQuery;

@@ -14,25 +14,25 @@
 
 import { filterMap } from '../../utils';
 import { parseSql } from '../parser';
+import { SqlAlias } from '../sql-alias/sql-alias';
 import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../sql-base';
+import { SqlFromClause } from '../sql-clause/sql-from-clause/sql-from-clause';
+import { SqlGroupByClause } from '../sql-clause/sql-group-by-clause/sql-group-by-clause';
+import { SqlHavingClause } from '../sql-clause/sql-having-clause/sql-having-clause';
+import { SqlJoinPart } from '../sql-clause/sql-join-part/sql-join-part';
+import { SqlLimitClause } from '../sql-clause/sql-limit-clause/sql-limit-clause';
+import { SqlOffsetClause } from '../sql-clause/sql-offset-clause/sql-offset-clause';
+import { SqlOrderByClause } from '../sql-clause/sql-order-by-clause/sql-order-by-clause';
+import {
+  SqlOrderByDirection,
+  SqlOrderByExpression,
+} from '../sql-clause/sql-order-by-expression/sql-order-by-expression';
+import { SqlWhereClause } from '../sql-clause/sql-where-clause/sql-where-clause';
 import { SqlExpression } from '../sql-expression';
 import { SqlLiteral } from '../sql-literal/sql-literal';
 import { SqlRef } from '../sql-ref/sql-ref';
 import { clampIndex, normalizeIndex, SeparatedArray, Separator } from '../utils';
 
-import { SqlAlias } from './sql-alias/sql-alias';
-import { SqlFromClause } from './sql-from-clause/sql-from-clause';
-import { SqlGroupByClause } from './sql-group-by-clause/sql-group-by-clause';
-import { SqlHavingClause } from './sql-having-clause/sql-having-clause';
-import { SqlJoinPart } from './sql-join-part/sql-join-part';
-import { SqlLimitClause } from './sql-limit-clause/sql-limit-clause';
-import { SqlOffsetClause } from './sql-offset-clause/sql-offset-clause';
-import { SqlOrderByClause } from './sql-order-by-clause/sql-order-by-clause';
-import {
-  SqlOrderByDirection,
-  SqlOrderByExpression,
-} from './sql-order-by-expression/sql-order-by-expression';
-import { SqlWhereClause } from './sql-where-clause/sql-where-clause';
 import { SqlWithPart } from './sql-with-part/sql-with-part';
 
 const INDENT_SPACE = '\n  ';
