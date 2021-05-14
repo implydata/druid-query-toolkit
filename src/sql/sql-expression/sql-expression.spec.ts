@@ -16,6 +16,18 @@ import { SqlBase, SqlExpression, SqlRef } from '../..';
 import { backAndForth } from '../../test-utils';
 
 describe('SqlExpression', () => {
+  it('things that work', () => {
+    const queries: string[] = ['1', '1 + 1', `CONCAT('a', 'b')`, `(Select 1)`];
+
+    for (const sql of queries) {
+      try {
+        backAndForth(sql);
+      } catch (e) {
+        throw new Error(`problem with \`${sql}\`: ${e.message}`);
+      }
+    }
+  });
+
   it('plywood expressions should not parse', () => {
     const queries: string[] = [`$lol`, `#main.sum($count)`];
 

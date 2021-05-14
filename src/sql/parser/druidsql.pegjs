@@ -545,7 +545,7 @@ ComparisonOpRhsBetween = op:BetweenToken postOp:_ symmetricKeyword:(SymmetricTok
     op: op.toUpperCase(),
     opKeyword: op,
     postOp: postOp,
-    rhs: new sql.SqlBetweenAndHelper(value)
+    rhs: new sql.SqlBetweenPart(value)
   };
 }
 
@@ -555,7 +555,7 @@ ComparisonOpRhsLike = op:(LikeToken / SimilarToToken) postOp:_ like:AdditionExpr
     op: op.toUpperCase(),
     opKeyword: op,
     postOp: postOp,
-    rhs: escape ? new sql.SqlLikeEscapeHelper({
+    rhs: escape ? new sql.SqlLikePart({
       like: like,
       escape: escape[3],
       spacing: {

@@ -14,27 +14,27 @@
 
 import { SqlBase, SqlBaseValue, SqlExpression, SqlType, Substitutor } from '../..';
 
-export interface SqlBetweenAndHelperValue extends SqlBaseValue {
+export interface SqlBetweenPartValue extends SqlBaseValue {
   symmetric?: boolean;
   start: SqlExpression;
   end: SqlExpression;
 }
 
-export class SqlBetweenAndHelper extends SqlBase {
-  static type: SqlType = 'betweenAndHelper';
+export class SqlBetweenPart extends SqlBase {
+  static type: SqlType = 'betweenPart';
 
   static DEFAULT_SYMMETRIC_KEYWORD = 'SYMMETRIC';
   static DEFAULT_AND_KEYWORD = 'AND';
 
-  static create(start: SqlExpression, end: SqlExpression): SqlBetweenAndHelper {
-    return new SqlBetweenAndHelper({
+  static create(start: SqlExpression, end: SqlExpression): SqlBetweenPart {
+    return new SqlBetweenPart({
       start,
       end,
     });
   }
 
-  static symmetric(start: SqlExpression, end: SqlExpression): SqlBetweenAndHelper {
-    return new SqlBetweenAndHelper({
+  static symmetric(start: SqlExpression, end: SqlExpression): SqlBetweenPart {
+    return new SqlBetweenPart({
       symmetric: true,
       start,
       end,
@@ -45,15 +45,15 @@ export class SqlBetweenAndHelper extends SqlBase {
   public readonly start: SqlExpression;
   public readonly end: SqlExpression;
 
-  constructor(options: SqlBetweenAndHelperValue) {
-    super(options, SqlBetweenAndHelper.type);
+  constructor(options: SqlBetweenPartValue) {
+    super(options, SqlBetweenPart.type);
     this.symmetric = options.symmetric;
     this.start = options.start;
     this.end = options.end;
   }
 
-  public valueOf(): SqlBetweenAndHelperValue {
-    const value = super.valueOf() as SqlBetweenAndHelperValue;
+  public valueOf(): SqlBetweenPartValue {
+    const value = super.valueOf() as SqlBetweenPartValue;
     if (this.symmetric) value.symmetric = true;
     value.start = this.start;
     value.end = this.end;
@@ -65,7 +65,7 @@ export class SqlBetweenAndHelper extends SqlBase {
 
     if (this.symmetric) {
       rawParts.push(
-        this.getKeyword('symmetric', SqlBetweenAndHelper.DEFAULT_SYMMETRIC_KEYWORD),
+        this.getKeyword('symmetric', SqlBetweenPart.DEFAULT_SYMMETRIC_KEYWORD),
         this.getSpace('postSymmetric'),
       );
     }
@@ -73,7 +73,7 @@ export class SqlBetweenAndHelper extends SqlBase {
     rawParts.push(
       this.start.toString(),
       this.getSpace('preAnd'),
-      this.getKeyword('and', SqlBetweenAndHelper.DEFAULT_AND_KEYWORD),
+      this.getKeyword('and', SqlBetweenPart.DEFAULT_AND_KEYWORD),
       this.getSpace('postAnd'),
       this.end.toString(),
     );
@@ -116,4 +116,4 @@ export class SqlBetweenAndHelper extends SqlBase {
   }
 }
 
-SqlBase.register(SqlBetweenAndHelper);
+SqlBase.register(SqlBetweenPart);

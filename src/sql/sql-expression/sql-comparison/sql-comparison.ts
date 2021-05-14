@@ -16,8 +16,8 @@ import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../../sql-base';
 import { LiteralValue, SqlLiteral } from '..';
 import { SqlExpression } from '../sql-expression';
 
-import { SqlBetweenAndHelper } from './sql-between-and-helper';
-import { SqlLikeEscapeHelper } from './sql-like-escape-helper';
+import { SqlBetweenPart } from './sql-between-part';
+import { SqlLikePart } from './sql-like-part';
 
 export type SqlComparisonOp = '=' | '<>' | '<' | '>' | '<=' | '>=' | 'IS' | 'LIKE' | 'BETWEEN'; // ToDo: 'similar to' ?
 export type SqlComparisonDecorator = 'ALL' | 'ANY';
@@ -132,7 +132,7 @@ export class SqlComparison extends SqlExpression {
     return new SqlComparison({
       op: 'LIKE',
       lhs: SqlExpression.wrap(lhs),
-      rhs: typeof escape === 'undefined' ? rhsEx : SqlLikeEscapeHelper.create(rhsEx, escape),
+      rhs: typeof escape === 'undefined' ? rhsEx : SqlLikePart.create(rhsEx, escape),
     });
   }
 
@@ -152,7 +152,7 @@ export class SqlComparison extends SqlExpression {
     return new SqlComparison({
       op: 'BETWEEN',
       lhs: SqlExpression.wrap(lhs),
-      rhs: SqlBetweenAndHelper.create(SqlExpression.wrap(start), SqlExpression.wrap(end)),
+      rhs: SqlBetweenPart.create(SqlExpression.wrap(start), SqlExpression.wrap(end)),
     });
   }
 
@@ -172,7 +172,7 @@ export class SqlComparison extends SqlExpression {
     return new SqlComparison({
       op: 'BETWEEN',
       lhs: SqlExpression.wrap(lhs),
-      rhs: SqlBetweenAndHelper.symmetric(SqlExpression.wrap(start), SqlExpression.wrap(end)),
+      rhs: SqlBetweenPart.symmetric(SqlExpression.wrap(start), SqlExpression.wrap(end)),
     });
   }
 
@@ -310,7 +310,7 @@ export class SqlComparison extends SqlExpression {
     if (op !== 'LIKE') return;
     if (rhs instanceof SqlLiteral) {
       return rhs.getStringValue();
-    } else if (rhs instanceof SqlLikeEscapeHelper && rhs.like instanceof SqlLiteral) {
+    } else if (rhs instanceof SqlLikePart && rhs.like instanceof SqlLiteral) {
       return rhs.like.getStringValue();
     }
     return;

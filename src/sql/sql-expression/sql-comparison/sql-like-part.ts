@@ -14,20 +14,20 @@
 import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../../sql-base';
 import { SqlExpression, SqlLiteral } from '..';
 
-export interface SqlLikeEscapeHelperValue extends SqlBaseValue {
+export interface SqlLikePartValue extends SqlBaseValue {
   like: SqlExpression;
   escape: SqlExpression;
 }
 
-export class SqlLikeEscapeHelper extends SqlBase {
-  static type: SqlType = 'likeEscapeHelper';
+export class SqlLikePart extends SqlBase {
+  static type: SqlType = 'likePart';
 
   static DEFAULT_ESCAPE_KEYWORD = 'ESCAPE';
 
-  static create(like: SqlExpression | string, escape: SqlExpression | string): SqlLikeEscapeHelper {
+  static create(like: SqlExpression | string, escape: SqlExpression | string): SqlLikePart {
     const likeEx: SqlExpression = typeof like === 'string' ? SqlLiteral.create(like) : like;
     const escapeEx: SqlExpression = typeof escape === 'string' ? SqlLiteral.create(escape) : escape;
-    return new SqlLikeEscapeHelper({
+    return new SqlLikePart({
       like: likeEx,
       escape: escapeEx,
     });
@@ -36,14 +36,14 @@ export class SqlLikeEscapeHelper extends SqlBase {
   public readonly like: SqlExpression;
   public readonly escape: SqlExpression;
 
-  constructor(options: SqlLikeEscapeHelperValue) {
-    super(options, SqlLikeEscapeHelper.type);
+  constructor(options: SqlLikePartValue) {
+    super(options, SqlLikePart.type);
     this.like = options.like;
     this.escape = options.escape;
   }
 
-  public valueOf(): SqlLikeEscapeHelperValue {
-    const value = super.valueOf() as SqlLikeEscapeHelperValue;
+  public valueOf(): SqlLikePartValue {
+    const value = super.valueOf() as SqlLikePartValue;
     value.like = this.like;
     value.escape = this.escape;
     return value;
@@ -53,7 +53,7 @@ export class SqlLikeEscapeHelper extends SqlBase {
     const rawParts: string[] = [
       this.like.toString(),
       this.getSpace('preEscape'),
-      this.getKeyword('escape', SqlLikeEscapeHelper.DEFAULT_ESCAPE_KEYWORD),
+      this.getKeyword('escape', SqlLikePart.DEFAULT_ESCAPE_KEYWORD),
       this.getSpace('postEscape'),
       this.escape.toString(),
     ];
@@ -96,4 +96,4 @@ export class SqlLikeEscapeHelper extends SqlBase {
   }
 }
 
-SqlBase.register(SqlLikeEscapeHelper);
+SqlBase.register(SqlLikePart);

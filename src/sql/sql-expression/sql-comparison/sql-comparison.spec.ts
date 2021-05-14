@@ -858,7 +858,7 @@ describe('SqlComparison', () => {
         },
         "not": false,
         "op": "BETWEEN",
-        "rhs": SqlBetweenAndHelper {
+        "rhs": SqlBetweenPart {
           "end": SqlRef {
             "column": "Z",
             "keywords": Object {},
@@ -889,7 +889,7 @@ describe('SqlComparison', () => {
             "type": "ref",
           },
           "symmetric": undefined,
-          "type": "betweenAndHelper",
+          "type": "betweenPart",
         },
         "spacing": Object {
           "postOp": " ",
@@ -925,7 +925,7 @@ describe('SqlComparison', () => {
         },
         "not": true,
         "op": "BETWEEN",
-        "rhs": SqlBetweenAndHelper {
+        "rhs": SqlBetweenPart {
           "end": SqlRef {
             "column": "Z",
             "keywords": Object {},
@@ -958,7 +958,7 @@ describe('SqlComparison', () => {
             "type": "ref",
           },
           "symmetric": true,
-          "type": "betweenAndHelper",
+          "type": "betweenPart",
         },
         "spacing": Object {
           "not": " ",
@@ -1105,7 +1105,7 @@ describe('SqlComparison', () => {
         },
         "not": true,
         "op": "LIKE",
-        "rhs": SqlLikeEscapeHelper {
+        "rhs": SqlLikePart {
           "escape": SqlMulti {
             "args": SeparatedArray {
               "separators": Array [
@@ -1175,7 +1175,7 @@ describe('SqlComparison', () => {
             "postEscape": " ",
             "preEscape": " ",
           },
-          "type": "likeEscapeHelper",
+          "type": "likePart",
         },
         "spacing": Object {
           "not": " ",
@@ -1211,7 +1211,7 @@ describe('SqlComparison', () => {
         },
         "not": false,
         "op": "LIKE",
-        "rhs": SqlLikeEscapeHelper {
+        "rhs": SqlLikePart {
           "escape": SqlLiteral {
             "keywords": Object {},
             "spacing": Object {},
@@ -1233,7 +1233,7 @@ describe('SqlComparison', () => {
             "postEscape": " ",
             "preEscape": " ",
           },
-          "type": "likeEscapeHelper",
+          "type": "likePart",
         },
         "spacing": Object {
           "postOp": " ",
@@ -1269,7 +1269,7 @@ describe('SqlComparison', () => {
         },
         "not": true,
         "op": "LIKE",
-        "rhs": SqlLikeEscapeHelper {
+        "rhs": SqlLikePart {
           "escape": SqlLiteral {
             "keywords": Object {},
             "spacing": Object {},
@@ -1291,7 +1291,7 @@ describe('SqlComparison', () => {
             "postEscape": " ",
             "preEscape": " ",
           },
-          "type": "likeEscapeHelper",
+          "type": "likePart",
         },
         "spacing": Object {
           "not": " ",
@@ -1530,7 +1530,7 @@ describe('SqlComparison', () => {
           },
           "not": false,
           "op": "BETWEEN",
-          "rhs": SqlBetweenAndHelper {
+          "rhs": SqlBetweenPart {
             "end": SqlRef {
               "column": "Z",
               "keywords": Object {},
@@ -1561,7 +1561,7 @@ describe('SqlComparison', () => {
               "type": "ref",
             },
             "symmetric": undefined,
-            "type": "betweenAndHelper",
+            "type": "betweenPart",
           },
           "spacing": Object {
             "postOp": " ",
@@ -1638,7 +1638,7 @@ describe('SqlComparison', () => {
                       },
                       "not": false,
                       "op": "BETWEEN",
-                      "rhs": SqlBetweenAndHelper {
+                      "rhs": SqlBetweenPart {
                         "end": SqlRef {
                           "column": "Z",
                           "keywords": Object {},
@@ -1669,7 +1669,7 @@ describe('SqlComparison', () => {
                           "type": "ref",
                         },
                         "symmetric": undefined,
-                        "type": "betweenAndHelper",
+                        "type": "betweenPart",
                       },
                       "spacing": Object {
                         "postOp": " ",
@@ -1718,7 +1718,7 @@ describe('SqlComparison', () => {
           },
           "not": false,
           "op": "BETWEEN",
-          "rhs": SqlBetweenAndHelper {
+          "rhs": SqlBetweenPart {
             "end": SqlMulti {
               "args": SeparatedArray {
                 "separators": Array [
@@ -1789,7 +1789,7 @@ describe('SqlComparison', () => {
               "type": "multi",
             },
             "symmetric": undefined,
-            "type": "betweenAndHelper",
+            "type": "betweenPart",
           },
           "spacing": Object {
             "postOp": " ",

@@ -55,8 +55,8 @@ export type SqlType =
   | 'withPart'
   | 'joinPart'
   | 'alias'
-  | 'betweenAndHelper'
-  | 'likeEscapeHelper'
+  | 'betweenPart'
+  | 'likePart'
   | 'comparison'
   | 'literal'
   | 'placeholder'
@@ -356,8 +356,8 @@ export abstract class SqlBase {
     return this;
   }
 
-  public isHelper(): boolean {
-    return this.type.endsWith('Helper');
+  public isPart(): boolean {
+    return this.type.endsWith('Part');
   }
 
   public some(fn: Matcher): boolean {
