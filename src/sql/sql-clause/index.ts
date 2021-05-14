@@ -17,24 +17,13 @@
 // Files can depend on the files below them by type only imported from the root.
 
 /* eslint-disable simple-import-sort/exports */
-export * from './utils';
-export * from './sql-base';
-export * from './sql-expression';
-export * from './sql-placeholder/sql-placeholder';
-export * from './sql-literal/sql-literal';
-export * from './sql-interval/sql-interval';
-export * from './sql-ref/sql-ref';
-export * from './sql-multi/sql-multi';
-export * from './sql-unary/sql-unary';
-export * from './sql-comparison/sql-between-part';
-export * from './sql-comparison/sql-like-part';
-export * from './sql-comparison/sql-comparison';
-export * from './sql-case/sql-when-then-part';
-export * from './sql-case/sql-case';
-export * from './sql-alias/sql-alias';
-
 export * from './sql-clause';
-
-export * from './sql-function/sql-function';
-export * from './sql-query/sql-with-part/sql-with-part';
-export * from './sql-query/sql-query';
+export * from './sql-order-by-expression/sql-order-by-expression';
+export * from './sql-order-by-clause/sql-order-by-clause';
+export * from './sql-join-part/sql-join-part';
+export * from './sql-from-clause/sql-from-clause';
+export * from './sql-group-by-clause/sql-group-by-clause';
+export * from './sql-where-clause/sql-where-clause';
+export * from './sql-having-clause/sql-having-clause';
+export * from './sql-limit-clause/sql-limit-clause';
+export * from './sql-offset-clause/sql-offset-clause';
