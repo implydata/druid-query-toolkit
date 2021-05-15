@@ -645,7 +645,6 @@ describe('SqlQuery', () => {
             "values": Array [
               SqlAlias {
                 "alias": undefined,
-                "as": undefined,
                 "expression": SqlQuery {
                   "decorator": undefined,
                   "explainPlanFor": undefined,
@@ -655,7 +654,6 @@ describe('SqlQuery', () => {
                       "values": Array [
                         SqlAlias {
                           "alias": undefined,
-                          "as": undefined,
                           "expression": SqlRef {
                             "column": undefined,
                             "keywords": Object {},
@@ -740,7 +738,6 @@ describe('SqlQuery', () => {
                     "values": Array [
                       SqlAlias {
                         "alias": undefined,
-                        "as": undefined,
                         "expression": SqlRef {
                           "column": "dim1",
                           "keywords": Object {},
@@ -813,7 +810,6 @@ describe('SqlQuery', () => {
           "values": Array [
             SqlAlias {
               "alias": undefined,
-              "as": undefined,
               "expression": SqlRef {
                 "column": "*",
                 "keywords": Object {},
@@ -867,7 +863,6 @@ describe('SqlQuery', () => {
             "values": Array [
               SqlAlias {
                 "alias": undefined,
-                "as": undefined,
                 "expression": SqlRef {
                   "column": undefined,
                   "keywords": Object {},
@@ -923,7 +918,6 @@ describe('SqlQuery', () => {
           "values": Array [
             SqlAlias {
               "alias": undefined,
-              "as": undefined,
               "expression": SqlRef {
                 "column": "datasource",
                 "keywords": Object {},
@@ -951,7 +945,6 @@ describe('SqlQuery', () => {
                 "tableQuotes": false,
                 "type": "ref",
               },
-              "as": true,
               "expression": SqlFunction {
                 "args": SeparatedArray {
                   "separators": Array [],
@@ -1004,7 +997,6 @@ describe('SqlQuery', () => {
                 "tableQuotes": false,
                 "type": "ref",
               },
-              "as": true,
               "expression": SqlFunction {
                 "args": SeparatedArray {
                   "separators": Array [],
@@ -1078,7 +1070,6 @@ describe('SqlQuery', () => {
             "values": Array [
               SqlAlias {
                 "alias": undefined,
-                "as": undefined,
                 "expression": SqlRef {
                   "column": undefined,
                   "keywords": Object {},
@@ -1121,7 +1112,6 @@ describe('SqlQuery', () => {
           "values": Array [
             SqlAlias {
               "alias": undefined,
-              "as": undefined,
               "expression": SqlRef {
                 "column": "*",
                 "keywords": Object {},
@@ -1176,7 +1166,6 @@ describe('SqlQuery', () => {
             "values": Array [
               SqlAlias {
                 "alias": undefined,
-                "as": undefined,
                 "expression": SqlRef {
                   "column": undefined,
                   "keywords": Object {},
@@ -1217,7 +1206,6 @@ describe('SqlQuery', () => {
           "values": Array [
             SqlAlias {
               "alias": undefined,
-              "as": undefined,
               "expression": SqlRef {
                 "column": "*",
                 "keywords": Object {},
@@ -1269,7 +1257,6 @@ describe('SqlQuery', () => {
                     "values": Array [
                       SqlAlias {
                         "alias": undefined,
-                        "as": undefined,
                         "expression": SqlRef {
                           "column": undefined,
                           "keywords": Object {},
@@ -1316,7 +1303,6 @@ describe('SqlQuery', () => {
                   "values": Array [
                     SqlAlias {
                       "alias": undefined,
-                      "as": undefined,
                       "expression": SqlRef {
                         "column": "deptno",
                         "keywords": Object {},
@@ -1380,7 +1366,6 @@ describe('SqlQuery', () => {
               "values": Array [
                 SqlAlias {
                   "alias": undefined,
-                  "as": undefined,
                   "expression": SqlRef {
                     "column": undefined,
                     "keywords": Object {},
@@ -1420,7 +1405,6 @@ describe('SqlQuery', () => {
             "values": Array [
               SqlAlias {
                 "alias": undefined,
-                "as": undefined,
                 "expression": SqlRef {
                   "column": "*",
                   "keywords": Object {},
@@ -1507,7 +1491,6 @@ describe('SqlQuery', () => {
               "values": Array [
                 SqlAlias {
                   "alias": undefined,
-                  "as": undefined,
                   "expression": SqlRef {
                     "column": undefined,
                     "keywords": Object {},
@@ -1550,7 +1533,6 @@ describe('SqlQuery', () => {
             "values": Array [
               SqlAlias {
                 "alias": undefined,
-                "as": undefined,
                 "expression": SqlRef {
                   "column": "*",
                   "keywords": Object {},
@@ -1637,7 +1619,6 @@ describe('SqlQuery', () => {
               "values": Array [
                 SqlAlias {
                   "alias": undefined,
-                  "as": undefined,
                   "expression": SqlRef {
                     "column": undefined,
                     "keywords": Object {},
@@ -1680,7 +1661,6 @@ describe('SqlQuery', () => {
             "values": Array [
               SqlAlias {
                 "alias": undefined,
-                "as": undefined,
                 "expression": SqlRef {
                   "column": "*",
                   "keywords": Object {},
@@ -1865,7 +1845,6 @@ describe('SqlQuery', () => {
               "values": Array [
                 SqlAlias {
                   "alias": undefined,
-                  "as": undefined,
                   "expression": SqlRef {
                     "column": undefined,
                     "keywords": Object {},
@@ -1931,7 +1910,6 @@ describe('SqlQuery', () => {
             "values": Array [
               SqlAlias {
                 "alias": undefined,
-                "as": undefined,
                 "expression": SqlRef {
                   "column": "*",
                   "keywords": Object {},
@@ -1979,7 +1957,6 @@ describe('SqlQuery', () => {
               "values": Array [
                 SqlAlias {
                   "alias": undefined,
-                  "as": undefined,
                   "expression": SqlRef {
                     "column": undefined,
                     "keywords": Object {},
@@ -2045,7 +2022,6 @@ describe('SqlQuery', () => {
             "values": Array [
               SqlAlias {
                 "alias": undefined,
-                "as": undefined,
                 "expression": SqlRef {
                   "column": "*",
                   "keywords": Object {},
@@ -2093,7 +2069,6 @@ describe('SqlQuery', () => {
               "values": Array [
                 SqlAlias {
                   "alias": undefined,
-                  "as": undefined,
                   "expression": SqlRef {
                     "column": undefined,
                     "keywords": Object {},
@@ -2182,7 +2157,6 @@ describe('SqlQuery', () => {
             "values": Array [
               SqlAlias {
                 "alias": undefined,
-                "as": undefined,
                 "expression": SqlRef {
                   "column": "*",
                   "keywords": Object {},
@@ -2232,7 +2206,6 @@ describe('SqlQuery', () => {
               "values": Array [
                 SqlAlias {
                   "alias": undefined,
-                  "as": undefined,
                   "expression": SqlRef {
                     "column": undefined,
                     "keywords": Object {},
@@ -2311,7 +2284,6 @@ describe('SqlQuery', () => {
             "values": Array [
               SqlAlias {
                 "alias": undefined,
-                "as": undefined,
                 "expression": SqlRef {
                   "column": "*",
                   "keywords": Object {},
@@ -2359,7 +2331,6 @@ describe('SqlQuery', () => {
               "values": Array [
                 SqlAlias {
                   "alias": undefined,
-                  "as": undefined,
                   "expression": SqlRef {
                     "column": undefined,
                     "keywords": Object {},
@@ -2441,7 +2412,6 @@ describe('SqlQuery', () => {
             "values": Array [
               SqlAlias {
                 "alias": undefined,
-                "as": undefined,
                 "expression": SqlRef {
                   "column": "*",
                   "keywords": Object {},
@@ -2489,7 +2459,6 @@ describe('SqlQuery', () => {
               "values": Array [
                 SqlAlias {
                   "alias": undefined,
-                  "as": undefined,
                   "expression": SqlRef {
                     "column": undefined,
                     "keywords": Object {},
@@ -2667,7 +2636,6 @@ describe('SqlQuery', () => {
             "values": Array [
               SqlAlias {
                 "alias": undefined,
-                "as": undefined,
                 "expression": SqlRef {
                   "column": "*",
                   "keywords": Object {},
@@ -2717,7 +2685,6 @@ describe('SqlQuery', () => {
               "values": Array [
                 SqlAlias {
                   "alias": undefined,
-                  "as": undefined,
                   "expression": SqlRef {
                     "column": undefined,
                     "keywords": Object {},
@@ -2785,7 +2752,6 @@ describe('SqlQuery', () => {
             "values": Array [
               SqlAlias {
                 "alias": undefined,
-                "as": undefined,
                 "expression": SqlRef {
                   "column": "col",
                   "keywords": Object {},
@@ -2833,7 +2799,6 @@ describe('SqlQuery', () => {
               "values": Array [
                 SqlAlias {
                   "alias": undefined,
-                  "as": undefined,
                   "expression": SqlRef {
                     "column": undefined,
                     "keywords": Object {},
@@ -2905,7 +2870,6 @@ describe('SqlQuery', () => {
             "values": Array [
               SqlAlias {
                 "alias": undefined,
-                "as": undefined,
                 "expression": SqlRef {
                   "column": "col",
                   "keywords": Object {},
@@ -2953,7 +2917,6 @@ describe('SqlQuery', () => {
               "values": Array [
                 SqlAlias {
                   "alias": undefined,
-                  "as": undefined,
                   "expression": SqlRef {
                     "column": undefined,
                     "keywords": Object {},
@@ -3025,7 +2988,6 @@ describe('SqlQuery', () => {
             "values": Array [
               SqlAlias {
                 "alias": undefined,
-                "as": undefined,
                 "expression": SqlRef {
                   "column": "col",
                   "keywords": Object {},
@@ -3073,7 +3035,6 @@ describe('SqlQuery', () => {
               "values": Array [
                 SqlAlias {
                   "alias": undefined,
-                  "as": undefined,
                   "expression": SqlRef {
                     "column": undefined,
                     "keywords": Object {},
@@ -3155,7 +3116,6 @@ describe('SqlQuery', () => {
             "values": Array [
               SqlAlias {
                 "alias": undefined,
-                "as": undefined,
                 "expression": SqlRef {
                   "column": "col",
                   "keywords": Object {},
@@ -3173,7 +3133,6 @@ describe('SqlQuery', () => {
               },
               SqlAlias {
                 "alias": undefined,
-                "as": undefined,
                 "expression": SqlRef {
                   "column": "colTwo",
                   "keywords": Object {},
@@ -3221,7 +3180,6 @@ describe('SqlQuery', () => {
               "values": Array [
                 SqlAlias {
                   "alias": undefined,
-                  "as": undefined,
                   "expression": SqlRef {
                     "column": undefined,
                     "keywords": Object {},
@@ -3316,7 +3274,6 @@ describe('SqlQuery', () => {
             "values": Array [
               SqlAlias {
                 "alias": undefined,
-                "as": undefined,
                 "expression": SqlRef {
                   "column": "col",
                   "keywords": Object {},
@@ -3364,7 +3321,6 @@ describe('SqlQuery', () => {
               "values": Array [
                 SqlAlias {
                   "alias": undefined,
-                  "as": undefined,
                   "expression": SqlRef {
                     "column": undefined,
                     "keywords": Object {},
@@ -3469,7 +3425,6 @@ describe('SqlQuery', () => {
             "values": Array [
               SqlAlias {
                 "alias": undefined,
-                "as": undefined,
                 "expression": SqlRef {
                   "column": "col",
                   "keywords": Object {},
@@ -3487,7 +3442,6 @@ describe('SqlQuery', () => {
               },
               SqlAlias {
                 "alias": undefined,
-                "as": undefined,
                 "expression": SqlRef {
                   "column": "colTwo",
                   "keywords": Object {},
@@ -3537,7 +3491,6 @@ describe('SqlQuery', () => {
               "values": Array [
                 SqlAlias {
                   "alias": undefined,
-                  "as": undefined,
                   "expression": SqlRef {
                     "column": undefined,
                     "keywords": Object {},
@@ -3592,7 +3545,6 @@ describe('SqlQuery', () => {
             "values": Array [
               SqlAlias {
                 "alias": undefined,
-                "as": undefined,
                 "expression": SqlRef {
                   "column": "*",
                   "keywords": Object {},
@@ -3642,7 +3594,6 @@ describe('SqlQuery', () => {
               "values": Array [
                 SqlAlias {
                   "alias": undefined,
-                  "as": undefined,
                   "expression": SqlRef {
                     "column": undefined,
                     "keywords": Object {},
@@ -3683,7 +3634,6 @@ describe('SqlQuery', () => {
             "values": Array [
               SqlAlias {
                 "alias": undefined,
-                "as": undefined,
                 "expression": SqlRef {
                   "column": "*",
                   "keywords": Object {},
@@ -3719,7 +3669,6 @@ describe('SqlQuery', () => {
                 "values": Array [
                   SqlAlias {
                     "alias": undefined,
-                    "as": undefined,
                     "expression": SqlRef {
                       "column": undefined,
                       "keywords": Object {},
@@ -3759,7 +3708,6 @@ describe('SqlQuery', () => {
               "values": Array [
                 SqlAlias {
                   "alias": undefined,
-                  "as": undefined,
                   "expression": SqlRef {
                     "column": "*",
                     "keywords": Object {},
@@ -3811,7 +3759,6 @@ describe('SqlQuery', () => {
               "values": Array [
                 SqlAlias {
                   "alias": undefined,
-                  "as": undefined,
                   "expression": SqlRef {
                     "column": undefined,
                     "keywords": Object {},
@@ -3882,7 +3829,6 @@ describe('SqlQuery', () => {
                   },
                   "table": SqlAlias {
                     "alias": undefined,
-                    "as": undefined,
                     "expression": SqlRef {
                       "column": undefined,
                       "keywords": Object {},
@@ -3924,7 +3870,6 @@ describe('SqlQuery', () => {
             "values": Array [
               SqlAlias {
                 "alias": undefined,
-                "as": undefined,
                 "expression": SqlRef {
                   "column": "*",
                   "keywords": Object {},
@@ -3971,7 +3916,6 @@ describe('SqlQuery', () => {
               "values": Array [
                 SqlAlias {
                   "alias": undefined,
-                  "as": undefined,
                   "expression": SqlRef {
                     "column": undefined,
                     "keywords": Object {},
@@ -4042,7 +3986,6 @@ describe('SqlQuery', () => {
                   },
                   "table": SqlAlias {
                     "alias": undefined,
-                    "as": undefined,
                     "expression": SqlRef {
                       "column": undefined,
                       "keywords": Object {},
@@ -4084,7 +4027,6 @@ describe('SqlQuery', () => {
             "values": Array [
               SqlAlias {
                 "alias": undefined,
-                "as": undefined,
                 "expression": SqlRef {
                   "column": "*",
                   "keywords": Object {},
@@ -4131,7 +4073,6 @@ describe('SqlQuery', () => {
               "values": Array [
                 SqlAlias {
                   "alias": undefined,
-                  "as": undefined,
                   "expression": SqlRef {
                     "column": undefined,
                     "keywords": Object {},
@@ -4202,7 +4143,6 @@ describe('SqlQuery', () => {
                   },
                   "table": SqlAlias {
                     "alias": undefined,
-                    "as": undefined,
                     "expression": SqlRef {
                       "column": undefined,
                       "keywords": Object {},
@@ -4244,7 +4184,6 @@ describe('SqlQuery', () => {
             "values": Array [
               SqlAlias {
                 "alias": undefined,
-                "as": undefined,
                 "expression": SqlRef {
                   "column": "*",
                   "keywords": Object {},
@@ -4291,7 +4230,6 @@ describe('SqlQuery', () => {
               "values": Array [
                 SqlAlias {
                   "alias": undefined,
-                  "as": undefined,
                   "expression": SqlRef {
                     "column": undefined,
                     "keywords": Object {},
@@ -4362,7 +4300,6 @@ describe('SqlQuery', () => {
                   },
                   "table": SqlAlias {
                     "alias": undefined,
-                    "as": undefined,
                     "expression": SqlRef {
                       "column": undefined,
                       "keywords": Object {},
@@ -4404,7 +4341,6 @@ describe('SqlQuery', () => {
             "values": Array [
               SqlAlias {
                 "alias": undefined,
-                "as": undefined,
                 "expression": SqlRef {
                   "column": "*",
                   "keywords": Object {},
@@ -4451,7 +4387,6 @@ describe('SqlQuery', () => {
               "values": Array [
                 SqlAlias {
                   "alias": undefined,
-                  "as": undefined,
                   "expression": SqlRef {
                     "column": undefined,
                     "keywords": Object {},
@@ -4522,7 +4457,6 @@ describe('SqlQuery', () => {
                   },
                   "table": SqlAlias {
                     "alias": undefined,
-                    "as": undefined,
                     "expression": SqlRef {
                       "column": undefined,
                       "keywords": Object {},
@@ -4564,7 +4498,6 @@ describe('SqlQuery', () => {
             "values": Array [
               SqlAlias {
                 "alias": undefined,
-                "as": undefined,
                 "expression": SqlRef {
                   "column": "*",
                   "keywords": Object {},
@@ -4616,7 +4549,6 @@ describe('SqlQuery', () => {
               "values": Array [
                 SqlAlias {
                   "alias": undefined,
-                  "as": undefined,
                   "expression": SqlRef {
                     "column": undefined,
                     "keywords": Object {},
@@ -4656,7 +4588,6 @@ describe('SqlQuery', () => {
             "values": Array [
               SqlAlias {
                 "alias": undefined,
-                "as": undefined,
                 "expression": SqlRef {
                   "column": "col",
                   "keywords": Object {},
@@ -4804,7 +4735,6 @@ describe('SqlQuery', () => {
               "values": Array [
                 SqlAlias {
                   "alias": undefined,
-                  "as": undefined,
                   "expression": SqlRef {
                     "column": undefined,
                     "keywords": Object {},
@@ -4917,7 +4847,6 @@ describe('SqlQuery', () => {
             "values": Array [
               SqlAlias {
                 "alias": undefined,
-                "as": undefined,
                 "expression": SqlRef {
                   "column": "channel",
                   "keywords": Object {},
@@ -4945,7 +4874,6 @@ describe('SqlQuery', () => {
                   "tableQuotes": false,
                   "type": "ref",
                 },
-                "as": true,
                 "expression": SqlFunction {
                   "args": SeparatedArray {
                     "separators": Array [],
@@ -4998,7 +4926,6 @@ describe('SqlQuery', () => {
                   "tableQuotes": false,
                   "type": "ref",
                 },
-                "as": true,
                 "expression": SqlFunction {
                   "args": SeparatedArray {
                     "separators": Array [],
@@ -5084,7 +5011,6 @@ describe('SqlQuery', () => {
               "values": Array [
                 SqlAlias {
                   "alias": undefined,
-                  "as": undefined,
                   "expression": SqlRef {
                     "column": undefined,
                     "keywords": Object {},
@@ -5199,7 +5125,6 @@ describe('SqlQuery', () => {
                   "tableQuotes": false,
                   "type": "ref",
                 },
-                "as": true,
                 "expression": SqlFunction {
                   "args": SeparatedArray {
                     "separators": Array [
@@ -5265,7 +5190,6 @@ describe('SqlQuery', () => {
                   "tableQuotes": false,
                   "type": "ref",
                 },
-                "as": true,
                 "expression": SqlFunction {
                   "args": SeparatedArray {
                     "separators": Array [],

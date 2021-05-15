@@ -19,7 +19,6 @@ import { SqlRef } from '../sql-ref/sql-ref';
 
 export interface SqlAliasValue extends SqlBaseValue {
   expression: SqlExpression | SqlQuery;
-  as?: boolean;
   alias?: SqlRef;
 }
 
@@ -57,26 +56,22 @@ export class SqlAlias extends SqlBase {
     }
     return new SqlAlias({
       expression: expression,
-      as: Boolean(alias),
       alias: alias ? (typeof alias === 'string' ? SqlRef.column(alias) : alias) : undefined,
     });
   }
 
   public readonly expression: SqlExpression | SqlQuery;
-  public readonly as?: boolean;
   public readonly alias?: SqlRef;
 
   constructor(options: SqlAliasValue) {
     super(options, SqlAlias.type);
     this.expression = options.expression;
-    this.as = options.as;
     this.alias = options.alias;
   }
 
   public valueOf() {
     const value = super.valueOf() as SqlAliasValue;
     value.expression = this.expression;
-    if (this.as) value.as = true;
     value.alias = this.alias;
     return value;
   }
@@ -85,7 +80,7 @@ export class SqlAlias extends SqlBase {
     const rawParts: string[] = [this.expression.toString()];
 
     if (this.alias) {
-      if (this.as) {
+      if (this.keywords['as'] !== '') {
         rawParts.push(this.getSpace('preAs'), this.getKeyword('as', SqlAlias.DEFAULT_AS_KEYWORD));
       }
 
@@ -104,9 +99,6 @@ export class SqlAlias extends SqlBase {
   public changeAlias(alias: SqlRef | undefined): this {
     const value = this.valueOf();
     value.alias = alias;
-    if (!this.alias && alias) {
-      value.as = true; // If going from un-named alias to a named alias also add the AS keyword for style
-    }
     return SqlBase.fromValue(value);
   }
 

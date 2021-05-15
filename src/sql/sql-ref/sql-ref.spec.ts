@@ -334,7 +334,6 @@ describe('upgrades', () => {
             "values": Array [
               SqlAlias {
                 "alias": undefined,
-                "as": undefined,
                 "expression": SqlRef {
                   "column": undefined,
                   "keywords": Object {},
@@ -377,7 +376,6 @@ describe('upgrades', () => {
           "values": Array [
             SqlAlias {
               "alias": undefined,
-              "as": undefined,
               "expression": SqlRef {
                 "column": "tbl",
                 "keywords": Object {},

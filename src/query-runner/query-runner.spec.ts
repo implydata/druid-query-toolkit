@@ -169,7 +169,6 @@ describe('QueryRunner', () => {
               "values": Array [
                 SqlAlias {
                   "alias": undefined,
-                  "as": undefined,
                   "expression": SqlRef {
                     "column": undefined,
                     "keywords": Object {},
@@ -269,7 +268,6 @@ describe('QueryRunner', () => {
             "values": Array [
               SqlAlias {
                 "alias": undefined,
-                "as": undefined,
                 "expression": SqlRef {
                   "column": "channel",
                   "keywords": Object {},
@@ -297,7 +295,6 @@ describe('QueryRunner', () => {
                   "tableQuotes": false,
                   "type": "ref",
                 },
-                "as": true,
                 "expression": SqlFunction {
                   "args": SeparatedArray {
                     "separators": Array [],
@@ -413,7 +410,6 @@ describe('QueryRunner', () => {
               "values": Array [
                 SqlAlias {
                   "alias": undefined,
-                  "as": undefined,
                   "expression": SqlRef {
                     "column": undefined,
                     "keywords": Object {},
@@ -513,7 +509,6 @@ describe('QueryRunner', () => {
             "values": Array [
               SqlAlias {
                 "alias": undefined,
-                "as": undefined,
                 "expression": SqlRef {
                   "column": "channel",
                   "keywords": Object {},
@@ -541,7 +536,6 @@ describe('QueryRunner', () => {
                   "tableQuotes": false,
                   "type": "ref",
                 },
-                "as": true,
                 "expression": SqlFunction {
                   "args": SeparatedArray {
                     "separators": Array [],
@@ -658,7 +652,6 @@ describe('QueryRunner', () => {
               "values": Array [
                 SqlAlias {
                   "alias": undefined,
-                  "as": undefined,
                   "expression": SqlRef {
                     "column": undefined,
                     "keywords": Object {},
@@ -758,7 +751,6 @@ describe('QueryRunner', () => {
             "values": Array [
               SqlAlias {
                 "alias": undefined,
-                "as": undefined,
                 "expression": SqlRef {
                   "column": "channel",
                   "keywords": Object {},
@@ -786,7 +778,6 @@ describe('QueryRunner', () => {
                   "tableQuotes": false,
                   "type": "ref",
                 },
-                "as": true,
                 "expression": SqlFunction {
                   "args": SeparatedArray {
                     "separators": Array [],

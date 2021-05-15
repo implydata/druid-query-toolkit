@@ -368,9 +368,10 @@ SqlAlias = expression:(Expression / SqlInParens) alias:((_ AsToken)? _ SqlRef)?
 
   var as = alias[0];
   if (as) {
-    value.as = true;
     spacing.preAs = as[0];
     keywords.as = as[1];
+  } else {
+    keywords.as = '';
   }
 
   spacing.preAlias = alias[1];
@@ -391,9 +392,10 @@ SqlAliasExpression = expression:Expression alias:((_ AsToken)? _ SqlRef)?
 
   var as = alias[0];
   if (as) {
-    value.as = true;
     spacing.preAs = as[0];
     keywords.as = as[1];
+  } else {
+    keywords.as = '';
   }
 
   spacing.preAlias = alias[1];

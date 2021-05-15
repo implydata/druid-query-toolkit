@@ -213,7 +213,6 @@ describe('SqlComparison', () => {
               "values": Array [
                 SqlAlias {
                   "alias": undefined,
-                  "as": undefined,
                   "expression": SqlRef {
                     "column": undefined,
                     "keywords": Object {},
@@ -352,7 +351,6 @@ describe('SqlComparison', () => {
             "values": Array [
               SqlAlias {
                 "alias": undefined,
-                "as": undefined,
                 "expression": SqlRef {
                   "column": "page",
                   "keywords": Object {},
@@ -599,7 +597,6 @@ describe('SqlComparison', () => {
               "values": Array [
                 SqlAlias {
                   "alias": undefined,
-                  "as": undefined,
                   "expression": SqlRef {
                     "column": undefined,
                     "keywords": Object {},
@@ -660,7 +657,6 @@ describe('SqlComparison', () => {
             "values": Array [
               SqlAlias {
                 "alias": undefined,
-                "as": undefined,
                 "expression": SqlRef {
                   "column": "val",
                   "keywords": Object {},
@@ -733,7 +729,6 @@ describe('SqlComparison', () => {
               "values": Array [
                 SqlAlias {
                   "alias": undefined,
-                  "as": undefined,
                   "expression": SqlRef {
                     "column": undefined,
                     "keywords": Object {},
@@ -794,7 +789,6 @@ describe('SqlComparison', () => {
             "values": Array [
               SqlAlias {
                 "alias": undefined,
-                "as": undefined,
                 "expression": SqlRef {
                   "column": "val",
                   "keywords": Object {},

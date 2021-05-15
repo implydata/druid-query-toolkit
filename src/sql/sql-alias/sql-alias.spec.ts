@@ -25,7 +25,6 @@ describe('SqlAlias', () => {
       expect(SqlQuery.parse(sql)!.getSelectExpressionForIndex(0)).toMatchInlineSnapshot(`
         SqlAlias {
           "alias": undefined,
-          "as": undefined,
           "expression": SqlRef {
             "column": "city",
             "keywords": Object {},
@@ -62,7 +61,6 @@ describe('SqlAlias', () => {
             "tableQuotes": false,
             "type": "ref",
           },
-          "as": true,
           "expression": SqlRef {
             "column": "city",
             "keywords": Object {},
@@ -104,7 +102,6 @@ describe('SqlAlias', () => {
             "tableQuotes": false,
             "type": "ref",
           },
-          "as": true,
           "expression": SqlRef {
             "column": "city",
             "keywords": Object {},
@@ -149,7 +146,6 @@ describe('SqlAlias', () => {
             "tableQuotes": false,
             "type": "ref",
           },
-          "as": undefined,
           "expression": SqlRef {
             "column": "city",
             "keywords": Object {},
@@ -164,7 +160,9 @@ describe('SqlAlias', () => {
             "tableQuotes": false,
             "type": "ref",
           },
-          "keywords": Object {},
+          "keywords": Object {
+            "as": "",
+          },
           "spacing": Object {
             "preAlias": " ",
           },
