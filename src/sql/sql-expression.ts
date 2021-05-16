@@ -16,6 +16,7 @@ import { filterMap } from '../utils';
 
 import {
   LiteralValue,
+  RefName,
   SqlAlias,
   SqlComparison,
   SqlFunction,
@@ -95,7 +96,7 @@ export abstract class SqlExpression extends SqlBase {
     return this;
   }
 
-  public as(alias?: SqlRef | string) {
+  public as(alias?: RefName | string) {
     return SqlAlias.create(this, alias);
   }
 

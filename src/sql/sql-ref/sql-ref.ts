@@ -14,233 +14,179 @@
 
 import { SqlBase, SqlBaseValue, SqlType } from '../sql-base';
 import { SqlExpression } from '../sql-expression';
-import { trimString } from '../utils';
+import { SqlTableRef } from '../sql-table-ref/sql-table-ref';
+import { RefName } from '../utils';
 
 export interface SqlRefValue extends SqlBaseValue {
-  column?: string;
-  quotes?: boolean;
-  table?: string;
-  tableQuotes?: boolean;
-  namespace?: string;
-  namespaceQuotes?: boolean;
+  columnRefName: RefName;
+  tableRefName?: RefName;
+  namespaceRefName?: RefName;
 }
 
 export class SqlRef extends SqlExpression {
   static type: SqlType = 'ref';
 
-  static STAR: SqlRef;
-
   static column(
     column: string,
     table?: string,
     namespace?: string,
-    forceQuotes = false,
-    forceTableQuotes = false,
-    forceNamespaceQuotes = false,
+    forceQuotes?: boolean,
+    forceTableQuotes?: boolean,
+    forceNamespaceQuotes?: boolean,
   ) {
-    if (column === '*') return SqlRef.STAR;
     return new SqlRef({
-      column,
-      table,
-      namespace,
-      quotes: forceQuotes || SqlRef.needsQuotes(column),
-      tableQuotes: forceTableQuotes || SqlRef.needsQuotes(table),
-      namespaceQuotes: forceNamespaceQuotes || SqlRef.needsQuotes(namespace),
+      columnRefName: RefName.create(column, forceQuotes),
+      tableRefName: RefName.maybe(table, forceTableQuotes),
+      namespaceRefName: RefName.maybe(namespace, forceNamespaceQuotes),
     });
   }
 
   static columnWithQuotes(column: string, table?: string, namespace?: string) {
     return new SqlRef({
-      column,
-      table,
-      namespace,
-      quotes: true,
-      tableQuotes: Boolean(table),
-      namespaceQuotes: Boolean(namespace),
+      columnRefName: RefName.create(column, true),
+      tableRefName: RefName.maybe(table, true),
+      namespaceRefName: RefName.maybe(namespace, true),
     });
   }
 
-  static table(
-    table: string,
-    namespace?: string,
-    forceTableQuotes = false,
-    forceNamespaceQuotes = false,
-  ) {
-    return new SqlRef({
-      table,
-      namespace,
-      tableQuotes: forceTableQuotes || SqlRef.needsQuotes(table),
-      namespaceQuotes: forceNamespaceQuotes || SqlRef.needsQuotes(namespace),
-    });
-  }
-
-  static needsQuotes(name: string | undefined): boolean {
-    if (typeof name === 'undefined') return false;
-    return !/^\w+$/.test(name) || SqlBase.isReservedKeyword(name);
-  }
-
-  static wrapInQuotes(thing = '', quotes = false): string {
-    if (!thing) return '';
-    if (quotes) {
-      return `"${thing.replace(/"/g, '""')}"`;
-    } else {
-      return thing;
-    }
-  }
-
-  static _equalsString(expression: SqlBase, stringValue: string): boolean {
-    return (
-      expression instanceof SqlRef &&
-      (expression.column === stringValue ||
-        expression.table === stringValue ||
-        expression.namespace === stringValue)
-    );
-  }
-
-  public readonly column?: string;
-  public readonly quotes: boolean;
-  public readonly namespace?: string;
-  public readonly namespaceQuotes: boolean;
-  public readonly table?: string;
-  public readonly tableQuotes: boolean;
+  public readonly columnRefName: RefName;
+  public readonly tableRefName?: RefName;
+  public readonly namespaceRefName?: RefName;
 
   constructor(options: SqlRefValue) {
     super(options, SqlRef.type);
-    this.column = options.column;
-    this.quotes = Boolean(options.quotes);
-    this.namespace = options.namespace;
-    this.namespaceQuotes = Boolean(options.namespaceQuotes);
-    this.table = options.table;
-    this.tableQuotes = Boolean(options.tableQuotes);
+    this.columnRefName = options.columnRefName;
+    this.tableRefName = options.tableRefName;
+    this.namespaceRefName = options.namespaceRefName;
   }
 
   public valueOf(): SqlRefValue {
     const value = super.valueOf() as SqlRefValue;
-    value.column = this.column;
-    value.namespace = this.namespace;
-    value.table = this.table;
-    value.quotes = this.quotes;
-    value.namespaceQuotes = this.namespaceQuotes;
-    value.tableQuotes = this.tableQuotes;
-    value.namespaceQuotes = this.namespaceQuotes;
+    value.columnRefName = this.columnRefName;
+    value.tableRefName = this.tableRefName;
+    value.namespaceRefName = this.namespaceRefName;
     return value;
   }
 
   protected _toRawString(): string {
-    return [
-      SqlRef.wrapInQuotes(this.namespace, this.namespaceQuotes),
+    const { namespaceRefName, tableRefName, columnRefName } = this;
+    const rawParts: string[] = [];
 
-      this.getSpace('preNamespaceDot', ''),
-      this.namespace && this.table ? '.' : '',
-      this.getSpace('postNamespaceDot', ''),
+    if (namespaceRefName) {
+      rawParts.push(
+        namespaceRefName.toString(),
+        this.getSpace('preNamespaceDot', ''),
+        '.',
+        this.getSpace('postNamespaceDot', ''),
+      );
+    }
 
-      SqlRef.wrapInQuotes(this.table, this.tableQuotes),
+    if (tableRefName) {
+      rawParts.push(
+        tableRefName.toString(),
+        this.getSpace('preTableDot', ''),
+        '.',
+        this.getSpace('postTableDot', ''),
+      );
+    }
 
-      this.getSpace('preTableDot', ''),
-      this.column && this.table ? '.' : '',
-      this.getSpace('postTableDot', ''),
+    rawParts.push(columnRefName.toString());
 
-      SqlRef.wrapInQuotes(this.column, this.quotes),
-    ].join('');
+    return rawParts.join('');
+  }
+
+  public changeColumnRefName(columnRefName: RefName): this {
+    const value = this.valueOf();
+    value.columnRefName = columnRefName;
+    return SqlBase.fromValue(value);
   }
 
   public getColumn(): string {
-    if (!this.column) throw Error('SqlRef has no defined column');
-    return this.column;
+    return this.columnRefName.name;
   }
 
-  public changeColumn(column: string): SqlRef {
+  public changeColumn(column: string): this {
+    const { columnRefName } = this;
+    if (!columnRefName) return this;
     const value = this.valueOf();
-    value.column = column;
-    if (column && column !== '*') {
-      value.quotes = value.quotes || SqlRef.needsQuotes(column);
-    } else {
-      delete value.quotes;
-    }
+    value.columnRefName = columnRefName.changeName(column);
+    return SqlBase.fromValue(value);
+  }
+
+  public changeTableRefName(tableRefName: RefName): this {
+    const value = this.valueOf();
+    value.tableRefName = tableRefName;
     return SqlBase.fromValue(value);
   }
 
   public getTable(): string {
-    if (!this.table) throw Error('SqlRef has no defined table');
-    return this.table;
+    if (!this.tableRefName) throw Error('SqlRef has no defined table');
+    return this.tableRefName.name;
   }
 
-  public changeTable(table: string | undefined): SqlRef {
+  public changeTable(table: string | undefined): this {
+    const { tableRefName } = this;
     const value = this.valueOf();
-    value.table = table;
     if (table) {
-      value.tableQuotes = value.tableQuotes || SqlRef.needsQuotes(table);
+      value.tableRefName = tableRefName ? tableRefName.changeName(table) : RefName.create(table);
     } else {
-      delete value.tableQuotes;
+      delete value.tableRefName;
     }
+    return SqlBase.fromValue(value);
+  }
+
+  public changeNamespaceRefName(namespaceRefName: RefName): this {
+    const value = this.valueOf();
+    value.namespaceRefName = namespaceRefName;
     return SqlBase.fromValue(value);
   }
 
   public getNamespace(): string {
-    if (!this.namespace) throw Error('SqlRef has no defined namespace');
-    return this.namespace;
+    if (!this.namespaceRefName) throw Error('SqlRef has no defined namespace');
+    return this.namespaceRefName.name;
   }
 
-  public changeNamespace(namespace: string | undefined): SqlRef {
+  public changeNamespace(namespace: string | undefined): this {
+    const { namespaceRefName } = this;
     const value = this.valueOf();
-    value.namespace = namespace;
     if (namespace) {
-      value.namespaceQuotes = value.namespaceQuotes || SqlRef.needsQuotes(namespace);
+      value.namespaceRefName = namespaceRefName
+        ? namespaceRefName.changeName(namespace)
+        : RefName.create(namespace);
     } else {
-      delete value.namespaceQuotes;
+      delete value.namespaceRefName;
     }
     return SqlBase.fromValue(value);
   }
 
-  public getName(): string {
-    const name = this.column || this.table;
-    if (!name) throw new Error('SqlRef has no defined table or column');
-    return name;
+  public getOutputName(): string {
+    const name = this.columnRefName.name;
+    return name === '*' ? `"*"` : name;
   }
 
-  public isStar(): boolean {
-    return this.column === '*';
-  }
-
-  public isTableRef(): boolean {
-    return !this.column;
-  }
-
-  public upgrade() {
-    if (this.namespace) return this;
-
-    const value = this.valueOf();
-    value.namespace = value.table;
-    value.namespaceQuotes = value.tableQuotes;
-    // value.spacing.preNamespace = value.spacing.preTable;
-    // value.spacing.preNamespace = value.spacing.postTable;
-
-    value.table = value.column;
-    value.tableQuotes = value.quotes;
-    // value.spacing.postTable = '';
-    // value.spacing.preTable = '';
-
-    delete value.column;
-    delete value.quotes;
-
-    return new SqlRef(value);
-  }
-
-  public prettyTrim(maxLength: number): SqlBase {
-    const { column, table } = this;
-    let ret: SqlRef = this;
-    if (column && column !== '*') {
-      ret = ret.changeColumn(trimString(column, maxLength));
+  public convertToTableRef(): SqlTableRef {
+    if (this.namespaceRefName) {
+      throw new Error(`can not convert to SqlTableRef`);
     }
-    if (table) {
-      ret = ret.changeTable(trimString(table, maxLength));
+
+    return new SqlTableRef({
+      tableRefName: this.columnRefName,
+      namespaceRefName: this.namespaceRefName,
+      spacing: this.spacing,
+    });
+  }
+
+  public prettyTrim(maxLength: number): this {
+    const { columnRefName, tableRefName } = this;
+    let ret = this;
+    if (columnRefName) {
+      ret = ret.changeColumnRefName(columnRefName.prettyTrim(maxLength));
+    }
+    if (tableRefName) {
+      ret = ret.changeTableRefName(tableRefName.prettyTrim(maxLength));
     }
     return ret;
   }
 }
 
 SqlBase.register(SqlRef);
-
-SqlRef.STAR = new SqlRef({
-  column: '*',
-});

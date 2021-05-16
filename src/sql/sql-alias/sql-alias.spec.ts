@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { SqlQuery, SqlRef } from '../..';
+import { RefName, SqlQuery, SqlRef } from '../..';
 import { backAndForth } from '../../test-utils';
 
 describe('SqlAlias', () => {
@@ -175,7 +175,7 @@ describe('SqlAlias', () => {
   describe('changeAliasName', () => {
     const x = SqlRef.column('X').as('test');
     const y = SqlRef.column('Y').as();
-    const z = SqlRef.column('Z').as(SqlRef.columnWithQuotes('test'));
+    const z = SqlRef.column('Z').as(RefName.create('test', true));
 
     it('should work with undefined', () => {
       expect(String(x.changeAliasName(undefined))).toEqual('X');

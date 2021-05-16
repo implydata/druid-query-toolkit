@@ -23,7 +23,8 @@ describe('SqlRef', () => {
       try {
         backAndForth(sql);
       } catch (e) {
-        throw new Error(`problem with \`${sql}\`: ${e.message}`);
+        console.log(`problem with: \`${sql}\``);
+        throw e;
       }
     }
   });
@@ -32,26 +33,6 @@ describe('SqlRef', () => {
     const sql = 'From';
 
     expect(() => SqlExpression.parse(sql)).toThrowError('Expected');
-  });
-
-  it('#column', () => {
-    const star = SqlRef.column('*');
-
-    backAndForth(star.toString());
-    expect(star.isStar()).toEqual(true);
-    expect(star).toMatchInlineSnapshot(`
-      SqlRef {
-        "column": "*",
-        "keywords": Object {},
-        "namespace": undefined,
-        "namespaceQuotes": false,
-        "quotes": false,
-        "spacing": Object {},
-        "table": undefined,
-        "tableQuotes": false,
-        "type": "ref",
-      }
-    `);
   });
 
   describe('#column', () => {
@@ -299,9 +280,9 @@ describe('upgrades', () => {
   it('Ref with double quotes upgraded', () => {
     const sql = `"namespace"."table"`;
 
-    expect((SqlExpression.parse(sql) as SqlRef).upgrade().toString()).toEqual(sql);
+    expect((SqlExpression.parse(sql) as SqlRef).convertToTableRef().toString()).toEqual(sql);
 
-    expect((SqlExpression.parse(sql) as SqlRef).upgrade()).toMatchInlineSnapshot(`
+    expect((SqlExpression.parse(sql) as SqlRef).convertToTableRef()).toMatchInlineSnapshot(`
       SqlRef {
         "column": undefined,
         "keywords": Object {},

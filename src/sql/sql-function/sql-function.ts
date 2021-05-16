@@ -12,12 +12,18 @@
  * limitations under the License.
  */
 
+import { SPECIAL_FUNCTIONS } from '../special-functions';
 import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../sql-base';
 import { SqlWhereClause } from '../sql-clause/sql-where-clause/sql-where-clause';
 import { SqlExpression } from '../sql-expression';
 import { SqlLiteral } from '../sql-literal/sql-literal';
-import { SqlRef } from '../sql-ref/sql-ref';
+import { SqlStar } from '../sql-star/sql-star';
 import { SeparatedArray, Separator } from '../utils';
+
+const specialFunctionLookup: Record<string, boolean> = {};
+for (const r of SPECIAL_FUNCTIONS) {
+  specialFunctionLookup[r] = true;
+}
 
 export type SpecialParen = 'square' | 'none';
 
@@ -35,6 +41,12 @@ export class SqlFunction extends SqlExpression {
   static DEFAULT_FILTER_KEYWORD = 'FILTER';
 
   static COUNT_STAR: SqlFunction;
+
+  static SPECIAL_FUNCTIONS = SPECIAL_FUNCTIONS;
+
+  static isNakedFunction(functionName: string) {
+    return Boolean(specialFunctionLookup[functionName.toUpperCase()]);
+  }
 
   static simple(
     functionName: string,
@@ -224,11 +236,10 @@ export class SqlFunction extends SqlExpression {
     if (this.getEffectiveFunctionName() !== 'COUNT') return false;
     const args = this.args;
     if (!args || args.length() !== 1) return false;
-    const firstArg = args.first();
-    return firstArg instanceof SqlRef && firstArg.isStar();
+    return args.first() instanceof SqlStar;
   }
 }
 
 SqlBase.register(SqlFunction);
 
-SqlFunction.COUNT_STAR = SqlFunction.simple('COUNT', [SqlRef.STAR]);
+SqlFunction.COUNT_STAR = SqlFunction.simple('COUNT', [SqlStar.PLAIN]);

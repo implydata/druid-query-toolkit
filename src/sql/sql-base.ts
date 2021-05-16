@@ -12,12 +12,10 @@
  * limitations under the License.
  */
 
-import { cleanObject, dedupe, filterMap } from '../utils';
+import { cleanObject, dedupe } from '../utils';
 
 import { LiteralValue, SeparatedArray, SqlLiteral, SqlPlaceholder, SqlRef } from '.';
 import { parseSql } from './parser';
-import { RESERVED_KEYWORDS } from './reserved-keywords';
-import { SPECIAL_FUNCTIONS } from './special-functions';
 
 export interface Parens {
   leftSpacing: string;
@@ -66,6 +64,8 @@ export type SqlType =
   | 'case'
   | 'whenThenPart'
   | 'ref'
+  | 'star'
+  | 'tableRef'
   | 'unary';
 
 export interface SqlBaseValue {
@@ -75,33 +75,8 @@ export interface SqlBaseValue {
   parens?: readonly Parens[];
 }
 
-const reservedKeywordLookup: Record<string, boolean> = {};
-for (const r of RESERVED_KEYWORDS) {
-  reservedKeywordLookup[r] = true;
-}
-
-const specialFunctionLookup: Record<string, boolean> = {};
-for (const r of SPECIAL_FUNCTIONS) {
-  specialFunctionLookup[r] = true;
-}
-
 export abstract class SqlBase {
   static type: SqlType = 'base';
-  static RESERVED_KEYWORDS = RESERVED_KEYWORDS;
-  static SPECIAL_FUNCTIONS = SPECIAL_FUNCTIONS;
-
-  static isReservedKeyword(keyword: string) {
-    return Boolean(reservedKeywordLookup[keyword.toUpperCase()]);
-  }
-
-  static isNakedRefAppropriate(word: string) {
-    if (word === 'user') return true;
-    return !SqlBase.isReservedKeyword(word);
-  }
-
-  static isNakedFunction(functionName: string) {
-    return Boolean(specialFunctionLookup[functionName.toUpperCase()]);
-  }
 
   static parseSql(input: string | SqlBase): SqlBase {
     if (typeof input === 'string') {
@@ -394,7 +369,7 @@ export abstract class SqlBase {
   }
 
   public getUsedColumns(): string[] {
-    return dedupe(filterMap(this.getRefs(), x => (x.isStar() ? undefined : x.column))).sort();
+    return dedupe(this.getRefs().map(x => x.getColumn())).sort();
   }
 
   public contains(thing: SqlBase): boolean {
@@ -402,13 +377,13 @@ export abstract class SqlBase {
   }
 
   public containsColumn(column: string): boolean {
-    return this.some(b => b instanceof SqlRef && !b.isStar() && b.column === column);
+    return this.some(b => b instanceof SqlRef && b.getColumn() === column);
   }
 
   public getFirstColumn(): string | undefined {
-    const ref = this.getRefs().find(x => !x.isStar() && x.column);
+    const ref = this.getRefs()[0];
     if (!ref) return;
-    return ref.column;
+    return ref.getColumn();
   }
 
   public fillPlaceholders(fillWith: (SqlBase | LiteralValue)[]): SqlBase {
@@ -440,13 +415,13 @@ export abstract class SqlBase {
     });
   }
 
-  public prettyTrim(maxLength: number): SqlBase {
+  public prettyTrim(maxLength: number): this {
     return this.walk(ex => {
       if (ex instanceof SqlLiteral || ex instanceof SqlRef) {
         return ex.prettyTrim(maxLength);
       }
       return ex;
-    });
+    }) as any;
   }
 
   public apply<T>(fn: (self: this) => T): T {

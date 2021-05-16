@@ -641,8 +641,8 @@ export class SqlQuery extends SqlExpression {
       return selectIndex === ex.getIndexValue();
     }
 
-    if (allowAliasReferences && ex instanceof SqlRef && ex.column) {
-      return selectExpression.getOutputName() === ex.column;
+    if (allowAliasReferences && ex instanceof SqlRef) {
+      return selectExpression.getOutputName() === ex.getColumn();
     }
 
     return ex.equals(selectExpression.expression);
@@ -658,7 +658,7 @@ export class SqlQuery extends SqlExpression {
 
     if (allowAliasReferences && ex instanceof SqlRef) {
       const refIdx = selectExpressionsArray.findIndex((selectExpression, i) => {
-        return SqlQuery.getSelectExpressionOutput(selectExpression, i) === ex.column;
+        return SqlQuery.getSelectExpressionOutput(selectExpression, i) === ex.getColumn();
       });
       if (refIdx !== -1) {
         return refIdx;

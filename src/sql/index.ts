@@ -23,6 +23,8 @@ export * from './sql-expression';
 export * from './sql-placeholder/sql-placeholder';
 export * from './sql-literal/sql-literal';
 export * from './sql-interval/sql-interval';
+export * from './sql-table-ref/sql-table-ref';
+export * from './sql-star/sql-star';
 export * from './sql-ref/sql-ref';
 export * from './sql-multi/sql-multi';
 export * from './sql-unary/sql-unary';

@@ -193,9 +193,9 @@ export class SqlLiteral extends SqlExpression {
     return new SqlLiteral(value);
   }
 
-  public prettyTrim(maxLength: number): SqlBase {
+  public prettyTrim(maxLength: number): this {
     if (typeof this.value === 'string') {
-      return SqlLiteral.create(trimString(this.value, maxLength));
+      return SqlLiteral.create(trimString(this.value, maxLength)) as any;
     }
     return this;
   }

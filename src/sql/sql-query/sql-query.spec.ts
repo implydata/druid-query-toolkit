@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { SqlCase, SqlExpression, SqlFunction, SqlQuery, SqlRef } from '../..';
+import { SqlCase, SqlExpression, SqlFunction, SqlQuery, SqlRef, SqlTableRef } from '../..';
 import { backAndForth, sane } from '../../test-utils';
 
 describe('SqlQuery', () => {
@@ -83,14 +83,14 @@ describe('SqlQuery', () => {
 
   describe('.create', () => {
     it('works', () => {
-      expect(String(SqlQuery.create(SqlRef.table('lol')))).toEqual(sane`
+      expect(String(SqlQuery.create(SqlTableRef.create('lol')))).toEqual(sane`
         SELECT *
         FROM lol
       `);
     });
 
     it('works in advanced case', () => {
-      const query = SqlQuery.create(SqlRef.table('lol'))
+      const query = SqlQuery.create(SqlTableRef.create('lol'))
         .changeSelectExpressions([
           SqlRef.column('channel').as(),
           SqlRef.column('page').as(),
@@ -111,7 +111,7 @@ describe('SqlQuery', () => {
 
   describe('.from', () => {
     it('works', () => {
-      expect(String(SqlQuery.from(SqlRef.table('lol')))).toEqual(sane`
+      expect(String(SqlQuery.from(SqlTableRef.create('lol')))).toEqual(sane`
         SELECT ...
         FROM lol
       `);
@@ -156,9 +156,7 @@ describe('SqlQuery', () => {
         String(
           sqlMaster.walk(x => {
             if (x instanceof SqlRef) {
-              if (x.column && x.column !== '*') {
-                return x.changeColumn(x.column + '_lol');
-              }
+              return x.changeColumn(x.getColumn() + '_lol');
             }
             return x;
           }),
@@ -311,8 +309,8 @@ describe('SqlQuery', () => {
       const parts: string[] = [];
       sqlMaster.walkPostorder(x => {
         parts.push(x.toString());
-        if (x instanceof SqlRef && !x.isStar() && x.column) {
-          return x.changeColumn(`_${x.column}_`);
+        if (x instanceof SqlRef) {
+          return x.changeColumn(`_${x.getColumn()}_`);
         }
         return x;
       });
@@ -613,7 +611,7 @@ describe('SqlQuery', () => {
       String(
         SqlExpression.parse(sql).walk(x => {
           if (x instanceof SqlRef) {
-            if (x.column && x.table === 't') {
+            if (x.getTable() === 't') {
               return SqlCase.ifThenElse(condition, x);
             }
           }
