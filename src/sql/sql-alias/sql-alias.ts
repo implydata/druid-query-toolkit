@@ -113,12 +113,20 @@ export class SqlAlias extends SqlExpression {
     return SqlAlias.create(this, alias, forceQuotes);
   }
 
+  public ifUnnamedAliasAs(_alias: RefName | string, _forceQuotes?: boolean): SqlExpression {
+    return this;
+  }
+
   public convertToTableRef(): SqlExpression {
     const { expression } = this;
     if (expression instanceof SqlRef) {
       return this.changeExpression(expression.convertToTableRef());
     }
     return this;
+  }
+
+  public getAliasName(): string | undefined {
+    return this.alias.name;
   }
 
   public getOutputName(): string | undefined {

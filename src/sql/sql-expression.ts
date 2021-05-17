@@ -101,12 +101,16 @@ export abstract class SqlExpression extends SqlBase {
     return SqlAlias.create(this, alias, forceQuotes);
   }
 
-  public toOrderByPart(direction?: SqlOrderByDirection): SqlOrderByExpression {
-    return SqlOrderByExpression.create(this, direction);
+  public ifUnnamedAliasAs(alias: RefName | string, forceQuotes?: boolean): SqlExpression {
+    return SqlAlias.create(this, alias, forceQuotes);
   }
 
   public convertToTableRef(): SqlExpression {
     return this;
+  }
+
+  public getAliasName(): string | undefined {
+    return;
   }
 
   public getOutputName(): string | undefined {
@@ -115,6 +119,10 @@ export abstract class SqlExpression extends SqlBase {
 
   public getUnderlyingExpression(): SqlExpression {
     return this;
+  }
+
+  public toOrderByPart(direction?: SqlOrderByDirection): SqlOrderByExpression {
+    return SqlOrderByExpression.create(this, direction);
   }
 
   // SqlComparison
