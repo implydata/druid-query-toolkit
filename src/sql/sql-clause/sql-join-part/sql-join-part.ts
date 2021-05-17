@@ -12,7 +12,6 @@
  * limitations under the License.
  */
 
-import { SqlAlias } from '../../sql-alias/sql-alias';
 import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../../sql-base';
 import { SqlExpression } from '../../sql-expression';
 
@@ -98,7 +97,7 @@ export class SqlJoinPart extends SqlBase {
     return rawParts.join('');
   }
 
-  public changeJoinTable(table: SqlAlias): this {
+  public changeJoinTable(table: SqlExpression): this {
     const value = this.valueOf();
     value.table = table;
     return SqlBase.fromValue(value);
@@ -120,7 +119,7 @@ export class SqlJoinPart extends SqlBase {
     const table = this.table._walkHelper(nextStack, fn, postorder);
     if (!table) return;
     if (table !== this.table) {
-      ret = ret.changeJoinTable(table as SqlAlias);
+      ret = ret.changeJoinTable(table);
     }
 
     if (this.onExpression) {

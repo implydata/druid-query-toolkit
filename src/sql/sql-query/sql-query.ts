@@ -14,7 +14,6 @@
 
 import { filterMap } from '../../utils';
 import { parseSql } from '../parser';
-import { SqlAlias } from '../sql-alias/sql-alias';
 import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../sql-base';
 import {
   SqlFromClause,
@@ -311,7 +310,7 @@ export class SqlQuery extends SqlExpression {
   }
 
   public changeFromExpressions(
-    fromExpressions: SeparatedArray<SqlAlias> | SqlAlias[] | undefined,
+    fromExpressions: SeparatedArray<SqlExpression> | SqlExpression[] | undefined,
   ): this {
     if (!fromExpressions) return this.changeFromClause(undefined);
     return this.changeFromClause(

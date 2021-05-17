@@ -13,7 +13,6 @@
  */
 
 import { filterMap } from '../../../utils';
-import { SqlAlias } from '../../sql-alias/sql-alias';
 import { SqlBase, SqlType, Substitutor } from '../../sql-base';
 import { SqlExpression } from '../../sql-expression';
 import { SqlTableRef } from '../../sql-table-ref/sql-table-ref';
@@ -123,7 +122,7 @@ export class SqlFromClause extends SqlClause {
 
   public getFirstTableName(): string {
     return filterMap(this.expressions.values, table => {
-      if (table instanceof SqlAlias) table = table.expression;
+      table = table.getUnderlyingExpression();
       if (table instanceof SqlTableRef) {
         return table.getTable();
       }
@@ -133,7 +132,7 @@ export class SqlFromClause extends SqlClause {
 
   public getFirstSchema(): string {
     return filterMap(this.expressions.values, table => {
-      if (table instanceof SqlAlias) table = table.expression;
+      table = table.getUnderlyingExpression();
       if (table instanceof SqlTableRef) {
         return table.getNamespace();
       }
