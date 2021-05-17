@@ -26,6 +26,7 @@ describe('SqlQuery', () => {
       `(Select * from tbl)`,
       `Select count(*) As sums from tbl`,
       `Select count(*) As sums from tbl GROUP BY ()`,
+      `SELECT distinct dim1 FROM druid.foo`,
       sane`
         SELECT
           datasource d,

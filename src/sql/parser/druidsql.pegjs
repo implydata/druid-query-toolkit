@@ -60,6 +60,7 @@ SqlQuery =
   keywords.select = select.selectKeyword;
   spacing.postSelect = select.postSelect;
   value.decorator = select.decorator;
+  keywords.decorator = select.decoratorKeyword;
   spacing.postDecorator = select.postDecorator;
   value.selectExpressions = select.selectExpressions;
 
@@ -891,16 +892,17 @@ TrimFunction =
   preLeftParen:_
   OpenParen
   postLeftParen:_
-  decorator:(TrimDecoratorLead _)?
-  expr1:Expression
-  separator:FromSeparator
-  expr2:Expression
+  decorator:($((LeadingToken / BothToken / TrailingToken) (_ FromToken)?) _)?
+  expr:Expression
+  from:(FromSeparator Expression)?
   postArguments:_
   CloseParen
 {
   var value = {
     functionName: functionName.toUpperCase(),
-    args: new sql.SeparatedArray([expr1, expr2], [separator]),
+    args: from
+      ? new sql.SeparatedArray([expr, from[1]], [from[0]])
+      : sql.SeparatedArray.fromSingleValue(expr),
   };
   var spacing = value.spacing = {
     preLeftParen: preLeftParen,
@@ -1308,14 +1310,6 @@ EndOfQuery = $(_ ';'? _)
 OpenParen "(" = "("
 
 CloseParen ")" = ")"
-
-// ToDo: delete?
-// FunctionDecorator = $(TrimDecoratorLead (_ FromToken)?)
-
-TrimDecoratorLead =
-  LeadingToken
-/ BothToken
-/ TrailingToken
 
 /* Tokens */
 
