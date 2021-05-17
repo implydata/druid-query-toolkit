@@ -297,9 +297,9 @@ describe('SqlRef', () => {
   });
 });
 
-describe('upgrades', () => {
+describe('#convertToTableRef', () => {
   it('Ref with double quotes upgraded', () => {
-    const sql = `"namespace"."table"`;
+    const sql = `"namespace"  . "table"`;
 
     expect((SqlExpression.parse(sql) as SqlRef).convertToTableRef().toString()).toEqual(sql);
 
@@ -311,8 +311,8 @@ describe('upgrades', () => {
           "quotes": true,
         },
         "spacing": Object {
-          "postTableDot": "",
-          "preTableDot": "",
+          "postNamespaceDot": " ",
+          "preNamespaceDot": "  ",
         },
         "tableRefName": RefName {
           "name": "table",

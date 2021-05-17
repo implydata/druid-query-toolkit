@@ -170,7 +170,10 @@ export class SqlRef extends SqlExpression {
     return new SqlTableRef({
       tableRefName: this.columnRefName,
       namespaceRefName: this.tableRefName,
-      spacing: this.spacing,
+      spacing: {
+        preNamespaceDot: this.spacing.preTableDot,
+        postNamespaceDot: this.spacing.postTableDot,
+      },
     });
   }
 
