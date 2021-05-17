@@ -407,6 +407,25 @@ SqlAliasExpression = expression:Expression alias:((_ AsToken)? _ RefName)?
   return new sql.SqlAlias(value);
 }
 
+SqlAliasExpressionExplicitAs = expression:Expression alias:(_ AsToken _ RefName)?
+{
+  if (!alias) {
+    return expression;
+  }
+
+  return new sql.SqlAlias({
+    expression: expression,
+    alias: alias[3],
+    spacing: {
+      preAs: alias[0],
+      preAlias: alias[2],
+    },
+    keywords: {
+      as: alias[1],
+    },
+  });
+}
+
 /*
 Expressions are defined below in acceding priority order
 
@@ -745,8 +764,8 @@ GenericFunction =
   preLeftParen:_
   OpenParen
   postLeftParen:_
-  head:Expression?
-  tail:(CommaSeparator Expression)*
+  head:SqlAliasExpressionExplicitAs?
+  tail:(CommaSeparator SqlAliasExpressionExplicitAs)*
   postArguments:_
   CloseParen
   filter:(_ FunctionFilter)?

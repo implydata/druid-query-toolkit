@@ -39,6 +39,8 @@ describe('SqlFunction', () => {
       "trim(leading 'eh' from 'hehe__hehe')",
       "trim(trailing 'eh' from 'hehe__hehe')",
       "trim('eh' from 'hehe__hehe')",
+
+      `SomeFn("boo" AS "arg1")`,
     ];
 
     for (const sql of queries) {
@@ -51,7 +53,7 @@ describe('SqlFunction', () => {
     }
   });
 
-  it('is smart about clearing sepperators', () => {
+  it('is smart about clearing separators', () => {
     const sql = `EXTRACT(HOUR FROM "time")`;
     expect(String(SqlExpression.parse(sql).clearOwnSeparators())).toEqual(sql);
   });
