@@ -27,7 +27,15 @@ export class SqlAlias extends SqlExpression {
 
   static DEFAULT_AS_KEYWORD = 'AS';
 
-  static create(expression: SqlExpression, alias: RefName | string) {
+  static create(
+    expression: SqlExpression,
+    alias: RefName | string,
+    forceQuotes?: boolean,
+  ): SqlAlias {
+    if (expression instanceof SqlAlias) {
+      return expression.changeAlias(alias, forceQuotes);
+    }
+
     if (expression.type === 'query') {
       expression = expression.ensureParens();
     }
@@ -71,17 +79,17 @@ export class SqlAlias extends SqlExpression {
     return SqlBase.fromValue(value);
   }
 
-  public changeAlias(alias: RefName): this {
-    const value = this.valueOf();
-    value.alias = alias;
-    return SqlBase.fromValue(value);
-  }
+  public changeAlias(alias: string | RefName, forceQuotes = false): this {
+    const newAlias =
+      typeof alias === 'string'
+        ? forceQuotes
+          ? RefName.create(alias, forceQuotes)
+          : this.alias.changeName(alias)
+        : alias;
 
-  public changeAliasName(aliasName: string, forceQuotes = false): this {
-    const { alias } = this;
-    return this.changeAlias(
-      forceQuotes ? RefName.create(aliasName, forceQuotes) : alias.changeName(aliasName),
-    );
+    const value = this.valueOf();
+    value.alias = newAlias;
+    return SqlBase.fromValue(value);
   }
 
   public _walkInner(
@@ -98,6 +106,11 @@ export class SqlAlias extends SqlExpression {
     }
 
     return ret;
+  }
+
+  public as(alias: RefName | string | undefined, forceQuotes?: boolean): SqlExpression {
+    if (!alias) return this.expression;
+    return SqlAlias.create(this, alias, forceQuotes);
   }
 
   public convertToTableRef(): SqlExpression {

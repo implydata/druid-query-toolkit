@@ -96,8 +96,9 @@ export abstract class SqlExpression extends SqlBase {
     return this;
   }
 
-  public as(alias: RefName | string) {
-    return SqlAlias.create(this, alias);
+  public as(alias: RefName | string | undefined, forceQuotes?: boolean): SqlExpression {
+    if (!alias) return this;
+    return SqlAlias.create(this, alias, forceQuotes);
   }
 
   public toOrderByPart(direction?: SqlOrderByDirection): SqlOrderByExpression {
