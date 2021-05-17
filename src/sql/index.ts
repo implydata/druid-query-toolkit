@@ -12,10 +12,31 @@
  * limitations under the License.
  */
 
-// The order of exports in this file is significant as it resolves the circular dependencies of the files in a meaningful state.
+// The order of exports in this file is significant as it defines what depends on what.
+// Each file can directly depend directly on any file above it.
+// Files can depend on the files below them by type only imported from the root.
 
 /* eslint-disable simple-import-sort/exports */
 export * from './utils';
 export * from './sql-base';
 export * from './sql-expression';
-export * from './sql-query';
+export * from './sql-placeholder/sql-placeholder';
+export * from './sql-literal/sql-literal';
+export * from './sql-interval/sql-interval';
+export * from './sql-table-ref/sql-table-ref';
+export * from './sql-star/sql-star';
+export * from './sql-ref/sql-ref';
+export * from './sql-multi/sql-multi';
+export * from './sql-unary/sql-unary';
+export * from './sql-comparison/sql-between-part';
+export * from './sql-comparison/sql-like-part';
+export * from './sql-comparison/sql-comparison';
+export * from './sql-case/sql-when-then-part';
+export * from './sql-case/sql-case';
+export * from './sql-alias/sql-alias';
+
+export * from './sql-clause';
+
+export * from './sql-function/sql-function';
+export * from './sql-query/sql-with-part/sql-with-part';
+export * from './sql-query/sql-query';

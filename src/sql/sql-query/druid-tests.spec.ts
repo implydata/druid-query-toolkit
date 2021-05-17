@@ -14,7 +14,7 @@
 
 import { backAndForth, sane } from '../../test-utils';
 
-describe.skip('Druid test queries', () => {
+describe('Druid test queries', () => {
   const queries = [
     sane`
       SELECT REGEXP_EXTRACT('foo', '^(.)')
@@ -1831,7 +1831,9 @@ describe.skip('Druid test queries', () => {
     sane`
       SELECT REGEXP_LIKE('x', 1) FROM foo
     `,
-  ];
+  ]
+    .filter(q => !q.includes('GROUPING SETS')) // ToDo: implement GROUPING SETS
+    .filter(q => !q.includes(') IN')); // ToDo: implement (tuple) IN (sub query)
 
   it('all queries work', () => {
     let bad = 0;
@@ -1840,8 +1842,9 @@ describe.skip('Druid test queries', () => {
         backAndForth(sql);
       } catch (e) {
         bad++;
+        console.log('=====================================');
         console.log(sql);
-        // throw new Error(`problem with \`${sql}\`: ${e.message}`);
+        console.log(e);
       }
     }
 

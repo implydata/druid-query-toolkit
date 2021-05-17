@@ -25,7 +25,7 @@ export function filterMap<T, Q>(xs: readonly T[], f: (x: T, i: number) => Q | un
   return xs.map(f).filter((x: Q | undefined) => typeof x !== 'undefined') as Q[];
 }
 
-export function dedupe<T>(array: T[], keyFn: (x: T) => string = String): T[] {
+export function dedupe<T>(array: readonly T[], keyFn: (x: T) => string = String): T[] {
   const seen: Record<any, boolean> = {};
   const deduped: T[] = [];
   array.forEach(d => {

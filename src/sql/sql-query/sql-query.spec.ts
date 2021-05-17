@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { SqlCase, SqlExpression, SqlFunction, SqlQuery, SqlRef } from '../..';
+import { SqlCase, SqlExpression, SqlFunction, SqlQuery, SqlRef, SqlTableRef } from '../..';
 import { backAndForth, sane } from '../../test-utils';
 
 describe('SqlQuery', () => {
@@ -26,6 +26,7 @@ describe('SqlQuery', () => {
       `(Select * from tbl)`,
       `Select count(*) As sums from tbl`,
       `Select count(*) As sums from tbl GROUP BY ()`,
+      `SELECT distinct dim1 FROM druid.foo`,
       sane`
         SELECT
           datasource d,
@@ -42,7 +43,7 @@ describe('SqlQuery', () => {
       `SELECT ALL a, b FROM wikipedia t`,
       sane`
         SELECT
-          flags, channel, user, page,
+          flags, channel, "user", page,
           SUM(sum_added) AS Added
         FROM wikipedia
         GROUP BY 1, 2, 3, 4
@@ -55,7 +56,8 @@ describe('SqlQuery', () => {
       try {
         backAndForth(sql);
       } catch (e) {
-        throw new Error(`problem with \`${sql}\`: ${e.message}`);
+        console.log(`Problem with: \`${sql}\``);
+        throw e;
       }
     }
   });
@@ -83,18 +85,18 @@ describe('SqlQuery', () => {
 
   describe('.create', () => {
     it('works', () => {
-      expect(String(SqlQuery.create(SqlRef.table('lol')))).toEqual(sane`
+      expect(String(SqlQuery.create(SqlTableRef.create('lol')))).toEqual(sane`
         SELECT *
         FROM lol
       `);
     });
 
     it('works in advanced case', () => {
-      const query = SqlQuery.create(SqlRef.table('lol'))
+      const query = SqlQuery.create(SqlTableRef.create('lol'))
         .changeSelectExpressions([
-          SqlRef.column('channel').as(),
-          SqlRef.column('page').as(),
-          SqlRef.column('user').as(),
+          SqlRef.column('channel'),
+          SqlRef.column('page'),
+          SqlRef.column('user'),
         ])
         .changeWhereExpression(`channel  =  '#en.wikipedia'`);
 
@@ -111,7 +113,7 @@ describe('SqlQuery', () => {
 
   describe('.from', () => {
     it('works', () => {
-      expect(String(SqlQuery.from(SqlRef.table('lol')))).toEqual(sane`
+      expect(String(SqlQuery.from(SqlTableRef.create('lol')))).toEqual(sane`
         SELECT ...
         FROM lol
       `);
@@ -156,9 +158,7 @@ describe('SqlQuery', () => {
         String(
           sqlMaster.walk(x => {
             if (x instanceof SqlRef) {
-              if (x.column && x.column !== '*') {
-                return x.changeColumn(x.column + '_lol');
-              }
+              return x.changeColumn(x.getColumn() + '_lol');
             }
             return x;
           }),
@@ -217,7 +217,6 @@ describe('SqlQuery', () => {
         'COUNT(*)',
         '*',
         'FROM sys.segments',
-        'sys.segments',
         'sys.segments',
         "WHERE datasource IN ('moon', 'beam') AND 'druid' = schema",
         "datasource IN ('moon', 'beam') AND 'druid' = schema",
@@ -280,7 +279,6 @@ describe('SqlQuery', () => {
         'COUNT(*)',
         'COUNT(*) AS num_segments',
         'sys.segments',
-        'sys.segments',
         'FROM sys.segments',
         'datasource',
         "('moon', 'beam')",
@@ -311,8 +309,8 @@ describe('SqlQuery', () => {
       const parts: string[] = [];
       sqlMaster.walkPostorder(x => {
         parts.push(x.toString());
-        if (x instanceof SqlRef && !x.isStar() && x.column) {
-          return x.changeColumn(`_${x.column}_`);
+        if (x instanceof SqlRef) {
+          return x.changeColumn(`_${x.getColumn()}_`);
         }
         return x;
       });
@@ -346,7 +344,6 @@ describe('SqlQuery', () => {
         '*',
         'COUNT(*)',
         'COUNT(*) AS num_segments',
-        'sys.segments',
         'sys.segments',
         'FROM sys.segments',
         'datasource',
@@ -613,7 +610,7 @@ describe('SqlQuery', () => {
       String(
         SqlExpression.parse(sql).walk(x => {
           if (x instanceof SqlRef) {
-            if (x.column && x.table === 't') {
+            if (x.getTable() === 't') {
               return SqlCase.ifThenElse(condition, x);
             }
           }
@@ -643,136 +640,117 @@ describe('SqlQuery', () => {
           "expressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
-              SqlAlias {
-                "alias": undefined,
-                "as": undefined,
-                "expression": SqlQuery {
-                  "decorator": undefined,
-                  "explainPlanFor": undefined,
-                  "fromClause": SqlFromClause {
-                    "expressions": SeparatedArray {
-                      "separators": Array [],
-                      "values": Array [
-                        SqlAlias {
-                          "alias": undefined,
-                          "as": undefined,
-                          "expression": SqlRef {
-                            "column": undefined,
-                            "keywords": Object {},
-                            "namespace": "druid",
-                            "namespaceQuotes": false,
-                            "quotes": false,
-                            "spacing": Object {
-                              "postTableDot": "",
-                              "preTableDot": "",
-                            },
-                            "table": "foo",
-                            "tableQuotes": false,
-                            "type": "ref",
-                          },
-                          "keywords": Object {},
-                          "spacing": Object {},
-                          "type": "alias",
-                        },
-                      ],
-                    },
-                    "joinParts": undefined,
-                    "keywords": Object {
-                      "from": "FROM",
-                    },
-                    "spacing": Object {
-                      "postFrom": " ",
-                    },
-                    "type": "fromClause",
-                  },
-                  "groupByClause": undefined,
-                  "havingClause": undefined,
-                  "keywords": Object {
-                    "select": "SELECT",
-                  },
-                  "limitClause": undefined,
-                  "offsetClause": undefined,
-                  "orderByClause": SqlOrderByClause {
-                    "expressions": SeparatedArray {
-                      "separators": Array [],
-                      "values": Array [
-                        SqlOrderByExpression {
-                          "direction": "DESC",
-                          "expression": SqlRef {
-                            "column": "__time",
-                            "keywords": Object {},
-                            "namespace": undefined,
-                            "namespaceQuotes": false,
-                            "quotes": false,
-                            "spacing": Object {},
-                            "table": undefined,
-                            "tableQuotes": false,
-                            "type": "ref",
-                          },
-                          "keywords": Object {
-                            "direction": "DESC",
-                          },
-                          "spacing": Object {
-                            "preDirection": " ",
-                          },
-                          "type": "orderByExpression",
-                        },
-                      ],
-                    },
-                    "keywords": Object {
-                      "by": "BY",
-                      "order": "ORDER",
-                    },
-                    "spacing": Object {
-                      "postBy": " ",
-                      "postOrder": " ",
-                    },
-                    "type": "orderByClause",
-                  },
-                  "parens": Array [
-                    Object {
-                      "leftSpacing": "",
-                      "rightSpacing": "",
-                    },
-                  ],
-                  "selectExpressions": SeparatedArray {
+              SqlQuery {
+                "decorator": undefined,
+                "explainPlanFor": undefined,
+                "fromClause": SqlFromClause {
+                  "expressions": SeparatedArray {
                     "separators": Array [],
                     "values": Array [
-                      SqlAlias {
-                        "alias": undefined,
-                        "as": undefined,
-                        "expression": SqlRef {
-                          "column": "dim1",
-                          "keywords": Object {},
-                          "namespace": undefined,
-                          "namespaceQuotes": false,
-                          "quotes": false,
-                          "spacing": Object {},
-                          "table": undefined,
-                          "tableQuotes": false,
-                          "type": "ref",
-                        },
+                      SqlTableRef {
                         "keywords": Object {},
-                        "spacing": Object {},
-                        "type": "alias",
+                        "namespaceRefName": RefName {
+                          "name": "druid",
+                          "quotes": false,
+                        },
+                        "spacing": Object {
+                          "postNamespaceDot": "",
+                          "preNamespaceDot": "",
+                        },
+                        "tableRefName": RefName {
+                          "name": "foo",
+                          "quotes": false,
+                        },
+                        "type": "tableRef",
                       },
                     ],
                   },
-                  "spacing": Object {
-                    "postQuery": "",
-                    "postSelect": " ",
-                    "preFrom": " ",
-                    "preOrderBy": " ",
-                    "preQuery": "",
+                  "joinParts": undefined,
+                  "keywords": Object {
+                    "from": "FROM",
                   },
-                  "type": "query",
-                  "unionQuery": undefined,
-                  "whereClause": undefined,
-                  "withParts": undefined,
+                  "spacing": Object {
+                    "postFrom": " ",
+                  },
+                  "type": "fromClause",
                 },
-                "keywords": Object {},
-                "spacing": Object {},
-                "type": "alias",
+                "groupByClause": undefined,
+                "havingClause": undefined,
+                "keywords": Object {
+                  "select": "SELECT",
+                },
+                "limitClause": undefined,
+                "offsetClause": undefined,
+                "orderByClause": SqlOrderByClause {
+                  "expressions": SeparatedArray {
+                    "separators": Array [],
+                    "values": Array [
+                      SqlOrderByExpression {
+                        "direction": "DESC",
+                        "expression": SqlRef {
+                          "columnRefName": RefName {
+                            "name": "__time",
+                            "quotes": false,
+                          },
+                          "keywords": Object {},
+                          "namespaceRefName": undefined,
+                          "spacing": Object {},
+                          "tableRefName": undefined,
+                          "type": "ref",
+                        },
+                        "keywords": Object {
+                          "direction": "DESC",
+                        },
+                        "spacing": Object {
+                          "preDirection": " ",
+                        },
+                        "type": "orderByExpression",
+                      },
+                    ],
+                  },
+                  "keywords": Object {
+                    "by": "BY",
+                    "order": "ORDER",
+                  },
+                  "spacing": Object {
+                    "postBy": " ",
+                    "postOrder": " ",
+                  },
+                  "type": "orderByClause",
+                },
+                "parens": Array [
+                  Object {
+                    "leftSpacing": "",
+                    "rightSpacing": "",
+                  },
+                ],
+                "selectExpressions": SeparatedArray {
+                  "separators": Array [],
+                  "values": Array [
+                    SqlRef {
+                      "columnRefName": RefName {
+                        "name": "dim1",
+                        "quotes": false,
+                      },
+                      "keywords": Object {},
+                      "namespaceRefName": undefined,
+                      "spacing": Object {},
+                      "tableRefName": undefined,
+                      "type": "ref",
+                    },
+                  ],
+                },
+                "spacing": Object {
+                  "postQuery": "",
+                  "postSelect": " ",
+                  "preFrom": " ",
+                  "preOrderBy": " ",
+                  "preQuery": "",
+                },
+                "type": "query",
+                "unionQuery": undefined,
+                "whereClause": undefined,
+                "withParts": undefined,
               },
             ],
           },
@@ -811,23 +789,12 @@ describe('SqlQuery', () => {
         "selectExpressions": SeparatedArray {
           "separators": Array [],
           "values": Array [
-            SqlAlias {
-              "alias": undefined,
-              "as": undefined,
-              "expression": SqlRef {
-                "column": "*",
-                "keywords": Object {},
-                "namespace": undefined,
-                "namespaceQuotes": false,
-                "quotes": false,
-                "spacing": Object {},
-                "table": undefined,
-                "tableQuotes": false,
-                "type": "ref",
-              },
+            SqlStar {
               "keywords": Object {},
+              "namespaceRefName": undefined,
               "spacing": Object {},
-              "type": "alias",
+              "tableRefName": undefined,
+              "type": "star",
             },
           ],
         },
@@ -865,26 +832,21 @@ describe('SqlQuery', () => {
           "expressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
-              SqlAlias {
-                "alias": undefined,
-                "as": undefined,
-                "expression": SqlRef {
-                  "column": undefined,
-                  "keywords": Object {},
-                  "namespace": "sys",
-                  "namespaceQuotes": false,
-                  "quotes": false,
-                  "spacing": Object {
-                    "postTableDot": "",
-                    "preTableDot": "",
-                  },
-                  "table": "segments",
-                  "tableQuotes": false,
-                  "type": "ref",
-                },
+              SqlTableRef {
                 "keywords": Object {},
-                "spacing": Object {},
-                "type": "alias",
+                "namespaceRefName": RefName {
+                  "name": "sys",
+                  "quotes": false,
+                },
+                "spacing": Object {
+                  "postNamespaceDot": "",
+                  "preNamespaceDot": "",
+                },
+                "tableRefName": RefName {
+                  "name": "segments",
+                  "quotes": false,
+                },
+                "type": "tableRef",
               },
             ],
           },
@@ -921,50 +883,35 @@ describe('SqlQuery', () => {
             },
           ],
           "values": Array [
-            SqlAlias {
-              "alias": undefined,
-              "as": undefined,
-              "expression": SqlRef {
-                "column": "datasource",
-                "keywords": Object {},
-                "namespace": undefined,
-                "namespaceQuotes": false,
+            SqlRef {
+              "columnRefName": RefName {
+                "name": "datasource",
                 "quotes": false,
-                "spacing": Object {},
-                "table": undefined,
-                "tableQuotes": false,
-                "type": "ref",
               },
               "keywords": Object {},
+              "namespaceRefName": undefined,
               "spacing": Object {},
-              "type": "alias",
+              "tableRefName": undefined,
+              "type": "ref",
             },
             SqlAlias {
-              "alias": SqlRef {
-                "column": "total_size",
-                "keywords": Object {},
-                "namespace": undefined,
-                "namespaceQuotes": false,
+              "alias": RefName {
+                "name": "total_size",
                 "quotes": false,
-                "spacing": Object {},
-                "table": undefined,
-                "tableQuotes": false,
-                "type": "ref",
               },
-              "as": true,
               "expression": SqlFunction {
                 "args": SeparatedArray {
                   "separators": Array [],
                   "values": Array [
                     SqlRef {
-                      "column": "size",
+                      "columnRefName": RefName {
+                        "name": "size",
+                        "quotes": true,
+                      },
                       "keywords": Object {},
-                      "namespace": undefined,
-                      "namespaceQuotes": false,
-                      "quotes": true,
+                      "namespaceRefName": undefined,
                       "spacing": Object {},
-                      "table": undefined,
-                      "tableQuotes": false,
+                      "tableRefName": undefined,
                       "type": "ref",
                     },
                   ],
@@ -993,32 +940,20 @@ describe('SqlQuery', () => {
               "type": "alias",
             },
             SqlAlias {
-              "alias": SqlRef {
-                "column": "num_segments",
-                "keywords": Object {},
-                "namespace": undefined,
-                "namespaceQuotes": false,
+              "alias": RefName {
+                "name": "num_segments",
                 "quotes": false,
-                "spacing": Object {},
-                "table": undefined,
-                "tableQuotes": false,
-                "type": "ref",
               },
-              "as": true,
               "expression": SqlFunction {
                 "args": SeparatedArray {
                   "separators": Array [],
                   "values": Array [
-                    SqlRef {
-                      "column": "*",
+                    SqlStar {
                       "keywords": Object {},
-                      "namespace": undefined,
-                      "namespaceQuotes": false,
-                      "quotes": false,
+                      "namespaceRefName": undefined,
                       "spacing": Object {},
-                      "table": undefined,
-                      "tableQuotes": false,
-                      "type": "ref",
+                      "tableRefName": undefined,
+                      "type": "star",
                     },
                   ],
                 },
@@ -1076,23 +1011,15 @@ describe('SqlQuery', () => {
           "expressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
-              SqlAlias {
-                "alias": undefined,
-                "as": undefined,
-                "expression": SqlRef {
-                  "column": undefined,
-                  "keywords": Object {},
-                  "namespace": undefined,
-                  "namespaceQuotes": false,
-                  "quotes": false,
-                  "spacing": Object {},
-                  "table": "tbl",
-                  "tableQuotes": false,
-                  "type": "ref",
-                },
+              SqlTableRef {
                 "keywords": Object {},
+                "namespaceRefName": undefined,
                 "spacing": Object {},
-                "type": "alias",
+                "tableRefName": RefName {
+                  "name": "tbl",
+                  "quotes": false,
+                },
+                "type": "tableRef",
               },
             ],
           },
@@ -1119,23 +1046,12 @@ describe('SqlQuery', () => {
         "selectExpressions": SeparatedArray {
           "separators": Array [],
           "values": Array [
-            SqlAlias {
-              "alias": undefined,
-              "as": undefined,
-              "expression": SqlRef {
-                "column": "*",
-                "keywords": Object {},
-                "namespace": undefined,
-                "namespaceQuotes": false,
-                "quotes": false,
-                "spacing": Object {},
-                "table": undefined,
-                "tableQuotes": false,
-                "type": "ref",
-              },
+            SqlStar {
               "keywords": Object {},
+              "namespaceRefName": undefined,
               "spacing": Object {},
-              "type": "alias",
+              "tableRefName": undefined,
+              "type": "star",
             },
           ],
         },
@@ -1174,23 +1090,15 @@ describe('SqlQuery', () => {
           "expressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
-              SqlAlias {
-                "alias": undefined,
-                "as": undefined,
-                "expression": SqlRef {
-                  "column": undefined,
-                  "keywords": Object {},
-                  "namespace": undefined,
-                  "namespaceQuotes": false,
-                  "quotes": false,
-                  "spacing": Object {},
-                  "table": "tbl",
-                  "tableQuotes": false,
-                  "type": "ref",
-                },
+              SqlTableRef {
                 "keywords": Object {},
+                "namespaceRefName": undefined,
                 "spacing": Object {},
-                "type": "alias",
+                "tableRefName": RefName {
+                  "name": "tbl",
+                  "quotes": false,
+                },
+                "type": "tableRef",
               },
             ],
           },
@@ -1215,23 +1123,12 @@ describe('SqlQuery', () => {
         "selectExpressions": SeparatedArray {
           "separators": Array [],
           "values": Array [
-            SqlAlias {
-              "alias": undefined,
-              "as": undefined,
-              "expression": SqlRef {
-                "column": "*",
-                "keywords": Object {},
-                "namespace": undefined,
-                "namespaceQuotes": false,
-                "quotes": false,
-                "spacing": Object {},
-                "table": undefined,
-                "tableQuotes": false,
-                "type": "ref",
-              },
+            SqlStar {
               "keywords": Object {},
+              "namespaceRefName": undefined,
               "spacing": Object {},
-              "type": "alias",
+              "tableRefName": undefined,
+              "type": "star",
             },
           ],
         },
@@ -1267,23 +1164,15 @@ describe('SqlQuery', () => {
                   "expressions": SeparatedArray {
                     "separators": Array [],
                     "values": Array [
-                      SqlAlias {
-                        "alias": undefined,
-                        "as": undefined,
-                        "expression": SqlRef {
-                          "column": undefined,
-                          "keywords": Object {},
-                          "namespace": undefined,
-                          "namespaceQuotes": false,
-                          "quotes": false,
-                          "spacing": Object {},
-                          "table": "emp",
-                          "tableQuotes": false,
-                          "type": "ref",
-                        },
+                      SqlTableRef {
                         "keywords": Object {},
+                        "namespaceRefName": undefined,
                         "spacing": Object {},
-                        "type": "alias",
+                        "tableRefName": RefName {
+                          "name": "emp",
+                          "quotes": false,
+                        },
+                        "type": "tableRef",
                       },
                     ],
                   },
@@ -1314,23 +1203,16 @@ describe('SqlQuery', () => {
                 "selectExpressions": SeparatedArray {
                   "separators": Array [],
                   "values": Array [
-                    SqlAlias {
-                      "alias": undefined,
-                      "as": undefined,
-                      "expression": SqlRef {
-                        "column": "deptno",
-                        "keywords": Object {},
-                        "namespace": undefined,
-                        "namespaceQuotes": false,
+                    SqlRef {
+                      "columnRefName": RefName {
+                        "name": "deptno",
                         "quotes": false,
-                        "spacing": Object {},
-                        "table": undefined,
-                        "tableQuotes": false,
-                        "type": "ref",
                       },
                       "keywords": Object {},
+                      "namespaceRefName": undefined,
                       "spacing": Object {},
-                      "type": "alias",
+                      "tableRefName": undefined,
+                      "type": "ref",
                     },
                   ],
                 },
@@ -1346,16 +1228,9 @@ describe('SqlQuery', () => {
                 "whereClause": undefined,
                 "withParts": undefined,
               },
-              "withTable": SqlRef {
-                "column": "dept_count",
-                "keywords": Object {},
-                "namespace": undefined,
-                "namespaceQuotes": false,
+              "withTable": RefName {
+                "name": "dept_count",
                 "quotes": false,
-                "spacing": Object {},
-                "table": undefined,
-                "tableQuotes": false,
-                "type": "ref",
               },
             },
           ],
@@ -1378,23 +1253,15 @@ describe('SqlQuery', () => {
             "expressions": SeparatedArray {
               "separators": Array [],
               "values": Array [
-                SqlAlias {
-                  "alias": undefined,
-                  "as": undefined,
-                  "expression": SqlRef {
-                    "column": undefined,
-                    "keywords": Object {},
-                    "namespace": undefined,
-                    "namespaceQuotes": false,
-                    "quotes": false,
-                    "spacing": Object {},
-                    "table": "tbl",
-                    "tableQuotes": false,
-                    "type": "ref",
-                  },
+                SqlTableRef {
                   "keywords": Object {},
+                  "namespaceRefName": undefined,
                   "spacing": Object {},
-                  "type": "alias",
+                  "tableRefName": RefName {
+                    "name": "tbl",
+                    "quotes": false,
+                  },
+                  "type": "tableRef",
                 },
               ],
             },
@@ -1418,23 +1285,12 @@ describe('SqlQuery', () => {
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
-              SqlAlias {
-                "alias": undefined,
-                "as": undefined,
-                "expression": SqlRef {
-                  "column": "*",
-                  "keywords": Object {},
-                  "namespace": undefined,
-                  "namespaceQuotes": false,
-                  "quotes": false,
-                  "spacing": Object {},
-                  "table": undefined,
-                  "tableQuotes": false,
-                  "type": "ref",
-                },
+              SqlStar {
                 "keywords": Object {},
+                "namespaceRefName": undefined,
                 "spacing": Object {},
-                "type": "alias",
+                "tableRefName": undefined,
+                "type": "star",
               },
             ],
           },
@@ -1454,14 +1310,14 @@ describe('SqlQuery', () => {
                 "op": ">",
               },
               "lhs": SqlRef {
-                "column": "col",
+                "columnRefName": RefName {
+                  "name": "col",
+                  "quotes": false,
+                },
                 "keywords": Object {},
-                "namespace": undefined,
-                "namespaceQuotes": false,
-                "quotes": false,
+                "namespaceRefName": undefined,
                 "spacing": Object {},
-                "table": undefined,
-                "tableQuotes": false,
+                "tableRefName": undefined,
                 "type": "ref",
               },
               "not": false,
@@ -1505,26 +1361,21 @@ describe('SqlQuery', () => {
             "expressions": SeparatedArray {
               "separators": Array [],
               "values": Array [
-                SqlAlias {
-                  "alias": undefined,
-                  "as": undefined,
-                  "expression": SqlRef {
-                    "column": undefined,
-                    "keywords": Object {},
-                    "namespace": "sys",
-                    "namespaceQuotes": false,
-                    "quotes": false,
-                    "spacing": Object {
-                      "postTableDot": "",
-                      "preTableDot": "",
-                    },
-                    "table": "supervisors",
-                    "tableQuotes": false,
-                    "type": "ref",
-                  },
+                SqlTableRef {
                   "keywords": Object {},
-                  "spacing": Object {},
-                  "type": "alias",
+                  "namespaceRefName": RefName {
+                    "name": "sys",
+                    "quotes": false,
+                  },
+                  "spacing": Object {
+                    "postNamespaceDot": "",
+                    "preNamespaceDot": "",
+                  },
+                  "tableRefName": RefName {
+                    "name": "supervisors",
+                    "quotes": false,
+                  },
+                  "type": "tableRef",
                 },
               ],
             },
@@ -1548,23 +1399,12 @@ describe('SqlQuery', () => {
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
-              SqlAlias {
-                "alias": undefined,
-                "as": undefined,
-                "expression": SqlRef {
-                  "column": "*",
-                  "keywords": Object {},
-                  "namespace": undefined,
-                  "namespaceQuotes": false,
-                  "quotes": false,
-                  "spacing": Object {},
-                  "table": undefined,
-                  "tableQuotes": false,
-                  "type": "ref",
-                },
+              SqlStar {
                 "keywords": Object {},
+                "namespaceRefName": undefined,
                 "spacing": Object {},
-                "type": "alias",
+                "tableRefName": undefined,
+                "type": "star",
               },
             ],
           },
@@ -1584,14 +1424,14 @@ describe('SqlQuery', () => {
                 "op": "=",
               },
               "lhs": SqlRef {
-                "column": "healthy",
+                "columnRefName": RefName {
+                  "name": "healthy",
+                  "quotes": false,
+                },
                 "keywords": Object {},
-                "namespace": undefined,
-                "namespaceQuotes": false,
-                "quotes": false,
+                "namespaceRefName": undefined,
                 "spacing": Object {},
-                "table": undefined,
-                "tableQuotes": false,
+                "tableRefName": undefined,
                 "type": "ref",
               },
               "not": false,
@@ -1635,26 +1475,21 @@ describe('SqlQuery', () => {
             "expressions": SeparatedArray {
               "separators": Array [],
               "values": Array [
-                SqlAlias {
-                  "alias": undefined,
-                  "as": undefined,
-                  "expression": SqlRef {
-                    "column": undefined,
-                    "keywords": Object {},
-                    "namespace": "sys",
-                    "namespaceQuotes": false,
-                    "quotes": false,
-                    "spacing": Object {
-                      "postTableDot": "",
-                      "preTableDot": "",
-                    },
-                    "table": "supervisors",
-                    "tableQuotes": false,
-                    "type": "ref",
-                  },
+                SqlTableRef {
                   "keywords": Object {},
-                  "spacing": Object {},
-                  "type": "alias",
+                  "namespaceRefName": RefName {
+                    "name": "sys",
+                    "quotes": false,
+                  },
+                  "spacing": Object {
+                    "postNamespaceDot": "",
+                    "preNamespaceDot": "",
+                  },
+                  "tableRefName": RefName {
+                    "name": "supervisors",
+                    "quotes": false,
+                  },
+                  "type": "tableRef",
                 },
               ],
             },
@@ -1678,23 +1513,12 @@ describe('SqlQuery', () => {
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
-              SqlAlias {
-                "alias": undefined,
-                "as": undefined,
-                "expression": SqlRef {
-                  "column": "*",
-                  "keywords": Object {},
-                  "namespace": undefined,
-                  "namespaceQuotes": false,
-                  "quotes": false,
-                  "spacing": Object {},
-                  "table": undefined,
-                  "tableQuotes": false,
-                  "type": "ref",
-                },
+              SqlStar {
                 "keywords": Object {},
+                "namespaceRefName": undefined,
                 "spacing": Object {},
-                "type": "alias",
+                "tableRefName": undefined,
+                "type": "star",
               },
             ],
           },
@@ -1734,14 +1558,14 @@ describe('SqlQuery', () => {
                             "op": "=",
                           },
                           "lhs": SqlRef {
-                            "column": "healthy",
+                            "columnRefName": RefName {
+                              "name": "healthy",
+                              "quotes": false,
+                            },
                             "keywords": Object {},
-                            "namespace": undefined,
-                            "namespaceQuotes": false,
-                            "quotes": false,
+                            "namespaceRefName": undefined,
                             "spacing": Object {},
-                            "table": undefined,
-                            "tableQuotes": false,
+                            "tableRefName": undefined,
                             "type": "ref",
                           },
                           "not": false,
@@ -1765,14 +1589,14 @@ describe('SqlQuery', () => {
                             "op": ">",
                           },
                           "lhs": SqlRef {
-                            "column": "col",
+                            "columnRefName": RefName {
+                              "name": "col",
+                              "quotes": false,
+                            },
                             "keywords": Object {},
-                            "namespace": undefined,
-                            "namespaceQuotes": false,
-                            "quotes": false,
+                            "namespaceRefName": undefined,
                             "spacing": Object {},
-                            "table": undefined,
-                            "tableQuotes": false,
+                            "tableRefName": undefined,
                             "type": "ref",
                           },
                           "not": false,
@@ -1803,14 +1627,14 @@ describe('SqlQuery', () => {
                       "op": "=",
                     },
                     "lhs": SqlRef {
-                      "column": "otherColumn",
+                      "columnRefName": RefName {
+                        "name": "otherColumn",
+                        "quotes": false,
+                      },
                       "keywords": Object {},
-                      "namespace": undefined,
-                      "namespaceQuotes": false,
-                      "quotes": false,
+                      "namespaceRefName": undefined,
                       "spacing": Object {},
-                      "table": undefined,
-                      "tableQuotes": false,
+                      "tableRefName": undefined,
                       "type": "ref",
                     },
                     "not": false,
@@ -1863,23 +1687,15 @@ describe('SqlQuery', () => {
             "expressions": SeparatedArray {
               "separators": Array [],
               "values": Array [
-                SqlAlias {
-                  "alias": undefined,
-                  "as": undefined,
-                  "expression": SqlRef {
-                    "column": undefined,
-                    "keywords": Object {},
-                    "namespace": undefined,
-                    "namespaceQuotes": false,
-                    "quotes": false,
-                    "spacing": Object {},
-                    "table": "tbl",
-                    "tableQuotes": false,
-                    "type": "ref",
-                  },
+                SqlTableRef {
                   "keywords": Object {},
+                  "namespaceRefName": undefined,
                   "spacing": Object {},
-                  "type": "alias",
+                  "tableRefName": RefName {
+                    "name": "tbl",
+                    "quotes": false,
+                  },
+                  "type": "tableRef",
                 },
               ],
             },
@@ -1897,14 +1713,14 @@ describe('SqlQuery', () => {
               "separators": Array [],
               "values": Array [
                 SqlRef {
-                  "column": "col",
+                  "columnRefName": RefName {
+                    "name": "col",
+                    "quotes": false,
+                  },
                   "keywords": Object {},
-                  "namespace": undefined,
-                  "namespaceQuotes": false,
-                  "quotes": false,
+                  "namespaceRefName": undefined,
                   "spacing": Object {},
-                  "table": undefined,
-                  "tableQuotes": false,
+                  "tableRefName": undefined,
                   "type": "ref",
                 },
               ],
@@ -1929,23 +1745,12 @@ describe('SqlQuery', () => {
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
-              SqlAlias {
-                "alias": undefined,
-                "as": undefined,
-                "expression": SqlRef {
-                  "column": "*",
-                  "keywords": Object {},
-                  "namespace": undefined,
-                  "namespaceQuotes": false,
-                  "quotes": false,
-                  "spacing": Object {},
-                  "table": undefined,
-                  "tableQuotes": false,
-                  "type": "ref",
-                },
+              SqlStar {
                 "keywords": Object {},
+                "namespaceRefName": undefined,
                 "spacing": Object {},
-                "type": "alias",
+                "tableRefName": undefined,
+                "type": "star",
               },
             ],
           },
@@ -1977,23 +1782,15 @@ describe('SqlQuery', () => {
             "expressions": SeparatedArray {
               "separators": Array [],
               "values": Array [
-                SqlAlias {
-                  "alias": undefined,
-                  "as": undefined,
-                  "expression": SqlRef {
-                    "column": undefined,
-                    "keywords": Object {},
-                    "namespace": undefined,
-                    "namespaceQuotes": false,
-                    "quotes": false,
-                    "spacing": Object {},
-                    "table": "tbl",
-                    "tableQuotes": false,
-                    "type": "ref",
-                  },
+                SqlTableRef {
                   "keywords": Object {},
+                  "namespaceRefName": undefined,
                   "spacing": Object {},
-                  "type": "alias",
+                  "tableRefName": RefName {
+                    "name": "tbl",
+                    "quotes": false,
+                  },
+                  "type": "tableRef",
                 },
               ],
             },
@@ -2011,14 +1808,14 @@ describe('SqlQuery', () => {
               "separators": Array [],
               "values": Array [
                 SqlRef {
-                  "column": "col",
+                  "columnRefName": RefName {
+                    "name": "col",
+                    "quotes": false,
+                  },
                   "keywords": Object {},
-                  "namespace": undefined,
-                  "namespaceQuotes": false,
-                  "quotes": false,
+                  "namespaceRefName": undefined,
                   "spacing": Object {},
-                  "table": undefined,
-                  "tableQuotes": false,
+                  "tableRefName": undefined,
                   "type": "ref",
                 },
               ],
@@ -2043,23 +1840,12 @@ describe('SqlQuery', () => {
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
-              SqlAlias {
-                "alias": undefined,
-                "as": undefined,
-                "expression": SqlRef {
-                  "column": "*",
-                  "keywords": Object {},
-                  "namespace": undefined,
-                  "namespaceQuotes": false,
-                  "quotes": false,
-                  "spacing": Object {},
-                  "table": undefined,
-                  "tableQuotes": false,
-                  "type": "ref",
-                },
+              SqlStar {
                 "keywords": Object {},
+                "namespaceRefName": undefined,
                 "spacing": Object {},
-                "type": "alias",
+                "tableRefName": undefined,
+                "type": "star",
               },
             ],
           },
@@ -2091,23 +1877,15 @@ describe('SqlQuery', () => {
             "expressions": SeparatedArray {
               "separators": Array [],
               "values": Array [
-                SqlAlias {
-                  "alias": undefined,
-                  "as": undefined,
-                  "expression": SqlRef {
-                    "column": undefined,
-                    "keywords": Object {},
-                    "namespace": undefined,
-                    "namespaceQuotes": false,
-                    "quotes": false,
-                    "spacing": Object {},
-                    "table": "tbl",
-                    "tableQuotes": false,
-                    "type": "ref",
-                  },
+                SqlTableRef {
                   "keywords": Object {},
+                  "namespaceRefName": undefined,
                   "spacing": Object {},
-                  "type": "alias",
+                  "tableRefName": RefName {
+                    "name": "tbl",
+                    "quotes": false,
+                  },
+                  "type": "tableRef",
                 },
               ],
             },
@@ -2131,25 +1909,25 @@ describe('SqlQuery', () => {
               ],
               "values": Array [
                 SqlRef {
-                  "column": "col",
+                  "columnRefName": RefName {
+                    "name": "col",
+                    "quotes": false,
+                  },
                   "keywords": Object {},
-                  "namespace": undefined,
-                  "namespaceQuotes": false,
-                  "quotes": false,
+                  "namespaceRefName": undefined,
                   "spacing": Object {},
-                  "table": undefined,
-                  "tableQuotes": false,
+                  "tableRefName": undefined,
                   "type": "ref",
                 },
                 SqlRef {
-                  "column": "colTwo",
+                  "columnRefName": RefName {
+                    "name": "colTwo",
+                    "quotes": false,
+                  },
                   "keywords": Object {},
-                  "namespace": undefined,
-                  "namespaceQuotes": false,
-                  "quotes": false,
+                  "namespaceRefName": undefined,
                   "spacing": Object {},
-                  "table": undefined,
-                  "tableQuotes": false,
+                  "tableRefName": undefined,
                   "type": "ref",
                 },
               ],
@@ -2180,23 +1958,12 @@ describe('SqlQuery', () => {
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
-              SqlAlias {
-                "alias": undefined,
-                "as": undefined,
-                "expression": SqlRef {
-                  "column": "*",
-                  "keywords": Object {},
-                  "namespace": undefined,
-                  "namespaceQuotes": false,
-                  "quotes": false,
-                  "spacing": Object {},
-                  "table": undefined,
-                  "tableQuotes": false,
-                  "type": "ref",
-                },
+              SqlStar {
                 "keywords": Object {},
+                "namespaceRefName": undefined,
                 "spacing": Object {},
-                "type": "alias",
+                "tableRefName": undefined,
+                "type": "star",
               },
             ],
           },
@@ -2230,23 +1997,15 @@ describe('SqlQuery', () => {
             "expressions": SeparatedArray {
               "separators": Array [],
               "values": Array [
-                SqlAlias {
-                  "alias": undefined,
-                  "as": undefined,
-                  "expression": SqlRef {
-                    "column": undefined,
-                    "keywords": Object {},
-                    "namespace": undefined,
-                    "namespaceQuotes": false,
-                    "quotes": false,
-                    "spacing": Object {},
-                    "table": "tbl",
-                    "tableQuotes": false,
-                    "type": "ref",
-                  },
+                SqlTableRef {
                   "keywords": Object {},
+                  "namespaceRefName": undefined,
                   "spacing": Object {},
-                  "type": "alias",
+                  "tableRefName": RefName {
+                    "name": "tbl",
+                    "quotes": false,
+                  },
+                  "type": "tableRef",
                 },
               ],
             },
@@ -2267,14 +2026,14 @@ describe('SqlQuery', () => {
                 "op": ">",
               },
               "lhs": SqlRef {
-                "column": "col",
+                "columnRefName": RefName {
+                  "name": "col",
+                  "quotes": false,
+                },
                 "keywords": Object {},
-                "namespace": undefined,
-                "namespaceQuotes": false,
-                "quotes": false,
+                "namespaceRefName": undefined,
                 "spacing": Object {},
-                "table": undefined,
-                "tableQuotes": false,
+                "tableRefName": undefined,
                 "type": "ref",
               },
               "not": false,
@@ -2309,23 +2068,12 @@ describe('SqlQuery', () => {
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
-              SqlAlias {
-                "alias": undefined,
-                "as": undefined,
-                "expression": SqlRef {
-                  "column": "*",
-                  "keywords": Object {},
-                  "namespace": undefined,
-                  "namespaceQuotes": false,
-                  "quotes": false,
-                  "spacing": Object {},
-                  "table": undefined,
-                  "tableQuotes": false,
-                  "type": "ref",
-                },
+              SqlStar {
                 "keywords": Object {},
+                "namespaceRefName": undefined,
                 "spacing": Object {},
-                "type": "alias",
+                "tableRefName": undefined,
+                "type": "star",
               },
             ],
           },
@@ -2357,26 +2105,21 @@ describe('SqlQuery', () => {
             "expressions": SeparatedArray {
               "separators": Array [],
               "values": Array [
-                SqlAlias {
-                  "alias": undefined,
-                  "as": undefined,
-                  "expression": SqlRef {
-                    "column": undefined,
-                    "keywords": Object {},
-                    "namespace": "sys",
-                    "namespaceQuotes": false,
-                    "quotes": false,
-                    "spacing": Object {
-                      "postTableDot": "",
-                      "preTableDot": "",
-                    },
-                    "table": "supervisors",
-                    "tableQuotes": false,
-                    "type": "ref",
-                  },
+                SqlTableRef {
                   "keywords": Object {},
-                  "spacing": Object {},
-                  "type": "alias",
+                  "namespaceRefName": RefName {
+                    "name": "sys",
+                    "quotes": false,
+                  },
+                  "spacing": Object {
+                    "postNamespaceDot": "",
+                    "preNamespaceDot": "",
+                  },
+                  "tableRefName": RefName {
+                    "name": "supervisors",
+                    "quotes": false,
+                  },
+                  "type": "tableRef",
                 },
               ],
             },
@@ -2397,14 +2140,14 @@ describe('SqlQuery', () => {
                 "op": "=",
               },
               "lhs": SqlRef {
-                "column": "healthy",
+                "columnRefName": RefName {
+                  "name": "healthy",
+                  "quotes": false,
+                },
                 "keywords": Object {},
-                "namespace": undefined,
-                "namespaceQuotes": false,
-                "quotes": false,
+                "namespaceRefName": undefined,
                 "spacing": Object {},
-                "table": undefined,
-                "tableQuotes": false,
+                "tableRefName": undefined,
                 "type": "ref",
               },
               "not": false,
@@ -2439,23 +2182,12 @@ describe('SqlQuery', () => {
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
-              SqlAlias {
-                "alias": undefined,
-                "as": undefined,
-                "expression": SqlRef {
-                  "column": "*",
-                  "keywords": Object {},
-                  "namespace": undefined,
-                  "namespaceQuotes": false,
-                  "quotes": false,
-                  "spacing": Object {},
-                  "table": undefined,
-                  "tableQuotes": false,
-                  "type": "ref",
-                },
+              SqlStar {
                 "keywords": Object {},
+                "namespaceRefName": undefined,
                 "spacing": Object {},
-                "type": "alias",
+                "tableRefName": undefined,
+                "type": "star",
               },
             ],
           },
@@ -2487,26 +2219,21 @@ describe('SqlQuery', () => {
             "expressions": SeparatedArray {
               "separators": Array [],
               "values": Array [
-                SqlAlias {
-                  "alias": undefined,
-                  "as": undefined,
-                  "expression": SqlRef {
-                    "column": undefined,
-                    "keywords": Object {},
-                    "namespace": "sys",
-                    "namespaceQuotes": false,
-                    "quotes": false,
-                    "spacing": Object {
-                      "postTableDot": "",
-                      "preTableDot": "",
-                    },
-                    "table": "supervisors",
-                    "tableQuotes": false,
-                    "type": "ref",
-                  },
+                SqlTableRef {
                   "keywords": Object {},
-                  "spacing": Object {},
-                  "type": "alias",
+                  "namespaceRefName": RefName {
+                    "name": "sys",
+                    "quotes": false,
+                  },
+                  "spacing": Object {
+                    "postNamespaceDot": "",
+                    "preNamespaceDot": "",
+                  },
+                  "tableRefName": RefName {
+                    "name": "supervisors",
+                    "quotes": false,
+                  },
+                  "type": "tableRef",
                 },
               ],
             },
@@ -2547,14 +2274,14 @@ describe('SqlQuery', () => {
                             "op": "=",
                           },
                           "lhs": SqlRef {
-                            "column": "healthy",
+                            "columnRefName": RefName {
+                              "name": "healthy",
+                              "quotes": false,
+                            },
                             "keywords": Object {},
-                            "namespace": undefined,
-                            "namespaceQuotes": false,
-                            "quotes": false,
+                            "namespaceRefName": undefined,
                             "spacing": Object {},
-                            "table": undefined,
-                            "tableQuotes": false,
+                            "tableRefName": undefined,
                             "type": "ref",
                           },
                           "not": false,
@@ -2578,14 +2305,14 @@ describe('SqlQuery', () => {
                             "op": ">",
                           },
                           "lhs": SqlRef {
-                            "column": "col",
+                            "columnRefName": RefName {
+                              "name": "col",
+                              "quotes": false,
+                            },
                             "keywords": Object {},
-                            "namespace": undefined,
-                            "namespaceQuotes": false,
-                            "quotes": false,
+                            "namespaceRefName": undefined,
                             "spacing": Object {},
-                            "table": undefined,
-                            "tableQuotes": false,
+                            "tableRefName": undefined,
                             "type": "ref",
                           },
                           "not": false,
@@ -2616,14 +2343,14 @@ describe('SqlQuery', () => {
                       "op": "=",
                     },
                     "lhs": SqlRef {
-                      "column": "otherColumn",
+                      "columnRefName": RefName {
+                        "name": "otherColumn",
+                        "quotes": false,
+                      },
                       "keywords": Object {},
-                      "namespace": undefined,
-                      "namespaceQuotes": false,
-                      "quotes": false,
+                      "namespaceRefName": undefined,
                       "spacing": Object {},
-                      "table": undefined,
-                      "tableQuotes": false,
+                      "tableRefName": undefined,
                       "type": "ref",
                     },
                     "not": false,
@@ -2665,23 +2392,12 @@ describe('SqlQuery', () => {
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
-              SqlAlias {
-                "alias": undefined,
-                "as": undefined,
-                "expression": SqlRef {
-                  "column": "*",
-                  "keywords": Object {},
-                  "namespace": undefined,
-                  "namespaceQuotes": false,
-                  "quotes": false,
-                  "spacing": Object {},
-                  "table": undefined,
-                  "tableQuotes": false,
-                  "type": "ref",
-                },
+              SqlStar {
                 "keywords": Object {},
+                "namespaceRefName": undefined,
                 "spacing": Object {},
-                "type": "alias",
+                "tableRefName": undefined,
+                "type": "star",
               },
             ],
           },
@@ -2715,23 +2431,15 @@ describe('SqlQuery', () => {
             "expressions": SeparatedArray {
               "separators": Array [],
               "values": Array [
-                SqlAlias {
-                  "alias": undefined,
-                  "as": undefined,
-                  "expression": SqlRef {
-                    "column": undefined,
-                    "keywords": Object {},
-                    "namespace": undefined,
-                    "namespaceQuotes": false,
-                    "quotes": false,
-                    "spacing": Object {},
-                    "table": "tbl",
-                    "tableQuotes": false,
-                    "type": "ref",
-                  },
+                SqlTableRef {
                   "keywords": Object {},
+                  "namespaceRefName": undefined,
                   "spacing": Object {},
-                  "type": "alias",
+                  "tableRefName": RefName {
+                    "name": "tbl",
+                    "quotes": false,
+                  },
+                  "type": "tableRef",
                 },
               ],
             },
@@ -2783,23 +2491,16 @@ describe('SqlQuery', () => {
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
-              SqlAlias {
-                "alias": undefined,
-                "as": undefined,
-                "expression": SqlRef {
-                  "column": "col",
-                  "keywords": Object {},
-                  "namespace": undefined,
-                  "namespaceQuotes": false,
+              SqlRef {
+                "columnRefName": RefName {
+                  "name": "col",
                   "quotes": false,
-                  "spacing": Object {},
-                  "table": undefined,
-                  "tableQuotes": false,
-                  "type": "ref",
                 },
                 "keywords": Object {},
+                "namespaceRefName": undefined,
                 "spacing": Object {},
-                "type": "alias",
+                "tableRefName": undefined,
+                "type": "ref",
               },
             ],
           },
@@ -2831,23 +2532,15 @@ describe('SqlQuery', () => {
             "expressions": SeparatedArray {
               "separators": Array [],
               "values": Array [
-                SqlAlias {
-                  "alias": undefined,
-                  "as": undefined,
-                  "expression": SqlRef {
-                    "column": undefined,
-                    "keywords": Object {},
-                    "namespace": undefined,
-                    "namespaceQuotes": false,
-                    "quotes": false,
-                    "spacing": Object {},
-                    "table": "tbl",
-                    "tableQuotes": false,
-                    "type": "ref",
-                  },
+                SqlTableRef {
                   "keywords": Object {},
+                  "namespaceRefName": undefined,
                   "spacing": Object {},
-                  "type": "alias",
+                  "tableRefName": RefName {
+                    "name": "tbl",
+                    "quotes": false,
+                  },
+                  "type": "tableRef",
                 },
               ],
             },
@@ -2874,14 +2567,14 @@ describe('SqlQuery', () => {
                 SqlOrderByExpression {
                   "direction": undefined,
                   "expression": SqlRef {
-                    "column": "col",
+                    "columnRefName": RefName {
+                      "name": "col",
+                      "quotes": false,
+                    },
                     "keywords": Object {},
-                    "namespace": undefined,
-                    "namespaceQuotes": false,
-                    "quotes": false,
+                    "namespaceRefName": undefined,
                     "spacing": Object {},
-                    "table": undefined,
-                    "tableQuotes": false,
+                    "tableRefName": undefined,
                     "type": "ref",
                   },
                   "keywords": Object {},
@@ -2903,23 +2596,16 @@ describe('SqlQuery', () => {
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
-              SqlAlias {
-                "alias": undefined,
-                "as": undefined,
-                "expression": SqlRef {
-                  "column": "col",
-                  "keywords": Object {},
-                  "namespace": undefined,
-                  "namespaceQuotes": false,
+              SqlRef {
+                "columnRefName": RefName {
+                  "name": "col",
                   "quotes": false,
-                  "spacing": Object {},
-                  "table": undefined,
-                  "tableQuotes": false,
-                  "type": "ref",
                 },
                 "keywords": Object {},
+                "namespaceRefName": undefined,
                 "spacing": Object {},
-                "type": "alias",
+                "tableRefName": undefined,
+                "type": "ref",
               },
             ],
           },
@@ -2951,23 +2637,15 @@ describe('SqlQuery', () => {
             "expressions": SeparatedArray {
               "separators": Array [],
               "values": Array [
-                SqlAlias {
-                  "alias": undefined,
-                  "as": undefined,
-                  "expression": SqlRef {
-                    "column": undefined,
-                    "keywords": Object {},
-                    "namespace": undefined,
-                    "namespaceQuotes": false,
-                    "quotes": false,
-                    "spacing": Object {},
-                    "table": "tbl",
-                    "tableQuotes": false,
-                    "type": "ref",
-                  },
+                SqlTableRef {
                   "keywords": Object {},
+                  "namespaceRefName": undefined,
                   "spacing": Object {},
-                  "type": "alias",
+                  "tableRefName": RefName {
+                    "name": "tbl",
+                    "quotes": false,
+                  },
+                  "type": "tableRef",
                 },
               ],
             },
@@ -3023,23 +2701,16 @@ describe('SqlQuery', () => {
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
-              SqlAlias {
-                "alias": undefined,
-                "as": undefined,
-                "expression": SqlRef {
-                  "column": "col",
-                  "keywords": Object {},
-                  "namespace": undefined,
-                  "namespaceQuotes": false,
+              SqlRef {
+                "columnRefName": RefName {
+                  "name": "col",
                   "quotes": false,
-                  "spacing": Object {},
-                  "table": undefined,
-                  "tableQuotes": false,
-                  "type": "ref",
                 },
                 "keywords": Object {},
+                "namespaceRefName": undefined,
                 "spacing": Object {},
-                "type": "alias",
+                "tableRefName": undefined,
+                "type": "ref",
               },
             ],
           },
@@ -3071,23 +2742,15 @@ describe('SqlQuery', () => {
             "expressions": SeparatedArray {
               "separators": Array [],
               "values": Array [
-                SqlAlias {
-                  "alias": undefined,
-                  "as": undefined,
-                  "expression": SqlRef {
-                    "column": undefined,
-                    "keywords": Object {},
-                    "namespace": undefined,
-                    "namespaceQuotes": false,
-                    "quotes": false,
-                    "spacing": Object {},
-                    "table": "tbl",
-                    "tableQuotes": false,
-                    "type": "ref",
-                  },
+                SqlTableRef {
                   "keywords": Object {},
+                  "namespaceRefName": undefined,
                   "spacing": Object {},
-                  "type": "alias",
+                  "tableRefName": RefName {
+                    "name": "tbl",
+                    "quotes": false,
+                  },
+                  "type": "tableRef",
                 },
               ],
             },
@@ -3114,14 +2777,14 @@ describe('SqlQuery', () => {
                 SqlOrderByExpression {
                   "direction": "DESC",
                   "expression": SqlRef {
-                    "column": "col",
+                    "columnRefName": RefName {
+                      "name": "col",
+                      "quotes": false,
+                    },
                     "keywords": Object {},
-                    "namespace": undefined,
-                    "namespaceQuotes": false,
-                    "quotes": false,
+                    "namespaceRefName": undefined,
                     "spacing": Object {},
-                    "table": undefined,
-                    "tableQuotes": false,
+                    "tableRefName": undefined,
                     "type": "ref",
                   },
                   "keywords": Object {
@@ -3153,41 +2816,27 @@ describe('SqlQuery', () => {
               },
             ],
             "values": Array [
-              SqlAlias {
-                "alias": undefined,
-                "as": undefined,
-                "expression": SqlRef {
-                  "column": "col",
-                  "keywords": Object {},
-                  "namespace": undefined,
-                  "namespaceQuotes": false,
+              SqlRef {
+                "columnRefName": RefName {
+                  "name": "col",
                   "quotes": false,
-                  "spacing": Object {},
-                  "table": undefined,
-                  "tableQuotes": false,
-                  "type": "ref",
                 },
                 "keywords": Object {},
+                "namespaceRefName": undefined,
                 "spacing": Object {},
-                "type": "alias",
+                "tableRefName": undefined,
+                "type": "ref",
               },
-              SqlAlias {
-                "alias": undefined,
-                "as": undefined,
-                "expression": SqlRef {
-                  "column": "colTwo",
-                  "keywords": Object {},
-                  "namespace": undefined,
-                  "namespaceQuotes": false,
+              SqlRef {
+                "columnRefName": RefName {
+                  "name": "colTwo",
                   "quotes": false,
-                  "spacing": Object {},
-                  "table": undefined,
-                  "tableQuotes": false,
-                  "type": "ref",
                 },
                 "keywords": Object {},
+                "namespaceRefName": undefined,
                 "spacing": Object {},
-                "type": "alias",
+                "tableRefName": undefined,
+                "type": "ref",
               },
             ],
           },
@@ -3219,23 +2868,15 @@ describe('SqlQuery', () => {
             "expressions": SeparatedArray {
               "separators": Array [],
               "values": Array [
-                SqlAlias {
-                  "alias": undefined,
-                  "as": undefined,
-                  "expression": SqlRef {
-                    "column": undefined,
-                    "keywords": Object {},
-                    "namespace": undefined,
-                    "namespaceQuotes": false,
-                    "quotes": false,
-                    "spacing": Object {},
-                    "table": "tbl",
-                    "tableQuotes": false,
-                    "type": "ref",
-                  },
+                SqlTableRef {
                   "keywords": Object {},
+                  "namespaceRefName": undefined,
                   "spacing": Object {},
-                  "type": "alias",
+                  "tableRefName": RefName {
+                    "name": "tbl",
+                    "quotes": false,
+                  },
+                  "type": "tableRef",
                 },
               ],
             },
@@ -3285,14 +2926,14 @@ describe('SqlQuery', () => {
                 SqlOrderByExpression {
                   "direction": undefined,
                   "expression": SqlRef {
-                    "column": "col",
+                    "columnRefName": RefName {
+                      "name": "col",
+                      "quotes": false,
+                    },
                     "keywords": Object {},
-                    "namespace": undefined,
-                    "namespaceQuotes": false,
-                    "quotes": false,
+                    "namespaceRefName": undefined,
                     "spacing": Object {},
-                    "table": undefined,
-                    "tableQuotes": false,
+                    "tableRefName": undefined,
                     "type": "ref",
                   },
                   "keywords": Object {},
@@ -3314,23 +2955,16 @@ describe('SqlQuery', () => {
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
-              SqlAlias {
-                "alias": undefined,
-                "as": undefined,
-                "expression": SqlRef {
-                  "column": "col",
-                  "keywords": Object {},
-                  "namespace": undefined,
-                  "namespaceQuotes": false,
+              SqlRef {
+                "columnRefName": RefName {
+                  "name": "col",
                   "quotes": false,
-                  "spacing": Object {},
-                  "table": undefined,
-                  "tableQuotes": false,
-                  "type": "ref",
                 },
                 "keywords": Object {},
+                "namespaceRefName": undefined,
                 "spacing": Object {},
-                "type": "alias",
+                "tableRefName": undefined,
+                "type": "ref",
               },
             ],
           },
@@ -3362,23 +2996,15 @@ describe('SqlQuery', () => {
             "expressions": SeparatedArray {
               "separators": Array [],
               "values": Array [
-                SqlAlias {
-                  "alias": undefined,
-                  "as": undefined,
-                  "expression": SqlRef {
-                    "column": undefined,
-                    "keywords": Object {},
-                    "namespace": undefined,
-                    "namespaceQuotes": false,
-                    "quotes": false,
-                    "spacing": Object {},
-                    "table": "tbl",
-                    "tableQuotes": false,
-                    "type": "ref",
-                  },
+                SqlTableRef {
                   "keywords": Object {},
+                  "namespaceRefName": undefined,
                   "spacing": Object {},
-                  "type": "alias",
+                  "tableRefName": RefName {
+                    "name": "tbl",
+                    "quotes": false,
+                  },
+                  "type": "tableRef",
                 },
               ],
             },
@@ -3428,14 +3054,14 @@ describe('SqlQuery', () => {
                 SqlOrderByExpression {
                   "direction": "DESC",
                   "expression": SqlRef {
-                    "column": "col",
+                    "columnRefName": RefName {
+                      "name": "col",
+                      "quotes": false,
+                    },
                     "keywords": Object {},
-                    "namespace": undefined,
-                    "namespaceQuotes": false,
-                    "quotes": false,
+                    "namespaceRefName": undefined,
                     "spacing": Object {},
-                    "table": undefined,
-                    "tableQuotes": false,
+                    "tableRefName": undefined,
                     "type": "ref",
                   },
                   "keywords": Object {
@@ -3467,41 +3093,27 @@ describe('SqlQuery', () => {
               },
             ],
             "values": Array [
-              SqlAlias {
-                "alias": undefined,
-                "as": undefined,
-                "expression": SqlRef {
-                  "column": "col",
-                  "keywords": Object {},
-                  "namespace": undefined,
-                  "namespaceQuotes": false,
+              SqlRef {
+                "columnRefName": RefName {
+                  "name": "col",
                   "quotes": false,
-                  "spacing": Object {},
-                  "table": undefined,
-                  "tableQuotes": false,
-                  "type": "ref",
                 },
                 "keywords": Object {},
+                "namespaceRefName": undefined,
                 "spacing": Object {},
-                "type": "alias",
+                "tableRefName": undefined,
+                "type": "ref",
               },
-              SqlAlias {
-                "alias": undefined,
-                "as": undefined,
-                "expression": SqlRef {
-                  "column": "colTwo",
-                  "keywords": Object {},
-                  "namespace": undefined,
-                  "namespaceQuotes": false,
+              SqlRef {
+                "columnRefName": RefName {
+                  "name": "colTwo",
                   "quotes": false,
-                  "spacing": Object {},
-                  "table": undefined,
-                  "tableQuotes": false,
-                  "type": "ref",
                 },
                 "keywords": Object {},
+                "namespaceRefName": undefined,
                 "spacing": Object {},
-                "type": "alias",
+                "tableRefName": undefined,
+                "type": "ref",
               },
             ],
           },
@@ -3535,23 +3147,15 @@ describe('SqlQuery', () => {
             "expressions": SeparatedArray {
               "separators": Array [],
               "values": Array [
-                SqlAlias {
-                  "alias": undefined,
-                  "as": undefined,
-                  "expression": SqlRef {
-                    "column": undefined,
-                    "keywords": Object {},
-                    "namespace": undefined,
-                    "namespaceQuotes": false,
-                    "quotes": false,
-                    "spacing": Object {},
-                    "table": "tbl",
-                    "tableQuotes": false,
-                    "type": "ref",
-                  },
+                SqlTableRef {
                   "keywords": Object {},
+                  "namespaceRefName": undefined,
                   "spacing": Object {},
-                  "type": "alias",
+                  "tableRefName": RefName {
+                    "name": "tbl",
+                    "quotes": false,
+                  },
+                  "type": "tableRef",
                 },
               ],
             },
@@ -3590,23 +3194,12 @@ describe('SqlQuery', () => {
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
-              SqlAlias {
-                "alias": undefined,
-                "as": undefined,
-                "expression": SqlRef {
-                  "column": "*",
-                  "keywords": Object {},
-                  "namespace": undefined,
-                  "namespaceQuotes": false,
-                  "quotes": false,
-                  "spacing": Object {},
-                  "table": undefined,
-                  "tableQuotes": false,
-                  "type": "ref",
-                },
+              SqlStar {
                 "keywords": Object {},
+                "namespaceRefName": undefined,
                 "spacing": Object {},
-                "type": "alias",
+                "tableRefName": undefined,
+                "type": "star",
               },
             ],
           },
@@ -3640,23 +3233,15 @@ describe('SqlQuery', () => {
             "expressions": SeparatedArray {
               "separators": Array [],
               "values": Array [
-                SqlAlias {
-                  "alias": undefined,
-                  "as": undefined,
-                  "expression": SqlRef {
-                    "column": undefined,
-                    "keywords": Object {},
-                    "namespace": undefined,
-                    "namespaceQuotes": false,
-                    "quotes": false,
-                    "spacing": Object {},
-                    "table": "tbl",
-                    "tableQuotes": false,
-                    "type": "ref",
-                  },
+                SqlTableRef {
                   "keywords": Object {},
+                  "namespaceRefName": undefined,
                   "spacing": Object {},
-                  "type": "alias",
+                  "tableRefName": RefName {
+                    "name": "tbl",
+                    "quotes": false,
+                  },
+                  "type": "tableRef",
                 },
               ],
             },
@@ -3681,23 +3266,12 @@ describe('SqlQuery', () => {
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
-              SqlAlias {
-                "alias": undefined,
-                "as": undefined,
-                "expression": SqlRef {
-                  "column": "*",
-                  "keywords": Object {},
-                  "namespace": undefined,
-                  "namespaceQuotes": false,
-                  "quotes": false,
-                  "spacing": Object {},
-                  "table": undefined,
-                  "tableQuotes": false,
-                  "type": "ref",
-                },
+              SqlStar {
                 "keywords": Object {},
+                "namespaceRefName": undefined,
                 "spacing": Object {},
-                "type": "alias",
+                "tableRefName": undefined,
+                "type": "star",
               },
             ],
           },
@@ -3717,23 +3291,15 @@ describe('SqlQuery', () => {
               "expressions": SeparatedArray {
                 "separators": Array [],
                 "values": Array [
-                  SqlAlias {
-                    "alias": undefined,
-                    "as": undefined,
-                    "expression": SqlRef {
-                      "column": undefined,
-                      "keywords": Object {},
-                      "namespace": undefined,
-                      "namespaceQuotes": false,
-                      "quotes": false,
-                      "spacing": Object {},
-                      "table": "otherTable",
-                      "tableQuotes": false,
-                      "type": "ref",
-                    },
+                  SqlTableRef {
                     "keywords": Object {},
+                    "namespaceRefName": undefined,
                     "spacing": Object {},
-                    "type": "alias",
+                    "tableRefName": RefName {
+                      "name": "otherTable",
+                      "quotes": false,
+                    },
+                    "type": "tableRef",
                   },
                 ],
               },
@@ -3757,23 +3323,12 @@ describe('SqlQuery', () => {
             "selectExpressions": SeparatedArray {
               "separators": Array [],
               "values": Array [
-                SqlAlias {
-                  "alias": undefined,
-                  "as": undefined,
-                  "expression": SqlRef {
-                    "column": "*",
-                    "keywords": Object {},
-                    "namespace": undefined,
-                    "namespaceQuotes": false,
-                    "quotes": false,
-                    "spacing": Object {},
-                    "table": undefined,
-                    "tableQuotes": false,
-                    "type": "ref",
-                  },
+                SqlStar {
                   "keywords": Object {},
+                  "namespaceRefName": undefined,
                   "spacing": Object {},
-                  "type": "alias",
+                  "tableRefName": undefined,
+                  "type": "star",
                 },
               ],
             },
@@ -3809,23 +3364,15 @@ describe('SqlQuery', () => {
             "expressions": SeparatedArray {
               "separators": Array [],
               "values": Array [
-                SqlAlias {
-                  "alias": undefined,
-                  "as": undefined,
-                  "expression": SqlRef {
-                    "column": undefined,
-                    "keywords": Object {},
-                    "namespace": undefined,
-                    "namespaceQuotes": false,
-                    "quotes": false,
-                    "spacing": Object {},
-                    "table": "tbl",
-                    "tableQuotes": false,
-                    "type": "ref",
-                  },
+                SqlTableRef {
                   "keywords": Object {},
+                  "namespaceRefName": undefined,
                   "spacing": Object {},
-                  "type": "alias",
+                  "tableRefName": RefName {
+                    "name": "tbl",
+                    "quotes": false,
+                  },
+                  "type": "tableRef",
                 },
               ],
             },
@@ -3845,27 +3392,27 @@ describe('SqlQuery', () => {
                       "op": "=",
                     },
                     "lhs": SqlRef {
-                      "column": "col",
+                      "columnRefName": RefName {
+                        "name": "col",
+                        "quotes": false,
+                      },
                       "keywords": Object {},
-                      "namespace": undefined,
-                      "namespaceQuotes": false,
-                      "quotes": false,
+                      "namespaceRefName": undefined,
                       "spacing": Object {},
-                      "table": undefined,
-                      "tableQuotes": false,
+                      "tableRefName": undefined,
                       "type": "ref",
                     },
                     "not": false,
                     "op": "=",
                     "rhs": SqlRef {
-                      "column": "col",
+                      "columnRefName": RefName {
+                        "name": "col",
+                        "quotes": false,
+                      },
                       "keywords": Object {},
-                      "namespace": undefined,
-                      "namespaceQuotes": false,
-                      "quotes": false,
+                      "namespaceRefName": undefined,
                       "spacing": Object {},
-                      "table": undefined,
-                      "tableQuotes": false,
+                      "tableRefName": undefined,
                       "type": "ref",
                     },
                     "spacing": Object {
@@ -3880,23 +3427,15 @@ describe('SqlQuery', () => {
                     "postOn": " ",
                     "preOn": " ",
                   },
-                  "table": SqlAlias {
-                    "alias": undefined,
-                    "as": undefined,
-                    "expression": SqlRef {
-                      "column": undefined,
-                      "keywords": Object {},
-                      "namespace": undefined,
-                      "namespaceQuotes": false,
-                      "quotes": false,
-                      "spacing": Object {},
-                      "table": "anotherTable",
-                      "tableQuotes": false,
-                      "type": "ref",
-                    },
+                  "table": SqlTableRef {
                     "keywords": Object {},
+                    "namespaceRefName": undefined,
                     "spacing": Object {},
-                    "type": "alias",
+                    "tableRefName": RefName {
+                      "name": "anotherTable",
+                      "quotes": false,
+                    },
+                    "type": "tableRef",
                   },
                   "type": "joinPart",
                 },
@@ -3922,23 +3461,12 @@ describe('SqlQuery', () => {
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
-              SqlAlias {
-                "alias": undefined,
-                "as": undefined,
-                "expression": SqlRef {
-                  "column": "*",
-                  "keywords": Object {},
-                  "namespace": undefined,
-                  "namespaceQuotes": false,
-                  "quotes": false,
-                  "spacing": Object {},
-                  "table": undefined,
-                  "tableQuotes": false,
-                  "type": "ref",
-                },
+              SqlStar {
                 "keywords": Object {},
+                "namespaceRefName": undefined,
                 "spacing": Object {},
-                "type": "alias",
+                "tableRefName": undefined,
+                "type": "star",
               },
             ],
           },
@@ -3969,23 +3497,15 @@ describe('SqlQuery', () => {
             "expressions": SeparatedArray {
               "separators": Array [],
               "values": Array [
-                SqlAlias {
-                  "alias": undefined,
-                  "as": undefined,
-                  "expression": SqlRef {
-                    "column": undefined,
-                    "keywords": Object {},
-                    "namespace": undefined,
-                    "namespaceQuotes": false,
-                    "quotes": false,
-                    "spacing": Object {},
-                    "table": "tbl",
-                    "tableQuotes": false,
-                    "type": "ref",
-                  },
+                SqlTableRef {
                   "keywords": Object {},
+                  "namespaceRefName": undefined,
                   "spacing": Object {},
-                  "type": "alias",
+                  "tableRefName": RefName {
+                    "name": "tbl",
+                    "quotes": false,
+                  },
+                  "type": "tableRef",
                 },
               ],
             },
@@ -4005,27 +3525,27 @@ describe('SqlQuery', () => {
                       "op": "=",
                     },
                     "lhs": SqlRef {
-                      "column": "col",
+                      "columnRefName": RefName {
+                        "name": "col",
+                        "quotes": false,
+                      },
                       "keywords": Object {},
-                      "namespace": undefined,
-                      "namespaceQuotes": false,
-                      "quotes": false,
+                      "namespaceRefName": undefined,
                       "spacing": Object {},
-                      "table": undefined,
-                      "tableQuotes": false,
+                      "tableRefName": undefined,
                       "type": "ref",
                     },
                     "not": false,
                     "op": "=",
                     "rhs": SqlRef {
-                      "column": "col",
+                      "columnRefName": RefName {
+                        "name": "col",
+                        "quotes": false,
+                      },
                       "keywords": Object {},
-                      "namespace": undefined,
-                      "namespaceQuotes": false,
-                      "quotes": false,
+                      "namespaceRefName": undefined,
                       "spacing": Object {},
-                      "table": undefined,
-                      "tableQuotes": false,
+                      "tableRefName": undefined,
                       "type": "ref",
                     },
                     "spacing": Object {
@@ -4040,23 +3560,15 @@ describe('SqlQuery', () => {
                     "postOn": " ",
                     "preOn": " ",
                   },
-                  "table": SqlAlias {
-                    "alias": undefined,
-                    "as": undefined,
-                    "expression": SqlRef {
-                      "column": undefined,
-                      "keywords": Object {},
-                      "namespace": undefined,
-                      "namespaceQuotes": false,
-                      "quotes": false,
-                      "spacing": Object {},
-                      "table": "anotherTable",
-                      "tableQuotes": false,
-                      "type": "ref",
-                    },
+                  "table": SqlTableRef {
                     "keywords": Object {},
+                    "namespaceRefName": undefined,
                     "spacing": Object {},
-                    "type": "alias",
+                    "tableRefName": RefName {
+                      "name": "anotherTable",
+                      "quotes": false,
+                    },
+                    "type": "tableRef",
                   },
                   "type": "joinPart",
                 },
@@ -4082,23 +3594,12 @@ describe('SqlQuery', () => {
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
-              SqlAlias {
-                "alias": undefined,
-                "as": undefined,
-                "expression": SqlRef {
-                  "column": "*",
-                  "keywords": Object {},
-                  "namespace": undefined,
-                  "namespaceQuotes": false,
-                  "quotes": false,
-                  "spacing": Object {},
-                  "table": undefined,
-                  "tableQuotes": false,
-                  "type": "ref",
-                },
+              SqlStar {
                 "keywords": Object {},
+                "namespaceRefName": undefined,
                 "spacing": Object {},
-                "type": "alias",
+                "tableRefName": undefined,
+                "type": "star",
               },
             ],
           },
@@ -4129,23 +3630,15 @@ describe('SqlQuery', () => {
             "expressions": SeparatedArray {
               "separators": Array [],
               "values": Array [
-                SqlAlias {
-                  "alias": undefined,
-                  "as": undefined,
-                  "expression": SqlRef {
-                    "column": undefined,
-                    "keywords": Object {},
-                    "namespace": undefined,
-                    "namespaceQuotes": false,
-                    "quotes": false,
-                    "spacing": Object {},
-                    "table": "tbl",
-                    "tableQuotes": false,
-                    "type": "ref",
-                  },
+                SqlTableRef {
                   "keywords": Object {},
+                  "namespaceRefName": undefined,
                   "spacing": Object {},
-                  "type": "alias",
+                  "tableRefName": RefName {
+                    "name": "tbl",
+                    "quotes": false,
+                  },
+                  "type": "tableRef",
                 },
               ],
             },
@@ -4165,27 +3658,27 @@ describe('SqlQuery', () => {
                       "op": "=",
                     },
                     "lhs": SqlRef {
-                      "column": "col",
+                      "columnRefName": RefName {
+                        "name": "col",
+                        "quotes": false,
+                      },
                       "keywords": Object {},
-                      "namespace": undefined,
-                      "namespaceQuotes": false,
-                      "quotes": false,
+                      "namespaceRefName": undefined,
                       "spacing": Object {},
-                      "table": undefined,
-                      "tableQuotes": false,
+                      "tableRefName": undefined,
                       "type": "ref",
                     },
                     "not": false,
                     "op": "=",
                     "rhs": SqlRef {
-                      "column": "col",
+                      "columnRefName": RefName {
+                        "name": "col",
+                        "quotes": false,
+                      },
                       "keywords": Object {},
-                      "namespace": undefined,
-                      "namespaceQuotes": false,
-                      "quotes": false,
+                      "namespaceRefName": undefined,
                       "spacing": Object {},
-                      "table": undefined,
-                      "tableQuotes": false,
+                      "tableRefName": undefined,
                       "type": "ref",
                     },
                     "spacing": Object {
@@ -4200,23 +3693,15 @@ describe('SqlQuery', () => {
                     "postOn": " ",
                     "preOn": " ",
                   },
-                  "table": SqlAlias {
-                    "alias": undefined,
-                    "as": undefined,
-                    "expression": SqlRef {
-                      "column": undefined,
-                      "keywords": Object {},
-                      "namespace": undefined,
-                      "namespaceQuotes": false,
-                      "quotes": false,
-                      "spacing": Object {},
-                      "table": "anotherTable",
-                      "tableQuotes": false,
-                      "type": "ref",
-                    },
+                  "table": SqlTableRef {
                     "keywords": Object {},
+                    "namespaceRefName": undefined,
                     "spacing": Object {},
-                    "type": "alias",
+                    "tableRefName": RefName {
+                      "name": "anotherTable",
+                      "quotes": false,
+                    },
+                    "type": "tableRef",
                   },
                   "type": "joinPart",
                 },
@@ -4242,23 +3727,12 @@ describe('SqlQuery', () => {
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
-              SqlAlias {
-                "alias": undefined,
-                "as": undefined,
-                "expression": SqlRef {
-                  "column": "*",
-                  "keywords": Object {},
-                  "namespace": undefined,
-                  "namespaceQuotes": false,
-                  "quotes": false,
-                  "spacing": Object {},
-                  "table": undefined,
-                  "tableQuotes": false,
-                  "type": "ref",
-                },
+              SqlStar {
                 "keywords": Object {},
+                "namespaceRefName": undefined,
                 "spacing": Object {},
-                "type": "alias",
+                "tableRefName": undefined,
+                "type": "star",
               },
             ],
           },
@@ -4289,23 +3763,15 @@ describe('SqlQuery', () => {
             "expressions": SeparatedArray {
               "separators": Array [],
               "values": Array [
-                SqlAlias {
-                  "alias": undefined,
-                  "as": undefined,
-                  "expression": SqlRef {
-                    "column": undefined,
-                    "keywords": Object {},
-                    "namespace": undefined,
-                    "namespaceQuotes": false,
-                    "quotes": false,
-                    "spacing": Object {},
-                    "table": "tbl",
-                    "tableQuotes": false,
-                    "type": "ref",
-                  },
+                SqlTableRef {
                   "keywords": Object {},
+                  "namespaceRefName": undefined,
                   "spacing": Object {},
-                  "type": "alias",
+                  "tableRefName": RefName {
+                    "name": "tbl",
+                    "quotes": false,
+                  },
+                  "type": "tableRef",
                 },
               ],
             },
@@ -4325,27 +3791,27 @@ describe('SqlQuery', () => {
                       "op": "=",
                     },
                     "lhs": SqlRef {
-                      "column": "col",
+                      "columnRefName": RefName {
+                        "name": "col",
+                        "quotes": false,
+                      },
                       "keywords": Object {},
-                      "namespace": undefined,
-                      "namespaceQuotes": false,
-                      "quotes": false,
+                      "namespaceRefName": undefined,
                       "spacing": Object {},
-                      "table": undefined,
-                      "tableQuotes": false,
+                      "tableRefName": undefined,
                       "type": "ref",
                     },
                     "not": false,
                     "op": "=",
                     "rhs": SqlRef {
-                      "column": "col",
+                      "columnRefName": RefName {
+                        "name": "col",
+                        "quotes": false,
+                      },
                       "keywords": Object {},
-                      "namespace": undefined,
-                      "namespaceQuotes": false,
-                      "quotes": false,
+                      "namespaceRefName": undefined,
                       "spacing": Object {},
-                      "table": undefined,
-                      "tableQuotes": false,
+                      "tableRefName": undefined,
                       "type": "ref",
                     },
                     "spacing": Object {
@@ -4360,23 +3826,15 @@ describe('SqlQuery', () => {
                     "postOn": " ",
                     "preOn": " ",
                   },
-                  "table": SqlAlias {
-                    "alias": undefined,
-                    "as": undefined,
-                    "expression": SqlRef {
-                      "column": undefined,
-                      "keywords": Object {},
-                      "namespace": undefined,
-                      "namespaceQuotes": false,
-                      "quotes": false,
-                      "spacing": Object {},
-                      "table": "anotherTable",
-                      "tableQuotes": false,
-                      "type": "ref",
-                    },
+                  "table": SqlTableRef {
                     "keywords": Object {},
+                    "namespaceRefName": undefined,
                     "spacing": Object {},
-                    "type": "alias",
+                    "tableRefName": RefName {
+                      "name": "anotherTable",
+                      "quotes": false,
+                    },
+                    "type": "tableRef",
                   },
                   "type": "joinPart",
                 },
@@ -4402,23 +3860,12 @@ describe('SqlQuery', () => {
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
-              SqlAlias {
-                "alias": undefined,
-                "as": undefined,
-                "expression": SqlRef {
-                  "column": "*",
-                  "keywords": Object {},
-                  "namespace": undefined,
-                  "namespaceQuotes": false,
-                  "quotes": false,
-                  "spacing": Object {},
-                  "table": undefined,
-                  "tableQuotes": false,
-                  "type": "ref",
-                },
+              SqlStar {
                 "keywords": Object {},
+                "namespaceRefName": undefined,
                 "spacing": Object {},
-                "type": "alias",
+                "tableRefName": undefined,
+                "type": "star",
               },
             ],
           },
@@ -4449,23 +3896,15 @@ describe('SqlQuery', () => {
             "expressions": SeparatedArray {
               "separators": Array [],
               "values": Array [
-                SqlAlias {
-                  "alias": undefined,
-                  "as": undefined,
-                  "expression": SqlRef {
-                    "column": undefined,
-                    "keywords": Object {},
-                    "namespace": undefined,
-                    "namespaceQuotes": false,
-                    "quotes": false,
-                    "spacing": Object {},
-                    "table": "tbl",
-                    "tableQuotes": false,
-                    "type": "ref",
-                  },
+                SqlTableRef {
                   "keywords": Object {},
+                  "namespaceRefName": undefined,
                   "spacing": Object {},
-                  "type": "alias",
+                  "tableRefName": RefName {
+                    "name": "tbl",
+                    "quotes": false,
+                  },
+                  "type": "tableRef",
                 },
               ],
             },
@@ -4485,27 +3924,27 @@ describe('SqlQuery', () => {
                       "op": "=",
                     },
                     "lhs": SqlRef {
-                      "column": "col",
+                      "columnRefName": RefName {
+                        "name": "col",
+                        "quotes": false,
+                      },
                       "keywords": Object {},
-                      "namespace": undefined,
-                      "namespaceQuotes": false,
-                      "quotes": false,
+                      "namespaceRefName": undefined,
                       "spacing": Object {},
-                      "table": undefined,
-                      "tableQuotes": false,
+                      "tableRefName": undefined,
                       "type": "ref",
                     },
                     "not": false,
                     "op": "=",
                     "rhs": SqlRef {
-                      "column": "col",
+                      "columnRefName": RefName {
+                        "name": "col",
+                        "quotes": false,
+                      },
                       "keywords": Object {},
-                      "namespace": undefined,
-                      "namespaceQuotes": false,
-                      "quotes": false,
+                      "namespaceRefName": undefined,
                       "spacing": Object {},
-                      "table": undefined,
-                      "tableQuotes": false,
+                      "tableRefName": undefined,
                       "type": "ref",
                     },
                     "spacing": Object {
@@ -4520,23 +3959,15 @@ describe('SqlQuery', () => {
                     "postOn": " ",
                     "preOn": " ",
                   },
-                  "table": SqlAlias {
-                    "alias": undefined,
-                    "as": undefined,
-                    "expression": SqlRef {
-                      "column": undefined,
-                      "keywords": Object {},
-                      "namespace": undefined,
-                      "namespaceQuotes": false,
-                      "quotes": false,
-                      "spacing": Object {},
-                      "table": "anotherTable",
-                      "tableQuotes": false,
-                      "type": "ref",
-                    },
+                  "table": SqlTableRef {
                     "keywords": Object {},
+                    "namespaceRefName": undefined,
                     "spacing": Object {},
-                    "type": "alias",
+                    "tableRefName": RefName {
+                      "name": "anotherTable",
+                      "quotes": false,
+                    },
+                    "type": "tableRef",
                   },
                   "type": "joinPart",
                 },
@@ -4562,23 +3993,12 @@ describe('SqlQuery', () => {
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
-              SqlAlias {
-                "alias": undefined,
-                "as": undefined,
-                "expression": SqlRef {
-                  "column": "*",
-                  "keywords": Object {},
-                  "namespace": undefined,
-                  "namespaceQuotes": false,
-                  "quotes": false,
-                  "spacing": Object {},
-                  "table": undefined,
-                  "tableQuotes": false,
-                  "type": "ref",
-                },
+              SqlStar {
                 "keywords": Object {},
+                "namespaceRefName": undefined,
                 "spacing": Object {},
-                "type": "alias",
+                "tableRefName": undefined,
+                "type": "star",
               },
             ],
           },
@@ -4614,23 +4034,15 @@ describe('SqlQuery', () => {
             "expressions": SeparatedArray {
               "separators": Array [],
               "values": Array [
-                SqlAlias {
-                  "alias": undefined,
-                  "as": undefined,
-                  "expression": SqlRef {
-                    "column": undefined,
-                    "keywords": Object {},
-                    "namespace": undefined,
-                    "namespaceQuotes": false,
-                    "quotes": false,
-                    "spacing": Object {},
-                    "table": "tbl",
-                    "tableQuotes": false,
-                    "type": "ref",
-                  },
+                SqlTableRef {
                   "keywords": Object {},
+                  "namespaceRefName": undefined,
                   "spacing": Object {},
-                  "type": "alias",
+                  "tableRefName": RefName {
+                    "name": "tbl",
+                    "quotes": false,
+                  },
+                  "type": "tableRef",
                 },
               ],
             },
@@ -4654,23 +4066,16 @@ describe('SqlQuery', () => {
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
-              SqlAlias {
-                "alias": undefined,
-                "as": undefined,
-                "expression": SqlRef {
-                  "column": "col",
-                  "keywords": Object {},
-                  "namespace": undefined,
-                  "namespaceQuotes": false,
+              SqlRef {
+                "columnRefName": RefName {
+                  "name": "col",
                   "quotes": false,
-                  "spacing": Object {},
-                  "table": undefined,
-                  "tableQuotes": false,
-                  "type": "ref",
                 },
                 "keywords": Object {},
+                "namespaceRefName": undefined,
                 "spacing": Object {},
-                "type": "alias",
+                "tableRefName": undefined,
+                "type": "ref",
               },
             ],
           },
@@ -4802,23 +4207,15 @@ describe('SqlQuery', () => {
             "expressions": SeparatedArray {
               "separators": Array [],
               "values": Array [
-                SqlAlias {
-                  "alias": undefined,
-                  "as": undefined,
-                  "expression": SqlRef {
-                    "column": undefined,
-                    "keywords": Object {},
-                    "namespace": undefined,
-                    "namespaceQuotes": false,
-                    "quotes": false,
-                    "spacing": Object {},
-                    "table": "wiki",
-                    "tableQuotes": true,
-                    "type": "ref",
-                  },
+                SqlTableRef {
                   "keywords": Object {},
+                  "namespaceRefName": undefined,
                   "spacing": Object {},
-                  "type": "alias",
+                  "tableRefName": RefName {
+                    "name": "wiki",
+                    "quotes": true,
+                  },
+                  "type": "tableRef",
                 },
               ],
             },
@@ -4836,14 +4233,14 @@ describe('SqlQuery', () => {
               "separators": Array [],
               "values": Array [
                 SqlRef {
-                  "column": "channel",
+                  "columnRefName": RefName {
+                    "name": "channel",
+                    "quotes": true,
+                  },
                   "keywords": Object {},
-                  "namespace": undefined,
-                  "namespaceQuotes": false,
-                  "quotes": true,
+                  "namespaceRefName": undefined,
                   "spacing": Object {},
-                  "table": undefined,
-                  "tableQuotes": false,
+                  "tableRefName": undefined,
                   "type": "ref",
                 },
               ],
@@ -4871,14 +4268,14 @@ describe('SqlQuery', () => {
                 SqlOrderByExpression {
                   "direction": "DESC",
                   "expression": SqlRef {
-                    "column": "Count",
+                    "columnRefName": RefName {
+                      "name": "Count",
+                      "quotes": true,
+                    },
                     "keywords": Object {},
-                    "namespace": undefined,
-                    "namespaceQuotes": false,
-                    "quotes": true,
+                    "namespaceRefName": undefined,
                     "spacing": Object {},
-                    "table": undefined,
-                    "tableQuotes": false,
+                    "tableRefName": undefined,
                     "type": "ref",
                   },
                   "keywords": Object {
@@ -4915,51 +4312,32 @@ describe('SqlQuery', () => {
               },
             ],
             "values": Array [
-              SqlAlias {
-                "alias": undefined,
-                "as": undefined,
-                "expression": SqlRef {
-                  "column": "channel",
-                  "keywords": Object {},
-                  "namespace": undefined,
-                  "namespaceQuotes": false,
+              SqlRef {
+                "columnRefName": RefName {
+                  "name": "channel",
                   "quotes": true,
-                  "spacing": Object {},
-                  "table": undefined,
-                  "tableQuotes": false,
-                  "type": "ref",
                 },
                 "keywords": Object {},
+                "namespaceRefName": undefined,
                 "spacing": Object {},
-                "type": "alias",
+                "tableRefName": undefined,
+                "type": "ref",
               },
               SqlAlias {
-                "alias": SqlRef {
-                  "column": "Count",
-                  "keywords": Object {},
-                  "namespace": undefined,
-                  "namespaceQuotes": false,
+                "alias": RefName {
+                  "name": "Count",
                   "quotes": true,
-                  "spacing": Object {},
-                  "table": undefined,
-                  "tableQuotes": false,
-                  "type": "ref",
                 },
-                "as": true,
                 "expression": SqlFunction {
                   "args": SeparatedArray {
                     "separators": Array [],
                     "values": Array [
-                      SqlRef {
-                        "column": "*",
+                      SqlStar {
                         "keywords": Object {},
-                        "namespace": undefined,
-                        "namespaceQuotes": false,
-                        "quotes": false,
+                        "namespaceRefName": undefined,
                         "spacing": Object {},
-                        "table": undefined,
-                        "tableQuotes": false,
-                        "type": "ref",
+                        "tableRefName": undefined,
+                        "type": "star",
                       },
                     ],
                   },
@@ -4987,31 +4365,23 @@ describe('SqlQuery', () => {
                 "type": "alias",
               },
               SqlAlias {
-                "alias": SqlRef {
-                  "column": "dist_cityName",
-                  "keywords": Object {},
-                  "namespace": undefined,
-                  "namespaceQuotes": false,
+                "alias": RefName {
+                  "name": "dist_cityName",
                   "quotes": true,
-                  "spacing": Object {},
-                  "table": undefined,
-                  "tableQuotes": false,
-                  "type": "ref",
                 },
-                "as": true,
                 "expression": SqlFunction {
                   "args": SeparatedArray {
                     "separators": Array [],
                     "values": Array [
                       SqlRef {
-                        "column": "cityName",
+                        "columnRefName": RefName {
+                          "name": "cityName",
+                          "quotes": true,
+                        },
                         "keywords": Object {},
-                        "namespace": undefined,
-                        "namespaceQuotes": false,
-                        "quotes": true,
+                        "namespaceRefName": undefined,
                         "spacing": Object {},
-                        "table": undefined,
-                        "tableQuotes": false,
+                        "tableRefName": undefined,
                         "type": "ref",
                       },
                     ],
@@ -5082,23 +4452,15 @@ describe('SqlQuery', () => {
             "expressions": SeparatedArray {
               "separators": Array [],
               "values": Array [
-                SqlAlias {
-                  "alias": undefined,
-                  "as": undefined,
-                  "expression": SqlRef {
-                    "column": undefined,
-                    "keywords": Object {},
-                    "namespace": undefined,
-                    "namespaceQuotes": false,
-                    "quotes": false,
-                    "spacing": Object {},
-                    "table": "wikipedia",
-                    "tableQuotes": true,
-                    "type": "ref",
-                  },
+                SqlTableRef {
                   "keywords": Object {},
+                  "namespaceRefName": undefined,
                   "spacing": Object {},
-                  "type": "alias",
+                  "tableRefName": RefName {
+                    "name": "wikipedia",
+                    "quotes": true,
+                  },
+                  "type": "tableRef",
                 },
               ],
             },
@@ -5147,14 +4509,14 @@ describe('SqlQuery', () => {
                 SqlOrderByExpression {
                   "direction": "DESC",
                   "expression": SqlRef {
-                    "column": "Count",
+                    "columnRefName": RefName {
+                      "name": "Count",
+                      "quotes": true,
+                    },
                     "keywords": Object {},
-                    "namespace": undefined,
-                    "namespaceQuotes": false,
-                    "quotes": true,
+                    "namespaceRefName": undefined,
                     "spacing": Object {},
-                    "table": undefined,
-                    "tableQuotes": false,
+                    "tableRefName": undefined,
                     "type": "ref",
                   },
                   "keywords": Object {
@@ -5188,18 +4550,10 @@ describe('SqlQuery', () => {
             ],
             "values": Array [
               SqlAlias {
-                "alias": SqlRef {
-                  "column": "channel",
-                  "keywords": Object {},
-                  "namespace": undefined,
-                  "namespaceQuotes": false,
+                "alias": RefName {
+                  "name": "channel",
                   "quotes": true,
-                  "spacing": Object {},
-                  "table": undefined,
-                  "tableQuotes": false,
-                  "type": "ref",
                 },
-                "as": true,
                 "expression": SqlFunction {
                   "args": SeparatedArray {
                     "separators": Array [
@@ -5211,14 +4565,14 @@ describe('SqlQuery', () => {
                     ],
                     "values": Array [
                       SqlRef {
-                        "column": "channel",
+                        "columnRefName": RefName {
+                          "name": "channel",
+                          "quotes": true,
+                        },
                         "keywords": Object {},
-                        "namespace": undefined,
-                        "namespaceQuotes": false,
-                        "quotes": true,
+                        "namespaceRefName": undefined,
                         "spacing": Object {},
-                        "table": undefined,
-                        "tableQuotes": false,
+                        "tableRefName": undefined,
                         "type": "ref",
                       },
                       SqlLiteral {
@@ -5254,32 +4608,20 @@ describe('SqlQuery', () => {
                 "type": "alias",
               },
               SqlAlias {
-                "alias": SqlRef {
-                  "column": "Count",
-                  "keywords": Object {},
-                  "namespace": undefined,
-                  "namespaceQuotes": false,
+                "alias": RefName {
+                  "name": "Count",
                   "quotes": true,
-                  "spacing": Object {},
-                  "table": undefined,
-                  "tableQuotes": false,
-                  "type": "ref",
                 },
-                "as": true,
                 "expression": SqlFunction {
                   "args": SeparatedArray {
                     "separators": Array [],
                     "values": Array [
-                      SqlRef {
-                        "column": "*",
+                      SqlStar {
                         "keywords": Object {},
-                        "namespace": undefined,
-                        "namespaceQuotes": false,
-                        "quotes": false,
+                        "namespaceRefName": undefined,
                         "spacing": Object {},
-                        "table": undefined,
-                        "tableQuotes": false,
-                        "type": "ref",
+                        "tableRefName": undefined,
+                        "type": "star",
                       },
                     ],
                   },
@@ -5341,14 +4683,14 @@ describe('SqlQuery', () => {
                       "op": ">=",
                     },
                     "lhs": SqlRef {
-                      "column": "__time",
+                      "columnRefName": RefName {
+                        "name": "__time",
+                        "quotes": true,
+                      },
                       "keywords": Object {},
-                      "namespace": undefined,
-                      "namespaceQuotes": false,
-                      "quotes": true,
+                      "namespaceRefName": undefined,
                       "spacing": Object {},
-                      "table": undefined,
-                      "tableQuotes": false,
+                      "tableRefName": undefined,
                       "type": "ref",
                     },
                     "not": false,
@@ -5412,14 +4754,14 @@ describe('SqlQuery', () => {
                       "op": "=",
                     },
                     "lhs": SqlRef {
-                      "column": "cityName",
+                      "columnRefName": RefName {
+                        "name": "cityName",
+                        "quotes": false,
+                      },
                       "keywords": Object {},
-                      "namespace": undefined,
-                      "namespaceQuotes": false,
-                      "quotes": false,
+                      "namespaceRefName": undefined,
                       "spacing": Object {},
-                      "table": undefined,
-                      "tableQuotes": false,
+                      "tableRefName": undefined,
                       "type": "ref",
                     },
                     "not": false,

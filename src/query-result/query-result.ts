@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { SqlQuery } from '../sql/sql-query';
+import { SqlQuery } from '../sql';
 
 function isObject(obj: unknown): boolean {
   return Object.prototype.toString.call(obj) === '[object Object]';

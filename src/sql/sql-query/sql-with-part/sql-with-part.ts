@@ -12,14 +12,13 @@
  * limitations under the License.
  */
 
+import { SqlQuery } from '../..';
 import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../../sql-base';
-import { SqlRef } from '../../sql-expression';
-import { SeparatedArray } from '../../utils';
-import { SqlQuery } from '../sql-query';
+import { RefName, SeparatedArray } from '../../utils';
 
 export interface SqlWithPartValue extends SqlBaseValue {
-  withTable: SqlRef;
-  withColumns?: SeparatedArray<SqlRef>;
+  withTable: RefName;
+  withColumns?: SeparatedArray<RefName>;
   withQuery: SqlQuery;
 }
 
@@ -30,13 +29,13 @@ export class SqlWithPart extends SqlBase {
 
   static simple(name: string, query: SqlQuery): SqlWithPart {
     return new SqlWithPart({
-      withTable: SqlRef.column(name),
+      withTable: RefName.create(name),
       withQuery: query,
     });
   }
 
-  public readonly withTable: SqlRef;
-  public readonly withColumns?: SeparatedArray<SqlRef>;
+  public readonly withTable: RefName;
+  public readonly withColumns?: SeparatedArray<RefName>;
   public readonly withQuery: SqlQuery;
 
   constructor(options: SqlWithPartValue) {
@@ -77,13 +76,13 @@ export class SqlWithPart extends SqlBase {
     return rawParts.join('');
   }
 
-  public changeWithTable(withTable: SqlRef): this {
+  public changeWithTable(withTable: RefName): this {
     const value = this.valueOf();
     value.withTable = withTable;
     return SqlBase.fromValue(value);
   }
 
-  public changeWithColumns(withColumns: SeparatedArray<SqlRef>): this {
+  public changeWithColumns(withColumns: SeparatedArray<RefName>): this {
     const value = this.valueOf();
     value.withColumns = withColumns;
     return SqlBase.fromValue(value);
@@ -101,20 +100,6 @@ export class SqlWithPart extends SqlBase {
     postorder: boolean,
   ): SqlBase | undefined {
     let ret = this;
-
-    const withTable = this.withTable._walkHelper(nextStack, fn, postorder);
-    if (!withTable) return;
-    if (withTable !== this.withTable) {
-      ret = ret.changeWithTable(withTable as SqlRef);
-    }
-
-    if (this.withColumns) {
-      const withColumns = SqlBase.walkSeparatedArray(this.withColumns, nextStack, fn, postorder);
-      if (!withColumns) return;
-      if (withColumns !== this.withColumns) {
-        ret = ret.changeWithColumns(withColumns);
-      }
-    }
 
     const withQuery = this.withQuery._walkHelper(nextStack, fn, postorder);
     if (!withQuery) return;

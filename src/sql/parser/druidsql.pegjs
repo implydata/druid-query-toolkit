@@ -60,6 +60,7 @@ SqlQuery =
   keywords.select = select.selectKeyword;
   spacing.postSelect = select.postSelect;
   value.decorator = select.decorator;
+  keywords.decorator = select.decoratorKeyword;
   spacing.postDecorator = select.postDecorator;
   value.selectExpressions = select.selectExpressions;
 
@@ -125,7 +126,7 @@ WithClause =
 
 
 SqlWithPart =
-  withTable:SqlRef
+  withTable:RefName
   postWithTable:_?
   columns:(WithColumns _)?
   asKeyword:AsToken
@@ -152,7 +153,7 @@ SqlWithPart =
   return new sql.SqlWithPart(value);
 }
 
-WithColumns = OpenParen postLeftParen:_? head:BaseType tail:(CommaSeparator BaseType)* preRightParen:_? CloseParen
+WithColumns = OpenParen postLeftParen:_? head:RefName tail:(CommaSeparator RefName)* preRightParen:_? CloseParen
 {
   return {
     postLeftParen: postLeftParen,
@@ -165,13 +166,13 @@ SelectClause =
   selectKeyword:SelectToken
   postSelect:_
   decorator:((AllToken / DistinctToken) _)?
-  head:SqlAliasExpression
-  tail:(CommaSeparator SqlAliasExpression)*
+  head:SqlStarOrAliasExpression
+  tail:(CommaSeparator SqlStarOrAliasExpression)*
 {
   var ret = {
     selectKeyword: selectKeyword,
     postSelect: postSelect,
-    selectExpressions: makeSeparatedArray(head, tail).map(sql.SqlAlias.fromBase),
+    selectExpressions: makeSeparatedArray(head, tail),
   };
   if (decorator) {
     ret.decorator = decorator[0].toUpperCase();
@@ -184,7 +185,7 @@ SelectClause =
 FromClause = from:FromToken postFrom:_ head:SqlAlias tail:(CommaSeparator SqlAlias)* join:(_ JoinClauses)?
 {
   return new sql.SqlFromClause({
-    expressions: makeSeparatedArray(head, tail).map(sql.SqlAlias.fromBaseAndUpgrade),
+    expressions: makeSeparatedArray(head, tail).map(function(ex) { return ex.convertToTableRef() }),
     joinParts: join ? join[1] : undefined,
     spacing: {
       postFrom: postFrom,
@@ -209,7 +210,7 @@ SqlJoinPart =
   on:(_ OnToken _ Expression)?
 {
   var value = {
-    table: sql.SqlAlias.fromBaseAndUpgrade(table),
+    table: table.convertToTableRef(),
   };
   var spacing = value.spacing = {
     postJoin: postJoin,
@@ -368,9 +369,10 @@ SqlAlias = expression:(Expression / SqlInParens) alias:((_ AsToken)? _ SqlRef)?
 
   var as = alias[0];
   if (as) {
-    value.as = true;
     spacing.preAs = as[0];
     keywords.as = as[1];
+  } else {
+    keywords.as = '';
   }
 
   spacing.preAlias = alias[1];
@@ -379,7 +381,9 @@ SqlAlias = expression:(Expression / SqlInParens) alias:((_ AsToken)? _ SqlRef)?
   return new sql.SqlAlias(value);
 }
 
-SqlAliasExpression = expression:Expression alias:((_ AsToken)? _ SqlRef)?
+SqlStarOrAliasExpression = SqlStar / SqlAliasExpression
+
+SqlAliasExpression = expression:Expression alias:((_ AsToken)? _ RefName)?
 {
   if (!alias) {
     return expression;
@@ -391,15 +395,35 @@ SqlAliasExpression = expression:Expression alias:((_ AsToken)? _ SqlRef)?
 
   var as = alias[0];
   if (as) {
-    value.as = true;
     spacing.preAs = as[0];
     keywords.as = as[1];
+  } else {
+    keywords.as = '';
   }
 
   spacing.preAlias = alias[1];
   value.alias = alias[2];
 
   return new sql.SqlAlias(value);
+}
+
+SqlAliasExpressionExplicitAs = expression:Expression alias:(_ AsToken _ RefName)?
+{
+  if (!alias) {
+    return expression;
+  }
+
+  return new sql.SqlAlias({
+    expression: expression,
+    alias: alias[3],
+    spacing: {
+      preAs: alias[0],
+      preAlias: alias[2],
+    },
+    keywords: {
+      as: alias[1],
+    },
+  });
 }
 
 /*
@@ -545,7 +569,7 @@ ComparisonOpRhsBetween = op:BetweenToken postOp:_ symmetricKeyword:(SymmetricTok
     op: op.toUpperCase(),
     opKeyword: op,
     postOp: postOp,
-    rhs: new sql.SqlBetweenAndHelper(value)
+    rhs: new sql.SqlBetweenPart(value)
   };
 }
 
@@ -555,7 +579,7 @@ ComparisonOpRhsLike = op:(LikeToken / SimilarToToken) postOp:_ like:AdditionExpr
     op: op.toUpperCase(),
     opKeyword: op,
     postOp: postOp,
-    rhs: escape ? new sql.SqlLikeEscapeHelper({
+    rhs: escape ? new sql.SqlLikePart({
       like: like,
       escape: escape[3],
       spacing: {
@@ -725,6 +749,7 @@ TimeUnitExtra =
 
 Function =
   GenericFunction
+/ CountFunction
 / CastFunction
 / ExtractFunction
 / TrimFunction
@@ -735,13 +760,60 @@ Function =
 / NakedFunction
 
 GenericFunction =
-  functionName:UnquotedRefPartFree
+  functionName:UnquotedRefNameFree
   preLeftParen:_
   OpenParen
   postLeftParen:_
-  decorator:(FunctionDecorator _)?
-  head:Expression?
-  tail:(CommaSeparator Expression)*
+  head:SqlAliasExpressionExplicitAs?
+  tail:(CommaSeparator SqlAliasExpressionExplicitAs)*
+  postArguments:_
+  CloseParen
+  filter:(_ FunctionFilter)?
+{
+  var value = {
+    functionName: functionName.toUpperCase(),
+  };
+  var spacing = value.spacing = {
+    preLeftParen: preLeftParen,
+    postLeftParen: postLeftParen,
+  };
+  var keywords = value.keywords = {
+    functionName: functionName,
+  };
+
+  if (head) {
+    value.args = makeSeparatedArray(head, tail);
+    spacing.postArguments = postArguments;
+  }
+
+  if (filter) {
+    spacing.preFilter = filter[0];
+    keywords.filter = filter[1].filterKeyword;
+    spacing.postFilter = filter[1].postFilter;
+    value.whereClause = filter[1].whereClause;
+  }
+
+  return new sql.SqlFunction(value);
+}
+
+NakedFunction = functionName:UnquotedRefNameFree &{ return sql.SqlFunction.isNakedFunction(functionName) }
+{
+  return new sql.SqlFunction({
+    functionName: functionName.toUpperCase(),
+    specialParen: 'none',
+    keywords: {
+      functionName: functionName,
+    }
+  });
+}
+
+CountFunction =
+  functionName:CountToken
+  preLeftParen:_
+  OpenParen
+  postLeftParen:_
+  decorator:(DistinctToken _)?
+  arg:(Expression / "*")
   postArguments:_
   CloseParen
   filter:(_ FunctionFilter)?
@@ -763,10 +835,8 @@ GenericFunction =
     spacing.postDecorator = decorator[1];
   }
 
-  if (head) {
-    value.args = makeSeparatedArray(head, tail);
-    spacing.postArguments = postArguments;
-  }
+  value.args = sql.SeparatedArray.fromSingleValue(arg === '*' ? sql.SqlStar.PLAIN : arg);
+  spacing.postArguments = postArguments;
 
   if (filter) {
     spacing.preFilter = filter[0];
@@ -778,17 +848,6 @@ GenericFunction =
   return new sql.SqlFunction(value);
 }
 
-NakedFunction = functionName:UnquotedRefPartFree &{ return sql.SqlBase.isNakedFunction(functionName) }
-{
-  return new sql.SqlFunction({
-    functionName: functionName.toUpperCase(),
-    specialParen: 'none',
-    keywords: {
-      functionName: functionName,
-    }
-  });
-}
-
 CastFunction =
   functionName:CastToken
   preLeftParen:_
@@ -796,7 +855,7 @@ CastFunction =
   postLeftParen:_
   expr:Expression
   separator:AsSeparator
-  type:UnquotedRefPartFree
+  type:UnquotedRefNameFree
   postArguments:_
   CloseParen
 {
@@ -852,16 +911,17 @@ TrimFunction =
   preLeftParen:_
   OpenParen
   postLeftParen:_
-  decorator:(TrimDecoratorLead _)?
-  expr1:Expression
-  separator:FromSeparator
-  expr2:Expression
+  decorator:($((LeadingToken / BothToken / TrailingToken) (_ FromToken)?) _)?
+  expr:Expression
+  from:(FromSeparator Expression)?
   postArguments:_
   CloseParen
 {
   var value = {
     functionName: functionName.toUpperCase(),
-    args: new sql.SeparatedArray([expr1, expr2], [separator]),
+    args: from
+      ? new sql.SeparatedArray([expr, from[1]], [from[0]])
+      : sql.SeparatedArray.fromSingleValue(expr),
   };
   var spacing = value.spacing = {
     preLeftParen: preLeftParen,
@@ -1174,16 +1234,13 @@ ArrayEntry = Number / SingleQuotedString / UnicodeString / BinaryString
 
 // ------------------------------
 
-SqlRef = a:RefPart b:(_ "." _ RefPart)? c:(_ "." _ RefPart)?
+SqlRef = a:RefName b:(_ "." _ RefName)? c:(_ "." _ RefName)?
 {
   if (c) {
     return new sql.SqlRef({
-      column: c[3].name,
-      quotes: c[3].quotes,
-      table: b[3].name,
-      tableQuotes: b[3].quotes,
-      namespace: a.name,
-      namespaceQuotes: a.quotes,
+      columnRefName: c[3],
+      tableRefName: b[3],
+      namespaceRefName: a,
       spacing: {
         preTableDot: c[0],
         postTableDot: c[2],
@@ -1194,10 +1251,8 @@ SqlRef = a:RefPart b:(_ "." _ RefPart)? c:(_ "." _ RefPart)?
 
   } else if (b) {
     return new sql.SqlRef({
-      column: b[3].name,
-      quotes: b[3].quotes,
-      table: a.name,
-      tableQuotes: a.quotes,
+      columnRefName: b[3],
+      tableRefName: a,
       spacing: {
         preTableDot: b[0],
         postTableDot: b[2],
@@ -1206,38 +1261,49 @@ SqlRef = a:RefPart b:(_ "." _ RefPart)? c:(_ "." _ RefPart)?
 
   } else {
     return new sql.SqlRef({
-      column: a.name,
-      quotes: a.quotes,
+      columnRefName: a,
     });
   }
 }
 
-RefPart = QuotedRefPart / UnquotedRefPart / Star
+RefName = QuotedRefName / UnquotedRefName
 
-QuotedRefPart = '"' name:$(('""' / [^"])+) '"'
+QuotedRefName = '"' name:$(('""' / [^"])+) '"'
 {
-  return {
+  return new sql.RefName({
     name: name.replace(/""/g, '"'),
     quotes: true
-  };
+  });
 }
 
-UnquotedRefPart = name:UnquotedRefPartFree &{ return sql.SqlBase.isNakedRefAppropriate(name) }
+UnquotedRefName = name:UnquotedRefNameFree &{ return !sql.RefName.isReservedKeyword(name) }
 {
-  return {
+  return new sql.RefName({
     name: text(),
     quotes: false
-  };
+  });
 }
 
-UnquotedRefPartFree = $([a-z_]i [a-z0-9_]i*)
+UnquotedRefNameFree = $([a-z_]i [a-z0-9_]i*)
 
-Star = '*'
+SqlStar = namespace:(RefName _ "." _)? table:(RefName _ "." _)? "*"
 {
-  return {
-    name: '*',
-    quotes: false
-  };
+  var value = {};
+  var spacing = value.spacing = {};
+
+  if (namespace) {
+    value.namespaceRefName = namespace[0];
+    spacing.preNamespaceDot = namespace[1];
+    spacing.postNamespaceDot = namespace[3];
+  }
+
+  if (table) {
+    value.tableRefName = table[0];
+    spacing.preTableDot = table[1];
+    spacing.postTableDot = table[3];
+  }
+
+  return new sql.SqlStar(value);
 }
 
 // -----------------------------------
@@ -1264,15 +1330,6 @@ OpenParen "(" = "("
 
 CloseParen ")" = ")"
 
-FunctionDecorator =
-  DistinctToken
-/ $(TrimDecoratorLead (_ FromToken)?)
-
-TrimDecoratorLead =
-  LeadingToken
-/ BothToken
-/ TrailingToken
-
 /* Tokens */
 
 AllToken = $("ALL"i !IdentifierPart)
@@ -1287,6 +1344,7 @@ ByToken = $("BY"i !IdentifierPart)
 CaseToken = $("CASE"i !IdentifierPart)
 CastToken = $("CAST"i !IdentifierPart)
 CeilToken = $("CEIL"i !IdentifierPart)
+CountToken = $("COUNT"i !IdentifierPart)
 DateToken = $("DATE"i !IdentifierPart)
 DescToken = $("DESC"i !IdentifierPart)
 DistinctToken = $("DISTINCT"i !IdentifierPart)

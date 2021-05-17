@@ -106,7 +106,6 @@ describe('Uber Query', () => {
       'col9',
       'colA',
       'colB',
-      'temp_t1',
       'time',
     ]);
   });

@@ -12,7 +12,8 @@
  * limitations under the License.
  */
 
+/* eslint-disable simple-import-sort/exports */
+export * from './sql';
 export * from './introspect/introspect';
 export * from './query-result/query-result';
 export * from './query-runner/query-runner';
-export * from './sql';
