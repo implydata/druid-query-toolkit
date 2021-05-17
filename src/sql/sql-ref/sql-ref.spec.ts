@@ -345,8 +345,8 @@ describe('#convertToTableRef', () => {
                     "quotes": false,
                   },
                   "spacing": Object {
-                    "postTableDot": "",
-                    "preTableDot": "",
+                    "postNamespaceDot": "",
+                    "preNamespaceDot": "",
                   },
                   "tableRefName": RefName {
                     "name": "segments",

@@ -661,8 +661,8 @@ describe('SqlQuery', () => {
                               "quotes": false,
                             },
                             "spacing": Object {
-                              "postTableDot": "",
-                              "preTableDot": "",
+                              "postNamespaceDot": "",
+                              "preNamespaceDot": "",
                             },
                             "tableRefName": RefName {
                               "name": "foo",
@@ -868,8 +868,8 @@ describe('SqlQuery', () => {
                     "quotes": false,
                   },
                   "spacing": Object {
-                    "postTableDot": "",
-                    "preTableDot": "",
+                    "postNamespaceDot": "",
+                    "preNamespaceDot": "",
                   },
                   "tableRefName": RefName {
                     "name": "segments",
@@ -1457,8 +1457,8 @@ describe('SqlQuery', () => {
                       "quotes": false,
                     },
                     "spacing": Object {
-                      "postTableDot": "",
-                      "preTableDot": "",
+                      "postNamespaceDot": "",
+                      "preNamespaceDot": "",
                     },
                     "tableRefName": RefName {
                       "name": "supervisors",
@@ -1583,8 +1583,8 @@ describe('SqlQuery', () => {
                       "quotes": false,
                     },
                     "spacing": Object {
-                      "postTableDot": "",
-                      "preTableDot": "",
+                      "postNamespaceDot": "",
+                      "preNamespaceDot": "",
                     },
                     "tableRefName": RefName {
                       "name": "supervisors",
@@ -2273,8 +2273,8 @@ describe('SqlQuery', () => {
                       "quotes": false,
                     },
                     "spacing": Object {
-                      "postTableDot": "",
-                      "preTableDot": "",
+                      "postNamespaceDot": "",
+                      "preNamespaceDot": "",
                     },
                     "tableRefName": RefName {
                       "name": "supervisors",
@@ -2399,8 +2399,8 @@ describe('SqlQuery', () => {
                       "quotes": false,
                     },
                     "spacing": Object {
-                      "postTableDot": "",
-                      "preTableDot": "",
+                      "postNamespaceDot": "",
+                      "preNamespaceDot": "",
                     },
                     "tableRefName": RefName {
                       "name": "supervisors",
