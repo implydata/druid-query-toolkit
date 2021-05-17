@@ -39,7 +39,8 @@ describe('SqlLiteral', () => {
       try {
         backAndForth(sql);
       } catch (e) {
-        throw new Error(`problem with \`${sql}\`: ${e.message}`);
+        console.log(`Problem with: \`${sql}\``);
+        throw e;
       }
     }
   });

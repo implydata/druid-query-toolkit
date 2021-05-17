@@ -23,7 +23,7 @@ describe('SqlRef', () => {
       try {
         backAndForth(sql);
       } catch (e) {
-        console.log(`problem with: \`${sql}\``);
+        console.log(`Problem with: \`${sql}\``);
         throw e;
       }
     }
@@ -52,17 +52,20 @@ describe('SqlRef', () => {
 
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlRef {
-        "column": "namespace",
+        "columnRefName": RefName {
+          "name": "namespace",
+          "quotes": true,
+        },
         "keywords": Object {},
-        "namespace": undefined,
-        "namespaceQuotes": false,
-        "quotes": true,
+        "namespaceRefName": undefined,
         "spacing": Object {
           "postTableDot": "",
           "preTableDot": "",
         },
-        "table": "test",
-        "tableQuotes": true,
+        "tableRefName": RefName {
+          "name": "test",
+          "quotes": true,
+        },
         "type": "ref",
       }
     `);
@@ -75,17 +78,20 @@ describe('SqlRef', () => {
 
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlRef {
-        "column": "namespace",
+        "columnRefName": RefName {
+          "name": "namespace",
+          "quotes": false,
+        },
         "keywords": Object {},
-        "namespace": undefined,
-        "namespaceQuotes": false,
-        "quotes": false,
+        "namespaceRefName": undefined,
         "spacing": Object {
           "postTableDot": "",
           "preTableDot": "",
         },
-        "table": "test",
-        "tableQuotes": true,
+        "tableRefName": RefName {
+          "name": "test",
+          "quotes": true,
+        },
         "type": "ref",
       }
     `);
@@ -98,17 +104,20 @@ describe('SqlRef', () => {
 
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlRef {
-        "column": "namespace",
+        "columnRefName": RefName {
+          "name": "namespace",
+          "quotes": false,
+        },
         "keywords": Object {},
-        "namespace": undefined,
-        "namespaceQuotes": false,
-        "quotes": false,
+        "namespaceRefName": undefined,
         "spacing": Object {
           "postTableDot": "",
           "preTableDot": "",
         },
-        "table": "test",
-        "tableQuotes": false,
+        "tableRefName": RefName {
+          "name": "test",
+          "quotes": false,
+        },
         "type": "ref",
       }
     `);
@@ -121,14 +130,14 @@ describe('SqlRef', () => {
 
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlRef {
-        "column": "test",
+        "columnRefName": RefName {
+          "name": "test",
+          "quotes": false,
+        },
         "keywords": Object {},
-        "namespace": undefined,
-        "namespaceQuotes": false,
-        "quotes": false,
+        "namespaceRefName": undefined,
         "spacing": Object {},
-        "table": undefined,
-        "tableQuotes": false,
+        "tableRefName": undefined,
         "type": "ref",
       }
     `);
@@ -141,14 +150,14 @@ describe('SqlRef', () => {
 
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlRef {
-        "column": "test",
+        "columnRefName": RefName {
+          "name": "test",
+          "quotes": true,
+        },
         "keywords": Object {},
-        "namespace": undefined,
-        "namespaceQuotes": false,
-        "quotes": true,
+        "namespaceRefName": undefined,
         "spacing": Object {},
-        "table": undefined,
-        "tableQuotes": false,
+        "tableRefName": undefined,
         "type": "ref",
       }
     `);
@@ -159,14 +168,14 @@ describe('SqlRef', () => {
 
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlRef {
-        "column": "page",
+        "columnRefName": RefName {
+          "name": "page",
+          "quotes": true,
+        },
         "keywords": Object {},
-        "namespace": undefined,
-        "namespaceQuotes": false,
-        "quotes": true,
+        "namespaceRefName": undefined,
         "spacing": Object {},
-        "table": undefined,
-        "tableQuotes": false,
+        "tableRefName": undefined,
         "type": "ref",
       }
     `);
@@ -177,14 +186,14 @@ describe('SqlRef', () => {
 
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlRef {
-        "column": "channel",
+        "columnRefName": RefName {
+          "name": "channel",
+          "quotes": false,
+        },
         "keywords": Object {},
-        "namespace": undefined,
-        "namespaceQuotes": false,
-        "quotes": false,
+        "namespaceRefName": undefined,
         "spacing": Object {},
-        "table": undefined,
-        "tableQuotes": false,
+        "tableRefName": undefined,
         "type": "ref",
       }
     `);
@@ -195,17 +204,20 @@ describe('SqlRef', () => {
 
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlRef {
-        "column": "channel",
+        "columnRefName": RefName {
+          "name": "channel",
+          "quotes": false,
+        },
         "keywords": Object {},
-        "namespace": undefined,
-        "namespaceQuotes": false,
-        "quotes": false,
+        "namespaceRefName": undefined,
         "spacing": Object {
           "postTableDot": " ",
           "preTableDot": " ",
         },
-        "table": "lol",
-        "tableQuotes": true,
+        "tableRefName": RefName {
+          "name": "lol",
+          "quotes": true,
+        },
         "type": "ref",
       }
     `);
@@ -218,10 +230,12 @@ describe('SqlRef', () => {
 
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlRef {
-        "column": "channel",
+        "columnRefName": RefName {
+          "name": "channel",
+          "quotes": false,
+        },
         "keywords": Object {},
-        "namespace": undefined,
-        "namespaceQuotes": false,
+        "namespaceRefName": undefined,
         "parens": Array [
           Object {
             "leftSpacing": " ",
@@ -232,13 +246,14 @@ describe('SqlRef', () => {
             "rightSpacing": "   ",
           },
         ],
-        "quotes": false,
         "spacing": Object {
           "postTableDot": " ",
           "preTableDot": " ",
         },
-        "table": "lol",
-        "tableQuotes": true,
+        "tableRefName": RefName {
+          "name": "lol",
+          "quotes": true,
+        },
         "type": "ref",
       }
     `);
@@ -251,19 +266,25 @@ describe('SqlRef', () => {
 
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlRef {
-        "column": "boo",
+        "columnRefName": RefName {
+          "name": "boo",
+          "quotes": false,
+        },
         "keywords": Object {},
-        "namespace": "lol",
-        "namespaceQuotes": true,
-        "quotes": false,
+        "namespaceRefName": RefName {
+          "name": "lol",
+          "quotes": true,
+        },
         "spacing": Object {
           "postNamespaceDot": "  ",
           "postTableDot": "  ",
           "preNamespaceDot": "  ",
           "preTableDot": "  ",
         },
-        "table": "channel",
-        "tableQuotes": false,
+        "tableRefName": RefName {
+          "name": "channel",
+          "quotes": false,
+        },
         "type": "ref",
       }
     `);
@@ -283,19 +304,21 @@ describe('upgrades', () => {
     expect((SqlExpression.parse(sql) as SqlRef).convertToTableRef().toString()).toEqual(sql);
 
     expect((SqlExpression.parse(sql) as SqlRef).convertToTableRef()).toMatchInlineSnapshot(`
-      SqlRef {
-        "column": undefined,
+      SqlTableRef {
         "keywords": Object {},
-        "namespace": "namespace",
-        "namespaceQuotes": true,
-        "quotes": false,
+        "namespaceRefName": RefName {
+          "name": "namespace",
+          "quotes": true,
+        },
         "spacing": Object {
           "postTableDot": "",
           "preTableDot": "",
         },
-        "table": "table",
-        "tableQuotes": true,
-        "type": "ref",
+        "tableRefName": RefName {
+          "name": "table",
+          "quotes": true,
+        },
+        "type": "tableRef",
       }
     `);
   });
@@ -315,19 +338,21 @@ describe('upgrades', () => {
             "values": Array [
               SqlAlias {
                 "alias": undefined,
-                "expression": SqlRef {
-                  "column": undefined,
+                "expression": SqlTableRef {
                   "keywords": Object {},
-                  "namespace": "sys",
-                  "namespaceQuotes": false,
-                  "quotes": false,
+                  "namespaceRefName": RefName {
+                    "name": "sys",
+                    "quotes": false,
+                  },
                   "spacing": Object {
                     "postTableDot": "",
                     "preTableDot": "",
                   },
-                  "table": "segments",
-                  "tableQuotes": false,
-                  "type": "ref",
+                  "tableRefName": RefName {
+                    "name": "segments",
+                    "quotes": false,
+                  },
+                  "type": "tableRef",
                 },
                 "keywords": Object {},
                 "spacing": Object {},
@@ -358,14 +383,14 @@ describe('upgrades', () => {
             SqlAlias {
               "alias": undefined,
               "expression": SqlRef {
-                "column": "tbl",
+                "columnRefName": RefName {
+                  "name": "tbl",
+                  "quotes": false,
+                },
                 "keywords": Object {},
-                "namespace": undefined,
-                "namespaceQuotes": false,
-                "quotes": false,
+                "namespaceRefName": undefined,
                 "spacing": Object {},
-                "table": undefined,
-                "tableQuotes": false,
+                "tableRefName": undefined,
                 "type": "ref",
               },
               "keywords": Object {},

@@ -169,16 +169,15 @@ describe('QueryRunner', () => {
               "values": Array [
                 SqlAlias {
                   "alias": undefined,
-                  "expression": SqlRef {
-                    "column": undefined,
+                  "expression": SqlTableRef {
                     "keywords": Object {},
-                    "namespace": undefined,
-                    "namespaceQuotes": false,
-                    "quotes": false,
+                    "namespaceRefName": undefined,
                     "spacing": Object {},
-                    "table": "wikipedia",
-                    "tableQuotes": false,
-                    "type": "ref",
+                    "tableRefName": RefName {
+                      "name": "wikipedia",
+                      "quotes": false,
+                    },
+                    "type": "tableRef",
                   },
                   "keywords": Object {},
                   "spacing": Object {},
@@ -269,14 +268,14 @@ describe('QueryRunner', () => {
               SqlAlias {
                 "alias": undefined,
                 "expression": SqlRef {
-                  "column": "channel",
+                  "columnRefName": RefName {
+                    "name": "channel",
+                    "quotes": false,
+                  },
                   "keywords": Object {},
-                  "namespace": undefined,
-                  "namespaceQuotes": false,
-                  "quotes": false,
+                  "namespaceRefName": undefined,
                   "spacing": Object {},
-                  "table": undefined,
-                  "tableQuotes": false,
+                  "tableRefName": undefined,
                   "type": "ref",
                 },
                 "keywords": Object {},
@@ -284,31 +283,20 @@ describe('QueryRunner', () => {
                 "type": "alias",
               },
               SqlAlias {
-                "alias": SqlRef {
-                  "column": "Count",
-                  "keywords": Object {},
-                  "namespace": undefined,
-                  "namespaceQuotes": false,
+                "alias": RefName {
+                  "name": "Count",
                   "quotes": true,
-                  "spacing": Object {},
-                  "table": undefined,
-                  "tableQuotes": false,
-                  "type": "ref",
                 },
                 "expression": SqlFunction {
                   "args": SeparatedArray {
                     "separators": Array [],
                     "values": Array [
-                      SqlRef {
-                        "column": "*",
+                      SqlStar {
                         "keywords": Object {},
-                        "namespace": undefined,
-                        "namespaceQuotes": false,
-                        "quotes": false,
+                        "namespaceRefName": undefined,
                         "spacing": Object {},
-                        "table": undefined,
-                        "tableQuotes": false,
-                        "type": "ref",
+                        "tableRefName": undefined,
+                        "type": "star",
                       },
                     ],
                   },
@@ -410,16 +398,15 @@ describe('QueryRunner', () => {
               "values": Array [
                 SqlAlias {
                   "alias": undefined,
-                  "expression": SqlRef {
-                    "column": undefined,
+                  "expression": SqlTableRef {
                     "keywords": Object {},
-                    "namespace": undefined,
-                    "namespaceQuotes": false,
-                    "quotes": false,
+                    "namespaceRefName": undefined,
                     "spacing": Object {},
-                    "table": "wikipedia",
-                    "tableQuotes": false,
-                    "type": "ref",
+                    "tableRefName": RefName {
+                      "name": "wikipedia",
+                      "quotes": false,
+                    },
+                    "type": "tableRef",
                   },
                   "keywords": Object {},
                   "spacing": Object {},
@@ -510,14 +497,14 @@ describe('QueryRunner', () => {
               SqlAlias {
                 "alias": undefined,
                 "expression": SqlRef {
-                  "column": "channel",
+                  "columnRefName": RefName {
+                    "name": "channel",
+                    "quotes": false,
+                  },
                   "keywords": Object {},
-                  "namespace": undefined,
-                  "namespaceQuotes": false,
-                  "quotes": false,
+                  "namespaceRefName": undefined,
                   "spacing": Object {},
-                  "table": undefined,
-                  "tableQuotes": false,
+                  "tableRefName": undefined,
                   "type": "ref",
                 },
                 "keywords": Object {},
@@ -525,31 +512,20 @@ describe('QueryRunner', () => {
                 "type": "alias",
               },
               SqlAlias {
-                "alias": SqlRef {
-                  "column": "Count",
-                  "keywords": Object {},
-                  "namespace": undefined,
-                  "namespaceQuotes": false,
+                "alias": RefName {
+                  "name": "Count",
                   "quotes": true,
-                  "spacing": Object {},
-                  "table": undefined,
-                  "tableQuotes": false,
-                  "type": "ref",
                 },
                 "expression": SqlFunction {
                   "args": SeparatedArray {
                     "separators": Array [],
                     "values": Array [
-                      SqlRef {
-                        "column": "*",
+                      SqlStar {
                         "keywords": Object {},
-                        "namespace": undefined,
-                        "namespaceQuotes": false,
-                        "quotes": false,
+                        "namespaceRefName": undefined,
                         "spacing": Object {},
-                        "table": undefined,
-                        "tableQuotes": false,
-                        "type": "ref",
+                        "tableRefName": undefined,
+                        "type": "star",
                       },
                     ],
                   },
@@ -652,16 +628,15 @@ describe('QueryRunner', () => {
               "values": Array [
                 SqlAlias {
                   "alias": undefined,
-                  "expression": SqlRef {
-                    "column": undefined,
+                  "expression": SqlTableRef {
                     "keywords": Object {},
-                    "namespace": undefined,
-                    "namespaceQuotes": false,
-                    "quotes": false,
+                    "namespaceRefName": undefined,
                     "spacing": Object {},
-                    "table": "wikipedia",
-                    "tableQuotes": false,
-                    "type": "ref",
+                    "tableRefName": RefName {
+                      "name": "wikipedia",
+                      "quotes": false,
+                    },
+                    "type": "tableRef",
                   },
                   "keywords": Object {},
                   "spacing": Object {},
@@ -752,14 +727,14 @@ describe('QueryRunner', () => {
               SqlAlias {
                 "alias": undefined,
                 "expression": SqlRef {
-                  "column": "channel",
+                  "columnRefName": RefName {
+                    "name": "channel",
+                    "quotes": false,
+                  },
                   "keywords": Object {},
-                  "namespace": undefined,
-                  "namespaceQuotes": false,
-                  "quotes": false,
+                  "namespaceRefName": undefined,
                   "spacing": Object {},
-                  "table": undefined,
-                  "tableQuotes": false,
+                  "tableRefName": undefined,
                   "type": "ref",
                 },
                 "keywords": Object {},
@@ -767,31 +742,20 @@ describe('QueryRunner', () => {
                 "type": "alias",
               },
               SqlAlias {
-                "alias": SqlRef {
-                  "column": "Count",
-                  "keywords": Object {},
-                  "namespace": undefined,
-                  "namespaceQuotes": false,
+                "alias": RefName {
+                  "name": "Count",
                   "quotes": true,
-                  "spacing": Object {},
-                  "table": undefined,
-                  "tableQuotes": false,
-                  "type": "ref",
                 },
                 "expression": SqlFunction {
                   "args": SeparatedArray {
                     "separators": Array [],
                     "values": Array [
-                      SqlRef {
-                        "column": "*",
+                      SqlStar {
                         "keywords": Object {},
-                        "namespace": undefined,
-                        "namespaceQuotes": false,
-                        "quotes": false,
+                        "namespaceRefName": undefined,
                         "spacing": Object {},
-                        "table": undefined,
-                        "tableQuotes": false,
-                        "type": "ref",
+                        "tableRefName": undefined,
+                        "type": "star",
                       },
                     ],
                   },

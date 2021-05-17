@@ -125,7 +125,7 @@ WithClause =
 
 
 SqlWithPart =
-  withTable:SqlRef
+  withTable:RefName
   postWithTable:_?
   columns:(WithColumns _)?
   asKeyword:AsToken
@@ -152,7 +152,7 @@ SqlWithPart =
   return new sql.SqlWithPart(value);
 }
 
-WithColumns = OpenParen postLeftParen:_? head:BaseType tail:(CommaSeparator BaseType)* preRightParen:_? CloseParen
+WithColumns = OpenParen postLeftParen:_? head:RefName tail:(CommaSeparator RefName)* preRightParen:_? CloseParen
 {
   return {
     postLeftParen: postLeftParen,
@@ -165,8 +165,8 @@ SelectClause =
   selectKeyword:SelectToken
   postSelect:_
   decorator:((AllToken / DistinctToken) _)?
-  head:SqlAliasOrStarExpression
-  tail:(CommaSeparator SqlAliasOrStarExpression)*
+  head:SqlStarOrAliasExpression
+  tail:(CommaSeparator SqlStarOrAliasExpression)*
 {
   var ret = {
     selectKeyword: selectKeyword,
@@ -380,9 +380,9 @@ SqlAlias = expression:(Expression / SqlInParens) alias:((_ AsToken)? _ SqlRef)?
   return new sql.SqlAlias(value);
 }
 
-SqlAliasOrStarExpression = SqlAliasExpression / SqlStar
+SqlStarOrAliasExpression = SqlStar / SqlAliasExpression
 
-SqlAliasExpression = expression:Expression alias:((_ AsToken)? _ SqlRef)?
+SqlAliasExpression = expression:Expression alias:((_ AsToken)? _ RefName)?
 {
   if (!alias) {
     return expression;
@@ -815,7 +815,7 @@ CountFunction =
     spacing.postDecorator = decorator[1];
   }
 
-  value.args = arg === '*' ? sql.SqlStar.PLAIN : sql.SeparatedArray.fromSingleValue(arg);
+  value.args = sql.SeparatedArray.fromSingleValue(arg === '*' ? sql.SqlStar.PLAIN : arg);
   spacing.postArguments = postArguments;
 
   if (filter) {

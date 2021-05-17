@@ -17,20 +17,21 @@ import { backAndForth } from '../../test-utils';
 describe('SqlStar', () => {
   it('things that work', () => {
     const queries: string[] = [
-      '*',
-      `hello. *`,
-      `"hello" . *`,
-      `"""hello""".*`,
-      `"a""b".*`,
-      `a . b . *`,
-      `"a""b".c.*`,
+      'SELECT *',
+      `SELECT hello. *`,
+      `SELECT "hello" . *`,
+      `SELECT """hello""".*`,
+      `SELECT "a""b".*`,
+      `SELECT a . b . *`,
+      `SELECT "a""b".c.*`,
     ];
 
     for (const sql of queries) {
       try {
         backAndForth(sql);
       } catch (e) {
-        throw new Error(`problem with \`${sql}\`: ${e.message}`);
+        console.log(`Problem with: \`${sql}\``);
+        throw e;
       }
     }
   });

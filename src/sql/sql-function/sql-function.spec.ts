@@ -45,7 +45,8 @@ describe('SqlFunction', () => {
       try {
         backAndForth(sql);
       } catch (e) {
-        throw new Error(`problem with \`${sql}\`: ${e.message}`);
+        console.log(`Problem with: \`${sql}\``);
+        throw e;
       }
     }
   });
@@ -90,14 +91,14 @@ describe('SqlFunction', () => {
           "separators": Array [],
           "values": Array [
             SqlRef {
-              "column": "A",
+              "columnRefName": RefName {
+                "name": "A",
+                "quotes": false,
+              },
               "keywords": Object {},
-              "namespace": undefined,
-              "namespaceQuotes": false,
-              "quotes": false,
+              "namespaceRefName": undefined,
               "spacing": Object {},
-              "table": undefined,
-              "tableQuotes": false,
+              "tableRefName": undefined,
               "type": "ref",
             },
           ],
@@ -130,14 +131,14 @@ describe('SqlFunction', () => {
           "separators": Array [],
           "values": Array [
             SqlRef {
-              "column": "A",
+              "columnRefName": RefName {
+                "name": "A",
+                "quotes": false,
+              },
               "keywords": Object {},
-              "namespace": undefined,
-              "namespaceQuotes": false,
-              "quotes": false,
+              "namespaceRefName": undefined,
               "spacing": Object {},
-              "table": undefined,
-              "tableQuotes": false,
+              "tableRefName": undefined,
               "type": "ref",
             },
           ],
@@ -284,14 +285,14 @@ describe('SqlFunction', () => {
           "separators": Array [],
           "values": Array [
             SqlRef {
-              "column": "A",
+              "columnRefName": RefName {
+                "name": "A",
+                "quotes": false,
+              },
               "keywords": Object {},
-              "namespace": undefined,
-              "namespaceQuotes": false,
-              "quotes": false,
+              "namespaceRefName": undefined,
               "spacing": Object {},
-              "table": undefined,
-              "tableQuotes": false,
+              "tableRefName": undefined,
               "type": "ref",
             },
           ],
@@ -334,14 +335,14 @@ describe('SqlFunction', () => {
                 "separators": Array [],
                 "values": Array [
                   SqlRef {
-                    "column": "A",
+                    "columnRefName": RefName {
+                      "name": "A",
+                      "quotes": false,
+                    },
                     "keywords": Object {},
-                    "namespace": undefined,
-                    "namespaceQuotes": false,
-                    "quotes": false,
+                    "namespaceRefName": undefined,
                     "spacing": Object {},
-                    "table": undefined,
-                    "tableQuotes": false,
+                    "tableRefName": undefined,
                     "type": "ref",
                   },
                 ],
@@ -375,14 +376,14 @@ describe('SqlFunction', () => {
                       "separators": Array [],
                       "values": Array [
                         SqlRef {
-                          "column": "B",
+                          "columnRefName": RefName {
+                            "name": "B",
+                            "quotes": false,
+                          },
                           "keywords": Object {},
-                          "namespace": undefined,
-                          "namespaceQuotes": false,
-                          "quotes": false,
+                          "namespaceRefName": undefined,
                           "spacing": Object {},
-                          "table": undefined,
-                          "tableQuotes": false,
+                          "tableRefName": undefined,
                           "type": "ref",
                         },
                       ],
@@ -416,14 +417,14 @@ describe('SqlFunction', () => {
                             "separators": Array [],
                             "values": Array [
                               SqlRef {
-                                "column": "c",
+                                "columnRefName": RefName {
+                                  "name": "c",
+                                  "quotes": false,
+                                },
                                 "keywords": Object {},
-                                "namespace": undefined,
-                                "namespaceQuotes": false,
-                                "quotes": false,
+                                "namespaceRefName": undefined,
                                 "spacing": Object {},
-                                "table": undefined,
-                                "tableQuotes": false,
+                                "tableRefName": undefined,
                                 "type": "ref",
                               },
                             ],
@@ -484,14 +485,14 @@ describe('SqlFunction', () => {
           "separators": Array [],
           "values": Array [
             SqlRef {
-              "column": "A",
+              "columnRefName": RefName {
+                "name": "A",
+                "quotes": false,
+              },
               "keywords": Object {},
-              "namespace": undefined,
-              "namespaceQuotes": false,
-              "quotes": false,
+              "namespaceRefName": undefined,
               "spacing": Object {},
-              "table": undefined,
-              "tableQuotes": false,
+              "tableRefName": undefined,
               "type": "ref",
             },
           ],
@@ -518,14 +519,14 @@ describe('SqlFunction', () => {
               "op": ">",
             },
             "lhs": SqlRef {
-              "column": "val",
+              "columnRefName": RefName {
+                "name": "val",
+                "quotes": false,
+              },
               "keywords": Object {},
-              "namespace": undefined,
-              "namespaceQuotes": false,
-              "quotes": false,
+              "namespaceRefName": undefined,
               "spacing": Object {},
-              "table": undefined,
-              "tableQuotes": false,
+              "tableRefName": undefined,
               "type": "ref",
             },
             "not": false,

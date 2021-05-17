@@ -26,14 +26,14 @@ describe('SqlAlias', () => {
         SqlAlias {
           "alias": undefined,
           "expression": SqlRef {
-            "column": "city",
+            "columnRefName": RefName {
+              "name": "city",
+              "quotes": false,
+            },
             "keywords": Object {},
-            "namespace": undefined,
-            "namespaceQuotes": false,
-            "quotes": false,
+            "namespaceRefName": undefined,
             "spacing": Object {},
-            "table": undefined,
-            "tableQuotes": false,
+            "tableRefName": undefined,
             "type": "ref",
           },
           "keywords": Object {},
@@ -50,26 +50,19 @@ describe('SqlAlias', () => {
 
       expect(SqlQuery.parse(sql)!.getSelectExpressionForIndex(0)).toMatchInlineSnapshot(`
         SqlAlias {
-          "alias": SqlRef {
-            "column": "City",
-            "keywords": Object {},
-            "namespace": undefined,
-            "namespaceQuotes": false,
+          "alias": RefName {
+            "name": "City",
             "quotes": false,
-            "spacing": Object {},
-            "table": undefined,
-            "tableQuotes": false,
-            "type": "ref",
           },
           "expression": SqlRef {
-            "column": "city",
+            "columnRefName": RefName {
+              "name": "city",
+              "quotes": false,
+            },
             "keywords": Object {},
-            "namespace": undefined,
-            "namespaceQuotes": false,
-            "quotes": false,
+            "namespaceRefName": undefined,
             "spacing": Object {},
-            "table": undefined,
-            "tableQuotes": false,
+            "tableRefName": undefined,
             "type": "ref",
           },
           "keywords": Object {
@@ -91,29 +84,25 @@ describe('SqlAlias', () => {
 
       expect(SqlQuery.parse(sql)!.getSelectExpressionForIndex(0)).toMatchInlineSnapshot(`
         SqlAlias {
-          "alias": SqlRef {
-            "column": "City",
-            "keywords": Object {},
-            "namespace": undefined,
-            "namespaceQuotes": false,
+          "alias": RefName {
+            "name": "City",
             "quotes": false,
-            "spacing": Object {},
-            "table": undefined,
-            "tableQuotes": false,
-            "type": "ref",
           },
           "expression": SqlRef {
-            "column": "city",
+            "columnRefName": RefName {
+              "name": "city",
+              "quotes": false,
+            },
             "keywords": Object {},
-            "namespace": undefined,
-            "namespaceQuotes": false,
-            "quotes": false,
+            "namespaceRefName": undefined,
             "spacing": Object {
               "postTableDot": "",
               "preTableDot": "",
             },
-            "table": "tbl",
-            "tableQuotes": false,
+            "tableRefName": RefName {
+              "name": "tbl",
+              "quotes": false,
+            },
             "type": "ref",
           },
           "keywords": Object {
@@ -135,29 +124,25 @@ describe('SqlAlias', () => {
 
       expect(SqlQuery.parse(sql)!.getSelectExpressionForIndex(0)).toMatchInlineSnapshot(`
         SqlAlias {
-          "alias": SqlRef {
-            "column": "City",
-            "keywords": Object {},
-            "namespace": undefined,
-            "namespaceQuotes": false,
+          "alias": RefName {
+            "name": "City",
             "quotes": false,
-            "spacing": Object {},
-            "table": undefined,
-            "tableQuotes": false,
-            "type": "ref",
           },
           "expression": SqlRef {
-            "column": "city",
+            "columnRefName": RefName {
+              "name": "city",
+              "quotes": false,
+            },
             "keywords": Object {},
-            "namespace": undefined,
-            "namespaceQuotes": false,
-            "quotes": false,
+            "namespaceRefName": undefined,
             "spacing": Object {
               "postTableDot": "",
               "preTableDot": "",
             },
-            "table": "tbl",
-            "tableQuotes": false,
+            "tableRefName": RefName {
+              "name": "tbl",
+              "quotes": false,
+            },
             "type": "ref",
           },
           "keywords": Object {

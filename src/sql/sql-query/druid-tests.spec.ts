@@ -1841,7 +1841,6 @@ describe.skip('Druid test queries', () => {
       } catch (e) {
         bad++;
         console.log(sql);
-        // throw new Error(`problem with \`${sql}\`: ${e.message}`);
       }
     }
 

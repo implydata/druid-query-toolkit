@@ -119,9 +119,8 @@ export class SqlRef extends SqlExpression {
     return SqlBase.fromValue(value);
   }
 
-  public getTable(): string {
-    if (!this.tableRefName) throw Error('SqlRef has no defined table');
-    return this.tableRefName.name;
+  public getTable(): string | undefined {
+    return this.tableRefName?.name;
   }
 
   public changeTable(table: string | undefined): this {
@@ -141,9 +140,8 @@ export class SqlRef extends SqlExpression {
     return SqlBase.fromValue(value);
   }
 
-  public getNamespace(): string {
-    if (!this.namespaceRefName) throw Error('SqlRef has no defined namespace');
-    return this.namespaceRefName.name;
+  public getNamespace(): string | undefined {
+    return this.namespaceRefName?.name;
   }
 
   public changeNamespace(namespace: string | undefined): this {
@@ -171,7 +169,7 @@ export class SqlRef extends SqlExpression {
 
     return new SqlTableRef({
       tableRefName: this.columnRefName,
-      namespaceRefName: this.namespaceRefName,
+      namespaceRefName: this.tableRefName,
       spacing: this.spacing,
     });
   }

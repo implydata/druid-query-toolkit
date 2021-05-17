@@ -87,9 +87,8 @@ export class SqlStar extends SqlExpression {
     return SqlBase.fromValue(value);
   }
 
-  public getTable(): string {
-    if (!this.tableRefName) throw Error('SqlStar has no defined table');
-    return this.tableRefName.name;
+  public getTable(): string | undefined {
+    return this.tableRefName?.name;
   }
 
   public changeTable(table: string | undefined): this {
@@ -109,9 +108,8 @@ export class SqlStar extends SqlExpression {
     return SqlBase.fromValue(value);
   }
 
-  public getNamespace(): string {
-    if (!this.namespaceRefName) throw Error('SqlStar has no defined namespace');
-    return this.namespaceRefName.name;
+  public getNamespace(): string | undefined {
+    return this.namespaceRefName?.name;
   }
 
   public changeNamespace(namespace: string | undefined): this {
