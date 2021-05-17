@@ -22,7 +22,7 @@ export type SqlJoinJoinType = SqlJoinJoinTypeWithOn | 'CROSS';
 
 export interface SqlJoinPartValue extends SqlBaseValue {
   joinType?: SqlJoinJoinType;
-  table: SqlAlias;
+  table: SqlExpression;
   onExpression?: SqlExpression;
 }
 
@@ -34,7 +34,7 @@ export class SqlJoinPart extends SqlBase {
 
   static create(
     joinType: SqlJoinJoinTypeWithOn,
-    table: SqlBase,
+    table: SqlExpression,
     onExpression: SqlExpression | SqlExpression[],
   ): SqlJoinPart {
     if (Array.isArray(onExpression)) {
@@ -42,20 +42,20 @@ export class SqlJoinPart extends SqlBase {
     }
     return new SqlJoinPart({
       joinType: joinType,
-      table: SqlAlias.fromBase(table),
+      table: table.convertToTableRef(),
       onExpression: onExpression,
     });
   }
 
-  static cross(table: SqlBase): SqlJoinPart {
+  static cross(table: SqlExpression): SqlJoinPart {
     return new SqlJoinPart({
       joinType: 'CROSS',
-      table: SqlAlias.fromBase(table),
+      table: table.convertToTableRef(),
     });
   }
 
   public readonly joinType?: SqlJoinJoinType;
-  public readonly table: SqlAlias;
+  public readonly table: SqlExpression;
   public readonly onExpression?: SqlExpression;
 
   constructor(options: SqlJoinPartValue) {

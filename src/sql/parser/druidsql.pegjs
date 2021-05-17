@@ -172,7 +172,7 @@ SelectClause =
   var ret = {
     selectKeyword: selectKeyword,
     postSelect: postSelect,
-    selectExpressions: makeSeparatedArray(head, tail).map(sql.SqlAlias.fromBase),
+    selectExpressions: makeSeparatedArray(head, tail),
   };
   if (decorator) {
     ret.decorator = decorator[0].toUpperCase();
@@ -185,7 +185,7 @@ SelectClause =
 FromClause = from:FromToken postFrom:_ head:SqlAlias tail:(CommaSeparator SqlAlias)* join:(_ JoinClauses)?
 {
   return new sql.SqlFromClause({
-    expressions: makeSeparatedArray(head, tail).map(sql.SqlAlias.fromBaseAndUpgrade),
+    expressions: makeSeparatedArray(head, tail).map(function(ex) { return ex.convertToTableRef() }),
     joinParts: join ? join[1] : undefined,
     spacing: {
       postFrom: postFrom,
@@ -210,7 +210,7 @@ SqlJoinPart =
   on:(_ OnToken _ Expression)?
 {
   var value = {
-    table: sql.SqlAlias.fromBaseAndUpgrade(table),
+    table: table.convertToTableRef(),
   };
   var spacing = value.spacing = {
     postJoin: postJoin,
@@ -1284,7 +1284,7 @@ SqlStar = namespace:(RefName _ "." _)? table:(RefName _ "." _)? "*"
     spacing.postTableDot = table[3];
   }
 
-  return new sql.SqlStar(value).as(); // ToDo: remove .as()
+  return new sql.SqlStar(value);
 }
 
 // -----------------------------------

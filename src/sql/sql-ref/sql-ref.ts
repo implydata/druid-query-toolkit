@@ -162,7 +162,7 @@ export class SqlRef extends SqlExpression {
     return name === '*' ? `"*"` : name;
   }
 
-  public convertToTableRef(): SqlTableRef {
+  public convertToTableRef(): SqlExpression {
     if (this.namespaceRefName) {
       throw new Error(`can not convert to SqlTableRef`);
     }

@@ -12,8 +12,8 @@
  * limitations under the License.
  */
 
-import { SqlAlias } from '../../sql-alias/sql-alias';
 import { SqlBase, SqlType, Substitutor } from '../../sql-base';
+import { SqlExpression } from '../../sql-expression';
 import { SqlLiteral } from '../../sql-literal/sql-literal';
 import { SeparatedArray } from '../../utils';
 import { SqlClause, SqlClauseValue } from '../sql-clause';
@@ -116,7 +116,7 @@ export class SqlOrderByClause extends SqlClause {
   }
 
   public removeExpression(
-    selectExpression: SqlAlias,
+    selectExpression: SqlExpression,
     selectIndex: number,
   ): SqlOrderByClause | undefined {
     if (!this.expressions) return this;
@@ -130,7 +130,7 @@ export class SqlOrderByClause extends SqlClause {
           return;
         }
       }
-      if (expression.equals(selectExpression.expression)) return;
+      if (expression.equals(selectExpression.getUnderlyingExpression())) return;
       return orderByExpression;
     });
 

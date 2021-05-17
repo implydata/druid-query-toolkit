@@ -159,12 +159,7 @@ describe('SqlAlias', () => {
 
   describe('changeAliasName', () => {
     const x = SqlRef.column('X').as('test');
-    const y = SqlRef.column('Y').as();
     const z = SqlRef.column('Z').as(RefName.create('test', true));
-
-    it('should work with undefined', () => {
-      expect(String(x.changeAliasName(undefined))).toEqual('X');
-    });
 
     it('should work with normal string', () => {
       expect(String(x.changeAliasName('hello'))).toEqual('X AS hello');
@@ -180,10 +175,6 @@ describe('SqlAlias', () => {
 
     it('should work with quotes if forced', () => {
       expect(String(x.changeAliasName('hello', true))).toEqual('X AS "hello"');
-    });
-
-    it('should work with adding a new alias', () => {
-      expect(String(y.changeAliasName('hello'))).toEqual('Y AS hello');
     });
   });
 });

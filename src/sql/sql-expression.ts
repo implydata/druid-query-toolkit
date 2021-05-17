@@ -96,12 +96,24 @@ export abstract class SqlExpression extends SqlBase {
     return this;
   }
 
-  public as(alias?: RefName | string) {
+  public as(alias: RefName | string) {
     return SqlAlias.create(this, alias);
   }
 
   public toOrderByPart(direction?: SqlOrderByDirection): SqlOrderByExpression {
     return SqlOrderByExpression.create(this, direction);
+  }
+
+  public convertToTableRef(): SqlExpression {
+    return this;
+  }
+
+  public getOutputName(): string | undefined {
+    return;
+  }
+
+  public getUnderlyingExpression(): SqlExpression {
+    return this;
   }
 
   // SqlComparison

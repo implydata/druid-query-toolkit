@@ -12,7 +12,6 @@
  * limitations under the License.
  */
 
-import { SqlAlias } from '../../sql-alias/sql-alias';
 import { SqlBase, SqlType, Substitutor } from '../../sql-base';
 import { SqlExpression } from '../../sql-expression';
 import { SqlLiteral } from '../../sql-literal/sql-literal';
@@ -114,7 +113,7 @@ export class SqlGroupByClause extends SqlClause {
     return this.expressions ? this.expressions.values : [];
   }
 
-  public removeExpression(selectExpression: SqlAlias, selectIndex: number): SqlGroupByClause {
+  public removeExpression(selectExpression: SqlExpression, selectIndex: number): SqlGroupByClause {
     if (!this.expressions) return this;
     return this.changeExpressions(
       this.expressions.filterMap(expression => {
@@ -126,7 +125,7 @@ export class SqlGroupByClause extends SqlClause {
             return;
           }
         }
-        if (expression.equals(selectExpression.expression)) return;
+        if (expression.equals(selectExpression.getUnderlyingExpression())) return;
         return expression;
       }),
     );

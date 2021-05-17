@@ -31,6 +31,7 @@ import {
 import { SqlExpression } from '../sql-expression';
 import { SqlLiteral } from '../sql-literal/sql-literal';
 import { SqlRef } from '../sql-ref/sql-ref';
+import { SqlStar } from '../sql-star/sql-star';
 import { clampIndex, normalizeIndex, SeparatedArray, Separator } from '../utils';
 
 import { SqlWithPart } from './sql-with-part/sql-with-part';
@@ -60,7 +61,7 @@ export interface SqlQueryValue extends SqlBaseValue {
   explainPlanFor?: boolean;
   withParts?: SeparatedArray<SqlWithPart>;
   decorator?: SqlQueryDecorator;
-  selectExpressions?: SeparatedArray<SqlAlias>;
+  selectExpressions?: SeparatedArray<SqlExpression>;
 
   fromClause?: SqlFromClause;
   whereClause?: SqlWhereClause;
@@ -82,22 +83,22 @@ export class SqlQuery extends SqlExpression {
   static readonly DEFAULT_SELECT_KEYWORD = 'SELECT';
   static readonly DEFAULT_UNION_KEYWORD = 'UNION ALL';
 
-  static create(from: SqlBase): SqlQuery {
+  static create(from: SqlExpression | SqlFromClause): SqlQuery {
     return new SqlQuery({
-      selectExpressions: SeparatedArray.fromSingleValue(SqlAlias.STAR),
+      selectExpressions: SeparatedArray.fromSingleValue(SqlStar.PLAIN),
       fromClause:
         from instanceof SqlFromClause
           ? from
-          : SqlFromClause.create(SeparatedArray.fromSingleValue(SqlAlias.fromBaseAndUpgrade(from))),
+          : SqlFromClause.create(SeparatedArray.fromSingleValue(from.convertToTableRef())),
     });
   }
 
-  static from(from: SqlBase): SqlQuery {
+  static from(from: SqlExpression | SqlFromClause): SqlQuery {
     return new SqlQuery({
       fromClause:
         from instanceof SqlFromClause
           ? from
-          : SqlFromClause.create(SeparatedArray.fromSingleValue(SqlAlias.fromBaseAndUpgrade(from))),
+          : SqlFromClause.create(SeparatedArray.fromSingleValue(from.convertToTableRef())),
     });
   }
 
@@ -115,7 +116,7 @@ export class SqlQuery extends SqlExpression {
     }
   }
 
-  static getSelectExpressionOutput(selectExpression: SqlAlias, i: number) {
+  static getSelectExpressionOutput(selectExpression: SqlExpression, i: number) {
     return selectExpression.getOutputName() || `EXPR$${i}`;
   }
 
@@ -126,7 +127,7 @@ export class SqlQuery extends SqlExpression {
   public readonly explainPlanFor?: boolean;
   public readonly withParts?: SeparatedArray<SqlWithPart>;
   public readonly decorator?: SqlQueryDecorator;
-  public readonly selectExpressions?: SeparatedArray<SqlAlias>;
+  public readonly selectExpressions?: SeparatedArray<SqlExpression>;
   public readonly fromClause?: SqlFromClause;
   public readonly whereClause?: SqlWhereClause;
   public readonly groupByClause?: SqlGroupByClause;
@@ -285,7 +286,7 @@ export class SqlQuery extends SqlExpression {
   }
 
   public changeSelectExpressions(
-    selectExpressions: SeparatedArray<SqlAlias> | SqlAlias[] | undefined,
+    selectExpressions: SeparatedArray<SqlExpression> | SqlExpression[] | undefined,
   ): this {
     if (this.selectExpressions === selectExpressions) return this;
     const value = this.valueOf();
@@ -595,16 +596,16 @@ export class SqlQuery extends SqlExpression {
     return 0 <= selectIndex && selectIndex < selectExpressions.length();
   }
 
-  public getSelectExpressionsArray(): readonly SqlAlias[] {
+  public getSelectExpressionsArray(): readonly SqlExpression[] {
     return this.selectExpressions?.values || [];
   }
 
-  public getSelectExpressionForIndex(selectIndex: number): SqlAlias | undefined {
+  public getSelectExpressionForIndex(selectIndex: number): SqlExpression | undefined {
     return this.selectExpressions?.get(selectIndex);
   }
 
   public hasStarInSelect(): boolean {
-    return this.getSelectExpressionsArray().some(v => v.isStar());
+    return this.getSelectExpressionsArray().some(v => v instanceof SqlStar);
   }
 
   public getOutputColumns(): string[] {
@@ -645,7 +646,7 @@ export class SqlQuery extends SqlExpression {
       return selectExpression.getOutputName() === ex.getColumn();
     }
 
-    return ex.equals(selectExpression.expression);
+    return ex.equals(selectExpression.getUnderlyingExpression());
   }
 
   public getSelectIndexForExpression(ex: SqlExpression, allowAliasReferences: boolean): number {
@@ -666,7 +667,7 @@ export class SqlQuery extends SqlExpression {
     }
 
     return selectExpressionsArray.findIndex(selectExpression => {
-      return ex.equals(selectExpression.expression);
+      return ex.equals(selectExpression.getUnderlyingExpression());
     });
   }
 
@@ -688,7 +689,7 @@ export class SqlQuery extends SqlExpression {
     return this.isGroupedSelectIndex(this.getSelectIndexForOutputColumn(outputColumn));
   }
 
-  public getGroupedSelectExpressions(): SqlAlias[] {
+  public getGroupedSelectExpressions(): SqlExpression[] {
     if (!this.hasGroupBy()) return [];
     return this.getSelectExpressionsArray().filter((_selectExpression, i) => {
       return this.isGroupedSelectIndex(i);
@@ -713,7 +714,7 @@ export class SqlQuery extends SqlExpression {
     return this.isAggregateSelectIndex(this.getSelectIndexForOutputColumn(outputColumn));
   }
 
-  getAggregateSelectExpressions(): SqlAlias[] {
+  getAggregateSelectExpressions(): SqlExpression[] {
     if (!this.groupByClause) return [];
     return this.getSelectExpressionsArray().filter((_selectExpression, i) => {
       return this.isAggregateSelectIndex(i);
@@ -744,13 +745,14 @@ export class SqlQuery extends SqlExpression {
     }
   }
 
-  public addSelect(ex: SqlBase | string, options: AddSelectOptions = {}): this {
-    const alias = SqlAlias.fromBase(typeof ex === 'string' ? SqlBase.parseSql(ex) : ex);
+  public addSelect(ex: SqlExpression | string, options: AddSelectOptions = {}): this {
+    const selectExpression = SqlExpression.parse(ex);
     const { insertIndex, addToGroupBy, addToOrderBy, orderByExpression, direction } = options;
     const idx = this.decodeInsertIndex(insertIndex);
 
     const selectExpressions =
-      this.selectExpressions?.insert(idx, alias) || SeparatedArray.fromSingleValue(alias);
+      this.selectExpressions?.insert(idx, selectExpression) ||
+      SeparatedArray.fromSingleValue(selectExpression);
 
     let groupByClause = this.groupByClause?.shiftIndexes(idx);
     if (addToGroupBy) {
@@ -776,10 +778,12 @@ export class SqlQuery extends SqlExpression {
       .changeOrderByClause(orderByClause);
   }
 
-  public changeSelect(selectIndex: number, ex: SqlBase | string): this {
+  public changeSelect(selectIndex: number, ex: SqlExpression | string): this {
     if (!this.selectExpressions) return this;
-    const alias = SqlAlias.fromBase(typeof ex === 'string' ? SqlBase.parseSql(ex) : ex);
-    return this.changeSelectExpressions(this.selectExpressions.change(selectIndex, alias));
+    const selectExpression = SqlExpression.parse(ex);
+    return this.changeSelectExpressions(
+      this.selectExpressions.change(selectIndex, selectExpression),
+    );
   }
 
   public removeSelectIndex(selectIndex: number): this {
@@ -823,12 +827,12 @@ export class SqlQuery extends SqlExpression {
     return Boolean(this.fromClause);
   }
 
-  public getFromExpressions(): readonly SqlAlias[] {
+  public getFromExpressions(): readonly SqlExpression[] {
     if (!this.fromClause) return [];
     return this.fromClause.expressions.values;
   }
 
-  public getFirstFromExpression(): SqlAlias | undefined {
+  public getFirstFromExpression(): SqlExpression | undefined {
     if (!this.fromClause) return;
     return this.fromClause.expressions.first();
   }
@@ -859,23 +863,23 @@ export class SqlQuery extends SqlExpression {
     return this.changeFromClause(this.fromClause.addJoin(join));
   }
 
-  public addLeftJoin(table: SqlBase, onExpression: SqlExpression | SqlExpression[]) {
+  public addLeftJoin(table: SqlExpression, onExpression: SqlExpression | SqlExpression[]) {
     return this.addJoin(SqlJoinPart.create('LEFT', table, onExpression));
   }
 
-  public addRightJoin(table: SqlBase, onExpression: SqlExpression | SqlExpression[]) {
+  public addRightJoin(table: SqlExpression, onExpression: SqlExpression | SqlExpression[]) {
     return this.addJoin(SqlJoinPart.create('RIGHT', table, onExpression));
   }
 
-  public addInnerJoin(table: SqlBase, onExpression: SqlExpression | SqlExpression[]) {
+  public addInnerJoin(table: SqlExpression, onExpression: SqlExpression | SqlExpression[]) {
     return this.addJoin(SqlJoinPart.create('INNER', table, onExpression));
   }
 
-  public addFullJoin(table: SqlBase, onExpression: SqlExpression | SqlExpression[]) {
+  public addFullJoin(table: SqlExpression, onExpression: SqlExpression | SqlExpression[]) {
     return this.addJoin(SqlJoinPart.create('FULL', table, onExpression));
   }
 
-  public addCrossJoin(table: SqlBase) {
+  public addCrossJoin(table: SqlExpression) {
     return this.addJoin(SqlJoinPart.cross(table));
   }
 
@@ -932,7 +936,7 @@ export class SqlQuery extends SqlExpression {
       } else {
         const selectExpression = this.getSelectExpressionForIndex(selectIndex)!;
         return {
-          expression: selectExpression.expression as SqlExpression,
+          expression: selectExpression.getUnderlyingExpression(),
           selectIndex,
           outputColumn: SqlQuery.getSelectExpressionOutput(selectExpression, selectIndex),
           orderByExpression: this.getOrderByForSelectIndex(selectIndex),

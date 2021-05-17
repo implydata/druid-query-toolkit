@@ -15,13 +15,14 @@
 import { filterMap } from '../../../utils';
 import { SqlAlias } from '../../sql-alias/sql-alias';
 import { SqlBase, SqlType, Substitutor } from '../../sql-base';
+import { SqlExpression } from '../../sql-expression';
 import { SqlTableRef } from '../../sql-table-ref/sql-table-ref';
 import { SeparatedArray } from '../../utils';
 import { SqlClause, SqlClauseValue } from '../sql-clause';
 import { SqlJoinPart } from '../sql-join-part/sql-join-part';
 
 export interface SqlFromClauseValue extends SqlClauseValue {
-  expressions: SeparatedArray<SqlAlias>;
+  expressions: SeparatedArray<SqlExpression>;
   joinParts?: SeparatedArray<SqlJoinPart>;
 }
 
@@ -30,13 +31,13 @@ export class SqlFromClause extends SqlClause {
 
   static DEFAULT_FROM_KEYWORD = 'FROM';
 
-  static create(expressions: SeparatedArray<SqlAlias> | SqlAlias[]): SqlFromClause {
+  static create(expressions: SeparatedArray<SqlExpression> | SqlExpression[]): SqlFromClause {
     return new SqlFromClause({
       expressions: SeparatedArray.fromArray(expressions),
     });
   }
 
-  public readonly expressions: SeparatedArray<SqlAlias>;
+  public readonly expressions: SeparatedArray<SqlExpression>;
   public readonly joinParts?: SeparatedArray<SqlJoinPart>;
 
   constructor(options: SqlFromClauseValue) {
@@ -67,7 +68,7 @@ export class SqlFromClause extends SqlClause {
     return rawParts.join('');
   }
 
-  public changeExpressions(expressions: SeparatedArray<SqlAlias> | SqlAlias[]): this {
+  public changeExpressions(expressions: SeparatedArray<SqlExpression> | SqlExpression[]): this {
     const value = this.valueOf();
     value.expressions = SeparatedArray.fromArray(expressions);
     return SqlBase.fromValue(value);
@@ -122,9 +123,9 @@ export class SqlFromClause extends SqlClause {
 
   public getFirstTableName(): string {
     return filterMap(this.expressions.values, table => {
-      const tableRef = table.expression;
-      if (tableRef instanceof SqlTableRef) {
-        return tableRef.getTable();
+      if (table instanceof SqlAlias) table = table.expression;
+      if (table instanceof SqlTableRef) {
+        return table.getTable();
       }
       return;
     })[0];
@@ -132,9 +133,9 @@ export class SqlFromClause extends SqlClause {
 
   public getFirstSchema(): string {
     return filterMap(this.expressions.values, table => {
-      const tableRef = table.expression;
-      if (tableRef instanceof SqlTableRef) {
-        return tableRef.getNamespace();
+      if (table instanceof SqlAlias) table = table.expression;
+      if (table instanceof SqlTableRef) {
+        return table.getNamespace();
       }
       return;
     })[0];

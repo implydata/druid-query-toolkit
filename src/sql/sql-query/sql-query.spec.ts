@@ -94,9 +94,9 @@ describe('SqlQuery', () => {
     it('works in advanced case', () => {
       const query = SqlQuery.create(SqlTableRef.create('lol'))
         .changeSelectExpressions([
-          SqlRef.column('channel').as(),
-          SqlRef.column('page').as(),
-          SqlRef.column('user').as(),
+          SqlRef.column('channel'),
+          SqlRef.column('page'),
+          SqlRef.column('user'),
         ])
         .changeWhereExpression(`channel  =  '#en.wikipedia'`);
 

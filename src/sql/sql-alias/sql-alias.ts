@@ -12,56 +12,33 @@
  * limitations under the License.
  */
 
-import { RefName, SqlQuery, SqlStar } from '..';
 import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../sql-base';
 import { SqlExpression } from '../sql-expression';
 import { SqlRef } from '../sql-ref/sql-ref';
+import { RefName } from '../utils';
 
 export interface SqlAliasValue extends SqlBaseValue {
-  expression: SqlExpression | SqlQuery;
-  alias?: RefName;
+  expression: SqlExpression;
+  alias: RefName;
 }
 
-export class SqlAlias extends SqlBase {
+export class SqlAlias extends SqlExpression {
   static type: SqlType = 'alias';
 
   static DEFAULT_AS_KEYWORD = 'AS';
 
-  static STAR: SqlAlias;
-
-  static fromBase(base: SqlBase): SqlAlias {
-    if (base instanceof SqlAlias) return base;
-    if (base instanceof SqlExpression || base instanceof SqlQuery) {
-      return new SqlAlias({
-        expression: base,
-      });
-    }
-    throw new Error(`can not construct and alias from ${base.type}`);
-  }
-
-  static fromBaseAndUpgrade(base: SqlBase): SqlAlias {
-    if (base instanceof SqlAlias) return base.upgrade();
-    if (base instanceof SqlRef) base = base.convertToTableRef();
-    if (base instanceof SqlExpression || base instanceof SqlQuery) {
-      return new SqlAlias({
-        expression: base,
-      });
-    }
-    throw new Error(`can not construct and alias from ${base.type}`);
-  }
-
-  static create(expression: SqlExpression, alias?: RefName | string) {
+  static create(expression: SqlExpression, alias: RefName | string) {
     if (expression.type === 'query') {
       expression = expression.ensureParens();
     }
     return new SqlAlias({
       expression: expression,
-      alias: alias ? (typeof alias === 'string' ? RefName.create(alias) : alias) : undefined,
+      alias: typeof alias === 'string' ? RefName.create(alias) : alias,
     });
   }
 
-  public readonly expression: SqlExpression | SqlQuery;
-  public readonly alias?: RefName;
+  public readonly expression: SqlExpression;
+  public readonly alias: RefName;
 
   constructor(options: SqlAliasValue) {
     super(options, SqlAlias.type);
@@ -79,37 +56,31 @@ export class SqlAlias extends SqlBase {
   protected _toRawString(): string {
     const rawParts: string[] = [this.expression.toString()];
 
-    if (this.alias) {
-      if (this.keywords['as'] !== '') {
-        rawParts.push(this.getSpace('preAs'), this.getKeyword('as', SqlAlias.DEFAULT_AS_KEYWORD));
-      }
-
-      rawParts.push(this.getSpace('preAlias'), this.alias.toString());
+    if (this.keywords['as'] !== '') {
+      rawParts.push(this.getSpace('preAs'), this.getKeyword('as', SqlAlias.DEFAULT_AS_KEYWORD));
     }
+
+    rawParts.push(this.getSpace('preAlias'), this.alias.toString());
 
     return rawParts.join('');
   }
 
-  public changeExpression(expression: SqlExpression | SqlQuery): this {
+  public changeExpression(expression: SqlExpression): this {
     const value = this.valueOf();
     value.expression = expression;
     return SqlBase.fromValue(value);
   }
 
-  public changeAlias(alias: RefName | undefined): this {
+  public changeAlias(alias: RefName): this {
     const value = this.valueOf();
     value.alias = alias;
     return SqlBase.fromValue(value);
   }
 
-  public changeAliasName(aliasName: string | undefined, forceQuotes = false): this {
+  public changeAliasName(aliasName: string, forceQuotes = false): this {
     const { alias } = this;
     return this.changeAlias(
-      aliasName
-        ? alias && !forceQuotes
-          ? alias.changeName(aliasName)
-          : RefName.create(aliasName, forceQuotes)
-        : undefined,
+      forceQuotes ? RefName.create(aliasName, forceQuotes) : alias.changeName(aliasName),
     );
   }
 
@@ -117,7 +88,7 @@ export class SqlAlias extends SqlBase {
     nextStack: SqlBase[],
     fn: Substitutor,
     postorder: boolean,
-  ): SqlBase | undefined {
+  ): SqlExpression | undefined {
     let ret = this;
 
     const expression = this.expression._walkHelper(nextStack, fn, postorder);
@@ -129,7 +100,7 @@ export class SqlAlias extends SqlBase {
     return ret;
   }
 
-  public upgrade(): this {
+  public convertToTableRef(): SqlExpression {
     const { expression } = this;
     if (expression instanceof SqlRef) {
       return this.changeExpression(expression.convertToTableRef());
@@ -138,20 +109,12 @@ export class SqlAlias extends SqlBase {
   }
 
   public getOutputName(): string | undefined {
-    if (this.alias) return this.alias.name;
-    const { expression } = this;
-    if (expression instanceof SqlRef) {
-      return expression.getOutputName();
-    }
-    return;
+    return this.alias.name;
   }
 
-  public isStar(): boolean {
-    const { expression } = this;
-    return expression instanceof SqlStar;
+  public getUnderlyingExpression(): SqlExpression {
+    return this.expression;
   }
 }
 
 SqlBase.register(SqlAlias);
-
-SqlAlias.STAR = SqlAlias.create(SqlStar.PLAIN);
