@@ -167,21 +167,15 @@ describe('QueryRunner', () => {
             "expressions": SeparatedArray {
               "separators": Array [],
               "values": Array [
-                SqlAlias {
-                  "alias": undefined,
-                  "expression": SqlTableRef {
-                    "keywords": Object {},
-                    "namespaceRefName": undefined,
-                    "spacing": Object {},
-                    "tableRefName": RefName {
-                      "name": "wikipedia",
-                      "quotes": false,
-                    },
-                    "type": "tableRef",
-                  },
+                SqlTableRef {
                   "keywords": Object {},
+                  "namespaceRefName": undefined,
                   "spacing": Object {},
-                  "type": "alias",
+                  "tableRefName": RefName {
+                    "name": "wikipedia",
+                    "quotes": false,
+                  },
+                  "type": "tableRef",
                 },
               ],
             },
@@ -265,22 +259,16 @@ describe('QueryRunner', () => {
               },
             ],
             "values": Array [
-              SqlAlias {
-                "alias": undefined,
-                "expression": SqlRef {
-                  "columnRefName": RefName {
-                    "name": "channel",
-                    "quotes": false,
-                  },
-                  "keywords": Object {},
-                  "namespaceRefName": undefined,
-                  "spacing": Object {},
-                  "tableRefName": undefined,
-                  "type": "ref",
+              SqlRef {
+                "columnRefName": RefName {
+                  "name": "channel",
+                  "quotes": false,
                 },
                 "keywords": Object {},
+                "namespaceRefName": undefined,
                 "spacing": Object {},
-                "type": "alias",
+                "tableRefName": undefined,
+                "type": "ref",
               },
               SqlAlias {
                 "alias": RefName {
@@ -396,21 +384,15 @@ describe('QueryRunner', () => {
             "expressions": SeparatedArray {
               "separators": Array [],
               "values": Array [
-                SqlAlias {
-                  "alias": undefined,
-                  "expression": SqlTableRef {
-                    "keywords": Object {},
-                    "namespaceRefName": undefined,
-                    "spacing": Object {},
-                    "tableRefName": RefName {
-                      "name": "wikipedia",
-                      "quotes": false,
-                    },
-                    "type": "tableRef",
-                  },
+                SqlTableRef {
                   "keywords": Object {},
+                  "namespaceRefName": undefined,
                   "spacing": Object {},
-                  "type": "alias",
+                  "tableRefName": RefName {
+                    "name": "wikipedia",
+                    "quotes": false,
+                  },
+                  "type": "tableRef",
                 },
               ],
             },
@@ -494,22 +476,16 @@ describe('QueryRunner', () => {
               },
             ],
             "values": Array [
-              SqlAlias {
-                "alias": undefined,
-                "expression": SqlRef {
-                  "columnRefName": RefName {
-                    "name": "channel",
-                    "quotes": false,
-                  },
-                  "keywords": Object {},
-                  "namespaceRefName": undefined,
-                  "spacing": Object {},
-                  "tableRefName": undefined,
-                  "type": "ref",
+              SqlRef {
+                "columnRefName": RefName {
+                  "name": "channel",
+                  "quotes": false,
                 },
                 "keywords": Object {},
+                "namespaceRefName": undefined,
                 "spacing": Object {},
-                "type": "alias",
+                "tableRefName": undefined,
+                "type": "ref",
               },
               SqlAlias {
                 "alias": RefName {
@@ -626,21 +602,15 @@ describe('QueryRunner', () => {
             "expressions": SeparatedArray {
               "separators": Array [],
               "values": Array [
-                SqlAlias {
-                  "alias": undefined,
-                  "expression": SqlTableRef {
-                    "keywords": Object {},
-                    "namespaceRefName": undefined,
-                    "spacing": Object {},
-                    "tableRefName": RefName {
-                      "name": "wikipedia",
-                      "quotes": false,
-                    },
-                    "type": "tableRef",
-                  },
+                SqlTableRef {
                   "keywords": Object {},
+                  "namespaceRefName": undefined,
                   "spacing": Object {},
-                  "type": "alias",
+                  "tableRefName": RefName {
+                    "name": "wikipedia",
+                    "quotes": false,
+                  },
+                  "type": "tableRef",
                 },
               ],
             },
@@ -724,22 +694,16 @@ describe('QueryRunner', () => {
               },
             ],
             "values": Array [
-              SqlAlias {
-                "alias": undefined,
-                "expression": SqlRef {
-                  "columnRefName": RefName {
-                    "name": "channel",
-                    "quotes": false,
-                  },
-                  "keywords": Object {},
-                  "namespaceRefName": undefined,
-                  "spacing": Object {},
-                  "tableRefName": undefined,
-                  "type": "ref",
+              SqlRef {
+                "columnRefName": RefName {
+                  "name": "channel",
+                  "quotes": false,
                 },
                 "keywords": Object {},
+                "namespaceRefName": undefined,
                 "spacing": Object {},
-                "type": "alias",
+                "tableRefName": undefined,
+                "type": "ref",
               },
               SqlAlias {
                 "alias": RefName {

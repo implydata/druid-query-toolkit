@@ -336,27 +336,21 @@ describe('#convertToTableRef', () => {
           "expressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
-              SqlAlias {
-                "alias": undefined,
-                "expression": SqlTableRef {
-                  "keywords": Object {},
-                  "namespaceRefName": RefName {
-                    "name": "sys",
-                    "quotes": false,
-                  },
-                  "spacing": Object {
-                    "postNamespaceDot": "",
-                    "preNamespaceDot": "",
-                  },
-                  "tableRefName": RefName {
-                    "name": "segments",
-                    "quotes": false,
-                  },
-                  "type": "tableRef",
-                },
+              SqlTableRef {
                 "keywords": Object {},
-                "spacing": Object {},
-                "type": "alias",
+                "namespaceRefName": RefName {
+                  "name": "sys",
+                  "quotes": false,
+                },
+                "spacing": Object {
+                  "postNamespaceDot": "",
+                  "preNamespaceDot": "",
+                },
+                "tableRefName": RefName {
+                  "name": "segments",
+                  "quotes": false,
+                },
+                "type": "tableRef",
               },
             ],
           },
@@ -380,22 +374,16 @@ describe('#convertToTableRef', () => {
         "selectExpressions": SeparatedArray {
           "separators": Array [],
           "values": Array [
-            SqlAlias {
-              "alias": undefined,
-              "expression": SqlRef {
-                "columnRefName": RefName {
-                  "name": "tbl",
-                  "quotes": false,
-                },
-                "keywords": Object {},
-                "namespaceRefName": undefined,
-                "spacing": Object {},
-                "tableRefName": undefined,
-                "type": "ref",
+            SqlRef {
+              "columnRefName": RefName {
+                "name": "tbl",
+                "quotes": false,
               },
               "keywords": Object {},
+              "namespaceRefName": undefined,
               "spacing": Object {},
-              "type": "alias",
+              "tableRefName": undefined,
+              "type": "ref",
             },
           ],
         },

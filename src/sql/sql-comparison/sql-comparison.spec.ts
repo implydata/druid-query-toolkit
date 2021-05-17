@@ -212,21 +212,15 @@ describe('SqlComparison', () => {
             "expressions": SeparatedArray {
               "separators": Array [],
               "values": Array [
-                SqlAlias {
-                  "alias": undefined,
-                  "expression": SqlTableRef {
-                    "keywords": Object {},
-                    "namespaceRefName": undefined,
-                    "spacing": Object {},
-                    "tableRefName": RefName {
-                      "name": "wikipedia",
-                      "quotes": false,
-                    },
-                    "type": "tableRef",
-                  },
+                SqlTableRef {
                   "keywords": Object {},
+                  "namespaceRefName": undefined,
                   "spacing": Object {},
-                  "type": "alias",
+                  "tableRefName": RefName {
+                    "name": "wikipedia",
+                    "quotes": false,
+                  },
+                  "type": "tableRef",
                 },
               ],
             },
@@ -345,22 +339,16 @@ describe('SqlComparison', () => {
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
-              SqlAlias {
-                "alias": undefined,
-                "expression": SqlRef {
-                  "columnRefName": RefName {
-                    "name": "page",
-                    "quotes": false,
-                  },
-                  "keywords": Object {},
-                  "namespaceRefName": undefined,
-                  "spacing": Object {},
-                  "tableRefName": undefined,
-                  "type": "ref",
+              SqlRef {
+                "columnRefName": RefName {
+                  "name": "page",
+                  "quotes": false,
                 },
                 "keywords": Object {},
+                "namespaceRefName": undefined,
                 "spacing": Object {},
-                "type": "alias",
+                "tableRefName": undefined,
+                "type": "ref",
               },
             ],
           },
@@ -591,21 +579,15 @@ describe('SqlComparison', () => {
             "expressions": SeparatedArray {
               "separators": Array [],
               "values": Array [
-                SqlAlias {
-                  "alias": undefined,
-                  "expression": SqlTableRef {
-                    "keywords": Object {},
-                    "namespaceRefName": undefined,
-                    "spacing": Object {},
-                    "tableRefName": RefName {
-                      "name": "tbl",
-                      "quotes": false,
-                    },
-                    "type": "tableRef",
-                  },
+                SqlTableRef {
                   "keywords": Object {},
+                  "namespaceRefName": undefined,
                   "spacing": Object {},
-                  "type": "alias",
+                  "tableRefName": RefName {
+                    "name": "tbl",
+                    "quotes": false,
+                  },
+                  "type": "tableRef",
                 },
               ],
             },
@@ -650,22 +632,16 @@ describe('SqlComparison', () => {
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
-              SqlAlias {
-                "alias": undefined,
-                "expression": SqlRef {
-                  "columnRefName": RefName {
-                    "name": "val",
-                    "quotes": false,
-                  },
-                  "keywords": Object {},
-                  "namespaceRefName": undefined,
-                  "spacing": Object {},
-                  "tableRefName": undefined,
-                  "type": "ref",
+              SqlRef {
+                "columnRefName": RefName {
+                  "name": "val",
+                  "quotes": false,
                 },
                 "keywords": Object {},
+                "namespaceRefName": undefined,
                 "spacing": Object {},
-                "type": "alias",
+                "tableRefName": undefined,
+                "type": "ref",
               },
             ],
           },
@@ -722,21 +698,15 @@ describe('SqlComparison', () => {
             "expressions": SeparatedArray {
               "separators": Array [],
               "values": Array [
-                SqlAlias {
-                  "alias": undefined,
-                  "expression": SqlTableRef {
-                    "keywords": Object {},
-                    "namespaceRefName": undefined,
-                    "spacing": Object {},
-                    "tableRefName": RefName {
-                      "name": "tbl",
-                      "quotes": false,
-                    },
-                    "type": "tableRef",
-                  },
+                SqlTableRef {
                   "keywords": Object {},
+                  "namespaceRefName": undefined,
                   "spacing": Object {},
-                  "type": "alias",
+                  "tableRefName": RefName {
+                    "name": "tbl",
+                    "quotes": false,
+                  },
+                  "type": "tableRef",
                 },
               ],
             },
@@ -781,22 +751,16 @@ describe('SqlComparison', () => {
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
-              SqlAlias {
-                "alias": undefined,
-                "expression": SqlRef {
-                  "columnRefName": RefName {
-                    "name": "val",
-                    "quotes": false,
-                  },
-                  "keywords": Object {},
-                  "namespaceRefName": undefined,
-                  "spacing": Object {},
-                  "tableRefName": undefined,
-                  "type": "ref",
+              SqlRef {
+                "columnRefName": RefName {
+                  "name": "val",
+                  "quotes": false,
                 },
                 "keywords": Object {},
+                "namespaceRefName": undefined,
                 "spacing": Object {},
-                "type": "alias",
+                "tableRefName": undefined,
+                "type": "ref",
               },
             ],
           },

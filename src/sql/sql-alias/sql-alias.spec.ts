@@ -23,22 +23,16 @@ describe('SqlAlias', () => {
       backAndForth(sql);
 
       expect(SqlQuery.parse(sql)!.getSelectExpressionForIndex(0)).toMatchInlineSnapshot(`
-        SqlAlias {
-          "alias": undefined,
-          "expression": SqlRef {
-            "columnRefName": RefName {
-              "name": "city",
-              "quotes": false,
-            },
-            "keywords": Object {},
-            "namespaceRefName": undefined,
-            "spacing": Object {},
-            "tableRefName": undefined,
-            "type": "ref",
+        SqlRef {
+          "columnRefName": RefName {
+            "name": "city",
+            "quotes": false,
           },
           "keywords": Object {},
+          "namespaceRefName": undefined,
           "spacing": Object {},
-          "type": "alias",
+          "tableRefName": undefined,
+          "type": "ref",
         }
       `);
     });
