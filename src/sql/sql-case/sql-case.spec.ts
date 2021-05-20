@@ -15,7 +15,86 @@
 import { backAndForth } from '../../test-utils';
 import { SqlExpression } from '..';
 
-describe('Case expression', () => {
+describe('CaseExpression', () => {
+  it('things that work', () => {
+    const queries: string[] = [
+      `CASE WHEN (A) THEN 'hello' END`,
+      `CASE WHEN TIMESTAMP '2019-08-27 18:00:00'<=(t."__time") AND (t."__time")<TIMESTAMP '2019-08-28 00:00:00' THEN (t."__time") END`,
+      `CASE WHEN (3<="__time") THEN 1 END`,
+      `CASE WHEN (TIMESTAMP '2019-08-27 18:00:00'<=(t."__time") AND (t."__time")<TIMESTAMP '2019-08-28 00:00:00') THEN (t."__time") END`,
+    ];
+
+    for (const sql of queries) {
+      try {
+        backAndForth(sql);
+      } catch (e) {
+        console.log(`Problem with: \`${sql}\``);
+        throw e;
+      }
+    }
+  });
+
+  it('caseless CASE Expression', () => {
+    const sql = `CASE WHEN B THEN C END`;
+
+    backAndForth(sql);
+
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+      SqlCase {
+        "caseExpression": undefined,
+        "elseExpression": undefined,
+        "keywords": Object {
+          "case": "CASE",
+          "end": "END",
+        },
+        "spacing": Object {
+          "postCase": " ",
+          "preEnd": " ",
+        },
+        "type": "case",
+        "whenThenParts": SeparatedArray {
+          "separators": Array [],
+          "values": Array [
+            SqlWhenThenPart {
+              "keywords": Object {
+                "then": "THEN",
+                "when": "WHEN",
+              },
+              "spacing": Object {
+                "postThen": " ",
+                "postWhen": " ",
+                "postWhenExpression": " ",
+              },
+              "thenExpression": SqlRef {
+                "columnRefName": RefName {
+                  "name": "C",
+                  "quotes": false,
+                },
+                "keywords": Object {},
+                "namespaceRefName": undefined,
+                "spacing": Object {},
+                "tableRefName": undefined,
+                "type": "ref",
+              },
+              "type": "whenThenPart",
+              "whenExpression": SqlRef {
+                "columnRefName": RefName {
+                  "name": "B",
+                  "quotes": false,
+                },
+                "keywords": Object {},
+                "namespaceRefName": undefined,
+                "spacing": Object {},
+                "tableRefName": undefined,
+                "type": "ref",
+              },
+            },
+          ],
+        },
+      }
+    `);
+  });
+
   it('simple CASE Expression', () => {
     const sql = `CASE A WHEN B THEN C END`;
 

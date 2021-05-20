@@ -58,6 +58,10 @@ describe('SqlFunction', () => {
     expect(String(SqlExpression.parse(sql).clearOwnSeparators())).toEqual(sql);
   });
 
+  it('.isValidFunctionName', () => {
+    expect(SqlFunction.isValidFunctionName('SUM')).toEqual(true);
+  });
+
   it('Function without args', () => {
     const sql = `FN()`;
 

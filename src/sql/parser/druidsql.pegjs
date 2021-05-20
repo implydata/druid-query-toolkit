@@ -16,7 +16,48 @@ Start = Sql
 
 // Rest of the work...
 
-Sql = SqlQuery / SqlAliasExpression
+Sql = SqlQuery / SqlAlias
+
+// ------------------------------
+
+SqlAlias = expression:Expression alias:((_ AsToken)? _ RefName)?
+{
+  if (!alias) return expression;
+
+  var value = { expression: expression };
+  var spacing = value.spacing = {};
+  var keywords = value.keywords = {};
+
+  var as = alias[0];
+  if (as) {
+    spacing.preAs = as[0];
+    keywords.as = as[1];
+  } else {
+    keywords.as = '';
+  }
+
+  spacing.preAlias = alias[1];
+  value.alias = alias[2];
+
+  return new sql.SqlAlias(value);
+}
+
+SqlAliasExplicitAs = expression:Expression alias:(_ AsToken _ RefName)?
+{
+  if (!alias) return expression;
+
+  return new sql.SqlAlias({
+    expression: expression,
+    alias: alias[3],
+    spacing: {
+      preAs: alias[0],
+      preAlias: alias[2],
+    },
+    keywords: {
+      as: alias[1],
+    },
+  });
+}
 
 // ------------------------------
 
@@ -26,7 +67,7 @@ SqlQuery =
   withClause:(WithClause _)?
   select:SelectClause
   from:(_ FromClause)?
-  where:(_ WhereClause)?
+  where:(_ SqlWhereClause)?
   groupBy:(_ GroupByClause)?
   having:(_ HavingClause)?
   orderBy:(_ OrderByClause)?
@@ -182,6 +223,8 @@ SelectClause =
   return ret;
 }
 
+SqlStarOrAliasExpression = SqlStar / SqlAlias
+
 FromClause = from:FromToken postFrom:_ head:SqlAlias tail:(CommaSeparator SqlAlias)* join:(_ JoinClauses)?
 {
   return new sql.SqlFromClause({
@@ -242,7 +285,7 @@ JoinType =
 / "INNER"i
 / "CROSS"i
 
-WhereClause = where:WhereToken postWhere:_ expression:Expression
+SqlWhereClause = where:WhereToken postWhere:_ expression:Expression
 {
   return new sql.SqlWhereClause({
     expression: expression,
@@ -356,75 +399,6 @@ UnionClause = unionKeyword:UnionToken postUnion:_ unionQuery:SqlQuery
 }
 
 // ------------------------------
-
-SqlAlias = expression:(Expression / SqlInParens) alias:((_ AsToken)? _ SqlRef)?
-{
-  if (!alias) {
-    return expression;
-  }
-
-  var value = { expression: expression };
-  var spacing = value.spacing = {};
-  var keywords = value.keywords = {};
-
-  var as = alias[0];
-  if (as) {
-    spacing.preAs = as[0];
-    keywords.as = as[1];
-  } else {
-    keywords.as = '';
-  }
-
-  spacing.preAlias = alias[1];
-  value.alias = alias[2];
-
-  return new sql.SqlAlias(value);
-}
-
-SqlStarOrAliasExpression = SqlStar / SqlAliasExpression
-
-SqlAliasExpression = expression:Expression alias:((_ AsToken)? _ RefName)?
-{
-  if (!alias) {
-    return expression;
-  }
-
-  var value = { expression: expression };
-  var spacing = value.spacing = {};
-  var keywords = value.keywords = {};
-
-  var as = alias[0];
-  if (as) {
-    spacing.preAs = as[0];
-    keywords.as = as[1];
-  } else {
-    keywords.as = '';
-  }
-
-  spacing.preAlias = alias[1];
-  value.alias = alias[2];
-
-  return new sql.SqlAlias(value);
-}
-
-SqlAliasExpressionExplicitAs = expression:Expression alias:(_ AsToken _ RefName)?
-{
-  if (!alias) {
-    return expression;
-  }
-
-  return new sql.SqlAlias({
-    expression: expression,
-    alias: alias[3],
-    spacing: {
-      preAs: alias[0],
-      preAlias: alias[2],
-    },
-    keywords: {
-      as: alias[1],
-    },
-  });
-}
 
 /*
 Expressions are defined below in acceding priority order
@@ -659,8 +633,8 @@ CaseExpression =
   caseToken:CaseToken
   postCase:_
   caseExpression:(Expression _)?
-  head:WhenThenPair
-  tail:(_ WhenThenPair)*
+  head:SqlWhenThenPart
+  tail:(_ SqlWhenThenPart)*
   elseValue:(_ ElseToken _ Expression)?
   preEnd:_
   end:EndToken
@@ -684,7 +658,7 @@ CaseExpression =
   });
 }
 
-WhenThenPair = when:WhenToken postWhen:_ whenExpression:Expression postWhenExpression:_ then:ThenToken postThen:_ thenExpression:Expression
+SqlWhenThenPart = when:WhenToken postWhen:_ whenExpression:Expression postWhenExpression:_ then:ThenToken postThen:_ thenExpression:Expression
 {
   return new sql.SqlWhenThenPart({
     whenExpression: whenExpression,
@@ -760,12 +734,12 @@ Function =
 / NakedFunction
 
 GenericFunction =
-  functionName:UnquotedRefNameFree
+  functionName:UnquotedRefNameFree &{ return sql.SqlFunction.isValidFunctionName(functionName) }
   preLeftParen:_
   OpenParen
   postLeftParen:_
-  head:SqlAliasExpressionExplicitAs?
-  tail:(CommaSeparator SqlAliasExpressionExplicitAs)*
+  head:SqlAliasExplicitAs?
+  tail:(CommaSeparator SqlAliasExplicitAs)*
   postArguments:_
   CloseParen
   filter:(_ FunctionFilter)?
@@ -1062,7 +1036,7 @@ ArrayFunction =
   return new sql.SqlFunction(value);
 }
 
-FunctionFilter = filterKeyword:FilterToken postFilter:_ OpenParen postLeftParen:_ whereClause:WhereClause preRightParen:_ CloseParen
+FunctionFilter = filterKeyword:FilterToken postFilter:_ OpenParen postLeftParen:_ whereClause:SqlWhereClause preRightParen:_ CloseParen
 {
   return {
     filterKeyword: filterKeyword,

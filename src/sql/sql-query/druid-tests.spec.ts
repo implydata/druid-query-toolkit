@@ -1833,6 +1833,8 @@ describe('Druid test queries', () => {
     `,
   ]
     .filter(q => !q.includes('GROUPING SETS')) // ToDo: implement GROUPING SETS
+    .filter(q => !q.includes('GROUP BY CUBE')) // ToDo: implement GROUP BY CUBE
+    .filter(q => !q.includes('GROUP BY ROLLUP')) // ToDo: implement GROUP BY ROLLUP
     .filter(q => !q.includes(') IN')); // ToDo: implement (tuple) IN (sub query)
 
   it('all queries work', () => {

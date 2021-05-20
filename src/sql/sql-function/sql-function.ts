@@ -12,17 +12,23 @@
  * limitations under the License.
  */
 
+import { ALLOWED_FUNCTIONS } from '../allowed-functions';
 import { SPECIAL_FUNCTIONS } from '../special-functions';
 import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../sql-base';
 import { SqlWhereClause } from '../sql-clause/sql-where-clause/sql-where-clause';
 import { SqlExpression } from '../sql-expression';
 import { SqlLiteral } from '../sql-literal/sql-literal';
 import { SqlStar } from '../sql-star/sql-star';
-import { SeparatedArray, Separator } from '../utils';
+import { RefName, SeparatedArray, Separator } from '../utils';
 
 const specialFunctionLookup: Record<string, boolean> = {};
 for (const r of SPECIAL_FUNCTIONS) {
   specialFunctionLookup[r] = true;
+}
+
+const allowedFunctionLookup: Record<string, boolean> = {};
+for (const r of ALLOWED_FUNCTIONS) {
+  allowedFunctionLookup[r] = true;
 }
 
 export type SpecialParen = 'square' | 'none';
@@ -43,6 +49,13 @@ export class SqlFunction extends SqlExpression {
   static COUNT_STAR: SqlFunction;
 
   static SPECIAL_FUNCTIONS = SPECIAL_FUNCTIONS;
+  static ALLOWED_FUNCTIONS = ALLOWED_FUNCTIONS;
+
+  static isValidFunctionName(functionName: string) {
+    return Boolean(
+      !RefName.isReservedKeyword(functionName) || allowedFunctionLookup[functionName.toUpperCase()],
+    );
+  }
 
   static isNakedFunction(functionName: string) {
     return Boolean(specialFunctionLookup[functionName.toUpperCase()]);

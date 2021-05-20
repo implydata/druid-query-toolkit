@@ -1077,7 +1077,7 @@ describe('SqlQuery', () => {
       WITH dept_count AS (
         SELECT deptno
         FROM   emp)
-      Select * from tbl
+      Select * from tbl As t
     `;
 
     backAndForth(sql);
@@ -1090,15 +1090,29 @@ describe('SqlQuery', () => {
           "expressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
-              SqlTableRef {
-                "keywords": Object {},
-                "namespaceRefName": undefined,
-                "spacing": Object {},
-                "tableRefName": RefName {
-                  "name": "tbl",
+              SqlAlias {
+                "alias": RefName {
+                  "name": "t",
                   "quotes": false,
                 },
-                "type": "tableRef",
+                "expression": SqlTableRef {
+                  "keywords": Object {},
+                  "namespaceRefName": undefined,
+                  "spacing": Object {},
+                  "tableRefName": RefName {
+                    "name": "tbl",
+                    "quotes": false,
+                  },
+                  "type": "tableRef",
+                },
+                "keywords": Object {
+                  "as": "As",
+                },
+                "spacing": Object {
+                  "preAlias": " ",
+                  "preAs": " ",
+                },
+                "type": "alias",
               },
             ],
           },
