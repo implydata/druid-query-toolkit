@@ -74,7 +74,7 @@ export class Introspect {
   static decodeColumnTypesFromPlan(queryPlanResult: QueryResult): string[] {
     if (queryPlanResult.isEmpty()) return [];
     const { rows } = queryPlanResult;
-    if (queryPlanResult.getHeaderNames().join(',') !== 'PLAN') {
+    if (queryPlanResult.getHeaderNames()[0] !== 'PLAN') {
       throw new Error('invalid result shape, bad header');
     }
     if (rows.length !== 1) throw new Error('invalid result shape, bad number of results');
@@ -140,16 +140,13 @@ export class Introspect {
     queryResult: QueryResult,
     sampleRowResult?: QueryResult,
   ): ColumnInfo[] {
-    const headerShape = queryResult.getHeaderNames().join(',');
-    switch (headerShape) {
-      case 'COLUMN_NAME,DATA_TYPE':
-        return Introspect.decodeTableColumnIntrospectionResult(queryResult);
-
-      case 'PLAN':
-        return Introspect.decodeQueryColumnIntrospectionResult(queryResult, sampleRowResult);
-
-      default:
-        throw new Error('unknown header shape');
+    const headerNames = queryResult.getHeaderNames();
+    if (headerNames[0] === 'COLUMN_NAME' && headerNames[1] === 'DATA_TYPE') {
+      return Introspect.decodeTableColumnIntrospectionResult(queryResult);
+    } else if (headerNames[0] === 'PLAN') {
+      return Introspect.decodeQueryColumnIntrospectionResult(queryResult, sampleRowResult);
+    } else {
+      throw new Error(`unknown header shape: '${headerNames.join("', '")}'`);
     }
   }
 }

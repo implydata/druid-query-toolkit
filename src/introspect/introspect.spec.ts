@@ -101,10 +101,24 @@ describe('Introspect', () => {
   });
 
   describe('.decodeColumnTypesFromPlan', () => {
-    it('works', () => {
+    it('works when there is only a PLAN', () => {
       const queryPlanResult = new QueryResult({
         header: [{ name: 'PLAN' }],
         rows: [['DruidQueryRel(query=[...\n...], signature=[{d0:STRING, a0:LONG}])\n']],
+      });
+
+      expect(Introspect.decodeColumnTypesFromPlan(queryPlanResult)).toEqual(['STRING', 'LONG']);
+    });
+
+    it('works when there is more than a PLAN', () => {
+      const queryPlanResult = new QueryResult({
+        header: [{ name: 'PLAN' }, { name: 'RESOURCES' }],
+        rows: [
+          [
+            'DruidQueryRel(query=[...\n...], signature=[{d0:STRING, a0:LONG}])\n',
+            '[{"name":"wikipedia","type":"DATASOURCE"}]',
+          ],
+        ],
       });
 
       expect(Introspect.decodeColumnTypesFromPlan(queryPlanResult)).toEqual(['STRING', 'LONG']);
