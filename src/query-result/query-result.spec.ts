@@ -1007,5 +1007,111 @@ describe('QueryResult', () => {
         }
       `);
     });
+
+    it('works with empty string result', () => {
+      const result = '\n\n\n';
+
+      expect(QueryResult.fromRawResult(result)).toMatchInlineSnapshot(`
+        QueryResult {
+          "header": Array [],
+          "query": undefined,
+          "queryDuration": undefined,
+          "queryId": undefined,
+          "rows": Array [],
+          "sqlQuery": undefined,
+          "sqlQueryId": undefined,
+        }
+      `);
+    });
+
+    it('works with non-empty string result', () => {
+      const result = `{"channel":"#sv.wikipedia","added":31}
+{"channel":"#ja.wikipedia","added":125}
+{"channel":"#en.wikipedia","added":2}
+
+`;
+
+      expect(QueryResult.fromRawResult(result)).toMatchInlineSnapshot(`
+        QueryResult {
+          "header": Array [
+            Object {
+              "name": "channel",
+            },
+            Object {
+              "name": "added",
+            },
+          ],
+          "query": undefined,
+          "queryDuration": undefined,
+          "queryId": undefined,
+          "rows": Array [
+            Array [
+              "#sv.wikipedia",
+              31,
+            ],
+            Array [
+              "#ja.wikipedia",
+              125,
+            ],
+            Array [
+              "#en.wikipedia",
+              2,
+            ],
+          ],
+          "sqlQuery": undefined,
+          "sqlQueryId": undefined,
+        }
+      `);
+    });
+
+    it('works with non-empty string result', () => {
+      const result = `{"channel":"#sv.wikipedia","added":31}
+{"channel":"#ja.wikipedia","added":125}
+{"channel":"#en.wikipedia","added":2}
+
+`;
+
+      expect(QueryResult.fromRawResult(result)).toMatchInlineSnapshot(`
+        QueryResult {
+          "header": Array [
+            Object {
+              "name": "channel",
+            },
+            Object {
+              "name": "added",
+            },
+          ],
+          "query": undefined,
+          "queryDuration": undefined,
+          "queryId": undefined,
+          "rows": Array [
+            Array [
+              "#sv.wikipedia",
+              31,
+            ],
+            Array [
+              "#ja.wikipedia",
+              125,
+            ],
+            Array [
+              "#en.wikipedia",
+              2,
+            ],
+          ],
+          "sqlQuery": undefined,
+          "sqlQueryId": undefined,
+        }
+      `);
+    });
+
+    it('works with invalid string result', () => {
+      const result = `{"channel":"#sv.wikipedia","added":31}
+{"channel":"#ja.wikipedia","added":125}
+{"channel":"#en.wikipedia",`;
+
+      expect(() => QueryResult.fromRawResult(result)).toThrow(
+        `unparsable row on line 3 in string result: '{"channel":"#en.wikipedia",'`,
+      );
+    });
   });
 });

@@ -63,6 +63,7 @@ export interface QueryResultValue {
 
 export class QueryResult {
   static BLANK: QueryResult;
+  static jsonParse: (str: string) => any = JSON.parse;
 
   static shouldIncludeTimestamp(queryPayload: Record<string, unknown>): boolean {
     return Boolean(queryPayload.granularity && !isAllGranularity(queryPayload.granularity));
@@ -86,13 +87,17 @@ export class QueryResult {
     firstRowHeader?: boolean,
   ): QueryResult {
     if (typeof data === 'string') {
-      try {
-        data = data
-          .trim()
-          .split('\n')
-          .map(line => JSON.parse(line));
-      } catch {
-        throw new Error(`unparsable row in string return`);
+      const trimmedDataString = data.trimEnd();
+      if (trimmedDataString === '') {
+        data = [];
+      } else {
+        data = trimmedDataString.split('\n').map((line, i) => {
+          try {
+            return QueryResult.jsonParse(line);
+          } catch {
+            throw new Error(`unparsable row on line ${i + 1} in string result: '${line}'`);
+          }
+        });
       }
     }
 
