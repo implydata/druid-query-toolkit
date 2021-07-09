@@ -702,7 +702,6 @@ describe('SqlQuery operations', () => {
         Group By col2,  1, 3
       `;
 
-      console.log('blah');
       expect(SqlQuery.parse(sql).getAggregateOutputColumns()).toEqual(['aggregated']);
     });
   });

@@ -87,6 +87,14 @@ export class QueryResult {
     firstRowHeader?: boolean,
   ): QueryResult {
     if (typeof data === 'string') {
+      if (!data.endsWith('\n')) {
+        // For more context read the section on result truncation in the Druid docs:
+        // https://druid.apache.org/docs/latest/querying/sql.html#http-post
+        throw new Error(
+          `Query results were truncated midstream! This may indicate a server-side error or a client-side issue. Try re-running your query, or using a lower limit or a longer timeout.`,
+        );
+      }
+
       const trimmedDataString = data.trimEnd();
       if (trimmedDataString === '') {
         data = [];
@@ -95,7 +103,7 @@ export class QueryResult {
           try {
             return QueryResult.jsonParse(line);
           } catch {
-            throw new Error(`unparsable row on line ${i + 1} in string result: '${line}'`);
+            throw new Error(`Unparsable row on line ${i + 1} in query result: '${line}'.`);
           }
         });
       }
@@ -120,7 +128,7 @@ export class QueryResult {
       }
 
       if (!isObject(firstRow)) {
-        throw new Error(`unexpected query result, array of non objects or arrays`);
+        throw new Error(`Unexpected query result, array of non objects or arrays.`);
       }
 
       if (typeof firstRow.timestamp === 'string' && firstRow.result) {
@@ -226,7 +234,7 @@ export class QueryResult {
           });
         }
 
-        throw new Error(`unexpected scan like results`);
+        throw new Error(`Unexpected scan like results.`);
       }
 
       // segmentMetadata like
@@ -241,7 +249,7 @@ export class QueryResult {
       return QueryResult.fromObjectArray(data, firstRowHeader);
     }
 
-    throw new Error('unrecognizable query return shape, not an array');
+    throw new Error('Unrecognizable query return shape, not an array.');
   }
 
   static fromObjectArray(array: Record<string, any>[], ignoreFirstEvent?: boolean): QueryResult {

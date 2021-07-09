@@ -1104,13 +1104,25 @@ describe('QueryResult', () => {
       `);
     });
 
-    it('works with invalid string result', () => {
+    it('works with truncated string result', () => {
       const result = `{"channel":"#sv.wikipedia","added":31}
 {"channel":"#ja.wikipedia","added":125}
 {"channel":"#en.wikipedia",`;
 
       expect(() => QueryResult.fromRawResult(result)).toThrow(
-        `unparsable row on line 3 in string result: '{"channel":"#en.wikipedia",'`,
+        `Query results were truncated midstream! This may indicate a server-side error or a client-side issue. Try re-running your query, or using a lower limit or a longer timeout.`,
+      );
+    });
+
+    it('works with invalid string result', () => {
+      const result = `{"channel":"#sv.wikipedia","added":31}
+{"channel":"#ja.wikipedia","added":125}
+{"channel":"#en.wikipedia",
+
+`;
+
+      expect(() => QueryResult.fromRawResult(result)).toThrow(
+        `Unparsable row on line 3 in query result: '{"channel":"#en.wikipedia",'.`,
       );
     });
   });
