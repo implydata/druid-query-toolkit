@@ -3,287 +3,83 @@
 # Druid Query Toolkit
 
 A number of tools to make working with Druid queries a treat.
+There are a number of use cases for this toolkit and one of the chief use cases can be found in Druid's own [web-console](https://druid.apache.org/docs/latest/operations/druid-console.html).
 
-## Set up 
+Search for uses within [web-console/src](https://github.com/apache/druid/tree/master/web-console/src) for some examples.
+Specifically the [QueryView](https://github.com/apache/druid/tree/master/web-console/src/views/query-view) uses these tools a lot.
 
-Install druid-query-toolkit
+## Parts
 
-`npm i druid-query-toolkit`
+At a high level there are 4 parts to this toolkit:
 
-## SQL to AST 
+- SQL - a set of classes and parsers to model and parse DruidSQL.
+- QueryResult - a class to model and decode all the different shapes of Druid query results.
+- QueryRunner - a class to wrap around the boilerplate of running a query
+- Introspection - a set of utilities that help in decoding the results of Druid introspective metadata queries.
 
-Converts an SQL string to a SqlQuery object.  
+There are plenty of examples in the unit tests.
 
-```
-import { parseSql, parseSqlQuery } from './parser/druidsql';
+### SQL
 
-ast = parseSqlQuery(`SELECT "segment_id", "datasource", "start", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed", "payload"
-FROM sys.segments
-ORDER BY "start" DESC
-LIMIT 25`);
-```      
+The SQL parser parses and models the whitespace and casing as well as the logical representation of the query allowing the query to be transofrmed in a very human friendly way.
 
-## toString 
+Here are a few examples of what the SQL parser can do:
 
-Returns the SQL query represented by the SqlQuery object as a string.
+Adding a column at the start of the select clause.
 
-```
-const sqlString = ast.toString();
-console.log(sqlString);
-```
+```javascript
+import { SqlQuery } from 'druid-query-toolkit';
 
-logs: 
+const sql = SqlQuery.parse(`
+SELECT
+  isAnonymous,
+  cityName,
+  flags,
+  COUNT(*) AS "Count",
+  SUM(added) AS "sum_added"
+FROM wikipedia
+GROUP BY 1, 2, 3
+ORDER BY 4 DESC
+`);
 
-```
-SELECT "segment_id", "datasource", "start", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed", "payload"
-FROM sys.segments
-ORDER BY "start" DESC
-LIMIT 25
-```
+sql.addSelect(`"new_column" AS "New column"`, { insertIndex: 0 }).toString()
+/* →
+`
+SELECT
+  "new_column" AS "New column",
+  isAnonymous,
+  cityName,
+  flags,
+  COUNT(*) AS "Count",
+  SUM(added) AS "sum_added"
+FROM wikipedia
+GROUP BY 2, 3, 4
+ORDER BY 5 DESC
+`
+ */
 
-## orderBy
-
-Returns an SqlQuery object with a new ORDER BY clause. 
-
-Takes arguments:
-
-- `column:string`
-- `direction: 'ASC' | 'DESC'`
-
-```
-const orderedAst = ast.toString('end', 'ASC');
-console.log(orderedAst.toString());
-```
-
-logs: 
-
-```
-SELECT "segment_id", "datasource", "start", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed", "payload"
-FROM sys.segments
-ORDER BY "end" ASC
-LIMIT 25
-```
-
-## excludeColumn
-
-Returns an SqlQuery object with with the specified column removed from the SELECT, ORDER BY and GROUP BY clauses.
-
-Takes arguments:
-
-- `column:string`
-
-```
-const excludeColumnAst = ast.excludeColumn('start');
-console.log(excludeColumnAst.toString());
+sql.addSelect(`UPPER(city) AS City`, { insertIndex: 'last-grouping', addToGroupBy: 'end' }).toString()
+/* →
+`
+SELECT
+  isAnonymous,
+  cityName,
+  flags,
+  UPPER(city) AS City,
+  COUNT(*) AS "Count",
+  SUM(added) AS "sum_added"
+FROM wikipedia
+GROUP BY 1, 2, 3, 4
+ORDER BY 5 DESC
+`
+ */
 ```
 
-logs: 
+For more examples check out the unit tests.
 
-```
-SELECT "segment_id", "datasource", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed", "payload"
-FROM sys.segments
-LIMIT 25
-```
+#### ToDo
 
-## getSorted
-
-Returns an array of objects of type `{desc: string, id:string}` representing the direction of each column in the ORDER BY clause.
-
-```
-const getSortedArray = ast.getSorted();
-console.log(getSortedArray);
-```
-  
-## getSchema
-
-Returns the schema of the table in the FROM clause as a string.
-
-```
-const schema = ast.getSchema();
-console.log(schema);
-```
-
-logs:                 
-
-```
-sys
-```
-
-## getTableName
-
-Returns the name of the table in the FROM clause as a string.
-
-```
-const table = ast.getTableName();
-console.log(table);
-```
-     
-logs:                 
-
-```
-segments
-```
-
-## getAggregateColumns
-
-Returns an array of strings containing the names of the aggregate columns.
-
-```
-const aggregateColumns = ast.getAggregateColumns();
-console.log(aggregateColumns);
-```
-     
-logs:                 
-
-```
-Array [
-  "segment_id",
-  "datasource",
-  "start",
-  "end",
-  "size",
-  "version",
-  "partition_num",
-  "num_replicas",
-  "num_rows",
-  "is_published",
-  "is_available",
-  "is_realtime",
-  "is_overshadowed",
-  "payload",
-]
-```
-
-## addToGroupBy
-
-Adds a column with no alias to the group by clause and the select clause
-
-Takes argument:
-
-- `column: SqlBase`
-    
-```
-let query = parseSqlQuery(`select Count(*) from table`);
-query = query.addToGroupBy(SqlRef.factoryWithQuotes('column');
-console.log(query.toString());
-```
-
-logs:                 
-
-```
-select "column", Count(*) from table 
-    GROUP BY 1
-```
-
-## addAggregateColumn
-
-Adds an aggregate column to the select
-
-Takes arguments:
-
-- `columns: SqlBase[]`
-- `functionName: string`
-- `alias: string`
-- `filter?: SqlBase`
-- `decorator?: string`
-    
-```
-let query = parseSqlQuery(`select column1 from table`);
-query = query.addAggregateColumn([SqlRef.factory('column2')], 'min', 'alias');
-console.log(query.toString());
-```
-
-logs:                 
-
-```
-select column1, min(column2) AS "alias" from table
-```
-
-## getColumns
-
-Returns an array of the string names of all columns in the select clause.
-
-```
-let query = parseSqlQuery(`SELECT column, column1, column2
-                      FROM sys."github"`);
-query = query.getColumns();
-console.log(query.toString());
-```
-
-logs:                 
-
-```
-["column", "column1", "column2"]
-```
-
-## ReplaceFrom
-
-Replaces the `From` value of an SqlQuery Object, allowing you to which the the table in the select clause.  
-
-Takes argument:
-
-- `table: string`
-
-```
-let query = parseSqlQuery(`SELECT countryName from wikipedia`);
-query = query.replaceFrom("anotherTable");
-console.log(query.toString());
-```
-
-logs:                 
-
-```
-"SELECT countryName from anotherTable"
-```
-
-## addJoin
-
-Adds either an "INNER" or "LEFT" Join to an existing SqlQuery object. 
-
-Takes arguments:
-- `type: 'LEFT' | 'INNER'`
-- `joinTable: SqlRef`
-- `onExpression: SqlMulti`
-
-```
-let query = parseSqlQuery(`SELECT countryName from wikipedia`)
-query = query.addJoin(
-  'LEFT',
-  SqlRef.factory('country', 'lookup'),
-  SqlMulti.sqlMultiFactory('=', [
-    SqlRef.factory('v', 'country', 'lookup'),
-    SqlRef.factory('countryName', 'wikipedia'),
-  ]),
-);
-
-console.log(query.toString());
-```
-     
-logs:                 
-
-```
-"SELECT countryName from wikipedia 
-LEFT JOIN lookup.country ON lookup.country.v = wikipedia.countryName"
-```
-
-## RemoveJoin
-
-Removes the Join clause from an SqlQuery object. 
-
-```
-let query = parseSqlQuery(`SELECT countryName from wikipedia
-      LEFT JOIN lookup.country ON lookup.country.v = wikipedia.countryName`);
-query = query.removeJoin();
-console.log(query.toSting());
-```
-     
-logs:                 
-
-```
-SELECT countryName from wikipedia
-```
-
-## ToDo
+Not every valid DruidSQL construct can currently be parsed, the following snippets are not currently supported:
 
 - `(a, b) IN (subquery)`
 - Fancy group by definitions e.g. `GROUPING SETS`, `CUBE`
