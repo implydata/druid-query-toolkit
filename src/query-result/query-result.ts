@@ -14,7 +14,7 @@
 
 import { SqlQuery } from '../sql';
 
-function isObject(obj: unknown): boolean {
+function isObject(obj: unknown): obj is Record<string, unknown> {
   return Object.prototype.toString.call(obj) === '[object Object]';
 }
 
@@ -58,6 +58,7 @@ export interface QueryResultValue {
   sqlQuery?: SqlQuery;
   queryId?: string;
   sqlQueryId?: string;
+  resultContext?: Record<string, any>;
   queryDuration?: number;
 }
 
@@ -109,20 +110,31 @@ export class QueryResult {
       }
     }
 
+    // Possibly unwrap the result context
+    let resultContext: Record<string, any> | undefined;
+    if (isObject(data) && data.results) {
+      if (isObject(data.context)) {
+        resultContext = data.context;
+      }
+      data = data.results;
+    }
+
     if (Array.isArray(data)) {
       const firstRow = data[0];
-      if (!firstRow) return QueryResult.BLANK;
+      if (!firstRow) return QueryResult.BLANK.attachResultContext(resultContext);
 
       if (Array.isArray(firstRow)) {
         if (firstRowHeader) {
           return new QueryResult({
             header: makeColumns(firstRow),
             rows: data.slice(1),
+            resultContext,
           });
         } else {
           return new QueryResult({
             header: makeColumns(firstRow.map((_d, i) => i)),
             rows: data,
+            resultContext,
           });
         }
       }
@@ -270,6 +282,7 @@ export class QueryResult {
 
   public readonly queryId?: string;
   public readonly sqlQueryId?: string;
+  public readonly resultContext?: Record<string, any>;
   public readonly queryDuration?: number;
 
   constructor(value: QueryResultValue) {
@@ -279,6 +292,7 @@ export class QueryResult {
     this.sqlQuery = value.sqlQuery;
     this.queryId = value.queryId;
     this.sqlQueryId = value.sqlQueryId;
+    this.resultContext = value.resultContext;
     this.queryDuration = value.queryDuration;
   }
 
@@ -290,6 +304,7 @@ export class QueryResult {
       sqlQuery: this.sqlQuery,
       queryId: this.queryId,
       sqlQueryId: this.sqlQueryId,
+      resultContext: this.resultContext,
       queryDuration: this.queryDuration,
     };
   }
@@ -311,6 +326,13 @@ export class QueryResult {
     const value = this.valueOf();
     value.queryId = queryId;
     value.sqlQueryId = sqlQueryId;
+    return new QueryResult(value);
+  }
+
+  public attachResultContext(resultContext: Record<string, any> | undefined): QueryResult {
+    if (this.resultContext === resultContext) return this;
+    const value = this.valueOf();
+    value.resultContext = resultContext;
     return new QueryResult(value);
   }
 

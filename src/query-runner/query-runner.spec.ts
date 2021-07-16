@@ -91,6 +91,7 @@ describe('QueryRunner', () => {
         },
         "queryDuration": 1,
         "queryId": "query-id-xxx",
+        "resultContext": undefined,
         "rows": Array [
           Array [
             2068620,
@@ -150,6 +151,7 @@ describe('QueryRunner', () => {
         },
         "queryDuration": 1,
         "queryId": undefined,
+        "resultContext": undefined,
         "rows": Array [
           Array [
             "#en.wikipedia",
@@ -367,6 +369,7 @@ describe('QueryRunner', () => {
         },
         "queryDuration": 1,
         "queryId": undefined,
+        "resultContext": undefined,
         "rows": Array [
           Array [
             "#en.wikipedia",
@@ -585,6 +588,7 @@ describe('QueryRunner', () => {
         },
         "queryDuration": 1,
         "queryId": undefined,
+        "resultContext": undefined,
         "rows": Array [
           Array [
             "#en.wikipedia",

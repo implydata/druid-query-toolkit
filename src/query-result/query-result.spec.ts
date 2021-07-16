@@ -42,6 +42,7 @@ describe('QueryResult', () => {
           "query": undefined,
           "queryDuration": undefined,
           "queryId": undefined,
+          "resultContext": undefined,
           "rows": Array [
             Array [
               "A",
@@ -85,6 +86,7 @@ describe('QueryResult', () => {
           "query": undefined,
           "queryDuration": undefined,
           "queryId": undefined,
+          "resultContext": undefined,
           "rows": Array [
             Array [
               514,
@@ -119,6 +121,7 @@ describe('QueryResult', () => {
           "query": undefined,
           "queryDuration": undefined,
           "queryId": undefined,
+          "resultContext": undefined,
           "rows": Array [
             Array [
               "2019-08-04T15:00:00.000Z",
@@ -167,6 +170,7 @@ describe('QueryResult', () => {
           "query": undefined,
           "queryDuration": undefined,
           "queryId": undefined,
+          "resultContext": undefined,
           "rows": Array [
             Array [
               2976786,
@@ -203,6 +207,7 @@ describe('QueryResult', () => {
           "query": undefined,
           "queryDuration": undefined,
           "queryId": undefined,
+          "resultContext": undefined,
           "rows": Array [
             Array [
               "2019-08-04T16:05:29.000Z",
@@ -260,6 +265,7 @@ describe('QueryResult', () => {
           "query": undefined,
           "queryDuration": undefined,
           "queryId": undefined,
+          "resultContext": undefined,
           "rows": Array [
             Array [
               "#ar.wikipedia",
@@ -314,6 +320,7 @@ describe('QueryResult', () => {
           "query": undefined,
           "queryDuration": undefined,
           "queryId": undefined,
+          "resultContext": undefined,
           "rows": Array [
             Array [
               "#en.wikipedia",
@@ -361,6 +368,7 @@ describe('QueryResult', () => {
           "query": undefined,
           "queryDuration": undefined,
           "queryId": undefined,
+          "resultContext": undefined,
           "rows": Array [
             Array [
               "2019-08-04T18:00:00.000Z",
@@ -459,6 +467,7 @@ describe('QueryResult', () => {
           "query": undefined,
           "queryDuration": undefined,
           "queryId": undefined,
+          "resultContext": undefined,
           "rows": Array [
             Array [
               "2019-08-22T02:59:20.000Z",
@@ -512,6 +521,7 @@ describe('QueryResult', () => {
           "query": undefined,
           "queryDuration": undefined,
           "queryId": undefined,
+          "resultContext": undefined,
           "rows": Array [
             Array [
               1564887701848,
@@ -565,6 +575,7 @@ describe('QueryResult', () => {
           "query": undefined,
           "queryDuration": undefined,
           "queryId": undefined,
+          "resultContext": undefined,
           "rows": Array [
             Array [
               1564887701848,
@@ -650,6 +661,7 @@ describe('QueryResult', () => {
           "query": undefined,
           "queryDuration": undefined,
           "queryId": undefined,
+          "resultContext": undefined,
           "rows": Array [
             Array [
               "2019-01-01T00:00:00.321Z",
@@ -718,6 +730,7 @@ describe('QueryResult', () => {
           "query": undefined,
           "queryDuration": undefined,
           "queryId": undefined,
+          "resultContext": undefined,
           "rows": Array [
             Array [
               "dim1",
@@ -786,6 +799,7 @@ describe('QueryResult', () => {
           "query": undefined,
           "queryDuration": undefined,
           "queryId": undefined,
+          "resultContext": undefined,
           "rows": Array [
             Array [
               "dim1",
@@ -833,6 +847,7 @@ describe('QueryResult', () => {
           "query": undefined,
           "queryDuration": undefined,
           "queryId": undefined,
+          "resultContext": undefined,
           "rows": Array [
             Array [
               "2013-05-09T18:24:00.000Z",
@@ -865,6 +880,7 @@ describe('QueryResult', () => {
           "query": undefined,
           "queryDuration": undefined,
           "queryId": undefined,
+          "resultContext": undefined,
           "rows": Array [
             Array [
               "2013-05-09T18:24:09.007Z",
@@ -940,6 +956,7 @@ describe('QueryResult', () => {
           "query": undefined,
           "queryDuration": undefined,
           "queryId": undefined,
+          "resultContext": undefined,
           "rows": Array [
             Array [
               "__time",
@@ -972,7 +989,7 @@ describe('QueryResult', () => {
       `);
     });
 
-    it('works for sql', () => {
+    it('works for sql (resultFormat: array)', () => {
       const result = [
         ['Time', 'Count'],
         ['2019-08-04T15:00:00.000Z', 910],
@@ -992,6 +1009,51 @@ describe('QueryResult', () => {
           "query": undefined,
           "queryDuration": undefined,
           "queryId": undefined,
+          "resultContext": undefined,
+          "rows": Array [
+            Array [
+              "2019-08-04T15:00:00.000Z",
+              910,
+            ],
+            Array [
+              "2019-08-04T16:00:00.000Z",
+              15600,
+            ],
+          ],
+          "sqlQuery": undefined,
+          "sqlQueryId": undefined,
+        }
+      `);
+    });
+
+    it('works for sql (resultFormat: arrayWithTrailer)', () => {
+      const result = {
+        results: [
+          ['Time', 'Count'],
+          ['2019-08-04T15:00:00.000Z', 910],
+          ['2019-08-04T16:00:00.000Z', 15600],
+        ],
+        context: {
+          metrics: {},
+        },
+      };
+
+      expect(QueryResult.fromRawResult(result, false, true)).toMatchInlineSnapshot(`
+        QueryResult {
+          "header": Array [
+            Object {
+              "name": "Time",
+            },
+            Object {
+              "name": "Count",
+            },
+          ],
+          "query": undefined,
+          "queryDuration": undefined,
+          "queryId": undefined,
+          "resultContext": Object {
+            "metrics": Object {},
+          },
           "rows": Array [
             Array [
               "2019-08-04T15:00:00.000Z",
@@ -1017,6 +1079,7 @@ describe('QueryResult', () => {
           "query": undefined,
           "queryDuration": undefined,
           "queryId": undefined,
+          "resultContext": undefined,
           "rows": Array [],
           "sqlQuery": undefined,
           "sqlQueryId": undefined,
@@ -1044,6 +1107,7 @@ describe('QueryResult', () => {
           "query": undefined,
           "queryDuration": undefined,
           "queryId": undefined,
+          "resultContext": undefined,
           "rows": Array [
             Array [
               "#sv.wikipedia",
@@ -1084,6 +1148,7 @@ describe('QueryResult', () => {
           "query": undefined,
           "queryDuration": undefined,
           "queryId": undefined,
+          "resultContext": undefined,
           "rows": Array [
             Array [
               "#sv.wikipedia",
