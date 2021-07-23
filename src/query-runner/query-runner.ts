@@ -37,6 +37,8 @@ export interface RunQueryOptions {
   query: string | SqlQuery | Record<string, any>;
   extraQueryContext?: Record<string, any>;
   queryParameters?: QueryParameter[];
+  resultFormat?: string;
+  header?: boolean;
   cancelToken?: CancelToken;
 }
 
@@ -61,7 +63,14 @@ export class QueryRunner {
   }
 
   public async runQuery(options: RunQueryOptions): Promise<QueryResult> {
-    const { query, extraQueryContext, queryParameters, cancelToken } = options;
+    const {
+      query,
+      extraQueryContext,
+      queryParameters,
+      resultFormat,
+      header,
+      cancelToken,
+    } = options;
 
     let isSql: boolean;
     let jsonQuery: Record<string, any>;
@@ -70,8 +79,8 @@ export class QueryRunner {
       isSql = true;
       jsonQuery = {
         query,
-        resultFormat: 'array',
-        header: true,
+        resultFormat: resultFormat ?? 'array',
+        header: header ?? true,
       };
       try {
         parsedQuery = SqlQuery.parse(query);
@@ -81,8 +90,8 @@ export class QueryRunner {
       parsedQuery = query;
       jsonQuery = {
         query: String(query),
-        resultFormat: 'array',
-        header: true,
+        resultFormat: resultFormat ?? 'array',
+        header: header ?? true,
       };
     } else {
       jsonQuery = query;
