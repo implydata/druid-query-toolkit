@@ -153,7 +153,7 @@ export class QueryResult {
               data.flatMap(d => d.result.results),
               includeTimestampIfExists,
               firstRowHeader,
-            );
+            ).attachResultContext(resultContext);
           }
 
           // select like
@@ -174,6 +174,7 @@ export class QueryResult {
                   selectHeader.map(h => r.event[h]),
                 ),
               ),
+              resultContext,
             });
           }
 
@@ -186,6 +187,7 @@ export class QueryResult {
               const rest = header.map(h => result[h]);
               return includeTimestampIfExists ? [timestamp].concat(rest) : rest;
             }),
+            resultContext,
           });
         }
 
@@ -203,6 +205,7 @@ export class QueryResult {
                 return includeTimestampIfExists ? [timestamp].concat(rest) : rest;
               });
             }),
+            resultContext,
           });
         }
       }
@@ -217,6 +220,7 @@ export class QueryResult {
             const rest = header.map(h => event[h]);
             return includeTimestampIfExists ? [timestamp].concat(rest) : rest;
           }),
+          resultContext,
         });
       }
 
@@ -233,6 +237,7 @@ export class QueryResult {
           return new QueryResult({
             header,
             rows: data.flatMap(({ events }) => events),
+            resultContext,
           });
         }
 
@@ -243,6 +248,7 @@ export class QueryResult {
             rows: data.flatMap(({ events }) =>
               events.map((event: any) => headerNames.map(h => event[h])),
             ),
+            resultContext,
           });
         }
 
@@ -254,11 +260,11 @@ export class QueryResult {
         const flatArray = data.flatMap(({ columns }) =>
           Object.keys(columns).map(k => ({ column: k, ...columns[k] })),
         );
-        return QueryResult.fromObjectArray(flatArray);
+        return QueryResult.fromObjectArray(flatArray).attachResultContext(resultContext);
       }
 
       // sql object mode like
-      return QueryResult.fromObjectArray(data, firstRowHeader);
+      return QueryResult.fromObjectArray(data, firstRowHeader).attachResultContext(resultContext);
     }
 
     throw new Error('Unrecognizable query return shape, not an array.');
