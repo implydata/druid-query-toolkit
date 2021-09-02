@@ -121,7 +121,7 @@ export class QueryResult {
 
     if (Array.isArray(data)) {
       const firstRow = data[0];
-      if (!firstRow) return QueryResult.BLANK.attachResultContext(resultContext);
+      if (!firstRow) return QueryResult.BLANK.changeResultContext(resultContext);
 
       if (Array.isArray(firstRow)) {
         if (firstRowHeader) {
@@ -153,7 +153,7 @@ export class QueryResult {
               data.flatMap(d => d.result.results),
               includeTimestampIfExists,
               firstRowHeader,
-            ).attachResultContext(resultContext);
+            ).changeResultContext(resultContext);
           }
 
           // select like
@@ -260,11 +260,11 @@ export class QueryResult {
         const flatArray = data.flatMap(({ columns }) =>
           Object.keys(columns).map(k => ({ column: k, ...columns[k] })),
         );
-        return QueryResult.fromObjectArray(flatArray).attachResultContext(resultContext);
+        return QueryResult.fromObjectArray(flatArray).changeResultContext(resultContext);
       }
 
       // sql object mode like
-      return QueryResult.fromObjectArray(data, firstRowHeader).attachResultContext(resultContext);
+      return QueryResult.fromObjectArray(data, firstRowHeader).changeResultContext(resultContext);
     }
 
     throw new Error('Unrecognizable query return shape, not an array.');
@@ -335,7 +335,7 @@ export class QueryResult {
     return new QueryResult(value);
   }
 
-  public attachResultContext(resultContext: Record<string, any> | undefined): QueryResult {
+  public changeResultContext(resultContext: Record<string, any> | undefined): QueryResult {
     if (this.resultContext === resultContext) return this;
     const value = this.valueOf();
     value.resultContext = resultContext;

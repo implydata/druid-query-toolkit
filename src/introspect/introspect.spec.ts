@@ -270,6 +270,54 @@ describe('Introspect', () => {
       ]);
     });
 
+    it('works with star with fancy names', () => {
+      const query = SqlQuery.parse(sane`
+        SELECT "time", cityName, added + 1, * FROM wikipedia
+      `);
+
+      const queryPlanResult = new QueryResult({
+        sqlQuery: Introspect.getQueryColumnIntrospectionQuery(query),
+        header: [{ name: 'PLAN' }],
+        rows: [
+          [
+            'DruidQueryRel(query=[...\n...], signature=[{Hello World:LONG, A-B:STRING, Россия:LONG, ö:LONG, hello, world:LONG}])\n',
+          ],
+        ],
+      });
+
+      const sampleResult = new QueryResult({
+        header: [
+          { name: 'time' },
+          { name: 'cityName' },
+          { name: 'EXPR$0' },
+          { name: 'delta' },
+          { name: 'deleted' },
+        ],
+        rows: [[new Date('2020-01-01T00:00:00'), 'SF', 1, 4, true]],
+      });
+
+      expect(
+        Introspect.decodeQueryColumnIntrospectionResult(queryPlanResult, sampleResult),
+      ).toEqual([
+        {
+          name: 'time',
+          type: 'TIMESTAMP',
+        },
+        {
+          name: 'cityName',
+          type: 'STRING',
+        },
+        {
+          name: 'delta',
+          type: 'LONG',
+        },
+        {
+          name: 'deleted',
+          type: 'BOOLEAN',
+        },
+      ]);
+    });
+
     it('works with a JOIN query', () => {
       const query = SqlQuery.parse(sane`
         SELECT
