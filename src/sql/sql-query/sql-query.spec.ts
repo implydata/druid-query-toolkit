@@ -43,7 +43,7 @@ describe('SqlQuery', () => {
       `SELECT ALL a, b FROM wikipedia t`,
       sane`
         SELECT
-          flags, channel, "user", page,
+          flags, channel, user, "timestamp",
           SUM(sum_added) AS Added
         FROM wikipedia
         GROUP BY 1, 2, 3, 4
@@ -97,6 +97,7 @@ describe('SqlQuery', () => {
           SqlRef.column('channel'),
           SqlRef.column('page'),
           SqlRef.column('user'),
+          SqlRef.column('as'),
         ])
         .changeWhereExpression(`channel  =  '#en.wikipedia'`);
 
@@ -104,7 +105,8 @@ describe('SqlQuery', () => {
         SELECT
           channel,
           page,
-          "user"
+          user,
+          "as"
         FROM lol
         WHERE channel  =  '#en.wikipedia'
       `);

@@ -20,7 +20,7 @@ Sql = SqlQuery / SqlAlias
 
 // ------------------------------
 
-SqlAlias = expression:Expression alias:((_ AsToken)? _ RefName)?
+SqlAlias = expression:Expression alias:((_ AsToken)? _ RefNameAlias)?
 {
   if (!alias) return expression;
 
@@ -42,7 +42,7 @@ SqlAlias = expression:Expression alias:((_ AsToken)? _ RefName)?
   return new sql.SqlAlias(value);
 }
 
-SqlAliasExplicitAs = expression:Expression alias:(_ AsToken _ RefName)?
+SqlAliasExplicitAs = expression:Expression alias:(_ AsToken _ RefNameAlias)?
 {
   if (!alias) return expression;
 
@@ -1242,6 +1242,8 @@ SqlRef = a:RefName b:(_ "." _ RefName)? c:(_ "." _ RefName)?
 
 RefName = QuotedRefName / UnquotedRefName
 
+RefNameAlias = QuotedRefName / UnquotedRefNameAlias
+
 QuotedRefName = '"' name:$(('""' / [^"])+) '"'
 {
   return new sql.RefName({
@@ -1251,6 +1253,14 @@ QuotedRefName = '"' name:$(('""' / [^"])+) '"'
 }
 
 UnquotedRefName = name:UnquotedRefNameFree &{ return !sql.RefName.isReservedKeyword(name) }
+{
+  return new sql.RefName({
+    name: text(),
+    quotes: false
+  });
+}
+
+UnquotedRefNameAlias = name:UnquotedRefNameFree &{ return !sql.RefName.isReservedKeyword(name) && !sql.RefName.isReservedAlias(name) }
 {
   return new sql.RefName({
     name: text(),

@@ -17,16 +17,18 @@ const axios = require('axios');
 async function main() {
   // Do basic check first
   await axios.post('http://localhost:8888/druid/v2/sql', {
-    "query": `SELECT 123`
+    query: `SELECT 123`,
   });
 
   const calciteRef = await axios.get('https://calcite.apache.org/docs/reference.html');
-  const sqlRef = await axios.get('https://raw.githubusercontent.com/apache/druid/master/docs/querying/sql.md');
+  const sqlRef = await axios.get(
+    'https://raw.githubusercontent.com/apache/druid/master/docs/querying/sql.md',
+  );
 
   let errorMessage;
   try {
     await axios.post('http://localhost:8888/druid/v2/sql', {
-      "query": `SELECT CURRENT_ROW`
+      query: `SELECT CURRENT_ROW`,
     });
   } catch (e) {
     errorMessage = e.response.data.errorMessage;
@@ -40,19 +42,30 @@ async function main() {
   const possibleKeywords = [...new Set(allData.match(/\b[A-Z_]+\b/g)).values()].sort();
   console.log(`Got ${possibleKeywords.length} possible keywords`);
 
-  let reservedKeywords = [];
+  const reservedKeywords = [];
+  const reservedAliases = [];
   for (let keyword of possibleKeywords) {
     try {
       await axios.post('http://localhost:8888/druid/v2/sql', {
-        "query": `SELECT 123 AS ${keyword}`
+        query: `SELECT 123 AS ${keyword}`,
       });
     } catch {
-      reservedKeywords.push(keyword);
+      try {
+        await axios.post('http://localhost:8888/druid/v2/sql', {
+          query: `SELECT ${keyword} FROM (SELECT 123 AS "${keyword}")`,
+        });
+        reservedAliases.push(keyword);
+      } catch {
+        reservedKeywords.push(keyword);
+      }
     }
   }
 
-  console.log(`Found ${reservedKeywords.length} reserved keywords`);
-  console.log(JSON.stringify(reservedKeywords));
+  console.log(
+    `Found ${reservedKeywords.length} reserved keywords and ${reservedAliases.length} reserved aliases`,
+  );
+  console.log('export const RESERVED_KEYWORDS = ' + JSON.stringify(reservedKeywords));
+  console.log('export const RESERVED_ALIASES = ' + JSON.stringify(reservedAliases));
 }
 
 main();

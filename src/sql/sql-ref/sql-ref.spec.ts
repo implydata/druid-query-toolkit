@@ -37,7 +37,11 @@ describe('SqlRef', () => {
 
   describe('#column', () => {
     it('works with reserved word', () => {
-      expect(String(SqlRef.column('user'))).toEqual(`"user"`);
+      expect(String(SqlRef.column('as'))).toEqual(`"as"`);
+    });
+
+    it('is cool with reserved alias', () => {
+      expect(String(SqlRef.column('user'))).toEqual(`user`);
     });
 
     it('works with .', () => {
