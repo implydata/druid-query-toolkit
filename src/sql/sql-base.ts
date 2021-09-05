@@ -50,6 +50,8 @@ export type SqlType =
   | 'havingClause'
   | 'limitClause'
   | 'groupByClause'
+  | 'insertIntoClause'
+  | 'explainPlanForClause'
   | 'withPart'
   | 'joinPart'
   | 'alias'

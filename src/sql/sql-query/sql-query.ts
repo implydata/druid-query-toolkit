@@ -16,9 +16,11 @@ import { filterMap } from '../../utils';
 import { parseSql } from '../parser';
 import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../sql-base';
 import {
+  SqlExplainPlanForClause,
   SqlFromClause,
   SqlGroupByClause,
   SqlHavingClause,
+  SqlInsertIntoClause,
   SqlJoinPart,
   SqlLimitClause,
   SqlOffsetClause,
@@ -31,6 +33,7 @@ import { SqlExpression } from '../sql-expression';
 import { SqlLiteral } from '../sql-literal/sql-literal';
 import { SqlRef } from '../sql-ref/sql-ref';
 import { SqlStar } from '../sql-star/sql-star';
+import { SqlTableRef } from '../sql-table-ref/sql-table-ref';
 import { clampIndex, normalizeIndex, SeparatedArray, Separator } from '../utils';
 
 import { SqlWithPart } from './sql-with-part/sql-with-part';
@@ -57,7 +60,8 @@ export interface AddSelectOptions {
 }
 
 export interface SqlQueryValue extends SqlBaseValue {
-  explainPlanFor?: boolean;
+  explainPlanFor?: SqlExplainPlanForClause;
+  insertInto?: SqlInsertIntoClause;
   withParts?: SeparatedArray<SqlWithPart>;
   decorator?: SqlQueryDecorator;
   selectExpressions?: SeparatedArray<SqlExpression>;
@@ -75,9 +79,6 @@ export interface SqlQueryValue extends SqlBaseValue {
 export class SqlQuery extends SqlExpression {
   static type: SqlType = 'query';
 
-  static readonly DEFAULT_EXPLAIN_KEYWORD = 'EXPLAIN';
-  static readonly DEFAULT_PLAN_KEYWORD = 'PLAN';
-  static readonly DEFAULT_FOR_KEYWORD = 'FOR';
   static readonly DEFAULT_WITH_KEYWORD = 'WITH';
   static readonly DEFAULT_SELECT_KEYWORD = 'SELECT';
   static readonly DEFAULT_UNION_KEYWORD = 'UNION ALL';
@@ -123,7 +124,8 @@ export class SqlQuery extends SqlExpression {
     return /^EXPR\$(?:\d|[1-9]\d*)$/.test(name);
   }
 
-  public readonly explainPlanFor?: boolean;
+  public readonly explainPlanFor?: SqlExplainPlanForClause;
+  public readonly insertInto?: SqlInsertIntoClause;
   public readonly withParts?: SeparatedArray<SqlWithPart>;
   public readonly decorator?: SqlQueryDecorator;
   public readonly selectExpressions?: SeparatedArray<SqlExpression>;
@@ -139,6 +141,7 @@ export class SqlQuery extends SqlExpression {
   constructor(options: SqlQueryValue) {
     super(options, SqlQuery.type);
     this.explainPlanFor = options.explainPlanFor;
+    this.insertInto = options.insertInto;
     this.withParts = options.withParts;
     this.decorator = options.decorator;
     this.selectExpressions = options.selectExpressions;
@@ -154,7 +157,8 @@ export class SqlQuery extends SqlExpression {
 
   public valueOf(): SqlQueryValue {
     const value = super.valueOf() as SqlQueryValue;
-    if (this.explainPlanFor) value.explainPlanFor = true;
+    value.explainPlanFor = this.explainPlanFor;
+    value.insertInto = this.insertInto;
     value.withParts = this.withParts;
     value.decorator = this.decorator;
     value.selectExpressions = this.selectExpressions;
@@ -172,6 +176,7 @@ export class SqlQuery extends SqlExpression {
   protected _toRawString(): string {
     const {
       explainPlanFor,
+      insertInto,
       withParts,
       decorator,
       selectExpressions,
@@ -189,14 +194,12 @@ export class SqlQuery extends SqlExpression {
 
     // Explain clause
     if (explainPlanFor) {
-      rawParts.push(
-        this.getKeyword('explain', SqlQuery.DEFAULT_EXPLAIN_KEYWORD),
-        this.getSpace('postExplain'),
-        this.getKeyword('plan', SqlQuery.DEFAULT_PLAN_KEYWORD),
-        this.getSpace('postPlan'),
-        this.getKeyword('for', SqlQuery.DEFAULT_FOR_KEYWORD),
-        this.getSpace('postFor', '\n'),
-      );
+      rawParts.push(explainPlanFor.toString(), this.getSpace('postExplainPlanFor', '\n'));
+    }
+
+    // INSERT INTO clause
+    if (insertInto) {
+      rawParts.push(insertInto.toString(), this.getSpace('postInsertInfo', '\n'));
     }
 
     // WITH clause
@@ -571,11 +574,27 @@ export class SqlQuery extends SqlExpression {
     return SqlBase.fromValue(value);
   }
 
-  /* ~~~~~ EXPLAIN ~~~~~ */
+  /* ~~~~~ EXPLAIN PLAN FOR ~~~~~ */
 
   public makeExplain(): this {
     const value = this.valueOf();
-    value.explainPlanFor = true;
+    value.explainPlanFor = SqlExplainPlanForClause.create();
+    return SqlBase.fromValue(value);
+  }
+
+  /* ~~~~~ INSERT INTO ~~~~~ */
+
+  public getInsertIntoTable(): SqlTableRef | undefined {
+    return this.insertInto?.table;
+  }
+
+  public changeInsertIntoTable(table: SqlTableRef | string | undefined) {
+    const value = this.valueOf();
+    value.insertInto = table
+      ? value.insertInto
+        ? value.insertInto.changeTable(table)
+        : SqlInsertIntoClause.create(table)
+      : undefined;
     return SqlBase.fromValue(value);
   }
 

@@ -257,6 +257,7 @@ describe('SqlComparison', () => {
             "type": "groupByClause",
           },
           "havingClause": undefined,
+          "insertInto": undefined,
           "keywords": Object {
             "select": "SELECT",
           },
@@ -602,6 +603,7 @@ describe('SqlComparison', () => {
           },
           "groupByClause": undefined,
           "havingClause": undefined,
+          "insertInto": undefined,
           "keywords": Object {
             "select": "SELECT",
           },
@@ -721,6 +723,7 @@ describe('SqlComparison', () => {
           },
           "groupByClause": undefined,
           "havingClause": undefined,
+          "insertInto": undefined,
           "keywords": Object {
             "select": "SELECT",
           },

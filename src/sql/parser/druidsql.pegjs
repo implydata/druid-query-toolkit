@@ -63,7 +63,8 @@ SqlAliasExplicitAs = expression:Expression alias:(_ AsToken _ RefNameAlias)?
 
 SqlQuery =
   preQuery:_?
-  explainPlanFor:(ExplainToken __ PlanToken __ ForToken _)?
+  explainPlanFor:(ExplainPlanForClause _)?
+  insertInto:(InsertInto _)?
   withClause:(WithClause _)?
   select:SelectClause
   from:(_ FromClause)?
@@ -82,13 +83,13 @@ SqlQuery =
   spacing.preQuery = preQuery;
 
   if (explainPlanFor) {
-    value.explainPlanFor = true;
-    keywords.explain = explainPlanFor[0];
-    spacing.postExplain = explainPlanFor[1];
-    keywords.plan = explainPlanFor[2];
-    spacing.postPlan = explainPlanFor[3];
-    keywords['for'] = explainPlanFor[4];
-    spacing.postFor = explainPlanFor[5];
+    value.explainPlanFor = explainPlanFor[0];
+    spacing.postExplainPlanFor = explainPlanFor[1];
+  }
+
+  if (insertInto) {
+    value.insertInto = insertInto[0];
+    spacing.postInsertInto = insertInto[1];
   }
 
   if (withClause) {
@@ -151,6 +152,39 @@ SqlQuery =
 
   return new sql.SqlQuery(value);
 }
+
+
+ExplainPlanForClause = explain:ExplainToken postExplain:__ plan:PlanToken postPlan:__ forToken:ForToken
+{
+  return new sql.SqlExplainPlanForClause({
+    keywords: {
+      explain: explain,
+      plan: plan,
+      'for': forToken
+    },
+    spacing: {
+      postExplain: postExplain,
+      postPlan: postPlan
+    }
+  });
+}
+
+
+InsertInto = insert:InsertToken postInsert:__ into:IntoToken postInto:__ table:SqlRef
+{
+  return new sql.SqlInsertIntoClause({
+    table: table.convertToTableRef(),
+    keywords: {
+      insert: insert,
+      into: into
+    },
+    spacing: {
+      postInsert: postInsert,
+      postInto: postInto
+    }
+  });
+}
+
 
 WithClause =
   withKeyword:WithToken
@@ -1345,7 +1379,9 @@ FromToken = $("FROM"i !IdentifierPart)
 GroupToken = $("GROUP"i !IdentifierPart)
 HavingToken = $("HAVING"i !IdentifierPart)
 InToken = $("IN"i !IdentifierPart)
+InsertToken = $("INSERT"i !IdentifierPart)
 IntervalToken = $("INTERVAL"i !IdentifierPart)
+IntoToken = $("INTO"i !IdentifierPart)
 IsToken = $("IS"i !IdentifierPart)
 JoinToken = $("JOIN"i !IdentifierPart)
 LeadingToken = $("LEADING"i !IdentifierPart)

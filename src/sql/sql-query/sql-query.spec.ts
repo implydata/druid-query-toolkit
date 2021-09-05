@@ -50,6 +50,19 @@ describe('SqlQuery', () => {
         ORDER BY 4 DESC
       `,
       `SELECT w1."channel" FROM "wikipedia" w1 JOIN "wikipedia2" w2 ON w1."channel" = w2."channel"`,
+      sane`
+        Explain Plan For
+        SELECT * FROM wikipedia t
+      `,
+      sane`
+        Insert Into "new_table"
+        SELECT * FROM wikipedia t
+      `,
+      sane`
+        Explain Plan For
+        Insert Into "new_table"
+        SELECT * FROM wikipedia t
+      `,
     ];
 
     for (const sql of queries) {
@@ -391,6 +404,36 @@ describe('SqlQuery', () => {
     });
   });
 
+  describe('#changeInsertIntoTable', () => {
+    const sql = SqlQuery.parse(`SELECT * FROM wikipedia t`);
+
+    it('works', () => {
+      const insertSql = sql.changeInsertIntoTable('hello');
+
+      expect(insertSql.insertInto).toMatchInlineSnapshot(`
+        SqlInsertIntoClause {
+          "keywords": Object {},
+          "spacing": Object {},
+          "table": SqlTableRef {
+            "keywords": Object {},
+            "namespaceRefName": undefined,
+            "spacing": Object {},
+            "tableRefName": RefName {
+              "name": "hello",
+              "quotes": false,
+            },
+            "type": "tableRef",
+          },
+          "type": "insertIntoClause",
+        }
+      `);
+
+      expect(String(insertSql.changeInsertIntoTable('"lol"').insertInto)).toEqual(
+        `INSERT INTO "lol"`,
+      );
+    });
+  });
+
   describe('#addSelect', () => {
     const sql = SqlQuery.parse(sane`
       SELECT
@@ -678,6 +721,7 @@ describe('SqlQuery', () => {
                 },
                 "groupByClause": undefined,
                 "havingClause": undefined,
+                "insertInto": undefined,
                 "keywords": Object {
                   "select": "SELECT",
                 },
@@ -767,6 +811,7 @@ describe('SqlQuery', () => {
         },
         "groupByClause": undefined,
         "havingClause": undefined,
+        "insertInto": undefined,
         "keywords": Object {
           "select": "SELECT",
         },
@@ -863,6 +908,7 @@ describe('SqlQuery', () => {
         },
         "groupByClause": undefined,
         "havingClause": undefined,
+        "insertInto": undefined,
         "keywords": Object {
           "select": "SELECT",
         },
@@ -1008,7 +1054,18 @@ describe('SqlQuery', () => {
     expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "decorator": undefined,
-        "explainPlanFor": true,
+        "explainPlanFor": SqlExplainPlanForClause {
+          "keywords": Object {
+            "explain": "Explain",
+            "for": "for",
+            "plan": "plan",
+          },
+          "spacing": Object {
+            "postExplain": " ",
+            "postPlan": " ",
+          },
+          "type": "explainPlanForClause",
+        },
         "fromClause": SqlFromClause {
           "expressions": SeparatedArray {
             "separators": Array [],
@@ -1036,10 +1093,8 @@ describe('SqlQuery', () => {
         },
         "groupByClause": undefined,
         "havingClause": undefined,
+        "insertInto": undefined,
         "keywords": Object {
-          "explain": "Explain",
-          "for": "for",
-          "plan": "plan",
           "select": "Select",
         },
         "limitClause": undefined,
@@ -1058,9 +1113,7 @@ describe('SqlQuery', () => {
           ],
         },
         "spacing": Object {
-          "postExplain": " ",
-          "postFor": " ",
-          "postPlan": " ",
+          "postExplainPlanFor": " ",
           "postQuery": "",
           "postSelect": " ",
           "preFrom": " ",
@@ -1129,6 +1182,7 @@ describe('SqlQuery', () => {
         },
         "groupByClause": undefined,
         "havingClause": undefined,
+        "insertInto": undefined,
         "keywords": Object {
           "select": "Select",
           "with": "WITH",
@@ -1203,6 +1257,7 @@ describe('SqlQuery', () => {
                 },
                 "groupByClause": undefined,
                 "havingClause": undefined,
+                "insertInto": undefined,
                 "keywords": Object {
                   "select": "SELECT",
                 },
@@ -1292,6 +1347,7 @@ describe('SqlQuery', () => {
           },
           "groupByClause": undefined,
           "havingClause": undefined,
+          "insertInto": undefined,
           "keywords": Object {
             "select": "Select",
           },
@@ -1406,6 +1462,7 @@ describe('SqlQuery', () => {
           },
           "groupByClause": undefined,
           "havingClause": undefined,
+          "insertInto": undefined,
           "keywords": Object {
             "select": "SELECT",
           },
@@ -1520,6 +1577,7 @@ describe('SqlQuery', () => {
           },
           "groupByClause": undefined,
           "havingClause": undefined,
+          "insertInto": undefined,
           "keywords": Object {
             "select": "SELECT",
           },
@@ -1752,6 +1810,7 @@ describe('SqlQuery', () => {
             "type": "groupByClause",
           },
           "havingClause": undefined,
+          "insertInto": undefined,
           "keywords": Object {
             "select": "Select",
           },
@@ -1847,6 +1906,7 @@ describe('SqlQuery', () => {
             "type": "groupByClause",
           },
           "havingClause": undefined,
+          "insertInto": undefined,
           "keywords": Object {
             "select": "Select",
           },
@@ -1959,6 +2019,7 @@ describe('SqlQuery', () => {
             "type": "groupByClause",
           },
           "havingClause": undefined,
+          "insertInto": undefined,
           "keywords": Object {
             "select": "Select",
           },
@@ -2075,6 +2136,7 @@ describe('SqlQuery', () => {
             },
             "type": "havingClause",
           },
+          "insertInto": undefined,
           "keywords": Object {
             "select": "Select",
           },
@@ -2189,6 +2251,7 @@ describe('SqlQuery', () => {
             },
             "type": "havingClause",
           },
+          "insertInto": undefined,
           "keywords": Object {
             "select": "SELECT",
           },
@@ -2399,6 +2462,7 @@ describe('SqlQuery', () => {
             },
             "type": "havingClause",
           },
+          "insertInto": undefined,
           "keywords": Object {
             "select": "SELECT",
           },
@@ -2470,6 +2534,7 @@ describe('SqlQuery', () => {
           },
           "groupByClause": undefined,
           "havingClause": undefined,
+          "insertInto": undefined,
           "keywords": Object {
             "select": "Select",
           },
@@ -2571,6 +2636,7 @@ describe('SqlQuery', () => {
           },
           "groupByClause": undefined,
           "havingClause": undefined,
+          "insertInto": undefined,
           "keywords": Object {
             "select": "Select",
           },
@@ -2676,6 +2742,7 @@ describe('SqlQuery', () => {
           },
           "groupByClause": undefined,
           "havingClause": undefined,
+          "insertInto": undefined,
           "keywords": Object {
             "select": "Select",
           },
@@ -2781,6 +2848,7 @@ describe('SqlQuery', () => {
           },
           "groupByClause": undefined,
           "havingClause": undefined,
+          "insertInto": undefined,
           "keywords": Object {
             "select": "Select",
           },
@@ -2907,6 +2975,7 @@ describe('SqlQuery', () => {
           },
           "groupByClause": undefined,
           "havingClause": undefined,
+          "insertInto": undefined,
           "keywords": Object {
             "select": "Select",
           },
@@ -3035,6 +3104,7 @@ describe('SqlQuery', () => {
           },
           "groupByClause": undefined,
           "havingClause": undefined,
+          "insertInto": undefined,
           "keywords": Object {
             "select": "Select",
           },
@@ -3186,6 +3256,7 @@ describe('SqlQuery', () => {
           },
           "groupByClause": undefined,
           "havingClause": undefined,
+          "insertInto": undefined,
           "keywords": Object {
             "select": "Select",
           },
@@ -3272,6 +3343,7 @@ describe('SqlQuery', () => {
           },
           "groupByClause": undefined,
           "havingClause": undefined,
+          "insertInto": undefined,
           "keywords": Object {
             "select": "Select",
             "union": "union all",
@@ -3330,6 +3402,7 @@ describe('SqlQuery', () => {
             },
             "groupByClause": undefined,
             "havingClause": undefined,
+            "insertInto": undefined,
             "keywords": Object {
               "select": "select",
             },
@@ -3468,6 +3541,7 @@ describe('SqlQuery', () => {
           },
           "groupByClause": undefined,
           "havingClause": undefined,
+          "insertInto": undefined,
           "keywords": Object {
             "select": "Select",
           },
@@ -3601,6 +3675,7 @@ describe('SqlQuery', () => {
           },
           "groupByClause": undefined,
           "havingClause": undefined,
+          "insertInto": undefined,
           "keywords": Object {
             "select": "Select",
           },
@@ -3734,6 +3809,7 @@ describe('SqlQuery', () => {
           },
           "groupByClause": undefined,
           "havingClause": undefined,
+          "insertInto": undefined,
           "keywords": Object {
             "select": "Select",
           },
@@ -3867,6 +3943,7 @@ describe('SqlQuery', () => {
           },
           "groupByClause": undefined,
           "havingClause": undefined,
+          "insertInto": undefined,
           "keywords": Object {
             "select": "Select",
           },
@@ -4000,6 +4077,7 @@ describe('SqlQuery', () => {
           },
           "groupByClause": undefined,
           "havingClause": undefined,
+          "insertInto": undefined,
           "keywords": Object {
             "select": "Select",
           },
@@ -4073,6 +4151,7 @@ describe('SqlQuery', () => {
           },
           "groupByClause": undefined,
           "havingClause": undefined,
+          "insertInto": undefined,
           "keywords": Object {
             "select": "Select",
           },
@@ -4272,6 +4351,7 @@ describe('SqlQuery', () => {
             "type": "groupByClause",
           },
           "havingClause": undefined,
+          "insertInto": undefined,
           "keywords": Object {
             "select": "SELECT",
           },
@@ -4513,6 +4593,7 @@ describe('SqlQuery', () => {
             "type": "groupByClause",
           },
           "havingClause": undefined,
+          "insertInto": undefined,
           "keywords": Object {
             "select": "SELECT",
           },

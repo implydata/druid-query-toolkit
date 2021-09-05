@@ -369,6 +369,7 @@ describe('#convertToTableRef', () => {
         },
         "groupByClause": undefined,
         "havingClause": undefined,
+        "insertInto": undefined,
         "keywords": Object {
           "select": "select",
         },

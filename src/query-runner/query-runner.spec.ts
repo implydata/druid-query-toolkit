@@ -214,6 +214,7 @@ describe('QueryRunner', () => {
             "type": "groupByClause",
           },
           "havingClause": undefined,
+          "insertInto": undefined,
           "keywords": Object {
             "select": "SELECT",
           },
@@ -432,6 +433,7 @@ describe('QueryRunner', () => {
             "type": "groupByClause",
           },
           "havingClause": undefined,
+          "insertInto": undefined,
           "keywords": Object {
             "select": "SELECT",
           },
@@ -651,6 +653,7 @@ describe('QueryRunner', () => {
             "type": "groupByClause",
           },
           "havingClause": undefined,
+          "insertInto": undefined,
           "keywords": Object {
             "select": "SELECT",
           },
