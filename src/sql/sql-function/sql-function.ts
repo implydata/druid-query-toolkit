@@ -150,6 +150,10 @@ export class SqlFunction extends SqlExpression {
     return this.functionName.toUpperCase();
   }
 
+  public getEffectiveDecorator(): string | undefined {
+    return this.decorator?.toUpperCase();
+  }
+
   public changeArgs(args: SeparatedArray<SqlExpression>): this {
     const value = this.valueOf();
     value.args = args;

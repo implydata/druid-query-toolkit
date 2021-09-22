@@ -83,9 +83,9 @@ export class Introspect {
     const m = plan.match(/ signature=\[\{([^}]*)}]/m);
     if (!m) throw new Error('could not find signature');
 
-    return m[1].split(/(?<=:[A-Z]+), /).map((t: string) => {
-      const parts = t.split(':');
-      return parts[parts.length - 1];
+    return m[1].match(/:[A-Z]+(?:, |$)/g).map((t: string) => {
+      // Will match something like ':LONG, ' or ':LONG'
+      return t.replace(/[:, ]/g, '');
     });
   }
 
