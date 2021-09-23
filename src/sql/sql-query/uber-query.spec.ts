@@ -19,7 +19,7 @@ import { SqlQuery } from './sql-query';
 
 describe('Uber Query', () => {
   const sql = sane`
-    WITH temp_t1 AS (SELECT * FROM blah)
+    WITH temp_t1 AS (SELECT * FROM blah), temp_t2 AS (SELECT * FROM blah2)
     SELECT
       col1 AS "Col1",
       CASE WHEN colA = 1 THEN 3 ELSE 4 END AS "SomeCase1",

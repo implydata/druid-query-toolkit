@@ -89,6 +89,7 @@ export const ALLOWED_FUNCTIONS = [
   'STREAM',
   'SUBSTRING',
   'SUM',
+  'TABLE',
   'TRANSLATE',
   'TRIM',
   'TRUNCATE',

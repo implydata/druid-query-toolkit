@@ -45,6 +45,8 @@ async function main() {
     'PERIOD',
     'POSITION',
     'SUBSTRING',
+    'TABLE',
+    'USER',
   ];
   for (const k of RESERVED_KEYWORDS) {
     if (SPECIAL_FUNCTIONS.includes(k)) continue;

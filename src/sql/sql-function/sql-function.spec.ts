@@ -41,6 +41,8 @@ describe('SqlFunction', () => {
       "trim('eh' from 'hehe__hehe')",
 
       `SomeFn("boo" AS "arg1")`,
+
+      `TABLE(extern('{...}', '{...}', '[...]'))`,
     ];
 
     for (const sql of queries) {
@@ -60,6 +62,7 @@ describe('SqlFunction', () => {
 
   it('.isValidFunctionName', () => {
     expect(SqlFunction.isValidFunctionName('SUM')).toEqual(true);
+    expect(SqlFunction.isValidFunctionName('TABLE')).toEqual(true);
   });
 
   it('Function without args', () => {
