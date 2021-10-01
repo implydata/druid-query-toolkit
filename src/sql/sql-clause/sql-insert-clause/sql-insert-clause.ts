@@ -17,18 +17,18 @@ import { SqlExpression } from '../../sql-expression';
 import { SqlTableRef } from '../../sql-table-ref/sql-table-ref';
 import { SqlClause, SqlClauseValue } from '../sql-clause';
 
-export interface SqlInsertIntoClauseValue extends SqlClauseValue {
+export interface SqlInsertClauseValue extends SqlClauseValue {
   table: SqlTableRef;
 }
 
-export class SqlInsertIntoClause extends SqlClause {
-  static type: SqlType = 'insertIntoClause';
+export class SqlInsertClause extends SqlClause {
+  static type: SqlType = 'insertClause';
 
   static readonly DEFAULT_INSERT_KEYWORD = 'INSERT';
   static readonly DEFAULT_INTO_KEYWORD = 'INTO';
 
-  static create(table: SqlInsertIntoClause | SqlTableRef | string): SqlInsertIntoClause {
-    if (table instanceof SqlInsertIntoClause) return table;
+  static create(table: SqlInsertClause | SqlTableRef | string): SqlInsertClause {
+    if (table instanceof SqlInsertClause) return table;
     if (typeof table === 'string') {
       const ex = SqlExpression.parse(table).convertToTableRef();
       if (ex instanceof SqlTableRef) {
@@ -37,29 +37,29 @@ export class SqlInsertIntoClause extends SqlClause {
         throw new Error('bad input');
       }
     }
-    return new SqlInsertIntoClause({
+    return new SqlInsertClause({
       table,
     });
   }
 
   public readonly table: SqlTableRef;
 
-  constructor(options: SqlInsertIntoClauseValue) {
-    super(options, SqlInsertIntoClause.type);
+  constructor(options: SqlInsertClauseValue) {
+    super(options, SqlInsertClause.type);
     this.table = options.table;
   }
 
-  public valueOf(): SqlInsertIntoClauseValue {
-    const value = super.valueOf() as SqlInsertIntoClauseValue;
+  public valueOf(): SqlInsertClauseValue {
+    const value = super.valueOf() as SqlInsertClauseValue;
     value.table = this.table;
     return value;
   }
 
   protected _toRawString(): string {
     return [
-      this.getKeyword('insert', SqlInsertIntoClause.DEFAULT_INSERT_KEYWORD),
+      this.getKeyword('insert', SqlInsertClause.DEFAULT_INSERT_KEYWORD),
       this.getSpace('postInsert'),
-      this.getKeyword('into', SqlInsertIntoClause.DEFAULT_INTO_KEYWORD),
+      this.getKeyword('into', SqlInsertClause.DEFAULT_INTO_KEYWORD),
       this.getSpace('postInto'),
       this.table.toString(),
     ].join('');
@@ -99,4 +99,4 @@ export class SqlInsertIntoClause extends SqlClause {
   }
 }
 
-SqlBase.register(SqlInsertIntoClause);
+SqlBase.register(SqlInsertClause);

@@ -73,6 +73,10 @@ export class SqlLimitClause extends SqlClause {
 
     return ret;
   }
+
+  public getLimitValue(): number {
+    return this.limit.getNumberValue() as number;
+  }
 }
 
 SqlBase.register(SqlLimitClause);

@@ -15,32 +15,32 @@
 import { SqlBase, SqlType } from '../../sql-base';
 import { SqlClause, SqlClauseValue } from '../sql-clause';
 
-export interface SqlExplainPlanForClauseValue extends SqlClauseValue {}
+export interface SqlExplainClauseValue extends SqlClauseValue {}
 
-export class SqlExplainPlanForClause extends SqlClause {
-  static type: SqlType = 'explainPlanForClause';
+export class SqlExplainClause extends SqlClause {
+  static type: SqlType = 'explainClause';
 
   static readonly DEFAULT_EXPLAIN_KEYWORD = 'EXPLAIN';
   static readonly DEFAULT_PLAN_KEYWORD = 'PLAN';
   static readonly DEFAULT_FOR_KEYWORD = 'FOR';
 
-  static create(): SqlExplainPlanForClause {
-    return new SqlExplainPlanForClause({});
+  static create(): SqlExplainClause {
+    return new SqlExplainClause({});
   }
 
-  constructor(options: SqlExplainPlanForClauseValue) {
-    super(options, SqlExplainPlanForClause.type);
+  constructor(options: SqlExplainClauseValue) {
+    super(options, SqlExplainClause.type);
   }
 
   protected _toRawString(): string {
     return [
-      this.getKeyword('explain', SqlExplainPlanForClause.DEFAULT_EXPLAIN_KEYWORD),
+      this.getKeyword('explain', SqlExplainClause.DEFAULT_EXPLAIN_KEYWORD),
       this.getSpace('postExplain'),
-      this.getKeyword('plan', SqlExplainPlanForClause.DEFAULT_PLAN_KEYWORD),
+      this.getKeyword('plan', SqlExplainClause.DEFAULT_PLAN_KEYWORD),
       this.getSpace('postPlan'),
-      this.getKeyword('for', SqlExplainPlanForClause.DEFAULT_FOR_KEYWORD),
+      this.getKeyword('for', SqlExplainClause.DEFAULT_FOR_KEYWORD),
     ].join('');
   }
 }
 
-SqlBase.register(SqlExplainPlanForClause);
+SqlBase.register(SqlExplainClause);

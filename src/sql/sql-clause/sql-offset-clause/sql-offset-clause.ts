@@ -73,6 +73,10 @@ export class SqlOffsetClause extends SqlClause {
 
     return ret;
   }
+
+  public getOffsetValue(): number {
+    return this.offset.getNumberValue() as number;
+  }
 }
 
 SqlBase.register(SqlOffsetClause);

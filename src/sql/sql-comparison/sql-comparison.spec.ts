@@ -207,7 +207,7 @@ describe('SqlComparison', () => {
         "op": "=",
         "rhs": SqlQuery {
           "decorator": undefined,
-          "explainPlanFor": undefined,
+          "explainClause": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -257,7 +257,7 @@ describe('SqlComparison', () => {
             "type": "groupByClause",
           },
           "havingClause": undefined,
-          "insertInto": undefined,
+          "insertClause": undefined,
           "keywords": Object {
             "select": "SELECT",
           },
@@ -356,16 +356,16 @@ describe('SqlComparison', () => {
           "spacing": Object {
             "postQuery": "",
             "postSelect": " ",
-            "preFrom": " ",
-            "preGroupBy": " ",
-            "preLimit": " ",
-            "preOrderBy": " ",
+            "preFromClause": " ",
+            "preGroupByClause": " ",
+            "preLimitClause": " ",
+            "preOrderByClause": " ",
             "preQuery": "",
           },
           "type": "query",
           "unionQuery": undefined,
           "whereClause": undefined,
-          "withParts": undefined,
+          "withClause": undefined,
         },
         "spacing": Object {
           "postDecorator": " ",
@@ -575,7 +575,7 @@ describe('SqlComparison', () => {
         "op": "IN",
         "rhs": SqlQuery {
           "decorator": undefined,
-          "explainPlanFor": undefined,
+          "explainClause": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -603,7 +603,7 @@ describe('SqlComparison', () => {
           },
           "groupByClause": undefined,
           "havingClause": undefined,
-          "insertInto": undefined,
+          "insertClause": undefined,
           "keywords": Object {
             "select": "SELECT",
           },
@@ -650,14 +650,14 @@ describe('SqlComparison', () => {
           "spacing": Object {
             "postQuery": "",
             "postSelect": " ",
-            "preFrom": " ",
-            "preLimit": " ",
+            "preFromClause": " ",
+            "preLimitClause": " ",
             "preQuery": "",
           },
           "type": "query",
           "unionQuery": undefined,
           "whereClause": undefined,
-          "withParts": undefined,
+          "withClause": undefined,
         },
         "spacing": Object {
           "postOp": " ",
@@ -695,7 +695,7 @@ describe('SqlComparison', () => {
         "op": "IN",
         "rhs": SqlQuery {
           "decorator": undefined,
-          "explainPlanFor": undefined,
+          "explainClause": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -723,7 +723,7 @@ describe('SqlComparison', () => {
           },
           "groupByClause": undefined,
           "havingClause": undefined,
-          "insertInto": undefined,
+          "insertClause": undefined,
           "keywords": Object {
             "select": "SELECT",
           },
@@ -770,14 +770,14 @@ describe('SqlComparison', () => {
           "spacing": Object {
             "postQuery": "",
             "postSelect": " ",
-            "preFrom": " ",
-            "preLimit": " ",
+            "preFromClause": " ",
+            "preLimitClause": " ",
             "preQuery": "",
           },
           "type": "query",
           "unionQuery": undefined,
           "whereClause": undefined,
-          "withParts": undefined,
+          "withClause": undefined,
         },
         "spacing": Object {
           "not": " ",

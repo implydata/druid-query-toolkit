@@ -38,5 +38,5 @@ export * from './sql-alias/sql-alias';
 export * from './sql-clause';
 
 export * from './sql-function/sql-function';
-export * from './sql-query/sql-with-part/sql-with-part';
 export * from './sql-query/sql-query';
+export * from './sql-with-query/sql-with-query';

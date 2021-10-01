@@ -63,82 +63,61 @@ SqlAliasExplicitAs = expression:Expression alias:(_ AsToken _ RefNameAlias)?
 
 SqlQuery =
   preQuery:_?
-  explainPlanFor:(ExplainPlanForClause _)?
-  insertInto:(InsertInto _)?
-  withClause:(WithClause _)?
-  select:SelectClause
-  from:(_ FromClause)?
-  where:(_ SqlWhereClause)?
-  groupBy:(_ GroupByClause)?
-  having:(_ HavingClause)?
-  orderBy:(_ OrderByClause)?
-  limit:(_ LimitClause)?
-  offset:(_ OffsetClause)?
+  explainClause:(ExplainClause _)?
+  insertClause:(InsertClause _)?
+  heart:(((WithClause _)? QueryHeart) / (WithClause _ OpenParen _ SqlQuery _ CloseParen))
+  orderByClause:(_ OrderByClause)?
+  limitClause:(_ LimitClause)?
+  offsetClause:(_ OffsetClause)?
   union:(_ UnionClause)?
-  postQuery:EndOfQuery?
+  postQuery:_?
 {
   var value = {};
   var keywords = value.keywords = {};
   var spacing = value.spacing = {};
   spacing.preQuery = preQuery;
 
-  if (explainPlanFor) {
-    value.explainPlanFor = explainPlanFor[0];
-    spacing.postExplainPlanFor = explainPlanFor[1];
+  if (explainClause) {
+    value.explainClause = explainClause[0];
+    spacing.postExplainClause = explainClause[1];
   }
 
-  if (insertInto) {
-    value.insertInto = insertInto[0];
-    spacing.postInsertInto = insertInto[1];
+  if (insertClause) {
+    value.insertClause = insertClause[0];
+    spacing.postInsertClause = insertClause[1];
   }
 
-  if (withClause) {
-    keywords.with = withClause[0].withKeyword;
-    spacing.postWith = withClause[0].postWith;
-    value.withParts = withClause[0].withParts;
-    spacing.postWithParts = withClause[1];
+  var withQueryMode = heart.length === 7;
+  if (withQueryMode) {
+    value.withClause = heart[0];
+    spacing.postWithClause = heart[1];
+    value.query = heart[4].addParens(heart[3], heart[5]);
+  } else {
+    var withClause = heart[0];
+    if (withClause) {
+      value.withClause = withClause[0];
+      spacing.postWithClause = withClause[1];
+    }
+
+    var subQuery = heart[1];
+    Object.assign(value, subQuery.value);
+    Object.assign(keywords, subQuery.keywords);
+    Object.assign(spacing, subQuery.spacing);
   }
 
-  keywords.select = select.selectKeyword;
-  spacing.postSelect = select.postSelect;
-  value.decorator = select.decorator;
-  keywords.decorator = select.decoratorKeyword;
-  spacing.postDecorator = select.postDecorator;
-  value.selectExpressions = select.selectExpressions;
-
-  if (from) {
-    spacing.preFrom = from[0];
-    value.fromClause = from[1];
+  if (orderByClause) {
+    spacing.preOrderByClause = orderByClause[0];
+    value.orderByClause = orderByClause[1];
   }
 
-  if (where) {
-    spacing.preWhere = where[0];
-    value.whereClause = where[1];
+  if (limitClause) {
+    spacing.preLimitClause = limitClause[0];
+    value.limitClause = limitClause[1];
   }
 
-  if (groupBy) {
-    spacing.preGroupBy = groupBy[0];
-    value.groupByClause = groupBy[1];
-  }
-
-  if (having) {
-    spacing.preHaving = having[0];
-    value.havingClause = having[1];
-  }
-
-  if (orderBy) {
-    spacing.preOrderBy = orderBy[0];
-    value.orderByClause = orderBy[1];
-  }
-
-  if (limit) {
-    spacing.preLimit = limit[0];
-    value.limitClause = limit[1];
-  }
-
-  if (offset) {
-    spacing.preOffset = offset[0];
-    value.offsetClause = offset[1];
+  if (offsetClause) {
+    spacing.preOffsetClause = offsetClause[0];
+    value.offsetClause = offsetClause[1];
   }
 
   if (union) {
@@ -150,13 +129,59 @@ SqlQuery =
 
   spacing.postQuery = postQuery;
 
-  return new sql.SqlQuery(value);
+  return withQueryMode ? new sql.SqlWithQuery(value) : new sql.SqlQuery(value);
 }
 
 
-ExplainPlanForClause = explain:ExplainToken postExplain:__ plan:PlanToken postPlan:__ forToken:ForToken
+QueryHeart =
+  select:SelectClause
+  fromClause:(_ FromClause)?
+  whereClause:(_ SqlWhereClause)?
+  groupByClause:(_ GroupByClause)?
+  havingClause:(_ HavingClause)?
 {
-  return new sql.SqlExplainPlanForClause({
+  var value = {};
+  var keywords = {};
+  var spacing = {};
+
+  keywords.select = select.selectKeyword;
+  spacing.postSelect = select.postSelect;
+  value.decorator = select.decorator;
+  keywords.decorator = select.decoratorKeyword;
+  spacing.postDecorator = select.postDecorator;
+  value.selectExpressions = select.selectExpressions;
+
+  if (fromClause) {
+    spacing.preFromClause = fromClause[0];
+    value.fromClause = fromClause[1];
+  }
+
+  if (whereClause) {
+    spacing.preWhereClause = whereClause[0];
+    value.whereClause = whereClause[1];
+  }
+
+  if (groupByClause) {
+    spacing.preGroupByClause = groupByClause[0];
+    value.groupByClause = groupByClause[1];
+  }
+
+  if (havingClause) {
+    spacing.preHavingClause = havingClause[0];
+    value.havingClause = havingClause[1];
+  }
+
+  return {
+    value: value,
+    keywords: keywords,
+    spacing: spacing,
+  };
+}
+
+
+ExplainClause = explain:ExplainToken postExplain:__ plan:PlanToken postPlan:__ forToken:ForToken
+{
+  return new sql.SqlExplainClause({
     keywords: {
       explain: explain,
       plan: plan,
@@ -170,9 +195,9 @@ ExplainPlanForClause = explain:ExplainToken postExplain:__ plan:PlanToken postPl
 }
 
 
-InsertInto = insert:InsertToken postInsert:__ into:IntoToken postInto:__ table:SqlRef
+InsertClause = insert:InsertToken postInsert:__ into:IntoToken postInto:__ table:SqlRef
 {
-  return new sql.SqlInsertIntoClause({
+  return new sql.SqlInsertClause({
     table: table.convertToTableRef(),
     keywords: {
       insert: insert,
@@ -192,11 +217,15 @@ WithClause =
   head:SqlWithPart
   tail:(CommaSeparator SqlWithPart)*
 {
-  return {
-    withKeyword: withKeyword,
-    postWith: postWith,
+  return new sql.SqlWithClause({
     withParts: makeSeparatedArray(head, tail),
-  };
+    keywords: {
+      'with': withKeyword
+    },
+    spacing: {
+      postWith: postWith
+    }
+  });
 }
 
 
@@ -1341,8 +1370,6 @@ FinalSingleLineComment = $("--" [^\n]*)
 MultiLineComment = $("/*" (!"*/" .)* "*/")
 
 Space = [ \t\n\r]
-
-EndOfQuery = $(_ ';'? _)
 
 OpenParen "(" = "("
 

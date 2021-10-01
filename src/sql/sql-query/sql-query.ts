@@ -16,11 +16,11 @@ import { filterMap } from '../../utils';
 import { parseSql } from '../parser';
 import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../sql-base';
 import {
-  SqlExplainPlanForClause,
+  SqlExplainClause,
   SqlFromClause,
   SqlGroupByClause,
   SqlHavingClause,
-  SqlInsertIntoClause,
+  SqlInsertClause,
   SqlJoinPart,
   SqlLimitClause,
   SqlOffsetClause,
@@ -28,6 +28,8 @@ import {
   SqlOrderByDirection,
   SqlOrderByExpression,
   SqlWhereClause,
+  SqlWithClause,
+  SqlWithPart,
 } from '../sql-clause';
 import { SqlExpression } from '../sql-expression';
 import { SqlLiteral } from '../sql-literal/sql-literal';
@@ -35,8 +37,6 @@ import { SqlRef } from '../sql-ref/sql-ref';
 import { SqlStar } from '../sql-star/sql-star';
 import { SqlTableRef } from '../sql-table-ref/sql-table-ref';
 import { clampIndex, normalizeIndex, SeparatedArray, Separator } from '../utils';
-
-import { SqlWithPart } from './sql-with-part/sql-with-part';
 
 const INDENT_SPACE = '\n  ';
 
@@ -60,9 +60,9 @@ export interface AddSelectOptions {
 }
 
 export interface SqlQueryValue extends SqlBaseValue {
-  explainPlanFor?: SqlExplainPlanForClause;
-  insertInto?: SqlInsertIntoClause;
-  withParts?: SeparatedArray<SqlWithPart>;
+  explainClause?: SqlExplainClause;
+  insertClause?: SqlInsertClause;
+  withClause?: SqlWithClause;
   decorator?: SqlQueryDecorator;
   selectExpressions?: SeparatedArray<SqlExpression>;
 
@@ -79,7 +79,6 @@ export interface SqlQueryValue extends SqlBaseValue {
 export class SqlQuery extends SqlExpression {
   static type: SqlType = 'query';
 
-  static readonly DEFAULT_WITH_KEYWORD = 'WITH';
   static readonly DEFAULT_SELECT_KEYWORD = 'SELECT';
   static readonly DEFAULT_UNION_KEYWORD = 'UNION ALL';
 
@@ -124,9 +123,9 @@ export class SqlQuery extends SqlExpression {
     return /^EXPR\$(?:\d|[1-9]\d*)$/.test(name);
   }
 
-  public readonly explainPlanFor?: SqlExplainPlanForClause;
-  public readonly insertInto?: SqlInsertIntoClause;
-  public readonly withParts?: SeparatedArray<SqlWithPart>;
+  public readonly explainClause?: SqlExplainClause;
+  public readonly insertClause?: SqlInsertClause;
+  public readonly withClause?: SqlWithClause;
   public readonly decorator?: SqlQueryDecorator;
   public readonly selectExpressions?: SeparatedArray<SqlExpression>;
   public readonly fromClause?: SqlFromClause;
@@ -140,9 +139,9 @@ export class SqlQuery extends SqlExpression {
 
   constructor(options: SqlQueryValue) {
     super(options, SqlQuery.type);
-    this.explainPlanFor = options.explainPlanFor;
-    this.insertInto = options.insertInto;
-    this.withParts = options.withParts;
+    this.explainClause = options.explainClause;
+    this.insertClause = options.insertClause;
+    this.withClause = options.withClause;
     this.decorator = options.decorator;
     this.selectExpressions = options.selectExpressions;
     this.fromClause = options.fromClause;
@@ -157,9 +156,9 @@ export class SqlQuery extends SqlExpression {
 
   public valueOf(): SqlQueryValue {
     const value = super.valueOf() as SqlQueryValue;
-    value.explainPlanFor = this.explainPlanFor;
-    value.insertInto = this.insertInto;
-    value.withParts = this.withParts;
+    value.explainClause = this.explainClause;
+    value.insertClause = this.insertClause;
+    value.withClause = this.withClause;
     value.decorator = this.decorator;
     value.selectExpressions = this.selectExpressions;
     value.fromClause = this.fromClause;
@@ -175,9 +174,9 @@ export class SqlQuery extends SqlExpression {
 
   protected _toRawString(): string {
     const {
-      explainPlanFor,
-      insertInto,
-      withParts,
+      explainClause,
+      insertClause,
+      withClause,
       decorator,
       selectExpressions,
       fromClause,
@@ -193,23 +192,18 @@ export class SqlQuery extends SqlExpression {
     const rawParts: string[] = [this.getSpace('preQuery', '')];
 
     // Explain clause
-    if (explainPlanFor) {
-      rawParts.push(explainPlanFor.toString(), this.getSpace('postExplainPlanFor', '\n'));
+    if (explainClause) {
+      rawParts.push(explainClause.toString(), this.getSpace('postExplainClause', '\n'));
     }
 
-    // INSERT INTO clause
-    if (insertInto) {
-      rawParts.push(insertInto.toString(), this.getSpace('postInsertInfo', '\n'));
+    // INSERT clause
+    if (insertClause) {
+      rawParts.push(insertClause.toString(), this.getSpace('postInsertClause', '\n'));
     }
 
     // WITH clause
-    if (withParts) {
-      rawParts.push(
-        this.getKeyword('with', SqlQuery.DEFAULT_WITH_KEYWORD),
-        this.getSpace('postWith', INDENT_SPACE),
-        withParts.toString(INDENT_SPACE),
-        this.getSpace('postWithParts', '\n'),
-      );
+    if (withClause) {
+      rawParts.push(withClause.toString(), this.getSpace('postWithClause', '\n'));
     }
 
     const indentSpace = selectExpressions && selectExpressions.length() > 1 ? INDENT_SPACE : ' ';
@@ -233,31 +227,31 @@ export class SqlQuery extends SqlExpression {
     );
 
     if (fromClause) {
-      rawParts.push(this.getSpace('preFrom', '\n'), fromClause.toString());
+      rawParts.push(this.getSpace('preFromClause', '\n'), fromClause.toString());
     }
 
     if (whereClause) {
-      rawParts.push(this.getSpace('preWhere', '\n'), whereClause.toString());
+      rawParts.push(this.getSpace('preWhereClause', '\n'), whereClause.toString());
     }
 
     if (groupByClause) {
-      rawParts.push(this.getSpace('preGroupBy', '\n'), groupByClause.toString());
+      rawParts.push(this.getSpace('preGroupByClause', '\n'), groupByClause.toString());
     }
 
     if (havingClause) {
-      rawParts.push(this.getSpace('preHaving', '\n'), havingClause.toString());
+      rawParts.push(this.getSpace('preHavingClause', '\n'), havingClause.toString());
     }
 
     if (orderByClause) {
-      rawParts.push(this.getSpace('preOrderBy', '\n'), orderByClause.toString());
+      rawParts.push(this.getSpace('preOrderByClause', '\n'), orderByClause.toString());
     }
 
     if (limitClause) {
-      rawParts.push(this.getSpace('preLimit', '\n'), limitClause.toString());
+      rawParts.push(this.getSpace('preLimitClause', '\n'), limitClause.toString());
     }
 
     if (offsetClause) {
-      rawParts.push(this.getSpace('preOffset', '\n'), offsetClause.toString());
+      rawParts.push(this.getSpace('preOffsetClause', '\n'), offsetClause.toString());
     }
 
     if (unionQuery) {
@@ -274,15 +268,38 @@ export class SqlQuery extends SqlExpression {
     return rawParts.join('');
   }
 
-  public changeWithParts(withParts: SeparatedArray<SqlWithPart> | SqlWithPart[] | undefined): this {
-    if (this.withParts === withParts) return this;
+  public changeExplainClause(explainClause: SqlExplainClause | undefined): this {
+    if (this.explainClause === explainClause) return this;
     const value = this.valueOf();
-    if (withParts) {
-      value.withParts = SeparatedArray.fromArray(withParts);
+    if (explainClause) {
+      value.explainClause = explainClause;
     } else {
-      delete value.withParts;
-      value.keywords = this.getKeywordsWithout('with');
-      value.spacing = this.getSpacingWithout('postWith', 'postWithParts');
+      delete value.explainClause;
+      value.spacing = this.getSpacingWithout('postExplainClause');
+    }
+    return SqlBase.fromValue(value);
+  }
+
+  public changeInsertClause(insertClause: SqlInsertClause | undefined): this {
+    if (this.insertClause === insertClause) return this;
+    const value = this.valueOf();
+    if (insertClause) {
+      value.insertClause = insertClause;
+    } else {
+      delete value.insertClause;
+      value.spacing = this.getSpacingWithout('postInsertClause');
+    }
+    return SqlBase.fromValue(value);
+  }
+
+  public changeWithClause(withClause: SqlWithClause | undefined): this {
+    if (this.withClause === withClause) return this;
+    const value = this.valueOf();
+    if (withClause) {
+      value.withClause = withClause;
+    } else {
+      delete value.withClause;
+      value.spacing = this.getSpacingWithout('postWithClause');
     }
     return SqlBase.fromValue(value);
   }
@@ -307,7 +324,7 @@ export class SqlQuery extends SqlExpression {
       value.fromClause = fromClause;
     } else {
       delete value.fromClause;
-      value.spacing = this.getSpacingWithout('preFrom');
+      value.spacing = this.getSpacingWithout('preFromClause');
     }
     return SqlBase.fromValue(value);
   }
@@ -330,7 +347,7 @@ export class SqlQuery extends SqlExpression {
       value.whereClause = whereClause;
     } else {
       delete value.whereClause;
-      value.spacing = this.getSpacingWithout('preWhere');
+      value.spacing = this.getSpacingWithout('preWhereClause');
     }
     return SqlBase.fromValue(value);
   }
@@ -351,7 +368,7 @@ export class SqlQuery extends SqlExpression {
       value.groupByClause = groupByClause;
     } else {
       delete value.groupByClause;
-      value.spacing = this.getSpacingWithout('preGroupBy');
+      value.spacing = this.getSpacingWithout('preGroupByClause');
     }
     return SqlBase.fromValue(value);
   }
@@ -374,7 +391,7 @@ export class SqlQuery extends SqlExpression {
       value.havingClause = havingClause;
     } else {
       delete value.havingClause;
-      value.spacing = this.getSpacingWithout('preHaving');
+      value.spacing = this.getSpacingWithout('preHavingClause');
     }
     return SqlBase.fromValue(value);
   }
@@ -395,7 +412,7 @@ export class SqlQuery extends SqlExpression {
       value.orderByClause = orderByClause;
     } else {
       delete value.orderByClause;
-      value.spacing = this.getSpacingWithout('preOrderBy');
+      value.spacing = this.getSpacingWithout('preOrderByClause');
     }
     return SqlBase.fromValue(value);
   }
@@ -423,7 +440,7 @@ export class SqlQuery extends SqlExpression {
       value.limitClause = limitClause;
     } else {
       delete value.limitClause;
-      value.spacing = this.getSpacingWithout('preLimit');
+      value.spacing = this.getSpacingWithout('preLimitClause');
     }
     return SqlBase.fromValue(value);
   }
@@ -444,7 +461,7 @@ export class SqlQuery extends SqlExpression {
       value.offsetClause = offsetClause;
     } else {
       delete value.offsetClause;
-      value.spacing = this.getSpacingWithout('preOffset');
+      value.spacing = this.getSpacingWithout('preOffsetClause');
     }
     return SqlBase.fromValue(value);
   }
@@ -477,11 +494,19 @@ export class SqlQuery extends SqlExpression {
   ): SqlQuery | undefined {
     let ret: SqlQuery = this;
 
-    if (this.withParts) {
-      const withParts = SqlBase.walkSeparatedArray(this.withParts, nextStack, fn, postorder);
-      if (!withParts) return;
-      if (withParts !== this.withParts) {
-        ret = ret.changeWithParts(withParts);
+    if (this.insertClause) {
+      const insertClause = this.insertClause._walkHelper(nextStack, fn, postorder);
+      if (!insertClause) return;
+      if (insertClause !== this.insertClause) {
+        ret = ret.changeInsertClause(insertClause as SqlInsertClause);
+      }
+    }
+
+    if (this.withClause) {
+      const withClause = this.withClause._walkHelper(nextStack, fn, postorder);
+      if (!withClause) return;
+      if (withClause !== this.withClause) {
+        ret = ret.changeWithClause(withClause as SqlWithClause);
       }
     }
 
@@ -569,41 +594,61 @@ export class SqlQuery extends SqlExpression {
 
   public clearOwnSeparators(): this {
     const value = this.valueOf();
-    value.withParts = this.withParts?.clearSeparators();
     value.selectExpressions = this.selectExpressions?.clearSeparators();
     return SqlBase.fromValue(value);
   }
 
-  /* ~~~~~ EXPLAIN PLAN FOR ~~~~~ */
+  /* ~~~~~ EXPLAIN ~~~~~ */
 
   public makeExplain(): this {
-    const value = this.valueOf();
-    value.explainPlanFor = SqlExplainPlanForClause.create();
-    return SqlBase.fromValue(value);
+    if (this.explainClause) return this;
+    return this.changeExplainClause(SqlExplainClause.create());
   }
 
-  /* ~~~~~ INSERT INTO ~~~~~ */
+  /* ~~~~~ INSERT ~~~~~ */
 
   public getInsertIntoTable(): SqlTableRef | undefined {
-    return this.insertInto?.table;
+    return this.insertClause?.table;
   }
 
-  public changeInsertIntoTable(table: SqlTableRef | string | undefined) {
+  public changeInsertIntoTable(table: SqlTableRef | string | undefined): this {
     const value = this.valueOf();
-    value.insertInto = table
-      ? value.insertInto
-        ? value.insertInto.changeTable(table)
-        : SqlInsertIntoClause.create(table)
+    value.insertClause = table
+      ? value.insertClause
+        ? value.insertClause.changeTable(table)
+        : SqlInsertClause.create(table)
       : undefined;
     return SqlBase.fromValue(value);
   }
 
   /* ~~~~~ WITH ~~~~~ */
 
+  public getWithParts(): readonly SqlWithPart[] {
+    const { withClause } = this;
+    if (!withClause) return [];
+    return withClause.withParts.values;
+  }
+
+  public changeWithParts(withParts: SeparatedArray<SqlWithPart> | SqlWithPart[] | undefined): this {
+    if (withParts && (Array.isArray(withParts) ? withParts.length : true)) {
+      return this.changeWithClause(
+        this.withClause
+          ? this.withClause.changeWithParts(withParts)
+          : SqlWithClause.create(withParts),
+      );
+    } else {
+      return this.changeWithClause(undefined);
+    }
+  }
+
   public prependWith(name: string, query: SqlQuery): this {
-    const { withParts } = this;
-    const withPart = SqlWithPart.simple(name, query.ensureParens());
-    return this.changeWithParts(withParts ? withParts.prepend(withPart) : [withPart]);
+    return this.changeWithParts(
+      [SqlWithPart.simple(name, query.ensureParens())].concat(this.getWithParts()),
+    );
+  }
+
+  public flattenWith(): SqlQuery {
+    return this;
   }
 
   /* ~~~~~ SELECT ~~~~~ */
@@ -1072,10 +1117,30 @@ export class SqlQuery extends SqlExpression {
     return Boolean(this.limitClause);
   }
 
+  public combineWithLimitClause(otherLimitClause: SqlLimitClause): SqlQuery {
+    if (this.limitClause) {
+      return this.changeLimitValue(
+        Math.min(this.limitClause.getLimitValue(), otherLimitClause.getLimitValue()),
+      );
+    } else {
+      return this.changeLimitClause(otherLimitClause);
+    }
+  }
+
   /* ~~~~~ OFFSET ~~~~~ */
 
   public hasOffset(): boolean {
     return Boolean(this.offsetClause);
+  }
+
+  public combineWithOffsetClause(otherOffsetClause: SqlOffsetClause): SqlQuery {
+    if (this.offsetClause) {
+      return this.changeOffsetValue(
+        this.offsetClause.getOffsetValue() + otherOffsetClause.getOffsetValue(),
+      );
+    } else {
+      return this.changeOffsetClause(otherOffsetClause);
+    }
   }
 }
 

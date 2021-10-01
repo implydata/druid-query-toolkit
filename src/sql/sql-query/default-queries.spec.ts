@@ -253,7 +253,7 @@ describe('Druid Query Tests', () => {
       FROM totalSalary )
       SELECT Airline
       FROM totalSalary
-      WHERE totalSalary.total > airlineAverage.avgSalary;
+      WHERE totalSalary.total > airlineAverage.avgSalary
     `;
 
     backAndForth(sql);
@@ -270,7 +270,7 @@ describe('Druid Query Tests', () => {
       FROM totalSalary )
       SELECT Airline
       FROM totalSalary
-      WHERE totalSalary.total > airlineAverage.avgSalary;
+      WHERE totalSalary.total > airlineAverage.avgSalary
     `;
 
     backAndForth(sql);

@@ -164,7 +164,7 @@ describe('QueryRunner', () => {
         ],
         "sqlQuery": SqlQuery {
           "decorator": undefined,
-          "explainPlanFor": undefined,
+          "explainClause": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -214,7 +214,7 @@ describe('QueryRunner', () => {
             "type": "groupByClause",
           },
           "havingClause": undefined,
-          "insertInto": undefined,
+          "insertClause": undefined,
           "keywords": Object {
             "select": "SELECT",
           },
@@ -320,18 +320,18 @@ describe('QueryRunner', () => {
             "postQuery": "",
             "postSelect": "
         ",
-            "preFrom": "
+            "preFromClause": "
       ",
-            "preGroupBy": "
+            "preGroupByClause": "
       ",
-            "preOrderBy": "
+            "preOrderByClause": "
       ",
             "preQuery": "",
           },
           "type": "query",
           "unionQuery": undefined,
           "whereClause": undefined,
-          "withParts": undefined,
+          "withClause": undefined,
         },
         "sqlQueryId": "sql-query-id-yyy",
       }
@@ -383,7 +383,7 @@ describe('QueryRunner', () => {
         ],
         "sqlQuery": SqlQuery {
           "decorator": undefined,
-          "explainPlanFor": undefined,
+          "explainClause": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -433,7 +433,7 @@ describe('QueryRunner', () => {
             "type": "groupByClause",
           },
           "havingClause": undefined,
-          "insertInto": undefined,
+          "insertClause": undefined,
           "keywords": Object {
             "select": "SELECT",
           },
@@ -539,18 +539,18 @@ describe('QueryRunner', () => {
             "postQuery": "",
             "postSelect": "
         ",
-            "preFrom": "
+            "preFromClause": "
       ",
-            "preGroupBy": "
+            "preGroupByClause": "
       ",
-            "preOrderBy": "
+            "preOrderByClause": "
       ",
             "preQuery": "",
           },
           "type": "query",
           "unionQuery": undefined,
           "whereClause": undefined,
-          "withParts": undefined,
+          "withClause": undefined,
         },
         "sqlQueryId": "sql-query-id-yyy",
       }
@@ -603,7 +603,7 @@ describe('QueryRunner', () => {
         ],
         "sqlQuery": SqlQuery {
           "decorator": undefined,
-          "explainPlanFor": undefined,
+          "explainClause": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -653,7 +653,7 @@ describe('QueryRunner', () => {
             "type": "groupByClause",
           },
           "havingClause": undefined,
-          "insertInto": undefined,
+          "insertClause": undefined,
           "keywords": Object {
             "select": "SELECT",
           },
@@ -759,18 +759,18 @@ describe('QueryRunner', () => {
             "postQuery": "",
             "postSelect": "
         ",
-            "preFrom": "
+            "preFromClause": "
       ",
-            "preGroupBy": "
+            "preGroupByClause": "
       ",
-            "preOrderBy": "
+            "preOrderByClause": "
       ",
             "preQuery": "",
           },
           "type": "query",
           "unionQuery": undefined,
           "whereClause": undefined,
-          "withParts": undefined,
+          "withClause": undefined,
         },
         "sqlQueryId": "sql-query-id-yyy",
       }

@@ -410,8 +410,8 @@ describe('SqlQuery', () => {
     it('works', () => {
       const insertSql = sql.changeInsertIntoTable('hello');
 
-      expect(insertSql.insertInto).toMatchInlineSnapshot(`
-        SqlInsertIntoClause {
+      expect(insertSql.insertClause).toMatchInlineSnapshot(`
+        SqlInsertClause {
           "keywords": Object {},
           "spacing": Object {},
           "table": SqlTableRef {
@@ -424,11 +424,11 @@ describe('SqlQuery', () => {
             },
             "type": "tableRef",
           },
-          "type": "insertIntoClause",
+          "type": "insertClause",
         }
       `);
 
-      expect(String(insertSql.changeInsertIntoTable('"lol"').insertInto)).toEqual(
+      expect(String(insertSql.changeInsertIntoTable('"lol"').insertClause)).toEqual(
         `INSERT INTO "lol"`,
       );
     });
@@ -680,14 +680,14 @@ describe('SqlQuery', () => {
     expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "decorator": undefined,
-        "explainPlanFor": undefined,
+        "explainClause": undefined,
         "fromClause": SqlFromClause {
           "expressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
               SqlQuery {
                 "decorator": undefined,
-                "explainPlanFor": undefined,
+                "explainClause": undefined,
                 "fromClause": SqlFromClause {
                   "expressions": SeparatedArray {
                     "separators": Array [],
@@ -721,7 +721,7 @@ describe('SqlQuery', () => {
                 },
                 "groupByClause": undefined,
                 "havingClause": undefined,
-                "insertInto": undefined,
+                "insertClause": undefined,
                 "keywords": Object {
                   "select": "SELECT",
                 },
@@ -789,14 +789,14 @@ describe('SqlQuery', () => {
                 "spacing": Object {
                   "postQuery": "",
                   "postSelect": " ",
-                  "preFrom": " ",
-                  "preOrderBy": " ",
+                  "preFromClause": " ",
+                  "preOrderByClause": " ",
                   "preQuery": "",
                 },
                 "type": "query",
                 "unionQuery": undefined,
                 "whereClause": undefined,
-                "withParts": undefined,
+                "withClause": undefined,
               },
             ],
           },
@@ -811,7 +811,7 @@ describe('SqlQuery', () => {
         },
         "groupByClause": undefined,
         "havingClause": undefined,
-        "insertInto": undefined,
+        "insertClause": undefined,
         "keywords": Object {
           "select": "SELECT",
         },
@@ -848,14 +848,14 @@ describe('SqlQuery', () => {
         "spacing": Object {
           "postQuery": "",
           "postSelect": " ",
-          "preFrom": " ",
-          "preLimit": " ",
+          "preFromClause": " ",
+          "preLimitClause": " ",
           "preQuery": "",
         },
         "type": "query",
         "unionQuery": undefined,
         "whereClause": undefined,
-        "withParts": undefined,
+        "withClause": undefined,
       }
     `);
   });
@@ -874,7 +874,7 @@ describe('SqlQuery', () => {
     expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "decorator": undefined,
-        "explainPlanFor": undefined,
+        "explainClause": undefined,
         "fromClause": SqlFromClause {
           "expressions": SeparatedArray {
             "separators": Array [],
@@ -908,7 +908,7 @@ describe('SqlQuery', () => {
         },
         "groupByClause": undefined,
         "havingClause": undefined,
-        "insertInto": undefined,
+        "insertClause": undefined,
         "keywords": Object {
           "select": "SELECT",
         },
@@ -1034,14 +1034,14 @@ describe('SqlQuery', () => {
           "postQuery": "",
           "postSelect": "
         ",
-          "preFrom": "
+          "preFromClause": "
       ",
           "preQuery": "",
         },
         "type": "query",
         "unionQuery": undefined,
         "whereClause": undefined,
-        "withParts": undefined,
+        "withClause": undefined,
       }
     `);
   });
@@ -1054,7 +1054,7 @@ describe('SqlQuery', () => {
     expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "decorator": undefined,
-        "explainPlanFor": SqlExplainPlanForClause {
+        "explainClause": SqlExplainClause {
           "keywords": Object {
             "explain": "Explain",
             "for": "for",
@@ -1064,7 +1064,7 @@ describe('SqlQuery', () => {
             "postExplain": " ",
             "postPlan": " ",
           },
-          "type": "explainPlanForClause",
+          "type": "explainClause",
         },
         "fromClause": SqlFromClause {
           "expressions": SeparatedArray {
@@ -1093,7 +1093,7 @@ describe('SqlQuery', () => {
         },
         "groupByClause": undefined,
         "havingClause": undefined,
-        "insertInto": undefined,
+        "insertClause": undefined,
         "keywords": Object {
           "select": "Select",
         },
@@ -1113,16 +1113,16 @@ describe('SqlQuery', () => {
           ],
         },
         "spacing": Object {
-          "postExplainPlanFor": " ",
+          "postExplainClause": " ",
           "postQuery": "",
           "postSelect": " ",
-          "preFrom": " ",
+          "preFromClause": " ",
           "preQuery": "",
         },
         "type": "query",
         "unionQuery": undefined,
         "whereClause": undefined,
-        "withParts": undefined,
+        "withClause": undefined,
       }
     `);
   });
@@ -1140,7 +1140,7 @@ describe('SqlQuery', () => {
     expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "decorator": undefined,
-        "explainPlanFor": undefined,
+        "explainClause": undefined,
         "fromClause": SqlFromClause {
           "expressions": SeparatedArray {
             "separators": Array [],
@@ -1182,10 +1182,9 @@ describe('SqlQuery', () => {
         },
         "groupByClause": undefined,
         "havingClause": undefined,
-        "insertInto": undefined,
+        "insertClause": undefined,
         "keywords": Object {
           "select": "Select",
-          "with": "WITH",
         },
         "limitClause": undefined,
         "offsetClause": undefined,
@@ -1205,106 +1204,114 @@ describe('SqlQuery', () => {
         "spacing": Object {
           "postQuery": "",
           "postSelect": " ",
-          "postWith": " ",
-          "postWithParts": "
+          "postWithClause": "
       ",
-          "preFrom": " ",
+          "preFromClause": " ",
           "preQuery": "",
         },
         "type": "query",
         "unionQuery": undefined,
         "whereClause": undefined,
-        "withParts": SeparatedArray {
-          "separators": Array [],
-          "values": Array [
-            SqlWithPart {
-              "keywords": Object {
-                "as": "AS",
-              },
-              "spacing": Object {
-                "postAs": " ",
-                "postWithTable": " ",
-              },
-              "type": "withPart",
-              "withColumns": undefined,
-              "withQuery": SqlQuery {
-                "decorator": undefined,
-                "explainPlanFor": undefined,
-                "fromClause": SqlFromClause {
-                  "expressions": SeparatedArray {
+        "withClause": SqlWithClause {
+          "keywords": Object {
+            "with": "WITH",
+          },
+          "spacing": Object {
+            "postWith": " ",
+          },
+          "type": "withClause",
+          "withParts": SeparatedArray {
+            "separators": Array [],
+            "values": Array [
+              SqlWithPart {
+                "keywords": Object {
+                  "as": "AS",
+                },
+                "spacing": Object {
+                  "postAs": " ",
+                  "postWithTable": " ",
+                },
+                "type": "withPart",
+                "withColumns": undefined,
+                "withQuery": SqlQuery {
+                  "decorator": undefined,
+                  "explainClause": undefined,
+                  "fromClause": SqlFromClause {
+                    "expressions": SeparatedArray {
+                      "separators": Array [],
+                      "values": Array [
+                        SqlTableRef {
+                          "keywords": Object {},
+                          "namespaceRefName": undefined,
+                          "spacing": Object {},
+                          "tableRefName": RefName {
+                            "name": "emp",
+                            "quotes": false,
+                          },
+                          "type": "tableRef",
+                        },
+                      ],
+                    },
+                    "joinParts": undefined,
+                    "keywords": Object {
+                      "from": "FROM",
+                    },
+                    "spacing": Object {
+                      "postFrom": "   ",
+                    },
+                    "type": "fromClause",
+                  },
+                  "groupByClause": undefined,
+                  "havingClause": undefined,
+                  "insertClause": undefined,
+                  "keywords": Object {
+                    "select": "SELECT",
+                  },
+                  "limitClause": undefined,
+                  "offsetClause": undefined,
+                  "orderByClause": undefined,
+                  "parens": Array [
+                    Object {
+                      "leftSpacing": "
+        ",
+                      "rightSpacing": "",
+                    },
+                  ],
+                  "selectExpressions": SeparatedArray {
                     "separators": Array [],
                     "values": Array [
-                      SqlTableRef {
+                      SqlRef {
+                        "columnRefName": RefName {
+                          "name": "deptno",
+                          "quotes": false,
+                        },
                         "keywords": Object {},
                         "namespaceRefName": undefined,
                         "spacing": Object {},
-                        "tableRefName": RefName {
-                          "name": "emp",
-                          "quotes": false,
-                        },
-                        "type": "tableRef",
+                        "tableRefName": undefined,
+                        "type": "ref",
                       },
                     ],
                   },
-                  "joinParts": undefined,
-                  "keywords": Object {
-                    "from": "FROM",
-                  },
                   "spacing": Object {
-                    "postFrom": "   ",
-                  },
-                  "type": "fromClause",
-                },
-                "groupByClause": undefined,
-                "havingClause": undefined,
-                "insertInto": undefined,
-                "keywords": Object {
-                  "select": "SELECT",
-                },
-                "limitClause": undefined,
-                "offsetClause": undefined,
-                "orderByClause": undefined,
-                "parens": Array [
-                  Object {
-                    "leftSpacing": "
+                    "postQuery": "",
+                    "postSelect": " ",
+                    "preFromClause": "
         ",
-                    "rightSpacing": "",
+                    "preQuery": "",
                   },
-                ],
-                "selectExpressions": SeparatedArray {
-                  "separators": Array [],
-                  "values": Array [
-                    SqlRef {
-                      "columnRefName": RefName {
-                        "name": "deptno",
-                        "quotes": false,
-                      },
-                      "keywords": Object {},
-                      "namespaceRefName": undefined,
-                      "spacing": Object {},
-                      "tableRefName": undefined,
-                      "type": "ref",
-                    },
-                  ],
+                  "type": "query",
+                  "unionQuery": undefined,
+                  "whereClause": undefined,
+                  "withClause": undefined,
                 },
-                "spacing": Object {
-                  "postQuery": "",
-                  "postSelect": " ",
-                  "preFrom": "
-        ",
-                  "preQuery": "",
+                "withTable": RefName {
+                  "name": "dept_count",
+                  "quotes": false,
                 },
-                "type": "query",
-                "unionQuery": undefined,
-                "whereClause": undefined,
-                "withParts": undefined,
               },
-              "withTable": RefName {
-                "name": "dept_count",
-                "quotes": false,
-              },
-            },
-          ],
+            ],
+          },
         },
       }
     `);
@@ -1319,7 +1326,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "decorator": undefined,
-          "explainPlanFor": undefined,
+          "explainClause": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -1347,7 +1354,7 @@ describe('SqlQuery', () => {
           },
           "groupByClause": undefined,
           "havingClause": undefined,
-          "insertInto": undefined,
+          "insertClause": undefined,
           "keywords": Object {
             "select": "Select",
           },
@@ -1369,9 +1376,9 @@ describe('SqlQuery', () => {
           "spacing": Object {
             "postQuery": "",
             "postSelect": " ",
-            "preFrom": " ",
+            "preFromClause": " ",
             "preQuery": "",
-            "preWhere": " ",
+            "preWhereClause": " ",
           },
           "type": "query",
           "unionQuery": undefined,
@@ -1415,7 +1422,7 @@ describe('SqlQuery', () => {
             },
             "type": "whereClause",
           },
-          "withParts": undefined,
+          "withClause": undefined,
         }
       `);
     });
@@ -1428,7 +1435,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "decorator": undefined,
-          "explainPlanFor": undefined,
+          "explainClause": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -1462,7 +1469,7 @@ describe('SqlQuery', () => {
           },
           "groupByClause": undefined,
           "havingClause": undefined,
-          "insertInto": undefined,
+          "insertClause": undefined,
           "keywords": Object {
             "select": "SELECT",
           },
@@ -1484,9 +1491,9 @@ describe('SqlQuery', () => {
           "spacing": Object {
             "postQuery": "",
             "postSelect": " ",
-            "preFrom": " ",
+            "preFromClause": " ",
             "preQuery": "",
-            "preWhere": " ",
+            "preWhereClause": " ",
           },
           "type": "query",
           "unionQuery": undefined,
@@ -1530,7 +1537,7 @@ describe('SqlQuery', () => {
             },
             "type": "whereClause",
           },
-          "withParts": undefined,
+          "withClause": undefined,
         }
       `);
     });
@@ -1543,7 +1550,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "decorator": undefined,
-          "explainPlanFor": undefined,
+          "explainClause": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -1577,7 +1584,7 @@ describe('SqlQuery', () => {
           },
           "groupByClause": undefined,
           "havingClause": undefined,
-          "insertInto": undefined,
+          "insertClause": undefined,
           "keywords": Object {
             "select": "SELECT",
           },
@@ -1599,9 +1606,9 @@ describe('SqlQuery', () => {
           "spacing": Object {
             "postQuery": "",
             "postSelect": " ",
-            "preFrom": " ",
+            "preFromClause": " ",
             "preQuery": "",
-            "preWhere": " ",
+            "preWhereClause": " ",
           },
           "type": "query",
           "unionQuery": undefined,
@@ -1741,7 +1748,7 @@ describe('SqlQuery', () => {
             },
             "type": "whereClause",
           },
-          "withParts": undefined,
+          "withClause": undefined,
         }
       `);
     });
@@ -1756,7 +1763,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "decorator": undefined,
-          "explainPlanFor": undefined,
+          "explainClause": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -1810,7 +1817,7 @@ describe('SqlQuery', () => {
             "type": "groupByClause",
           },
           "havingClause": undefined,
-          "insertInto": undefined,
+          "insertClause": undefined,
           "keywords": Object {
             "select": "Select",
           },
@@ -1832,14 +1839,14 @@ describe('SqlQuery', () => {
           "spacing": Object {
             "postQuery": "",
             "postSelect": " ",
-            "preFrom": " ",
-            "preGroupBy": " ",
+            "preFromClause": " ",
+            "preGroupByClause": " ",
             "preQuery": "",
           },
           "type": "query",
           "unionQuery": undefined,
           "whereClause": undefined,
-          "withParts": undefined,
+          "withClause": undefined,
         }
       `);
     });
@@ -1852,7 +1859,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "decorator": undefined,
-          "explainPlanFor": undefined,
+          "explainClause": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -1906,7 +1913,7 @@ describe('SqlQuery', () => {
             "type": "groupByClause",
           },
           "havingClause": undefined,
-          "insertInto": undefined,
+          "insertClause": undefined,
           "keywords": Object {
             "select": "Select",
           },
@@ -1928,14 +1935,14 @@ describe('SqlQuery', () => {
           "spacing": Object {
             "postQuery": "",
             "postSelect": " ",
-            "preFrom": " ",
-            "preGroupBy": " ",
+            "preFromClause": " ",
+            "preGroupByClause": " ",
             "preQuery": "",
           },
           "type": "query",
           "unionQuery": undefined,
           "whereClause": undefined,
-          "withParts": undefined,
+          "withClause": undefined,
         }
       `);
     });
@@ -1948,7 +1955,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "decorator": undefined,
-          "explainPlanFor": undefined,
+          "explainClause": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -2019,7 +2026,7 @@ describe('SqlQuery', () => {
             "type": "groupByClause",
           },
           "havingClause": undefined,
-          "insertInto": undefined,
+          "insertClause": undefined,
           "keywords": Object {
             "select": "Select",
           },
@@ -2047,14 +2054,14 @@ describe('SqlQuery', () => {
           "spacing": Object {
             "postQuery": "",
             "postSelect": " ",
-            "preFrom": " ",
-            "preGroupBy": " ",
+            "preFromClause": " ",
+            "preGroupByClause": " ",
             "preQuery": "",
           },
           "type": "query",
           "unionQuery": undefined,
           "whereClause": undefined,
-          "withParts": undefined,
+          "withClause": undefined,
         }
       `);
     });
@@ -2069,7 +2076,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "decorator": undefined,
-          "explainPlanFor": undefined,
+          "explainClause": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -2136,7 +2143,7 @@ describe('SqlQuery', () => {
             },
             "type": "havingClause",
           },
-          "insertInto": undefined,
+          "insertClause": undefined,
           "keywords": Object {
             "select": "Select",
           },
@@ -2158,14 +2165,14 @@ describe('SqlQuery', () => {
           "spacing": Object {
             "postQuery": "",
             "postSelect": " ",
-            "preFrom": " ",
-            "preHaving": " ",
+            "preFromClause": " ",
+            "preHavingClause": " ",
             "preQuery": "",
           },
           "type": "query",
           "unionQuery": undefined,
           "whereClause": undefined,
-          "withParts": undefined,
+          "withClause": undefined,
         }
       `);
     });
@@ -2178,7 +2185,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "decorator": undefined,
-          "explainPlanFor": undefined,
+          "explainClause": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -2251,7 +2258,7 @@ describe('SqlQuery', () => {
             },
             "type": "havingClause",
           },
-          "insertInto": undefined,
+          "insertClause": undefined,
           "keywords": Object {
             "select": "SELECT",
           },
@@ -2273,14 +2280,14 @@ describe('SqlQuery', () => {
           "spacing": Object {
             "postQuery": "",
             "postSelect": " ",
-            "preFrom": " ",
-            "preHaving": " ",
+            "preFromClause": " ",
+            "preHavingClause": " ",
             "preQuery": "",
           },
           "type": "query",
           "unionQuery": undefined,
           "whereClause": undefined,
-          "withParts": undefined,
+          "withClause": undefined,
         }
       `);
     });
@@ -2293,7 +2300,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "decorator": undefined,
-          "explainPlanFor": undefined,
+          "explainClause": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -2462,7 +2469,7 @@ describe('SqlQuery', () => {
             },
             "type": "havingClause",
           },
-          "insertInto": undefined,
+          "insertClause": undefined,
           "keywords": Object {
             "select": "SELECT",
           },
@@ -2484,14 +2491,14 @@ describe('SqlQuery', () => {
           "spacing": Object {
             "postQuery": "",
             "postSelect": " ",
-            "preFrom": " ",
-            "preHaving": " ",
+            "preFromClause": " ",
+            "preHavingClause": " ",
             "preQuery": "",
           },
           "type": "query",
           "unionQuery": undefined,
           "whereClause": undefined,
-          "withParts": undefined,
+          "withClause": undefined,
         }
       `);
     });
@@ -2506,7 +2513,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "decorator": undefined,
-          "explainPlanFor": undefined,
+          "explainClause": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -2534,7 +2541,7 @@ describe('SqlQuery', () => {
           },
           "groupByClause": undefined,
           "havingClause": undefined,
-          "insertInto": undefined,
+          "insertClause": undefined,
           "keywords": Object {
             "select": "Select",
           },
@@ -2588,14 +2595,14 @@ describe('SqlQuery', () => {
           "spacing": Object {
             "postQuery": "",
             "postSelect": " ",
-            "preFrom": " ",
-            "preOrderBy": " ",
+            "preFromClause": " ",
+            "preOrderByClause": " ",
             "preQuery": "",
           },
           "type": "query",
           "unionQuery": undefined,
           "whereClause": undefined,
-          "withParts": undefined,
+          "withClause": undefined,
         }
       `);
     });
@@ -2608,7 +2615,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "decorator": undefined,
-          "explainPlanFor": undefined,
+          "explainClause": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -2636,7 +2643,7 @@ describe('SqlQuery', () => {
           },
           "groupByClause": undefined,
           "havingClause": undefined,
-          "insertInto": undefined,
+          "insertClause": undefined,
           "keywords": Object {
             "select": "Select",
           },
@@ -2694,14 +2701,14 @@ describe('SqlQuery', () => {
           "spacing": Object {
             "postQuery": "",
             "postSelect": " ",
-            "preFrom": " ",
-            "preOrderBy": " ",
+            "preFromClause": " ",
+            "preOrderByClause": " ",
             "preQuery": "",
           },
           "type": "query",
           "unionQuery": undefined,
           "whereClause": undefined,
-          "withParts": undefined,
+          "withClause": undefined,
         }
       `);
     });
@@ -2714,7 +2721,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "decorator": undefined,
-          "explainPlanFor": undefined,
+          "explainClause": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -2742,7 +2749,7 @@ describe('SqlQuery', () => {
           },
           "groupByClause": undefined,
           "havingClause": undefined,
-          "insertInto": undefined,
+          "insertClause": undefined,
           "keywords": Object {
             "select": "Select",
           },
@@ -2800,14 +2807,14 @@ describe('SqlQuery', () => {
           "spacing": Object {
             "postQuery": "",
             "postSelect": " ",
-            "preFrom": " ",
-            "preOrderBy": " ",
+            "preFromClause": " ",
+            "preOrderByClause": " ",
             "preQuery": "",
           },
           "type": "query",
           "unionQuery": undefined,
           "whereClause": undefined,
-          "withParts": undefined,
+          "withClause": undefined,
         }
       `);
     });
@@ -2820,7 +2827,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "decorator": undefined,
-          "explainPlanFor": undefined,
+          "explainClause": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -2848,7 +2855,7 @@ describe('SqlQuery', () => {
           },
           "groupByClause": undefined,
           "havingClause": undefined,
-          "insertInto": undefined,
+          "insertClause": undefined,
           "keywords": Object {
             "select": "Select",
           },
@@ -2927,14 +2934,14 @@ describe('SqlQuery', () => {
           "spacing": Object {
             "postQuery": "",
             "postSelect": " ",
-            "preFrom": " ",
-            "preOrderBy": " ",
+            "preFromClause": " ",
+            "preOrderByClause": " ",
             "preQuery": "",
           },
           "type": "query",
           "unionQuery": undefined,
           "whereClause": undefined,
-          "withParts": undefined,
+          "withClause": undefined,
         }
       `);
     });
@@ -2947,7 +2954,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "decorator": undefined,
-          "explainPlanFor": undefined,
+          "explainClause": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -2975,7 +2982,7 @@ describe('SqlQuery', () => {
           },
           "groupByClause": undefined,
           "havingClause": undefined,
-          "insertInto": undefined,
+          "insertClause": undefined,
           "keywords": Object {
             "select": "Select",
           },
@@ -3056,14 +3063,14 @@ describe('SqlQuery', () => {
           "spacing": Object {
             "postQuery": "",
             "postSelect": " ",
-            "preFrom": " ",
-            "preOrderBy": " ",
+            "preFromClause": " ",
+            "preOrderByClause": " ",
             "preQuery": "",
           },
           "type": "query",
           "unionQuery": undefined,
           "whereClause": undefined,
-          "withParts": undefined,
+          "withClause": undefined,
         }
       `);
     });
@@ -3076,7 +3083,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "decorator": undefined,
-          "explainPlanFor": undefined,
+          "explainClause": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -3104,7 +3111,7 @@ describe('SqlQuery', () => {
           },
           "groupByClause": undefined,
           "havingClause": undefined,
-          "insertInto": undefined,
+          "insertClause": undefined,
           "keywords": Object {
             "select": "Select",
           },
@@ -3206,14 +3213,14 @@ describe('SqlQuery', () => {
           "spacing": Object {
             "postQuery": "",
             "postSelect": " ",
-            "preFrom": " ",
-            "preOrderBy": " ",
+            "preFromClause": " ",
+            "preOrderByClause": " ",
             "preQuery": "",
           },
           "type": "query",
           "unionQuery": undefined,
           "whereClause": undefined,
-          "withParts": undefined,
+          "withClause": undefined,
         }
       `);
     });
@@ -3228,7 +3235,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "decorator": undefined,
-          "explainPlanFor": undefined,
+          "explainClause": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -3256,7 +3263,7 @@ describe('SqlQuery', () => {
           },
           "groupByClause": undefined,
           "havingClause": undefined,
-          "insertInto": undefined,
+          "insertClause": undefined,
           "keywords": Object {
             "select": "Select",
           },
@@ -3293,14 +3300,14 @@ describe('SqlQuery', () => {
           "spacing": Object {
             "postQuery": "",
             "postSelect": " ",
-            "preFrom": " ",
-            "preLimit": " ",
+            "preFromClause": " ",
+            "preLimitClause": " ",
             "preQuery": "",
           },
           "type": "query",
           "unionQuery": undefined,
           "whereClause": undefined,
-          "withParts": undefined,
+          "withClause": undefined,
         }
       `);
     });
@@ -3315,7 +3322,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "decorator": undefined,
-          "explainPlanFor": undefined,
+          "explainClause": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -3343,7 +3350,7 @@ describe('SqlQuery', () => {
           },
           "groupByClause": undefined,
           "havingClause": undefined,
-          "insertInto": undefined,
+          "insertClause": undefined,
           "keywords": Object {
             "select": "Select",
             "union": "union all",
@@ -3367,14 +3374,14 @@ describe('SqlQuery', () => {
             "postQuery": "",
             "postSelect": " ",
             "postUnion": " ",
-            "preFrom": " ",
+            "preFromClause": " ",
             "preQuery": "",
             "preUnion": " ",
           },
           "type": "query",
           "unionQuery": SqlQuery {
             "decorator": undefined,
-            "explainPlanFor": undefined,
+            "explainClause": undefined,
             "fromClause": SqlFromClause {
               "expressions": SeparatedArray {
                 "separators": Array [],
@@ -3402,7 +3409,7 @@ describe('SqlQuery', () => {
             },
             "groupByClause": undefined,
             "havingClause": undefined,
-            "insertInto": undefined,
+            "insertClause": undefined,
             "keywords": Object {
               "select": "select",
             },
@@ -3424,16 +3431,16 @@ describe('SqlQuery', () => {
             "spacing": Object {
               "postQuery": "",
               "postSelect": " ",
-              "preFrom": " ",
+              "preFromClause": " ",
               "preQuery": "",
             },
             "type": "query",
             "unionQuery": undefined,
             "whereClause": undefined,
-            "withParts": undefined,
+            "withClause": undefined,
           },
           "whereClause": undefined,
-          "withParts": undefined,
+          "withClause": undefined,
         }
       `);
     });
@@ -3448,7 +3455,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "decorator": undefined,
-          "explainPlanFor": undefined,
+          "explainClause": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -3541,7 +3548,7 @@ describe('SqlQuery', () => {
           },
           "groupByClause": undefined,
           "havingClause": undefined,
-          "insertInto": undefined,
+          "insertClause": undefined,
           "keywords": Object {
             "select": "Select",
           },
@@ -3563,13 +3570,13 @@ describe('SqlQuery', () => {
           "spacing": Object {
             "postQuery": "",
             "postSelect": " ",
-            "preFrom": " ",
+            "preFromClause": " ",
             "preQuery": "",
           },
           "type": "query",
           "unionQuery": undefined,
           "whereClause": undefined,
-          "withParts": undefined,
+          "withClause": undefined,
         }
       `);
     });
@@ -3582,7 +3589,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "decorator": undefined,
-          "explainPlanFor": undefined,
+          "explainClause": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -3675,7 +3682,7 @@ describe('SqlQuery', () => {
           },
           "groupByClause": undefined,
           "havingClause": undefined,
-          "insertInto": undefined,
+          "insertClause": undefined,
           "keywords": Object {
             "select": "Select",
           },
@@ -3697,13 +3704,13 @@ describe('SqlQuery', () => {
           "spacing": Object {
             "postQuery": "",
             "postSelect": " ",
-            "preFrom": " ",
+            "preFromClause": " ",
             "preQuery": "",
           },
           "type": "query",
           "unionQuery": undefined,
           "whereClause": undefined,
-          "withParts": undefined,
+          "withClause": undefined,
         }
       `);
     });
@@ -3716,7 +3723,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "decorator": undefined,
-          "explainPlanFor": undefined,
+          "explainClause": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -3809,7 +3816,7 @@ describe('SqlQuery', () => {
           },
           "groupByClause": undefined,
           "havingClause": undefined,
-          "insertInto": undefined,
+          "insertClause": undefined,
           "keywords": Object {
             "select": "Select",
           },
@@ -3831,13 +3838,13 @@ describe('SqlQuery', () => {
           "spacing": Object {
             "postQuery": "",
             "postSelect": " ",
-            "preFrom": " ",
+            "preFromClause": " ",
             "preQuery": "",
           },
           "type": "query",
           "unionQuery": undefined,
           "whereClause": undefined,
-          "withParts": undefined,
+          "withClause": undefined,
         }
       `);
     });
@@ -3850,7 +3857,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "decorator": undefined,
-          "explainPlanFor": undefined,
+          "explainClause": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -3943,7 +3950,7 @@ describe('SqlQuery', () => {
           },
           "groupByClause": undefined,
           "havingClause": undefined,
-          "insertInto": undefined,
+          "insertClause": undefined,
           "keywords": Object {
             "select": "Select",
           },
@@ -3965,13 +3972,13 @@ describe('SqlQuery', () => {
           "spacing": Object {
             "postQuery": "",
             "postSelect": " ",
-            "preFrom": " ",
+            "preFromClause": " ",
             "preQuery": "",
           },
           "type": "query",
           "unionQuery": undefined,
           "whereClause": undefined,
-          "withParts": undefined,
+          "withClause": undefined,
         }
       `);
     });
@@ -3984,7 +3991,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "decorator": undefined,
-          "explainPlanFor": undefined,
+          "explainClause": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -4077,7 +4084,7 @@ describe('SqlQuery', () => {
           },
           "groupByClause": undefined,
           "havingClause": undefined,
-          "insertInto": undefined,
+          "insertClause": undefined,
           "keywords": Object {
             "select": "Select",
           },
@@ -4099,13 +4106,13 @@ describe('SqlQuery', () => {
           "spacing": Object {
             "postQuery": "",
             "postSelect": " ",
-            "preFrom": " ",
+            "preFromClause": " ",
             "preQuery": "",
           },
           "type": "query",
           "unionQuery": undefined,
           "whereClause": undefined,
-          "withParts": undefined,
+          "withClause": undefined,
         }
       `);
     });
@@ -4123,7 +4130,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "decorator": undefined,
-          "explainPlanFor": undefined,
+          "explainClause": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -4151,7 +4158,7 @@ describe('SqlQuery', () => {
           },
           "groupByClause": undefined,
           "havingClause": undefined,
-          "insertInto": undefined,
+          "insertClause": undefined,
           "keywords": Object {
             "select": "Select",
           },
@@ -4178,13 +4185,13 @@ describe('SqlQuery', () => {
             "postQuery": "",
             "postSelect": " -- some comment
         ",
-            "preFrom": " ",
+            "preFromClause": " ",
             "preQuery": "",
           },
           "type": "query",
           "unionQuery": undefined,
           "whereClause": undefined,
-          "withParts": undefined,
+          "withClause": undefined,
         }
       `);
     });
@@ -4297,7 +4304,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "decorator": undefined,
-          "explainPlanFor": undefined,
+          "explainClause": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -4351,7 +4358,7 @@ describe('SqlQuery', () => {
             "type": "groupByClause",
           },
           "havingClause": undefined,
-          "insertInto": undefined,
+          "insertClause": undefined,
           "keywords": Object {
             "select": "SELECT",
           },
@@ -4512,15 +4519,15 @@ describe('SqlQuery', () => {
           "spacing": Object {
             "postQuery": "",
             "postSelect": "",
-            "preFrom": "",
-            "preGroupBy": "",
-            "preOrderBy": "",
+            "preFromClause": "",
+            "preGroupByClause": "",
+            "preOrderByClause": "",
             "preQuery": "",
           },
           "type": "query",
           "unionQuery": undefined,
           "whereClause": undefined,
-          "withParts": undefined,
+          "withClause": undefined,
         }
       `);
     });
@@ -4543,7 +4550,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "decorator": undefined,
-          "explainPlanFor": undefined,
+          "explainClause": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -4593,7 +4600,7 @@ describe('SqlQuery', () => {
             "type": "groupByClause",
           },
           "havingClause": undefined,
-          "insertInto": undefined,
+          "insertClause": undefined,
           "keywords": Object {
             "select": "SELECT",
           },
@@ -4751,14 +4758,14 @@ describe('SqlQuery', () => {
             "postQuery": "",
             "postSelect": "
           ",
-            "preFrom": "
+            "preFromClause": "
         ",
-            "preGroupBy": "
+            "preGroupByClause": "
         ",
-            "preOrderBy": "
+            "preOrderByClause": "
         ",
             "preQuery": "",
-            "preWhere": "
+            "preWhereClause": "
         ",
           },
           "type": "query",
@@ -4890,7 +4897,7 @@ describe('SqlQuery', () => {
             },
             "type": "whereClause",
           },
-          "withParts": undefined,
+          "withClause": undefined,
         }
       `);
     });

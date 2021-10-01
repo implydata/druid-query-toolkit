@@ -335,7 +335,7 @@ describe('#convertToTableRef', () => {
     expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "decorator": undefined,
-        "explainPlanFor": undefined,
+        "explainClause": undefined,
         "fromClause": SqlFromClause {
           "expressions": SeparatedArray {
             "separators": Array [],
@@ -369,7 +369,7 @@ describe('#convertToTableRef', () => {
         },
         "groupByClause": undefined,
         "havingClause": undefined,
-        "insertInto": undefined,
+        "insertClause": undefined,
         "keywords": Object {
           "select": "select",
         },
@@ -395,13 +395,13 @@ describe('#convertToTableRef', () => {
         "spacing": Object {
           "postQuery": "",
           "postSelect": " ",
-          "preFrom": " ",
+          "preFromClause": " ",
           "preQuery": "",
         },
         "type": "query",
         "unionQuery": undefined,
         "whereClause": undefined,
-        "withParts": undefined,
+        "withClause": undefined,
       }
     `);
   });
