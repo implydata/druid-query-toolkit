@@ -45,6 +45,14 @@ export abstract class SqlExpression extends SqlBase {
     }
   }
 
+  static maybeParse(input: string | SqlExpression): SqlExpression | undefined {
+    try {
+      return SqlExpression.parse(input);
+    } catch {
+      return;
+    }
+  }
+
   static wrap(input: SqlExpression | LiteralValue): SqlExpression {
     return input instanceof SqlExpression ? input : SqlLiteral.create(input);
   }

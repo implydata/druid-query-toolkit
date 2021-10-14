@@ -115,6 +115,14 @@ export class SqlQuery extends SqlExpression {
     }
   }
 
+  static maybeParse(input: string | SqlQuery): SqlQuery | undefined {
+    try {
+      return SqlQuery.parse(input);
+    } catch {
+      return;
+    }
+  }
+
   static getSelectExpressionOutput(selectExpression: SqlExpression, i: number) {
     return selectExpression.getOutputName() || `EXPR$${i}`;
   }
