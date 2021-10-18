@@ -24,6 +24,7 @@ import {
   SqlMulti,
   SqlOrderByDirection,
   SqlOrderByExpression,
+  SqlPlaceholder,
   SqlRef,
 } from '.';
 import { parseSql } from './parser';
@@ -216,6 +217,29 @@ export abstract class SqlExpression extends SqlBase {
 
   public removeColumnFromAnd(column: string): SqlExpression | undefined {
     return this.filterAnd(ex => !ex.containsColumn(column));
+  }
+
+  public fillPlaceholders(fillWith: (SqlExpression | LiteralValue)[]): SqlExpression {
+    let i = 0;
+    return this.walk(ex => {
+      if (ex instanceof SqlPlaceholder) {
+        if (i === fillWith.length) {
+          return ex;
+        }
+
+        let filler = fillWith[i++];
+        if (!(filler instanceof SqlExpression)) {
+          if (typeof filler === 'string') {
+            filler = SqlExpression.parse(filler);
+          } else {
+            filler = SqlLiteral.create(filler);
+          }
+        }
+
+        return filler;
+      }
+      return ex;
+    }) as SqlExpression;
   }
 
   // Logic

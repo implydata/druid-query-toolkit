@@ -14,7 +14,7 @@
 
 import { cleanObject, dedupe } from '../utils';
 
-import { LiteralValue, SeparatedArray, SqlLiteral, SqlPlaceholder, SqlRef } from '.';
+import { SeparatedArray, SqlLiteral, SqlRef } from '.';
 import { parseSql } from './parser';
 
 export interface Parens {
@@ -390,29 +390,6 @@ export abstract class SqlBase {
     return ref.getColumn();
   }
 
-  public fillPlaceholders(fillWith: (SqlBase | LiteralValue)[]): SqlBase {
-    let i = 0;
-    return this.walk(ex => {
-      if (ex instanceof SqlPlaceholder) {
-        if (i === fillWith.length) {
-          return ex;
-        }
-
-        let filler = fillWith[i++];
-        if (!(filler instanceof SqlBase)) {
-          if (typeof filler === 'string') {
-            filler = SqlBase.parseSql(filler);
-          } else {
-            filler = SqlLiteral.create(filler);
-          }
-        }
-
-        return filler;
-      }
-      return ex;
-    });
-  }
-
   public prettify(): SqlBase {
     return this.walkPostorder(ex => {
       return ex.resetOwnSpacing().resetOwnKeywords().clearOwnSeparators().removeOwnParenSpaces();
@@ -437,7 +414,10 @@ export abstract class SqlBase {
     return fn(this);
   }
 
-  public applyForEach<T>(things: T[], fn: (self: this, thing: T, index: number) => this): this {
+  public applyForEach<T>(
+    things: readonly T[],
+    fn: (self: this, thing: T, index: number) => this,
+  ): this {
     return things.reduce(fn, this);
   }
 }

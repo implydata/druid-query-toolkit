@@ -15,18 +15,6 @@
 import { parseSql } from './parser';
 
 describe('SqlBase', () => {
-  describe('#fillPlaceholders', () => {
-    it('works in basic case', () => {
-      expect(parseSql(`? < ?`).fillPlaceholders(['A', '5']).toString()).toEqual(`A < 5`);
-    });
-
-    it('works in missing placeholder', () => {
-      expect(parseSql(`? BETWEEN ? AND ?`).fillPlaceholders(['A', '5']).toString()).toEqual(
-        `A BETWEEN 5 AND ?`,
-      );
-    });
-  });
-
   describe('#prettyTrim', () => {
     it('works in basic case', () => {
       expect(

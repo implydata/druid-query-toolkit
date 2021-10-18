@@ -164,6 +164,10 @@ export class SqlFunction extends SqlExpression {
     return this.args?.length() || 0;
   }
 
+  public getArgArray(): readonly SqlExpression[] {
+    return this.args?.values || [];
+  }
+
   public getArg(index: number): SqlExpression | undefined {
     return this.args?.get(index);
   }

@@ -39,6 +39,7 @@ function isAllGranularity(granularity: unknown): boolean {
 
 export interface Column {
   name: string;
+  type?: string;
 }
 
 function makeColumn(name: any): Column {
