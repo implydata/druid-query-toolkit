@@ -41,7 +41,7 @@ export class SqlAlias extends SqlExpression {
     }
     return new SqlAlias({
       expression: expression,
-      alias: typeof alias === 'string' ? RefName.alias(alias) : alias,
+      alias: typeof alias === 'string' ? RefName.alias(alias, forceQuotes) : alias,
     });
   }
 
