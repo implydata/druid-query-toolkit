@@ -30,7 +30,7 @@ export class SqlWithPart extends SqlBase {
   static simple(name: string, query: SqlQuery): SqlWithPart {
     return new SqlWithPart({
       withTable: RefName.create(name),
-      withQuery: query,
+      withQuery: query.ensureParens(),
     });
   }
 

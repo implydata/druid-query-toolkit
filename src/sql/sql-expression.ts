@@ -106,7 +106,7 @@ export abstract class SqlExpression extends SqlBase {
   }
 
   public as(alias: RefName | string | undefined, forceQuotes?: boolean): SqlExpression {
-    if (!alias) return this;
+    if (!alias) return this.getUnderlyingExpression();
     return SqlAlias.create(this, alias, forceQuotes);
   }
 

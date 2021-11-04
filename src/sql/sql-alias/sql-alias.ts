@@ -108,11 +108,6 @@ export class SqlAlias extends SqlExpression {
     return ret;
   }
 
-  public as(alias: RefName | string | undefined, forceQuotes?: boolean): SqlExpression {
-    if (!alias) return this.expression;
-    return SqlAlias.create(this, alias, forceQuotes);
-  }
-
   public ifUnnamedAliasAs(_alias: RefName | string, _forceQuotes?: boolean): SqlExpression {
     return this;
   }
