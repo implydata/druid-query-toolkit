@@ -30,12 +30,7 @@ export class SqlInsertClause extends SqlClause {
   static create(table: SqlInsertClause | SqlTableRef | string): SqlInsertClause {
     if (table instanceof SqlInsertClause) return table;
     if (typeof table === 'string') {
-      const ex = SqlExpression.parse(table).convertToTableRef();
-      if (ex instanceof SqlTableRef) {
-        table = ex;
-      } else {
-        throw new Error('bad input');
-      }
+      table = SqlTableRef.create(table);
     }
     return new SqlInsertClause({
       table,
