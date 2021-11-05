@@ -429,7 +429,7 @@ describe('SqlQuery', () => {
       `);
 
       expect(String(insertSql.changeInsertIntoTable('"lol"').insertClause)).toEqual(
-        `INSERT INTO "lol"`,
+        `INSERT INTO """lol"""`,
       );
     });
   });

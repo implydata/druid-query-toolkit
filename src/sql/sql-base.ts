@@ -262,6 +262,12 @@ export abstract class SqlBase {
     return typeof s === 'string' ? s : defaultSpace;
   }
 
+  public changeSpace(name: string, space: string): this {
+    const value = this.valueOf();
+    value.spacing = { ...value.spacing, [name]: space };
+    return SqlBase.fromValue(value);
+  }
+
   protected getSpacingWithout(...toRemove: string[]) {
     const ret = { ...this.spacing };
     for (const thing of toRemove) {

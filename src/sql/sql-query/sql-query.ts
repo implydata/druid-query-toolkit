@@ -620,13 +620,13 @@ export class SqlQuery extends SqlExpression {
   }
 
   public changeInsertIntoTable(table: SqlTableRef | string | undefined): this {
-    const value = this.valueOf();
-    value.insertClause = table
-      ? value.insertClause
-        ? value.insertClause.changeTable(table)
-        : SqlInsertClause.create(table)
-      : undefined;
-    return SqlBase.fromValue(value);
+    return this.changeInsertClause(
+      table
+        ? this.insertClause
+          ? this.insertClause.changeTable(table)
+          : SqlInsertClause.create(table)
+        : undefined,
+    );
   }
 
   /* ~~~~~ WITH ~~~~~ */

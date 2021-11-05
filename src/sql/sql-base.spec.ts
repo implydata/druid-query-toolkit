@@ -30,4 +30,14 @@ describe('SqlBase', () => {
       expect(parseSql(`COUNT(*)`).prettyTrim(10).toString()).toEqual(`COUNT(*)`);
     });
   });
+
+  describe('#changeSpace', () => {
+    it('works', () => {
+      let sql = parseSql(`COUNT(*)`);
+      expect(sql.getSpace('postArguments')).toEqual('');
+      sql = sql.changeSpace('postArguments', '   ');
+      expect(sql.getSpace('postArguments')).toEqual('   ');
+      expect(sql.toString()).toEqual(`COUNT(*   )`);
+    });
+  });
 });

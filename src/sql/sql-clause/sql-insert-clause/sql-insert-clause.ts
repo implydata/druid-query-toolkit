@@ -68,12 +68,7 @@ export class SqlInsertClause extends SqlClause {
   public changeTable(table: SqlTableRef | string): this {
     const value = this.valueOf();
     if (typeof table === 'string') {
-      const ex = SqlExpression.parse(table).convertToTableRef();
-      if (ex instanceof SqlTableRef) {
-        table = ex;
-      } else {
-        throw new Error('bad input');
-      }
+      table = SqlTableRef.create(table);
     }
     value.table = table;
     return SqlBase.fromValue(value);
