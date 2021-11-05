@@ -13,7 +13,6 @@
  */
 
 import { SqlBase, SqlType, Substitutor } from '../../sql-base';
-import { SqlExpression } from '../../sql-expression';
 import { SqlTableRef } from '../../sql-table-ref/sql-table-ref';
 import { SqlClause, SqlClauseValue } from '../sql-clause';
 
