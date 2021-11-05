@@ -134,6 +134,13 @@ export abstract class SqlExpression extends SqlBase {
     return SqlOrderByExpression.create(this, direction);
   }
 
+  /**
+   * @deprecated use toOrderByExpression instead
+   */
+  public toOrderByPart(direction?: SqlOrderByDirection): SqlOrderByExpression {
+    return this.toOrderByExpression(direction);
+  }
+
   // SqlComparison
 
   public equal(rhs: SqlExpression | LiteralValue): SqlComparison {
