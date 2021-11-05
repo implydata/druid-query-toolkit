@@ -60,8 +60,8 @@ describe('SqlExpression', () => {
       expect(String(x.as('lol'))).toEqual('x AS lol');
     });
 
-    it('works with toOrderByPart', () => {
-      expect(String(x.toOrderByPart('DESC'))).toEqual('x DESC');
+    it('works with toOrderByExpression', () => {
+      expect(String(x.toOrderByExpression('DESC'))).toEqual('x DESC');
     });
 
     it('works with equal', () => {

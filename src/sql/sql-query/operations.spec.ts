@@ -283,7 +283,7 @@ describe('SqlQuery operations', () => {
             FROM sys."github"
           `,
         )
-          .addOrderBy(SqlRef.column('col').toOrderByPart('DESC'))
+          .addOrderBy(SqlRef.column('col').toOrderByExpression('DESC'))
           .toString(),
       ).toEqual(sane`
         SELECT *
@@ -301,7 +301,7 @@ describe('SqlQuery operations', () => {
             ORDER BY col
           `,
         )
-          .addOrderBy(SqlRef.columnWithQuotes('colTwo').toOrderByPart('ASC'))
+          .addOrderBy(SqlRef.columnWithQuotes('colTwo').toOrderByExpression('ASC'))
           .toString(),
       ).toEqual(sane`
         SELECT *
@@ -319,7 +319,7 @@ describe('SqlQuery operations', () => {
             ORDER BY col, colTwo ASC
           `,
         )
-          .addOrderBy(SqlRef.columnWithQuotes('colThree').toOrderByPart())
+          .addOrderBy(SqlRef.columnWithQuotes('colThree').toOrderByExpression())
           .toString(),
       ).toEqual(sane`
         SELECT *

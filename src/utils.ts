@@ -36,3 +36,7 @@ export function dedupe<T>(array: readonly T[], keyFn: (x: T) => string = String)
   });
   return deduped;
 }
+
+export function isEmptyArray(x: unknown): x is Array<unknown> {
+  return Array.isArray(x) && !x.length;
+}

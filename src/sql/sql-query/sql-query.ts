@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { filterMap } from '../../utils';
+import { filterMap, isEmptyArray } from '../../utils';
 import { parseSql } from '../parser';
 import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../sql-base';
 import {
@@ -428,12 +428,15 @@ export class SqlQuery extends SqlExpression {
   public changeOrderByExpressions(
     orderByExpressions: SeparatedArray<SqlOrderByExpression> | SqlOrderByExpression[] | undefined,
   ): this {
-    if (!orderByExpressions) return this.changeOrderByClause(undefined);
-    return this.changeOrderByClause(
-      this.orderByClause
-        ? this.orderByClause.changeExpressions(orderByExpressions)
-        : SqlOrderByClause.create(orderByExpressions),
-    );
+    if (!orderByExpressions || isEmptyArray(orderByExpressions)) {
+      return this.changeOrderByClause(undefined);
+    } else {
+      return this.changeOrderByClause(
+        this.orderByClause
+          ? this.orderByClause.changeExpressions(orderByExpressions)
+          : SqlOrderByClause.create(orderByExpressions),
+      );
+    }
   }
 
   public changeOrderByExpression(orderByExpression: SqlOrderByExpression | undefined): this {
@@ -638,14 +641,14 @@ export class SqlQuery extends SqlExpression {
   }
 
   public changeWithParts(withParts: SeparatedArray<SqlWithPart> | SqlWithPart[] | undefined): this {
-    if (withParts && (Array.isArray(withParts) ? withParts.length : true)) {
+    if (!withParts || isEmptyArray(withParts)) {
+      return this.changeWithClause(undefined);
+    } else {
       return this.changeWithClause(
         this.withClause
           ? this.withClause.changeWithParts(withParts)
           : SqlWithClause.create(withParts),
       );
-    } else {
-      return this.changeWithClause(undefined);
     }
   }
 

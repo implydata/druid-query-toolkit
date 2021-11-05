@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 
+import { isEmptyArray } from '../../../utils';
 import { SqlBase, SqlType, Substitutor } from '../../sql-base';
 import { SqlExpression } from '../../sql-expression';
 import { SqlLiteral } from '../../sql-literal/sql-literal';
@@ -30,10 +31,7 @@ export class SqlGroupByClause extends SqlClause {
 
   static create(expressions: SeparatedArray<SqlExpression> | SqlExpression[]): SqlGroupByClause {
     return new SqlGroupByClause({
-      expressions:
-        Array.isArray(expressions) && !expressions.length
-          ? undefined
-          : SeparatedArray.fromArray(expressions),
+      expressions: isEmptyArray(expressions) ? undefined : SeparatedArray.fromArray(expressions),
     });
   }
 
@@ -64,7 +62,7 @@ export class SqlGroupByClause extends SqlClause {
     expressions: SeparatedArray<SqlExpression> | SqlExpression[] | undefined,
   ): this {
     const value = this.valueOf();
-    if (!expressions || (Array.isArray(expressions) && !expressions.length)) {
+    if (!expressions || isEmptyArray(expressions)) {
       delete value.expressions;
     } else {
       value.expressions = SeparatedArray.fromArray(expressions);

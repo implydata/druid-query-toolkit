@@ -415,7 +415,7 @@ export abstract class SqlBase {
     return fn(this);
   }
 
-  public applyIf(condition: boolean, fn: (self: this) => this): this {
+  public applyIf(condition: unknown, fn: (self: this) => this): this {
     if (!condition) return this;
     return fn(this);
   }

@@ -130,7 +130,7 @@ export abstract class SqlExpression extends SqlBase {
     return this;
   }
 
-  public toOrderByPart(direction?: SqlOrderByDirection): SqlOrderByExpression {
+  public toOrderByExpression(direction?: SqlOrderByDirection): SqlOrderByExpression {
     return SqlOrderByExpression.create(this, direction);
   }
 
