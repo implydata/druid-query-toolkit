@@ -80,7 +80,7 @@ export class QueryResult {
       data,
       QueryResult.shouldIncludeTimestamp(queryPayload),
       QueryResult.isFirstRowHeader(queryPayload),
-    ).inflateDates();
+    );
   }
 
   static fromRawResult(

@@ -53,10 +53,12 @@ export class QueryRunner {
     return !context || Object.keys(context).length === 0;
   }
 
-  public queryExecutor: QueryExecutor;
+  public readonly queryExecutor: QueryExecutor;
+  public readonly inflateDates: boolean;
 
-  constructor(queryExecutor?: QueryExecutor) {
+  constructor(queryExecutor?: QueryExecutor, inflateDates?: boolean) {
     this.queryExecutor = queryExecutor || QueryRunner.defaultQueryExecutor;
+    this.inflateDates = Boolean(inflateDates);
     if (!this.queryExecutor) {
       throw new Error(`Query executor must be provided`);
     }
@@ -121,12 +123,18 @@ export class QueryRunner {
 
     if (cancelToken) cancelToken.throwIfRequested();
 
-    return QueryResult.fromQueryAndRawResult(jsonQuery, dataAndHeaders.data)
+    let result = QueryResult.fromQueryAndRawResult(jsonQuery, dataAndHeaders.data)
       .attachQuery(jsonQuery, parsedQuery)
       .attachQueryId(
         dataAndHeaders.headers['x-druid-query-id'],
         dataAndHeaders.headers['x-druid-sql-query-id'],
       )
       .changeQueryDuration(endTime - startTime);
+
+    if (this.inflateDates) {
+      result = result.inflateDates();
+    }
+
+    return result;
   }
 }
