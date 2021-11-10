@@ -51,7 +51,7 @@ export interface QueryRunnerOptions {
 }
 
 export class QueryRunner {
-  static defaultQueryExecutor: QueryExecutor;
+  static defaultQueryExecutor?: QueryExecutor;
 
   static now(): number {
     return Date.now();
@@ -61,16 +61,20 @@ export class QueryRunner {
     return !context || Object.keys(context).length === 0;
   }
 
-  public readonly executor: QueryExecutor;
+  public readonly executor?: QueryExecutor;
   public readonly inflateDateStrategy: InflateDateStrategy;
 
-  constructor(options: QueryRunnerOptions) {
-    this.executor = options.executor || QueryRunner.defaultQueryExecutor;
-    if (!this.executor) {
+  constructor(options: QueryRunnerOptions = {}) {
+    this.executor = options.executor;
+    this.inflateDateStrategy = options.inflateDateStrategy || 'fromSqlTypes';
+  }
+
+  private getExecutor(): QueryExecutor {
+    const executor = this.executor || QueryRunner.defaultQueryExecutor;
+    if (!executor) {
       throw new Error(`Query executor must be provided or a default must be defined`);
     }
-
-    this.inflateDateStrategy = options.inflateDateStrategy || 'fromSqlTypes';
+    return executor;
   }
 
   public async runQuery(options: RunQueryOptions): Promise<QueryResult> {
@@ -130,7 +134,7 @@ export class QueryRunner {
     }
 
     const startTime = QueryRunner.now();
-    const dataAndHeaders = await this.executor(jsonQuery, isSql, cancelToken);
+    const dataAndHeaders = await this.getExecutor()(jsonQuery, isSql, cancelToken);
     const endTime = QueryRunner.now();
 
     if (cancelToken) cancelToken.throwIfRequested();
