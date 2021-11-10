@@ -13,6 +13,9 @@
  */
 
 import { SqlQuery } from '../sql';
+import { filterMap } from '../utils';
+
+import { Column } from './column';
 
 function isObject(obj: unknown): obj is Record<string, unknown> {
   return Object.prototype.toString.call(obj) === '[object Object]';
@@ -35,21 +38,6 @@ function isAllGranularity(granularity: unknown): boolean {
     return (granularity as any).type.toLowerCase() === 'all';
   }
   return false;
-}
-
-export interface Column {
-  name: string;
-  type?: string;
-}
-
-function makeColumn(name: any): Column {
-  return {
-    name: String(name),
-  };
-}
-
-function makeColumns(names: any[]): Column[] {
-  return names.map(makeColumn);
 }
 
 export interface QueryResultValue {
@@ -75,11 +63,28 @@ export class QueryResult {
     return typeof queryPayload.query === 'string' && queryPayload.header === true;
   }
 
+  static isSecondRowTypeHeader(queryPayload: Record<string, unknown>, data: unknown): boolean {
+    return (
+      typeof queryPayload.query === 'string' &&
+      queryPayload.header === true &&
+      queryPayload.sqlTypesHeader === true &&
+      Array.isArray(data) &&
+      data.length >= 2 &&
+      QueryResult.isTypeRow(data[1])
+    );
+  }
+
+  static isTypeRow(possibleTypeRow: unknown): boolean {
+    if (!Array.isArray(possibleTypeRow)) return false;
+    return /^[A-Z]+$/.test(possibleTypeRow.join(''));
+  }
+
   static fromQueryAndRawResult(queryPayload: Record<string, unknown>, data: unknown): QueryResult {
     return QueryResult.fromRawResult(
       data,
       QueryResult.shouldIncludeTimestamp(queryPayload),
       QueryResult.isFirstRowHeader(queryPayload),
+      QueryResult.isSecondRowTypeHeader(queryPayload, data),
     );
   }
 
@@ -87,6 +92,7 @@ export class QueryResult {
     data: unknown,
     includeTimestampIfExists?: boolean,
     firstRowHeader?: boolean,
+    secondRowTypeHeader?: boolean,
   ): QueryResult {
     if (typeof data === 'string') {
       if (!data.endsWith('\n')) {
@@ -126,14 +132,22 @@ export class QueryResult {
 
       if (Array.isArray(firstRow)) {
         if (firstRowHeader) {
-          return new QueryResult({
-            header: makeColumns(firstRow),
-            rows: data.slice(1),
-            resultContext,
-          });
+          if (secondRowTypeHeader) {
+            return new QueryResult({
+              header: Column.fromColumnNamesAndSqlTypes(firstRow, data[1]),
+              rows: data.slice(2),
+              resultContext,
+            });
+          } else {
+            return new QueryResult({
+              header: Column.fromColumnNames(firstRow),
+              rows: data.slice(1),
+              resultContext,
+            });
+          }
         } else {
           return new QueryResult({
-            header: makeColumns(firstRow.map((_d, i) => i)),
+            header: Column.fromColumnNames(firstRow.map((_d, i) => i)),
             rows: data,
             resultContext,
           });
@@ -169,7 +183,7 @@ export class QueryResult {
               firstRowResult.metrics,
             );
             return new QueryResult({
-              header: makeColumns(selectHeader),
+              header: Column.fromColumnNames(selectHeader),
               rows: data.flatMap(r =>
                 r.result.events.map((r: { event: Record<string, any> }) =>
                   selectHeader.map(h => r.event[h]),
@@ -182,7 +196,9 @@ export class QueryResult {
           // timeseries like
           const header = Object.keys(firstRowResult);
           return new QueryResult({
-            header: makeColumns(includeTimestampIfExists ? ['timestamp'].concat(header) : header),
+            header: Column.fromColumnNames(
+              includeTimestampIfExists ? ['timestamp'].concat(header) : header,
+            ),
             rows: data.map((r: Record<string, any>) => {
               const { timestamp, result } = r;
               const rest = header.map(h => result[h]);
@@ -198,7 +214,9 @@ export class QueryResult {
           if (!firstSubRow) return QueryResult.BLANK;
           const header = Object.keys(firstSubRow.result[0]);
           return new QueryResult({
-            header: makeColumns(includeTimestampIfExists ? ['timestamp'].concat(header) : header),
+            header: Column.fromColumnNames(
+              includeTimestampIfExists ? ['timestamp'].concat(header) : header,
+            ),
             rows: data.flatMap((r: Record<string, any>) => {
               const { timestamp, result } = r;
               return result.map((subResult: Record<string, any>) => {
@@ -215,7 +233,9 @@ export class QueryResult {
       if (typeof firstRow.timestamp === 'string' && isObject(firstRow.event)) {
         const header = Object.keys(firstRow.event);
         return new QueryResult({
-          header: makeColumns(includeTimestampIfExists ? ['timestamp'].concat(header) : header),
+          header: Column.fromColumnNames(
+            includeTimestampIfExists ? ['timestamp'].concat(header) : header,
+          ),
           rows: data.map((r: Record<string, any>) => {
             const { timestamp, event } = r;
             const rest = header.map(h => event[h]);
@@ -228,7 +248,7 @@ export class QueryResult {
       // scan like
       if (Array.isArray(firstRow.columns) && Array.isArray(firstRow.events)) {
         const headerNames: string[] = firstRow.columns;
-        const header: Column[] = makeColumns(headerNames);
+        const header: Column[] = Column.fromColumnNames(headerNames);
         const firstSubRow = data.find(r => r.events[0]);
         if (!firstSubRow) return new QueryResult({ header, rows: [] });
         const firstSubRowEvents = firstSubRow.events[0];
@@ -276,7 +296,7 @@ export class QueryResult {
     if (!firstRow) return QueryResult.BLANK;
     const header = Object.keys(firstRow);
     return new QueryResult({
-      header: makeColumns(header),
+      header: Column.fromColumnNames(header),
       rows: (ignoreFirstEvent ? array.slice(1) : array).map(r => header.map(h => r[h])),
     });
   }
@@ -363,7 +383,7 @@ export class QueryResult {
     return (context as any).sqlOuterLimit;
   }
 
-  public detectDateColumnIndexes(): number[] {
+  private guessDateColumnIndexes(): number[] {
     const { header, rows } = this;
     if (!rows.length) return [];
     const indexes = header.map((_x, i) => i);
@@ -382,8 +402,7 @@ export class QueryResult {
     return indexes;
   }
 
-  public inflateDates(): QueryResult {
-    const indexes = this.detectDateColumnIndexes();
+  private inflateDatesForIndexes(indexes: number[]): QueryResult {
     if (!indexes.length) return this;
 
     const value = this.valueOf();
@@ -395,6 +414,16 @@ export class QueryResult {
       return row;
     });
     return new QueryResult(value);
+  }
+
+  public inflateDatesByGuessing(): QueryResult {
+    return this.inflateDatesForIndexes(this.guessDateColumnIndexes());
+  }
+
+  public inflateDatesFromSqlTypes(): QueryResult {
+    return this.inflateDatesForIndexes(
+      filterMap(this.header, (c, i) => (c.sqlType === 'TIMESTAMP' ? i : undefined)),
+    );
   }
 }
 

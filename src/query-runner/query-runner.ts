@@ -39,7 +39,15 @@ export interface RunQueryOptions {
   queryParameters?: QueryParameter[];
   resultFormat?: string;
   header?: boolean;
+  sqlTypesHeader?: boolean;
   cancelToken?: CancelToken;
+}
+
+export type InflateDateStrategy = 'fromSqlTypes' | 'guess' | 'none';
+
+export interface QueryRunnerOptions {
+  executor?: QueryExecutor;
+  inflateDateStrategy?: InflateDateStrategy;
 }
 
 export class QueryRunner {
@@ -53,15 +61,16 @@ export class QueryRunner {
     return !context || Object.keys(context).length === 0;
   }
 
-  public readonly queryExecutor: QueryExecutor;
-  public readonly inflateDates: boolean;
+  public readonly executor: QueryExecutor;
+  public readonly inflateDateStrategy: InflateDateStrategy;
 
-  constructor(queryExecutor?: QueryExecutor, inflateDates?: boolean) {
-    this.queryExecutor = queryExecutor || QueryRunner.defaultQueryExecutor;
-    this.inflateDates = Boolean(inflateDates);
-    if (!this.queryExecutor) {
-      throw new Error(`Query executor must be provided`);
+  constructor(options: QueryRunnerOptions) {
+    this.executor = options.executor || QueryRunner.defaultQueryExecutor;
+    if (!this.executor) {
+      throw new Error(`Query executor must be provided or a default must be defined`);
     }
+
+    this.inflateDateStrategy = options.inflateDateStrategy || 'fromSqlTypes';
   }
 
   public async runQuery(options: RunQueryOptions): Promise<QueryResult> {
@@ -71,6 +80,7 @@ export class QueryRunner {
       queryParameters,
       resultFormat,
       header,
+      sqlTypesHeader,
       cancelToken,
     } = options;
 
@@ -83,6 +93,7 @@ export class QueryRunner {
         query,
         resultFormat: resultFormat ?? 'array',
         header: header ?? true,
+        sqlTypesHeader: (header && sqlTypesHeader) ?? true,
       };
       try {
         parsedQuery = SqlQuery.parse(query);
@@ -94,6 +105,7 @@ export class QueryRunner {
         query: String(query),
         resultFormat: resultFormat ?? 'array',
         header: header ?? true,
+        sqlTypesHeader: (header && sqlTypesHeader) ?? true,
       };
     } else {
       jsonQuery = query;
@@ -118,12 +130,12 @@ export class QueryRunner {
     }
 
     const startTime = QueryRunner.now();
-    const dataAndHeaders = await this.queryExecutor(jsonQuery, isSql, cancelToken);
+    const dataAndHeaders = await this.executor(jsonQuery, isSql, cancelToken);
     const endTime = QueryRunner.now();
 
     if (cancelToken) cancelToken.throwIfRequested();
 
-    let result = QueryResult.fromQueryAndRawResult(jsonQuery, dataAndHeaders.data)
+    const result = QueryResult.fromQueryAndRawResult(jsonQuery, dataAndHeaders.data)
       .attachQuery(jsonQuery, parsedQuery)
       .attachQueryId(
         dataAndHeaders.headers['x-druid-query-id'],
@@ -131,10 +143,15 @@ export class QueryRunner {
       )
       .changeQueryDuration(endTime - startTime);
 
-    if (this.inflateDates) {
-      result = result.inflateDates();
-    }
+    switch (this.inflateDateStrategy) {
+      case 'fromSqlTypes':
+        return result.inflateDatesFromSqlTypes();
 
-    return result;
+      case 'guess':
+        return result.inflateDatesByGuessing();
+
+      default:
+        return result;
+    }
   }
 }

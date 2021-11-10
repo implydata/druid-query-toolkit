@@ -20,38 +20,47 @@ describe('QueryRunner', () => {
   let n = 100000000;
   QueryRunner.now = () => ++n;
 
-  // eslint-disable-next-line @typescript-eslint/require-await
-  const queryRunner = new QueryRunner(async (payload, isSql) => {
-    const firstParameterValue: any =
-      payload.parameters && payload.parameters.length ? payload.parameters[0].value : undefined;
+  const queryRunner = new QueryRunner({
+    // eslint-disable-next-line @typescript-eslint/require-await
+    executor: async (payload, isSql) => {
+      const firstParameterValue: any =
+        payload.parameters && payload.parameters.length ? payload.parameters[0].value : undefined;
 
-    if (isSql) {
-      return {
-        data: [
-          ['channel', 'Count'],
-          ['#en.wikipedia', 6650],
-          ['#sh.wikipedia', 3969],
-        ],
-        headers: {
-          'x-druid-sql-query-id': firstParameterValue || 'sql-query-id-yyy',
-        } as any,
-      };
-    } else {
-      return {
-        data: [
-          {
-            timestamp: '2016-06-27T00:00:00.000Z',
-            result: [
-              { a1: 2068620, p0: 1077329.0, a2: 86038, d0: '#en.wikipedia', a0: 6650 },
-              { a1: 856, p0: 2422.0, a2: 3988, d0: '#sh.wikipedia', a0: 3969 },
-            ],
-          },
-        ],
-        headers: {
-          'x-druid-query-id': 'query-id-xxx',
-        } as any,
-      };
-    }
+      if (isSql) {
+        return {
+          data: payload.sqlTypesHeader
+            ? [
+                ['channel', 'Count'],
+                ['VARCHAR', 'LONG'],
+                ['#en.wikipedia', 6650],
+                ['#sh.wikipedia', 3969],
+              ]
+            : [
+                ['channel', 'Count'],
+                ['#en.wikipedia', 6650],
+                ['#sh.wikipedia', 3969],
+              ],
+          headers: {
+            'x-druid-sql-query-id': firstParameterValue || 'sql-query-id-yyy',
+          } as any,
+        };
+      } else {
+        return {
+          data: [
+            {
+              timestamp: '2016-06-27T00:00:00.000Z',
+              result: [
+                { a1: 2068620, p0: 1077329.0, a2: 86038, d0: '#en.wikipedia', a0: 6650 },
+                { a1: 856, p0: 2422.0, a2: 3988, d0: '#sh.wikipedia', a0: 3969 },
+              ],
+            },
+          ],
+          headers: {
+            'x-druid-query-id': 'query-id-xxx',
+          } as any,
+        };
+      }
+    },
   });
 
   it('works with rune query', async () => {
@@ -67,20 +76,30 @@ describe('QueryRunner', () => {
     expect(queryResult).toMatchInlineSnapshot(`
       QueryResult {
         "header": Array [
-          Object {
+          Column {
             "name": "a1",
+            "nativeType": undefined,
+            "sqlType": undefined,
           },
-          Object {
+          Column {
             "name": "p0",
+            "nativeType": undefined,
+            "sqlType": undefined,
           },
-          Object {
+          Column {
             "name": "a2",
+            "nativeType": undefined,
+            "sqlType": undefined,
           },
-          Object {
+          Column {
             "name": "d0",
+            "nativeType": undefined,
+            "sqlType": undefined,
           },
-          Object {
+          Column {
             "name": "a0",
+            "nativeType": undefined,
+            "sqlType": undefined,
           },
         ],
         "query": Object {
@@ -130,11 +149,15 @@ describe('QueryRunner', () => {
     expect(queryResult).toMatchInlineSnapshot(`
       QueryResult {
         "header": Array [
-          Object {
+          Column {
             "name": "channel",
+            "nativeType": undefined,
+            "sqlType": undefined,
           },
-          Object {
+          Column {
             "name": "Count",
+            "nativeType": undefined,
+            "sqlType": undefined,
           },
         ],
         "query": Object {
@@ -349,11 +372,15 @@ describe('QueryRunner', () => {
     expect(queryResult).toMatchInlineSnapshot(`
       QueryResult {
         "header": Array [
-          Object {
+          Column {
             "name": "channel",
+            "nativeType": undefined,
+            "sqlType": "VARCHAR",
           },
-          Object {
+          Column {
             "name": "Count",
+            "nativeType": undefined,
+            "sqlType": "LONG",
           },
         ],
         "query": Object {
@@ -367,6 +394,7 @@ describe('QueryRunner', () => {
       GROUP BY 1
       ORDER BY 2 DESC",
           "resultFormat": "array",
+          "sqlTypesHeader": true,
         },
         "queryDuration": 1,
         "queryId": undefined,
@@ -569,11 +597,15 @@ describe('QueryRunner', () => {
     expect(queryResult).toMatchInlineSnapshot(`
       QueryResult {
         "header": Array [
-          Object {
+          Column {
             "name": "channel",
+            "nativeType": undefined,
+            "sqlType": "VARCHAR",
           },
-          Object {
+          Column {
             "name": "Count",
+            "nativeType": undefined,
+            "sqlType": "LONG",
           },
         ],
         "query": Object {
@@ -587,6 +619,7 @@ describe('QueryRunner', () => {
       GROUP BY 1
       ORDER BY 2 DESC",
           "resultFormat": "array",
+          "sqlTypesHeader": true,
         },
         "queryDuration": 1,
         "queryId": undefined,
@@ -777,7 +810,7 @@ describe('QueryRunner', () => {
     `);
   });
 
-  it('works with a parsed SQL query', async () => {
+  it('works with query parameters', async () => {
     const queryResult = await queryRunner.runQuery({
       query: SqlQuery.parse(
         'SELECT\n  channel, COUNT(*) AS "Count"\nFROM wikipedia\nGROUP BY 1\nORDER BY 2 DESC',

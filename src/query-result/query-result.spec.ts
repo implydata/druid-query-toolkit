@@ -12,13 +12,14 @@
  * limitations under the License.
  */
 
+import { Column } from './column';
 import { QueryResult } from './query-result';
 
 describe('QueryResult', () => {
   describe('#inflateDates', () => {
     it('works', () => {
       const data = new QueryResult({
-        header: [{ name: 'A' }, { name: 'B' }, { name: 'C' }],
+        header: Column.fromColumnNames(['A', 'B', 'C']),
         rows: [
           ['A', '2016-06-27T00:00:00.000Z', 876],
           ['J', '2016-06-27T01:00:00.000Z', 870],
@@ -26,17 +27,23 @@ describe('QueryResult', () => {
         ],
       });
 
-      expect(data.inflateDates()).toMatchInlineSnapshot(`
+      expect(data.inflateDatesByGuessing()).toMatchInlineSnapshot(`
         QueryResult {
           "header": Array [
-            Object {
+            Column {
               "name": "A",
+              "nativeType": undefined,
+              "sqlType": undefined,
             },
-            Object {
+            Column {
               "name": "B",
+              "nativeType": undefined,
+              "sqlType": undefined,
             },
-            Object {
+            Column {
               "name": "C",
+              "nativeType": undefined,
+              "sqlType": undefined,
             },
           ],
           "query": undefined,
@@ -76,11 +83,15 @@ describe('QueryResult', () => {
       expect(QueryResult.fromRawResult(result)).toMatchInlineSnapshot(`
         QueryResult {
           "header": Array [
-            Object {
+            Column {
               "name": "count",
+              "nativeType": undefined,
+              "sqlType": undefined,
             },
-            Object {
+            Column {
               "name": "added",
+              "nativeType": undefined,
+              "sqlType": undefined,
             },
           ],
           "query": undefined,
@@ -108,14 +119,20 @@ describe('QueryResult', () => {
       expect(QueryResult.fromRawResult(result, true)).toMatchInlineSnapshot(`
         QueryResult {
           "header": Array [
-            Object {
+            Column {
               "name": "timestamp",
+              "nativeType": undefined,
+              "sqlType": undefined,
             },
-            Object {
+            Column {
               "name": "count",
+              "nativeType": undefined,
+              "sqlType": undefined,
             },
-            Object {
+            Column {
               "name": "added",
+              "nativeType": undefined,
+              "sqlType": undefined,
             },
           ],
           "query": undefined,
@@ -157,14 +174,20 @@ describe('QueryResult', () => {
       expect(QueryResult.fromRawResult(result)).toMatchInlineSnapshot(`
         QueryResult {
           "header": Array [
-            Object {
+            Column {
               "name": "added",
+              "nativeType": undefined,
+              "sqlType": undefined,
             },
-            Object {
+            Column {
               "name": "channel",
+              "nativeType": undefined,
+              "sqlType": undefined,
             },
-            Object {
+            Column {
               "name": "count",
+              "nativeType": undefined,
+              "sqlType": undefined,
             },
           ],
           "query": undefined,
@@ -191,17 +214,25 @@ describe('QueryResult', () => {
       expect(QueryResult.fromRawResult(result, true)).toMatchInlineSnapshot(`
         QueryResult {
           "header": Array [
-            Object {
+            Column {
               "name": "timestamp",
+              "nativeType": undefined,
+              "sqlType": undefined,
             },
-            Object {
+            Column {
               "name": "added",
+              "nativeType": undefined,
+              "sqlType": undefined,
             },
-            Object {
+            Column {
               "name": "channel",
+              "nativeType": undefined,
+              "sqlType": undefined,
             },
-            Object {
+            Column {
               "name": "count",
+              "nativeType": undefined,
+              "sqlType": undefined,
             },
           ],
           "query": undefined,
@@ -255,11 +286,15 @@ describe('QueryResult', () => {
       expect(QueryResult.fromRawResult(result)).toMatchInlineSnapshot(`
         QueryResult {
           "header": Array [
-            Object {
+            Column {
               "name": "d0",
+              "nativeType": undefined,
+              "sqlType": undefined,
             },
-            Object {
+            Column {
               "name": "a0",
+              "nativeType": undefined,
+              "sqlType": undefined,
             },
           ],
           "query": undefined,
@@ -310,11 +345,15 @@ describe('QueryResult', () => {
       expect(QueryResult.fromRawResult(result)).toMatchInlineSnapshot(`
         QueryResult {
           "header": Array [
-            Object {
+            Column {
               "name": "channel",
+              "nativeType": undefined,
+              "sqlType": undefined,
             },
-            Object {
+            Column {
               "name": "count",
+              "nativeType": undefined,
+              "sqlType": undefined,
             },
           ],
           "query": undefined,
@@ -355,14 +394,20 @@ describe('QueryResult', () => {
       expect(QueryResult.fromRawResult(result, true)).toMatchInlineSnapshot(`
         QueryResult {
           "header": Array [
-            Object {
+            Column {
               "name": "timestamp",
+              "nativeType": undefined,
+              "sqlType": undefined,
             },
-            Object {
+            Column {
               "name": "channel",
+              "nativeType": undefined,
+              "sqlType": undefined,
             },
-            Object {
+            Column {
               "name": "count",
+              "nativeType": undefined,
+              "sqlType": undefined,
             },
           ],
           "query": undefined,
@@ -454,14 +499,20 @@ describe('QueryResult', () => {
       expect(QueryResult.fromRawResult(result, true)).toMatchInlineSnapshot(`
         QueryResult {
           "header": Array [
-            Object {
+            Column {
               "name": "timestamp",
+              "nativeType": undefined,
+              "sqlType": undefined,
             },
-            Object {
+            Column {
               "name": "d0",
+              "nativeType": undefined,
+              "sqlType": undefined,
             },
-            Object {
+            Column {
               "name": "a0",
+              "nativeType": undefined,
+              "sqlType": undefined,
             },
           ],
           "query": undefined,
@@ -508,14 +559,20 @@ describe('QueryResult', () => {
       expect(QueryResult.fromRawResult(result)).toMatchInlineSnapshot(`
         QueryResult {
           "header": Array [
-            Object {
+            Column {
               "name": "__time",
+              "nativeType": undefined,
+              "sqlType": undefined,
             },
-            Object {
+            Column {
               "name": "added",
+              "nativeType": undefined,
+              "sqlType": undefined,
             },
-            Object {
+            Column {
               "name": "channel",
+              "nativeType": undefined,
+              "sqlType": undefined,
             },
           ],
           "query": undefined,
@@ -562,14 +619,20 @@ describe('QueryResult', () => {
       expect(QueryResult.fromRawResult(result)).toMatchInlineSnapshot(`
         QueryResult {
           "header": Array [
-            Object {
+            Column {
               "name": "__time",
+              "nativeType": undefined,
+              "sqlType": undefined,
             },
-            Object {
+            Column {
               "name": "added",
+              "nativeType": undefined,
+              "sqlType": undefined,
             },
-            Object {
+            Column {
               "name": "channel",
+              "nativeType": undefined,
+              "sqlType": undefined,
             },
           ],
           "query": undefined,
@@ -648,14 +711,20 @@ describe('QueryResult', () => {
       expect(QueryResult.fromRawResult(result)).toMatchInlineSnapshot(`
         QueryResult {
           "header": Array [
-            Object {
+            Column {
               "name": "timestamp",
+              "nativeType": undefined,
+              "sqlType": undefined,
             },
-            Object {
+            Column {
               "name": "channel",
+              "nativeType": undefined,
+              "sqlType": undefined,
             },
-            Object {
+            Column {
               "name": "added",
+              "nativeType": undefined,
+              "sqlType": undefined,
             },
           ],
           "query": undefined,
@@ -717,14 +786,20 @@ describe('QueryResult', () => {
       expect(QueryResult.fromRawResult(result)).toMatchInlineSnapshot(`
         QueryResult {
           "header": Array [
-            Object {
+            Column {
               "name": "dimension",
+              "nativeType": undefined,
+              "sqlType": undefined,
             },
-            Object {
+            Column {
               "name": "value",
+              "nativeType": undefined,
+              "sqlType": undefined,
             },
-            Object {
+            Column {
               "name": "count",
+              "nativeType": undefined,
+              "sqlType": undefined,
             },
           ],
           "query": undefined,
@@ -786,14 +861,20 @@ describe('QueryResult', () => {
       expect(QueryResult.fromRawResult(result)).toMatchInlineSnapshot(`
         QueryResult {
           "header": Array [
-            Object {
+            Column {
               "name": "dimension",
+              "nativeType": undefined,
+              "sqlType": undefined,
             },
-            Object {
+            Column {
               "name": "value",
+              "nativeType": undefined,
+              "sqlType": undefined,
             },
-            Object {
+            Column {
               "name": "count",
+              "nativeType": undefined,
+              "sqlType": undefined,
             },
           ],
           "query": undefined,
@@ -837,11 +918,15 @@ describe('QueryResult', () => {
       expect(QueryResult.fromRawResult(result)).toMatchInlineSnapshot(`
         QueryResult {
           "header": Array [
-            Object {
+            Column {
               "name": "minTime",
+              "nativeType": undefined,
+              "sqlType": undefined,
             },
-            Object {
+            Column {
               "name": "maxTime",
+              "nativeType": undefined,
+              "sqlType": undefined,
             },
           ],
           "query": undefined,
@@ -873,8 +958,10 @@ describe('QueryResult', () => {
       expect(QueryResult.fromRawResult(result)).toMatchInlineSnapshot(`
         QueryResult {
           "header": Array [
-            Object {
+            Column {
               "name": "maxIngestedEventTime",
+              "nativeType": undefined,
+              "sqlType": undefined,
             },
           ],
           "query": undefined,
@@ -934,23 +1021,35 @@ describe('QueryResult', () => {
       expect(QueryResult.fromRawResult(result)).toMatchInlineSnapshot(`
         QueryResult {
           "header": Array [
-            Object {
+            Column {
               "name": "column",
+              "nativeType": undefined,
+              "sqlType": undefined,
             },
-            Object {
+            Column {
               "name": "type",
+              "nativeType": undefined,
+              "sqlType": undefined,
             },
-            Object {
+            Column {
               "name": "hasMultipleValues",
+              "nativeType": undefined,
+              "sqlType": undefined,
             },
-            Object {
+            Column {
               "name": "size",
+              "nativeType": undefined,
+              "sqlType": undefined,
             },
-            Object {
+            Column {
               "name": "cardinality",
+              "nativeType": undefined,
+              "sqlType": undefined,
             },
-            Object {
+            Column {
               "name": "errorMessage",
+              "nativeType": undefined,
+              "sqlType": undefined,
             },
           ],
           "query": undefined,
@@ -999,11 +1098,15 @@ describe('QueryResult', () => {
       expect(QueryResult.fromRawResult(result, false, true)).toMatchInlineSnapshot(`
         QueryResult {
           "header": Array [
-            Object {
+            Column {
               "name": "Time",
+              "nativeType": undefined,
+              "sqlType": undefined,
             },
-            Object {
+            Column {
               "name": "Count",
+              "nativeType": undefined,
+              "sqlType": undefined,
             },
           ],
           "query": undefined,
@@ -1041,11 +1144,15 @@ describe('QueryResult', () => {
       expect(QueryResult.fromRawResult(result, false, true)).toMatchInlineSnapshot(`
         QueryResult {
           "header": Array [
-            Object {
+            Column {
               "name": "Time",
+              "nativeType": undefined,
+              "sqlType": undefined,
             },
-            Object {
+            Column {
               "name": "Count",
+              "nativeType": undefined,
+              "sqlType": undefined,
             },
           ],
           "query": undefined,
@@ -1097,11 +1204,15 @@ describe('QueryResult', () => {
       expect(QueryResult.fromRawResult(result)).toMatchInlineSnapshot(`
         QueryResult {
           "header": Array [
-            Object {
+            Column {
               "name": "channel",
+              "nativeType": undefined,
+              "sqlType": undefined,
             },
-            Object {
+            Column {
               "name": "added",
+              "nativeType": undefined,
+              "sqlType": undefined,
             },
           ],
           "query": undefined,
@@ -1138,11 +1249,15 @@ describe('QueryResult', () => {
       expect(QueryResult.fromRawResult(result)).toMatchInlineSnapshot(`
         QueryResult {
           "header": Array [
-            Object {
+            Column {
               "name": "channel",
+              "nativeType": undefined,
+              "sqlType": undefined,
             },
-            Object {
+            Column {
               "name": "added",
+              "nativeType": undefined,
+              "sqlType": undefined,
             },
           ],
           "query": undefined,
