@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { Introspect, QueryResult, SqlQuery } from '..';
+import { Column, Introspect, QueryResult, SqlQuery } from '..';
 import { sane } from '../test-utils';
 
 describe('Introspect', () => {
@@ -24,7 +24,7 @@ describe('Introspect', () => {
   describe('.decodeTableIntrospectionResult', () => {
     it('works', () => {
       const queryResult = new QueryResult({
-        header: [{ name: 'TABLE_NAME' }],
+        header: Column.fromColumnNames(['TABLE_NAME']),
         rows: [['wikipedia'], ['github']],
       });
 
@@ -46,7 +46,7 @@ describe('Introspect', () => {
   describe('.decodeTableColumnIntrospectionResult', () => {
     it('works', () => {
       const queryResult = new QueryResult({
-        header: [{ name: 'COLUMN_NAME' }, { name: 'DATA_TYPE' }],
+        header: Column.fromColumnNames(['COLUMN_NAME', 'DATA_TYPE']),
         rows: [
           ['__time', 'TIMESTAMP'],
           ['channel', 'VARCHAR'],
@@ -103,7 +103,7 @@ describe('Introspect', () => {
   describe('.decodeColumnTypesFromPlan', () => {
     it('works when there is only a PLAN', () => {
       const queryPlanResult = new QueryResult({
-        header: [{ name: 'PLAN' }],
+        header: Column.fromColumnNames(['PLAN']),
         rows: [['DruidQueryRel(query=[...\n...], signature=[{d0:STRING, a0:LONG}])\n']],
       });
 
@@ -112,7 +112,7 @@ describe('Introspect', () => {
 
     it('works when there is more than a PLAN', () => {
       const queryPlanResult = new QueryResult({
-        header: [{ name: 'PLAN' }, { name: 'RESOURCES' }],
+        header: Column.fromColumnNames(['PLAN', 'RESOURCES']),
         rows: [
           [
             'DruidQueryRel(query=[...\n...], signature=[{d0:STRING, a0:LONG}])\n',
@@ -162,7 +162,7 @@ describe('Introspect', () => {
 
       const queryPlanResult = new QueryResult({
         sqlQuery: Introspect.getQueryColumnIntrospectionQuery(query),
-        header: [{ name: 'PLAN' }],
+        header: Column.fromColumnNames(['PLAN']),
         rows: [['DruidQueryRel(query=[...\n...], signature=[{d0:LONG, d1:STRING, a0:LONG}])\n']],
       });
 
@@ -194,7 +194,7 @@ describe('Introspect', () => {
 
       const queryPlanResult = new QueryResult({
         sqlQuery: Introspect.getQueryColumnIntrospectionQuery(query),
-        header: [{ name: 'PLAN' }],
+        header: Column.fromColumnNames(['PLAN']),
         rows: [['DruidQueryRel(query=[...\n...], signature=[{d0:STRING, a0:LONG}])\n']],
       });
 
@@ -213,7 +213,7 @@ describe('Introspect', () => {
 
       const queryPlanResult = new QueryResult({
         sqlQuery: Introspect.getQueryColumnIntrospectionQuery(query),
-        header: [{ name: 'PLAN' }],
+        header: Column.fromColumnNames(['PLAN']),
         rows: [['DruidQueryRel(query=[...\n...], signature=[{d0:STRING, a0:LONG, a1:LONG}])\n']],
       });
 
@@ -229,7 +229,7 @@ describe('Introspect', () => {
 
       const queryPlanResult = new QueryResult({
         sqlQuery: Introspect.getQueryColumnIntrospectionQuery(query),
-        header: [{ name: 'PLAN' }],
+        header: Column.fromColumnNames(['PLAN']),
         rows: [
           [
             'DruidQueryRel(query=[...\n...], signature=[{d0:LONG, d1:STRING, a0:LONG, a1:LONG, a1:LONG}])\n',
@@ -238,13 +238,7 @@ describe('Introspect', () => {
       });
 
       const sampleResult = new QueryResult({
-        header: [
-          { name: 'time' },
-          { name: 'cityName' },
-          { name: 'EXPR$0' },
-          { name: 'delta' },
-          { name: 'deleted' },
-        ],
+        header: Column.fromColumnNames(['time', 'cityName', 'EXPR$0', 'delta', 'deleted']),
         rows: [[new Date('2020-01-01T00:00:00'), 'SF', 1, 4, true]],
       });
 
@@ -277,7 +271,7 @@ describe('Introspect', () => {
 
       const queryPlanResult = new QueryResult({
         sqlQuery: Introspect.getQueryColumnIntrospectionQuery(query),
-        header: [{ name: 'PLAN' }],
+        header: Column.fromColumnNames(['PLAN']),
         rows: [
           [
             'DruidQueryRel(query=[...\n...], signature=[{Hello World:LONG, A-B:STRING, Россия:LONG, ö:LONG, hello, world:LONG}])\n',
@@ -286,13 +280,7 @@ describe('Introspect', () => {
       });
 
       const sampleResult = new QueryResult({
-        header: [
-          { name: 'time' },
-          { name: 'cityName' },
-          { name: 'EXPR$0' },
-          { name: 'delta' },
-          { name: 'deleted' },
-        ],
+        header: Column.fromColumnNames(['time', 'cityName', 'EXPR$0', 'delta', 'deleted']),
         rows: [[new Date('2020-01-01T00:00:00'), 'SF', 1, 4, true]],
       });
 
@@ -332,7 +320,7 @@ describe('Introspect', () => {
 
       const queryPlanResult = new QueryResult({
         sqlQuery: Introspect.getQueryColumnIntrospectionQuery(query),
-        header: [{ name: 'PLAN' }],
+        header: Column.fromColumnNames(['PLAN']),
         rows: [
           [
             '\nDruidJoinQueryRel(condition=[=($4, $29)], joinType=[left], query=[{ ... }], signature=[{d0:STRING, d1:STRING, a0:LONG}]) DruidQueryRel(query=[{ ... }], signature=[{__time:LONG, adblock_list:STRING, agent_category:STRING, agent_type:STRING, browser:STRING, browser_version:STRING, city:STRING, continent:STRING, country:STRING, event_subtype:STRING, event_type:STRING, forwarded_for:STRING, language:STRING, loaded_image:STRING, number:LONG, os:STRING, path:STRING, platform:STRING, referrer:STRING, referrer_host:STRING, region:STRING, remote_address:STRING, screen:STRING, session:STRING, session_length:LONG, timezone:STRING, timezone_offset:LONG, version:STRING, window:STRING}]) DruidQueryRel(query=[{ ... }], signature=[{k:STRING, v:STRING}])\n',
