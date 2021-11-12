@@ -139,7 +139,11 @@ export class QueryRunner {
 
     if (cancelToken) cancelToken.throwIfRequested();
 
-    const result = QueryResult.fromQueryAndRawResult(jsonQuery, dataAndHeaders.data)
+    const result = QueryResult.fromQueryAndRawResult(
+      jsonQuery,
+      dataAndHeaders.data,
+      dataAndHeaders.headers,
+    )
       .attachQuery(jsonQuery, parsedQuery)
       .attachQueryId(
         dataAndHeaders.headers['x-druid-query-id'],

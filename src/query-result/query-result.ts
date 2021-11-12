@@ -59,40 +59,52 @@ export class QueryResult {
     return Boolean(queryPayload.granularity && !isAllGranularity(queryPayload.granularity));
   }
 
-  static isFirstRowHeader(queryPayload: Record<string, unknown>): boolean {
+  static hasHeader(queryPayload: Record<string, unknown>): boolean {
     return typeof queryPayload.query === 'string' && queryPayload.header === true;
   }
 
-  static isSecondRowTypeHeader(queryPayload: Record<string, unknown>, data: unknown): boolean {
+  static hasTypeHeader(
+    queryPayload: Record<string, unknown>,
+    header: Record<string, string>,
+  ): boolean {
     return (
-      typeof queryPayload.query === 'string' &&
-      queryPayload.header === true &&
-      queryPayload.sqlTypesHeader === true &&
-      Array.isArray(data) &&
-      data.length >= 2 &&
-      QueryResult.isTypeRow(data[1])
+      QueryResult.hasHeader(queryPayload) &&
+      queryPayload.typesHeader === true &&
+      header['x-druid-sql-header-included'] === 'yes'
     );
   }
 
-  static isTypeRow(possibleTypeRow: unknown): boolean {
-    if (!Array.isArray(possibleTypeRow)) return false;
-    return /^[A-Z]+$/.test(possibleTypeRow.join(''));
+  static hasSqlTypeHeader(
+    queryPayload: Record<string, unknown>,
+    header: Record<string, string>,
+  ): boolean {
+    return (
+      QueryResult.hasHeader(queryPayload) &&
+      queryPayload.sqlTypesHeader === true &&
+      header['x-druid-sql-header-included'] === 'yes'
+    );
   }
 
-  static fromQueryAndRawResult(queryPayload: Record<string, unknown>, data: unknown): QueryResult {
+  static fromQueryAndRawResult(
+    queryPayload: Record<string, unknown>,
+    data: unknown,
+    header: Record<string, string> = {},
+  ): QueryResult {
     return QueryResult.fromRawResult(
       data,
       QueryResult.shouldIncludeTimestamp(queryPayload),
-      QueryResult.isFirstRowHeader(queryPayload),
-      QueryResult.isSecondRowTypeHeader(queryPayload, data),
+      QueryResult.hasHeader(queryPayload),
+      QueryResult.hasTypeHeader(queryPayload, header),
+      QueryResult.hasSqlTypeHeader(queryPayload, header),
     );
   }
 
   static fromRawResult(
     data: unknown,
     includeTimestampIfExists?: boolean,
-    firstRowHeader?: boolean,
-    secondRowTypeHeader?: boolean,
+    hasHeader?: boolean,
+    hasTypeHeader?: boolean,
+    hasSqlTypeHeader?: boolean,
   ): QueryResult {
     if (typeof data === 'string') {
       if (!data.endsWith('\n')) {
@@ -131,27 +143,33 @@ export class QueryResult {
       if (!firstRow) return QueryResult.BLANK.changeResultContext(resultContext);
 
       if (Array.isArray(firstRow)) {
-        if (firstRowHeader) {
-          if (secondRowTypeHeader) {
-            return new QueryResult({
-              header: Column.fromColumnNamesAndSqlTypes(firstRow, data[1]),
-              rows: data.slice(2),
-              resultContext,
-            });
-          } else {
-            return new QueryResult({
-              header: Column.fromColumnNames(firstRow),
-              rows: data.slice(1),
-              resultContext,
-            });
+        let rowsToSkip = 0;
+        let header: Column[];
+        if (hasHeader) {
+          rowsToSkip++;
+
+          let types: string[] | undefined;
+          if (hasTypeHeader) {
+            types = data[rowsToSkip];
+            rowsToSkip++;
           }
+
+          let sqlTypes: string[] | undefined;
+          if (hasSqlTypeHeader) {
+            sqlTypes = data[rowsToSkip];
+            rowsToSkip++;
+          }
+
+          header = Column.fromColumnNamesAndTypeArrays(firstRow, types, sqlTypes);
         } else {
-          return new QueryResult({
-            header: Column.fromColumnNames(firstRow.map((_d, i) => i)),
-            rows: data,
-            resultContext,
-          });
+          header = Column.fromColumnNames(firstRow.map((_d, i) => i));
         }
+
+        return new QueryResult({
+          header,
+          rows: rowsToSkip ? data.slice(rowsToSkip) : data,
+          resultContext,
+        });
       }
 
       if (!isObject(firstRow)) {
@@ -167,7 +185,7 @@ export class QueryResult {
             return QueryResult.fromRawResult(
               data.flatMap(d => d.result.results),
               includeTimestampIfExists,
-              firstRowHeader,
+              hasHeader,
             ).changeResultContext(resultContext);
           }
 
@@ -285,19 +303,30 @@ export class QueryResult {
       }
 
       // sql object mode like
-      return QueryResult.fromObjectArray(data, firstRowHeader).changeResultContext(resultContext);
+      return QueryResult.fromObjectArray(
+        data,
+        hasHeader,
+        hasTypeHeader || hasSqlTypeHeader,
+      ).changeResultContext(resultContext);
     }
 
     throw new Error('Unrecognizable query return shape, not an array.');
   }
 
-  static fromObjectArray(array: Record<string, any>[], ignoreFirstEvent?: boolean): QueryResult {
+  static fromObjectArray(
+    array: Record<string, any>[],
+    hasHeader?: boolean,
+    hasTypes?: boolean,
+  ): QueryResult {
     const firstRow = array[0];
     if (!firstRow) return QueryResult.BLANK;
     const header = Object.keys(firstRow);
     return new QueryResult({
-      header: Column.fromColumnNames(header),
-      rows: (ignoreFirstEvent ? array.slice(1) : array).map(r => header.map(h => r[h])),
+      header: Column.fromColumnNamesAndTypeArray(
+        header,
+        hasHeader && hasTypes ? header.map(h => firstRow[h]) : undefined,
+      ),
+      rows: (hasHeader ? array.slice(1) : array).map(r => header.map(h => r[h])),
     });
   }
 

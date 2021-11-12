@@ -27,8 +27,28 @@ export class Column {
     return names.map(Column.fromName);
   }
 
-  static fromColumnNamesAndSqlTypes(names: readonly unknown[], sqlTypes: string[]): Column[] {
-    return names.map((name, i) => new Column({ name: String(name), sqlType: sqlTypes[i] }));
+  static fromColumnNamesAndTypeArrays(
+    names: readonly unknown[],
+    types: string[] = [],
+    sqlTypes: string[] = [],
+  ): Column[] {
+    return names.map(
+      (name, i) => new Column({ name: String(name), nativeType: types[i], sqlType: sqlTypes[i] }),
+    );
+  }
+
+  static fromColumnNamesAndTypeArray(
+    names: readonly unknown[],
+    typeArray: { type: string; sqlType: string }[] = [],
+  ): Column[] {
+    return names.map(
+      (name, i) =>
+        new Column({
+          name: String(name),
+          nativeType: typeArray[i]?.type,
+          sqlType: typeArray[i]?.sqlType,
+        }),
+    );
   }
 
   public readonly name: string;
