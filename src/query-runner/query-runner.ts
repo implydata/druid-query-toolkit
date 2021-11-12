@@ -39,6 +39,7 @@ export interface RunQueryOptions {
   queryParameters?: QueryParameter[];
   resultFormat?: string;
   header?: boolean;
+  typesHeader?: boolean;
   sqlTypesHeader?: boolean;
   cancelToken?: CancelToken;
 }
@@ -84,6 +85,7 @@ export class QueryRunner {
       queryParameters,
       resultFormat,
       header,
+      typesHeader,
       sqlTypesHeader,
       cancelToken,
     } = options;
@@ -97,6 +99,7 @@ export class QueryRunner {
         query,
         resultFormat: resultFormat ?? 'array',
         header: header ?? true,
+        typesHeader: (header && typesHeader) ?? true,
         sqlTypesHeader: (header && sqlTypesHeader) ?? true,
       };
       try {
@@ -109,6 +112,7 @@ export class QueryRunner {
         query: String(query),
         resultFormat: resultFormat ?? 'array',
         header: header ?? true,
+        typesHeader: (header && typesHeader) ?? true,
         sqlTypesHeader: (header && sqlTypesHeader) ?? true,
       };
     } else {

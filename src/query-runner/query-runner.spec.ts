@@ -28,20 +28,16 @@ describe('QueryRunner', () => {
 
       if (isSql) {
         return {
-          data: payload.sqlTypesHeader
-            ? [
-                ['channel', 'Count'],
-                ['VARCHAR', 'LONG'],
-                ['#en.wikipedia', 6650],
-                ['#sh.wikipedia', 3969],
-              ]
-            : [
-                ['channel', 'Count'],
-                ['#en.wikipedia', 6650],
-                ['#sh.wikipedia', 3969],
-              ],
+          data: [
+            ['channel', 'Count'],
+            payload.typesHeader ? ['STRING', 'LONG'] : undefined,
+            payload.sqlTypesHeader ? ['VARCHAR', 'BIGINT'] : undefined,
+            ['#en.wikipedia', 6650],
+            ['#sh.wikipedia', 3969],
+          ].filter(Boolean),
           headers: {
             'x-druid-sql-query-id': firstParameterValue || 'sql-query-id-yyy',
+            'x-druid-sql-header-included': 'yes',
           } as any,
         };
       } else {
@@ -374,13 +370,13 @@ describe('QueryRunner', () => {
         "header": Array [
           Column {
             "name": "channel",
-            "nativeType": undefined,
+            "nativeType": "STRING",
             "sqlType": "VARCHAR",
           },
           Column {
             "name": "Count",
-            "nativeType": undefined,
-            "sqlType": "LONG",
+            "nativeType": "LONG",
+            "sqlType": "BIGINT",
           },
         ],
         "query": Object {
@@ -395,6 +391,7 @@ describe('QueryRunner', () => {
       ORDER BY 2 DESC",
           "resultFormat": "array",
           "sqlTypesHeader": true,
+          "typesHeader": true,
         },
         "queryDuration": 1,
         "queryId": undefined,
@@ -599,13 +596,13 @@ describe('QueryRunner', () => {
         "header": Array [
           Column {
             "name": "channel",
-            "nativeType": undefined,
+            "nativeType": "STRING",
             "sqlType": "VARCHAR",
           },
           Column {
             "name": "Count",
-            "nativeType": undefined,
-            "sqlType": "LONG",
+            "nativeType": "LONG",
+            "sqlType": "BIGINT",
           },
         ],
         "query": Object {
@@ -620,6 +617,7 @@ describe('QueryRunner', () => {
       ORDER BY 2 DESC",
           "resultFormat": "array",
           "sqlTypesHeader": true,
+          "typesHeader": true,
         },
         "queryDuration": 1,
         "queryId": undefined,
