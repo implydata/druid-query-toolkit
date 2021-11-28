@@ -12,7 +12,15 @@
  * limitations under the License.
  */
 
-import { SqlCase, SqlExpression, SqlFunction, SqlQuery, SqlRef, SqlTableRef } from '../..';
+import {
+  SqlCase,
+  SqlExpression,
+  SqlFunction,
+  SqlLiteral,
+  SqlQuery,
+  SqlRef,
+  SqlTableRef,
+} from '../..';
 import { backAndForth, sane } from '../../test-utils';
 
 describe('SqlQuery', () => {
@@ -238,6 +246,8 @@ describe('SqlQuery', () => {
         "datasource IN ('moon', 'beam')",
         'datasource',
         "('moon', 'beam')",
+        "'moon'",
+        "'beam'",
         "'druid' = schema",
         "'druid'",
         'schema',
@@ -296,6 +306,8 @@ describe('SqlQuery', () => {
         'sys.segments',
         'FROM sys.segments',
         'datasource',
+        "'moon'",
+        "'beam'",
         "('moon', 'beam')",
         "datasource IN ('moon', 'beam')",
         "'druid'",
@@ -326,6 +338,9 @@ describe('SqlQuery', () => {
         parts.push(x.toString());
         if (x instanceof SqlRef) {
           return x.changeColumn(`_${x.getColumn()}_`);
+        }
+        if (x instanceof SqlLiteral && x.getStringValue()) {
+          return SqlLiteral.create(`[${x.getStringValue()}]`);
         }
         return x;
       });
@@ -362,13 +377,15 @@ describe('SqlQuery', () => {
         'sys.segments',
         'FROM sys.segments',
         'datasource',
-        "('moon', 'beam')",
-        "_datasource_ IN ('moon', 'beam')",
+        "'moon'",
+        "'beam'",
+        "('[moon]', '[beam]')",
+        "_datasource_ IN ('[moon]', '[beam]')",
         "'druid'",
         'schema',
-        "'druid' = _schema_",
-        "_datasource_ IN ('moon', 'beam') AND 'druid' = _schema_",
-        "WHERE _datasource_ IN ('moon', 'beam') AND 'druid' = _schema_",
+        "'[druid]' = _schema_",
+        "_datasource_ IN ('[moon]', '[beam]') AND '[druid]' = _schema_",
+        "WHERE _datasource_ IN ('[moon]', '[beam]') AND '[druid]' = _schema_",
         'datasource',
         'GROUP BY _datasource_',
         'total_size',
@@ -382,7 +399,7 @@ describe('SqlQuery', () => {
         'ORDER BY _datasource_ DESC, 2 ASC',
         '100',
         'LIMIT 100',
-        'SELECT\n  _datasource_ d,\n  SUM("_size_") AS total_size,\n  CASE WHEN SUM("_size_") = 0 THEN 0 ELSE SUM("_size_") END AS avg_size,\n  CASE WHEN SUM(_num_rows_) = 0 THEN 0 ELSE SUM("_num_rows_") END AS avg_num_rows,\n  COUNT(*) AS num_segments\nFROM sys.segments\nWHERE _datasource_ IN (\'moon\', \'beam\') AND \'druid\' = _schema_\nGROUP BY _datasource_\nHAVING _total_size_ > 100\nORDER BY _datasource_ DESC, 2 ASC\nLIMIT 100',
+        'SELECT\n  _datasource_ d,\n  SUM("_size_") AS total_size,\n  CASE WHEN SUM("_size_") = 0 THEN 0 ELSE SUM("_size_") END AS avg_size,\n  CASE WHEN SUM(_num_rows_) = 0 THEN 0 ELSE SUM("_num_rows_") END AS avg_num_rows,\n  COUNT(*) AS num_segments\nFROM sys.segments\nWHERE _datasource_ IN (\'[moon]\', \'[beam]\') AND \'[druid]\' = _schema_\nGROUP BY _datasource_\nHAVING _total_size_ > 100\nORDER BY _datasource_ DESC, 2 ASC\nLIMIT 100',
       ]);
     });
 
@@ -412,6 +429,7 @@ describe('SqlQuery', () => {
 
       expect(insertSql.insertClause).toMatchInlineSnapshot(`
         SqlInsertClause {
+          "columns": undefined,
           "keywords": Object {},
           "spacing": Object {},
           "table": SqlTableRef {
@@ -787,11 +805,9 @@ describe('SqlQuery', () => {
                   ],
                 },
                 "spacing": Object {
-                  "postQuery": "",
                   "postSelect": " ",
                   "preFromClause": " ",
                   "preOrderByClause": " ",
-                  "preQuery": "",
                 },
                 "type": "query",
                 "unionQuery": undefined,
@@ -846,11 +862,9 @@ describe('SqlQuery', () => {
           ],
         },
         "spacing": Object {
-          "postQuery": "",
           "postSelect": " ",
           "preFromClause": " ",
           "preLimitClause": " ",
-          "preQuery": "",
         },
         "type": "query",
         "unionQuery": undefined,
@@ -947,6 +961,7 @@ describe('SqlQuery', () => {
                 "name": "total_size",
                 "quotes": false,
               },
+              "columns": undefined,
               "expression": SqlFunction {
                 "args": SeparatedArray {
                   "separators": Array [],
@@ -992,6 +1007,7 @@ describe('SqlQuery', () => {
                 "name": "num_segments",
                 "quotes": false,
               },
+              "columns": undefined,
               "expression": SqlFunction {
                 "args": SeparatedArray {
                   "separators": Array [],
@@ -1031,12 +1047,10 @@ describe('SqlQuery', () => {
           ],
         },
         "spacing": Object {
-          "postQuery": "",
           "postSelect": "
         ",
           "preFromClause": "
       ",
-          "preQuery": "",
         },
         "type": "query",
         "unionQuery": undefined,
@@ -1114,10 +1128,8 @@ describe('SqlQuery', () => {
         },
         "spacing": Object {
           "postExplainClause": " ",
-          "postQuery": "",
           "postSelect": " ",
           "preFromClause": " ",
-          "preQuery": "",
         },
         "type": "query",
         "unionQuery": undefined,
@@ -1150,6 +1162,7 @@ describe('SqlQuery', () => {
                   "name": "t",
                   "quotes": false,
                 },
+                "columns": undefined,
                 "expression": SqlTableRef {
                   "keywords": Object {},
                   "namespaceRefName": undefined,
@@ -1202,12 +1215,10 @@ describe('SqlQuery', () => {
           ],
         },
         "spacing": Object {
-          "postQuery": "",
           "postSelect": " ",
           "postWithClause": "
       ",
           "preFromClause": " ",
-          "preQuery": "",
         },
         "type": "query",
         "unionQuery": undefined,
@@ -1224,16 +1235,11 @@ describe('SqlQuery', () => {
             "separators": Array [],
             "values": Array [
               SqlWithPart {
+                "columns": undefined,
                 "keywords": Object {
                   "as": "AS",
                 },
-                "spacing": Object {
-                  "postAs": " ",
-                  "postWithTable": " ",
-                },
-                "type": "withPart",
-                "withColumns": undefined,
-                "withQuery": SqlQuery {
+                "query": SqlQuery {
                   "decorator": undefined,
                   "explainClause": undefined,
                   "fromClause": SqlFromClause {
@@ -1294,21 +1300,24 @@ describe('SqlQuery', () => {
                     ],
                   },
                   "spacing": Object {
-                    "postQuery": "",
                     "postSelect": " ",
                     "preFromClause": "
         ",
-                    "preQuery": "",
                   },
                   "type": "query",
                   "unionQuery": undefined,
                   "whereClause": undefined,
                   "withClause": undefined,
                 },
-                "withTable": RefName {
+                "spacing": Object {
+                  "postAs": " ",
+                  "postTable": " ",
+                },
+                "table": RefName {
                   "name": "dept_count",
                   "quotes": false,
                 },
+                "type": "withPart",
               },
             ],
           },
@@ -1374,10 +1383,8 @@ describe('SqlQuery', () => {
             ],
           },
           "spacing": Object {
-            "postQuery": "",
             "postSelect": " ",
             "preFromClause": " ",
-            "preQuery": "",
             "preWhereClause": " ",
           },
           "type": "query",
@@ -1489,10 +1496,8 @@ describe('SqlQuery', () => {
             ],
           },
           "spacing": Object {
-            "postQuery": "",
             "postSelect": " ",
             "preFromClause": " ",
-            "preQuery": "",
             "preWhereClause": " ",
           },
           "type": "query",
@@ -1604,10 +1609,8 @@ describe('SqlQuery', () => {
             ],
           },
           "spacing": Object {
-            "postQuery": "",
             "postSelect": " ",
             "preFromClause": " ",
-            "preQuery": "",
             "preWhereClause": " ",
           },
           "type": "query",
@@ -1837,11 +1840,9 @@ describe('SqlQuery', () => {
             ],
           },
           "spacing": Object {
-            "postQuery": "",
             "postSelect": " ",
             "preFromClause": " ",
             "preGroupByClause": " ",
-            "preQuery": "",
           },
           "type": "query",
           "unionQuery": undefined,
@@ -1933,11 +1934,9 @@ describe('SqlQuery', () => {
             ],
           },
           "spacing": Object {
-            "postQuery": "",
             "postSelect": " ",
             "preFromClause": " ",
             "preGroupByClause": " ",
-            "preQuery": "",
           },
           "type": "query",
           "unionQuery": undefined,
@@ -2052,11 +2051,9 @@ describe('SqlQuery', () => {
             ],
           },
           "spacing": Object {
-            "postQuery": "",
             "postSelect": " ",
             "preFromClause": " ",
             "preGroupByClause": " ",
-            "preQuery": "",
           },
           "type": "query",
           "unionQuery": undefined,
@@ -2163,11 +2160,9 @@ describe('SqlQuery', () => {
             ],
           },
           "spacing": Object {
-            "postQuery": "",
             "postSelect": " ",
             "preFromClause": " ",
             "preHavingClause": " ",
-            "preQuery": "",
           },
           "type": "query",
           "unionQuery": undefined,
@@ -2278,11 +2273,9 @@ describe('SqlQuery', () => {
             ],
           },
           "spacing": Object {
-            "postQuery": "",
             "postSelect": " ",
             "preFromClause": " ",
             "preHavingClause": " ",
-            "preQuery": "",
           },
           "type": "query",
           "unionQuery": undefined,
@@ -2489,11 +2482,9 @@ describe('SqlQuery', () => {
             ],
           },
           "spacing": Object {
-            "postQuery": "",
             "postSelect": " ",
             "preFromClause": " ",
             "preHavingClause": " ",
-            "preQuery": "",
           },
           "type": "query",
           "unionQuery": undefined,
@@ -2593,11 +2584,9 @@ describe('SqlQuery', () => {
             ],
           },
           "spacing": Object {
-            "postQuery": "",
             "postSelect": " ",
             "preFromClause": " ",
             "preOrderByClause": " ",
-            "preQuery": "",
           },
           "type": "query",
           "unionQuery": undefined,
@@ -2699,11 +2688,9 @@ describe('SqlQuery', () => {
             ],
           },
           "spacing": Object {
-            "postQuery": "",
             "postSelect": " ",
             "preFromClause": " ",
             "preOrderByClause": " ",
-            "preQuery": "",
           },
           "type": "query",
           "unionQuery": undefined,
@@ -2805,11 +2792,9 @@ describe('SqlQuery', () => {
             ],
           },
           "spacing": Object {
-            "postQuery": "",
             "postSelect": " ",
             "preFromClause": " ",
             "preOrderByClause": " ",
-            "preQuery": "",
           },
           "type": "query",
           "unionQuery": undefined,
@@ -2932,11 +2917,9 @@ describe('SqlQuery', () => {
             ],
           },
           "spacing": Object {
-            "postQuery": "",
             "postSelect": " ",
             "preFromClause": " ",
             "preOrderByClause": " ",
-            "preQuery": "",
           },
           "type": "query",
           "unionQuery": undefined,
@@ -3061,11 +3044,9 @@ describe('SqlQuery', () => {
             ],
           },
           "spacing": Object {
-            "postQuery": "",
             "postSelect": " ",
             "preFromClause": " ",
             "preOrderByClause": " ",
-            "preQuery": "",
           },
           "type": "query",
           "unionQuery": undefined,
@@ -3211,11 +3192,9 @@ describe('SqlQuery', () => {
             ],
           },
           "spacing": Object {
-            "postQuery": "",
             "postSelect": " ",
             "preFromClause": " ",
             "preOrderByClause": " ",
-            "preQuery": "",
           },
           "type": "query",
           "unionQuery": undefined,
@@ -3298,11 +3277,9 @@ describe('SqlQuery', () => {
             ],
           },
           "spacing": Object {
-            "postQuery": "",
             "postSelect": " ",
             "preFromClause": " ",
             "preLimitClause": " ",
-            "preQuery": "",
           },
           "type": "query",
           "unionQuery": undefined,
@@ -3371,11 +3348,9 @@ describe('SqlQuery', () => {
             ],
           },
           "spacing": Object {
-            "postQuery": "",
             "postSelect": " ",
             "postUnion": " ",
             "preFromClause": " ",
-            "preQuery": "",
             "preUnion": " ",
           },
           "type": "query",
@@ -3429,10 +3404,8 @@ describe('SqlQuery', () => {
               ],
             },
             "spacing": Object {
-              "postQuery": "",
               "postSelect": " ",
               "preFromClause": " ",
-              "preQuery": "",
             },
             "type": "query",
             "unionQuery": undefined,
@@ -3568,10 +3541,8 @@ describe('SqlQuery', () => {
             ],
           },
           "spacing": Object {
-            "postQuery": "",
             "postSelect": " ",
             "preFromClause": " ",
-            "preQuery": "",
           },
           "type": "query",
           "unionQuery": undefined,
@@ -3702,10 +3673,8 @@ describe('SqlQuery', () => {
             ],
           },
           "spacing": Object {
-            "postQuery": "",
             "postSelect": " ",
             "preFromClause": " ",
-            "preQuery": "",
           },
           "type": "query",
           "unionQuery": undefined,
@@ -3836,10 +3805,8 @@ describe('SqlQuery', () => {
             ],
           },
           "spacing": Object {
-            "postQuery": "",
             "postSelect": " ",
             "preFromClause": " ",
-            "preQuery": "",
           },
           "type": "query",
           "unionQuery": undefined,
@@ -3970,10 +3937,8 @@ describe('SqlQuery', () => {
             ],
           },
           "spacing": Object {
-            "postQuery": "",
             "postSelect": " ",
             "preFromClause": " ",
-            "preQuery": "",
           },
           "type": "query",
           "unionQuery": undefined,
@@ -4104,10 +4069,8 @@ describe('SqlQuery', () => {
             ],
           },
           "spacing": Object {
-            "postQuery": "",
             "postSelect": " ",
             "preFromClause": " ",
-            "preQuery": "",
           },
           "type": "query",
           "unionQuery": undefined,
@@ -4182,11 +4145,9 @@ describe('SqlQuery', () => {
             ],
           },
           "spacing": Object {
-            "postQuery": "",
             "postSelect": " -- some comment
         ",
             "preFromClause": " ",
-            "preQuery": "",
           },
           "type": "query",
           "unionQuery": undefined,
@@ -4431,6 +4392,7 @@ describe('SqlQuery', () => {
                   "name": "Count",
                   "quotes": true,
                 },
+                "columns": undefined,
                 "expression": SqlFunction {
                   "args": SeparatedArray {
                     "separators": Array [],
@@ -4472,6 +4434,7 @@ describe('SqlQuery', () => {
                   "name": "dist_cityName",
                   "quotes": true,
                 },
+                "columns": undefined,
                 "expression": SqlFunction {
                   "args": SeparatedArray {
                     "separators": Array [],
@@ -4517,12 +4480,10 @@ describe('SqlQuery', () => {
             ],
           },
           "spacing": Object {
-            "postQuery": "",
             "postSelect": "",
             "preFromClause": "",
             "preGroupByClause": "",
             "preOrderByClause": "",
-            "preQuery": "",
           },
           "type": "query",
           "unionQuery": undefined,
@@ -4658,6 +4619,7 @@ describe('SqlQuery', () => {
                   "name": "channel",
                   "quotes": true,
                 },
+                "columns": undefined,
                 "expression": SqlFunction {
                   "args": SeparatedArray {
                     "separators": Array [
@@ -4716,6 +4678,7 @@ describe('SqlQuery', () => {
                   "name": "Count",
                   "quotes": true,
                 },
+                "columns": undefined,
                 "expression": SqlFunction {
                   "args": SeparatedArray {
                     "separators": Array [],
@@ -4755,7 +4718,6 @@ describe('SqlQuery', () => {
             ],
           },
           "spacing": Object {
-            "postQuery": "",
             "postSelect": "
           ",
             "preFromClause": "
@@ -4764,7 +4726,6 @@ describe('SqlQuery', () => {
         ",
             "preOrderByClause": "
         ",
-            "preQuery": "",
             "preWhereClause": "
         ",
           },

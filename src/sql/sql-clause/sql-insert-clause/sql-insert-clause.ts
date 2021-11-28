@@ -13,11 +13,13 @@
  */
 
 import { SqlBase, SqlType, Substitutor } from '../../sql-base';
+import { SqlColumnList } from '../../sql-column-list/sql-column-list';
 import { SqlTableRef } from '../../sql-table-ref/sql-table-ref';
 import { SqlClause, SqlClauseValue } from '../sql-clause';
 
 export interface SqlInsertClauseValue extends SqlClauseValue {
   table: SqlTableRef;
+  columns?: SqlColumnList;
 }
 
 export class SqlInsertClause extends SqlClause {
@@ -37,26 +39,35 @@ export class SqlInsertClause extends SqlClause {
   }
 
   public readonly table: SqlTableRef;
+  public readonly columns?: SqlColumnList;
 
   constructor(options: SqlInsertClauseValue) {
     super(options, SqlInsertClause.type);
     this.table = options.table;
+    this.columns = options.columns;
   }
 
   public valueOf(): SqlInsertClauseValue {
     const value = super.valueOf() as SqlInsertClauseValue;
     value.table = this.table;
+    value.columns = this.columns;
     return value;
   }
 
   protected _toRawString(): string {
-    return [
+    const rawParts: string[] = [
       this.getKeyword('insert', SqlInsertClause.DEFAULT_INSERT_KEYWORD),
       this.getSpace('postInsert'),
       this.getKeyword('into', SqlInsertClause.DEFAULT_INTO_KEYWORD),
       this.getSpace('postInto'),
       this.table.toString(),
-    ].join('');
+    ];
+
+    if (this.columns) {
+      rawParts.push(this.getSpace('preColumns'), this.columns.toString());
+    }
+
+    return rawParts.join('');
   }
 
   public changeTable(table: SqlTableRef | string): this {

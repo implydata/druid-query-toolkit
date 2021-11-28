@@ -18,7 +18,8 @@ import { SqlExpression } from '../../sql-expression';
 import { SqlTableRef } from '../../sql-table-ref/sql-table-ref';
 import { SeparatedArray } from '../../utils';
 import { SqlClause, SqlClauseValue } from '../sql-clause';
-import { SqlJoinPart } from '../sql-join-part/sql-join-part';
+
+import { SqlJoinPart } from './sql-join-part';
 
 export interface SqlFromClauseValue extends SqlClauseValue {
   expressions: SeparatedArray<SqlExpression>;

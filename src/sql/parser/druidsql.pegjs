@@ -12,15 +12,16 @@
  * limitations under the License.
  */
 
-Start = Sql
-
-// Rest of the work...
-
-Sql = SqlQuery / SqlAlias
+Start = initial:_? thing:(SqlQuery / SqlAlias) final:_?
+{
+  if (initial) thing = thing.changeSpace('initial', initial);
+  if (final) thing = thing.changeSpace('final', final);
+  return thing;
+}
 
 // ------------------------------
 
-SqlAlias = expression:Expression alias:((_ AsToken)? _ RefNameAlias)?
+SqlAlias = expression:Expression alias:((_ AsToken)? _ RefNameAlias)? columns:(_ SqlColumnList)?
 {
   if (!alias) return expression;
 
@@ -34,6 +35,11 @@ SqlAlias = expression:Expression alias:((_ AsToken)? _ RefNameAlias)?
     keywords.as = as[1];
   } else {
     keywords.as = '';
+  }
+
+  if (columns) {
+    spacing.preColumns = columns[0];
+    value.columns = columns[1];
   }
 
   spacing.preAlias = alias[1];
@@ -62,7 +68,6 @@ SqlAliasExplicitAs = expression:Expression alias:(_ AsToken _ RefNameAlias)?
 // ------------------------------
 
 SqlQuery =
-  preQuery:_?
   explainClause:(ExplainClause _)?
   insertClause:(InsertClause _)?
   heart:(((WithClause _)? QueryHeart) / (WithClause _ OpenParen _ SqlQuery _ CloseParen))
@@ -70,12 +75,10 @@ SqlQuery =
   limitClause:(_ LimitClause)?
   offsetClause:(_ OffsetClause)?
   union:(_ UnionClause)?
-  postQuery:_?
 {
   var value = {};
   var keywords = value.keywords = {};
   var spacing = value.spacing = {};
-  spacing.preQuery = preQuery;
 
   if (explainClause) {
     value.explainClause = explainClause[0];
@@ -126,8 +129,6 @@ SqlQuery =
     spacing.postUnion = union[1].postUnion;
     value.unionQuery = union[1].unionQuery;
   }
-
-  spacing.postQuery = postQuery;
 
   return withQueryMode ? new sql.SqlWithQuery(value) : new sql.SqlQuery(value);
 }
@@ -195,9 +196,9 @@ ExplainClause = explain:ExplainToken postExplain:__ plan:PlanToken postPlan:__ f
 }
 
 
-InsertClause = insert:InsertToken postInsert:__ into:IntoToken postInto:__ table:SqlRef
+InsertClause = insert:InsertToken postInsert:__ into:IntoToken postInto:__ table:SqlRef columns:(_ SqlColumnList)?
 {
-  return new sql.SqlInsertClause({
+  var value = {
     table: table.convertToTableRef(),
     keywords: {
       insert: insert,
@@ -207,7 +208,14 @@ InsertClause = insert:InsertToken postInsert:__ into:IntoToken postInto:__ table
       postInsert: postInsert,
       postInto: postInto
     }
-  });
+  };
+
+  if (columns) {
+    value.spacing.preColumns = columns[0];
+    value.columns = columns[1];
+  }
+
+  return new sql.SqlInsertClause(value);
 }
 
 
@@ -230,41 +238,39 @@ WithClause =
 
 
 SqlWithPart =
-  withTable:RefName
-  postWithTable:_?
-  columns:(WithColumns _)?
+  table:RefName
+  postTable:_?
+  columns:(SqlColumnList _)?
   asKeyword:AsToken
   postAs:_
-  withQuery:SqlInParens
+  query:SqlQueryInParens
 {
   var value = {
-    withTable: withTable,
-    withQuery: withQuery,
+    table: table,
+    query: query,
   };
   var spacing = value.spacing = {
-    postWithTable: postWithTable,
+    postTable: postTable,
     postAs: postAs,
   };
   var keywords = value.keywords = {
     as: asKeyword,
   };
   if (columns) {
-    spacing.postLeftParen = columns[0].postLeftParen;
-    value.withColumns = columns[0].withColumns;
-    spacing.preRightParen = columns[0].preRightParen;
-    spacing.postWithColumns = columns[1];
+    value.columns = columns[0];
+    spacing.postColumns = columns[1];
   }
   return new sql.SqlWithPart(value);
 }
 
-WithColumns = OpenParen postLeftParen:_? head:RefName tail:(CommaSeparator RefName)* preRightParen:_? CloseParen
+
+SqlColumnList = OpenParen postLeftParen:_? head:RefName tail:(CommaSeparator RefName)* preRightParen:_? CloseParen
 {
-  return {
-    postLeftParen: postLeftParen,
-    withColumns: makeSeparatedArray(head, tail),
-    preRightParen: preRightParen
-  };
+  return new sql.SqlColumnList({
+    columns: makeSeparatedArray(head, tail)
+  }).addParens(postLeftParen, preRightParen);
 }
+
 
 SelectClause =
   selectKeyword:SelectToken
@@ -529,7 +535,7 @@ ComparisonExpression = lhs:AdditionExpression rhs:(_ ComparisonOpRhs)?
 
 ComparisonOpRhs = ComparisonOpRhsSimple / ComparisonOpRhsIs / ComparisonOpRhsIn / ComparisonOpRhsBetween / ComparisonOpRhsLike / ComparisonOpRhsNot
 
-ComparisonOpRhsSimple = op:ComparisonOperator postOp:_ rhs:(AdditionExpression / (ComparisonDecorator _ SqlInParens))
+ComparisonOpRhsSimple = op:ComparisonOperator postOp:_ rhs:(AdditionExpression / (ComparisonDecorator _ SqlQueryInParens))
 {
   const ret = {
     op: op === '!=' ? '<>' : op,
@@ -572,7 +578,7 @@ ComparisonOpRhsIs = op:IsToken postOp:_ not:(NotToken _)? rhs:SqlLiteral
   };
 }
 
-ComparisonOpRhsIn = op:InToken postOp:_ rhs:(SqlInArrayLiteral / SqlInParens)
+ComparisonOpRhsIn = op:InToken postOp:_ rhs:(SqlRecordMaybe / SqlQueryInParens)
 {
   return {
     op: op.toUpperCase(),
@@ -686,9 +692,11 @@ BaseType =
 / Interval
 / CaseExpression
 / Function
+/ SqlValues
 / SqlLiteral
 / SqlRef
-/ SqlInParens
+/ SqlRecordMaybe
+/ SqlQueryInParens
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -721,7 +729,14 @@ CaseExpression =
   });
 }
 
-SqlWhenThenPart = when:WhenToken postWhen:_ whenExpression:Expression postWhenExpression:_ then:ThenToken postThen:_ thenExpression:Expression
+SqlWhenThenPart =
+  when:WhenToken
+  postWhen:_
+  whenExpression:Expression
+  postWhenExpression:_
+  then:ThenToken
+  postThen:_
+  thenExpression:Expression
 {
   return new sql.SqlWhenThenPart({
     whenExpression: whenExpression,
@@ -1153,9 +1168,45 @@ InSeparator = left:_ separator:InToken right:_
   });
 }
 
-SqlInParens = OpenParen leftSpacing:_ ex:Sql rightSpacing:_ CloseParen
+SqlRecordMaybe = record:SqlRecord
+{
+  return record.unwrapIfSingleton();
+}
+
+SqlRecord = row:(RowToken _)? OpenParen postLeftParen:_ head:Expression tail:(CommaSeparator Expression)* postExpressions:_ CloseParen
+{
+  var value = {
+    expressions: makeSeparatedArray(head, tail),
+    spacing: {
+      postLeftParen: postLeftParen,
+      postExpressions: postExpressions
+    }
+  }
+
+  if (row) {
+    value.keywords = { row: row[0] };
+    value.spacing.postRow = row[1];
+  }
+
+  return new sql.SqlRecord(value);
+}
+
+SqlQueryInParens = OpenParen leftSpacing:_ ex:SqlQuery rightSpacing:_ CloseParen
 {
   return ex.addParens(leftSpacing, rightSpacing);
+}
+
+SqlValues = values:ValuesToken postValues:_ head:SqlRecord tail:(CommaSeparator SqlRecord)*
+{
+  return new sql.SqlValues({
+    records: makeSeparatedArray(head, tail),
+    keywords: {
+      values: values
+    },
+    spacing: {
+      postValues: postValues
+    }
+  });
 }
 
 SqlPlaceholder = "?"
@@ -1249,18 +1300,6 @@ Timestamp = timestamp:(TimestampToken / DateToken) postTimestamp:_ v:SingleQuote
 }
 
 /* Array */
-
-SqlInArrayLiteral = '(' _ vs:ArrayEntries? _ ')'
-{
-  var values = (vs || []).map(function(d) {
-    return d.value;
-  });
-
-  return new sql.SqlLiteral({
-    value: values,
-    stringValue: text()
-  });
-}
 
 ArrayEntries = head:ArrayEntry tail:(CommaSeparator ArrayEntry)*
 {
@@ -1423,6 +1462,7 @@ OrderToken = $("ORDER"i !IdentifierPart)
 OuterToken = $("OUTER"i !IdentifierPart)
 PlanToken = $("PLAN"i !IdentifierPart)
 PositionToken = $("POSITION"i !IdentifierPart)
+RowToken = $("ROW"i !IdentifierPart)
 SelectToken = $("SELECT"i !IdentifierPart)
 SimilarToToken = $("SIMILAR"i !IdentifierPart __ ToToken)
 SomeToken = $("SOME"i !IdentifierPart)
@@ -1436,6 +1476,7 @@ TrailingToken = $("TRAILING"i !IdentifierPart)
 TrimToken = $("TRIM"i !IdentifierPart)
 TrueToken = $("TRUE"i !IdentifierPart) { return { value: true, stringValue: text() }; }
 UnionToken = $("UNION"i !IdentifierPart __ AllToken)
+ValuesToken = $("VALUES"i !IdentifierPart)
 WhenToken = $("WHEN"i !IdentifierPart)
 WhereToken = $("WHERE"i !IdentifierPart)
 WithToken = $("WITH"i !IdentifierPart)

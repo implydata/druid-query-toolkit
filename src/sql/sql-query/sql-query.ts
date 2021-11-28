@@ -197,7 +197,7 @@ export class SqlQuery extends SqlExpression {
       unionQuery,
     } = this;
 
-    const rawParts: string[] = [this.getSpace('preQuery', '')];
+    const rawParts: string[] = [];
 
     // Explain clause
     if (explainClause) {
@@ -270,8 +270,6 @@ export class SqlQuery extends SqlExpression {
         unionQuery.toString(),
       );
     }
-
-    rawParts.push(this.getSpace('postQuery', ''));
 
     return rawParts.join('');
   }

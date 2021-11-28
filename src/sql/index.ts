@@ -20,6 +20,7 @@
 export * from './utils';
 export * from './sql-base';
 export * from './sql-expression';
+export * from './sql-column-list/sql-column-list';
 export * from './sql-placeholder/sql-placeholder';
 export * from './sql-literal/sql-literal';
 export * from './sql-interval/sql-interval';
@@ -37,6 +38,8 @@ export * from './sql-alias/sql-alias';
 
 export * from './sql-clause';
 
+export * from './sql-record/sql-record';
+export * from './sql-values/sql-values';
 export * from './sql-function/sql-function';
 export * from './sql-query/sql-query';
 export * from './sql-with-query/sql-with-query';

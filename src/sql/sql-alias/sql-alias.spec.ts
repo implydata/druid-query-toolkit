@@ -48,6 +48,7 @@ describe('SqlAlias', () => {
             "name": "City",
             "quotes": false,
           },
+          "columns": undefined,
           "expression": SqlRef {
             "columnRefName": RefName {
               "name": "city",
@@ -82,6 +83,7 @@ describe('SqlAlias', () => {
             "name": "City",
             "quotes": false,
           },
+          "columns": undefined,
           "expression": SqlRef {
             "columnRefName": RefName {
               "name": "city",
@@ -122,6 +124,7 @@ describe('SqlAlias', () => {
             "name": "City",
             "quotes": false,
           },
+          "columns": undefined,
           "expression": SqlRef {
             "columnRefName": RefName {
               "name": "city",

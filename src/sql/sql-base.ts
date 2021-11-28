@@ -41,8 +41,11 @@ export type Matcher = (t: SqlBase, stack: SqlBase[]) => boolean;
 
 export type SqlType =
   | 'base'
+  | 'columnList'
+  | 'record'
   | 'query'
   | 'withQuery'
+  | 'values'
   | 'withClause'
   | 'whereClause'
   | 'orderByExpression'
@@ -298,7 +301,7 @@ export abstract class SqlBase {
         str = `(${paren.leftSpacing}${str}${paren.rightSpacing})`;
       }
     }
-    return str;
+    return this.getSpace('initial', '') + str + this.getSpace('final', '');
   }
 
   public walk(fn: Substitutor): SqlBase {

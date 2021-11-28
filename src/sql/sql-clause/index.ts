@@ -22,7 +22,7 @@ export * from './sql-explain-clause/sql-explain-clause';
 export * from './sql-insert-clause/sql-insert-clause';
 export * from './sql-order-by-expression/sql-order-by-expression';
 export * from './sql-order-by-clause/sql-order-by-clause';
-export * from './sql-join-part/sql-join-part';
+export * from './sql-from-clause/sql-join-part';
 export * from './sql-from-clause/sql-from-clause';
 export * from './sql-group-by-clause/sql-group-by-clause';
 export * from './sql-where-clause/sql-where-clause';

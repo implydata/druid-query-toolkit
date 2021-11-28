@@ -14,12 +14,13 @@
 
 import { SqlQuery } from '../..';
 import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../../sql-base';
+import { SqlColumnList } from '../../sql-column-list/sql-column-list';
 import { RefName, SeparatedArray } from '../../utils';
 
 export interface SqlWithPartValue extends SqlBaseValue {
-  withTable: RefName;
-  withColumns?: SeparatedArray<RefName>;
-  withQuery: SqlQuery;
+  table: RefName;
+  columns?: SqlColumnList;
+  query: SqlQuery;
 }
 
 export class SqlWithPart extends SqlBase {
@@ -29,68 +30,72 @@ export class SqlWithPart extends SqlBase {
 
   static simple(name: string, query: SqlQuery): SqlWithPart {
     return new SqlWithPart({
-      withTable: RefName.create(name),
-      withQuery: query.ensureParens(),
+      table: RefName.create(name),
+      query: query.ensureParens(),
     });
   }
 
-  public readonly withTable: RefName;
-  public readonly withColumns?: SeparatedArray<RefName>;
-  public readonly withQuery: SqlQuery;
+  public readonly table: RefName;
+  public readonly columns?: SqlColumnList;
+  public readonly query: SqlQuery;
 
   constructor(options: SqlWithPartValue) {
     super(options, SqlWithPart.type);
-    this.withTable = options.withTable;
-    this.withColumns = options.withColumns;
-    this.withQuery = options.withQuery;
+    this.table = options.table;
+    this.columns = options.columns;
+    this.query = options.query;
   }
 
   public valueOf(): SqlWithPartValue {
     const value = super.valueOf() as SqlWithPartValue;
-    value.withTable = this.withTable;
-    value.withColumns = this.withColumns;
-    value.withQuery = this.withQuery;
+    value.table = this.table;
+    value.columns = this.columns;
+    value.query = this.query;
     return value;
   }
 
   protected _toRawString(): string {
-    const rawParts: string[] = [this.withTable.toString(), this.getSpace('postWithTable')];
+    const rawParts: string[] = [this.table.toString(), this.getSpace('postTable')];
 
-    if (this.withColumns) {
-      rawParts.push(
-        '(',
-        this.getSpace('postLeftParen'),
-        this.withColumns.toString('\n'),
-        this.getSpace('preRightParen'),
-        ')',
-        this.getSpace('postWithColumns'),
-      );
+    if (this.columns) {
+      rawParts.push(this.columns.toString(), this.getSpace('postColumns'));
     }
 
     rawParts.push(
       this.getKeyword('as', SqlWithPart.DEFAULT_AS_KEYWORD),
       this.getSpace('postAs'),
-      this.withQuery.toString(),
+      this.query.toString(),
     );
 
     return rawParts.join('');
   }
 
-  public changeWithTable(withTable: RefName): this {
+  public changeTable(table: RefName): this {
     const value = this.valueOf();
-    value.withTable = withTable;
+    value.table = table;
     return SqlBase.fromValue(value);
   }
 
-  public changeWithColumns(withColumns: SeparatedArray<RefName>): this {
+  public changeColumns(
+    columns: SqlColumnList | SeparatedArray<RefName> | RefName[] | undefined,
+  ): this {
     const value = this.valueOf();
-    value.withColumns = withColumns;
+    if (!columns) {
+      value.spacing = this.getSpacingWithout('postWithColumns');
+      delete value.columns;
+    } else if (columns instanceof SqlColumnList) {
+      value.columns = columns;
+    } else {
+      value.columns = this.columns
+        ? this.columns.changeColumns(columns)
+        : SqlColumnList.create(columns);
+    }
     return SqlBase.fromValue(value);
   }
 
-  public changeWithQuery(withQuery: SqlQuery): this {
+  public changeQuery(query: SqlQuery): this {
     const value = this.valueOf();
-    value.withQuery = withQuery;
+    value.query = query;
     return SqlBase.fromValue(value);
   }
 
@@ -101,20 +106,13 @@ export class SqlWithPart extends SqlBase {
   ): SqlBase | undefined {
     let ret = this;
 
-    const withQuery = this.withQuery._walkHelper(nextStack, fn, postorder);
-    if (!withQuery) return;
-    if (withQuery !== this.withQuery) {
-      ret = ret.changeWithQuery(withQuery as SqlQuery);
+    const query = this.query._walkHelper(nextStack, fn, postorder);
+    if (!query) return;
+    if (query !== this.query) {
+      ret = ret.changeQuery(query as SqlQuery);
     }
 
     return ret;
-  }
-
-  public clearOwnSeparators(): this {
-    if (!this.withColumns) return this;
-    const value = this.valueOf();
-    value.withColumns = this.withColumns.clearSeparators();
-    return SqlBase.fromValue(value);
   }
 }
 

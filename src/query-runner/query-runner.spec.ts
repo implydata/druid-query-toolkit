@@ -297,6 +297,7 @@ describe('QueryRunner', () => {
                   "name": "Count",
                   "quotes": true,
                 },
+                "columns": undefined,
                 "expression": SqlFunction {
                   "args": SeparatedArray {
                     "separators": Array [],
@@ -336,7 +337,6 @@ describe('QueryRunner', () => {
             ],
           },
           "spacing": Object {
-            "postQuery": "",
             "postSelect": "
         ",
             "preFromClause": "
@@ -345,7 +345,6 @@ describe('QueryRunner', () => {
       ",
             "preOrderByClause": "
       ",
-            "preQuery": "",
           },
           "type": "query",
           "unionQuery": undefined,
@@ -522,6 +521,7 @@ describe('QueryRunner', () => {
                   "name": "Count",
                   "quotes": true,
                 },
+                "columns": undefined,
                 "expression": SqlFunction {
                   "args": SeparatedArray {
                     "separators": Array [],
@@ -561,7 +561,6 @@ describe('QueryRunner', () => {
             ],
           },
           "spacing": Object {
-            "postQuery": "",
             "postSelect": "
         ",
             "preFromClause": "
@@ -570,7 +569,6 @@ describe('QueryRunner', () => {
       ",
             "preOrderByClause": "
       ",
-            "preQuery": "",
           },
           "type": "query",
           "unionQuery": undefined,
@@ -748,6 +746,7 @@ describe('QueryRunner', () => {
                   "name": "Count",
                   "quotes": true,
                 },
+                "columns": undefined,
                 "expression": SqlFunction {
                   "args": SeparatedArray {
                     "separators": Array [],
@@ -787,7 +786,6 @@ describe('QueryRunner', () => {
             ],
           },
           "spacing": Object {
-            "postQuery": "",
             "postSelect": "
         ",
             "preFromClause": "
@@ -796,7 +794,6 @@ describe('QueryRunner', () => {
       ",
             "preOrderByClause": "
       ",
-            "preQuery": "",
           },
           "type": "query",
           "unionQuery": undefined,

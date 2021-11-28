@@ -13,6 +13,7 @@
  */
 
 import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../sql-base';
+import { SqlColumnList } from '../sql-column-list/sql-column-list';
 import { SqlExpression } from '../sql-expression';
 import { SqlRef } from '../sql-ref/sql-ref';
 import { RefName } from '../utils';
@@ -20,6 +21,7 @@ import { RefName } from '../utils';
 export interface SqlAliasValue extends SqlBaseValue {
   expression: SqlExpression;
   alias: RefName;
+  columns?: SqlColumnList;
 }
 
 export class SqlAlias extends SqlExpression {
@@ -47,17 +49,20 @@ export class SqlAlias extends SqlExpression {
 
   public readonly expression: SqlExpression;
   public readonly alias: RefName;
+  public readonly columns?: SqlColumnList;
 
   constructor(options: SqlAliasValue) {
     super(options, SqlAlias.type);
     this.expression = options.expression;
     this.alias = options.alias;
+    this.columns = options.columns;
   }
 
   public valueOf() {
     const value = super.valueOf() as SqlAliasValue;
     value.expression = this.expression;
     value.alias = this.alias;
+    value.columns = this.columns;
     return value;
   }
 
@@ -69,6 +74,10 @@ export class SqlAlias extends SqlExpression {
     }
 
     rawParts.push(this.getSpace('preAlias'), this.alias.toString());
+
+    if (this.columns) {
+      rawParts.push(this.getSpace('preColumns'), this.columns.toString());
+    }
 
     return rawParts.join('');
   }

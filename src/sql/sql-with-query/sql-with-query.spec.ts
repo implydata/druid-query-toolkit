@@ -133,10 +133,8 @@ describe('SqlWithQuery', () => {
             ],
           },
           "spacing": Object {
-            "postQuery": "",
             "postSelect": " ",
             "preFromClause": " ",
-            "preQuery": "",
           },
           "type": "query",
           "unionQuery": undefined,
@@ -144,9 +142,7 @@ describe('SqlWithQuery', () => {
           "withClause": undefined,
         },
         "spacing": Object {
-          "postQuery": "",
           "postWithClause": " ",
-          "preQuery": "",
         },
         "type": "withQuery",
         "withClause": SqlWithClause {
@@ -161,16 +157,11 @@ describe('SqlWithQuery', () => {
             "separators": Array [],
             "values": Array [
               SqlWithPart {
+                "columns": undefined,
                 "keywords": Object {
                   "as": "AS",
                 },
-                "spacing": Object {
-                  "postAs": " ",
-                  "postWithTable": " ",
-                },
-                "type": "withPart",
-                "withColumns": undefined,
-                "withQuery": SqlQuery {
+                "query": SqlQuery {
                   "decorator": undefined,
                   "explainClause": undefined,
                   "fromClause": SqlFromClause {
@@ -226,20 +217,23 @@ describe('SqlWithQuery', () => {
                     ],
                   },
                   "spacing": Object {
-                    "postQuery": "",
                     "postSelect": " ",
                     "preFromClause": " ",
-                    "preQuery": "",
                   },
                   "type": "query",
                   "unionQuery": undefined,
                   "whereClause": undefined,
                   "withClause": undefined,
                 },
-                "withTable": RefName {
+                "spacing": Object {
+                  "postAs": " ",
+                  "postTable": " ",
+                },
+                "table": RefName {
                   "name": "wiki",
                   "quotes": false,
                 },
+                "type": "withPart",
               },
             ],
           },

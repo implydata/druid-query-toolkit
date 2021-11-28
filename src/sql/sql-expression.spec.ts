@@ -25,6 +25,9 @@ describe('SqlExpression', () => {
       `(TIMESTAMP '2019-08-27 18:00:00'<=(t."__time") AND (t."__time")<TIMESTAMP '2019-08-28 00:00:00')`,
       `COALESCE(CASE WHEN (TIMESTAMP '2019-08-27 18:00:00'<=(t."__time") AND (t."__time")<TIMESTAMP '2019-08-28 00:00:00') THEN (t."__time") END, TIME_SHIFT((t."__time"), 'PT6H', 1, 'Etc/UTC'))`,
       `TIME_FLOOR(COALESCE(CASE WHEN (TIMESTAMP '2019-08-27 18:00:00'<=(t."__time") AND (t."__time")<TIMESTAMP '2019-08-28 00:00:00') THEN (t."__time") END, TIME_SHIFT((t."__time"), 'PT6H', 1, 'Etc/UTC')), 'PT5M', NULL, 'Etc/UTC')`,
+      't AS x (a, b, "c")',
+      `VALUES   (1, 1 + 1),(2, 1 + 1)`,
+      `VALUES('Toy' || 'ota', 2, 2+2, CURRENT_TIMESTAMP), ROW('Honda', (SELECT COUNT(*) FROM wikipedia), GREATEST(5, 1), CURRENT_TIMESTAMP - INTERVAL '1' DAY)`,
     ];
 
     for (const sql of queries) {

@@ -393,10 +393,8 @@ describe('#convertToTableRef', () => {
           ],
         },
         "spacing": Object {
-          "postQuery": "",
           "postSelect": " ",
           "preFromClause": " ",
-          "preQuery": "",
         },
         "type": "query",
         "unionQuery": undefined,

@@ -21,10 +21,13 @@ describe('SqlComparison', () => {
       '1 = 2',
       '1 != 2',
       '1 <> 2',
+      '(1, ROW(2)) = Row (1, 1 + 1)',
+
       '1 < 2',
       '1 > 2',
       '1 <= 2',
       '1 >= 2',
+      ' 1 >= 2  ',
 
       `X = ANY (SELECT page FROM wikipedia GROUP BY 1 ORDER BY COUNT(*) DESC LIMIT 5)`,
       `X <> any (SELECT page FROM wikipedia GROUP BY 1 ORDER BY COUNT(*) DESC LIMIT 5)`,
@@ -34,8 +37,12 @@ describe('SqlComparison', () => {
       `X >= some (SELECT page FROM wikipedia GROUP BY 1 ORDER BY COUNT(*) DESC LIMIT 5)`,
 
       `X IN ('moon', 'beam')`,
+      `X IN ('mo' || 'on', 'be' || 'am')`,
       `X NOT IN ('moon', 'beam')`,
       `X IN (SELECT page FROM wikipedia GROUP BY 1 ORDER BY COUNT(*) DESC LIMIT 5)`,
+      `X IN ((SELECT page FROM wikipedia GROUP BY 1 ORDER BY COUNT(*) DESC LIMIT 5))`,
+      `(browser, country) IN (ROW ('Chr' || 'ome', 'United States'), ('Firefox', 'Israel'))`,
+      `(1, 2) IN (VALUES   (1, 1 + 1),(2, 1 + 1))`,
 
       "''  similar to ''",
       "'a' similar to 'a'",
@@ -354,13 +361,11 @@ describe('SqlComparison', () => {
             ],
           },
           "spacing": Object {
-            "postQuery": "",
             "postSelect": " ",
             "preFromClause": " ",
             "preGroupByClause": " ",
             "preLimitClause": " ",
             "preOrderByClause": " ",
-            "preQuery": "",
           },
           "type": "query",
           "unionQuery": undefined,
@@ -460,7 +465,7 @@ describe('SqlComparison', () => {
   });
 
   it('works with IN (values)', () => {
-    const sql = `X IN (1, 2, 3)`;
+    const sql = `X IN (1, 2, 4 - 1)`;
 
     backAndForth(sql);
 
@@ -483,16 +488,74 @@ describe('SqlComparison', () => {
         },
         "not": false,
         "op": "IN",
-        "rhs": SqlLiteral {
+        "rhs": SqlRecord {
+          "expressions": SeparatedArray {
+            "separators": Array [
+              Separator {
+                "left": "",
+                "right": " ",
+                "separator": ",",
+              },
+              Separator {
+                "left": "",
+                "right": " ",
+                "separator": ",",
+              },
+            ],
+            "values": Array [
+              SqlLiteral {
+                "keywords": Object {},
+                "spacing": Object {},
+                "stringValue": "1",
+                "type": "literal",
+                "value": 1,
+              },
+              SqlLiteral {
+                "keywords": Object {},
+                "spacing": Object {},
+                "stringValue": "2",
+                "type": "literal",
+                "value": 2,
+              },
+              SqlMulti {
+                "args": SeparatedArray {
+                  "separators": Array [
+                    Separator {
+                      "left": " ",
+                      "right": " ",
+                      "separator": "-",
+                    },
+                  ],
+                  "values": Array [
+                    SqlLiteral {
+                      "keywords": Object {},
+                      "spacing": Object {},
+                      "stringValue": "4",
+                      "type": "literal",
+                      "value": 4,
+                    },
+                    SqlLiteral {
+                      "keywords": Object {},
+                      "spacing": Object {},
+                      "stringValue": "1",
+                      "type": "literal",
+                      "value": 1,
+                    },
+                  ],
+                },
+                "keywords": Object {},
+                "op": "-",
+                "spacing": Object {},
+                "type": "multi",
+              },
+            ],
+          },
           "keywords": Object {},
-          "spacing": Object {},
-          "stringValue": "(1, 2, 3)",
-          "type": "literal",
-          "value": Array [
-            1,
-            2,
-            3,
-          ],
+          "spacing": Object {
+            "postExpressions": "",
+            "postLeftParen": "",
+          },
+          "type": "record",
         },
         "spacing": Object {
           "postOp": " ",
@@ -504,7 +567,7 @@ describe('SqlComparison', () => {
   });
 
   it('works with NOT IN (values)', () => {
-    const sql = `X NOT IN (1, 2, 3)`;
+    const sql = `X NOT IN (1, 2, 4 - 1)`;
 
     backAndForth(sql);
 
@@ -528,16 +591,74 @@ describe('SqlComparison', () => {
         },
         "not": true,
         "op": "IN",
-        "rhs": SqlLiteral {
+        "rhs": SqlRecord {
+          "expressions": SeparatedArray {
+            "separators": Array [
+              Separator {
+                "left": "",
+                "right": " ",
+                "separator": ",",
+              },
+              Separator {
+                "left": "",
+                "right": " ",
+                "separator": ",",
+              },
+            ],
+            "values": Array [
+              SqlLiteral {
+                "keywords": Object {},
+                "spacing": Object {},
+                "stringValue": "1",
+                "type": "literal",
+                "value": 1,
+              },
+              SqlLiteral {
+                "keywords": Object {},
+                "spacing": Object {},
+                "stringValue": "2",
+                "type": "literal",
+                "value": 2,
+              },
+              SqlMulti {
+                "args": SeparatedArray {
+                  "separators": Array [
+                    Separator {
+                      "left": " ",
+                      "right": " ",
+                      "separator": "-",
+                    },
+                  ],
+                  "values": Array [
+                    SqlLiteral {
+                      "keywords": Object {},
+                      "spacing": Object {},
+                      "stringValue": "4",
+                      "type": "literal",
+                      "value": 4,
+                    },
+                    SqlLiteral {
+                      "keywords": Object {},
+                      "spacing": Object {},
+                      "stringValue": "1",
+                      "type": "literal",
+                      "value": 1,
+                    },
+                  ],
+                },
+                "keywords": Object {},
+                "op": "-",
+                "spacing": Object {},
+                "type": "multi",
+              },
+            ],
+          },
           "keywords": Object {},
-          "spacing": Object {},
-          "stringValue": "(1, 2, 3)",
-          "type": "literal",
-          "value": Array [
-            1,
-            2,
-            3,
-          ],
+          "spacing": Object {
+            "postExpressions": "",
+            "postLeftParen": "",
+          },
+          "type": "record",
         },
         "spacing": Object {
           "not": " ",
@@ -550,7 +671,7 @@ describe('SqlComparison', () => {
   });
 
   it('works with IN (subquery)', () => {
-    const sql = `X IN (SELECT val FROM tbl LIMIT 1)`;
+    const sql = `X IN ( (SELECT val FROM tbl LIMIT 1  ))`;
 
     backAndForth(sql);
 
@@ -628,6 +749,10 @@ describe('SqlComparison', () => {
           "parens": Array [
             Object {
               "leftSpacing": "",
+              "rightSpacing": "  ",
+            },
+            Object {
+              "leftSpacing": " ",
               "rightSpacing": "",
             },
           ],
@@ -648,11 +773,9 @@ describe('SqlComparison', () => {
             ],
           },
           "spacing": Object {
-            "postQuery": "",
             "postSelect": " ",
             "preFromClause": " ",
             "preLimitClause": " ",
-            "preQuery": "",
           },
           "type": "query",
           "unionQuery": undefined,
@@ -768,11 +891,9 @@ describe('SqlComparison', () => {
             ],
           },
           "spacing": Object {
-            "postQuery": "",
             "postSelect": " ",
             "preFromClause": " ",
             "preLimitClause": " ",
-            "preQuery": "",
           },
           "type": "query",
           "unionQuery": undefined,
@@ -781,6 +902,178 @@ describe('SqlComparison', () => {
         },
         "spacing": Object {
           "not": " ",
+          "postOp": " ",
+          "preOp": " ",
+        },
+        "type": "comparison",
+      }
+    `);
+  });
+
+  it('works with IN nested record', () => {
+    const sql = `(browser, country) IN (('Chr' || 'ome', 'United States'), ('Firefox', 'Israel'))`;
+
+    backAndForth(sql);
+
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+      SqlComparison {
+        "decorator": undefined,
+        "keywords": Object {
+          "op": "IN",
+        },
+        "lhs": SqlRecord {
+          "expressions": SeparatedArray {
+            "separators": Array [
+              Separator {
+                "left": "",
+                "right": " ",
+                "separator": ",",
+              },
+            ],
+            "values": Array [
+              SqlRef {
+                "columnRefName": RefName {
+                  "name": "browser",
+                  "quotes": false,
+                },
+                "keywords": Object {},
+                "namespaceRefName": undefined,
+                "spacing": Object {},
+                "tableRefName": undefined,
+                "type": "ref",
+              },
+              SqlRef {
+                "columnRefName": RefName {
+                  "name": "country",
+                  "quotes": false,
+                },
+                "keywords": Object {},
+                "namespaceRefName": undefined,
+                "spacing": Object {},
+                "tableRefName": undefined,
+                "type": "ref",
+              },
+            ],
+          },
+          "keywords": Object {},
+          "spacing": Object {
+            "postExpressions": "",
+            "postLeftParen": "",
+          },
+          "type": "record",
+        },
+        "not": false,
+        "op": "IN",
+        "rhs": SqlRecord {
+          "expressions": SeparatedArray {
+            "separators": Array [
+              Separator {
+                "left": "",
+                "right": " ",
+                "separator": ",",
+              },
+            ],
+            "values": Array [
+              SqlRecord {
+                "expressions": SeparatedArray {
+                  "separators": Array [
+                    Separator {
+                      "left": "",
+                      "right": " ",
+                      "separator": ",",
+                    },
+                  ],
+                  "values": Array [
+                    SqlMulti {
+                      "args": SeparatedArray {
+                        "separators": Array [
+                          Separator {
+                            "left": " ",
+                            "right": " ",
+                            "separator": "||",
+                          },
+                        ],
+                        "values": Array [
+                          SqlLiteral {
+                            "keywords": Object {},
+                            "spacing": Object {},
+                            "stringValue": "'Chr'",
+                            "type": "literal",
+                            "value": "Chr",
+                          },
+                          SqlLiteral {
+                            "keywords": Object {},
+                            "spacing": Object {},
+                            "stringValue": "'ome'",
+                            "type": "literal",
+                            "value": "ome",
+                          },
+                        ],
+                      },
+                      "keywords": Object {},
+                      "op": "||",
+                      "spacing": Object {},
+                      "type": "multi",
+                    },
+                    SqlLiteral {
+                      "keywords": Object {},
+                      "spacing": Object {},
+                      "stringValue": "'United States'",
+                      "type": "literal",
+                      "value": "United States",
+                    },
+                  ],
+                },
+                "keywords": Object {},
+                "spacing": Object {
+                  "postExpressions": "",
+                  "postLeftParen": "",
+                },
+                "type": "record",
+              },
+              SqlRecord {
+                "expressions": SeparatedArray {
+                  "separators": Array [
+                    Separator {
+                      "left": "",
+                      "right": " ",
+                      "separator": ",",
+                    },
+                  ],
+                  "values": Array [
+                    SqlLiteral {
+                      "keywords": Object {},
+                      "spacing": Object {},
+                      "stringValue": "'Firefox'",
+                      "type": "literal",
+                      "value": "Firefox",
+                    },
+                    SqlLiteral {
+                      "keywords": Object {},
+                      "spacing": Object {},
+                      "stringValue": "'Israel'",
+                      "type": "literal",
+                      "value": "Israel",
+                    },
+                  ],
+                },
+                "keywords": Object {},
+                "spacing": Object {
+                  "postExpressions": "",
+                  "postLeftParen": "",
+                },
+                "type": "record",
+              },
+            ],
+          },
+          "keywords": Object {},
+          "spacing": Object {
+            "postExpressions": "",
+            "postLeftParen": "",
+          },
+          "type": "record",
+        },
+        "spacing": Object {
           "postOp": " ",
           "preOp": " ",
         },
