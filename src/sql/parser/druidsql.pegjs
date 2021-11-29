@@ -1196,17 +1196,41 @@ SqlQueryInParens = OpenParen leftSpacing:_ ex:SqlQuery rightSpacing:_ CloseParen
   return ex.addParens(leftSpacing, rightSpacing);
 }
 
-SqlValues = values:ValuesToken postValues:_ head:SqlRecord tail:(CommaSeparator SqlRecord)*
+SqlValues =
+  values:ValuesToken
+  postValues:_
+  head:SqlRecord
+  tail:(CommaSeparator SqlRecord)*
+  orderByClause:(_ OrderByClause)?
+  limitClause:(_ LimitClause)?
+  offsetClause:(_ OffsetClause)?
 {
-  return new sql.SqlValues({
+  var value = {
     records: makeSeparatedArray(head, tail),
     keywords: {
       values: values
-    },
-    spacing: {
-      postValues: postValues
     }
-  });
+  };
+  var spacing = value.spacing = {
+    postValues: postValues
+  };
+
+  if (orderByClause) {
+    spacing.preOrderByClause = orderByClause[0];
+    value.orderByClause = orderByClause[1];
+  }
+
+  if (limitClause) {
+    spacing.preLimitClause = limitClause[0];
+    value.limitClause = limitClause[1];
+  }
+
+  if (offsetClause) {
+    spacing.preOffsetClause = offsetClause[0];
+    value.offsetClause = offsetClause[1];
+  }
+
+  return new sql.SqlValues(value);
 }
 
 SqlPlaceholder = "?"
