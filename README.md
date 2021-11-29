@@ -2,7 +2,7 @@
 
 # Druid Query Toolkit
 
-A number of tools to make working with Druid queries a treat.
+A number of tools to make working with [Druid queries](https://calcite.apache.org/docs/reference.html) a treat.
 There are a number of use cases for this toolkit and one of the chief use cases can be found in Druid's own [web-console](https://druid.apache.org/docs/latest/operations/druid-console.html).
 
 Search for uses within [web-console/src](https://github.com/apache/druid/tree/master/web-console/src) for some examples.

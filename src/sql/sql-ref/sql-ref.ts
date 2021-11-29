@@ -113,9 +113,20 @@ export class SqlRef extends SqlExpression {
     return SqlBase.fromValue(value);
   }
 
-  public changeTableRefName(tableRefName: RefName): this {
+  public changeTableRefName(tableRefName: RefName | undefined): this {
     const value = this.valueOf();
-    value.tableRefName = tableRefName;
+    if (tableRefName) {
+      value.tableRefName = tableRefName;
+    } else {
+      delete value.tableRefName;
+      delete value.namespaceRefName;
+      value.spacing = this.getSpacingWithout(
+        'preTableDot',
+        'postTableDot',
+        'preNamespaceDot',
+        'postNamespaceDot',
+      );
+    }
     return SqlBase.fromValue(value);
   }
 
@@ -124,19 +135,23 @@ export class SqlRef extends SqlExpression {
   }
 
   public changeTable(table: string | undefined): this {
-    const { tableRefName } = this;
-    const value = this.valueOf();
-    if (table) {
-      value.tableRefName = tableRefName ? tableRefName.changeName(table) : RefName.create(table);
-    } else {
-      delete value.tableRefName;
-    }
-    return SqlBase.fromValue(value);
+    return this.changeTableRefName(
+      table
+        ? this.tableRefName
+          ? this.tableRefName.changeName(table)
+          : RefName.create(table)
+        : undefined,
+    );
   }
 
-  public changeNamespaceRefName(namespaceRefName: RefName): this {
+  public changeNamespaceRefName(namespaceRefName: RefName | undefined): this {
     const value = this.valueOf();
-    value.namespaceRefName = namespaceRefName;
+    if (namespaceRefName) {
+      value.namespaceRefName = namespaceRefName;
+    } else {
+      delete value.namespaceRefName;
+      value.spacing = this.getSpacingWithout('preNamespaceDot', 'postNamespaceDot');
+    }
     return SqlBase.fromValue(value);
   }
 
@@ -145,16 +160,13 @@ export class SqlRef extends SqlExpression {
   }
 
   public changeNamespace(namespace: string | undefined): this {
-    const { namespaceRefName } = this;
-    const value = this.valueOf();
-    if (namespace) {
-      value.namespaceRefName = namespaceRefName
-        ? namespaceRefName.changeName(namespace)
-        : RefName.create(namespace);
-    } else {
-      delete value.namespaceRefName;
-    }
-    return SqlBase.fromValue(value);
+    return this.changeNamespaceRefName(
+      namespace
+        ? this.namespaceRefName
+          ? this.namespaceRefName.changeName(namespace)
+          : RefName.create(namespace)
+        : undefined,
+    );
   }
 
   public getOutputName(): string {

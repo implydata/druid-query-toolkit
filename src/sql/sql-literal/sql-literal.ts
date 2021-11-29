@@ -221,19 +221,19 @@ export class SqlLiteral extends SqlExpression {
     return isDate(this.value);
   }
 
-  getNumberValue(): number | bigint | undefined {
+  public getNumberValue(): number | bigint | undefined {
     const { value } = this;
     if (typeof value !== 'number' && typeof value !== 'bigint') return;
     return value;
   }
 
-  getStringValue(): string | undefined {
+  public getStringValue(): string | undefined {
     const { value } = this;
     if (typeof value !== 'string') return;
     return value;
   }
 
-  getDateValue(): Date | undefined {
+  public getDateValue(): Date | undefined {
     const { value } = this;
     if (!isDate(value)) return;
     return value;
