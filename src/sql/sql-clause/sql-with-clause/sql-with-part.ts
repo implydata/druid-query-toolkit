@@ -81,7 +81,7 @@ export class SqlWithPart extends SqlBase {
   ): this {
     const value = this.valueOf();
     if (!columns) {
-      value.spacing = this.getSpacingWithout('postWithColumns');
+      value.spacing = this.getSpacingWithout('postColumns');
       delete value.columns;
     } else if (columns instanceof SqlColumnList) {
       value.columns = columns;

@@ -75,10 +75,126 @@ export type SqlType =
   | 'tableRef'
   | 'unary';
 
+export type KeywordName =
+  | 'and'
+  | 'as'
+  | 'by'
+  | 'case'
+  | 'decorator'
+  | 'direction'
+  | 'else'
+  | 'end'
+  | 'escape'
+  | 'explain'
+  | 'filter'
+  | 'for'
+  | 'from'
+  | 'functionName'
+  | 'group'
+  | 'having'
+  | 'insert'
+  | 'interval'
+  | 'into'
+  | 'join'
+  | 'joinType'
+  | 'limit'
+  | 'not'
+  | 'offset'
+  | 'on'
+  | 'op'
+  | 'order'
+  | 'plan'
+  | 'row'
+  | 'select'
+  | 'symmetric'
+  | 'then'
+  | 'timestamp'
+  | 'union'
+  | 'values'
+  | 'when'
+  | 'where'
+  | 'with';
+
+export type SpaceName =
+  | 'initial'
+  | 'final'
+  | 'not'
+  | 'postAnd'
+  | 'postArguments'
+  | 'postAs'
+  | 'postBy'
+  | 'postCase'
+  | 'postCaseExpression'
+  | 'postColumns'
+  | 'postDecorator'
+  | 'postElse'
+  | 'postEscape'
+  | 'postExplain'
+  | 'postExplainClause'
+  | 'postExpressions'
+  | 'postFilter'
+  | 'postFrom'
+  | 'postGroup'
+  | 'postHaving'
+  | 'postInsert'
+  | 'postInsertClause'
+  | 'postInterval'
+  | 'postIntervalValue'
+  | 'postInto'
+  | 'postJoin'
+  | 'postJoinType'
+  | 'postLeftParen'
+  | 'postLimit'
+  | 'postNamespaceDot'
+  | 'postOffset'
+  | 'postOn'
+  | 'postOp'
+  | 'postOrder'
+  | 'postPlan'
+  | 'postQuery'
+  | 'postRow'
+  | 'postSelect'
+  | 'postSymmetric'
+  | 'postTable'
+  | 'postTableDot'
+  | 'postThen'
+  | 'postTimestamp'
+  | 'postUnion'
+  | 'postValues'
+  | 'postWhen'
+  | 'postWhenExpression'
+  | 'postWhere'
+  | 'postWith'
+  | 'postWithClause'
+  | 'preAlias'
+  | 'preAnd'
+  | 'preAs'
+  | 'preColumns'
+  | 'preDirection'
+  | 'preElse'
+  | 'preEnd'
+  | 'preEscape'
+  | 'preFilter'
+  | 'preFromClause'
+  | 'preGroupByClause'
+  | 'preHavingClause'
+  | 'preJoin'
+  | 'preLeftParen'
+  | 'preLimitClause'
+  | 'preNamespaceDot'
+  | 'preOffsetClause'
+  | 'preOn'
+  | 'preOp'
+  | 'preOrderByClause'
+  | 'preQuery'
+  | 'preTableDot'
+  | 'preUnion'
+  | 'preWhereClause';
+
 export interface SqlBaseValue {
   type?: SqlType;
-  spacing?: Record<string, string>;
-  keywords?: Record<string, string>;
+  spacing?: Partial<Record<SpaceName, string>>;
+  keywords?: Partial<Record<KeywordName, string>>;
   parens?: readonly Parens[];
 }
 
@@ -260,18 +376,18 @@ export abstract class SqlBase {
     return this;
   }
 
-  public getSpace(name: string, defaultSpace = ' ') {
+  public getSpace(name: SpaceName, defaultSpace = ' ') {
     const s = this.spacing[name];
     return typeof s === 'string' ? s : defaultSpace;
   }
 
-  public changeSpace(name: string, space: string): this {
+  public changeSpace(name: SpaceName, space: string): this {
     const value = this.valueOf();
     value.spacing = { ...value.spacing, [name]: space };
     return SqlBase.fromValue(value);
   }
 
-  protected getSpacingWithout(...toRemove: string[]) {
+  protected getSpacingWithout(...toRemove: SpaceName[]) {
     const ret = { ...this.spacing };
     for (const thing of toRemove) {
       delete ret[thing];
@@ -279,11 +395,11 @@ export abstract class SqlBase {
     return ret;
   }
 
-  public getKeyword(name: string, defaultKeyword: string): string {
+  public getKeyword(name: KeywordName, defaultKeyword: string): string {
     return this.keywords[name] || SqlBase.capitalize(defaultKeyword);
   }
 
-  protected getKeywordsWithout(...toRemove: string[]) {
+  protected getKeywordsWithout(...toRemove: KeywordName[]) {
     const ret = { ...this.keywords };
     for (const thing of toRemove) {
       delete ret[thing];

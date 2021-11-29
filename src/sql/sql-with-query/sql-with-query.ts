@@ -166,7 +166,7 @@ export class SqlWithQuery extends SqlExpression {
       value.orderByClause = orderByClause;
     } else {
       delete value.orderByClause;
-      value.spacing = this.getSpacingWithout('preOrderBy');
+      value.spacing = this.getSpacingWithout('preOrderByClause');
     }
     return SqlBase.fromValue(value);
   }
@@ -194,7 +194,7 @@ export class SqlWithQuery extends SqlExpression {
       value.limitClause = limitClause;
     } else {
       delete value.limitClause;
-      value.spacing = this.getSpacingWithout('preLimit');
+      value.spacing = this.getSpacingWithout('preLimitClause');
     }
     return SqlBase.fromValue(value);
   }
@@ -215,7 +215,7 @@ export class SqlWithQuery extends SqlExpression {
       value.offsetClause = offsetClause;
     } else {
       delete value.offsetClause;
-      value.spacing = this.getSpacingWithout('preOffset');
+      value.spacing = this.getSpacingWithout('preOffsetClause');
     }
     return SqlBase.fromValue(value);
   }
