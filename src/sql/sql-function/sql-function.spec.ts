@@ -24,6 +24,7 @@ describe('SqlFunction', () => {
       "position('b' in 'abcabc' FROM 5)",
       "position('b' in 'abcabc' FROM 6)",
       "position('b' in 'abcabc' FROM -5)",
+      // "position('b' in ('abcabc') FROM -5)", // ToDo: make this work, right now it parses as an IN statement
       "position('' in 'abc' FROM 3)",
       "position('' in 'abc' FROM 10)",
       "position(x'bb' in x'aabbcc')",

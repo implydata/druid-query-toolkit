@@ -732,18 +732,19 @@ CaseExpression =
 SqlWhenThenPart =
   when:WhenToken
   postWhen:_
-  whenExpression:Expression
-  postWhenExpression:_
+  whenHead:Expression
+  whenTail:(CommaSeparator Expression)*
+  postWhenExpressions:_
   then:ThenToken
   postThen:_
   thenExpression:Expression
 {
   return new sql.SqlWhenThenPart({
-    whenExpression: whenExpression,
+    whenExpressions: makeSeparatedArray(whenHead, whenTail),
     thenExpression: thenExpression,
     spacing: {
       postWhen: postWhen,
-      postWhenExpression: postWhenExpression,
+      postWhenExpressions: postWhenExpressions,
       postThen: postThen,
     },
     keywords: {

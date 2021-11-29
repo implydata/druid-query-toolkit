@@ -14,9 +14,10 @@
 
 import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../sql-base';
 import { SqlExpression } from '../sql-expression';
+import { SeparatedArray, Separator } from '../utils';
 
 export interface SqlWhenThenPartValue extends SqlBaseValue {
-  whenExpression: SqlExpression;
+  whenExpressions: SeparatedArray<SqlExpression>;
   thenExpression: SqlExpression;
 }
 
@@ -26,25 +27,30 @@ export class SqlWhenThenPart extends SqlBase {
   static DEFAULT_WHEN_KEYWORD = 'WHEN';
   static DEFAULT_THEN_KEYWORD = 'THEN';
 
-  static create(whenExpression: SqlExpression, thenExpression: SqlExpression): SqlWhenThenPart {
+  static create(
+    whenExpressions: SeparatedArray<SqlExpression> | SqlExpression[] | SqlExpression,
+    thenExpression: SqlExpression,
+  ): SqlWhenThenPart {
     return new SqlWhenThenPart({
-      whenExpression,
+      whenExpressions: SeparatedArray.fromArray(
+        whenExpressions instanceof SqlExpression ? [whenExpressions] : whenExpressions,
+      ),
       thenExpression,
     });
   }
 
-  public readonly whenExpression: SqlExpression;
+  public readonly whenExpressions: SeparatedArray<SqlExpression>;
   public readonly thenExpression: SqlExpression;
 
   constructor(options: SqlWhenThenPartValue) {
     super(options, SqlWhenThenPart.type);
-    this.whenExpression = options.whenExpression;
+    this.whenExpressions = options.whenExpressions;
     this.thenExpression = options.thenExpression;
   }
 
   public valueOf(): SqlWhenThenPartValue {
     const value = super.valueOf() as SqlWhenThenPartValue;
-    value.whenExpression = this.whenExpression;
+    value.whenExpressions = this.whenExpressions;
     value.thenExpression = this.thenExpression;
     return value;
   }
@@ -53,18 +59,24 @@ export class SqlWhenThenPart extends SqlBase {
     return [
       this.getKeyword('when', SqlWhenThenPart.DEFAULT_WHEN_KEYWORD),
       this.getSpace('postWhen'),
-      this.whenExpression.toString(),
-      this.getSpace('postWhenExpression'),
+      this.whenExpressions.toString(Separator.COMMA),
+      this.getSpace('postWhenExpressions'),
       this.getKeyword('then', SqlWhenThenPart.DEFAULT_THEN_KEYWORD),
       this.getSpace('postThen'),
       this.thenExpression.toString(),
     ].join('');
   }
 
-  public changeWhenExpression(whenExpression: SqlExpression): this {
+  public changeWhenExpressions(
+    whenExpressions: SeparatedArray<SqlExpression> | SqlExpression[],
+  ): this {
     const value = this.valueOf();
-    value.whenExpression = whenExpression;
+    value.whenExpressions = SeparatedArray.fromArray(whenExpressions);
     return SqlBase.fromValue(value);
+  }
+
+  public changeWhenExpression(whenExpression: SqlExpression): this {
+    return this.changeWhenExpressions([whenExpression]);
   }
 
   public changeThenExpression(thenExpression: SqlExpression): this {
@@ -80,10 +92,15 @@ export class SqlWhenThenPart extends SqlBase {
   ): SqlBase | undefined {
     let ret = this;
 
-    const whenExpression = this.whenExpression._walkHelper(nextStack, fn, postorder);
-    if (!whenExpression) return;
-    if (whenExpression !== this.whenExpression) {
-      ret = ret.changeWhenExpression(whenExpression);
+    const whenExpressions = SqlBase.walkSeparatedArray(
+      this.whenExpressions,
+      nextStack,
+      fn,
+      postorder,
+    );
+    if (!whenExpressions) return;
+    if (whenExpressions !== this.whenExpressions) {
+      ret = ret.changeWhenExpressions(whenExpressions);
     }
 
     const thenExpression = this.thenExpression._walkHelper(nextStack, fn, postorder);

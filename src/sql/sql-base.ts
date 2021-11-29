@@ -162,7 +162,7 @@ export type SpaceName =
   | 'postUnion'
   | 'postValues'
   | 'postWhen'
-  | 'postWhenExpression'
+  | 'postWhenExpressions'
   | 'postWhere'
   | 'postWith'
   | 'postWithClause'
