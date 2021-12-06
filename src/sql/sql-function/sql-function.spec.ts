@@ -18,6 +18,10 @@ import { SqlExpression, SqlFunction } from '..';
 describe('SqlFunction', () => {
   it('things that work', () => {
     const queries: string[] = [
+      `COUNT(*)`,
+      `COUNT(DISTINCT blah)`,
+      `COUNT(ALL blah)`,
+
       "position('b' in 'abc')",
       "position('' in 'abc')",
       "position('b' in 'abcabc' FROM 3)",

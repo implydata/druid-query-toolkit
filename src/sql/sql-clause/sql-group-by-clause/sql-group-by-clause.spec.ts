@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { sane } from '../../../test-utils';
+import { sane } from '../../../utils';
 import { SqlQuery } from '../..';
 
 describe('SqlGroupByClause', () => {

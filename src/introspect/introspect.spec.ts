@@ -13,7 +13,7 @@
  */
 
 import { Column, Introspect, QueryResult, SqlQuery } from '..';
-import { sane } from '../test-utils';
+import { sane } from '../utils';
 
 describe('Introspect', () => {
   const emptyQueryResult = new QueryResult({

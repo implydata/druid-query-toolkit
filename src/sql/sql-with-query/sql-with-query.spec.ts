@@ -12,7 +12,8 @@
  * limitations under the License.
  */
 
-import { backAndForth, sane } from '../../test-utils';
+import { backAndForth } from '../../test-utils';
+import { sane } from '../../utils';
 import { SqlExpression } from '../sql-expression';
 
 import { SqlWithQuery } from './sql-with-query';

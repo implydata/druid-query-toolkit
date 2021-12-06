@@ -12,8 +12,20 @@
  * limitations under the License.
  */
 
-import { SqlExpression, SqlQuery, SqlRef } from '../..';
-import { sane, stringifyExpressions } from '../../test-utils';
+import { SqlBase, SqlExpression, SqlQuery, SqlRef } from '../..';
+import { sane } from '../../utils';
+
+function stringifyExpressions(v: any) {
+  return JSON.parse(
+    JSON.stringify(v, (_k: string, v: any) => {
+      if (v instanceof SqlBase) {
+        return `EX[${v}]`;
+      } else {
+        return v;
+      }
+    }),
+  );
+}
 
 describe('SqlQuery operations', () => {
   describe('#makeExplain', () => {

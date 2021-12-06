@@ -817,6 +817,7 @@ GenericFunction =
   preLeftParen:_
   OpenParen
   postLeftParen:_
+  decorator:(FunctionDecorator _)?
   head:SqlAliasExplicitAs?
   tail:(CommaSeparator SqlAliasExplicitAs)*
   postArguments:_
@@ -833,6 +834,12 @@ GenericFunction =
   var keywords = value.keywords = {
     functionName: functionName,
   };
+
+  if (decorator) {
+    value.decorator = decorator[0].toUpperCase();
+    keywords.decorator = decorator[0];
+    spacing.postDecorator = decorator[1];
+  }
 
   if (head) {
     value.args = makeSeparatedArray(head, tail);
@@ -865,7 +872,7 @@ CountFunction =
   preLeftParen:_
   OpenParen
   postLeftParen:_
-  decorator:(DistinctToken _)?
+  decorator:(FunctionDecorator _)?
   arg:(Expression / "*")
   postArguments:_
   CloseParen
@@ -1114,6 +1121,8 @@ ArrayFunction =
 
   return new sql.SqlFunction(value);
 }
+
+FunctionDecorator = DistinctToken / AllToken;
 
 FunctionFilter = filterKeyword:FilterToken postFilter:_ OpenParen postLeftParen:_ whereClause:SqlWhereClause preRightParen:_ CloseParen
 {

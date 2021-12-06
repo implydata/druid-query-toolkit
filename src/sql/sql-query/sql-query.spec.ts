@@ -21,7 +21,8 @@ import {
   SqlRef,
   SqlTableRef,
 } from '../..';
-import { backAndForth, sane } from '../../test-utils';
+import { backAndForth } from '../../test-utils';
+import { sane } from '../../utils';
 
 describe('SqlQuery', () => {
   it('things that work', () => {

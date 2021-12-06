@@ -12,89 +12,32 @@
  * limitations under the License.
  */
 
-import { backAndForth, sane } from '../../test-utils';
+import { backAndForth } from '../../test-utils';
+import { sane } from '../../utils';
 
 describe('Druid test queries', () => {
   const queries = [
     sane`
-      SELECT REGEXP_EXTRACT('foo', '^(.)')
-    `,
-    sane`
-      SELECT 1 + 1, dim1 FROM foo LIMIT 1
-    `,
-    sane`
-      SELECT dim2, AVG(m2) FROM (SELECT * FROM foo AS t1 INNER JOIN foo AS t2 ON t1.m1 = t2.m1 LIMIT 10) AS t3 GROUP BY dim2
-    `,
-    sane`
-      SELECT dim2, AVG(m2) FROM (SELECT * FROM foo AS t1 INNER JOIN foo AS t2 ON t1.m1 = t2.m1) AS t3 GROUP BY dim2
-    `,
-    sane`
-      SELECT t1.dim2, AVG(t1.m2) FROM (SELECT * FROM foo LIMIT 10) AS t1 INNER JOIN foo AS t2 ON t1.m1 = t2.m1 GROUP BY t1.dim2
-    `,
-    sane`
-      SELECT CAST(__time AS BIGINT), m1, ANY_VALUE(dim3, 100) FROM foo WHERE (TIME_FLOOR(__time, 'PT1H'), m1) IN
-         (
-           SELECT TIME_FLOOR(__time, 'PT1H') AS t1, MIN(m1) AS t2 FROM foo WHERE dim3 = 'b'
-               AND __time BETWEEN '1994-04-29 00:00:00' AND '2020-01-11 00:00:00' GROUP BY 1
-          )
-      GROUP BY 1, 2
-
-    `,
-    sane`
-      SELECT CAST(__time AS BIGINT), m1, ANY_VALUE(dim3, 100) FROM foo WHERE (CAST(TIME_FLOOR(__time, 'PT1H') AS BIGINT), m1) IN
-         (
-           SELECT CAST(TIME_FLOOR(__time, 'PT1H') AS BIGINT) + 0 AS t1, MIN(m1) AS t2 FROM foo WHERE dim3 = 'b'
-               AND __time BETWEEN '1994-04-29 00:00:00' AND '2020-01-11 00:00:00' GROUP BY 1
-          )
-      GROUP BY 1, 2
-
-    `,
-    sane`
-      SELECT exp(count(*)) + 10, sum(m2)  FROM druid.foo WHERE  dim2 = 0
-    `,
-    sane`
-      SELECT exp(count(*)) + 10, sum(m2)  FROM druid.foo WHERE  __time >= TIMESTAMP '2999-01-01 00:00:00'
-    `,
-    sane`
-      SELECT COUNT(*) FROM foo WHERE dim1 = 'nonexistent' GROUP BY FLOOR(__time TO DAY)
-    `,
-    sane`
-      SELECT
-      TRIM(BOTH 'x' FROM 'xfoox'),
-      TRIM(TRAILING 'x' FROM 'xfoox'),
-      TRIM(' ' FROM ' foo '),
-      TRIM(TRAILING FROM ' foo '),
-      TRIM(' foo '),
-      BTRIM(' foo '),
-      BTRIM('xfoox', 'x'),
-      LTRIM(' foo '),
-      LTRIM('xfoox', 'x'),
-      RTRIM(' foo '),
-      RTRIM('xfoox', 'x'),
-      COUNT(*)
-      FROM foo
-    `,
-    sane`
-      SELECT
-      LPAD('foo', 5, 'x'),
-      LPAD('foo', 2, 'x'),
-      LPAD('foo', 5),
-      RPAD('foo', 5, 'x'),
-      RPAD('foo', 2, 'x'),
-      RPAD('foo', 5),
-      COUNT(*)
-      FROM foo
+      SELECT TIME_FORMAT("date", 'yyyy-MM'), SUM(x)
+      FROM (
+          SELECT
+              FLOOR(__time to hour) as "date",
+              COUNT(*) as x
+          FROM foo
+          GROUP BY 1
+      )
+      GROUP BY 1
     `,
     sane`
       SELECT DISTINCT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA
     `,
     sane`
-      SELECT TABLE_SCHEMA, TABLE_NAME, TABLE_TYPE
+      SELECT TABLE_SCHEMA, TABLE_NAME, TABLE_TYPE, IS_JOINABLE, IS_BROADCAST
       FROM INFORMATION_SCHEMA.TABLES
       WHERE TABLE_TYPE IN ('SYSTEM_TABLE', 'TABLE', 'VIEW')
     `,
     sane`
-      SELECT TABLE_SCHEMA, TABLE_NAME, TABLE_TYPE
+      SELECT TABLE_SCHEMA, TABLE_NAME, TABLE_TYPE, IS_JOINABLE, IS_BROADCAST
       FROM INFORMATION_SCHEMA.TABLES
       WHERE TABLE_TYPE IN ('SYSTEM_TABLE', 'TABLE', 'VIEW')
     `,
@@ -116,7 +59,12 @@ describe('Druid test queries', () => {
     sane`
       SELECT COLUMN_NAME, DATA_TYPE, IS_NULLABLE
       FROM INFORMATION_SCHEMA.COLUMNS
-      WHERE TABLE_SCHEMA = 'druid' AND TABLE_NAME = 'aview'
+      WHERE TABLE_SCHEMA = 'view' AND TABLE_NAME = 'aview'
+    `,
+    sane`
+      SELECT COLUMN_NAME, DATA_TYPE, IS_NULLABLE
+      FROM INFORMATION_SCHEMA.COLUMNS
+      WHERE TABLE_SCHEMA = 'view' AND TABLE_NAME = 'cview'
     `,
     sane`
       SELECT
@@ -129,51 +77,6 @@ describe('Druid test queries', () => {
       WHERE TABLE_SCHEMA = 'druid' AND TABLE_NAME = 'foo'
     `,
     sane`
-      SELECT * FROM druid.foo
-    `,
-    sane`
-      SELECT * FROM druid.forbiddenDatasource
-    `,
-    sane`
-      SELECT * FROM druid.forbiddenDatasource
-    `,
-    sane`
-      SELECT COUNT(*) FROM foo
-    `,
-    sane`
-      SELECT * FROM druid.foo LIMIT 2
-    `,
-    sane`
-      SELECT SUBSTRING(dim2, 1, 1) FROM druid.foo LIMIT 2
-    `,
-    sane`
-      SELECT dim1 FROM druid.foo WHERE m1 + 1 = 7
-    `,
-    sane`
-      SELECT * FROM druid.foo ORDER BY __time DESC LIMIT 2
-    `,
-    sane`
-      SELECT * FROM druid.foo ORDER BY __time
-    `,
-    sane`
-      SELECT dim2 x, dim2 y FROM druid.foo LIMIT 2
-    `,
-    sane`
-      SELECT dim1 FROM druid.foo ORDER BY __time DESC LIMIT 2
-    `,
-    sane`
-      SELECT * FROM (SELECT dim1 FROM druid.foo ORDER BY __time DESC) LIMIT 2
-    `,
-    sane`
-      SELECT dim1 FROM druid.foo ORDER BY __time DESC
-    `,
-    sane`
-      SELECT "__time", "count", "dimHyperUnique", "dimMultivalEnumerated", "dimMultivalEnumerated2", "dimMultivalSequentialWithNulls", "dimSequential", "dimSequentialHalfNull", "dimUniform", "dimZipf", "metFloatNormal", "metFloatZipf", "metLongSequential" FROM druid.lotsocolumns WHERE __time >= CURRENT_TIMESTAMP - INTERVAL '10' YEAR
-    `,
-    sane`
-      SELECT "__time", "count", "dimHyperUnique", "dimMultivalEnumerated", "dimMultivalEnumerated2", "dimMultivalSequentialWithNulls", "dimSequential", "dimSequentialHalfNull", "dimUniform", "dimZipf", "metFloatNormal", "metFloatZipf", "metLongSequential", "metLongUniform" FROM druid.lotsocolumns WHERE __time >= CURRENT_TIMESTAMP - INTERVAL '10' YEAR
-    `,
-    sane`
       SELECT dim1, COUNT(*) FROM druid.foo GROUP BY dim1 ORDER BY dim1 DESC
     `,
     sane`
@@ -183,25 +86,19 @@ describe('Druid test queries', () => {
       SELECT dim1, dim2, COUNT(*) FROM druid.foo GROUP BY dim1, dim2 ORDER BY dim1 DESC
     `,
     sane`
+      SELECT dim1, dim2, COUNT(*) FROM druid.foo GROUP BY dim1, dim2 limit 1
+    `,
+    sane`
       SELECT dim1, dim2, COUNT(*) FROM druid.foo GROUP BY 1, 2 ORDER BY 3 DESC
-    `,
-    sane`
-      SELECT 'beep ' || dim1 FROM (SELECT dim1 FROM druid.foo ORDER BY __time DESC LIMIT 2)
-    `,
-    sane`
-      SELECT 'beep ' || dim1 FROM (SELECT dim1 FROM druid.foo ORDER BY __time DESC)
-    `,
-    sane`
-      SELECT 'beep ' || dim1 FROM (SELECT dim1 FROM druid.foo ORDER BY __time DESC LIMIT 4) LIMIT 2
     `,
     sane`
       SELECT dim1 FROM druid.foo GROUP BY dim1 ORDER BY dim1 DESC
     `,
     sane`
-      SELECT EARLIEST(cnt), EARLIEST(m1), EARLIEST(dim1, 10), EARLIEST(cnt + 1), EARLIEST(m1 + 1), EARLIEST(dim1 || CAST(cnt AS VARCHAR), 10) FROM druid.foo
+      SELECT EARLIEST(cnt), EARLIEST(m1), EARLIEST(dim1, 10), EARLIEST(cnt + 1), EARLIEST(m1 + 1), EARLIEST(dim1 || CAST(cnt AS VARCHAR), 10), EARLIEST(cnt, m1), EARLIEST(m1, m1), EARLIEST(dim1, 10, m1), EARLIEST(cnt + 1, m1), EARLIEST(m1 + 1, m1), EARLIEST(dim1 || CAST(cnt AS VARCHAR), 10, m1) FROM druid.foo
     `,
     sane`
-      SELECT LATEST(cnt), LATEST(m1), LATEST(dim1, 10), LATEST(cnt + 1), LATEST(m1 + 1), LATEST(dim1 || CAST(cnt AS VARCHAR), 10) FROM druid.foo
+      SELECT LATEST(cnt), LATEST(m1), LATEST(dim1, 10), LATEST(cnt + 1), LATEST(m1 + 1), LATEST(dim1 || CAST(cnt AS VARCHAR), 10), LATEST(cnt, m1), LATEST(m1, m1), LATEST(dim1, 10, m1), LATEST(cnt + 1, m1), LATEST(m1 + 1, m1), LATEST(dim1 || CAST(cnt AS VARCHAR), 10, m1) FROM druid.foo
     `,
     sane`
       SELECT ANY_VALUE(cnt), ANY_VALUE(m1), ANY_VALUE(m2), ANY_VALUE(dim1, 10), ANY_VALUE(cnt + 1), ANY_VALUE(m1 + 1), ANY_VALUE(dim1 || CAST(cnt AS VARCHAR), 10) FROM druid.foo
@@ -366,6 +263,83 @@ describe('Druid test queries', () => {
     `,
     sane`
       SELECT
+      dim1, dim2, SUM(m1), COUNT(*)
+      FROM (SELECT dim1, dim2, m1 FROM foo UNION ALL SELECT dim1, dim2, m1 FROM numfoo)
+      WHERE dim2 = 'a' OR dim2 = 'def'
+      GROUP BY 1, 2
+    `,
+    sane`
+      SELECT
+      dim1, dim2, SUM(m1), COUNT(*)
+      FROM (SELECT dim1, dim2, m1 FROM foo UNION ALL SELECT dim1, dim2, m1 FROM numfoo)
+      WHERE dim2 = 'a' OR dim2 = 'def'
+      GROUP BY 1, 2
+    `,
+    sane`
+      SELECT
+      dim1, dim2, SUM(m1), COUNT(*)
+      FROM (SELECT * FROM foo UNION ALL SELECT * FROM numfoo)
+      WHERE dim2 = 'a' OR dim2 = 'def'
+      GROUP BY 1, 2
+    `,
+    sane`
+      SELECT
+      dim1, dim2, SUM(m1), COUNT(*)
+      FROM (SELECT dim1, dim2, m1 FROM foo2 UNION ALL SELECT dim1, dim2, m1 FROM foo)
+      WHERE dim2 = 'a' OR dim2 = 'en'
+      GROUP BY 1, 2
+    `,
+    sane`
+      SELECT
+      dim1, dim2, SUM(m1), COUNT(*)
+      FROM (SELECT * FROM foo UNION ALL SELECT * FROM foo)
+      WHERE dim2 = 'a' OR dim2 = 'def'
+      GROUP BY 1, 2
+    `,
+    sane`
+      SELECT
+      dim1, dim2, SUM(m1), COUNT(*)
+      FROM (SELECT dim1, dim2, m1 FROM foo UNION ALL SELECT dim1, dim2, m1 FROM foo)
+      WHERE dim2 = 'a' OR dim2 = 'def'
+      GROUP BY 1, 2
+    `,
+    sane`
+      SELECT
+      dim1, dim2, SUM(m1), COUNT(*)
+      FROM (SELECT * FROM foo UNION ALL SELECT * FROM foo UNION ALL SELECT * FROM foo)
+      WHERE dim2 = 'a' OR dim2 = 'def'
+      GROUP BY 1, 2
+    `,
+    sane`
+      SELECT
+      dim1, dim2, SUM(m1), COUNT(*)
+      FROM (SELECT * FROM numfoo UNION ALL SELECT * FROM foo UNION ALL SELECT * from foo)
+      WHERE dim2 = 'a' OR dim2 = 'def'
+      GROUP BY 1, 2
+    `,
+    sane`
+      SELECT
+      dim1, dim2, SUM(m1), COUNT(*)
+      FROM (SELECT * FROM numfoo UNION ALL SELECT * FROM foo UNION ALL SELECT * from foo)
+      WHERE dim2 = 'a' OR dim2 = 'def'
+      GROUP BY 1, 2
+    `,
+    sane`
+      SELECT
+      dim1, dim2, SUM(m1), COUNT(*)
+      FROM (SELECT * FROM foo UNION ALL SELECT * FROM foo UNION ALL SELECT * from numfoo)
+      WHERE dim2 = 'a' OR dim2 = 'def'
+      GROUP BY 1, 2
+    `,
+    sane`
+      SELECT
+      dim1, dim2, SUM(m1), COUNT(*)
+      FROM (SELECT dim1, dim2, m1 FROM foo UNION ALL SELECT dim1, dim2, m1 FROM foo UNION ALL SELECT dim1, dim2, m1 FROM foo)
+      WHERE dim2 = 'a' OR dim2 = 'def'
+      GROUP BY 1, 2
+    `,
+    sane`
+      SELECT
         CASE 'foo'
         WHEN 'bar' THEN SUM(cnt)
         WHEN 'foo' THEN SUM(m1)
@@ -440,6 +414,9 @@ describe('Druid test queries', () => {
       SELECT l1, COUNT(*) FROM druid.numfoo GROUP BY l1 ORDER BY l1 DESC LIMIT 10
     `,
     sane`
+      SELECT l1 is null FROM druid.numfoo
+    `,
+    sane`
       SELECT COUNT(*)
       FROM druid.numfoo
       WHERE l1 > 3
@@ -485,22 +462,14 @@ describe('Druid test queries', () => {
       SELECT dim1 FROM druid.foo ORDER BY dim1
     `,
     sane`
-      SELECT DISTINCT dim2 FROM druid.foo ORDER BY dim2 LIMIT 2 OFFSET 5
-    `,
-    sane`
       SELECT foo.dim1, foo.dim2, l.k, l.v
       FROM foo INNER JOIN lookup.lookyloo l ON foo.dim2 <> l.k
     `,
     sane`
-      SELECT foo.dim1, foo.dim2, l.k, l.v
-      FROM foo INNER JOIN lookup.lookyloo l ON CHARACTER_LENGTH(foo.dim2 || l.k) > 3
-
+      SELECT COUNT(*) FROM foo WHERE dim1 IN (NULL)
     `,
     sane`
       SELECT COUNT(distinct dim1), COUNT(distinct dim2) FROM druid.foo
-    `,
-    sane`
-      SELECT * FROM druid.foo WHERE dim1 > 'd' OR dim2 = 'a'
     `,
     sane`
       SELECT COUNT(*), MAX(cnt) FROM druid.foo WHERE 1 = 0
@@ -511,13 +480,19 @@ describe('Druid test queries', () => {
       OR FLOOR(__time TO DAY) = TIMESTAMP '2000-01-02 02:00:00'
     `,
     sane`
+      SELECT dim1, COUNT(*) FROM druid.foo
+      WHERE FLOOR(__time TO DAY) = TIMESTAMP '2000-01-02 01:00:00'
+      OR FLOOR(__time TO DAY) = TIMESTAMP '2000-01-02 02:00:00'
+      GROUP BY 1
+    `,
+    sane`
       SELECT COUNT(*), MAX(cnt) FROM druid.foo WHERE 1 = 0 GROUP BY dim1
     `,
     sane`
       SELECT COUNT(*), MAX(cnt) FROM druid.foo WHERE dim1 = 'foobar'
     `,
     sane`
-      SELECT COUNT(*), SUM(cnt) FROM druid.foo GROUP BY ()
+      SELECT COUNT(*), SUM(cnt), MIN(cnt) FROM druid.foo GROUP BY ()
     `,
     sane`
       SELECT COUNT(*), MAX(cnt) FROM druid.foo WHERE dim1 = 'foobar' GROUP BY 'dummy'
@@ -535,7 +510,13 @@ describe('Druid test queries', () => {
       SELECT COUNT(*) FROM druid.foo
     `,
     sane`
-      SELECT COUNT(*) FROM druid.aview WHERE dim1_firstchar <> 'z'
+      SELECT COUNT(*) FROM view.aview WHERE dim1_firstchar <> 'z'
+    `,
+    sane`
+      SELECT COUNT(*) FROM view.dview as druid WHERE druid.numfoo <> 'z'
+    `,
+    sane`
+      SELECT COUNT(*) FROM view.cview as a INNER JOIN druid.foo d on d.dim2 = a.dim2 WHERE a.dim1_firstchar <> 'z'
     `,
     sane`
       SELECT COUNT(*) FROM druid.foo WHERE dim1 like 'a%' OR dim2 like '%xb%' escape 'x'
@@ -562,7 +543,16 @@ describe('Druid test queries', () => {
       SELECT distinct dim1 FROM druid.foo WHERE dim1 = 10 OR (floor(CAST(dim1 AS float)) = 10.00 and CAST(dim1 AS float) > 9 and CAST(dim1 AS float) <= 10.5)
     `,
     sane`
-      SELECT COUNT(*), COUNT(cnt), COUNT(dim1), AVG(cnt), SUM(cnt), SUM(cnt) + MIN(cnt) + MAX(cnt), COUNT(dim2) FROM druid.foo
+      SELECT  MIN(l1), MIN(cnt), MAX(l1) FROM druid.numfoo
+    `,
+    sane`
+      SELECT  MIN(d1), MAX(d1) FROM druid.numfoo
+    `,
+    sane`
+      SELECT  MIN(m1), MAX(m1) FROM druid.numfoo
+    `,
+    sane`
+      SELECT COUNT(*), COUNT(cnt), COUNT(dim1), AVG(cnt), SUM(cnt), SUM(cnt) + MIN(cnt) + MAX(cnt), COUNT(dim2), COUNT(d1), AVG(d1) FROM druid.numfoo
     `,
     sane`
       SELECT dim1, MIN(m1) + MAX(m1) AS x FROM druid.foo GROUP BY dim1 ORDER BY x LIMIT 3
@@ -725,27 +715,6 @@ describe('Druid test queries', () => {
         FLOOR(MILLIS_TO_TIMESTAMP(cnt) TO YEAR)
     `,
     sane`
-      SELECT distinct dim1 FROM druid.foo WHERE substring(substring(dim1, 2), 1, 1) = 'e' OR dim2 = 'a'
-    `,
-    sane`
-      SELECT distinct dim1 FROM druid.foo WHERE CHARACTER_LENGTH(dim1) = 3 OR CAST(CHARACTER_LENGTH(dim1) AS varchar) = 3
-    `,
-    sane`
-      SELECT DISTINCT dim2 FROM druid.foo LIMIT 10
-    `,
-    sane`
-      SELECT * FROM (SELECT DISTINCT dim2 FROM druid.foo ORDER BY dim2) LIMIT 10
-    `,
-    sane`
-      SELECT * FROM (SELECT DISTINCT dim2 FROM druid.foo ORDER BY dim2 LIMIT 5) LIMIT 10
-    `,
-    sane`
-      SELECT * FROM (SELECT DISTINCT dim2 FROM druid.foo ORDER BY dim2 LIMIT 2 OFFSET 5) OFFSET 2
-    `,
-    sane`
-      SELECT * FROM (SELECT DISTINCT dim2 FROM druid.foo ORDER BY dim2 DESC LIMIT 5) LIMIT 10
-    `,
-    sane`
       SELECT SUM(cnt), COUNT(distinct dim2), COUNT(distinct unique_dim1) FROM druid.foo
     `,
     sane`
@@ -762,7 +731,16 @@ describe('Druid test queries', () => {
       SELECT APPROX_COUNT_DISTINCT(dim2) FROM druid.foo
     `,
     sane`
+      SELECT APPROX_COUNT_DISTINCT_BUILTIN(dim2) FROM druid.foo
+    `,
+    sane`
       SELECT dim2, SUM(cnt), COUNT(distinct dim1) FROM druid.foo GROUP BY dim2
+    `,
+    sane`
+      SELECT FLOOR(__time to day), COUNT(distinct city), COUNT(distinct user) FROM druid.visits GROUP BY 1
+    `,
+    sane`
+      SELECT APPROX_COUNT_DISTINCT(dim1 || 'hello') FROM druid.foo
     `,
     sane`
       SELECT
@@ -814,6 +792,16 @@ describe('Druid test queries', () => {
       FROM (SELECT dim2, SUM(cnt) AS cnt FROM druid.foo GROUP BY dim2)
     `,
     sane`
+      SELECT
+        SUM(cnt),
+        COUNT(*)
+      FROM (
+        SELECT dim2, SUM(cnt) AS cnt
+        FROM (SELECT * FROM druid.foo UNION ALL SELECT * FROM druid.foo)
+        GROUP BY dim2
+      )
+    `,
+    sane`
       SELECT * FROM (  SELECT max(cnt), min(cnt), avg(cnt), TIME_EXTRACT(max(t), 'EPOCH') last_time, count(1) num_days FROM (
             SELECT TIME_FLOOR(__time, 'P1D') AS t, count(1) cnt
             FROM "foo"
@@ -825,52 +813,6 @@ describe('Druid test queries', () => {
       SELECT
         AVG(u)
       FROM (SELECT FLOOR(__time TO DAY), APPROX_COUNT_DISTINCT(cnt) AS u FROM druid.foo GROUP BY 1)
-    `,
-    sane`
-      SELECT t1.dim1, SUM(t1.cnt)
-      FROM druid.foo t1
-        INNER JOIN (
-        SELECT
-          SUM(cnt) AS sum_cnt,
-          dim2
-        FROM druid.foo
-        GROUP BY dim2
-        ORDER BY 1 DESC
-        LIMIT 2
-      ) t2 ON (t1.dim2 = t2.dim2)
-      GROUP BY t1.dim1
-      ORDER BY 1
-
-    `,
-    sane`
-      SELECT SUBSTRING(t1.dim1, 1, 10), SUM(t1.cnt)
-      FROM druid.foo t1
-        INNER JOIN (
-        SELECT
-          SUM(cnt) AS sum_cnt,
-          dim2
-        FROM druid.foo
-        GROUP BY dim2
-        ORDER BY 1 DESC
-        LIMIT 2
-      ) t2 ON (t1.dim2 = t2.dim2)
-      GROUP BY SUBSTRING(t1.dim1, 1, 10)
-    `,
-    sane`
-      SELECT t1.dim1, SUM(t1.cnt)
-      FROM druid.foo t1
-        LEFT JOIN (
-        SELECT
-          SUM(cnt) AS sum_cnt,
-          dim2
-        FROM druid.foo
-        GROUP BY dim2
-        ORDER BY 1 DESC
-        LIMIT 2
-      ) t2 ON (t1.dim2 = t2.dim2)
-      GROUP BY t1.dim1
-      ORDER BY 1
-
     `,
     sane`
       SELECT COUNT(*)
@@ -999,17 +941,14 @@ describe('Druid test queries', () => {
         AND __time < TIMESTAMP '2003-02-02 01:00:00' - INTERVAL '1 1' DAY TO HOUR - INTERVAL '1-1' YEAR TO MONTH
     `,
     sane`
-      SELECT CURRENT_TIMESTAMP, CURRENT_DATE, CURRENT_DATE + INTERVAL '1' DAY
-    `,
-    sane`
       SELECT COUNT(*) FROM druid.foo
       WHERE __time >= CURRENT_TIMESTAMP + INTERVAL '1' DAY AND __time < TIMESTAMP '2002-01-01 00:00:00'
     `,
     sane`
-      SELECT * FROM bview
+      SELECT * FROM view.bview
     `,
     sane`
-      SELECT * FROM bview
+      SELECT * FROM view.bview
     `,
     sane`
       SELECT COUNT(*) FROM druid.foo
@@ -1069,247 +1008,7 @@ describe('Druid test queries', () => {
       GROUP BY LOOKUP(dim1, 'lookyloo')
     `,
     sane`
-      SELECT lookyloo.k, COUNT(*)
-      FROM foo LEFT JOIN lookup.lookyloo ON foo.dim2 = lookyloo.k
-      WHERE lookyloo.v = '123'
-      GROUP BY lookyloo.k
-    `,
-    sane`
-      SELECT lookyloo.v, COUNT(*)
-      FROM foo LEFT JOIN lookup.lookyloo ON foo.dim2 = lookyloo.k
-      WHERE lookyloo.v <> 'xa' OR lookyloo.v IS NULL
-      GROUP BY lookyloo.v
-    `,
-    sane`
-      SELECT lookyloo.v, COUNT(*)
-      FROM lookup.lookyloo RIGHT JOIN foo ON foo.dim2 = lookyloo.k
-      WHERE lookyloo.v <> 'xa'
-      GROUP BY lookyloo.v
-    `,
-    sane`
-      SELECT lookyloo.v, COUNT(*)
-      FROM foo LEFT JOIN lookup.lookyloo ON foo.dim2 = lookyloo.k
-      WHERE lookyloo.v <> 'xa'
-      GROUP BY lookyloo.v
-    `,
-    sane`
-      SELECT lookyloo.k, COUNT(*)
-      FROM foo LEFT JOIN lookup.lookyloo ON foo.dim2 = lookyloo.k
-      WHERE lookyloo.v = 'xa'
-      GROUP BY lookyloo.k
-    `,
-    sane`
-      SELECT base.dim2, lookyloo.v, base.cnt FROM (
-        SELECT dim2, COUNT(*) cnt FROM foo GROUP BY dim2
-      ) base
-      LEFT JOIN lookup.lookyloo ON base.dim2 = lookyloo.k
-      WHERE lookyloo.v <> 'xa' OR lookyloo.v IS NULL
-    `,
-    sane`
-      SELECT lookyloo.v, COUNT(*)
-      FROM foo INNER JOIN lookup.lookyloo ON foo.dim1 = lookyloo.k
-      GROUP BY lookyloo.v
-    `,
-    sane`
-      SELECT dim2, lookyloo.*
-      FROM foo INNER JOIN lookup.lookyloo ON foo.dim2 = lookyloo.k
-
-    `,
-    sane`
-      SELECT dim1, dim2, l1.v, l2.v
-      FROM foo
-      LEFT JOIN lookup.lookyloo l1 ON foo.dim1 = l1.k
-      LEFT JOIN lookup.lookyloo l2 ON foo.dim2 = l2.k
-
-    `,
-    sane`
-      SELECT dim1
-      FROM foo
-      INNER JOIN lookup.lookyloo l ON foo.dim2 = l.k
-      INNER JOIN lookup.lookyloo l2 ON foo.dim2 = l2.k
-      WHERE l.v = 'xa'
-      LIMIT 100
-
-    `,
-    sane`
-      SELECT dim1
-      FROM foo
-      INNER JOIN lookup.lookyloo l ON foo.dim2 = l.k
-      INNER JOIN lookup.lookyloo l2 ON foo.dim2 = l2.k
-      WHERE l.v = 'xa'
-
-    `,
-    sane`
-      SELECT __time, cnt, dim1, dim2, dim3, m1, m2, unique_dim1
-      FROM foo
-      INNER JOIN lookup.lookyloo l ON foo.dim2 = l.k
-      INNER JOIN lookup.lookyloo l2 ON foo.dim2 = l2.k
-      WHERE l.v = 'xa'
-      LIMIT 100
-
-    `,
-    sane`
-      SELECT __time, cnt, dim1, dim2, dim3, m1, m2, unique_dim1
-      FROM foo
-      INNER JOIN lookup.lookyloo l ON foo.dim2 = l.k
-      INNER JOIN lookup.lookyloo l2 ON foo.dim2 = l2.k
-      WHERE l.v = 'xa'
-
-    `,
-    sane`
-      SELECT dim1
-      FROM foo
-      INNER JOIN lookup.lookyloo l ON foo.dim2 = l.k
-      INNER JOIN lookup.lookyloo l2 ON foo.dim2 = l2.k
-      INNER JOIN lookup.lookyloo l3 ON foo.dim2 = l3.k
-      INNER JOIN lookup.lookyloo l4 ON foo.dim2 = l4.k
-      INNER JOIN lookup.lookyloo l5 ON foo.dim2 = l5.k
-      INNER JOIN lookup.lookyloo l6 ON foo.dim2 = l6.k
-      INNER JOIN lookup.lookyloo l7 ON foo.dim2 = l7.k
-      INNER JOIN lookup.lookyloo l8 ON foo.dim2 = l8.k
-      INNER JOIN lookup.lookyloo l9 ON foo.dim2 = l9.k
-      INNER JOIN lookup.lookyloo l10 ON foo.dim2 = l10.k
-      INNER JOIN lookup.lookyloo l11 ON foo.dim2 = l11.k
-      INNER JOIN lookup.lookyloo l12 ON foo.dim2 = l12.k
-      INNER JOIN lookup.lookyloo l13 ON foo.dim2 = l13.k
-      INNER JOIN lookup.lookyloo l14 ON foo.dim2 = l14.k
-      INNER JOIN lookup.lookyloo l15 ON foo.dim2 = l15.k
-      INNER JOIN lookup.lookyloo l16 ON foo.dim2 = l16.k
-      INNER JOIN lookup.lookyloo l17 ON foo.dim2 = l17.k
-      INNER JOIN lookup.lookyloo l18 ON foo.dim2 = l18.k
-      INNER JOIN lookup.lookyloo l19 ON foo.dim2 = l19.k
-      WHERE l.v = 'xa'
-
-    `,
-    sane`
-      SELECT dim1, dim2, t1.v, t1.v
-      FROM foo
-      INNER JOIN
-        (SELECT SUBSTRING(k, 1, 1) k, LATEST(v, 10) v FROM lookup.lookyloo GROUP BY 1) t1
-        ON foo.dim2 = t1.k
-    `,
-    sane`
-      SELECT dim1, dim2, t1.sk
-      FROM foo
-      INNER JOIN
-        (SELECT k, SUBSTRING(v, 1, 3) sk FROM lookup.lookyloo) t1
-        ON foo.dim2 = t1.k
-    `,
-    sane`
-      SELECT COUNT(*)
-      FROM foo
-      INNER JOIN lookup.lookyloo l1 ON l1.k = foo.m1
-      INNER JOIN lookup.lookyloo l2 ON l2.k = l1.k
-    `,
-    sane`
-      SELECT COUNT(*)
-      FROM lookup.lookyloo l1
-      INNER JOIN lookup.lookyloo l2 ON l1.k = l2.k
-      INNER JOIN foo on l2.k = foo.m1
-    `,
-    sane`
-      SELECT l.k, l.v, SUM(f.m1), SUM(nf.m1)
-      FROM lookup.lookyloo l
-      INNER JOIN druid.foo f on f.dim1 = l.k
-      INNER JOIN druid.numfoo nf on nf.dim1 = l.k
-      GROUP BY 1, 2 ORDER BY 2
-    `,
-    sane`
-      SELECT l.k, l.v, SUM(f.m1), SUM(nf.m1)
-      FROM lookup.lookyloo l
-      INNER JOIN druid.foo f on f.dim1 = l.k
-      INNER JOIN druid.numfoo nf on nf.dim1 = f.dim1
-      GROUP BY 1, 2 ORDER BY 2
-    `,
-    sane`
-      SELECT * FROM foo where dim1 IN (SELECT NULL FROM lookup.lookyloo)
-    `,
-    sane`
-      SELECT foo.dim1, foo.dim2, l.k, l.v
-      FROM foo, lookup.lookyloo l
-      WHERE SUBSTRING(foo.dim2, 1, 1) = l.k
-
-    `,
-    sane`
-      SELECT COUNT(*)
-      FROM foo, lookup.lookyloo l, numfoo
-      WHERE foo.cnt = l.k AND l.k = numfoo.cnt
-
-    `,
-    sane`
-      SELECT COUNT(*)
-      FROM foo
-      INNER JOIN lookup.lookyloo l ON foo.cnt = l.k
-      INNER JOIN numfoo ON l.k = numfoo.cnt
-
-    `,
-    sane`
-      SELECT foo.m1, l.k, l.v
-      FROM foo
-      INNER JOIN lookup.lookyloo l ON CAST(foo.m1 AS VARCHAR) = l.k
-
-    `,
-    sane`
-      SELECT foo.m1, l.k, l.v
-      FROM foo
-      INNER JOIN lookup.lookyloo l ON foo.m1 = CAST(l.k AS FLOAT)
-
-    `,
-    sane`
-      SELECT foo.m1, l.k, l.v
-      FROM foo
-      INNER JOIN lookup.lookyloo l ON foo.m1 = l.k
-
-    `,
-    sane`
-      SELECT foo.dim1, foo.dim2, l.k, l.v
-      FROM foo
-      INNER JOIN lookup.lookyloo l ON SUBSTRING(foo.dim2, 1, 1) = l.k
-
-    `,
-    sane`
-      SELECT foo.dim1, foo.dim2, l.k, l.v
-      FROM foo
-      INNER JOIN lookup.lookyloo l ON foo.dim2 = SUBSTRING(l.k, 1, 2)
-
-    `,
-    sane`
-      SELECT dim2, l1.v, l2.v
-      FROM foo
-      LEFT JOIN lookup.lookyloo l1 ON foo.dim2 = l1.k
-      LEFT JOIN lookup.lookyloo l2 ON l1.k = l2.k
-    `,
-    sane`
-      SELECT dim1, dim2, l1.v, l2.v, l3.v
-      FROM foo
-      LEFT JOIN lookup.lookyloo l1 ON foo.dim1 = l1.k
-      LEFT JOIN lookup.lookyloo l2 ON foo.dim2 = l2.k
-      LEFT JOIN lookup.lookyloo l3 ON l2.k = l3.k
-    `,
-    sane`
-      SELECT dim1, lookyloo.*
-      FROM foo LEFT JOIN lookup.lookyloo ON foo.dim1 = lookyloo.k
-      WHERE lookyloo.v <> 'xxx' OR lookyloo.v IS NULL
-    `,
-    sane`
-      SELECT dim1, lookyloo.*
-      FROM foo RIGHT JOIN lookup.lookyloo ON foo.dim1 = lookyloo.k
-      WHERE lookyloo.v <> 'xxx' OR lookyloo.v IS NULL
-    `,
-    sane`
-      SELECT dim1, m1, cnt, lookyloo.*
-      FROM foo FULL JOIN lookup.lookyloo ON foo.dim1 = lookyloo.k
-      WHERE lookyloo.v <> 'xxx' OR lookyloo.v IS NULL
-    `,
-    sane`
       SELECT COUNT(DISTINCT LOOKUP(dim1, 'lookyloo')) FROM foo
-    `,
-    sane`
-      SELECT COUNT(DISTINCT lookyloo.v)
-      FROM foo LEFT JOIN lookup.lookyloo ON foo.dim1 = lookyloo.k
-    `,
-    sane`
-      SELECT * FROM lookup.lookyloo
     `,
     sane`
       SELECT SUBSTRING(v, 1, 1), COUNT(*) FROM lookup.lookyloo GROUP BY 1
@@ -1436,6 +1135,68 @@ describe('Druid test queries', () => {
     `,
     sane`
       SELECT
+       count(*),
+       COUNT(DISTINCT dim1),
+       APPROX_COUNT_DISTINCT(distinct dim1),
+       sum(d1),
+       max(d1),
+       min(d1),
+       sum(l1),
+       max(l1),
+       min(l1),
+       avg(l1),
+       avg(d1)
+      FROM druid.numfoo WHERE dim2 = 0
+    `,
+    sane`
+      SELECT
+       ANY_VALUE(dim1, 1024),
+       ANY_VALUE(l1),
+       EARLIEST(dim1, 1024),
+       EARLIEST(l1),
+       LATEST(dim1, 1024),
+       LATEST(l1),
+       ARRAY_AGG(DISTINCT dim3),
+       STRING_AGG(DISTINCT dim3, '|'),
+       BIT_AND(l1),
+       BIT_OR(l1),
+       BIT_XOR(l1)
+      FROM druid.numfoo WHERE dim2 = 0
+    `,
+    sane`
+      SELECT
+       dim2,
+       count(*) FILTER(WHERE dim1 = 'nonexistent'),
+       COUNT(DISTINCT dim1) FILTER(WHERE dim1 = 'nonexistent'),
+       APPROX_COUNT_DISTINCT(distinct dim1) FILTER(WHERE dim1 = 'nonexistent'),
+       sum(d1) FILTER(WHERE dim1 = 'nonexistent'),
+       max(d1) FILTER(WHERE dim1 = 'nonexistent'),
+       min(d1) FILTER(WHERE dim1 = 'nonexistent'),
+       sum(l1) FILTER(WHERE dim1 = 'nonexistent'),
+       max(l1) FILTER(WHERE dim1 = 'nonexistent'),
+       min(l1) FILTER(WHERE dim1 = 'nonexistent'),
+       avg(l1) FILTER(WHERE dim1 = 'nonexistent'),
+       avg(d1) FILTER(WHERE dim1 = 'nonexistent')
+      FROM druid.numfoo WHERE dim2 = 'a' GROUP BY dim2
+    `,
+    sane`
+      SELECT
+       dim2,
+       ANY_VALUE(dim1, 1024) FILTER(WHERE dim1 = 'nonexistent'),
+       ANY_VALUE(l1) FILTER(WHERE dim1 = 'nonexistent'),
+       EARLIEST(dim1, 1024) FILTER(WHERE dim1 = 'nonexistent'),
+       EARLIEST(l1) FILTER(WHERE dim1 = 'nonexistent'),
+       LATEST(dim1, 1024) FILTER(WHERE dim1 = 'nonexistent'),
+       LATEST(l1) FILTER(WHERE dim1 = 'nonexistent'),
+       ARRAY_AGG(DISTINCT dim3) FILTER(WHERE dim1 = 'nonexistent'),
+       STRING_AGG(DISTINCT dim3, '|') FILTER(WHERE dim1 = 'nonexistent'),
+       BIT_AND(l1) FILTER(WHERE dim1 = 'nonexistent'),
+       BIT_OR(l1) FILTER(WHERE dim1 = 'nonexistent'),
+       BIT_XOR(l1) FILTER(WHERE dim1 = 'nonexistent')
+      FROM druid.numfoo WHERE dim2 = 'a' GROUP BY dim2
+    `,
+    sane`
+      SELECT
         EXTRACT(YEAR FROM __time) AS "year",
         SUM(cnt)
       FROM druid.foo
@@ -1488,6 +1249,16 @@ describe('Druid test queries', () => {
         FROM druid.foo
       ) AS x
       GROUP BY gran
+      LIMIT 2
+      OFFSET 1
+    `,
+    sane`
+      SELECT gran, SUM(cnt)
+      FROM (
+        SELECT floor(__time TO month) AS gran, cnt
+        FROM druid.foo
+      ) AS x
+      GROUP BY gran
       ORDER BY gran
       LIMIT 1
     `,
@@ -1498,9 +1269,26 @@ describe('Druid test queries', () => {
       ORDER BY dim2, gran
     `,
     sane`
-      SELECT dim2, gran, SUM(cnt)
+      SELECT dim2, time_floor(gran, 'P1M') gran, sum(s)
+      FROM (SELECT time_floor(__time, 'P1D') AS gran, dim2, sum(m1) as s FROM druid.foo GROUP BY 1, 2 HAVING sum(m1) > 1) AS x
+      GROUP BY 1, 2
+      ORDER BY dim2, gran desc
+    `,
+    sane`
+      SELECT dim2, gran, SUM(cnt), GROUPING(dim2, gran)
       FROM (SELECT FLOOR(__time TO MONTH) AS gran, COALESCE(dim2, '') dim2, cnt FROM druid.foo) AS x
       GROUP BY GROUPING SETS ( (dim2, gran), (dim2), (gran), () )
+    `,
+    sane`
+      SELECT dim2, gran, SUM(cnt), GROUPING(gran, dim2)
+      FROM (SELECT FLOOR(__time TO MONTH) AS gran, COALESCE(dim2, '') dim2, cnt FROM druid.foo) AS x
+      GROUP BY GROUPING SETS ( (dim2, gran), (dim2), (gran), () )
+    `,
+    sane`
+      SELECT dim2, SUM(cnt), GROUPING(dim2),
+      CASE WHEN GROUPING(dim2) = 1 THEN 'ALL' ELSE dim2 END
+      FROM druid.foo
+      GROUP BY GROUPING SETS ( (dim2), () )
     `,
     sane`
       SELECT cnt, COUNT(*)
@@ -1553,17 +1341,6 @@ describe('Druid test queries', () => {
       LIMIT 1
     `,
     sane`
-      SELECT dim1, dim2, COUNT(*) FROM druid.foo
-      WHERE dim2 IN (SELECT dim1 FROM druid.foo WHERE dim1 <> '')
-      AND dim1 <> 'xxx'
-      group by dim1, dim2 ORDER BY dim2
-    `,
-    sane`
-      SELECT dim1, dim2, COUNT(*) FROM druid.foo
-      WHERE dim1 = 'xxx' OR dim2 IN (SELECT dim1 FROM druid.foo WHERE dim1 LIKE '%bc')
-      group by dim1, dim2 ORDER BY dim2
-    `,
-    sane`
       SELECT __time, cnt, dim1, dim2 FROM druid.foo  WHERE (dim1, dim2) IN (   SELECT dim1, dim2 FROM (     SELECT dim1, dim2, COUNT(*)     FROM druid.foo     WHERE dim2 = 'abc'     GROUP BY dim1, dim2     HAVING COUNT(*) = 1   ) )
     `,
     sane`
@@ -1574,38 +1351,6 @@ describe('Druid test queries', () => {
          GROUP BY dim2
          ORDER BY dim2 DESC
        )
-    `,
-    sane`
-      SELECT dim1, EXTRACT(MONTH FROM __time) FROM druid.foo
-       WHERE dim2 IN (
-         SELECT dim2
-         FROM druid.foo
-         WHERE dim1 = 'def'
-       ) AND dim1 <> ''
-    `,
-    sane`
-      SELECT COUNT(DISTINCT dim1), EXTRACT(MONTH FROM __time) FROM druid.foo
-       WHERE dim2 IN (
-         SELECT dim2
-         FROM druid.foo
-         WHERE dim1 = 'def'
-       ) AND dim1 <> ''GROUP BY EXTRACT(MONTH FROM __time)
-      ORDER BY EXTRACT(MONTH FROM __time)
-    `,
-    sane`
-      SELECT DISTINCT __time FROM druid.foo WHERE __time IN (SELECT MAX(__time) FROM druid.foo)
-    `,
-    sane`
-      SELECT DISTINCT __time FROM druid.foo WHERE __time NOT IN (SELECT MAX(__time) FROM druid.foo)
-    `,
-    sane`
-      SELECT dim2, COUNT(*) FROM druid.foo WHERE substring(dim2, 1, 1) IN (SELECT substring(dim1, 1, 1) FROM druid.foo WHERE dim1 <> '')group by dim2
-    `,
-    sane`
-      SELECT dim1, l.v from druid.foo f inner join lookup.lookyloo l on f.dim1 = l.k where f.dim2 is null
-    `,
-    sane`
-      SELECT dim3, l.v, count(*) from druid.foo f inner join lookup.lookyloo l on f.dim3 = l.k group by 1, 2
     `,
     sane`
       SELECT COUNT(*) AS cnt FROM ( SELECT * FROM druid.foo LIMIT 10 ) tmpA
@@ -1641,6 +1386,12 @@ describe('Druid test queries', () => {
       SELECT CONCAt(dim1, CONCAt(dim2,'x'), m2, 9999, dim1) as dimX FROM foo
     `,
     sane`
+      SELECT CONCAT(dim1, '-', dim1, '_', dim1) as dimX FROM foo GROUP BY 1
+    `,
+    sane`
+      SELECT CONCAT(dim1, CONCAT(dim2,'x'), m2, 9999, dim1) as dimX FROM foo GROUP BY 1
+    `,
+    sane`
       SELECT textcat(dim1, dim1) as dimX FROM foo
     `,
     sane`
@@ -1666,6 +1417,9 @@ describe('Druid test queries', () => {
         SELECT SUBSTRING(dim1, 1, 1) FROM druid.foo
         WHERE dim1 <> '' AND __time >= '2000-01-01'
       )
+    `,
+    sane`
+      SELECT 2 + 2 AS a
     `,
     sane`
       SELECT SUM(cnt), gran FROM (
@@ -1727,79 +1481,25 @@ describe('Druid test queries', () => {
 
     `,
     sane`
-      SELECT concat(dim3, 'foo'), SUM(cnt) FROM druid.numfoo GROUP BY 1 ORDER BY 2 DESC
-    `,
-    sane`
-      SELECT concat(dim3, 'foo'), SUM(cnt) FROM druid.numfoo where concat(dim3, 'foo') = 'bfoo' GROUP BY 1 ORDER BY 2 DESC
-    `,
-    sane`
-      SELECT concat(dim3, 'foo') FROM druid.numfoo
-    `,
-    sane`
-      SELECT concat(dim3, '-lol-', dim3) FROM druid.numfoo
-    `,
-    sane`
-      SELECT concat(dim3, 'foo') FROM druid.numfoo where concat(dim3, 'foo') = 'bfoo'
-    `,
-    sane`
-      SELECT ARRAY[1,2] as arr, dim1 FROM foo LIMIT 1
-    `,
-    sane`
-      SELECT ARRAY[CONCAT(dim1, 'word'),'up'] as arr, dim1 FROM foo LIMIT 5
-    `,
-    sane`
-      SELECT ARRAY[CONCAT(dim3, 'word'),'up'] as arr, dim1 FROM foo LIMIT 5
-    `,
-    sane`
-      SELECT dim3 FROM druid.numfoo WHERE MV_OVERLAP(dim3, ARRAY['a','b']) LIMIT 5
-    `,
-    sane`
-      SELECT dim3 FROM druid.numfoo WHERE MV_OVERLAP(dim3, ARRAY[dim2]) LIMIT 5
-    `,
-    sane`
-      SELECT dim3 FROM druid.numfoo WHERE MV_CONTAINS(dim3, ARRAY['a','b']) LIMIT 5
-    `,
-    sane`
-      SELECT dim3 FROM druid.numfoo WHERE MV_CONTAINS(dim3, ARRAY['a']) LIMIT 5
-    `,
-    sane`
-      SELECT dim3 FROM druid.numfoo WHERE MV_CONTAINS(dim3, ARRAY[dim2]) LIMIT 5
-    `,
-    sane`
-      SELECT MV_SLICE(dim3, 1) FROM druid.numfoo
-    `,
-    sane`
-      SELECT dim1, MV_LENGTH(dim3), SUM(cnt) FROM druid.numfoo GROUP BY 1, 2 ORDER BY 2 DESC
-    `,
-    sane`
-      SELECT MV_APPEND(dim3, 'foo'), SUM(cnt) FROM druid.numfoo GROUP BY 1 ORDER BY 2 DESC
-    `,
-    sane`
-      SELECT MV_PREPEND('foo', dim3), SUM(cnt) FROM druid.numfoo GROUP BY 1 ORDER BY 2 DESC
-    `,
-    sane`
-      SELECT MV_TO_STRING(MV_PREPEND('foo', dim3), ','), MV_TO_STRING(MV_APPEND(dim3, 'foo'), ','), SUM(cnt) FROM druid.numfoo GROUP BY 1,2 ORDER BY 3 DESC
-    `,
-    sane`
-      SELECT MV_CONCAT(dim3, dim3), SUM(cnt) FROM druid.numfoo GROUP BY 1 ORDER BY 2 DESC
-    `,
-    sane`
-      SELECT MV_OFFSET(dim3, 1), SUM(cnt) FROM druid.numfoo GROUP BY 1 ORDER BY 2 DESC
-    `,
-    sane`
-      SELECT MV_ORDINAL(dim3, 2), SUM(cnt) FROM druid.numfoo GROUP BY 1 ORDER BY 2 DESC
-    `,
-    sane`
-      SELECT MV_OFFSET_OF(dim3, 'b'), SUM(cnt) FROM druid.numfoo GROUP BY 1 ORDER BY 2 DESC
-    `,
-    sane`
-      SELECT MV_ORDINAL_OF(dim3, 'b'), SUM(cnt) FROM druid.numfoo GROUP BY 1 ORDER BY 2 DESC
-    `,
-    sane`
-      SELECT MV_TO_STRING(dim3, ','), SUM(cnt) FROM druid.numfoo GROUP BY 1 ORDER BY 2 DESC
-    `,
-    sane`
-      SELECT STRING_TO_MV(CONCAT(MV_TO_STRING(dim3, ','), ',d'), ','), SUM(cnt) FROM druid.numfoo WHERE MV_LENGTH(dim3) > 0 GROUP BY 1 ORDER BY 2 DESC
+      SELECT
+         t1, t2
+        FROM
+         ( SELECT
+           'dummy' as t1,
+           CASE
+             WHEN
+               dim4 = 'b'
+             THEN dim4
+             ELSE NULL
+           END AS t2
+           FROM
+             numfoo
+           GROUP BY
+             dim4
+         )
+       GROUP BY
+         t1,t2
+
     `,
     sane`
       SELECT
@@ -1819,10 +1519,6 @@ describe('Druid test queries', () => {
       SELECT dim1 FROM druid.foo GROUP BY dim1 ORDER BY dim1 DESC LIMIT 2
     `,
     sane`
-      SELECT dim1 FROM foo WHERE dim1 IN (SELECT dim1 FROM foo WHERE dim1 = '10.1')
-
-    `,
-    sane`
       SELECT REGEXP_LIKE('x', NULL)
     `,
     sane`
@@ -1831,15 +1527,131 @@ describe('Druid test queries', () => {
     sane`
       SELECT REGEXP_LIKE('x', 1) FROM foo
     `,
-  ]
-    .filter(q => !q.includes('GROUPING SETS')) // ToDo: implement GROUPING SETS
-    .filter(q => !q.includes('GROUP BY CUBE')) // ToDo: implement GROUP BY CUBE
-    .filter(q => !q.includes('GROUP BY ROLLUP')) // ToDo: implement GROUP BY ROLLUP
-    .filter(q => !q.includes(') IN')); // ToDo: implement (tuple) IN (sub query)
+    sane`
+      SELECT TIMESTAMPADD(DAY, 0, "__time") FROM druid.foo
+    `,
+    sane`
+      SELECT TIMESTAMPADD(MONTH, 0, "__time") FROM druid.foo
+    `,
+    sane`
+      SELECT TIMESTAMPADD(YEAR, 0, "__time") FROM druid.foo
+    `,
+    sane`
+      SELECT TIMESTAMPADD(MONTH, 1, "__time") FROM druid.foo
+    `,
+    sane`
+      SELECT TIMESTAMPADD(MONTH, "cnt", "__time") FROM druid.foo
+    `,
+    sane`
+      SELECT dim2, gran, SUM(cnt)
+      FROM (SELECT FLOOR(__time TO MONTH) AS gran, COALESCE(dim2, '') dim2, cnt FROM druid.foo) AS x
+      GROUP BY GROUPING SETS ( (dim2, gran), (dim2), (gran), () ) LIMIT 100
+    `,
+    sane`
+      SELECT dim2, gran, SUM(cnt)
+      FROM (SELECT FLOOR(__time TO MONTH) AS gran, COALESCE(dim2, '') dim2, cnt FROM druid.foo) AS x
+      GROUP BY GROUPING SETS ( (dim2, gran), (dim2), (gran), () ) ORDER BY x.gran LIMIT 100
+    `,
+    sane`
+      SELECT dim2 ,lookup(dim2,'lookyloo') from foo where dim2 is null
+    `,
+    sane`
+      SELECT f1, round(f1) FROM druid.numfoo
+    `,
+    sane`
+      SELECT dim5, COUNT(dim1), AVG(l1) FROM druid.numfoo WHERE dim1 = '10.1' AND l1 = 325323 GROUP BY dim5
+    `,
+    sane`
+      SELECT r0.c, r1.c
+      FROM (
+        SELECT COUNT(*) AS c
+        FROM "foo"
+        GROUP BY ()
+        OFFSET 1
+      ) AS r0
+      LEFT JOIN (
+        SELECT COUNT(*) AS c
+        FROM "foo"
+        GROUP BY ()
+      ) AS r1 ON TRUE LIMIT 10
+    `,
+    sane`
+      SELECT count(*) FROM druid.foo t1 inner join druid.foo t2 on t1.__time = t2.__time
+    `,
+    sane`
+      SELECT
+       COUNT(reverse(dim2)),
+       COUNT(left(dim2, 5)),
+       COUNT(strpos(dim2, 'a'))
+      FROM druid.numfoo
+    `,
+    sane`
+      SELECT
+       BIT_AND(l1),
+       BIT_OR(l1),
+       BIT_XOR(l1)
+      FROM druid.numfoo
+    `,
+    sane`
+      SELECT
+       dim2,
+       BIT_AND(l1),
+       BIT_OR(l1),
+       BIT_XOR(l1)
+      FROM druid.numfoo GROUP BY 1 ORDER BY 4
+    `,
+    sane`
+      SELECT STRING_AGG(dim1,','), STRING_AGG(DISTINCT dim1, ','), STRING_AGG(DISTINCT dim1,',') FILTER(WHERE dim1 = 'shazbot') FROM foo WHERE dim1 is not null
+    `,
+    sane`
+      SELECT STRING_AGG(dim3, ','), STRING_AGG(DISTINCT dim3, ',') FROM foo
+    `,
+    sane`
+      SELECT STRING_AGG(l1, ','), STRING_AGG(DISTINCT l1, ','), STRING_AGG(d1, ','), STRING_AGG(DISTINCT d1, ','), STRING_AGG(f1, ','), STRING_AGG(DISTINCT f1, ',') FROM numfoo
+    `,
+    sane`
+      SELECT STRING_AGG(DISTINCT CONCAT(dim1, dim2), ','), STRING_AGG(DISTINCT CONCAT(dim1, dim2), CONCAT('|', '|')) FROM foo
+    `,
+    sane`
+      SELECT STRING_AGG(DISTINCT CONCAT(dim1, dim2), CONCAT('|', dim1)) FROM foo
+    `,
+    sane`
+      SELECT STRING_AGG(l1, ',', 128), STRING_AGG(DISTINCT l1, ',', 128) FROM numfoo
+    `,
+    sane`
+      SELECT m1, HUMAN_READABLE_BINARY_BYTE_FORMAT(45678),HUMAN_READABLE_BINARY_BYTE_FORMAT(m1*12345),HUMAN_READABLE_BINARY_BYTE_FORMAT(m1*12345, 0), HUMAN_READABLE_DECIMAL_BYTE_FORMAT(m1*12345), HUMAN_READABLE_DECIMAL_FORMAT(m1*12345), HUMAN_READABLE_BINARY_BYTE_FORMAT(l1),HUMAN_READABLE_DECIMAL_BYTE_FORMAT(l1), HUMAN_READABLE_DECIMAL_FORMAT(l1) FROM numfoo WHERE dim1 = '1' LIMIT 1
+    `,
+    sane`
+      SELECT HUMAN_READABLE_BINARY_BYTE_FORMAT('45678')
+    `,
+    sane`
+      SELECT HUMAN_READABLE_BINARY_BYTE_FORMAT(45678, '2')
+    `,
+    sane`
+      SELECT HUMAN_READABLE_BINARY_BYTE_FORMAT(45678, 2, 1)
+    `,
+    sane`
+      select
+       dim1,
+       sum(cast(0 as bigint)) as s1,
+       sum(cast(0 as double)) as s2
+      from druid.foo
+      where dim1 = 'none'
+      group by dim1
+      limit 1
+    `,
+  ];
 
   it('all queries work', () => {
     let bad = 0;
     for (const sql of queries) {
+      if (
+        sql.toUpperCase().includes('GROUP BY CUBE') ||
+        sql.toUpperCase().includes('GROUP BY ROLLUP') ||
+        sql.toUpperCase().includes('GROUP BY GROUPING SETS')
+      ) {
+        continue; // Grouping sets are known not to parse // ToDo: fix this
+      }
       try {
         backAndForth(sql);
       } catch (e) {

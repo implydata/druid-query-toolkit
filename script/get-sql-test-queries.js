@@ -29,7 +29,8 @@ const prefix = `/*
  * limitations under the License.
  */
 
-import { backAndForth, sane } from '../../test-utils';
+import { backAndForth } from '../../test-utils';
+import { sane } from '../../utils';
 
 describe('Druid test queries', () => {
   const queries = [
@@ -37,23 +38,31 @@ describe('Druid test queries', () => {
 
 const postfix = `
   ];
-  
+
   it('all queries work', () => {
+    let bad = 0;
     for (const sql of queries) {
       try {
         backAndForth(sql);
       } catch (e) {
-        throw new Error(\`problem with \\\`\${sql}\\\`: \${e.message}\`);
+        bad++;
+        console.log('=====================================');
+        console.log(sql);
+        console.log(e);
       }
     }
+
+    expect(bad).toEqual(0);
   });
 });
 `;
 
 async function main() {
-  const druidRef = await axios.get('https://raw.githubusercontent.com/apache/druid/master/sql/src/test/java/org/apache/druid/sql/calcite/CalciteQueryTest.java');
+  const druidRef = await axios.get(
+    'https://raw.githubusercontent.com/apache/druid/master/sql/src/test/java/org/apache/druid/sql/calcite/CalciteQueryTest.java',
+  );
 
-  const m = druidRef.data.match(/  "SELECT[^\n]*"(?:\s*\+\s*"[^\n]+")*,\n/igm);
+  const m = druidRef.data.match(/  "SELECT[^\n]*"(?:\s*\+\s*"[^\n]+")*,\n/gim);
   let queries = [];
   for (let ent of m) {
     try {
@@ -69,11 +78,16 @@ async function main() {
 
   fs.writeFileSync(
     './src/sql/sql-query/druid-tests.spec.ts',
-    prefix + queries.map(query => {
-      return '    sane`\n      ' +
-        query.replace(/`/g, '\\`').replace(/\n/g, '\n      ') +
-        '\n    `,'
-    }).join('') + postfix);
+    prefix +
+      queries
+        .map(query => {
+          return (
+            '    sane`\n      ' + query.replace(/`/g, '\\`').replace(/\n/g, '\n      ') + '\n    `,'
+          );
+        })
+        .join('\n') +
+      postfix,
+  );
 }
 
 main();

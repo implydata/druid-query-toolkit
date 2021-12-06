@@ -12,7 +12,8 @@
  * limitations under the License.
  */
 
-import { backAndForth, sane } from '../../test-utils';
+import { backAndForth } from '../../test-utils';
+import { sane } from '../../utils';
 
 describe('Druid Query Tests', () => {
   it('parses the default data sources query', () => {

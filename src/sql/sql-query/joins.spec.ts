@@ -13,7 +13,8 @@
  */
 
 import { SqlExpression, SqlJoinPart, SqlQuery, SqlRef } from '../..';
-import { backAndForth, sane } from '../../test-utils';
+import { backAndForth } from '../../test-utils';
+import { sane } from '../../utils';
 
 describe('joins', () => {
   describe('parse join with lookup', () => {
