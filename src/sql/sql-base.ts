@@ -39,6 +39,10 @@ function pseudoRandomCapitalization(str: string): string {
 export type Substitutor = (t: SqlBase, stack: SqlBase[]) => SqlBase | undefined;
 export type Matcher = (t: SqlBase, stack: SqlBase[]) => boolean;
 
+export interface PrettifyOptions {
+  keywordCasing?: 'preserve';
+}
+
 export type SqlType =
   | 'base'
   | 'columnList'
@@ -515,9 +519,11 @@ export abstract class SqlBase {
     return ref.getColumn();
   }
 
-  public prettify(): SqlBase {
+  public prettify(options: PrettifyOptions = {}): SqlBase {
+    const { keywordCasing } = options;
     return this.walkPostorder(ex => {
-      return ex.resetOwnSpacing().resetOwnKeywords().clearOwnSeparators().removeOwnParenSpaces();
+      const resetSpaceEx = ex.resetOwnSpacing().clearOwnSeparators().removeOwnParenSpaces();
+      return keywordCasing === 'preserve' ? resetSpaceEx : resetSpaceEx.resetOwnKeywords();
     });
   }
 

@@ -755,6 +755,11 @@ describe('SqlQuery operations', () => {
         SELECT DISTINCT col1 || lol
         FROM tbl
       `);
+
+      expect(SqlQuery.parse(sql).prettify({ keywordCasing: 'preserve' }).toString()).toEqual(sane`
+        Select Distinct col1 || lol
+        From tbl
+      `);
     });
 
     it('misc query 2', () => {
@@ -783,6 +788,19 @@ describe('SqlQuery operations', () => {
         GROUP BY 1
         ORDER BY 2 DESC, 3 ASC
         LIMIT 12
+      `);
+
+      expect(SqlQuery.parse(sql).prettify({ keywordCasing: 'preserve' }).toString()).toEqual(sane`
+        Select
+          col1 || lol,
+          (Min(col1) + Sum(kl)) AS aliasName,
+          Concat(a, b, c),
+          Case A When B Then C WheN D Then E End As m
+        From tbl
+        Where __time Between Timestamp '2020-01-01' And Timestamp '2020-01-02' AND goo is not Null AND NoT True
+        Group By 1
+        Order By 2 Desc, 3 asC
+        LimIT 12
       `);
     });
   });
