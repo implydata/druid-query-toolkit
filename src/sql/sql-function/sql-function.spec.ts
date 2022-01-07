@@ -17,7 +17,7 @@ import { SqlExpression, SqlFunction } from '..';
 
 describe('SqlFunction', () => {
   it('things that work', () => {
-    const queries: string[] = [
+    const functionExpressions: string[] = [
       `COUNT(*)`,
       `COUNT(DISTINCT blah)`,
       `COUNT(ALL blah)`,
@@ -48,11 +48,14 @@ describe('SqlFunction', () => {
       `SomeFn("boo" AS "arg1")`,
 
       `TABLE(extern('{...}', '{...}', '[...]'))`,
+
+      `PI`,
+      `CURRENT_TIMESTAMP`,
     ];
 
-    for (const sql of queries) {
+    for (const sql of functionExpressions) {
       try {
-        backAndForth(sql);
+        backAndForth(sql, SqlFunction);
       } catch (e) {
         console.log(`Problem with: \`${sql}\``);
         throw e;

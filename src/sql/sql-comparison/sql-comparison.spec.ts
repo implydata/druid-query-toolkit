@@ -13,7 +13,7 @@
  */
 
 import { backAndForth } from '../../test-utils';
-import { SqlExpression } from '..';
+import { SqlComparison, SqlExpression } from '..';
 
 describe('SqlComparison', () => {
   it('things that work', () => {
@@ -95,7 +95,7 @@ describe('SqlComparison', () => {
 
     for (const sql of queries) {
       try {
-        backAndForth(sql);
+        backAndForth(sql, SqlComparison);
       } catch (e) {
         console.log(`Problem with: \`${sql}\``);
         throw e;

@@ -13,7 +13,7 @@
  */
 
 import { backAndForth } from '../../test-utils';
-import { SqlExpression } from '..';
+import { SqlCase, SqlExpression } from '..';
 
 describe('CaseExpression', () => {
   it('things that work', () => {
@@ -27,7 +27,7 @@ describe('CaseExpression', () => {
 
     for (const sql of queries) {
       try {
-        backAndForth(sql);
+        backAndForth(sql, SqlCase);
       } catch (e) {
         console.log(`Problem with: \`${sql}\``);
         throw e;

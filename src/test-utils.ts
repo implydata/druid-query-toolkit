@@ -14,6 +14,12 @@
 
 import { parseSql } from './sql/parser';
 
-export function backAndForth(sql: string): void {
-  expect(parseSql(sql).toString()).toEqual(sql);
+export function backAndForth(sql: string, expectedConstructor?: any): void {
+  const parsed = parseSql(sql);
+
+  if (expectedConstructor && !(parsed instanceof expectedConstructor)) {
+    throw new Error(`${sql} did not parse to the right class`);
+  }
+
+  expect(parsed.toString()).toEqual(sql);
 }

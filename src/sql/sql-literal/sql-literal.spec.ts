@@ -37,7 +37,7 @@ describe('SqlLiteral', () => {
 
     for (const sql of queries) {
       try {
-        backAndForth(sql);
+        backAndForth(sql, SqlLiteral);
       } catch (e) {
         console.log(`Problem with: \`${sql}\``);
         throw e;

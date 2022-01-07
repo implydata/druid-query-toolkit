@@ -33,7 +33,7 @@ describe('SqlExpression', () => {
 
     for (const sql of queries) {
       try {
-        backAndForth(sql);
+        backAndForth(sql, SqlExpression);
       } catch (e) {
         console.log(`Problem with: \`${sql}\``);
         throw e;

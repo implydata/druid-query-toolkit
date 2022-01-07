@@ -14,6 +14,8 @@
 
 import { backAndForth } from '../../test-utils';
 
+import { SqlValues } from './sql-values';
+
 describe('SqlValues', () => {
   it('things that work', () => {
     const queries: string[] = [
@@ -23,7 +25,7 @@ describe('SqlValues', () => {
 
     for (const sql of queries) {
       try {
-        backAndForth(sql);
+        backAndForth(sql, SqlValues);
       } catch (e) {
         console.log(`Problem with: \`${sql}\``);
         throw e;

@@ -29,6 +29,7 @@ describe('SqlQuery', () => {
     const queries: string[] = [
       `Select nottingham from tbl`,
       `Select 3`,
+      `Select PI as "pi"`,
       `Select * from tbl`,
       `Select * from tbl Limit 10`,
       `Select * from tbl Limit 10 offset 5`,
@@ -76,7 +77,7 @@ describe('SqlQuery', () => {
 
     for (const sql of queries) {
       try {
-        backAndForth(sql);
+        backAndForth(sql, SqlQuery);
       } catch (e) {
         console.log(`Problem with: \`${sql}\``);
         throw e;
