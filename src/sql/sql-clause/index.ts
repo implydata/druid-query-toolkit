@@ -13,7 +13,7 @@
  */
 
 // The order of exports in this file is significant as it defines what depends on what.
-// Each file can directly depend directly on any file above it.
+// Each file can directly depend on any file above it.
 // Files can depend on the files below them by type only imported from the root.
 
 /* eslint-disable simple-import-sort/exports */
@@ -29,5 +29,7 @@ export * from './sql-where-clause/sql-where-clause';
 export * from './sql-having-clause/sql-having-clause';
 export * from './sql-limit-clause/sql-limit-clause';
 export * from './sql-offset-clause/sql-offset-clause';
+export * from './sql-partitioned-by-clause/sql-partitioned-by-clause';
+export * from './sql-clustered-by-clause/sql-clustered-by-clause';
 export * from './sql-with-clause/sql-with-part';
 export * from './sql-with-clause/sql-with-clause';

@@ -16,6 +16,7 @@ import { filterMap, isEmptyArray } from '../../utils';
 import { parseSql } from '../parser';
 import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../sql-base';
 import {
+  SqlClusteredByClause,
   SqlExplainClause,
   SqlFromClause,
   SqlGroupByClause,
@@ -27,6 +28,7 @@ import {
   SqlOrderByClause,
   SqlOrderByDirection,
   SqlOrderByExpression,
+  SqlPartitionedByClause,
   SqlWhereClause,
   SqlWithClause,
   SqlWithPart,
@@ -70,6 +72,8 @@ export interface SqlQueryValue extends SqlBaseValue {
   whereClause?: SqlWhereClause;
   groupByClause?: SqlGroupByClause;
   havingClause?: SqlHavingClause;
+  partitionedByClause?: SqlPartitionedByClause;
+  clusteredByClause?: SqlClusteredByClause;
   orderByClause?: SqlOrderByClause;
   limitClause?: SqlLimitClause;
   offsetClause?: SqlOffsetClause;
@@ -140,6 +144,8 @@ export class SqlQuery extends SqlExpression {
   public readonly whereClause?: SqlWhereClause;
   public readonly groupByClause?: SqlGroupByClause;
   public readonly havingClause?: SqlHavingClause;
+  public readonly partitionedByClause?: SqlPartitionedByClause;
+  public readonly clusteredByClause?: SqlClusteredByClause;
   public readonly orderByClause?: SqlOrderByClause;
   public readonly limitClause?: SqlLimitClause;
   public readonly offsetClause?: SqlOffsetClause;
@@ -156,6 +162,8 @@ export class SqlQuery extends SqlExpression {
     this.whereClause = options.whereClause;
     this.groupByClause = options.groupByClause;
     this.havingClause = options.havingClause;
+    this.partitionedByClause = options.partitionedByClause;
+    this.clusteredByClause = options.clusteredByClause;
     this.orderByClause = options.orderByClause;
     this.limitClause = options.limitClause;
     this.offsetClause = options.offsetClause;
@@ -173,6 +181,8 @@ export class SqlQuery extends SqlExpression {
     value.whereClause = this.whereClause;
     value.groupByClause = this.groupByClause;
     value.havingClause = this.havingClause;
+    value.partitionedByClause = this.partitionedByClause;
+    value.clusteredByClause = this.clusteredByClause;
     value.orderByClause = this.orderByClause;
     value.limitClause = this.limitClause;
     value.offsetClause = this.offsetClause;
@@ -191,6 +201,8 @@ export class SqlQuery extends SqlExpression {
       whereClause,
       groupByClause,
       havingClause,
+      partitionedByClause,
+      clusteredByClause,
       orderByClause,
       limitClause,
       offsetClause,
@@ -248,6 +260,14 @@ export class SqlQuery extends SqlExpression {
 
     if (havingClause) {
       rawParts.push(this.getSpace('preHavingClause', '\n'), havingClause.toString());
+    }
+
+    if (partitionedByClause) {
+      rawParts.push(this.getSpace('prePartitionedByClause', '\n'), partitionedByClause.toString());
+    }
+
+    if (clusteredByClause) {
+      rawParts.push(this.getSpace('preClusteredByClause', '\n'), clusteredByClause.toString());
     }
 
     if (orderByClause) {
@@ -411,6 +431,30 @@ export class SqlQuery extends SqlExpression {
     );
   }
 
+  public changePartitionedByClause(partitionedByClause: SqlPartitionedByClause | undefined): this {
+    if (this.partitionedByClause === partitionedByClause) return this;
+    const value = this.valueOf();
+    if (partitionedByClause) {
+      value.partitionedByClause = partitionedByClause;
+    } else {
+      delete value.partitionedByClause;
+      value.spacing = this.getSpacingWithout('prePartitionedByClause');
+    }
+    return SqlBase.fromValue(value);
+  }
+
+  public changeClusteredByClause(clusteredByClause: SqlClusteredByClause | undefined): this {
+    if (this.clusteredByClause === clusteredByClause) return this;
+    const value = this.valueOf();
+    if (clusteredByClause) {
+      value.clusteredByClause = clusteredByClause;
+    } else {
+      delete value.clusteredByClause;
+      value.spacing = this.getSpacingWithout('preClusteredByClause');
+    }
+    return SqlBase.fromValue(value);
+  }
+
   public changeOrderByClause(orderByClause: SqlOrderByClause | undefined): this {
     if (this.orderByClause === orderByClause) return this;
     const value = this.valueOf();
@@ -561,6 +605,22 @@ export class SqlQuery extends SqlExpression {
       if (!havingClause) return;
       if (havingClause !== this.havingClause) {
         ret = ret.changeHavingClause(havingClause as SqlHavingClause);
+      }
+    }
+
+    if (this.partitionedByClause) {
+      const partitionedByClause = this.partitionedByClause._walkHelper(nextStack, fn, postorder);
+      if (!partitionedByClause) return;
+      if (partitionedByClause !== this.partitionedByClause) {
+        ret = ret.changePartitionedByClause(partitionedByClause as SqlPartitionedByClause);
+      }
+    }
+
+    if (this.clusteredByClause) {
+      const clusteredByClause = this.clusteredByClause._walkHelper(nextStack, fn, postorder);
+      if (!clusteredByClause) return;
+      if (clusteredByClause !== this.clusteredByClause) {
+        ret = ret.changeClusteredByClause(clusteredByClause as SqlClusteredByClause);
       }
     }
 

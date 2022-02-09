@@ -37,7 +37,10 @@ async function main() {
     }
   }
 
-  const allData = calciteRef.data + sqlRef.data + errorMessage;
+  const extra = ``;
+
+  const allData =
+    calciteRef.data + sqlRef.data + errorMessage + ' PARTITIONED ALL TIME CLUSTERED' + extra;
 
   const possibleKeywords = [...new Set(allData.match(/\b[A-Z_]+\b/g)).values()].sort();
   console.log(`Got ${possibleKeywords.length} possible keywords`);

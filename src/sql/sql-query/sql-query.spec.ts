@@ -73,6 +73,13 @@ describe('SqlQuery', () => {
         Insert Into "new_table"
         SELECT * FROM wikipedia t
       `,
+      sane`
+        INSERT INTO "tbl2"
+        SELECT *
+        FROM tbl
+        PARTITIONED  BY   ALL    TIME
+        CLUSTERED BY  "hello"
+      `,
     ];
 
     for (const sql of queries) {
@@ -4860,6 +4867,167 @@ describe('SqlQuery', () => {
             },
             "type": "whereClause",
           },
+          "withClause": undefined,
+        }
+      `);
+    });
+  });
+
+  describe('expressions with partitioned and clustered clauses', () => {
+    it('Simple select with where', () => {
+      const sql = sane`
+        INSERT INTO "tbl2"
+        SELECT *
+        FROM tbl
+        PARTITIONED BY DAY
+        CLUSTERED BY 2, blah
+      `;
+
+      backAndForth(sql);
+
+      expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
+        SqlQuery {
+          "clusteredByClause": SqlClusteredByClause {
+            "expressions": SeparatedArray {
+              "separators": Array [
+                Separator {
+                  "left": "",
+                  "right": " ",
+                  "separator": ",",
+                },
+              ],
+              "values": Array [
+                SqlLiteral {
+                  "keywords": Object {},
+                  "spacing": Object {},
+                  "stringValue": "2",
+                  "type": "literal",
+                  "value": 2,
+                },
+                SqlRef {
+                  "columnRefName": RefName {
+                    "name": "blah",
+                    "quotes": false,
+                  },
+                  "keywords": Object {},
+                  "namespaceRefName": undefined,
+                  "spacing": Object {},
+                  "tableRefName": undefined,
+                  "type": "ref",
+                },
+              ],
+            },
+            "keywords": Object {
+              "by": "BY",
+              "clustered": "CLUSTERED",
+            },
+            "spacing": Object {
+              "postBy": " ",
+              "postClustered": " ",
+            },
+            "type": "clusteredByClause",
+          },
+          "decorator": undefined,
+          "explainClause": undefined,
+          "fromClause": SqlFromClause {
+            "expressions": SeparatedArray {
+              "separators": Array [],
+              "values": Array [
+                SqlTableRef {
+                  "keywords": Object {},
+                  "namespaceRefName": undefined,
+                  "spacing": Object {},
+                  "tableRefName": RefName {
+                    "name": "tbl",
+                    "quotes": false,
+                  },
+                  "type": "tableRef",
+                },
+              ],
+            },
+            "joinParts": undefined,
+            "keywords": Object {
+              "from": "FROM",
+            },
+            "spacing": Object {
+              "postFrom": " ",
+            },
+            "type": "fromClause",
+          },
+          "groupByClause": undefined,
+          "havingClause": undefined,
+          "insertClause": SqlInsertClause {
+            "columns": undefined,
+            "keywords": Object {
+              "insert": "INSERT",
+              "into": "INTO",
+            },
+            "spacing": Object {
+              "postInsert": " ",
+              "postInto": " ",
+            },
+            "table": SqlTableRef {
+              "keywords": Object {},
+              "namespaceRefName": undefined,
+              "spacing": Object {},
+              "tableRefName": RefName {
+                "name": "tbl2",
+                "quotes": true,
+              },
+              "type": "tableRef",
+            },
+            "type": "insertClause",
+          },
+          "keywords": Object {
+            "select": "SELECT",
+          },
+          "limitClause": undefined,
+          "offsetClause": undefined,
+          "orderByClause": undefined,
+          "partitionedByClause": SqlPartitionedByClause {
+            "expression": SqlLiteral {
+              "keywords": Object {},
+              "spacing": Object {},
+              "stringValue": "DAY",
+              "type": "literal",
+              "value": "DAY",
+            },
+            "keywords": Object {
+              "by": "BY",
+              "partitioned": "PARTITIONED",
+            },
+            "spacing": Object {
+              "postBy": " ",
+              "postPartitioned": " ",
+            },
+            "type": "partitionedByClause",
+          },
+          "selectExpressions": SeparatedArray {
+            "separators": Array [],
+            "values": Array [
+              SqlStar {
+                "keywords": Object {},
+                "namespaceRefName": undefined,
+                "spacing": Object {},
+                "tableRefName": undefined,
+                "type": "star",
+              },
+            ],
+          },
+          "spacing": Object {
+            "postInsertClause": "
+        ",
+            "postSelect": " ",
+            "preClusteredByClause": "
+        ",
+            "preFromClause": "
+        ",
+            "prePartitionedByClause": "
+        ",
+          },
+          "type": "query",
+          "unionQuery": undefined,
+          "whereClause": undefined,
           "withClause": undefined,
         }
       `);

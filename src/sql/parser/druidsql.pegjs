@@ -71,6 +71,8 @@ SqlQuery =
   explainClause:(ExplainClause _)?
   insertClause:(InsertClause _)?
   heart:(((WithClause _)? QueryHeart) / (WithClause _ OpenParen _ SqlQuery _ CloseParen))
+  partitionedByClause:(_ PartitionedByClause)?
+  clusteredByClause:(_ ClusteredByClause)?
   orderByClause:(_ OrderByClause)?
   limitClause:(_ LimitClause)?
   offsetClause:(_ OffsetClause)?
@@ -106,6 +108,16 @@ SqlQuery =
     Object.assign(value, subQuery.value);
     Object.assign(keywords, subQuery.keywords);
     Object.assign(spacing, subQuery.spacing);
+  }
+
+  if (partitionedByClause) {
+    spacing.prePartitionedByClause = partitionedByClause[0];
+    value.partitionedByClause = partitionedByClause[1];
+  }
+
+  if (clusteredByClause) {
+    spacing.preClusteredByClause = clusteredByClause[0];
+    value.clusteredByClause = clusteredByClause[1];
   }
 
   if (orderByClause) {
@@ -396,6 +408,44 @@ HavingClause = having:HavingToken postHaving:_ expression:Expression
     },
     keywords: {
       having: having,
+    },
+  });
+}
+
+PartitionedByClause = partitioned:PartitionedToken postPartitioned:__ by:ByToken postBy:_ ex:(TimeUnitLiteral / Expression / (AllToken __ TimeToken))
+{
+  var value = {};
+  var spacing = value.spacing = {
+    postPartitioned: postPartitioned,
+    postBy: postBy,
+  };
+  var keywords = value.keywords = {
+    partitioned: partitioned,
+    by: by,
+  };
+
+  if (Array.isArray(ex)) {
+    keywords.all = ex[0];
+    spacing.postAll = ex[1];
+    keywords.time = ex[2];
+  } else {
+    value.expression = ex;
+  }
+
+  return new sql.SqlPartitionedByClause(value);
+}
+
+ClusteredByClause = clustered:ClusteredToken postClustered:__ by:ByToken postBy:_ head:Expression tail:(CommaSeparator Expression)*
+{
+  return new sql.SqlClusteredByClause({
+    expressions: makeSeparatedArray(head, tail),
+    spacing: {
+      postClustered: postClustered,
+      postBy: postBy,
+    },
+    keywords: {
+      clustered: clustered,
+      by: by,
     },
   });
 }
@@ -777,6 +827,14 @@ Interval =
   });
 }
 
+TimeUnitLiteral = unit:TimeUnit
+{
+  return new sql.SqlLiteral({
+    value: unit.toUpperCase(),
+    stringValue: unit,
+  });
+}
+
 TimeUnit =
   "SECOND"i
 / "MINUTE"i
@@ -1008,17 +1066,13 @@ FloorCeilFunction =
   postLeftParen:_
   expr:Expression
   separator:ToSeparator
-  unit:TimeUnit
+  unit:TimeUnitLiteral
   postArguments:_
   CloseParen
 {
-  var unitLiteral = new sql.SqlLiteral({
-    value: unit.toUpperCase(),
-    stringValue: unit,
-  });
   return new sql.SqlFunction({
     functionName: functionName.toUpperCase(),
-    args: new sql.SeparatedArray([expr, unitLiteral], [separator]),
+    args: new sql.SeparatedArray([expr, unit], [separator]),
     spacing: {
       preLeftParen: preLeftParen,
       postLeftParen: postLeftParen,
@@ -1035,7 +1089,7 @@ TimestampAddDiffFunction =
   preLeftParen:_
   OpenParen
   postLeftParen:_
-  unit:TimeUnit
+  unit:TimeUnitLiteral
   tail:(CommaSeparator Expression)*
   postArguments:_
   CloseParen
@@ -1051,12 +1105,7 @@ TimestampAddDiffFunction =
     postLeftParen: postLeftParen,
   };
 
-  var head = new sql.SqlLiteral({
-    value: unit.toUpperCase(),
-    stringValue: unit,
-  });
-
-  value.args = makeSeparatedArray(head, tail);
+  value.args = makeSeparatedArray(unit, tail);
   spacing.postArguments = postArguments;
 
   return new sql.SqlFunction(value);
@@ -1462,6 +1511,7 @@ ByToken = $("BY"i !IdentifierPart)
 CaseToken = $("CASE"i !IdentifierPart)
 CastToken = $("CAST"i !IdentifierPart)
 CeilToken = $("CEIL"i !IdentifierPart)
+ClusteredToken = $("CLUSTERED"i !IdentifierPart)
 CountToken = $("COUNT"i !IdentifierPart)
 DateToken = $("DATE"i !IdentifierPart)
 DescToken = $("DESC"i !IdentifierPart)
@@ -1494,6 +1544,7 @@ OnToken = $("ON"i !IdentifierPart)
 OrToken = $("OR"i !IdentifierPart)
 OrderToken = $("ORDER"i !IdentifierPart)
 OuterToken = $("OUTER"i !IdentifierPart)
+PartitionedToken = $("PARTITIONED"i !IdentifierPart)
 PlanToken = $("PLAN"i !IdentifierPart)
 PositionToken = $("POSITION"i !IdentifierPart)
 RowToken = $("ROW"i !IdentifierPart)
@@ -1502,6 +1553,7 @@ SimilarToToken = $("SIMILAR"i !IdentifierPart __ ToToken)
 SomeToken = $("SOME"i !IdentifierPart)
 SymmetricToken = $("SYMMETRIC"i !IdentifierPart)
 ThenToken = $("THEN"i !IdentifierPart)
+TimeToken = $("TIME"i !IdentifierPart)
 TimestampToken = $("TIMESTAMP"i !IdentifierPart)
 TimestampaddToken = $("TIMESTAMPADD"i !IdentifierPart)
 TimestampdiffToken = $("TIMESTAMPDIFF"i !IdentifierPart)
