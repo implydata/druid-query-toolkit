@@ -15,6 +15,8 @@
 import { RESERVED_ALIASES, RESERVED_KEYWORDS } from '../../reserved-keywords';
 import { trimString } from '../general/general';
 
+const VALID_NAKED_NAME_REGEXP = /^[a-z_]\w*$/i;
+
 const reservedKeywordLookup: Record<string, boolean> = {};
 for (const r of RESERVED_KEYWORDS) {
   reservedKeywordLookup[r] = true;
@@ -44,12 +46,16 @@ export class RefName {
 
   static needsQuotes(name: string | undefined): boolean {
     if (typeof name === 'undefined') return false;
-    return !/^\w+$/.test(name) || RefName.isReservedKeyword(name);
+    return !VALID_NAKED_NAME_REGEXP.test(name) || RefName.isReservedKeyword(name);
   }
 
   static needsQuotesAlias(name: string | undefined): boolean {
     if (typeof name === 'undefined') return false;
-    return !/^\w+$/.test(name) || RefName.isReservedKeyword(name) || RefName.isReservedAlias(name);
+    return (
+      !VALID_NAKED_NAME_REGEXP.test(name) ||
+      RefName.isReservedKeyword(name) ||
+      RefName.isReservedAlias(name)
+    );
   }
 
   static maybe(name: string | undefined, forceQuotes?: boolean): RefName | undefined {

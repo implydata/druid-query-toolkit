@@ -17,7 +17,16 @@ import { backAndForth } from '../../test-utils';
 
 describe('SqlRef', () => {
   it('things that work', () => {
-    const queries: string[] = [`hello`, `"hello"`, `"""hello"""`, `"a""b"`, `a.b`, `"a""b".c`];
+    const queries: string[] = [
+      `hello`,
+      `h`,
+      `_hello`,
+      `"hello"`,
+      `"""hello"""`,
+      `"a""b"`,
+      `a.b`,
+      `"a""b".c`,
+    ];
 
     for (const sql of queries) {
       try {
@@ -46,6 +55,10 @@ describe('SqlRef', () => {
 
     it('works with .', () => {
       expect(String(SqlRef.column('wiki.pedia'))).toEqual(`"wiki.pedia"`);
+    });
+
+    it('works with column starting with a number', () => {
+      expect(String(SqlRef.column('3d'))).toEqual(`"3d"`);
     });
   });
 
