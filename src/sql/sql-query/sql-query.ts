@@ -455,6 +455,20 @@ export class SqlQuery extends SqlExpression {
     return SqlBase.fromValue(value);
   }
 
+  public changeClusteredByExpressions(
+    clusteredByExpressions: SeparatedArray<SqlExpression> | SqlExpression[] | undefined,
+  ): this {
+    if (!clusteredByExpressions || isEmptyArray(clusteredByExpressions)) {
+      return this.changeClusteredByClause(undefined);
+    } else {
+      return this.changeClusteredByClause(
+        this.clusteredByClause
+          ? this.clusteredByClause.changeExpressions(clusteredByExpressions)
+          : SqlClusteredByClause.create(clusteredByExpressions),
+      );
+    }
+  }
+
   public changeOrderByClause(orderByClause: SqlOrderByClause | undefined): this {
     if (this.orderByClause === orderByClause) return this;
     const value = this.valueOf();
