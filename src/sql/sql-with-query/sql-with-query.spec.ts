@@ -79,6 +79,7 @@ describe('SqlWithQuery', () => {
         "offsetClause": undefined,
         "orderByClause": undefined,
         "query": SqlQuery {
+          "clusteredByClause": undefined,
           "decorator": undefined,
           "explainClause": undefined,
           "fromClause": SqlFromClause {
@@ -121,6 +122,7 @@ describe('SqlWithQuery', () => {
               "rightSpacing": "",
             },
           ],
+          "partitionedByClause": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
@@ -163,6 +165,7 @@ describe('SqlWithQuery', () => {
                   "as": "AS",
                 },
                 "query": SqlQuery {
+                  "clusteredByClause": undefined,
                   "decorator": undefined,
                   "explainClause": undefined,
                   "fromClause": SqlFromClause {
@@ -205,6 +208,7 @@ describe('SqlWithQuery', () => {
                       "rightSpacing": "",
                     },
                   ],
+                  "partitionedByClause": undefined,
                   "selectExpressions": SeparatedArray {
                     "separators": Array [],
                     "values": Array [

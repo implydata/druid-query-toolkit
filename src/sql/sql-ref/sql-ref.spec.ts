@@ -334,6 +334,7 @@ describe('#convertToTableRef', () => {
 
     expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
       SqlQuery {
+        "clusteredByClause": undefined,
         "decorator": undefined,
         "explainClause": undefined,
         "fromClause": SqlFromClause {
@@ -376,6 +377,7 @@ describe('#convertToTableRef', () => {
         "limitClause": undefined,
         "offsetClause": undefined,
         "orderByClause": undefined,
+        "partitionedByClause": undefined,
         "selectExpressions": SeparatedArray {
           "separators": Array [],
           "values": Array [

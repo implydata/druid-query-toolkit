@@ -182,6 +182,7 @@ describe('QueryRunner', () => {
           ],
         ],
         "sqlQuery": SqlQuery {
+          "clusteredByClause": undefined,
           "decorator": undefined,
           "explainClause": undefined,
           "fromClause": SqlFromClause {
@@ -272,6 +273,7 @@ describe('QueryRunner', () => {
             },
             "type": "orderByClause",
           },
+          "partitionedByClause": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [
               Separator {
@@ -406,6 +408,7 @@ describe('QueryRunner', () => {
           ],
         ],
         "sqlQuery": SqlQuery {
+          "clusteredByClause": undefined,
           "decorator": undefined,
           "explainClause": undefined,
           "fromClause": SqlFromClause {
@@ -496,6 +499,7 @@ describe('QueryRunner', () => {
             },
             "type": "orderByClause",
           },
+          "partitionedByClause": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [
               Separator {
@@ -631,6 +635,7 @@ describe('QueryRunner', () => {
           ],
         ],
         "sqlQuery": SqlQuery {
+          "clusteredByClause": undefined,
           "decorator": undefined,
           "explainClause": undefined,
           "fromClause": SqlFromClause {
@@ -721,6 +726,7 @@ describe('QueryRunner', () => {
             },
             "type": "orderByClause",
           },
+          "partitionedByClause": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [
               Separator {

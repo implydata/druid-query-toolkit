@@ -213,6 +213,7 @@ describe('SqlComparison', () => {
         "not": false,
         "op": "=",
         "rhs": SqlQuery {
+          "clusteredByClause": undefined,
           "decorator": undefined,
           "explainClause": undefined,
           "fromClause": SqlFromClause {
@@ -344,6 +345,7 @@ describe('SqlComparison', () => {
               "rightSpacing": "",
             },
           ],
+          "partitionedByClause": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
@@ -695,6 +697,7 @@ describe('SqlComparison', () => {
         "not": false,
         "op": "IN",
         "rhs": SqlQuery {
+          "clusteredByClause": undefined,
           "decorator": undefined,
           "explainClause": undefined,
           "fromClause": SqlFromClause {
@@ -756,6 +759,7 @@ describe('SqlComparison', () => {
               "rightSpacing": "",
             },
           ],
+          "partitionedByClause": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
@@ -817,6 +821,7 @@ describe('SqlComparison', () => {
         "not": true,
         "op": "IN",
         "rhs": SqlQuery {
+          "clusteredByClause": undefined,
           "decorator": undefined,
           "explainClause": undefined,
           "fromClause": SqlFromClause {
@@ -874,6 +879,7 @@ describe('SqlComparison', () => {
               "rightSpacing": "",
             },
           ],
+          "partitionedByClause": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
