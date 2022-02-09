@@ -77,6 +77,12 @@ describe('SqlQuery', () => {
         INSERT INTO "tbl2"
         SELECT *
         FROM tbl
+        PARTITIONED  BY   ALL
+      `,
+      sane`
+        INSERT INTO "tbl2"
+        SELECT *
+        FROM tbl
         PARTITIONED  BY   ALL    TIME
         CLUSTERED BY  "hello"
       `,

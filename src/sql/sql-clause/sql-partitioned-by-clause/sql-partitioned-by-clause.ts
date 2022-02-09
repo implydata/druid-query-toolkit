@@ -27,7 +27,6 @@ export class SqlPartitionedByClause extends SqlClause {
   static DEFAULT_PARTITIONED_KEYWORD = 'PARTITIONED';
   static DEFAULT_BY_KEYWORD = 'BY';
   static DEFAULT_ALL_KEYWORD = 'ALL';
-  static DEFAULT_TIME_KEYWORD = 'TIME';
 
   static create(unit: SqlLiteral | undefined): SqlPartitionedByClause {
     return new SqlPartitionedByClause({ expression: unit });
@@ -57,11 +56,11 @@ export class SqlPartitionedByClause extends SqlClause {
     if (this.expression) {
       rawParts.push(this.expression.toString());
     } else {
-      rawParts.push(
-        this.getKeyword('all', SqlPartitionedByClause.DEFAULT_ALL_KEYWORD),
-        this.getSpace('postAll'),
-        this.getKeyword('time', SqlPartitionedByClause.DEFAULT_TIME_KEYWORD),
-      );
+      rawParts.push(this.getKeyword('all', SqlPartitionedByClause.DEFAULT_ALL_KEYWORD));
+
+      if (this.keywords['time']) {
+        rawParts.push(this.getSpace('preTime'), this.keywords['time']);
+      }
     }
 
     return rawParts.join('');

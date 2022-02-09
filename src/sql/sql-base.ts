@@ -126,10 +126,9 @@ export type KeywordName =
   | 'with';
 
 export type SpaceName =
-  | 'initial'
   | 'final'
+  | 'initial'
   | 'not'
-  | 'postAll'
   | 'postAnd'
   | 'postArguments'
   | 'postAs'
@@ -182,6 +181,7 @@ export type SpaceName =
   | 'preAlias'
   | 'preAnd'
   | 'preAs'
+  | 'preClusteredByClause'
   | 'preColumns'
   | 'preDirection'
   | 'preElse'
@@ -198,11 +198,11 @@ export type SpaceName =
   | 'preOffsetClause'
   | 'preOn'
   | 'preOp'
-  | 'prePartitionedByClause'
-  | 'preClusteredByClause'
   | 'preOrderByClause'
+  | 'prePartitionedByClause'
   | 'preQuery'
   | 'preTableDot'
+  | 'preTime'
   | 'preUnion'
   | 'preWhereClause';
 

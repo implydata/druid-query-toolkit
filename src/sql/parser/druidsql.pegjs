@@ -412,7 +412,7 @@ HavingClause = having:HavingToken postHaving:_ expression:Expression
   });
 }
 
-PartitionedByClause = partitioned:PartitionedToken postPartitioned:__ by:ByToken postBy:_ ex:(TimeUnitLiteral / Expression / (AllToken __ TimeToken))
+PartitionedByClause = partitioned:PartitionedToken postPartitioned:__ by:ByToken postBy:_ ex:(TimeUnitLiteral / Expression / (AllToken (__ TimeToken)?))
 {
   var value = {};
   var spacing = value.spacing = {
@@ -426,8 +426,12 @@ PartitionedByClause = partitioned:PartitionedToken postPartitioned:__ by:ByToken
 
   if (Array.isArray(ex)) {
     keywords.all = ex[0];
-    spacing.postAll = ex[1];
-    keywords.time = ex[2];
+
+    var timeKeyword = ex[1];
+    if (timeKeyword) {
+      spacing.preTime = timeKeyword[0];
+      keywords.time = timeKeyword[1];
+    }
   } else {
     value.expression = ex;
   }
