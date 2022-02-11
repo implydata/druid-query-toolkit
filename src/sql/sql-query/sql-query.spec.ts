@@ -83,6 +83,7 @@ describe('SqlQuery', () => {
         INSERT INTO "tbl2"
         SELECT *
         FROM tbl
+        LIMIT 100
         PARTITIONED  BY   ALL    TIME
         CLUSTERED BY  "hello"
       `,

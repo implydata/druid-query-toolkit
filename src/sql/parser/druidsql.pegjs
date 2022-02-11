@@ -71,11 +71,11 @@ SqlQuery =
   explainClause:(ExplainClause _)?
   insertClause:(InsertClause _)?
   heart:(((WithClause _)? QueryHeart) / (WithClause _ OpenParen _ SqlQuery _ CloseParen))
-  partitionedByClause:(_ PartitionedByClause)?
-  clusteredByClause:(_ ClusteredByClause)?
   orderByClause:(_ OrderByClause)?
   limitClause:(_ LimitClause)?
   offsetClause:(_ OffsetClause)?
+  partitionedByClause:(_ PartitionedByClause)?
+  clusteredByClause:(_ ClusteredByClause)?
   union:(_ UnionClause)?
 {
   var value = {};
@@ -412,48 +412,6 @@ HavingClause = having:HavingToken postHaving:_ expression:Expression
   });
 }
 
-PartitionedByClause = partitioned:PartitionedToken postPartitioned:__ by:ByToken postBy:_ ex:(TimeUnitLiteral / Expression / (AllToken (__ TimeToken)?))
-{
-  var value = {};
-  var spacing = value.spacing = {
-    postPartitioned: postPartitioned,
-    postBy: postBy,
-  };
-  var keywords = value.keywords = {
-    partitioned: partitioned,
-    by: by,
-  };
-
-  if (Array.isArray(ex)) {
-    keywords.all = ex[0];
-
-    var timeKeyword = ex[1];
-    if (timeKeyword) {
-      spacing.preTime = timeKeyword[0];
-      keywords.time = timeKeyword[1];
-    }
-  } else {
-    value.expression = ex;
-  }
-
-  return new sql.SqlPartitionedByClause(value);
-}
-
-ClusteredByClause = clustered:ClusteredToken postClustered:__ by:ByToken postBy:_ head:Expression tail:(CommaSeparator Expression)*
-{
-  return new sql.SqlClusteredByClause({
-    expressions: makeSeparatedArray(head, tail),
-    spacing: {
-      postClustered: postClustered,
-      postBy: postBy,
-    },
-    keywords: {
-      clustered: clustered,
-      by: by,
-    },
-  });
-}
-
 OrderByClause = order:OrderToken postOrder:__ by:ByToken postBy:_ head:SqlOrderByExpression tail:(CommaSeparator SqlOrderByExpression)*
 {
   return new sql.SqlOrderByClause({
@@ -508,6 +466,48 @@ OffsetClause = offset:OffsetToken postOffset:_ offsetLiteral:SqlLiteral
     },
     keywords: {
       offset: offset,
+    },
+  });
+}
+
+PartitionedByClause = partitioned:PartitionedToken postPartitioned:__ by:ByToken postBy:_ ex:(TimeUnitLiteral / Expression / (AllToken (__ TimeToken)?))
+{
+  var value = {};
+  var spacing = value.spacing = {
+    postPartitioned: postPartitioned,
+    postBy: postBy,
+  };
+  var keywords = value.keywords = {
+    partitioned: partitioned,
+    by: by,
+  };
+
+  if (Array.isArray(ex)) {
+    keywords.all = ex[0];
+
+    var timeKeyword = ex[1];
+    if (timeKeyword) {
+      spacing.preTime = timeKeyword[0];
+      keywords.time = timeKeyword[1];
+    }
+  } else {
+    value.expression = ex;
+  }
+
+  return new sql.SqlPartitionedByClause(value);
+}
+
+ClusteredByClause = clustered:ClusteredToken postClustered:__ by:ByToken postBy:_ head:Expression tail:(CommaSeparator Expression)*
+{
+  return new sql.SqlClusteredByClause({
+    expressions: makeSeparatedArray(head, tail),
+    spacing: {
+      postClustered: postClustered,
+      postBy: postBy,
+    },
+    keywords: {
+      clustered: clustered,
+      by: by,
     },
   });
 }

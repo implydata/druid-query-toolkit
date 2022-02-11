@@ -72,11 +72,11 @@ export interface SqlQueryValue extends SqlBaseValue {
   whereClause?: SqlWhereClause;
   groupByClause?: SqlGroupByClause;
   havingClause?: SqlHavingClause;
-  partitionedByClause?: SqlPartitionedByClause;
-  clusteredByClause?: SqlClusteredByClause;
   orderByClause?: SqlOrderByClause;
   limitClause?: SqlLimitClause;
   offsetClause?: SqlOffsetClause;
+  partitionedByClause?: SqlPartitionedByClause;
+  clusteredByClause?: SqlClusteredByClause;
   unionQuery?: SqlQuery;
 }
 
@@ -144,10 +144,10 @@ export class SqlQuery extends SqlExpression {
   public readonly whereClause?: SqlWhereClause;
   public readonly groupByClause?: SqlGroupByClause;
   public readonly havingClause?: SqlHavingClause;
-  public readonly partitionedByClause?: SqlPartitionedByClause;
-  public readonly clusteredByClause?: SqlClusteredByClause;
   public readonly orderByClause?: SqlOrderByClause;
   public readonly limitClause?: SqlLimitClause;
+  public readonly partitionedByClause?: SqlPartitionedByClause;
+  public readonly clusteredByClause?: SqlClusteredByClause;
   public readonly offsetClause?: SqlOffsetClause;
   public readonly unionQuery?: SqlQuery;
 
@@ -162,11 +162,11 @@ export class SqlQuery extends SqlExpression {
     this.whereClause = options.whereClause;
     this.groupByClause = options.groupByClause;
     this.havingClause = options.havingClause;
-    this.partitionedByClause = options.partitionedByClause;
-    this.clusteredByClause = options.clusteredByClause;
     this.orderByClause = options.orderByClause;
     this.limitClause = options.limitClause;
     this.offsetClause = options.offsetClause;
+    this.partitionedByClause = options.partitionedByClause;
+    this.clusteredByClause = options.clusteredByClause;
     this.unionQuery = options.unionQuery;
   }
 
@@ -181,11 +181,11 @@ export class SqlQuery extends SqlExpression {
     value.whereClause = this.whereClause;
     value.groupByClause = this.groupByClause;
     value.havingClause = this.havingClause;
-    value.partitionedByClause = this.partitionedByClause;
-    value.clusteredByClause = this.clusteredByClause;
     value.orderByClause = this.orderByClause;
     value.limitClause = this.limitClause;
     value.offsetClause = this.offsetClause;
+    value.partitionedByClause = this.partitionedByClause;
+    value.clusteredByClause = this.clusteredByClause;
     value.unionQuery = this.unionQuery;
     return value;
   }
@@ -201,11 +201,11 @@ export class SqlQuery extends SqlExpression {
       whereClause,
       groupByClause,
       havingClause,
-      partitionedByClause,
-      clusteredByClause,
       orderByClause,
       limitClause,
       offsetClause,
+      partitionedByClause,
+      clusteredByClause,
       unionQuery,
     } = this;
 
@@ -262,14 +262,6 @@ export class SqlQuery extends SqlExpression {
       rawParts.push(this.getSpace('preHavingClause', '\n'), havingClause.toString());
     }
 
-    if (partitionedByClause) {
-      rawParts.push(this.getSpace('prePartitionedByClause', '\n'), partitionedByClause.toString());
-    }
-
-    if (clusteredByClause) {
-      rawParts.push(this.getSpace('preClusteredByClause', '\n'), clusteredByClause.toString());
-    }
-
     if (orderByClause) {
       rawParts.push(this.getSpace('preOrderByClause', '\n'), orderByClause.toString());
     }
@@ -280,6 +272,14 @@ export class SqlQuery extends SqlExpression {
 
     if (offsetClause) {
       rawParts.push(this.getSpace('preOffsetClause', '\n'), offsetClause.toString());
+    }
+
+    if (partitionedByClause) {
+      rawParts.push(this.getSpace('prePartitionedByClause', '\n'), partitionedByClause.toString());
+    }
+
+    if (clusteredByClause) {
+      rawParts.push(this.getSpace('preClusteredByClause', '\n'), clusteredByClause.toString());
     }
 
     if (unionQuery) {
@@ -431,44 +431,6 @@ export class SqlQuery extends SqlExpression {
     );
   }
 
-  public changePartitionedByClause(partitionedByClause: SqlPartitionedByClause | undefined): this {
-    if (this.partitionedByClause === partitionedByClause) return this;
-    const value = this.valueOf();
-    if (partitionedByClause) {
-      value.partitionedByClause = partitionedByClause;
-    } else {
-      delete value.partitionedByClause;
-      value.spacing = this.getSpacingWithout('prePartitionedByClause');
-    }
-    return SqlBase.fromValue(value);
-  }
-
-  public changeClusteredByClause(clusteredByClause: SqlClusteredByClause | undefined): this {
-    if (this.clusteredByClause === clusteredByClause) return this;
-    const value = this.valueOf();
-    if (clusteredByClause) {
-      value.clusteredByClause = clusteredByClause;
-    } else {
-      delete value.clusteredByClause;
-      value.spacing = this.getSpacingWithout('preClusteredByClause');
-    }
-    return SqlBase.fromValue(value);
-  }
-
-  public changeClusteredByExpressions(
-    clusteredByExpressions: SeparatedArray<SqlExpression> | SqlExpression[] | undefined,
-  ): this {
-    if (!clusteredByExpressions || isEmptyArray(clusteredByExpressions)) {
-      return this.changeClusteredByClause(undefined);
-    } else {
-      return this.changeClusteredByClause(
-        this.clusteredByClause
-          ? this.clusteredByClause.changeExpressions(clusteredByExpressions)
-          : SqlClusteredByClause.create(clusteredByExpressions),
-      );
-    }
-  }
-
   public changeOrderByClause(orderByClause: SqlOrderByClause | undefined): this {
     if (this.orderByClause === orderByClause) return this;
     const value = this.valueOf();
@@ -540,6 +502,44 @@ export class SqlQuery extends SqlExpression {
         ? this.offsetClause.changeOffset(offsetValue)
         : SqlOffsetClause.create(offsetValue),
     );
+  }
+
+  public changePartitionedByClause(partitionedByClause: SqlPartitionedByClause | undefined): this {
+    if (this.partitionedByClause === partitionedByClause) return this;
+    const value = this.valueOf();
+    if (partitionedByClause) {
+      value.partitionedByClause = partitionedByClause;
+    } else {
+      delete value.partitionedByClause;
+      value.spacing = this.getSpacingWithout('prePartitionedByClause');
+    }
+    return SqlBase.fromValue(value);
+  }
+
+  public changeClusteredByClause(clusteredByClause: SqlClusteredByClause | undefined): this {
+    if (this.clusteredByClause === clusteredByClause) return this;
+    const value = this.valueOf();
+    if (clusteredByClause) {
+      value.clusteredByClause = clusteredByClause;
+    } else {
+      delete value.clusteredByClause;
+      value.spacing = this.getSpacingWithout('preClusteredByClause');
+    }
+    return SqlBase.fromValue(value);
+  }
+
+  public changeClusteredByExpressions(
+    clusteredByExpressions: SeparatedArray<SqlExpression> | SqlExpression[] | undefined,
+  ): this {
+    if (!clusteredByExpressions || isEmptyArray(clusteredByExpressions)) {
+      return this.changeClusteredByClause(undefined);
+    } else {
+      return this.changeClusteredByClause(
+        this.clusteredByClause
+          ? this.clusteredByClause.changeExpressions(clusteredByExpressions)
+          : SqlClusteredByClause.create(clusteredByExpressions),
+      );
+    }
   }
 
   public changeUnionQuery(unionQuery: SqlQuery | undefined): this {
@@ -622,22 +622,6 @@ export class SqlQuery extends SqlExpression {
       }
     }
 
-    if (this.partitionedByClause) {
-      const partitionedByClause = this.partitionedByClause._walkHelper(nextStack, fn, postorder);
-      if (!partitionedByClause) return;
-      if (partitionedByClause !== this.partitionedByClause) {
-        ret = ret.changePartitionedByClause(partitionedByClause as SqlPartitionedByClause);
-      }
-    }
-
-    if (this.clusteredByClause) {
-      const clusteredByClause = this.clusteredByClause._walkHelper(nextStack, fn, postorder);
-      if (!clusteredByClause) return;
-      if (clusteredByClause !== this.clusteredByClause) {
-        ret = ret.changeClusteredByClause(clusteredByClause as SqlClusteredByClause);
-      }
-    }
-
     if (this.orderByClause) {
       const orderByClause = this.orderByClause._walkHelper(nextStack, fn, postorder);
       if (!orderByClause) return;
@@ -659,6 +643,22 @@ export class SqlQuery extends SqlExpression {
       if (!offsetClause) return;
       if (offsetClause !== this.offsetClause) {
         ret = ret.changeOffsetClause(offsetClause as SqlOffsetClause);
+      }
+    }
+
+    if (this.partitionedByClause) {
+      const partitionedByClause = this.partitionedByClause._walkHelper(nextStack, fn, postorder);
+      if (!partitionedByClause) return;
+      if (partitionedByClause !== this.partitionedByClause) {
+        ret = ret.changePartitionedByClause(partitionedByClause as SqlPartitionedByClause);
+      }
+    }
+
+    if (this.clusteredByClause) {
+      const clusteredByClause = this.clusteredByClause._walkHelper(nextStack, fn, postorder);
+      if (!clusteredByClause) return;
+      if (clusteredByClause !== this.clusteredByClause) {
+        ret = ret.changeClusteredByClause(clusteredByClause as SqlClusteredByClause);
       }
     }
 
