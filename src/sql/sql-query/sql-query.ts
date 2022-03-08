@@ -254,6 +254,15 @@ export class SqlQuery extends SqlExpression {
       rawParts.push(this.getSpace('preWhereClause', '\n'), whereClause.toString());
     }
 
+    if (unionQuery) {
+      rawParts.push(
+        this.getSpace('preUnion', '\n'),
+        this.getKeyword('union', SqlQuery.DEFAULT_UNION_KEYWORD),
+        this.getSpace('postUnion'),
+        unionQuery.toString(),
+      );
+    }
+
     if (groupByClause) {
       rawParts.push(this.getSpace('preGroupByClause', '\n'), groupByClause.toString());
     }
@@ -280,15 +289,6 @@ export class SqlQuery extends SqlExpression {
 
     if (clusteredByClause) {
       rawParts.push(this.getSpace('preClusteredByClause', '\n'), clusteredByClause.toString());
-    }
-
-    if (unionQuery) {
-      rawParts.push(
-        this.getSpace('preUnion', '\n'),
-        this.getKeyword('union', SqlQuery.DEFAULT_UNION_KEYWORD),
-        this.getSpace('postUnion'),
-        unionQuery.toString(),
-      );
     }
 
     return rawParts.join('');

@@ -135,11 +135,15 @@ describe('Introspect', () => {
         Introspect.getQueryColumnSampleQuery(
           SqlQuery.parse(sane`
             SELECT added + 1, * FROM "wikipedia"
+            Union All
+            SELECT * FROM "wiki"
           `),
         ),
       ),
     ).toEqual(sane`
       SELECT added + 1, * FROM "wikipedia"
+      Union All
+      SELECT * FROM "wiki"
       LIMIT 1
     `);
   });
