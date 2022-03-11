@@ -83,7 +83,7 @@ export class Introspect {
     const m = plan.match(/ signature=\[\{([^}]*)}]/m);
     if (!m) throw new Error('could not find signature');
 
-    return m[1].match(/:[A-Z]+(?:, |$)/g).map((t: string) => {
+    return m[1].match(/:[A-Z]+(?:<[A-Za-z]+>)?(?:, |$)/g).map((t: string) => {
       // Will match something like ':LONG, ' or ':LONG'
       return t.replace(/[:, ]/g, '');
     });
@@ -100,7 +100,9 @@ export class Introspect {
 
     if (sampleRowResult) {
       if (sampleRowResult.header.length !== types.length) {
-        throw new Error('number of columns in the sample row does not match the number of types');
+        throw new Error(
+          `number of columns in the sample row (${sampleRowResult.header.length}) does not match the number of types (${types.length})`,
+        );
       }
 
       const sampleRow = sampleRowResult.rows[0];
