@@ -56,6 +56,7 @@ describe('Introspect', () => {
           ['sum_delta', 'BIGINT'],
           ['sum_deltaBucket', 'BIGINT'],
           ['user', 'VARCHAR'],
+          ['distinct_thing', 'COMPLEX<HLLSketch>'],
         ],
       });
 
@@ -91,6 +92,10 @@ describe('Introspect', () => {
         {
           name: 'user',
           type: 'VARCHAR',
+        },
+        {
+          name: 'distinct_thing',
+          type: 'COMPLEX<HLLSketch>',
         },
       ]);
     });
@@ -340,6 +345,58 @@ describe('Introspect', () => {
         {
           name: 'Count',
           type: 'LONG',
+        },
+      ]);
+    });
+
+    it('works with some columns having complex data types', () => {
+      const query = SqlQuery.parse(sane`
+        SELECT * FROM wikipedia
+      `);
+
+      const queryPlanResult = new QueryResult({
+        sqlQuery: Introspect.getQueryColumnIntrospectionQuery(query),
+        header: Column.fromColumnNames(['PLAN']),
+        rows: [
+          [
+            'DruidQueryRel(query=[...\n...], signature=[{d0:LONG, d1:STRING, a0:COMPLEX<HLLSketch>, a1:LONG, a1:LONG}])\n',
+          ],
+        ],
+      });
+
+      const sampleResult = new QueryResult({
+        header: Column.fromColumnNames([
+          'time',
+          'cityName',
+          'distinct_cityName',
+          'delta',
+          'deleted',
+        ]),
+        rows: [[new Date('2020-01-01T00:00:00'), 'SF', 1, 4, true]],
+      });
+
+      expect(
+        Introspect.decodeQueryColumnIntrospectionResult(queryPlanResult, sampleResult),
+      ).toEqual([
+        {
+          name: 'time',
+          type: 'TIMESTAMP',
+        },
+        {
+          name: 'cityName',
+          type: 'STRING',
+        },
+        {
+          name: 'distinct_cityName',
+          type: 'COMPLEX<HLLSketch>',
+        },
+        {
+          name: 'delta',
+          type: 'LONG',
+        },
+        {
+          name: 'deleted',
+          type: 'BOOLEAN',
         },
       ]);
     });
