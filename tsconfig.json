@@ -13,6 +13,7 @@
     "esModuleInterop": true,
     "noUnusedParameters": true,
     "noUnusedLocals": true,
+    "useUnknownInCatchVariables": false,
     "target": "es5",
     "module": "commonjs",
     "moduleResolution": "node",
