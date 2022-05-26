@@ -391,6 +391,7 @@ describe('#convertToTableRef', () => {
         "offsetClause": undefined,
         "orderByClause": undefined,
         "partitionedByClause": undefined,
+        "replaceClause": undefined,
         "selectExpressions": SeparatedArray {
           "separators": Array [],
           "values": Array [

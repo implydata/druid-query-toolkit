@@ -79,17 +79,18 @@ export class SqlMulti extends SqlExpression {
   }
 
   public and(expression: SqlExpression): SqlExpression {
-    if (this.op !== 'AND') {
-      return super.and(expression);
-    }
-
+    if (this.op !== 'AND') return super.and(expression);
     return this.changeArgs(this.args.append(expression));
   }
 
   public decomposeViaAnd(): SqlExpression[] {
     if (this.op !== 'AND') return super.decomposeViaAnd();
-
     return this.args.values.flatMap(v => v.decomposeViaAnd());
+  }
+
+  public or(expression: SqlExpression): SqlExpression {
+    if (this.op !== 'OR') return super.or(expression);
+    return this.changeArgs(this.args.append(expression));
   }
 
   public filterAnd(fn: (ex: SqlExpression) => boolean): SqlExpression | undefined {

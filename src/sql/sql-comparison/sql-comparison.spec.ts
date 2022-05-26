@@ -346,6 +346,7 @@ describe('SqlComparison', () => {
             },
           ],
           "partitionedByClause": undefined,
+          "replaceClause": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
@@ -760,6 +761,7 @@ describe('SqlComparison', () => {
             },
           ],
           "partitionedByClause": undefined,
+          "replaceClause": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
@@ -880,6 +882,7 @@ describe('SqlComparison', () => {
             },
           ],
           "partitionedByClause": undefined,
+          "replaceClause": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [

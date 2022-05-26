@@ -405,7 +405,7 @@ describe('SqlQuery operations', () => {
           .toString(),
       ).toEqual(sane`
         SELECT *
-        FROM sys."github" WHERE (col > 1 OR col < 5) AND colTwo > 5 AND colTwo > 2
+        FROM sys."github" WHERE ((col > 1 OR col < 5) AND colTwo > 5) AND colTwo > 2
       `);
     });
   });

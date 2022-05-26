@@ -62,22 +62,71 @@ export abstract class SqlExpression extends SqlBase {
     const compactArgs = filterMap(args, a => {
       if (!a) return;
       a = SqlExpression.parse(a);
-      if (a instanceof SqlMulti && a.op === 'OR') {
+      if (a instanceof SqlMulti) {
         return a.ensureParens();
       }
       return a;
     });
 
-    if (compactArgs.length === 0) {
-      return SqlLiteral.TRUE;
-    } else if (compactArgs.length === 1) {
-      return compactArgs[0];
-    } else {
-      return new SqlMulti({
-        op: 'AND',
-        args: SeparatedArray.fromArray(compactArgs, Separator.symmetricSpace('AND')),
-      });
+    switch (compactArgs.length) {
+      case 0:
+        return SqlLiteral.TRUE;
+
+      case 1:
+        return compactArgs[0];
+
+      default:
+        return new SqlMulti({
+          op: 'AND',
+          args: SeparatedArray.fromArray(compactArgs, Separator.symmetricSpace('AND')),
+        });
     }
+  }
+
+  static or(...args: (SqlExpression | string | undefined)[]): SqlExpression {
+    const compactArgs = filterMap(args, a => {
+      if (!a) return;
+      a = SqlExpression.parse(a);
+      if (a instanceof SqlMulti) {
+        return a.ensureParens();
+      }
+      return a;
+    });
+
+    switch (compactArgs.length) {
+      case 0:
+        return SqlLiteral.FALSE;
+
+      case 1:
+        return compactArgs[0];
+
+      default:
+        return new SqlMulti({
+          op: 'OR',
+          args: SeparatedArray.fromArray(compactArgs, Separator.symmetricSpace('OR')),
+        });
+    }
+  }
+
+  static fromTimeRefAndInterval(timeRef: SqlRef, interval: string | string[]): SqlExpression {
+    if (Array.isArray(interval)) {
+      return SqlExpression.or(
+        ...interval.map(int => SqlExpression.fromTimeRefAndInterval(timeRef, int)),
+      );
+    }
+
+    const parts = interval.split('/');
+    if (parts.length !== 2) throw new Error(`can not convert interval: ${interval}`);
+
+    const start = new Date(parts[0]);
+    if (isNaN(start.valueOf())) throw new Error(`can not parse the start of interval: ${interval}`);
+
+    const end = new Date(parts[1]);
+    if (isNaN(end.valueOf())) throw new Error(`can not parse the end of interval: ${interval}`);
+
+    return SqlLiteral.create(start)
+      .lessThanOrEqual(timeRef)
+      .and(timeRef.lessThan(SqlLiteral.create(end)));
   }
 
   // ------------------------------
@@ -204,6 +253,10 @@ export abstract class SqlExpression extends SqlBase {
 
   public and(expression: SqlExpression | string): SqlExpression {
     return SqlExpression.and(this, expression);
+  }
+
+  public or(expression: SqlExpression | string): SqlExpression {
+    return SqlExpression.or(this, expression);
   }
 
   public decomposeViaAnd(): SqlExpression[] {

@@ -123,6 +123,7 @@ describe('SqlWithQuery', () => {
             },
           ],
           "partitionedByClause": undefined,
+          "replaceClause": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
@@ -209,6 +210,7 @@ describe('SqlWithQuery', () => {
                     },
                   ],
                   "partitionedByClause": undefined,
+                  "replaceClause": undefined,
                   "selectExpressions": SeparatedArray {
                     "separators": Array [],
                     "values": Array [

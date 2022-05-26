@@ -56,7 +56,85 @@ describe('SqlExpression', () => {
     }
   });
 
-  describe('factories', () => {
+  describe('factories (static)', () => {
+    describe('.and', () => {
+      it('works in empty case', () => {
+        expect(String(SqlExpression.and())).toEqual('TRUE');
+      });
+
+      it('works in single clause case', () => {
+        expect(String(SqlExpression.and('c < 10'))).toEqual('c < 10');
+      });
+
+      it('works in general case', () => {
+        expect(
+          String(
+            SqlExpression.and(
+              SqlExpression.parse('a OR b'),
+              SqlExpression.parse('x AND y'),
+              'c < 10',
+              undefined,
+              'NOT k = 1',
+            ),
+          ),
+        ).toEqual('(a OR b) AND (x AND y) AND c < 10 AND NOT k = 1');
+      });
+    });
+
+    describe('.or', () => {
+      it('works in empty case', () => {
+        expect(String(SqlExpression.or())).toEqual('FALSE');
+      });
+
+      it('works in single clause case', () => {
+        expect(String(SqlExpression.or('c < 10'))).toEqual('c < 10');
+      });
+
+      it('works in general case', () => {
+        expect(
+          String(
+            SqlExpression.or(
+              SqlExpression.parse('a OR b'),
+              SqlExpression.parse('x AND y'),
+              'c < 10',
+              undefined,
+              'NOT k = 1',
+            ),
+          ),
+        ).toEqual('(a OR b) OR (x AND y) OR c < 10 OR NOT k = 1');
+      });
+    });
+
+    describe('.fromTimeRefAndInterval', () => {
+      const timeRef = SqlRef.column('__time');
+
+      it('works for a single interval', () => {
+        expect(
+          String(
+            SqlExpression.fromTimeRefAndInterval(
+              timeRef,
+              '2022-04-30T00:00:00.000Z/2022-05-01T00:00:00.000Z',
+            ),
+          ),
+        ).toEqual("TIMESTAMP '2022-04-30' <= __time AND __time < TIMESTAMP '2022-05-01'");
+      });
+
+      it('works for multiple intervals', () => {
+        expect(
+          String(
+            SqlExpression.fromTimeRefAndInterval(timeRef, [
+              '2022-04-30T00:00:00.000Z/2022-04-30T01:00:00.000Z',
+              '2022-04-30T02:00:00.000Z/2022-04-30T03:00:00.000Z',
+            ]),
+          ),
+        ).toEqual(
+          "(TIMESTAMP '2022-04-30' <= __time AND __time < TIMESTAMP '2022-04-30 01:00:00') OR (TIMESTAMP '2022-04-30 02:00:00' <= __time AND __time < TIMESTAMP '2022-04-30 03:00:00')",
+        );
+      });
+    });
+  });
+
+  describe('factories (methods)', () => {
     const x = SqlRef.column('x');
     const y = SqlRef.column('y');
 

@@ -70,6 +70,7 @@ SqlAliasExplicitAs = expression:Expression alias:(_ AsToken _ RefNameAlias)?
 SqlQuery =
   explainClause:(ExplainClause _)?
   insertClause:(InsertClause _)?
+  replaceClause:(ReplaceClause _)?
   heart:(((WithClause _)? QueryHeart) / (WithClause _ OpenParen _ SqlQuery _ CloseParen))
   orderByClause:(_ OrderByClause)?
   limitClause:(_ LimitClause)?
@@ -87,9 +88,18 @@ SqlQuery =
     spacing.postExplainClause = explainClause[1];
   }
 
+  if (insertClause && replaceClause) {
+    error('Can not have both an INSERT and a REPLACE clause');
+  }
+
   if (insertClause) {
     value.insertClause = insertClause[0];
     spacing.postInsertClause = insertClause[1];
+  }
+
+  if (replaceClause) {
+    value.replaceClause = replaceClause[0];
+    spacing.postReplaceClause = replaceClause[1];
   }
 
   var withQueryMode = heart.length === 7;
@@ -208,7 +218,13 @@ ExplainClause = explain:ExplainToken postExplain:__ plan:PlanToken postPlan:__ f
 }
 
 
-InsertClause = insert:InsertToken postInsert:__ into:IntoToken postInto:__ table:SqlRef columns:(_ SqlColumnList)?
+InsertClause =
+  insert:InsertToken
+  postInsert:__
+  into:IntoToken
+  postInto:__
+  table:SqlRef
+  columns:(_ SqlColumnList)?
 {
   var value = {
     table: table.convertToTableRef(),
@@ -228,6 +244,47 @@ InsertClause = insert:InsertToken postInsert:__ into:IntoToken postInto:__ table
   }
 
   return new sql.SqlInsertClause(value);
+}
+
+
+ReplaceClause =
+  replace:ReplaceToken
+  postReplace:__
+  into:IntoToken
+  postInto:__ table:SqlRef
+  columns:(_ SqlColumnList)?
+  preOverwrite:__
+  overwrite:OverwriteToken
+  postOverwrite:__
+  allOrWhere:(AllToken / SqlWhereClause)
+{
+  var value = {
+    table: table.convertToTableRef(),
+    keywords: {
+      replace: replace,
+      into: into,
+      overwrite: overwrite
+    },
+    spacing: {
+      postReplace: postReplace,
+      postInto: postInto,
+      preOverwrite: preOverwrite,
+      postOverwrite: postOverwrite
+    }
+  };
+
+  if (columns) {
+    value.spacing.preColumns = columns[0];
+    value.columns = columns[1];
+  }
+
+  if (typeof allOrWhere === 'string') {
+    value.keywords.all = allOrWhere;
+  } else {
+    value.whereClause = allOrWhere;
+  }
+
+  return new sql.SqlReplaceClause(value);
 }
 
 
@@ -1548,9 +1605,11 @@ OnToken = $("ON"i !IdentifierPart)
 OrToken = $("OR"i !IdentifierPart)
 OrderToken = $("ORDER"i !IdentifierPart)
 OuterToken = $("OUTER"i !IdentifierPart)
+OverwriteToken = $("OVERWRITE"i !IdentifierPart)
 PartitionedToken = $("PARTITIONED"i !IdentifierPart)
 PlanToken = $("PLAN"i !IdentifierPart)
 PositionToken = $("POSITION"i !IdentifierPart)
+ReplaceToken = $("REPLACE"i !IdentifierPart)
 RowToken = $("ROW"i !IdentifierPart)
 SelectToken = $("SELECT"i !IdentifierPart)
 SimilarToToken = $("SIMILAR"i !IdentifierPart __ ToToken)

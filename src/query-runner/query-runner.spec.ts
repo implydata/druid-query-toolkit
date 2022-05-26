@@ -274,6 +274,7 @@ describe('QueryRunner', () => {
             "type": "orderByClause",
           },
           "partitionedByClause": undefined,
+          "replaceClause": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [
               Separator {
@@ -500,6 +501,7 @@ describe('QueryRunner', () => {
             "type": "orderByClause",
           },
           "partitionedByClause": undefined,
+          "replaceClause": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [
               Separator {
@@ -727,6 +729,7 @@ describe('QueryRunner', () => {
             "type": "orderByClause",
           },
           "partitionedByClause": undefined,
+          "replaceClause": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [
               Separator {

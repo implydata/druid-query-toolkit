@@ -87,6 +87,20 @@ describe('SqlQuery', () => {
         PARTITIONED  BY   ALL    TIME
         CLUSTERED BY  "hello"
       `,
+      sane`
+        Replace Into "tbl2"  Overwrite  All
+        SELECT *
+        FROM tbl
+        PARTITIONED  BY   ALL
+      `,
+      sane`
+        Replace Into "tbl2"  Overwrite  Where  TIME_FLOOR(__time) = TIMESTAMP '2020-01-01'
+        SELECT *
+        FROM tbl
+        LIMIT 100
+        PARTITIONED  BY   ALL    TIME
+        CLUSTERED BY  "hello"
+      `,
     ];
 
     for (const sql of queries) {
@@ -118,6 +132,20 @@ describe('SqlQuery', () => {
         throw new Error(`should not parse: ${sql}`);
       }
     }
+  });
+
+  it('errors on parse if there are INSERT and REPLACE clauses', () => {
+    expect(() => {
+      SqlQuery.parse(sane`
+        INSERT Into "tbl2"
+        Replace Into "tbl2"  Overwrite  Where  TIME_FLOOR(__time) = TIMESTAMP '2020-01-01'
+        SELECT *
+        FROM tbl
+        LIMIT 100
+        PARTITIONED  BY   ALL    TIME
+        CLUSTERED BY  "hello"
+    `);
+    }).toThrowError('Can not have both an INSERT and a REPLACE clause');
   });
 
   describe('.create', () => {
@@ -807,6 +835,7 @@ describe('SqlQuery', () => {
                   },
                 ],
                 "partitionedByClause": undefined,
+                "replaceClause": undefined,
                 "selectExpressions": SeparatedArray {
                   "separators": Array [],
                   "values": Array [
@@ -869,6 +898,7 @@ describe('SqlQuery', () => {
         "offsetClause": undefined,
         "orderByClause": undefined,
         "partitionedByClause": undefined,
+        "replaceClause": undefined,
         "selectExpressions": SeparatedArray {
           "separators": Array [],
           "values": Array [
@@ -951,6 +981,7 @@ describe('SqlQuery', () => {
         "offsetClause": undefined,
         "orderByClause": undefined,
         "partitionedByClause": undefined,
+        "replaceClause": undefined,
         "selectExpressions": SeparatedArray {
           "separators": Array [
             Separator {
@@ -1138,6 +1169,7 @@ describe('SqlQuery', () => {
         "offsetClause": undefined,
         "orderByClause": undefined,
         "partitionedByClause": undefined,
+        "replaceClause": undefined,
         "selectExpressions": SeparatedArray {
           "separators": Array [],
           "values": Array [
@@ -1228,6 +1260,7 @@ describe('SqlQuery', () => {
         "offsetClause": undefined,
         "orderByClause": undefined,
         "partitionedByClause": undefined,
+        "replaceClause": undefined,
         "selectExpressions": SeparatedArray {
           "separators": Array [],
           "values": Array [
@@ -1311,6 +1344,7 @@ describe('SqlQuery', () => {
                     },
                   ],
                   "partitionedByClause": undefined,
+                  "replaceClause": undefined,
                   "selectExpressions": SeparatedArray {
                     "separators": Array [],
                     "values": Array [
@@ -1400,6 +1434,7 @@ describe('SqlQuery', () => {
           "offsetClause": undefined,
           "orderByClause": undefined,
           "partitionedByClause": undefined,
+          "replaceClause": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
@@ -1515,6 +1550,7 @@ describe('SqlQuery', () => {
           "offsetClause": undefined,
           "orderByClause": undefined,
           "partitionedByClause": undefined,
+          "replaceClause": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
@@ -1630,6 +1666,7 @@ describe('SqlQuery', () => {
           "offsetClause": undefined,
           "orderByClause": undefined,
           "partitionedByClause": undefined,
+          "replaceClause": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
@@ -1863,6 +1900,7 @@ describe('SqlQuery', () => {
           "offsetClause": undefined,
           "orderByClause": undefined,
           "partitionedByClause": undefined,
+          "replaceClause": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
@@ -1959,6 +1997,7 @@ describe('SqlQuery', () => {
           "offsetClause": undefined,
           "orderByClause": undefined,
           "partitionedByClause": undefined,
+          "replaceClause": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
@@ -2078,6 +2117,7 @@ describe('SqlQuery', () => {
             },
           ],
           "partitionedByClause": undefined,
+          "replaceClause": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
@@ -2189,6 +2229,7 @@ describe('SqlQuery', () => {
           "offsetClause": undefined,
           "orderByClause": undefined,
           "partitionedByClause": undefined,
+          "replaceClause": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
@@ -2304,6 +2345,7 @@ describe('SqlQuery', () => {
           "offsetClause": undefined,
           "orderByClause": undefined,
           "partitionedByClause": undefined,
+          "replaceClause": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
@@ -2515,6 +2557,7 @@ describe('SqlQuery', () => {
           "offsetClause": undefined,
           "orderByClause": undefined,
           "partitionedByClause": undefined,
+          "replaceClause": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
@@ -2615,6 +2658,7 @@ describe('SqlQuery', () => {
             "type": "orderByClause",
           },
           "partitionedByClause": undefined,
+          "replaceClause": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
@@ -2721,6 +2765,7 @@ describe('SqlQuery', () => {
             "type": "orderByClause",
           },
           "partitionedByClause": undefined,
+          "replaceClause": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
@@ -2827,6 +2872,7 @@ describe('SqlQuery', () => {
             "type": "orderByClause",
           },
           "partitionedByClause": undefined,
+          "replaceClause": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
@@ -2937,6 +2983,7 @@ describe('SqlQuery', () => {
             "type": "orderByClause",
           },
           "partitionedByClause": undefined,
+          "replaceClause": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [
               Separator {
@@ -3083,6 +3130,7 @@ describe('SqlQuery', () => {
             "type": "orderByClause",
           },
           "partitionedByClause": undefined,
+          "replaceClause": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
@@ -3216,6 +3264,7 @@ describe('SqlQuery', () => {
             "type": "orderByClause",
           },
           "partitionedByClause": undefined,
+          "replaceClause": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [
               Separator {
@@ -3324,6 +3373,7 @@ describe('SqlQuery', () => {
           "offsetClause": undefined,
           "orderByClause": undefined,
           "partitionedByClause": undefined,
+          "replaceClause": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
@@ -3397,6 +3447,7 @@ describe('SqlQuery', () => {
           "offsetClause": undefined,
           "orderByClause": undefined,
           "partitionedByClause": undefined,
+          "replaceClause": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
@@ -3455,6 +3506,7 @@ describe('SqlQuery', () => {
             "offsetClause": undefined,
             "orderByClause": undefined,
             "partitionedByClause": undefined,
+            "replaceClause": undefined,
             "selectExpressions": SeparatedArray {
               "separators": Array [],
               "values": Array [
@@ -3594,6 +3646,7 @@ describe('SqlQuery', () => {
           "offsetClause": undefined,
           "orderByClause": undefined,
           "partitionedByClause": undefined,
+          "replaceClause": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
@@ -3728,6 +3781,7 @@ describe('SqlQuery', () => {
           "offsetClause": undefined,
           "orderByClause": undefined,
           "partitionedByClause": undefined,
+          "replaceClause": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
@@ -3862,6 +3916,7 @@ describe('SqlQuery', () => {
           "offsetClause": undefined,
           "orderByClause": undefined,
           "partitionedByClause": undefined,
+          "replaceClause": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
@@ -3996,6 +4051,7 @@ describe('SqlQuery', () => {
           "offsetClause": undefined,
           "orderByClause": undefined,
           "partitionedByClause": undefined,
+          "replaceClause": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
@@ -4130,6 +4186,7 @@ describe('SqlQuery', () => {
           "offsetClause": undefined,
           "orderByClause": undefined,
           "partitionedByClause": undefined,
+          "replaceClause": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
@@ -4204,6 +4261,7 @@ describe('SqlQuery', () => {
           "offsetClause": undefined,
           "orderByClause": undefined,
           "partitionedByClause": undefined,
+          "replaceClause": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
@@ -4440,6 +4498,7 @@ describe('SqlQuery', () => {
             "type": "orderByClause",
           },
           "partitionedByClause": undefined,
+          "replaceClause": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [
               Separator {
@@ -4684,6 +4743,7 @@ describe('SqlQuery', () => {
             "type": "orderByClause",
           },
           "partitionedByClause": undefined,
+          "replaceClause": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [
               Separator {
@@ -5073,6 +5133,7 @@ describe('SqlQuery', () => {
             },
             "type": "partitionedByClause",
           },
+          "replaceClause": undefined,
           "selectExpressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
