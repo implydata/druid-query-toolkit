@@ -14,6 +14,7 @@
 
 import { SqlBase, SqlType, Substitutor } from '../../sql-base';
 import { SqlColumnList } from '../../sql-column-list/sql-column-list';
+import { SqlExpression } from '../../sql-expression';
 import { SqlTableRef } from '../../sql-table-ref/sql-table-ref';
 import { SqlClause, SqlClauseValue } from '../sql-clause';
 import { SqlWhereClause } from '../sql-where-clause/sql-where-clause';
@@ -32,13 +33,23 @@ export class SqlReplaceClause extends SqlClause {
   static readonly DEFAULT_OVERWRITE_KEYWORD = 'OVERWRITE';
   static readonly DEFAULT_ALL_KEYWORD = 'ALL';
 
-  static create(table: SqlReplaceClause | SqlTableRef | string): SqlReplaceClause {
+  static create(
+    table: SqlReplaceClause | SqlTableRef | string,
+    where?: SqlWhereClause | SqlExpression | string,
+  ): SqlReplaceClause {
     if (table instanceof SqlReplaceClause) return table;
     if (typeof table === 'string') {
       table = SqlTableRef.create(table);
     }
+
+    let whereClause: SqlWhereClause | undefined;
+    if (where) {
+      whereClause = where instanceof SqlWhereClause ? where : SqlWhereClause.create(where);
+    }
+
     return new SqlReplaceClause({
       table,
+      whereClause,
     });
   }
 

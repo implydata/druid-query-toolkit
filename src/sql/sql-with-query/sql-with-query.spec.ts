@@ -24,6 +24,14 @@ describe('SqlWithQuery', () => {
       `WITH wiki AS (SELECT * FROM wikipedia) (SELECT * FROM wiki)`,
       `WITH wiki AS (SELECT * FROM wikipedia) (SELECT * FROM wiki) ORDER BY __time DESC LIMIT 3 OFFSET 0`,
       sane`
+        INSERT INTO dst
+        WITH wiki AS (SELECT * FROM wikipedia) (SELECT * FROM wiki) ORDER BY __time DESC LIMIT 3 OFFSET 0
+      `,
+      sane`
+        REPLACE INTO dst OVERWRITE ALL
+        WITH wiki AS (SELECT * FROM wikipedia) (SELECT * FROM wiki) ORDER BY __time DESC LIMIT 3 OFFSET 0
+      `,
+      sane`
         WITH wiki AS (SELECT * FROM wikipedia)
         (
           WITH wiki2 AS (SELECT * FROM wiki)
@@ -46,6 +54,7 @@ describe('SqlWithQuery', () => {
 
   it('flattenWith', () => {
     const sql = sane`
+      REPLACE INTO dst OVERWRITE ALL
       WITH wiki1 AS (SELECT * FROM wikipedia), wiki2 AS (SELECT * FROM wikipedia)
       (
         WITH wiki3 AS (SELECT * FROM wiki1), wiki4 AS (SELECT * FROM wiki2)
@@ -59,6 +68,7 @@ describe('SqlWithQuery', () => {
     const query = SqlExpression.parse(sql) as SqlWithQuery;
 
     expect(String(query.flattenWith()).trim()).toEqual(sane`
+      REPLACE INTO dst OVERWRITE ALL
       WITH wiki1 AS (SELECT * FROM wikipedia),
       wiki2 AS (SELECT * FROM wikipedia),
       wiki3 AS (SELECT * FROM wiki1),
@@ -145,6 +155,7 @@ describe('SqlWithQuery', () => {
           "whereClause": undefined,
           "withClause": undefined,
         },
+        "replaceClause": undefined,
         "spacing": Object {
           "postWithClause": " ",
         },

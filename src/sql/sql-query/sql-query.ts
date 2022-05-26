@@ -591,9 +591,7 @@ export class SqlQuery extends SqlExpression {
       if (insertClause !== this.insertClause) {
         ret = ret.changeInsertClause(insertClause as SqlInsertClause);
       }
-    }
-
-    if (this.replaceClause) {
+    } else if (this.replaceClause) {
       const replaceClause = this.replaceClause._walkHelper(nextStack, fn, postorder);
       if (!replaceClause) return;
       if (replaceClause !== this.replaceClause) {

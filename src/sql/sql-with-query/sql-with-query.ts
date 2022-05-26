@@ -20,6 +20,7 @@ import {
   SqlOffsetClause,
   SqlOrderByClause,
   SqlOrderByExpression,
+  SqlReplaceClause,
   SqlWithClause,
   SqlWithPart,
 } from '../sql-clause';
@@ -32,6 +33,7 @@ import { SeparatedArray } from '../utils';
 export interface SqlWithQueryValue extends SqlBaseValue {
   explainClause?: SqlExplainClause;
   insertClause?: SqlInsertClause;
+  replaceClause?: SqlReplaceClause;
   withClause: SqlWithClause;
 
   query: SqlQuery | SqlWithQuery;
@@ -46,6 +48,7 @@ export class SqlWithQuery extends SqlExpression {
 
   public readonly explainClause?: SqlExplainClause;
   public readonly insertClause?: SqlInsertClause;
+  public readonly replaceClause?: SqlReplaceClause;
   public readonly withClause: SqlWithClause;
   public readonly query: SqlQuery | SqlWithQuery;
   public readonly orderByClause?: SqlOrderByClause;
@@ -56,6 +59,11 @@ export class SqlWithQuery extends SqlExpression {
     super(options, SqlWithQuery.type);
     this.explainClause = options.explainClause;
     this.insertClause = options.insertClause;
+    this.replaceClause = options.replaceClause;
+    if (this.insertClause && this.replaceClause) {
+      throw new Error('SqlWithQuery can not have both an insertClause and a replaceClause');
+    }
+
     this.withClause = options.withClause;
     this.query = options.query;
     this.orderByClause = options.orderByClause;
@@ -67,6 +75,7 @@ export class SqlWithQuery extends SqlExpression {
     const value = super.valueOf() as SqlWithQueryValue;
     value.explainClause = this.explainClause;
     value.insertClause = this.insertClause;
+    value.replaceClause = this.replaceClause;
     value.withClause = this.withClause;
     value.query = this.query;
     value.orderByClause = this.orderByClause;
@@ -79,6 +88,7 @@ export class SqlWithQuery extends SqlExpression {
     const {
       explainClause,
       insertClause,
+      replaceClause,
       withClause,
       query,
       orderByClause,
@@ -93,9 +103,11 @@ export class SqlWithQuery extends SqlExpression {
       rawParts.push(explainClause.toString(), this.getSpace('postExplainClause', '\n'));
     }
 
-    // INSERT clause
+    // INSERT / REPLACE clause
     if (insertClause) {
       rawParts.push(insertClause.toString(), this.getSpace('postInsertClause', '\n'));
+    } else if (replaceClause) {
+      rawParts.push(replaceClause.toString(), this.getSpace('postReplaceClause', '\n'));
     }
 
     // WITH clause
@@ -141,6 +153,18 @@ export class SqlWithQuery extends SqlExpression {
     } else {
       delete value.insertClause;
       value.spacing = this.getSpacingWithout('postInsertClause');
+    }
+    return SqlBase.fromValue(value);
+  }
+
+  public changeReplaceClause(replaceClause: SqlReplaceClause | undefined): this {
+    if (this.replaceClause === replaceClause) return this;
+    const value = this.valueOf();
+    if (replaceClause) {
+      value.replaceClause = replaceClause;
+    } else {
+      delete value.replaceClause;
+      value.spacing = this.getSpacingWithout('postReplaceClause');
     }
     return SqlBase.fromValue(value);
   }
@@ -242,6 +266,12 @@ export class SqlWithQuery extends SqlExpression {
       if (insertClause !== this.insertClause) {
         ret = ret.changeInsertClause(insertClause as SqlInsertClause);
       }
+    } else if (this.replaceClause) {
+      const replaceClause = this.replaceClause._walkHelper(nextStack, fn, postorder);
+      if (!replaceClause) return;
+      if (replaceClause !== this.replaceClause) {
+        ret = ret.changeReplaceClause(replaceClause as SqlReplaceClause);
+      }
     }
 
     const withClause = this.withClause._walkHelper(nextStack, fn, postorder);
@@ -300,6 +330,22 @@ export class SqlWithQuery extends SqlExpression {
     return SqlBase.fromValue(value);
   }
 
+  /* ~~~~~ REPLACE ~~~~~ */
+
+  public getReplaceIntoTable(): SqlTableRef | undefined {
+    return this.replaceClause?.table;
+  }
+
+  public changeReplaceIntoTable(table: SqlTableRef | string | undefined): this {
+    return this.changeReplaceClause(
+      table
+        ? this.replaceClause
+          ? this.replaceClause.changeTable(table)
+          : SqlReplaceClause.create(table)
+        : undefined,
+    );
+  }
+
   /* ~~~~~ WITH ~~~~~ */
 
   public getWithParts(): readonly SqlWithPart[] {
@@ -328,6 +374,8 @@ export class SqlWithQuery extends SqlExpression {
 
     if (this.insertClause) {
       flatQuery = flatQuery.changeInsertClause(this.insertClause);
+    } else if (this.replaceClause) {
+      flatQuery = flatQuery.changeReplaceClause(this.replaceClause);
     }
 
     if (this.orderByClause) {
