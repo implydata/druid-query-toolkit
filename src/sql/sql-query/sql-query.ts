@@ -750,6 +750,12 @@ export class SqlQuery extends SqlExpression {
     );
   }
 
+  /* ~~~~~ INSERT + REPLACE ~~~~~ */
+
+  public getIngestTable(): SqlTableRef | undefined {
+    return this.getInsertIntoTable() || this.getReplaceIntoTable();
+  }
+
   /* ~~~~~ WITH ~~~~~ */
 
   public getWithParts(): readonly SqlWithPart[] {

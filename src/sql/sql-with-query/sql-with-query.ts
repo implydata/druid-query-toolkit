@@ -12,14 +12,17 @@
  * limitations under the License.
  */
 
+import { isEmptyArray } from '../../utils';
 import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../sql-base';
 import {
+  SqlClusteredByClause,
   SqlExplainClause,
   SqlInsertClause,
   SqlLimitClause,
   SqlOffsetClause,
   SqlOrderByClause,
   SqlOrderByExpression,
+  SqlPartitionedByClause,
   SqlReplaceClause,
   SqlWithClause,
   SqlWithPart,
@@ -41,6 +44,8 @@ export interface SqlWithQueryValue extends SqlBaseValue {
   orderByClause?: SqlOrderByClause;
   limitClause?: SqlLimitClause;
   offsetClause?: SqlOffsetClause;
+  partitionedByClause?: SqlPartitionedByClause;
+  clusteredByClause?: SqlClusteredByClause;
 }
 
 export class SqlWithQuery extends SqlExpression {
@@ -54,6 +59,8 @@ export class SqlWithQuery extends SqlExpression {
   public readonly orderByClause?: SqlOrderByClause;
   public readonly limitClause?: SqlLimitClause;
   public readonly offsetClause?: SqlOffsetClause;
+  public readonly partitionedByClause?: SqlPartitionedByClause;
+  public readonly clusteredByClause?: SqlClusteredByClause;
 
   constructor(options: SqlWithQueryValue) {
     super(options, SqlWithQuery.type);
@@ -69,6 +76,8 @@ export class SqlWithQuery extends SqlExpression {
     this.orderByClause = options.orderByClause;
     this.limitClause = options.limitClause;
     this.offsetClause = options.offsetClause;
+    this.partitionedByClause = options.partitionedByClause;
+    this.clusteredByClause = options.clusteredByClause;
   }
 
   public valueOf(): SqlWithQueryValue {
@@ -81,6 +90,8 @@ export class SqlWithQuery extends SqlExpression {
     value.orderByClause = this.orderByClause;
     value.limitClause = this.limitClause;
     value.offsetClause = this.offsetClause;
+    value.partitionedByClause = this.partitionedByClause;
+    value.clusteredByClause = this.clusteredByClause;
     return value;
   }
 
@@ -94,9 +105,11 @@ export class SqlWithQuery extends SqlExpression {
       orderByClause,
       limitClause,
       offsetClause,
+      partitionedByClause,
+      clusteredByClause,
     } = this;
 
-    const rawParts: string[] = [this.getSpace('preQuery', '')];
+    const rawParts: string[] = [];
 
     // Explain clause
     if (explainClause) {
@@ -128,7 +141,13 @@ export class SqlWithQuery extends SqlExpression {
       rawParts.push(this.getSpace('preOffsetClause', '\n'), offsetClause.toString());
     }
 
-    rawParts.push(this.getSpace('postQuery', ''));
+    if (partitionedByClause) {
+      rawParts.push(this.getSpace('prePartitionedByClause', '\n'), partitionedByClause.toString());
+    }
+
+    if (clusteredByClause) {
+      rawParts.push(this.getSpace('preClusteredByClause', '\n'), clusteredByClause.toString());
+    }
 
     return rawParts.join('');
   }
@@ -253,6 +272,44 @@ export class SqlWithQuery extends SqlExpression {
     );
   }
 
+  public changePartitionedByClause(partitionedByClause: SqlPartitionedByClause | undefined): this {
+    if (this.partitionedByClause === partitionedByClause) return this;
+    const value = this.valueOf();
+    if (partitionedByClause) {
+      value.partitionedByClause = partitionedByClause;
+    } else {
+      delete value.partitionedByClause;
+      value.spacing = this.getSpacingWithout('prePartitionedByClause');
+    }
+    return SqlBase.fromValue(value);
+  }
+
+  public changeClusteredByClause(clusteredByClause: SqlClusteredByClause | undefined): this {
+    if (this.clusteredByClause === clusteredByClause) return this;
+    const value = this.valueOf();
+    if (clusteredByClause) {
+      value.clusteredByClause = clusteredByClause;
+    } else {
+      delete value.clusteredByClause;
+      value.spacing = this.getSpacingWithout('preClusteredByClause');
+    }
+    return SqlBase.fromValue(value);
+  }
+
+  public changeClusteredByExpressions(
+    clusteredByExpressions: SeparatedArray<SqlExpression> | SqlExpression[] | undefined,
+  ): this {
+    if (!clusteredByExpressions || isEmptyArray(clusteredByExpressions)) {
+      return this.changeClusteredByClause(undefined);
+    } else {
+      return this.changeClusteredByClause(
+        this.clusteredByClause
+          ? this.clusteredByClause.changeExpressions(clusteredByExpressions)
+          : SqlClusteredByClause.create(clusteredByExpressions),
+      );
+    }
+  }
+
   public _walkInner(
     nextStack: SqlBase[],
     fn: Substitutor,
@@ -304,6 +361,22 @@ export class SqlWithQuery extends SqlExpression {
       }
     }
 
+    if (this.partitionedByClause) {
+      const partitionedByClause = this.partitionedByClause._walkHelper(nextStack, fn, postorder);
+      if (!partitionedByClause) return;
+      if (partitionedByClause !== this.partitionedByClause) {
+        ret = ret.changePartitionedByClause(partitionedByClause as SqlPartitionedByClause);
+      }
+    }
+
+    if (this.clusteredByClause) {
+      const clusteredByClause = this.clusteredByClause._walkHelper(nextStack, fn, postorder);
+      if (!clusteredByClause) return;
+      if (clusteredByClause !== this.clusteredByClause) {
+        ret = ret.changeClusteredByClause(clusteredByClause as SqlClusteredByClause);
+      }
+    }
+
     return ret;
   }
 
@@ -346,6 +419,12 @@ export class SqlWithQuery extends SqlExpression {
     );
   }
 
+  /* ~~~~~ INSERT + REPLACE ~~~~~ */
+
+  public getIngestTable(): SqlTableRef | undefined {
+    return this.getInsertIntoTable() || this.getReplaceIntoTable();
+  }
+
   /* ~~~~~ WITH ~~~~~ */
 
   public getWithParts(): readonly SqlWithPart[] {
@@ -368,7 +447,10 @@ export class SqlWithQuery extends SqlExpression {
   }
 
   public flattenWith(): SqlQuery {
-    let flatQuery = this.query.flattenWith().changeParens([]);
+    let flatQuery = this.query
+      .flattenWith()
+      .changeParens([])
+      .changeSpaces({ initial: this.spacing['initial'], final: this.spacing['final'] });
 
     flatQuery = flatQuery.changeWithParts(this.getWithParts().concat(flatQuery.getWithParts()));
 
@@ -388,6 +470,14 @@ export class SqlWithQuery extends SqlExpression {
 
     if (this.offsetClause) {
       flatQuery = flatQuery.combineWithOffsetClause(this.offsetClause);
+    }
+
+    if (this.partitionedByClause) {
+      flatQuery = flatQuery.changePartitionedByClause(this.partitionedByClause);
+    }
+
+    if (this.clusteredByClause) {
+      flatQuery = flatQuery.changeClusteredByClause(this.clusteredByClause);
     }
 
     return flatQuery;

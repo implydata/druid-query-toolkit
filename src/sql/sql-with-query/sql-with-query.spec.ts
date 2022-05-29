@@ -39,6 +39,8 @@ describe('SqlWithQuery', () => {
             SELECT * FROM wiki2
           )
         )
+        PARTITIONED BY ALL
+        CLUSTERED BY page
       `,
     ];
 
@@ -54,6 +56,7 @@ describe('SqlWithQuery', () => {
 
   it('flattenWith', () => {
     const sql = sane`
+      -- Leading comment
       REPLACE INTO dst OVERWRITE ALL
       WITH wiki1 AS (SELECT * FROM wikipedia), wiki2 AS (SELECT * FROM wikipedia)
       (
@@ -62,18 +65,22 @@ describe('SqlWithQuery', () => {
           SELECT * FROM wiki2 LIMIT 100
         )
       )
-      LIMIT 90
+      PARTITIONED BY ALL
+      -- Trailing comment
     `;
 
     const query = SqlExpression.parse(sql) as SqlWithQuery;
 
     expect(String(query.flattenWith()).trim()).toEqual(sane`
+      -- Leading comment
       REPLACE INTO dst OVERWRITE ALL
       WITH wiki1 AS (SELECT * FROM wikipedia),
       wiki2 AS (SELECT * FROM wikipedia),
       wiki3 AS (SELECT * FROM wiki1),
       wiki4 AS (SELECT * FROM wiki2)
-      SELECT * FROM wiki2 LIMIT 90
+      SELECT * FROM wiki2 LIMIT 100
+      PARTITIONED BY ALL
+      -- Trailing comment
     `);
   });
 
@@ -82,12 +89,14 @@ describe('SqlWithQuery', () => {
 
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlWithQuery {
+        "clusteredByClause": undefined,
         "explainClause": undefined,
         "insertClause": undefined,
         "keywords": Object {},
         "limitClause": undefined,
         "offsetClause": undefined,
         "orderByClause": undefined,
+        "partitionedByClause": undefined,
         "query": SqlQuery {
           "clusteredByClause": undefined,
           "decorator": undefined,

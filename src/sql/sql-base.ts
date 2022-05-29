@@ -167,7 +167,6 @@ export type SpaceName =
   | 'postOverwrite'
   | 'postPartitioned'
   | 'postPlan'
-  | 'postQuery'
   | 'postReplace'
   | 'postReplaceClause'
   | 'postRow'
@@ -207,7 +206,6 @@ export type SpaceName =
   | 'preOrderByClause'
   | 'preOverwrite'
   | 'prePartitionedByClause'
-  | 'preQuery'
   | 'preTableDot'
   | 'preTime'
   | 'preUnion'
@@ -404,8 +402,12 @@ export abstract class SqlBase {
   }
 
   public changeSpace(name: SpaceName, space: string): this {
+    return this.changeSpaces({ [name]: space });
+  }
+
+  public changeSpaces(newSpacing: Partial<Record<SpaceName, string>>): this {
     const value = this.valueOf();
-    value.spacing = { ...value.spacing, [name]: space };
+    value.spacing = { ...value.spacing, ...newSpacing };
     return SqlBase.fromValue(value);
   }
 
