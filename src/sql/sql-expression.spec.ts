@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlExpression, SqlRef } from '..';
+import { SqlBase, SqlExpression, SqlLiteral, SqlRef } from '..';
 import { backAndForth } from '../test-utils';
 
 describe('SqlExpression', () => {
@@ -205,6 +205,10 @@ describe('SqlExpression', () => {
   });
 
   describe('#decomposeViaAnd', () => {
+    it('works for TRUE', () => {
+      expect(SqlLiteral.TRUE.decomposeViaAnd()).toEqual([]);
+    });
+
     it('works without AND', () => {
       expect(String(SqlExpression.parse('a = 1').decomposeViaAnd())).toEqual('a = 1');
     });

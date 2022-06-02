@@ -200,6 +200,10 @@ export class SqlLiteral extends SqlExpression {
     return this;
   }
 
+  public decomposeViaAnd(): SqlExpression[] {
+    return [];
+  }
+
   public isInteger(): boolean {
     const { value, stringValue } = this;
     switch (typeof value) {
