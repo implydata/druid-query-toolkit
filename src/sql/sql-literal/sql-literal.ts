@@ -201,7 +201,7 @@ export class SqlLiteral extends SqlExpression {
   }
 
   public decomposeViaAnd(): SqlExpression[] {
-    return [];
+    return this.value === true ? [] : [this];
   }
 
   public isInteger(): boolean {

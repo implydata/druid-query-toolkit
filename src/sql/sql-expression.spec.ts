@@ -209,6 +209,10 @@ describe('SqlExpression', () => {
       expect(SqlLiteral.TRUE.decomposeViaAnd()).toEqual([]);
     });
 
+    it('works for FALSE', () => {
+      expect(String(SqlLiteral.FALSE.decomposeViaAnd())).toEqual('FALSE');
+    });
+
     it('works without AND', () => {
       expect(String(SqlExpression.parse('a = 1').decomposeViaAnd())).toEqual('a = 1');
     });
