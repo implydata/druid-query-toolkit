@@ -1471,7 +1471,7 @@ describe('SqlQuery', () => {
                 "tableRefName": undefined,
                 "type": "ref",
               },
-              "not": false,
+              "negated": false,
               "op": ">",
               "rhs": SqlLiteral {
                 "keywords": Object {},
@@ -1587,7 +1587,7 @@ describe('SqlQuery', () => {
                 "tableRefName": undefined,
                 "type": "ref",
               },
-              "not": false,
+              "negated": false,
               "op": "=",
               "rhs": SqlLiteral {
                 "keywords": Object {},
@@ -1723,7 +1723,7 @@ describe('SqlQuery', () => {
                             "tableRefName": undefined,
                             "type": "ref",
                           },
-                          "not": false,
+                          "negated": false,
                           "op": "=",
                           "rhs": SqlLiteral {
                             "keywords": Object {},
@@ -1754,7 +1754,7 @@ describe('SqlQuery', () => {
                             "tableRefName": undefined,
                             "type": "ref",
                           },
-                          "not": false,
+                          "negated": false,
                           "op": ">",
                           "rhs": SqlLiteral {
                             "keywords": Object {},
@@ -1792,7 +1792,7 @@ describe('SqlQuery', () => {
                       "tableRefName": undefined,
                       "type": "ref",
                     },
-                    "not": false,
+                    "negated": false,
                     "op": "=",
                     "rhs": SqlLiteral {
                       "keywords": Object {},
@@ -2198,7 +2198,7 @@ describe('SqlQuery', () => {
                 "tableRefName": undefined,
                 "type": "ref",
               },
-              "not": false,
+              "negated": false,
               "op": ">",
               "rhs": SqlLiteral {
                 "keywords": Object {},
@@ -2314,7 +2314,7 @@ describe('SqlQuery', () => {
                 "tableRefName": undefined,
                 "type": "ref",
               },
-              "not": false,
+              "negated": false,
               "op": "=",
               "rhs": SqlLiteral {
                 "keywords": Object {},
@@ -2450,7 +2450,7 @@ describe('SqlQuery', () => {
                             "tableRefName": undefined,
                             "type": "ref",
                           },
-                          "not": false,
+                          "negated": false,
                           "op": "=",
                           "rhs": SqlLiteral {
                             "keywords": Object {},
@@ -2481,7 +2481,7 @@ describe('SqlQuery', () => {
                             "tableRefName": undefined,
                             "type": "ref",
                           },
-                          "not": false,
+                          "negated": false,
                           "op": ">",
                           "rhs": SqlLiteral {
                             "keywords": Object {},
@@ -2519,7 +2519,7 @@ describe('SqlQuery', () => {
                       "tableRefName": undefined,
                       "type": "ref",
                     },
-                    "not": false,
+                    "negated": false,
                     "op": "=",
                     "rhs": SqlLiteral {
                       "keywords": Object {},
@@ -3588,7 +3588,7 @@ describe('SqlQuery', () => {
                       "tableRefName": undefined,
                       "type": "ref",
                     },
-                    "not": false,
+                    "negated": false,
                     "op": "=",
                     "rhs": SqlRef {
                       "columnRefName": RefName {
@@ -3723,7 +3723,7 @@ describe('SqlQuery', () => {
                       "tableRefName": undefined,
                       "type": "ref",
                     },
-                    "not": false,
+                    "negated": false,
                     "op": "=",
                     "rhs": SqlRef {
                       "columnRefName": RefName {
@@ -3858,7 +3858,7 @@ describe('SqlQuery', () => {
                       "tableRefName": undefined,
                       "type": "ref",
                     },
-                    "not": false,
+                    "negated": false,
                     "op": "=",
                     "rhs": SqlRef {
                       "columnRefName": RefName {
@@ -3993,7 +3993,7 @@ describe('SqlQuery', () => {
                       "tableRefName": undefined,
                       "type": "ref",
                     },
-                    "not": false,
+                    "negated": false,
                     "op": "=",
                     "rhs": SqlRef {
                       "columnRefName": RefName {
@@ -4128,7 +4128,7 @@ describe('SqlQuery', () => {
                       "tableRefName": undefined,
                       "type": "ref",
                     },
-                    "not": false,
+                    "negated": false,
                     "op": "=",
                     "rhs": SqlRef {
                       "columnRefName": RefName {
@@ -4898,7 +4898,7 @@ describe('SqlQuery', () => {
                       "tableRefName": undefined,
                       "type": "ref",
                     },
-                    "not": false,
+                    "negated": false,
                     "op": ">=",
                     "rhs": SqlMulti {
                       "args": SeparatedArray {
@@ -4969,7 +4969,7 @@ describe('SqlQuery', () => {
                       "tableRefName": undefined,
                       "type": "ref",
                     },
-                    "not": false,
+                    "negated": false,
                     "op": "=",
                     "rhs": SqlPlaceholder {
                       "customPlaceholder": undefined,

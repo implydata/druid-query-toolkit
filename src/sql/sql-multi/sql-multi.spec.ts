@@ -1088,7 +1088,7 @@ describe('Combined expression', () => {
                       "tableRefName": undefined,
                       "type": "ref",
                     },
-                    "not": false,
+                    "negated": false,
                     "op": ">",
                     "rhs": SqlMulti {
                       "args": SeparatedArray {
@@ -1222,7 +1222,7 @@ describe('Combined expression', () => {
                       "spacing": Object {},
                       "type": "multi",
                     },
-                    "not": false,
+                    "negated": false,
                     "op": ">",
                     "rhs": SqlRef {
                       "columnRefName": RefName {
@@ -1333,7 +1333,7 @@ describe('Combined expression', () => {
                       "tableRefName": undefined,
                       "type": "ref",
                     },
-                    "not": false,
+                    "negated": false,
                     "op": ">",
                     "rhs": SqlMulti {
                       "args": SeparatedArray {
@@ -2179,7 +2179,7 @@ describe('getSqlRefs', () => {
           "tableRefName": undefined,
           "type": "ref",
         },
-        "not": false,
+        "negated": false,
         "op": "IS",
         "rhs": SqlLiteral {
           "keywords": Object {},
@@ -2220,7 +2220,7 @@ describe('getSqlRefs', () => {
           "tableRefName": undefined,
           "type": "ref",
         },
-        "not": true,
+        "negated": true,
         "op": "IS",
         "rhs": SqlLiteral {
           "keywords": Object {},
@@ -2262,7 +2262,7 @@ describe('getSqlRefs', () => {
           "tableRefName": undefined,
           "type": "ref",
         },
-        "not": true,
+        "negated": true,
         "op": "IS",
         "rhs": SqlLiteral {
           "keywords": Object {},
@@ -2314,7 +2314,7 @@ describe('getSqlRefs', () => {
                 "tableRefName": undefined,
                 "type": "ref",
               },
-              "not": true,
+              "negated": true,
               "op": "IS",
               "rhs": SqlLiteral {
                 "keywords": Object {},
@@ -2346,7 +2346,7 @@ describe('getSqlRefs', () => {
                 "tableRefName": undefined,
                 "type": "ref",
               },
-              "not": false,
+              "negated": false,
               "op": "<>",
               "rhs": SqlLiteral {
                 "keywords": Object {},

@@ -25,6 +25,13 @@ export interface UnaryExpressionValue extends SqlBaseValue {
 export class SqlUnary extends SqlExpression {
   static type: SqlType = 'unary';
 
+  static not(ex: SqlExpression): SqlUnary {
+    return new SqlUnary({
+      op: 'NOT',
+      argument: ex.type === 'multi' || ex.type === 'comparison' ? ex.addParens() : ex,
+    });
+  }
+
   public readonly op: SqlUnaryOp;
   public readonly argument: SqlExpression;
 
@@ -67,6 +74,10 @@ export class SqlUnary extends SqlExpression {
     }
 
     return ret;
+  }
+
+  public negate(): SqlExpression {
+    return this.argument;
   }
 }
 

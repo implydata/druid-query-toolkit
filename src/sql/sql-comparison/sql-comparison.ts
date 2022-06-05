@@ -34,7 +34,7 @@ const ANTI_OP: Record<string, SqlComparisonOp> = {
 
 export interface SqlComparisonValue extends SqlBaseValue {
   op: SqlComparisonOp;
-  not?: boolean;
+  negated?: boolean;
   lhs: SqlExpression;
   decorator?: SqlComparisonDecorator;
   rhs: SqlBase;
@@ -185,7 +185,7 @@ export class SqlComparison extends SqlExpression {
   }
 
   public readonly op: SqlComparisonOp;
-  public readonly not?: boolean;
+  public readonly negated?: boolean;
   public readonly lhs: SqlExpression;
   public readonly decorator?: SqlComparisonDecorator;
   public readonly rhs: SqlBase;
@@ -193,7 +193,7 @@ export class SqlComparison extends SqlExpression {
   constructor(options: SqlComparisonValue) {
     super(options, SqlComparison.type);
     this.op = options.op;
-    this.not = options.not;
+    this.negated = options.negated;
     this.lhs = options.lhs;
     this.decorator = options.decorator;
     this.rhs = options.rhs;
@@ -202,7 +202,7 @@ export class SqlComparison extends SqlExpression {
   public valueOf(): SqlComparisonValue {
     const value = super.valueOf() as SqlComparisonValue;
     value.op = this.op;
-    if (this.not) value.not = true;
+    if (this.negated) value.negated = true;
     value.lhs = this.lhs;
     value.decorator = this.decorator;
     value.rhs = this.rhs;
@@ -210,12 +210,12 @@ export class SqlComparison extends SqlExpression {
   }
 
   protected _toRawString(): string {
-    const { lhs, op, not, decorator, rhs } = this;
+    const { lhs, op, negated, decorator, rhs } = this;
     const opIsIs = op === 'IS';
 
     const rawParts: string[] = [lhs.toString()];
 
-    if (not && !opIsIs) {
+    if (negated && !opIsIs) {
       rawParts.push(
         this.getSpace('not'),
         this.getKeyword('not', SqlComparison.DEFAULT_NOT_KEYWORD),
@@ -224,7 +224,7 @@ export class SqlComparison extends SqlExpression {
 
     rawParts.push(this.getSpace('preOp'), this.getKeyword('op', op), this.getSpace('postOp'));
 
-    if (not && opIsIs) {
+    if (negated && opIsIs) {
       rawParts.push(
         this.getKeyword('not', SqlComparison.DEFAULT_NOT_KEYWORD),
         this.getSpace('not'),
@@ -253,7 +253,7 @@ export class SqlComparison extends SqlExpression {
   }
 
   public negate(): this {
-    let { op, not, decorator } = this;
+    let { op, negated, decorator } = this;
 
     switch (op) {
       case '=':
@@ -269,14 +269,14 @@ export class SqlComparison extends SqlExpression {
         break;
 
       default:
-        not = !not;
+        negated = !negated;
         break;
     }
 
     const value = this.valueOf();
     value.op = op;
-    value.not = not;
-    if (!value.not) {
+    value.negated = negated;
+    if (!value.negated) {
       value.keywords = this.getKeywordsWithout('not');
     }
     value.decorator = decorator;

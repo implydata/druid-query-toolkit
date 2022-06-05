@@ -546,7 +546,7 @@ describe('SqlFunction', () => {
               "tableRefName": undefined,
               "type": "ref",
             },
-            "not": false,
+            "negated": false,
             "op": ">",
             "rhs": SqlLiteral {
               "keywords": Object {},

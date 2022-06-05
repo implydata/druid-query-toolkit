@@ -233,7 +233,7 @@ describe('SqlUnary', () => {
             "tableRefName": undefined,
             "type": "ref",
           },
-          "not": false,
+          "negated": false,
           "op": ">",
           "rhs": SqlRef {
             "columnRefName": RefName {
@@ -297,7 +297,7 @@ describe('SqlUnary', () => {
                   "tableRefName": undefined,
                   "type": "ref",
                 },
-                "not": false,
+                "negated": false,
                 "op": ">",
                 "rhs": SqlRef {
                   "columnRefName": RefName {
@@ -342,7 +342,7 @@ describe('SqlUnary', () => {
                   "tableRefName": undefined,
                   "type": "ref",
                 },
-                "not": false,
+                "negated": false,
                 "op": "=",
                 "rhs": SqlLiteral {
                   "keywords": Object {},
@@ -400,7 +400,7 @@ describe('SqlUnary', () => {
               "tableRefName": undefined,
               "type": "ref",
             },
-            "not": false,
+            "negated": false,
             "op": ">",
             "rhs": SqlRef {
               "columnRefName": RefName {

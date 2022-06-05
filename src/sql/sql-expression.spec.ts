@@ -146,6 +146,13 @@ describe('SqlExpression', () => {
       expect(String(x.toOrderByExpression('DESC'))).toEqual('x DESC');
     });
 
+    it('works with not', () => {
+      expect(String(x.not())).toEqual('NOT x');
+      expect(String(SqlExpression.parse(`a < b`).not())).toEqual('NOT (a < b)');
+      expect(String(SqlExpression.parse(`a OR b`).not())).toEqual('NOT (a OR b)');
+      expect(String(SqlExpression.parse(`a AND b`).not())).toEqual('NOT (a AND b)');
+    });
+
     it('works with equal', () => {
       expect(String(x.equal(y))).toEqual('x = y');
     });

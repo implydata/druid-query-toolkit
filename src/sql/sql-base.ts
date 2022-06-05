@@ -348,9 +348,11 @@ export abstract class SqlBase {
     return this.parens || [];
   }
 
-  public changeParens(parens: readonly Parens[]) {
+  public changeParens(parens: readonly Parens[]): this {
+    const newParens = parens.length ? parens : undefined;
+    if (this.parens === newParens) return this;
     const value = this.valueOf();
-    value.parens = parens;
+    value.parens = newParens;
     return SqlBase.fromValue(value);
   }
 
@@ -560,7 +562,7 @@ export abstract class SqlBase {
     return fn(this);
   }
 
-  public applyIf(condition: unknown, fn: (self: this) => this): this {
+  public applyIf<T>(condition: unknown, fn: (self: this) => T): T | this {
     if (!condition) return this;
     return fn(this);
   }

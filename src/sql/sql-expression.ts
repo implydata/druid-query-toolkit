@@ -26,6 +26,7 @@ import {
   SqlOrderByExpression,
   SqlPlaceholder,
   SqlRef,
+  SqlUnary,
 } from '.';
 import { parseSql } from './parser';
 import { SqlBase, Substitutor } from './sql-base';
@@ -181,6 +182,16 @@ export abstract class SqlExpression extends SqlBase {
 
   public toOrderByExpression(direction?: SqlOrderByDirection): SqlOrderByExpression {
     return SqlOrderByExpression.create(this, direction);
+  }
+
+  // SqlUnary
+
+  public not(): SqlUnary {
+    return SqlUnary.not(this);
+  }
+
+  public negate(): SqlExpression {
+    return this.not();
   }
 
   // SqlComparison

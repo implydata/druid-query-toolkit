@@ -125,7 +125,7 @@ describe('SqlComparison', () => {
           "tableRefName": undefined,
           "type": "ref",
         },
-        "not": false,
+        "negated": false,
         "op": ">",
         "rhs": SqlRef {
           "columnRefName": RefName {
@@ -169,7 +169,7 @@ describe('SqlComparison', () => {
           "tableRefName": undefined,
           "type": "ref",
         },
-        "not": false,
+        "negated": false,
         "op": "=",
         "rhs": SqlLiteral {
           "keywords": Object {},
@@ -210,7 +210,7 @@ describe('SqlComparison', () => {
           "tableRefName": undefined,
           "type": "ref",
         },
-        "not": false,
+        "negated": false,
         "op": "=",
         "rhs": SqlQuery {
           "clusteredByClause": undefined,
@@ -407,7 +407,7 @@ describe('SqlComparison', () => {
           "tableRefName": undefined,
           "type": "ref",
         },
-        "not": false,
+        "negated": false,
         "op": "IS",
         "rhs": SqlLiteral {
           "keywords": Object {},
@@ -448,7 +448,7 @@ describe('SqlComparison', () => {
           "tableRefName": undefined,
           "type": "ref",
         },
-        "not": true,
+        "negated": true,
         "op": "IS",
         "rhs": SqlLiteral {
           "keywords": Object {},
@@ -489,7 +489,7 @@ describe('SqlComparison', () => {
           "tableRefName": undefined,
           "type": "ref",
         },
-        "not": false,
+        "negated": false,
         "op": "IN",
         "rhs": SqlRecord {
           "expressions": SeparatedArray {
@@ -592,7 +592,7 @@ describe('SqlComparison', () => {
           "tableRefName": undefined,
           "type": "ref",
         },
-        "not": true,
+        "negated": true,
         "op": "IN",
         "rhs": SqlRecord {
           "expressions": SeparatedArray {
@@ -695,7 +695,7 @@ describe('SqlComparison', () => {
           "tableRefName": undefined,
           "type": "ref",
         },
-        "not": false,
+        "negated": false,
         "op": "IN",
         "rhs": SqlQuery {
           "clusteredByClause": undefined,
@@ -820,7 +820,7 @@ describe('SqlComparison', () => {
           "tableRefName": undefined,
           "type": "ref",
         },
-        "not": true,
+        "negated": true,
         "op": "IN",
         "rhs": SqlQuery {
           "clusteredByClause": undefined,
@@ -971,7 +971,7 @@ describe('SqlComparison', () => {
           },
           "type": "record",
         },
-        "not": false,
+        "negated": false,
         "op": "IN",
         "rhs": SqlRecord {
           "expressions": SeparatedArray {
@@ -1113,7 +1113,7 @@ describe('SqlComparison', () => {
           "tableRefName": undefined,
           "type": "ref",
         },
-        "not": false,
+        "negated": false,
         "op": "BETWEEN",
         "rhs": SqlBetweenPart {
           "end": SqlRef {
@@ -1180,7 +1180,7 @@ describe('SqlComparison', () => {
           "tableRefName": undefined,
           "type": "ref",
         },
-        "not": true,
+        "negated": true,
         "op": "BETWEEN",
         "rhs": SqlBetweenPart {
           "end": SqlRef {
@@ -1249,7 +1249,7 @@ describe('SqlComparison', () => {
           "tableRefName": undefined,
           "type": "ref",
         },
-        "not": false,
+        "negated": false,
         "op": "LIKE",
         "rhs": SqlLiteral {
           "keywords": Object {},
@@ -1290,7 +1290,7 @@ describe('SqlComparison', () => {
           "tableRefName": undefined,
           "type": "ref",
         },
-        "not": true,
+        "negated": true,
         "op": "LIKE",
         "rhs": SqlLiteral {
           "keywords": Object {},
@@ -1360,7 +1360,7 @@ describe('SqlComparison', () => {
           "spacing": Object {},
           "type": "multi",
         },
-        "not": true,
+        "negated": true,
         "op": "LIKE",
         "rhs": SqlLikePart {
           "escape": SqlMulti {
@@ -1466,7 +1466,7 @@ describe('SqlComparison', () => {
           "tableRefName": undefined,
           "type": "ref",
         },
-        "not": false,
+        "negated": false,
         "op": "LIKE",
         "rhs": SqlLikePart {
           "escape": SqlLiteral {
@@ -1524,7 +1524,7 @@ describe('SqlComparison', () => {
           "tableRefName": undefined,
           "type": "ref",
         },
-        "not": true,
+        "negated": true,
         "op": "LIKE",
         "rhs": SqlLikePart {
           "escape": SqlLiteral {
@@ -1583,7 +1583,7 @@ describe('SqlComparison', () => {
             "tableRefName": undefined,
             "type": "ref",
           },
-          "not": false,
+          "negated": false,
           "op": ">",
           "rhs": SqlRef {
             "columnRefName": RefName {
@@ -1623,7 +1623,7 @@ describe('SqlComparison', () => {
             "type": "literal",
             "value": "A",
           },
-          "not": false,
+          "negated": false,
           "op": ">",
           "rhs": SqlLiteral {
             "keywords": Object {},
@@ -1663,7 +1663,7 @@ describe('SqlComparison', () => {
             "tableRefName": undefined,
             "type": "ref",
           },
-          "not": false,
+          "negated": false,
           "op": ">",
           "rhs": SqlRef {
             "columnRefName": RefName {
@@ -1703,7 +1703,7 @@ describe('SqlComparison', () => {
             "type": "literal",
             "value": 1,
           },
-          "not": false,
+          "negated": false,
           "op": ">",
           "rhs": SqlLiteral {
             "keywords": Object {},
@@ -1739,7 +1739,7 @@ describe('SqlComparison', () => {
             "type": "literal",
             "value": 1,
           },
-          "not": undefined,
+          "negated": undefined,
           "op": ">",
           "parens": Array [
             Object {
@@ -1785,7 +1785,7 @@ describe('SqlComparison', () => {
             "tableRefName": undefined,
             "type": "ref",
           },
-          "not": false,
+          "negated": false,
           "op": "BETWEEN",
           "rhs": SqlBetweenPart {
             "end": SqlRef {
@@ -1893,7 +1893,7 @@ describe('SqlComparison', () => {
                         "tableRefName": undefined,
                         "type": "ref",
                       },
-                      "not": false,
+                      "negated": false,
                       "op": "BETWEEN",
                       "rhs": SqlBetweenPart {
                         "end": SqlRef {
@@ -1973,7 +1973,7 @@ describe('SqlComparison', () => {
             "tableRefName": undefined,
             "type": "ref",
           },
-          "not": false,
+          "negated": false,
           "op": "BETWEEN",
           "rhs": SqlBetweenPart {
             "end": SqlMulti {

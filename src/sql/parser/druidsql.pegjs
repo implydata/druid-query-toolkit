@@ -629,7 +629,7 @@ ComparisonExpression = lhs:AdditionExpression rhs:(_ ComparisonOpRhs)?
     op: opRhs.op,
     decorator: opRhs.decorator,
     rhs: opRhs.rhs,
-    not: Boolean(opRhs.notKeyword),
+    negated: Boolean(opRhs.notKeyword),
     spacing: {
       preOp: opRhs.preOp ? opRhs.preOp : preOp,
       postOp: opRhs.postOp,
