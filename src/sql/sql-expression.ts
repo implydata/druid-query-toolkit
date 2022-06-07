@@ -228,6 +228,14 @@ export abstract class SqlExpression extends SqlBase {
     return SqlComparison.isNotNull(this);
   }
 
+  public in(values: (SqlExpression | LiteralValue)[]): SqlComparison {
+    return SqlComparison.in(this, values);
+  }
+
+  public notIn(values: (SqlExpression | LiteralValue)[]): SqlComparison {
+    return SqlComparison.notIn(this, values);
+  }
+
   public like(rhs: SqlExpression | string, escape?: SqlExpression | string): SqlComparison {
     return SqlComparison.like(this, rhs, escape);
   }

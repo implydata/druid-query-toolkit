@@ -13,7 +13,7 @@
  */
 
 import { backAndForth } from '../../test-utils';
-import { SqlComparison, SqlExpression } from '..';
+import { SqlComparison, SqlExpression, SqlRef } from '..';
 
 describe('SqlComparison', () => {
   it('things that work', () => {
@@ -101,6 +101,15 @@ describe('SqlComparison', () => {
         throw e;
       }
     }
+  });
+
+  describe('factories', () => {
+    it('works with IN', () => {
+      expect(SqlComparison.in(SqlRef.column('x'), [1, 2, 3]).toString()).toEqual('x IN (1, 2, 3)');
+      expect(SqlComparison.notIn(SqlRef.column('x'), [1, 2, 3]).toString()).toEqual(
+        'x NOT IN (1, 2, 3)',
+      );
+    });
   });
 
   it('Simple compare 1', () => {

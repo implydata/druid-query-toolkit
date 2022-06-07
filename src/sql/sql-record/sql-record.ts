@@ -31,7 +31,7 @@ export class SqlRecord extends SqlExpression {
     if (expressions instanceof SqlRecord) return expressions;
     return new SqlRecord({
       expressions: SeparatedArray.fromArray(expressions, Separator.COMMA),
-    }).ensureParens();
+    });
   }
 
   public readonly expressions: SeparatedArray<SqlExpression>;

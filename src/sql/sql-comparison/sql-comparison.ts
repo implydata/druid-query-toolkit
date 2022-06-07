@@ -15,11 +15,22 @@
 import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../sql-base';
 import { SqlExpression } from '../sql-expression';
 import { LiteralValue, SqlLiteral } from '../sql-literal/sql-literal';
+import { SqlRecord } from '../sql-record/sql-record';
 
 import { SqlBetweenPart } from './sql-between-part';
 import { SqlLikePart } from './sql-like-part';
 
-export type SqlComparisonOp = '=' | '<>' | '<' | '>' | '<=' | '>=' | 'IS' | 'LIKE' | 'BETWEEN'; // ToDo: 'similar to' ?
+export type SqlComparisonOp =
+  | '='
+  | '<>'
+  | '<'
+  | '>'
+  | '<='
+  | '>='
+  | 'IS'
+  | 'IN'
+  | 'LIKE'
+  | 'BETWEEN'; // ToDo: 'similar to' ?
 export type SqlComparisonDecorator = 'ALL' | 'ANY';
 export type SpecialLikeType = 'includes' | 'prefix' | 'postfix' | 'exact';
 
@@ -121,6 +132,18 @@ export class SqlComparison extends SqlExpression {
 
   static isNotNull(lhs: SqlExpression | LiteralValue): SqlComparison {
     return SqlComparison.isNull(lhs).negate();
+  }
+
+  static in(lhs: SqlExpression, values: (SqlExpression | LiteralValue)[]): SqlComparison {
+    return new SqlComparison({
+      op: 'IN',
+      lhs: SqlExpression.wrap(lhs),
+      rhs: SqlRecord.create(values.map(v => SqlExpression.wrap(v))),
+    });
+  }
+
+  static notIn(lhs: SqlExpression, values: (SqlExpression | LiteralValue)[]): SqlComparison {
+    return SqlComparison.in(lhs, values).negate();
   }
 
   static like(
