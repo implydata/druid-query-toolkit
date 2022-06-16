@@ -13,7 +13,7 @@
  */
 
 import { SqlBase, SqlExpression, SqlLiteral, SqlRef } from '..';
-import { backAndForth } from '../test-utils';
+import { backAndForth, mapString } from '../test-utils';
 
 describe('SqlExpression', () => {
   it('things that work', () => {
@@ -213,29 +213,40 @@ describe('SqlExpression', () => {
 
   describe('#decomposeViaAnd', () => {
     it('works for TRUE', () => {
-      expect(SqlLiteral.TRUE.decomposeViaAnd()).toEqual([]);
+      expect(mapString(SqlLiteral.TRUE.decomposeViaAnd())).toEqual([]);
     });
 
     it('works for FALSE', () => {
-      expect(String(SqlLiteral.FALSE.decomposeViaAnd())).toEqual('FALSE');
+      expect(mapString(SqlLiteral.FALSE.decomposeViaAnd())).toEqual(['FALSE']);
     });
 
     it('works without AND', () => {
-      expect(String(SqlExpression.parse('a = 1').decomposeViaAnd())).toEqual('a = 1');
+      expect(mapString(SqlExpression.parse('a = 1').decomposeViaAnd())).toEqual(['a = 1']);
     });
 
     it('works with AND', () => {
-      expect(String(SqlExpression.parse('a AND b And c').decomposeViaAnd())).toEqual('a,b,c');
+      expect(mapString(SqlExpression.parse('a AND b And c').decomposeViaAnd())).toEqual([
+        'a',
+        'b',
+        'c',
+      ]);
+
+      expect(mapString(SqlExpression.parse('(a AND (b AND c)) And d').decomposeViaAnd())).toEqual([
+        'a AND (b AND c)',
+        'd',
+      ]);
     });
 
-    it('works with nested AND', () => {
-      expect(String(SqlExpression.parse('(a AND (b AND c)) And d').decomposeViaAnd())).toEqual(
-        'a,b,c,d',
-      );
+    it('works with nested AND + flatten', () => {
+      expect(
+        mapString(
+          SqlExpression.parse('(a AND (b AND c)) And d').decomposeViaAnd({ flatten: true }),
+        ),
+      ).toEqual(['a', 'b', 'c', 'd']);
     });
 
     it('works with query', () => {
-      expect(String(SqlExpression.parse('SELECT 13').decomposeViaAnd())).toEqual('SELECT 13');
+      expect(mapString(SqlExpression.parse('SELECT 13').decomposeViaAnd())).toEqual(['SELECT 13']);
     });
   });
 

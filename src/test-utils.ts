@@ -23,3 +23,7 @@ export function backAndForth(sql: string, expectedConstructor?: any): void {
 
   expect(parsed.toString()).toEqual(sql);
 }
+
+export function mapString(xs: any[]): string[] {
+  return xs.map(String);
+}

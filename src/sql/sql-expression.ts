@@ -32,6 +32,10 @@ import { parseSql } from './parser';
 import { SqlBase, Substitutor } from './sql-base';
 import { SeparatedArray, Separator } from './utils';
 
+export interface DecomposeViaAndOptions {
+  flatten?: boolean;
+}
+
 export abstract class SqlExpression extends SqlBase {
   static parse(input: string | SqlExpression): SqlExpression {
     if (typeof input === 'string') {
@@ -278,7 +282,7 @@ export abstract class SqlExpression extends SqlBase {
     return SqlExpression.or(this, expression);
   }
 
-  public decomposeViaAnd(): SqlExpression[] {
+  public decomposeViaAnd(_options?: DecomposeViaAndOptions): SqlExpression[] {
     return [this];
   }
 
