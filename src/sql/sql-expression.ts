@@ -78,7 +78,7 @@ export abstract class SqlExpression extends SqlBase {
         return SqlLiteral.TRUE;
 
       case 1:
-        return compactArgs[0];
+        return compactArgs[0]!;
 
       default:
         return new SqlMulti({
@@ -103,7 +103,7 @@ export abstract class SqlExpression extends SqlBase {
         return SqlLiteral.FALSE;
 
       case 1:
-        return compactArgs[0];
+        return compactArgs[0]!;
 
       default:
         return new SqlMulti({
@@ -123,10 +123,10 @@ export abstract class SqlExpression extends SqlBase {
     const parts = interval.split('/');
     if (parts.length !== 2) throw new Error(`can not convert interval: ${interval}`);
 
-    const start = new Date(parts[0]);
+    const start = new Date(parts[0]!);
     if (isNaN(start.valueOf())) throw new Error(`can not parse the start of interval: ${interval}`);
 
-    const end = new Date(parts[1]);
+    const end = new Date(parts[1]!);
     if (isNaN(end.valueOf())) throw new Error(`can not parse the end of interval: ${interval}`);
 
     return SqlLiteral.create(start)
@@ -303,7 +303,7 @@ export abstract class SqlExpression extends SqlBase {
           return ex;
         }
 
-        let filler = fillWith[i++];
+        let filler = fillWith[i++]!; // We checked above that i is in range
         if (!(filler instanceof SqlExpression)) {
           if (typeof filler === 'string') {
             filler = SqlExpression.parse(filler);
@@ -343,7 +343,7 @@ export abstract class SqlExpression extends SqlBase {
               return a.addFilterToAggregations(filter, knownAggregations);
             }),
           );
-        } catch (e) {
+        } catch (e: any) {
           if (e.message === 'column reference outside aggregation') {
             return x.addWhereExpression(filter);
           }

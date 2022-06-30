@@ -25,7 +25,7 @@ describe('joins', () => {
       `;
 
       backAndForth(sql);
-      expect(SqlQuery.parse(sql).getJoins()[0].joinType).toEqual('LEFT');
+      expect(SqlQuery.parse(sql).getJoins()[0]!.joinType).toEqual('LEFT');
     });
 
     it('parses a left outer join', () => {
@@ -35,7 +35,7 @@ describe('joins', () => {
       `;
 
       backAndForth(sql);
-      expect(SqlQuery.parse(sql).getJoins()[0].joinType).toEqual('LEFT');
+      expect(SqlQuery.parse(sql).getJoins()[0]!.joinType).toEqual('LEFT');
     });
 
     it('parses a right outer join', () => {
@@ -45,7 +45,7 @@ describe('joins', () => {
       `;
 
       backAndForth(sql);
-      expect(SqlQuery.parse(sql).getJoins()[0].joinType).toEqual('RIGHT');
+      expect(SqlQuery.parse(sql).getJoins()[0]!.joinType).toEqual('RIGHT');
     });
 
     it('parses a full outer join', () => {
@@ -55,7 +55,7 @@ describe('joins', () => {
       `;
 
       backAndForth(sql);
-      expect(SqlQuery.parse(sql).getJoins()[0].joinType).toEqual('FULL');
+      expect(SqlQuery.parse(sql).getJoins()[0]!.joinType).toEqual('FULL');
     });
 
     it('parses CROSS JOIN', () => {

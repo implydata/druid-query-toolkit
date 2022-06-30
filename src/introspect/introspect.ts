@@ -79,7 +79,7 @@ export class Introspect {
     }
     if (rows.length !== 1) throw new Error('invalid result shape, bad number of results');
 
-    const plan = rows[0][0];
+    const plan = rows[0]![0];
     let jsonPlan: { signature: { name: string; type: string }[] }[] | undefined;
 
     try {
@@ -99,7 +99,7 @@ export class Introspect {
     if (!Array.isArray(jsonPlan) || jsonPlan.length === 0) {
       throw new Error('could not find signature in JSON plan');
     }
-    const signature = jsonPlan[0].signature;
+    const signature = jsonPlan[0]!.signature;
     if (!signature) throw new Error('could not find signature in JSON plan');
     return signature.map(s => s.type);
   }
@@ -128,6 +128,7 @@ export class Introspect {
         let type = sampleRow ? guessTypeFromValue(sampleRow[i]) : undefined;
         if (!type) {
           type = types[i];
+          if (!type) return;
           if (columnName === '__time' && type === 'LONG') {
             type = 'TIMESTAMP';
           }
@@ -148,6 +149,7 @@ export class Introspect {
       return filterMap(outputColumns, (name, i) => {
         if (!sqlQuery.isRealOutputColumnAtSelectIndex(i)) return;
         let type = types[i];
+        if (!type) return;
         if (name === '__time' && type === 'LONG') {
           type = 'TIMESTAMP';
         }

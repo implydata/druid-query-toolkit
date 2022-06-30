@@ -48,7 +48,7 @@ export function sane(_x: TemplateStringsArray) {
 
   const match = /^\n( *)/m.exec(str);
   if (!match) throw new Error('sane string must start with a \\n is:' + str);
-  const spaces = match[1].length;
+  const spaces = match[1]!.length;
 
   let lines = str.split('\n');
   lines.shift(); // Remove the first empty lines
