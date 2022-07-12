@@ -20,7 +20,7 @@ function isDate(v: any): v is Date {
   return Boolean(v && typeof v.toISOString === 'function');
 }
 
-function isInterger(v: number): boolean {
+function isInteger(v: number): boolean {
   return isFinite(v) && Math.floor(v) === v;
 }
 
@@ -73,7 +73,7 @@ export class SqlLiteral extends SqlExpression {
     // Make sure to record the string value of a double with a `.` even if the number itself happens to be an integer.
     return new SqlLiteral({
       value,
-      stringValue: isInterger(value) ? value.toFixed(1) : undefined,
+      stringValue: isInteger(value) ? value.toFixed(1) : undefined,
     });
   }
 
@@ -211,7 +211,7 @@ export class SqlLiteral extends SqlExpression {
         if (typeof stringValue === 'string') {
           return !stringValue.includes('.');
         }
-        return isInterger(value);
+        return isInteger(value);
 
       case 'bigint':
         return true;

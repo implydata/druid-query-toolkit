@@ -35,6 +35,14 @@ export class SeparatedArray<T> {
     return new SeparatedArray<T>([x], []);
   }
 
+  static fromTwoValuesWithSeparator<T>(
+    value0: T,
+    separator: SeparatorOrString,
+    value1: T,
+  ): SeparatedArray<T> {
+    return new SeparatedArray<T>([value0, value1], [separator]);
+  }
+
   public readonly values: readonly T[];
   public readonly separators: (SeparatorOrString | undefined)[];
 

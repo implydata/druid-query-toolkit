@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { SqlQuery } from '../..';
+import { SqlQuery, SqlValues } from '../..';
 import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../../sql-base';
 import { SqlColumnList } from '../../sql-column-list/sql-column-list';
 import { RefName, SeparatedArray } from '../../utils';
@@ -20,7 +20,7 @@ import { RefName, SeparatedArray } from '../../utils';
 export interface SqlWithPartValue extends SqlBaseValue {
   table: RefName;
   columns?: SqlColumnList;
-  query: SqlQuery;
+  query: SqlQuery | SqlValues;
 }
 
 export class SqlWithPart extends SqlBase {
@@ -37,7 +37,7 @@ export class SqlWithPart extends SqlBase {
 
   public readonly table: RefName;
   public readonly columns?: SqlColumnList;
-  public readonly query: SqlQuery;
+  public readonly query: SqlQuery | SqlValues;
 
   constructor(options: SqlWithPartValue) {
     super(options, SqlWithPart.type);

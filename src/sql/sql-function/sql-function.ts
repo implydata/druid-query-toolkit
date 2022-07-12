@@ -17,7 +17,7 @@ import { SPECIAL_FUNCTIONS } from '../special-functions';
 import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../sql-base';
 import { SqlWhereClause } from '../sql-clause/sql-where-clause/sql-where-clause';
 import { SqlExpression } from '../sql-expression';
-import { SqlLiteral } from '../sql-literal/sql-literal';
+import { LiteralValue, SqlLiteral } from '../sql-literal/sql-literal';
 import { SqlStar } from '../sql-star/sql-star';
 import { RefName, SeparatedArray, Separator } from '../utils';
 
@@ -85,6 +85,32 @@ export class SqlFunction extends SqlExpression {
       args: SeparatedArray.fromArray(args, Separator.COMMA),
       whereClause: filter ? SqlWhereClause.createForFunction(filter) : undefined,
     });
+  }
+
+  static cast(ex: SqlExpression, asType: string): SqlExpression {
+    return new SqlFunction({
+      functionName: 'CAST',
+      args: SeparatedArray.fromTwoValuesWithSeparator(
+        ex,
+        Separator.symmetricSpace('AS'),
+        new SqlLiteral({
+          value: asType,
+          stringValue: asType,
+        }),
+      ),
+    });
+  }
+
+  static array(ex: SqlExpression[] | SeparatedArray<SqlExpression>) {
+    return new SqlFunction({
+      functionName: 'ARRAY',
+      specialParen: 'square',
+      args: SeparatedArray.fromArray(ex),
+    });
+  }
+
+  static arrayOfLiterals(xs: LiteralValue[]) {
+    return SqlFunction.array(xs.map(x => SqlLiteral.create(x)));
   }
 
   public readonly functionName: string;

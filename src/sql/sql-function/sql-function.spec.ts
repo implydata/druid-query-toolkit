@@ -73,6 +73,16 @@ describe('SqlFunction', () => {
     expect(SqlFunction.isValidFunctionName('TABLE')).toEqual(true);
   });
 
+  it('.cast', () => {
+    expect(SqlFunction.cast(SqlExpression.parse('X'), 'BIGINT').toString()).toEqual(
+      'CAST(X AS BIGINT)',
+    );
+  });
+
+  it('.arrayOfLiterals', () => {
+    expect(SqlFunction.arrayOfLiterals(['a', 'b', 'c']).toString()).toEqual(`ARRAY['a', 'b', 'c']`);
+  });
+
   it('Function without args', () => {
     const sql = `FN()`;
 

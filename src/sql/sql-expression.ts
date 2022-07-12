@@ -318,6 +318,12 @@ export abstract class SqlExpression extends SqlBase {
     }) as SqlExpression;
   }
 
+  // SqlFunction
+
+  public cast(asType: string): SqlExpression {
+    return SqlFunction.cast(this, asType);
+  }
+
   // Logic
 
   public addFilterToAggregations(
