@@ -13,6 +13,8 @@
  */
 
 import { backAndForth } from '../../test-utils';
+import { sane } from '../../utils';
+import { SqlExpression } from '../sql-expression';
 
 import { SqlValues } from './sql-values';
 
@@ -31,5 +33,21 @@ describe('SqlValues', () => {
         throw e;
       }
     }
+  });
+
+  it('prettifies single', () => {
+    expect(SqlExpression.parse(`Values   (1, 2   , 'V')`).prettify().toString()).toEqual(
+      `VALUES (1, 2, 'V')`,
+    );
+  });
+
+  it('prettifies multi', () => {
+    expect(SqlExpression.parse(`Values   (1, 2),   (3, 4),   (5, 6)`).prettify().toString())
+      .toEqual(sane`
+      VALUES
+      (1, 2),
+      (3, 4),
+      (5, 6)
+    `);
   });
 });

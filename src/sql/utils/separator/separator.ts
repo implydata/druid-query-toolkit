@@ -24,6 +24,7 @@ export class Separator {
   public separator: string;
 
   static COMMA: Separator;
+  static COMMA_NEW_LINE: Separator;
 
   static symmetricSpace(separator: string) {
     return new Separator({ left: ' ', separator: separator, right: ' ' });
@@ -45,3 +46,4 @@ export class Separator {
 }
 
 Separator.COMMA = Separator.rightSpace(',');
+Separator.COMMA_NEW_LINE = new Separator({ separator: ',', right: '\n' });

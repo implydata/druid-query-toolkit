@@ -71,8 +71,8 @@ export class SqlValues extends SqlExpression {
 
     const rawParts: string[] = [
       this.getKeyword('values', SqlValues.DEFAULT_VALUES_KEYWORD),
-      this.getSpace('postValues'),
-      records.toString(Separator.COMMA),
+      this.getSpace('postValues', records.length() > 1 ? '\n' : ' '),
+      records.toString(Separator.COMMA_NEW_LINE),
     ];
 
     if (orderByClause) {

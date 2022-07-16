@@ -19,13 +19,13 @@ export type SeparatorOrString = Separator | string;
 export class SeparatedArray<T> {
   static fromArray<T>(
     xs: readonly T[] | SeparatedArray<T>,
-    sep?: SeparatorOrString,
+    separator?: SeparatorOrString,
   ): SeparatedArray<T> {
     if (xs instanceof SeparatedArray) return xs;
     const separators: SeparatorOrString[] = [];
-    if (sep) {
+    if (separator) {
       for (let i = 1; i < xs.length; i++) {
-        separators.push(sep);
+        separators.push(separator);
       }
     }
     return new SeparatedArray<T>(xs, separators);
