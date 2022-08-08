@@ -40,7 +40,7 @@ export class SqlValues extends SqlExpression {
   static create(records: SqlValues | SeparatedArray<SqlRecord> | SqlRecord[]): SqlValues {
     if (records instanceof SqlValues) return records;
     return new SqlValues({
-      records: SeparatedArray.fromArray(records, Separator.COMMA),
+      records: SeparatedArray.fromArray(records),
     }).ensureParens();
   }
 
@@ -69,10 +69,11 @@ export class SqlValues extends SqlExpression {
   protected _toRawString(): string {
     const { records, orderByClause, limitClause, offsetClause } = this;
 
+    const multiline = records.length() > 1;
     const rawParts: string[] = [
       this.getKeyword('values', SqlValues.DEFAULT_VALUES_KEYWORD),
-      this.getSpace('postValues', records.length() > 1 ? '\n' : ' '),
-      records.toString(Separator.COMMA_NEW_LINE),
+      this.getSpace('postValues', multiline ? '\n' : ' '),
+      records.toString(multiline ? Separator.COMMA_NEW_LINE : Separator.COMMA),
     ];
 
     if (orderByClause) {

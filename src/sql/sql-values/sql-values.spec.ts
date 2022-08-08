@@ -15,6 +15,8 @@
 import { backAndForth } from '../../test-utils';
 import { sane } from '../../utils';
 import { SqlExpression } from '../sql-expression';
+import { SqlLiteral } from '../sql-literal/sql-literal';
+import { SqlRecord } from '../sql-record/sql-record';
 
 import { SqlValues } from './sql-values';
 
@@ -33,6 +35,25 @@ describe('SqlValues', () => {
         throw e;
       }
     }
+  });
+
+  it('.create', () => {
+    expect(
+      SqlValues.create([SqlRecord.create([1, 2, 3].map(v => SqlLiteral.create(v)))]).toString(),
+    ).toEqual(`(VALUES (1, 2, 3))`);
+
+    expect(
+      SqlValues.create([
+        SqlRecord.create([1, 2, 3].map(v => SqlLiteral.create(v))),
+        SqlRecord.create([4, 5, 6].map(v => SqlLiteral.create(v))),
+        SqlRecord.create([7, 8, 9].map(v => SqlLiteral.create(v))),
+      ]).toString(),
+    ).toEqual(sane`
+      (VALUES
+      (1, 2, 3),
+      (4, 5, 6),
+      (7, 8, 9))
+    `);
   });
 
   it('prettifies single', () => {
