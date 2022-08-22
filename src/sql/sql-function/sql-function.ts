@@ -93,10 +93,18 @@ export class SqlFunction extends SqlExpression {
       args: SeparatedArray.fromTwoValuesWithSeparator(
         ex,
         Separator.symmetricSpace('AS'),
-        new SqlLiteral({
-          value: asType,
-          stringValue: asType,
-        }),
+        SqlLiteral.direct(asType),
+      ),
+    });
+  }
+
+  static floor(ex: SqlExpression, timeUnit: string | SqlLiteral): SqlExpression {
+    return new SqlFunction({
+      functionName: 'FLOOR',
+      args: SeparatedArray.fromTwoValuesWithSeparator(
+        ex,
+        Separator.symmetricSpace('TO'),
+        SqlLiteral.direct(timeUnit),
       ),
     });
   }

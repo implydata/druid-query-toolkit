@@ -890,10 +890,7 @@ Interval =
 
 TimeUnitLiteral = unit:TimeUnit
 {
-  return new sql.SqlLiteral({
-    value: unit.toUpperCase(),
-    stringValue: unit,
-  });
+  return new sql.SqlLiteral.direct(unit);
 }
 
 TimeUnit =

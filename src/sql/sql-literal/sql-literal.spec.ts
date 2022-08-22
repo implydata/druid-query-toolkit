@@ -392,6 +392,11 @@ describe('SqlLiteral', () => {
     expect(String(SqlLiteral.double(17.23))).toEqual('17.23');
   });
 
+  it('.direct', () => {
+    expect(String(SqlLiteral.direct('VARCHAR'))).toEqual('VARCHAR');
+    expect(String(SqlLiteral.direct('day'))).toEqual('day');
+  });
+
   it('#isInteger', () => {
     expect(SqlLiteral.double(0).isInteger()).toEqual(false);
     expect(SqlLiteral.create(0).isInteger()).toEqual(true);

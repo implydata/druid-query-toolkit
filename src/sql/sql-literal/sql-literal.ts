@@ -89,6 +89,14 @@ export class SqlLiteral extends SqlExpression {
     return SqlLiteral.create(n + 1);
   }
 
+  static direct(v: string | SqlLiteral): SqlLiteral {
+    if (v instanceof SqlLiteral) return v;
+    return new SqlLiteral({
+      value: v.toUpperCase(),
+      stringValue: v,
+    });
+  }
+
   static escapeLiteralString(str: string): string {
     return `'${str.replace(/'/g, "''")}'`;
   }

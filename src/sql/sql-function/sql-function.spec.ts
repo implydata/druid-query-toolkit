@@ -13,7 +13,7 @@
  */
 
 import { backAndForth } from '../../test-utils';
-import { SqlExpression, SqlFunction } from '..';
+import { SqlExpression, SqlFunction, SqlRef } from '..';
 
 describe('SqlFunction', () => {
   it('things that work', () => {
@@ -76,6 +76,12 @@ describe('SqlFunction', () => {
   it('.cast', () => {
     expect(SqlFunction.cast(SqlExpression.parse('X'), 'BIGINT').toString()).toEqual(
       'CAST(X AS BIGINT)',
+    );
+  });
+
+  it('.floor', () => {
+    expect(SqlFunction.floor(SqlRef.column('__time'), 'Hour').toString()).toEqual(
+      'FLOOR(__time TO Hour)',
     );
   });
 
