@@ -80,13 +80,28 @@ export class Introspect {
     if (rows.length !== 1) throw new Error('invalid result shape, bad number of results');
 
     const plan = rows[0][0];
-    const m = plan.match(/ signature=\[\{([^}]*)}]/m);
-    if (!m) throw new Error('could not find signature');
+    let jsonPlan: { signature: { name: string; type: string }[] }[] | undefined;
 
-    return m[1].match(/:[A-Z]+(?:<[A-Za-z]+>)?(?:, |$)/g).map((t: string) => {
-      // Will match something like ':LONG, ' or ':LONG'
-      return t.replace(/[:, ]/g, '');
-    });
+    try {
+      // Try to parse it as a JSON plan first
+      jsonPlan = JSON.parse(plan);
+    } catch {
+      // Fall back to a native plan
+      const m = plan.match(/ signature=\[\{([^}]*)}]/m);
+      if (!m) throw new Error('could not find signature');
+
+      return m[1].match(/:[A-Z]+(?:<[A-Za-z]+>)?(?:, |$)/g).map((t: string) => {
+        // Will match something like ':LONG, ' or ':LONG'
+        return t.replace(/[:, ]/g, '');
+      });
+    }
+
+    if (!Array.isArray(jsonPlan) || jsonPlan.length === 0) {
+      throw new Error('could not find signature in JSON plan');
+    }
+    const signature = jsonPlan[0].signature;
+    if (!signature) throw new Error('could not find signature in JSON plan');
+    return signature.map(s => s.type);
   }
 
   static decodeQueryColumnIntrospectionResult(

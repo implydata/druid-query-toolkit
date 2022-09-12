@@ -153,7 +153,7 @@ describe('Introspect', () => {
     `);
   });
 
-  describe('.decodeQueryColumnIntrospectionResult', () => {
+  describe('.decodeQueryColumnIntrospectionResult (native)', () => {
     it('works with empty result', () => {
       expect(Introspect.decodeQueryColumnIntrospectionResult(emptyQueryResult)).toEqual([]);
     });
@@ -364,6 +364,271 @@ describe('Introspect', () => {
         rows: [
           [
             'DruidQueryRel(query=[...\n...], signature=[{d0:LONG, d1:STRING, a0:COMPLEX<HLLSketch>, a1:LONG, a1:LONG}])\n',
+          ],
+        ],
+      });
+
+      const sampleResult = new QueryResult({
+        header: Column.fromColumnNames([
+          'time',
+          'cityName',
+          'distinct_cityName',
+          'delta',
+          'deleted',
+        ]),
+        rows: [[new Date('2020-01-01T00:00:00'), 'SF', 1, 4, true]],
+      });
+
+      expect(
+        Introspect.decodeQueryColumnIntrospectionResult(queryPlanResult, sampleResult),
+      ).toEqual([
+        {
+          name: 'time',
+          type: 'TIMESTAMP',
+        },
+        {
+          name: 'cityName',
+          type: 'STRING',
+        },
+        {
+          name: 'distinct_cityName',
+          type: 'COMPLEX<HLLSketch>',
+        },
+        {
+          name: 'delta',
+          type: 'LONG',
+        },
+        {
+          name: 'deleted',
+          type: 'BOOLEAN',
+        },
+      ]);
+    });
+  });
+
+  describe('.decodeQueryColumnIntrospectionResult (json)', () => {
+    it('works with empty result', () => {
+      expect(Introspect.decodeQueryColumnIntrospectionResult(emptyQueryResult)).toEqual([]);
+    });
+
+    it('works with all columns having good names', () => {
+      const query = SqlQuery.parse(sane`
+        SELECT
+          __time,
+          cityName,
+          COUNT(*) AS "Count"
+        FROM wikipedia
+        GROUP BY 1
+        ORDER BY 2 DESC
+      `);
+
+      const queryPlanResult = new QueryResult({
+        sqlQuery: Introspect.getQueryColumnIntrospectionQuery(query),
+        header: Column.fromColumnNames(['PLAN']),
+        rows: [
+          [
+            '[{"query":{},"signature":[{"name":"__time","type":"LONG"},{"name":"cityName","type":"STRING"},{"name":"Count","type":"LONG"}]}]',
+          ],
+        ],
+      });
+
+      expect(Introspect.decodeQueryColumnIntrospectionResult(queryPlanResult)).toEqual([
+        {
+          name: '__time',
+          type: 'TIMESTAMP',
+        },
+        {
+          name: 'cityName',
+          type: 'STRING',
+        },
+        {
+          name: 'Count',
+          type: 'LONG',
+        },
+      ]);
+    });
+
+    it('works with some column not having good names', () => {
+      const query = SqlQuery.parse(sane`
+        SELECT
+          cityName,
+          COUNT(*)
+        FROM wikipedia
+        GROUP BY 1
+        ORDER BY 2 DESC
+      `);
+
+      const queryPlanResult = new QueryResult({
+        sqlQuery: Introspect.getQueryColumnIntrospectionQuery(query),
+        header: Column.fromColumnNames(['PLAN']),
+        rows: [
+          [
+            '[{"query":{},"signature":[{"name":"cityName","type":"STRING"},{"name":"Count","type":"LONG"}]}]',
+          ],
+        ],
+      });
+
+      expect(Introspect.decodeQueryColumnIntrospectionResult(queryPlanResult)).toEqual([
+        {
+          name: 'cityName',
+          type: 'STRING',
+        },
+      ]);
+    });
+
+    it('fails with star without sample', () => {
+      const query = SqlQuery.parse(sane`
+        SELECT cityName, * FROM wikipedia
+      `);
+
+      const queryPlanResult = new QueryResult({
+        sqlQuery: Introspect.getQueryColumnIntrospectionQuery(query),
+        header: Column.fromColumnNames(['PLAN']),
+        rows: [
+          [
+            '[{"query":{},"signature":[{"name":"__time","type":"LONG"},{"name":"cityName","type":"STRING"},{"name":"Count","type":"LONG"}]}]',
+          ],
+        ],
+      });
+
+      expect(() => Introspect.decodeQueryColumnIntrospectionResult(queryPlanResult)).toThrow(
+        'a query with a star must have sampleRowResult set',
+      );
+    });
+
+    it('works with star', () => {
+      const query = SqlQuery.parse(sane`
+        SELECT "time", cityName, added + 1, * FROM wikipedia
+      `);
+
+      const queryPlanResult = new QueryResult({
+        sqlQuery: Introspect.getQueryColumnIntrospectionQuery(query),
+        header: Column.fromColumnNames(['PLAN']),
+        rows: [
+          [
+            '[{"query":{},"signature":[{"name":"__time","type":"LONG"},{"name":"cityName","type":"STRING"},{"name":"EXPR$0","type":"LONG"},{"name":"delta","type":"LONG"},{"name":"deleted","type":"LONG"}]}]',
+          ],
+        ],
+      });
+
+      const sampleResult = new QueryResult({
+        header: Column.fromColumnNames(['time', 'cityName', 'EXPR$0', 'delta', 'deleted']),
+        rows: [[new Date('2020-01-01T00:00:00'), 'SF', 1, 4, true]],
+      });
+
+      expect(
+        Introspect.decodeQueryColumnIntrospectionResult(queryPlanResult, sampleResult),
+      ).toEqual([
+        {
+          name: 'time',
+          type: 'TIMESTAMP',
+        },
+        {
+          name: 'cityName',
+          type: 'STRING',
+        },
+        {
+          name: 'delta',
+          type: 'LONG',
+        },
+        {
+          name: 'deleted',
+          type: 'BOOLEAN',
+        },
+      ]);
+    });
+
+    it('works with star with fancy names', () => {
+      const query = SqlQuery.parse(sane`
+        SELECT "time", cityName, added + 1, * FROM wikipedia
+      `);
+
+      const queryPlanResult = new QueryResult({
+        sqlQuery: Introspect.getQueryColumnIntrospectionQuery(query),
+        header: Column.fromColumnNames(['PLAN']),
+        rows: [
+          [
+            '[{"query":{},"signature":[{"name":"Hello World","type":"LONG"},{"name":"A-B","type":"STRING"},{"name":"Россия","type":"LONG"},{"name":"ö","type":"LONG"},{"name":"hello, world","type":"LONG"}]}]',
+          ],
+        ],
+      });
+
+      const sampleResult = new QueryResult({
+        header: Column.fromColumnNames(['time', 'cityName', 'EXPR$0', 'delta', 'deleted']),
+        rows: [[new Date('2020-01-01T00:00:00'), 'SF', 1, 4, true]],
+      });
+
+      expect(
+        Introspect.decodeQueryColumnIntrospectionResult(queryPlanResult, sampleResult),
+      ).toEqual([
+        {
+          name: 'time',
+          type: 'TIMESTAMP',
+        },
+        {
+          name: 'cityName',
+          type: 'STRING',
+        },
+        {
+          name: 'delta',
+          type: 'LONG',
+        },
+        {
+          name: 'deleted',
+          type: 'BOOLEAN',
+        },
+      ]);
+    });
+
+    it('works with a JOIN query', () => {
+      const query = SqlQuery.parse(sane`
+        SELECT
+          browser,
+          lookup.browser_maker.v AS "maker",
+          COUNT(*) AS "Count"
+        FROM kttm
+        LEFT JOIN lookup.browser_maker ON lookup.browser_maker.k = kttm.browser
+        GROUP BY 1, 2
+        ORDER BY 3 DESC
+      `);
+
+      const queryPlanResult = new QueryResult({
+        sqlQuery: Introspect.getQueryColumnIntrospectionQuery(query),
+        header: Column.fromColumnNames(['PLAN']),
+        rows: [
+          [
+            '[{"query":{},"signature":[{"name":"browser","type":"STRING"},{"name":"maker","type":"STRING"},{"name":"Count","type":"LONG"}]}]',
+          ],
+        ],
+      });
+
+      expect(Introspect.decodeQueryColumnIntrospectionResult(queryPlanResult)).toEqual([
+        {
+          name: 'browser',
+          type: 'STRING',
+        },
+        {
+          name: 'maker',
+          type: 'STRING',
+        },
+        {
+          name: 'Count',
+          type: 'LONG',
+        },
+      ]);
+    });
+
+    it('works with some columns having complex data types', () => {
+      const query = SqlQuery.parse(sane`
+        SELECT * FROM wikipedia
+      `);
+
+      const queryPlanResult = new QueryResult({
+        sqlQuery: Introspect.getQueryColumnIntrospectionQuery(query),
+        header: Column.fromColumnNames(['PLAN']),
+        rows: [
+          [
+            '[{"query":{},"signature":[{"name":"time","type":"LONG"},{"name":"cityName","type":"STRING"},{"name":"distinct_cityName","type":"COMPLEX<HLLSketch>"},{"name":"delta","type":"LONG"},{"name":"deleted","type":"LONG"}]}]',
           ],
         ],
       });
