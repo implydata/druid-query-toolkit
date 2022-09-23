@@ -2,10 +2,10 @@
   "name": "druid-query-toolkit",
   "version": "0.14.24",
   "description": "A collection of utilities for working with Druid queries",
-  "main": "dist/index.js",
-  "module": "dist/index.mjs",
+  "main": "dist/druid-query-toolkit.js",
+  "module": "dist/druid-query-toolkit.mjs",
   "types": "types/index.d.ts",
-  "homepage": "https://github.com/implydata/druid-sql-parser",
+  "homepage": "https://github.com/implydata/druid-query-toolkit",
   "engines": {
     "node": ">=14"
   },
@@ -24,9 +24,9 @@
   },
   "prettier": "@awesome-code-style/prettier-config",
   "tsup": {
-    "entry": [
-      "src/index.ts"
-    ],
+    "entry": {
+      "druid-query-toolkit": "src/index.ts"
+    },
     "format": [
       "esm",
       "cjs",
@@ -38,7 +38,7 @@
   },
   "scripts": {
     "build:types": "rm -rf types && tsc --emitDeclarationOnly",
-    "build": "tsup",
+    "build": "tsup --global-name druid",
     "prepublishOnly": "npx build:types && npx build",
     "pretest": "npm run compile",
     "test": "npm run eslint && npm run prettify-check && jest",
@@ -70,7 +70,8 @@
     "url": "https://github.com/implydata/druid-query-toolkit"
   },
   "files": [
-    "build/"
+    "dist/",
+    "types/"
   ],
   "dependencies": {
     "tslib": "^2.3.1"
