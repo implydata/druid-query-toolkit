@@ -39,7 +39,7 @@
   "scripts": {
     "build:types": "rm -rf types && tsc --emitDeclarationOnly",
     "build": "tsup --global-name druid",
-    "prepublishOnly": "npx build:types && npx build",
+    "prepublishOnly": "npm run build:types && npm run build",
     "pretest": "npm run compile",
     "test": "npm run eslint && npm run prettify-check && jest",
     "coverage": "jest --coverage",
