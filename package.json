@@ -70,6 +70,7 @@
     "url": "https://github.com/implydata/druid-query-toolkit"
   },
   "files": [
+    "src/",
     "dist/",
     "types/"
   ],
