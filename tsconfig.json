@@ -1,29 +1,27 @@
 {
   "compilerOptions": {
-    "forceConsistentCasingInFileNames": true,
-    "experimentalDecorators": true,
-    "noEmitOnError": true,
+    "allowSyntheticDefaultImports": false,
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
     "declaration": true,
-    "removeComments": true,
+    "declarationDir": "types",
+    "declarationMap": true,
+    "esModuleInterop": false,
+    "forceConsistentCasingInFileNames": true,
+    "importHelpers": true,
+    "isolatedModules": true,
+    "module": "esnext",
+    "moduleResolution": "node",
     "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,
-    "strict": true,
-    "skipLibCheck": true,
-    "importHelpers": true,
-    "esModuleInterop": true,
-    "noUnusedParameters": true,
     "noUnusedLocals": true,
-    "useUnknownInCatchVariables": false,
-    "target": "es5",
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "lib": [
-      "es2016",
-      "esnext"
-    ],
-    "rootDirs": ["lib", "src"],
-
-    "outDir": "build"
+    "noUnusedParameters": true,
+    "noUncheckedIndexedAccess": true,
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "strict": true,
+    "target": "es2021",
+    "useDefineForClassFields": true
   },
   "include": ["src/**/*.ts"]
 }

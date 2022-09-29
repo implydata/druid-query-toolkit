@@ -63,12 +63,15 @@ export class SqlFunction extends SqlExpression {
 
   static simple(
     functionName: string,
-    args: SqlExpression[] | SeparatedArray<SqlExpression>,
+    args: (SqlExpression | LiteralValue)[] | SeparatedArray<SqlExpression>,
     filter?: SqlWhereClause | SqlExpression,
   ) {
     return new SqlFunction({
       functionName: functionName,
-      args: SeparatedArray.fromArray(args, Separator.COMMA),
+      args: SeparatedArray.fromArray(
+        Array.isArray(args) ? args.map(SqlExpression.wrap) : args,
+        Separator.COMMA,
+      ),
       whereClause: filter ? SqlWhereClause.createForFunction(filter) : undefined,
     });
   }
@@ -76,15 +79,26 @@ export class SqlFunction extends SqlExpression {
   static decorated(
     functionName: string,
     decorator: string | undefined,
-    args: SqlExpression[] | SeparatedArray<SqlExpression>,
+    args: (SqlExpression | LiteralValue)[] | SeparatedArray<SqlExpression>,
     filter?: SqlWhereClause | SqlExpression,
   ) {
     return new SqlFunction({
       functionName: functionName,
       decorator: decorator,
-      args: SeparatedArray.fromArray(args, Separator.COMMA),
+      args: SeparatedArray.fromArray(
+        Array.isArray(args) ? args.map(SqlExpression.wrap) : args,
+        Separator.COMMA,
+      ),
       whereClause: filter ? SqlWhereClause.createForFunction(filter) : undefined,
     });
+  }
+
+  static count(arg?: SqlExpression, filter?: SqlWhereClause | SqlExpression) {
+    return SqlFunction.simple('COUNT', [arg || SqlStar.PLAIN], filter);
+  }
+
+  static countDistinct(arg: SqlExpression, filter?: SqlWhereClause | SqlExpression) {
+    return SqlFunction.decorated('COUNT', 'DISTINCT', [arg], filter);
   }
 
   static cast(ex: SqlExpression, asType: string): SqlExpression {

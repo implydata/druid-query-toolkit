@@ -48,6 +48,9 @@ export class SeparatedArray<T> {
 
   constructor(values: readonly T[], separators?: (SeparatorOrString | undefined)[]) {
     separators = separators || [];
+    if (!values.length) {
+      throw new Error('must have at least one value');
+    }
     if (values.length <= separators.length) {
       throw new Error(
         `invalid values (${values.length}) or separator length (${separators.length})`,
@@ -75,7 +78,7 @@ export class SeparatedArray<T> {
   }
 
   public first(): T {
-    return this.values[0];
+    return this.values[0]!;
   }
 
   public change(index: number, newValue: T): SeparatedArray<T> {
@@ -93,7 +96,7 @@ export class SeparatedArray<T> {
     const filteredSeparators: (SeparatorOrString | undefined)[] = [];
     let skippedFirst = false;
     for (let i = 0; i < values.length; i++) {
-      const value = values[i];
+      const value = values[i]!;
       if (fn(value, i)) {
         filteredValues.push(value);
         if (i > 0) filteredSeparators.push(separators[i - 1]);

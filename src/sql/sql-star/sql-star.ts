@@ -41,7 +41,7 @@ export class SqlStar extends SqlExpression {
   public readonly tableRefName?: RefName;
   public readonly namespaceRefName?: RefName;
 
-  constructor(options: SqlStarValue) {
+  constructor(options: SqlStarValue = {}) {
     super(options, SqlStar.type);
     this.tableRefName = options.tableRefName;
     this.namespaceRefName = options.namespaceRefName;

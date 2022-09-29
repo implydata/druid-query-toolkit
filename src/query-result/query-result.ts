@@ -419,7 +419,7 @@ export class QueryResult {
     for (const row of rows) {
       let i = 0;
       while (i < indexes.length) {
-        const index = indexes[i];
+        const index = indexes[i]!;
         if (isIsoDate(row[index])) {
           i++;
         } else {

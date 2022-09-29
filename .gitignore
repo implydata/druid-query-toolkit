@@ -10,6 +10,8 @@
 /node_modules/
 /coverage/
 /build/
+/dist/
+/types/
 /src/sql/parser/index.js
 /src/sql/parser/.DS_Store
 

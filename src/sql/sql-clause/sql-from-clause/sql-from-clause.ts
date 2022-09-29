@@ -121,7 +121,7 @@ export class SqlFromClause extends SqlClause {
     return SqlBase.fromValue(value);
   }
 
-  public getFirstTableName(): string {
+  public getFirstTableName(): string | undefined {
     return filterMap(this.expressions.values, table => {
       table = table.getUnderlyingExpression();
       if (table instanceof SqlTableRef) {
@@ -131,7 +131,7 @@ export class SqlFromClause extends SqlClause {
     })[0];
   }
 
-  public getFirstSchema(): string {
+  public getFirstSchema(): string | undefined {
     return filterMap(this.expressions.values, table => {
       table = table.getUnderlyingExpression();
       if (table instanceof SqlTableRef) {

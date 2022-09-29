@@ -13,7 +13,7 @@
  */
 
 import { backAndForth } from '../../test-utils';
-import { SqlExpression, SqlFunction, SqlRef } from '..';
+import { SqlExpression, SqlFunction, SqlRef, SqlStar } from '..';
 
 describe('SqlFunction', () => {
   it('things that work', () => {
@@ -71,6 +71,21 @@ describe('SqlFunction', () => {
   it('.isValidFunctionName', () => {
     expect(SqlFunction.isValidFunctionName('SUM')).toEqual(true);
     expect(SqlFunction.isValidFunctionName('TABLE')).toEqual(true);
+  });
+
+  it('.count', () => {
+    expect(SqlFunction.count().toString()).toEqual('COUNT(*)');
+    expect(SqlFunction.count(SqlStar.PLAIN, SqlExpression.parse('x > 1')).toString()).toEqual(
+      'COUNT(*) FILTER (WHERE x > 1)',
+    );
+  });
+
+  it('.countDistinct', () => {
+    const x = SqlExpression.parse('x');
+    expect(SqlFunction.countDistinct(x).toString()).toEqual('COUNT(DISTINCT x)');
+    expect(SqlFunction.countDistinct(x, SqlExpression.parse('x > 1')).toString()).toEqual(
+      'COUNT(DISTINCT x) FILTER (WHERE x > 1)',
+    );
   });
 
   it('.cast', () => {

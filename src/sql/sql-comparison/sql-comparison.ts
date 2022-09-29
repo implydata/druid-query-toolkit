@@ -285,7 +285,7 @@ export class SqlComparison extends SqlExpression {
       case '>':
       case '<=':
       case '>=':
-        op = ANTI_OP[op];
+        op = ANTI_OP[op]!;
         if (decorator) {
           decorator = decorator === 'ALL' ? 'ANY' : 'ALL';
         }
