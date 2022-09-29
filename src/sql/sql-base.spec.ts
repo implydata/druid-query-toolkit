@@ -16,6 +16,12 @@ import { parseSql } from './parser';
 
 describe('SqlBase', () => {
   describe('#prettyTrim', () => {
+    it('.toJSON', () => {
+      expect(JSON.stringify({ x: parseSql(`COUNT(*)`) })).toEqual('{"x":"COUNT(*)"}');
+    });
+  });
+
+  describe('#prettyTrim', () => {
     it('works in basic case', () => {
       expect(
         parseSql(

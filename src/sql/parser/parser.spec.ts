@@ -38,6 +38,7 @@ describe('Parser', () => {
               },
               "keywords": Object {},
               "namespaceRefName": undefined,
+              "parens": undefined,
               "spacing": Object {},
               "tableRefName": undefined,
               "type": "ref",
@@ -49,6 +50,7 @@ describe('Parser', () => {
               },
               "keywords": Object {},
               "namespaceRefName": undefined,
+              "parens": undefined,
               "spacing": Object {},
               "tableRefName": undefined,
               "type": "ref",
@@ -57,6 +59,7 @@ describe('Parser', () => {
         },
         "keywords": Object {},
         "op": "OR",
+        "parens": undefined,
         "spacing": Object {},
         "type": "multi",
       }

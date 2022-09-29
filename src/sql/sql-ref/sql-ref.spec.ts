@@ -75,6 +75,7 @@ describe('SqlRef', () => {
         },
         "keywords": Object {},
         "namespaceRefName": undefined,
+        "parens": undefined,
         "spacing": Object {
           "postTableDot": "",
           "preTableDot": "",
@@ -101,6 +102,7 @@ describe('SqlRef', () => {
         },
         "keywords": Object {},
         "namespaceRefName": undefined,
+        "parens": undefined,
         "spacing": Object {
           "postTableDot": "",
           "preTableDot": "",
@@ -127,6 +129,7 @@ describe('SqlRef', () => {
         },
         "keywords": Object {},
         "namespaceRefName": undefined,
+        "parens": undefined,
         "spacing": Object {
           "postTableDot": "",
           "preTableDot": "",
@@ -153,6 +156,7 @@ describe('SqlRef', () => {
         },
         "keywords": Object {},
         "namespaceRefName": undefined,
+        "parens": undefined,
         "spacing": Object {},
         "tableRefName": undefined,
         "type": "ref",
@@ -173,6 +177,7 @@ describe('SqlRef', () => {
         },
         "keywords": Object {},
         "namespaceRefName": undefined,
+        "parens": undefined,
         "spacing": Object {},
         "tableRefName": undefined,
         "type": "ref",
@@ -191,6 +196,7 @@ describe('SqlRef', () => {
         },
         "keywords": Object {},
         "namespaceRefName": undefined,
+        "parens": undefined,
         "spacing": Object {},
         "tableRefName": undefined,
         "type": "ref",
@@ -209,6 +215,7 @@ describe('SqlRef', () => {
         },
         "keywords": Object {},
         "namespaceRefName": undefined,
+        "parens": undefined,
         "spacing": Object {},
         "tableRefName": undefined,
         "type": "ref",
@@ -227,6 +234,7 @@ describe('SqlRef', () => {
         },
         "keywords": Object {},
         "namespaceRefName": undefined,
+        "parens": undefined,
         "spacing": Object {
           "postTableDot": " ",
           "preTableDot": " ",
@@ -292,6 +300,7 @@ describe('SqlRef', () => {
           "name": "lol",
           "quotes": true,
         },
+        "parens": undefined,
         "spacing": Object {
           "postNamespaceDot": "  ",
           "postTableDot": "  ",
@@ -327,6 +336,7 @@ describe('#convertToTableRef', () => {
           "name": "namespace",
           "quotes": true,
         },
+        "parens": undefined,
         "spacing": Object {
           "postNamespaceDot": " ",
           "preNamespaceDot": "  ",
@@ -360,6 +370,7 @@ describe('#convertToTableRef', () => {
                   "name": "sys",
                   "quotes": false,
                 },
+                "parens": undefined,
                 "spacing": Object {
                   "postNamespaceDot": "",
                   "preNamespaceDot": "",
@@ -376,6 +387,7 @@ describe('#convertToTableRef', () => {
           "keywords": Object {
             "from": "from",
           },
+          "parens": undefined,
           "spacing": Object {
             "postFrom": " ",
           },
@@ -390,6 +402,7 @@ describe('#convertToTableRef', () => {
         "limitClause": undefined,
         "offsetClause": undefined,
         "orderByClause": undefined,
+        "parens": undefined,
         "partitionedByClause": undefined,
         "replaceClause": undefined,
         "selectExpressions": SeparatedArray {
@@ -402,6 +415,7 @@ describe('#convertToTableRef', () => {
               },
               "keywords": Object {},
               "namespaceRefName": undefined,
+              "parens": undefined,
               "spacing": Object {},
               "tableRefName": undefined,
               "type": "ref",

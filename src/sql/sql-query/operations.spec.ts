@@ -12,19 +12,11 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlExpression, SqlQuery, SqlRef } from '../..';
+import { SqlExpression, SqlQuery, SqlRef } from '../..';
 import { sane } from '../../utils';
 
 function stringifyExpressions(v: any) {
-  return JSON.parse(
-    JSON.stringify(v, (_k: string, v: any) => {
-      if (v instanceof SqlBase) {
-        return `EX[${v}]`;
-      } else {
-        return v;
-      }
-    }),
-  );
+  return JSON.parse(JSON.stringify(v));
 }
 
 describe('SqlQuery operations', () => {
@@ -226,25 +218,25 @@ describe('SqlQuery operations', () => {
     it('#getGroupingExpressionInfos', () => {
       expect(stringifyExpressions(query.getGroupingExpressionInfos())).toEqual([
         {
-          expression: 'EX[channel]',
-          orderByExpression: 'EX[channel]',
+          expression: 'channel',
+          orderByExpression: 'channel',
           outputColumn: 'channel',
           selectIndex: 0,
         },
         {
-          expression: 'EX[namespace]',
-          orderByExpression: 'EX[s_namespace Desc]',
+          expression: 'namespace',
+          orderByExpression: 's_namespace Desc',
           outputColumn: 's_namespace',
           selectIndex: 2,
         },
         {
-          expression: 'EX[SUBSTR(cityName, 1, 2)]',
+          expression: 'SUBSTR(cityName, 1, 2)',
           outputColumn: 'EXPR$1',
           selectIndex: 1,
         },
         {
-          expression: 'EX[subspace]',
-          orderByExpression: 'EX[subspace ASC]',
+          expression: 'subspace',
+          orderByExpression: 'subspace ASC',
           selectIndex: -1,
         },
       ]);

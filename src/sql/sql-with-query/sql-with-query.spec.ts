@@ -96,6 +96,7 @@ describe('SqlWithQuery', () => {
         "limitClause": undefined,
         "offsetClause": undefined,
         "orderByClause": undefined,
+        "parens": undefined,
         "partitionedByClause": undefined,
         "query": SqlQuery {
           "clusteredByClause": undefined,
@@ -108,6 +109,7 @@ describe('SqlWithQuery', () => {
                 SqlTableRef {
                   "keywords": Object {},
                   "namespaceRefName": undefined,
+                  "parens": undefined,
                   "spacing": Object {},
                   "tableRefName": RefName {
                     "name": "wiki",
@@ -121,6 +123,7 @@ describe('SqlWithQuery', () => {
             "keywords": Object {
               "from": "FROM",
             },
+            "parens": undefined,
             "spacing": Object {
               "postFrom": " ",
             },
@@ -149,6 +152,7 @@ describe('SqlWithQuery', () => {
               SqlStar {
                 "keywords": Object {},
                 "namespaceRefName": undefined,
+                "parens": undefined,
                 "spacing": Object {},
                 "tableRefName": undefined,
                 "type": "star",
@@ -173,6 +177,7 @@ describe('SqlWithQuery', () => {
           "keywords": Object {
             "with": "WITH",
           },
+          "parens": undefined,
           "spacing": Object {
             "postWith": " ",
           },
@@ -185,6 +190,7 @@ describe('SqlWithQuery', () => {
                 "keywords": Object {
                   "as": "AS",
                 },
+                "parens": undefined,
                 "query": SqlQuery {
                   "clusteredByClause": undefined,
                   "decorator": undefined,
@@ -196,6 +202,7 @@ describe('SqlWithQuery', () => {
                         SqlTableRef {
                           "keywords": Object {},
                           "namespaceRefName": undefined,
+                          "parens": undefined,
                           "spacing": Object {},
                           "tableRefName": RefName {
                             "name": "wikipedia",
@@ -209,6 +216,7 @@ describe('SqlWithQuery', () => {
                     "keywords": Object {
                       "from": "FROM",
                     },
+                    "parens": undefined,
                     "spacing": Object {
                       "postFrom": " ",
                     },
@@ -237,6 +245,7 @@ describe('SqlWithQuery', () => {
                       SqlStar {
                         "keywords": Object {},
                         "namespaceRefName": undefined,
+                        "parens": undefined,
                         "spacing": Object {},
                         "tableRefName": undefined,
                         "type": "star",

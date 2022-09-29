@@ -314,10 +314,7 @@ export abstract class SqlBase {
     this.type = type;
     this.spacing = cleanObject(options.spacing || {});
     this.keywords = cleanObject(options.keywords || {});
-    const { parens } = options;
-    if (parens && parens.length) {
-      this.parens = parens;
-    }
+    this.parens = options.parens;
   }
 
   public valueOf() {
@@ -328,6 +325,10 @@ export abstract class SqlBase {
     };
     if (this.parens) value.parens = this.parens;
     return value;
+  }
+
+  public toJSON() {
+    return this.toString();
   }
 
   public equals(other: SqlBase | undefined): boolean {

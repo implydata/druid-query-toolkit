@@ -25,6 +25,7 @@ describe('SqlInterval', () => {
       SqlInterval {
         "intervalValue": SqlLiteral {
           "keywords": Object {},
+          "parens": undefined,
           "spacing": Object {},
           "stringValue": "'1'",
           "type": "literal",
@@ -33,6 +34,7 @@ describe('SqlInterval', () => {
         "keywords": Object {
           "interval": "INTERVAL",
         },
+        "parens": undefined,
         "spacing": Object {
           "postInterval": " ",
           "postIntervalValue": " ",
@@ -52,6 +54,7 @@ describe('SqlInterval', () => {
       SqlInterval {
         "intervalValue": SqlLiteral {
           "keywords": Object {},
+          "parens": undefined,
           "spacing": Object {},
           "stringValue": "'1-2'",
           "type": "literal",
@@ -60,6 +63,7 @@ describe('SqlInterval', () => {
         "keywords": Object {
           "interval": "INTERVAL",
         },
+        "parens": undefined,
         "spacing": Object {
           "postInterval": " ",
           "postIntervalValue": " ",
@@ -79,6 +83,7 @@ describe('SqlInterval', () => {
       SqlInterval {
         "intervalValue": SqlLiteral {
           "keywords": Object {},
+          "parens": undefined,
           "spacing": Object {},
           "stringValue": "'1-2'",
           "type": "literal",
@@ -87,6 +92,7 @@ describe('SqlInterval', () => {
         "keywords": Object {
           "interval": "INTERVAL",
         },
+        "parens": undefined,
         "spacing": Object {
           "postInterval": " ",
           "postIntervalValue": " ",

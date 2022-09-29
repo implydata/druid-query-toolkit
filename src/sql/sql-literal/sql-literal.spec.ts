@@ -68,6 +68,7 @@ describe('SqlLiteral', () => {
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlLiteral {
         "keywords": Object {},
+        "parens": undefined,
         "spacing": Object {},
         "stringValue": "NULL",
         "type": "literal",
@@ -84,6 +85,7 @@ describe('SqlLiteral', () => {
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlLiteral {
         "keywords": Object {},
+        "parens": undefined,
         "spacing": Object {},
         "stringValue": "True",
         "type": "literal",
@@ -100,6 +102,7 @@ describe('SqlLiteral', () => {
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlLiteral {
         "keywords": Object {},
+        "parens": undefined,
         "spacing": Object {},
         "stringValue": "FalsE",
         "type": "literal",
@@ -116,6 +119,7 @@ describe('SqlLiteral', () => {
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlLiteral {
         "keywords": Object {},
+        "parens": undefined,
         "spacing": Object {},
         "stringValue": "'don''t go there'",
         "type": "literal",
@@ -156,6 +160,7 @@ describe('SqlLiteral', () => {
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlLiteral {
         "keywords": Object {},
+        "parens": undefined,
         "spacing": Object {},
         "stringValue": "1",
         "type": "literal",
@@ -216,6 +221,7 @@ describe('SqlLiteral', () => {
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlLiteral {
         "keywords": Object {},
+        "parens": undefined,
         "spacing": Object {},
         "stringValue": "''",
         "type": "literal",
@@ -232,6 +238,7 @@ describe('SqlLiteral', () => {
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlLiteral {
         "keywords": Object {},
+        "parens": undefined,
         "spacing": Object {},
         "stringValue": "1.01",
         "type": "literal",
@@ -248,6 +255,7 @@ describe('SqlLiteral', () => {
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlLiteral {
         "keywords": Object {},
+        "parens": undefined,
         "spacing": Object {},
         "stringValue": "12345",
         "type": "literal",
@@ -264,6 +272,7 @@ describe('SqlLiteral', () => {
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlLiteral {
         "keywords": Object {},
+        "parens": undefined,
         "spacing": Object {},
         "stringValue": "1606832560494517248",
         "type": "literal",
@@ -280,6 +289,7 @@ describe('SqlLiteral', () => {
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlLiteral {
         "keywords": Object {},
+        "parens": undefined,
         "spacing": Object {},
         "stringValue": "'hello'",
         "type": "literal",
@@ -296,6 +306,7 @@ describe('SqlLiteral', () => {
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlLiteral {
         "keywords": Object {},
+        "parens": undefined,
         "spacing": Object {},
         "stringValue": "U&'fo\\\\00F6'",
         "type": "literal",
@@ -312,6 +323,7 @@ describe('SqlLiteral', () => {
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlLiteral {
         "keywords": Object {},
+        "parens": undefined,
         "spacing": Object {},
         "stringValue": "u&'fo\\\\00F6\\\\00F6'",
         "type": "literal",
@@ -330,6 +342,7 @@ describe('SqlLiteral', () => {
         "keywords": Object {
           "timestamp": "TIMESTAMP",
         },
+        "parens": undefined,
         "spacing": Object {
           "postTimestamp": " ",
         },
@@ -350,6 +363,7 @@ describe('SqlLiteral', () => {
         "keywords": Object {
           "timestamp": "DATE",
         },
+        "parens": undefined,
         "spacing": Object {
           "postTimestamp": " ",
         },

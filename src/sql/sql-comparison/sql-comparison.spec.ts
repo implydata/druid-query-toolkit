@@ -130,12 +130,14 @@ describe('SqlComparison', () => {
           },
           "keywords": Object {},
           "namespaceRefName": undefined,
+          "parens": undefined,
           "spacing": Object {},
           "tableRefName": undefined,
           "type": "ref",
         },
         "negated": false,
         "op": ">",
+        "parens": undefined,
         "rhs": SqlRef {
           "columnRefName": RefName {
             "name": "B",
@@ -143,6 +145,7 @@ describe('SqlComparison', () => {
           },
           "keywords": Object {},
           "namespaceRefName": undefined,
+          "parens": undefined,
           "spacing": Object {},
           "tableRefName": undefined,
           "type": "ref",
@@ -174,14 +177,17 @@ describe('SqlComparison', () => {
           },
           "keywords": Object {},
           "namespaceRefName": undefined,
+          "parens": undefined,
           "spacing": Object {},
           "tableRefName": undefined,
           "type": "ref",
         },
         "negated": false,
         "op": "=",
+        "parens": undefined,
         "rhs": SqlLiteral {
           "keywords": Object {},
+          "parens": undefined,
           "spacing": Object {},
           "stringValue": "'xxx'",
           "type": "literal",
@@ -215,12 +221,14 @@ describe('SqlComparison', () => {
           },
           "keywords": Object {},
           "namespaceRefName": undefined,
+          "parens": undefined,
           "spacing": Object {},
           "tableRefName": undefined,
           "type": "ref",
         },
         "negated": false,
         "op": "=",
+        "parens": undefined,
         "rhs": SqlQuery {
           "clusteredByClause": undefined,
           "decorator": undefined,
@@ -232,6 +240,7 @@ describe('SqlComparison', () => {
                 SqlTableRef {
                   "keywords": Object {},
                   "namespaceRefName": undefined,
+                  "parens": undefined,
                   "spacing": Object {},
                   "tableRefName": RefName {
                     "name": "wikipedia",
@@ -245,6 +254,7 @@ describe('SqlComparison', () => {
             "keywords": Object {
               "from": "FROM",
             },
+            "parens": undefined,
             "spacing": Object {
               "postFrom": " ",
             },
@@ -256,6 +266,7 @@ describe('SqlComparison', () => {
               "values": Array [
                 SqlLiteral {
                   "keywords": Object {},
+                  "parens": undefined,
                   "spacing": Object {},
                   "stringValue": "1",
                   "type": "literal",
@@ -267,6 +278,7 @@ describe('SqlComparison', () => {
               "by": "BY",
               "group": "GROUP",
             },
+            "parens": undefined,
             "spacing": Object {
               "postBy": " ",
               "postGroup": " ",
@@ -284,11 +296,13 @@ describe('SqlComparison', () => {
             },
             "limit": SqlLiteral {
               "keywords": Object {},
+              "parens": undefined,
               "spacing": Object {},
               "stringValue": "5",
               "type": "literal",
               "value": 5,
             },
+            "parens": undefined,
             "spacing": Object {
               "postLimit": " ",
             },
@@ -308,6 +322,7 @@ describe('SqlComparison', () => {
                         SqlStar {
                           "keywords": Object {},
                           "namespaceRefName": undefined,
+                          "parens": undefined,
                           "spacing": Object {},
                           "tableRefName": undefined,
                           "type": "star",
@@ -319,6 +334,7 @@ describe('SqlComparison', () => {
                     "keywords": Object {
                       "functionName": "COUNT",
                     },
+                    "parens": undefined,
                     "spacing": Object {
                       "postArguments": "",
                       "postLeftParen": "",
@@ -331,6 +347,7 @@ describe('SqlComparison', () => {
                   "keywords": Object {
                     "direction": "DESC",
                   },
+                  "parens": undefined,
                   "spacing": Object {
                     "preDirection": " ",
                   },
@@ -342,6 +359,7 @@ describe('SqlComparison', () => {
               "by": "BY",
               "order": "ORDER",
             },
+            "parens": undefined,
             "spacing": Object {
               "postBy": " ",
               "postOrder": " ",
@@ -366,6 +384,7 @@ describe('SqlComparison', () => {
                 },
                 "keywords": Object {},
                 "namespaceRefName": undefined,
+                "parens": undefined,
                 "spacing": Object {},
                 "tableRefName": undefined,
                 "type": "ref",
@@ -412,14 +431,17 @@ describe('SqlComparison', () => {
           },
           "keywords": Object {},
           "namespaceRefName": undefined,
+          "parens": undefined,
           "spacing": Object {},
           "tableRefName": undefined,
           "type": "ref",
         },
         "negated": false,
         "op": "IS",
+        "parens": undefined,
         "rhs": SqlLiteral {
           "keywords": Object {},
+          "parens": undefined,
           "spacing": Object {},
           "stringValue": "NULL",
           "type": "literal",
@@ -453,14 +475,17 @@ describe('SqlComparison', () => {
           },
           "keywords": Object {},
           "namespaceRefName": undefined,
+          "parens": undefined,
           "spacing": Object {},
           "tableRefName": undefined,
           "type": "ref",
         },
         "negated": true,
         "op": "IS",
+        "parens": undefined,
         "rhs": SqlLiteral {
           "keywords": Object {},
+          "parens": undefined,
           "spacing": Object {},
           "stringValue": "NULL",
           "type": "literal",
@@ -494,12 +519,14 @@ describe('SqlComparison', () => {
           },
           "keywords": Object {},
           "namespaceRefName": undefined,
+          "parens": undefined,
           "spacing": Object {},
           "tableRefName": undefined,
           "type": "ref",
         },
         "negated": false,
         "op": "IN",
+        "parens": undefined,
         "rhs": SqlRecord {
           "expressions": SeparatedArray {
             "separators": Array [
@@ -517,6 +544,7 @@ describe('SqlComparison', () => {
             "values": Array [
               SqlLiteral {
                 "keywords": Object {},
+                "parens": undefined,
                 "spacing": Object {},
                 "stringValue": "1",
                 "type": "literal",
@@ -524,6 +552,7 @@ describe('SqlComparison', () => {
               },
               SqlLiteral {
                 "keywords": Object {},
+                "parens": undefined,
                 "spacing": Object {},
                 "stringValue": "2",
                 "type": "literal",
@@ -541,6 +570,7 @@ describe('SqlComparison', () => {
                   "values": Array [
                     SqlLiteral {
                       "keywords": Object {},
+                      "parens": undefined,
                       "spacing": Object {},
                       "stringValue": "4",
                       "type": "literal",
@@ -548,6 +578,7 @@ describe('SqlComparison', () => {
                     },
                     SqlLiteral {
                       "keywords": Object {},
+                      "parens": undefined,
                       "spacing": Object {},
                       "stringValue": "1",
                       "type": "literal",
@@ -557,12 +588,14 @@ describe('SqlComparison', () => {
                 },
                 "keywords": Object {},
                 "op": "-",
+                "parens": undefined,
                 "spacing": Object {},
                 "type": "multi",
               },
             ],
           },
           "keywords": Object {},
+          "parens": undefined,
           "spacing": Object {
             "postExpressions": "",
             "postLeftParen": "",
@@ -597,12 +630,14 @@ describe('SqlComparison', () => {
           },
           "keywords": Object {},
           "namespaceRefName": undefined,
+          "parens": undefined,
           "spacing": Object {},
           "tableRefName": undefined,
           "type": "ref",
         },
         "negated": true,
         "op": "IN",
+        "parens": undefined,
         "rhs": SqlRecord {
           "expressions": SeparatedArray {
             "separators": Array [
@@ -620,6 +655,7 @@ describe('SqlComparison', () => {
             "values": Array [
               SqlLiteral {
                 "keywords": Object {},
+                "parens": undefined,
                 "spacing": Object {},
                 "stringValue": "1",
                 "type": "literal",
@@ -627,6 +663,7 @@ describe('SqlComparison', () => {
               },
               SqlLiteral {
                 "keywords": Object {},
+                "parens": undefined,
                 "spacing": Object {},
                 "stringValue": "2",
                 "type": "literal",
@@ -644,6 +681,7 @@ describe('SqlComparison', () => {
                   "values": Array [
                     SqlLiteral {
                       "keywords": Object {},
+                      "parens": undefined,
                       "spacing": Object {},
                       "stringValue": "4",
                       "type": "literal",
@@ -651,6 +689,7 @@ describe('SqlComparison', () => {
                     },
                     SqlLiteral {
                       "keywords": Object {},
+                      "parens": undefined,
                       "spacing": Object {},
                       "stringValue": "1",
                       "type": "literal",
@@ -660,12 +699,14 @@ describe('SqlComparison', () => {
                 },
                 "keywords": Object {},
                 "op": "-",
+                "parens": undefined,
                 "spacing": Object {},
                 "type": "multi",
               },
             ],
           },
           "keywords": Object {},
+          "parens": undefined,
           "spacing": Object {
             "postExpressions": "",
             "postLeftParen": "",
@@ -700,12 +741,14 @@ describe('SqlComparison', () => {
           },
           "keywords": Object {},
           "namespaceRefName": undefined,
+          "parens": undefined,
           "spacing": Object {},
           "tableRefName": undefined,
           "type": "ref",
         },
         "negated": false,
         "op": "IN",
+        "parens": undefined,
         "rhs": SqlQuery {
           "clusteredByClause": undefined,
           "decorator": undefined,
@@ -717,6 +760,7 @@ describe('SqlComparison', () => {
                 SqlTableRef {
                   "keywords": Object {},
                   "namespaceRefName": undefined,
+                  "parens": undefined,
                   "spacing": Object {},
                   "tableRefName": RefName {
                     "name": "tbl",
@@ -730,6 +774,7 @@ describe('SqlComparison', () => {
             "keywords": Object {
               "from": "FROM",
             },
+            "parens": undefined,
             "spacing": Object {
               "postFrom": " ",
             },
@@ -747,11 +792,13 @@ describe('SqlComparison', () => {
             },
             "limit": SqlLiteral {
               "keywords": Object {},
+              "parens": undefined,
               "spacing": Object {},
               "stringValue": "1",
               "type": "literal",
               "value": 1,
             },
+            "parens": undefined,
             "spacing": Object {
               "postLimit": " ",
             },
@@ -781,6 +828,7 @@ describe('SqlComparison', () => {
                 },
                 "keywords": Object {},
                 "namespaceRefName": undefined,
+                "parens": undefined,
                 "spacing": Object {},
                 "tableRefName": undefined,
                 "type": "ref",
@@ -825,12 +873,14 @@ describe('SqlComparison', () => {
           },
           "keywords": Object {},
           "namespaceRefName": undefined,
+          "parens": undefined,
           "spacing": Object {},
           "tableRefName": undefined,
           "type": "ref",
         },
         "negated": true,
         "op": "IN",
+        "parens": undefined,
         "rhs": SqlQuery {
           "clusteredByClause": undefined,
           "decorator": undefined,
@@ -842,6 +892,7 @@ describe('SqlComparison', () => {
                 SqlTableRef {
                   "keywords": Object {},
                   "namespaceRefName": undefined,
+                  "parens": undefined,
                   "spacing": Object {},
                   "tableRefName": RefName {
                     "name": "tbl",
@@ -855,6 +906,7 @@ describe('SqlComparison', () => {
             "keywords": Object {
               "from": "FROM",
             },
+            "parens": undefined,
             "spacing": Object {
               "postFrom": " ",
             },
@@ -872,11 +924,13 @@ describe('SqlComparison', () => {
             },
             "limit": SqlLiteral {
               "keywords": Object {},
+              "parens": undefined,
               "spacing": Object {},
               "stringValue": "1",
               "type": "literal",
               "value": 1,
             },
+            "parens": undefined,
             "spacing": Object {
               "postLimit": " ",
             },
@@ -902,6 +956,7 @@ describe('SqlComparison', () => {
                 },
                 "keywords": Object {},
                 "namespaceRefName": undefined,
+                "parens": undefined,
                 "spacing": Object {},
                 "tableRefName": undefined,
                 "type": "ref",
@@ -956,6 +1011,7 @@ describe('SqlComparison', () => {
                 },
                 "keywords": Object {},
                 "namespaceRefName": undefined,
+                "parens": undefined,
                 "spacing": Object {},
                 "tableRefName": undefined,
                 "type": "ref",
@@ -967,6 +1023,7 @@ describe('SqlComparison', () => {
                 },
                 "keywords": Object {},
                 "namespaceRefName": undefined,
+                "parens": undefined,
                 "spacing": Object {},
                 "tableRefName": undefined,
                 "type": "ref",
@@ -974,6 +1031,7 @@ describe('SqlComparison', () => {
             ],
           },
           "keywords": Object {},
+          "parens": undefined,
           "spacing": Object {
             "postExpressions": "",
             "postLeftParen": "",
@@ -982,6 +1040,7 @@ describe('SqlComparison', () => {
         },
         "negated": false,
         "op": "IN",
+        "parens": undefined,
         "rhs": SqlRecord {
           "expressions": SeparatedArray {
             "separators": Array [
@@ -1014,6 +1073,7 @@ describe('SqlComparison', () => {
                         "values": Array [
                           SqlLiteral {
                             "keywords": Object {},
+                            "parens": undefined,
                             "spacing": Object {},
                             "stringValue": "'Chr'",
                             "type": "literal",
@@ -1021,6 +1081,7 @@ describe('SqlComparison', () => {
                           },
                           SqlLiteral {
                             "keywords": Object {},
+                            "parens": undefined,
                             "spacing": Object {},
                             "stringValue": "'ome'",
                             "type": "literal",
@@ -1030,11 +1091,13 @@ describe('SqlComparison', () => {
                       },
                       "keywords": Object {},
                       "op": "||",
+                      "parens": undefined,
                       "spacing": Object {},
                       "type": "multi",
                     },
                     SqlLiteral {
                       "keywords": Object {},
+                      "parens": undefined,
                       "spacing": Object {},
                       "stringValue": "'United States'",
                       "type": "literal",
@@ -1043,6 +1106,7 @@ describe('SqlComparison', () => {
                   ],
                 },
                 "keywords": Object {},
+                "parens": undefined,
                 "spacing": Object {
                   "postExpressions": "",
                   "postLeftParen": "",
@@ -1061,6 +1125,7 @@ describe('SqlComparison', () => {
                   "values": Array [
                     SqlLiteral {
                       "keywords": Object {},
+                      "parens": undefined,
                       "spacing": Object {},
                       "stringValue": "'Firefox'",
                       "type": "literal",
@@ -1068,6 +1133,7 @@ describe('SqlComparison', () => {
                     },
                     SqlLiteral {
                       "keywords": Object {},
+                      "parens": undefined,
                       "spacing": Object {},
                       "stringValue": "'Israel'",
                       "type": "literal",
@@ -1076,6 +1142,7 @@ describe('SqlComparison', () => {
                   ],
                 },
                 "keywords": Object {},
+                "parens": undefined,
                 "spacing": Object {
                   "postExpressions": "",
                   "postLeftParen": "",
@@ -1085,6 +1152,7 @@ describe('SqlComparison', () => {
             ],
           },
           "keywords": Object {},
+          "parens": undefined,
           "spacing": Object {
             "postExpressions": "",
             "postLeftParen": "",
@@ -1118,12 +1186,14 @@ describe('SqlComparison', () => {
           },
           "keywords": Object {},
           "namespaceRefName": undefined,
+          "parens": undefined,
           "spacing": Object {},
           "tableRefName": undefined,
           "type": "ref",
         },
         "negated": false,
         "op": "BETWEEN",
+        "parens": undefined,
         "rhs": SqlBetweenPart {
           "end": SqlRef {
             "columnRefName": RefName {
@@ -1132,6 +1202,7 @@ describe('SqlComparison', () => {
             },
             "keywords": Object {},
             "namespaceRefName": undefined,
+            "parens": undefined,
             "spacing": Object {},
             "tableRefName": undefined,
             "type": "ref",
@@ -1139,6 +1210,7 @@ describe('SqlComparison', () => {
           "keywords": Object {
             "and": "AND",
           },
+          "parens": undefined,
           "spacing": Object {
             "postAnd": " ",
             "preAnd": " ",
@@ -1150,6 +1222,7 @@ describe('SqlComparison', () => {
             },
             "keywords": Object {},
             "namespaceRefName": undefined,
+            "parens": undefined,
             "spacing": Object {},
             "tableRefName": undefined,
             "type": "ref",
@@ -1185,12 +1258,14 @@ describe('SqlComparison', () => {
           },
           "keywords": Object {},
           "namespaceRefName": undefined,
+          "parens": undefined,
           "spacing": Object {},
           "tableRefName": undefined,
           "type": "ref",
         },
         "negated": true,
         "op": "BETWEEN",
+        "parens": undefined,
         "rhs": SqlBetweenPart {
           "end": SqlRef {
             "columnRefName": RefName {
@@ -1199,6 +1274,7 @@ describe('SqlComparison', () => {
             },
             "keywords": Object {},
             "namespaceRefName": undefined,
+            "parens": undefined,
             "spacing": Object {},
             "tableRefName": undefined,
             "type": "ref",
@@ -1207,6 +1283,7 @@ describe('SqlComparison', () => {
             "and": "AND",
             "symmetric": "SYMMETRIC",
           },
+          "parens": undefined,
           "spacing": Object {
             "postAnd": " ",
             "postSymmetric": " ",
@@ -1219,6 +1296,7 @@ describe('SqlComparison', () => {
             },
             "keywords": Object {},
             "namespaceRefName": undefined,
+            "parens": undefined,
             "spacing": Object {},
             "tableRefName": undefined,
             "type": "ref",
@@ -1254,14 +1332,17 @@ describe('SqlComparison', () => {
           },
           "keywords": Object {},
           "namespaceRefName": undefined,
+          "parens": undefined,
           "spacing": Object {},
           "tableRefName": undefined,
           "type": "ref",
         },
         "negated": false,
         "op": "LIKE",
+        "parens": undefined,
         "rhs": SqlLiteral {
           "keywords": Object {},
+          "parens": undefined,
           "spacing": Object {},
           "stringValue": "'%A%'",
           "type": "literal",
@@ -1295,14 +1376,17 @@ describe('SqlComparison', () => {
           },
           "keywords": Object {},
           "namespaceRefName": undefined,
+          "parens": undefined,
           "spacing": Object {},
           "tableRefName": undefined,
           "type": "ref",
         },
         "negated": true,
         "op": "LIKE",
+        "parens": undefined,
         "rhs": SqlLiteral {
           "keywords": Object {},
+          "parens": undefined,
           "spacing": Object {},
           "stringValue": "'%A%'",
           "type": "literal",
@@ -1347,6 +1431,7 @@ describe('SqlComparison', () => {
                 },
                 "keywords": Object {},
                 "namespaceRefName": undefined,
+                "parens": undefined,
                 "spacing": Object {},
                 "tableRefName": undefined,
                 "type": "ref",
@@ -1358,6 +1443,7 @@ describe('SqlComparison', () => {
                 },
                 "keywords": Object {},
                 "namespaceRefName": undefined,
+                "parens": undefined,
                 "spacing": Object {},
                 "tableRefName": undefined,
                 "type": "ref",
@@ -1366,11 +1452,13 @@ describe('SqlComparison', () => {
           },
           "keywords": Object {},
           "op": "||",
+          "parens": undefined,
           "spacing": Object {},
           "type": "multi",
         },
         "negated": true,
         "op": "LIKE",
+        "parens": undefined,
         "rhs": SqlLikePart {
           "escape": SqlMulti {
             "args": SeparatedArray {
@@ -1384,6 +1472,7 @@ describe('SqlComparison', () => {
               "values": Array [
                 SqlLiteral {
                   "keywords": Object {},
+                  "parens": undefined,
                   "spacing": Object {},
                   "stringValue": "'\\\\'",
                   "type": "literal",
@@ -1391,6 +1480,7 @@ describe('SqlComparison', () => {
                 },
                 SqlLiteral {
                   "keywords": Object {},
+                  "parens": undefined,
                   "spacing": Object {},
                   "stringValue": "''",
                   "type": "literal",
@@ -1400,6 +1490,7 @@ describe('SqlComparison', () => {
             },
             "keywords": Object {},
             "op": "||",
+            "parens": undefined,
             "spacing": Object {},
             "type": "multi",
           },
@@ -1418,6 +1509,7 @@ describe('SqlComparison', () => {
               "values": Array [
                 SqlLiteral {
                   "keywords": Object {},
+                  "parens": undefined,
                   "spacing": Object {},
                   "stringValue": "'%Je'",
                   "type": "literal",
@@ -1425,6 +1517,7 @@ describe('SqlComparison', () => {
                 },
                 SqlLiteral {
                   "keywords": Object {},
+                  "parens": undefined,
                   "spacing": Object {},
                   "stringValue": "'%'",
                   "type": "literal",
@@ -1434,9 +1527,11 @@ describe('SqlComparison', () => {
             },
             "keywords": Object {},
             "op": "||",
+            "parens": undefined,
             "spacing": Object {},
             "type": "multi",
           },
+          "parens": undefined,
           "spacing": Object {
             "postEscape": " ",
             "preEscape": " ",
@@ -1471,15 +1566,18 @@ describe('SqlComparison', () => {
           },
           "keywords": Object {},
           "namespaceRefName": undefined,
+          "parens": undefined,
           "spacing": Object {},
           "tableRefName": undefined,
           "type": "ref",
         },
         "negated": false,
         "op": "LIKE",
+        "parens": undefined,
         "rhs": SqlLikePart {
           "escape": SqlLiteral {
             "keywords": Object {},
+            "parens": undefined,
             "spacing": Object {},
             "stringValue": "'$'",
             "type": "literal",
@@ -1490,11 +1588,13 @@ describe('SqlComparison', () => {
           },
           "like": SqlLiteral {
             "keywords": Object {},
+            "parens": undefined,
             "spacing": Object {},
             "stringValue": "'%A%'",
             "type": "literal",
             "value": "%A%",
           },
+          "parens": undefined,
           "spacing": Object {
             "postEscape": " ",
             "preEscape": " ",
@@ -1529,15 +1629,18 @@ describe('SqlComparison', () => {
           },
           "keywords": Object {},
           "namespaceRefName": undefined,
+          "parens": undefined,
           "spacing": Object {},
           "tableRefName": undefined,
           "type": "ref",
         },
         "negated": true,
         "op": "LIKE",
+        "parens": undefined,
         "rhs": SqlLikePart {
           "escape": SqlLiteral {
             "keywords": Object {},
+            "parens": undefined,
             "spacing": Object {},
             "stringValue": "'$'",
             "type": "literal",
@@ -1548,11 +1651,13 @@ describe('SqlComparison', () => {
           },
           "like": SqlLiteral {
             "keywords": Object {},
+            "parens": undefined,
             "spacing": Object {},
             "stringValue": "'%A%'",
             "type": "literal",
             "value": "%A%",
           },
+          "parens": undefined,
           "spacing": Object {
             "postEscape": " ",
             "preEscape": " ",
@@ -1588,12 +1693,14 @@ describe('SqlComparison', () => {
             },
             "keywords": Object {},
             "namespaceRefName": undefined,
+            "parens": undefined,
             "spacing": Object {},
             "tableRefName": undefined,
             "type": "ref",
           },
           "negated": false,
           "op": ">",
+          "parens": undefined,
           "rhs": SqlRef {
             "columnRefName": RefName {
               "name": "B",
@@ -1601,6 +1708,7 @@ describe('SqlComparison', () => {
             },
             "keywords": Object {},
             "namespaceRefName": undefined,
+            "parens": undefined,
             "spacing": Object {},
             "tableRefName": undefined,
             "type": "ref",
@@ -1627,6 +1735,7 @@ describe('SqlComparison', () => {
           },
           "lhs": SqlLiteral {
             "keywords": Object {},
+            "parens": undefined,
             "spacing": Object {},
             "stringValue": "'A'",
             "type": "literal",
@@ -1634,8 +1743,10 @@ describe('SqlComparison', () => {
           },
           "negated": false,
           "op": ">",
+          "parens": undefined,
           "rhs": SqlLiteral {
             "keywords": Object {},
+            "parens": undefined,
             "spacing": Object {},
             "stringValue": "'B'",
             "type": "literal",
@@ -1668,12 +1779,14 @@ describe('SqlComparison', () => {
             },
             "keywords": Object {},
             "namespaceRefName": undefined,
+            "parens": undefined,
             "spacing": Object {},
             "tableRefName": undefined,
             "type": "ref",
           },
           "negated": false,
           "op": ">",
+          "parens": undefined,
           "rhs": SqlRef {
             "columnRefName": RefName {
               "name": "B",
@@ -1681,6 +1794,7 @@ describe('SqlComparison', () => {
             },
             "keywords": Object {},
             "namespaceRefName": undefined,
+            "parens": undefined,
             "spacing": Object {},
             "tableRefName": undefined,
             "type": "ref",
@@ -1707,6 +1821,7 @@ describe('SqlComparison', () => {
           },
           "lhs": SqlLiteral {
             "keywords": Object {},
+            "parens": undefined,
             "spacing": Object {},
             "stringValue": "1",
             "type": "literal",
@@ -1714,8 +1829,10 @@ describe('SqlComparison', () => {
           },
           "negated": false,
           "op": ">",
+          "parens": undefined,
           "rhs": SqlLiteral {
             "keywords": Object {},
+            "parens": undefined,
             "spacing": Object {},
             "stringValue": "2",
             "type": "literal",
@@ -1743,6 +1860,7 @@ describe('SqlComparison', () => {
           },
           "lhs": SqlLiteral {
             "keywords": Object {},
+            "parens": undefined,
             "spacing": Object {},
             "stringValue": "1",
             "type": "literal",
@@ -1758,6 +1876,7 @@ describe('SqlComparison', () => {
           ],
           "rhs": SqlLiteral {
             "keywords": Object {},
+            "parens": undefined,
             "spacing": Object {},
             "stringValue": "2",
             "type": "literal",
@@ -1790,12 +1909,14 @@ describe('SqlComparison', () => {
             },
             "keywords": Object {},
             "namespaceRefName": undefined,
+            "parens": undefined,
             "spacing": Object {},
             "tableRefName": undefined,
             "type": "ref",
           },
           "negated": false,
           "op": "BETWEEN",
+          "parens": undefined,
           "rhs": SqlBetweenPart {
             "end": SqlRef {
               "columnRefName": RefName {
@@ -1804,6 +1925,7 @@ describe('SqlComparison', () => {
               },
               "keywords": Object {},
               "namespaceRefName": undefined,
+              "parens": undefined,
               "spacing": Object {},
               "tableRefName": undefined,
               "type": "ref",
@@ -1811,6 +1933,7 @@ describe('SqlComparison', () => {
             "keywords": Object {
               "and": "AND",
             },
+            "parens": undefined,
             "spacing": Object {
               "postAnd": " ",
               "preAnd": " ",
@@ -1822,6 +1945,7 @@ describe('SqlComparison', () => {
               },
               "keywords": Object {},
               "namespaceRefName": undefined,
+              "parens": undefined,
               "spacing": Object {},
               "tableRefName": undefined,
               "type": "ref",
@@ -1861,6 +1985,7 @@ describe('SqlComparison', () => {
                 },
                 "keywords": Object {},
                 "namespaceRefName": undefined,
+                "parens": undefined,
                 "spacing": Object {},
                 "tableRefName": undefined,
                 "type": "ref",
@@ -1882,6 +2007,7 @@ describe('SqlComparison', () => {
                       },
                       "keywords": Object {},
                       "namespaceRefName": undefined,
+                      "parens": undefined,
                       "spacing": Object {},
                       "tableRefName": undefined,
                       "type": "ref",
@@ -1898,12 +2024,14 @@ describe('SqlComparison', () => {
                         },
                         "keywords": Object {},
                         "namespaceRefName": undefined,
+                        "parens": undefined,
                         "spacing": Object {},
                         "tableRefName": undefined,
                         "type": "ref",
                       },
                       "negated": false,
                       "op": "BETWEEN",
+                      "parens": undefined,
                       "rhs": SqlBetweenPart {
                         "end": SqlRef {
                           "columnRefName": RefName {
@@ -1912,6 +2040,7 @@ describe('SqlComparison', () => {
                           },
                           "keywords": Object {},
                           "namespaceRefName": undefined,
+                          "parens": undefined,
                           "spacing": Object {},
                           "tableRefName": undefined,
                           "type": "ref",
@@ -1919,6 +2048,7 @@ describe('SqlComparison', () => {
                         "keywords": Object {
                           "and": "AND",
                         },
+                        "parens": undefined,
                         "spacing": Object {
                           "postAnd": " ",
                           "preAnd": " ",
@@ -1930,6 +2060,7 @@ describe('SqlComparison', () => {
                           },
                           "keywords": Object {},
                           "namespaceRefName": undefined,
+                          "parens": undefined,
                           "spacing": Object {},
                           "tableRefName": undefined,
                           "type": "ref",
@@ -1947,6 +2078,7 @@ describe('SqlComparison', () => {
                 },
                 "keywords": Object {},
                 "op": "AND",
+                "parens": undefined,
                 "spacing": Object {},
                 "type": "multi",
               },
@@ -1954,6 +2086,7 @@ describe('SqlComparison', () => {
           },
           "keywords": Object {},
           "op": "OR",
+          "parens": undefined,
           "spacing": Object {},
           "type": "multi",
         }
@@ -1978,12 +2111,14 @@ describe('SqlComparison', () => {
             },
             "keywords": Object {},
             "namespaceRefName": undefined,
+            "parens": undefined,
             "spacing": Object {},
             "tableRefName": undefined,
             "type": "ref",
           },
           "negated": false,
           "op": "BETWEEN",
+          "parens": undefined,
           "rhs": SqlBetweenPart {
             "end": SqlMulti {
               "args": SeparatedArray {
@@ -1997,6 +2132,7 @@ describe('SqlComparison', () => {
                 "values": Array [
                   SqlLiteral {
                     "keywords": Object {},
+                    "parens": undefined,
                     "spacing": Object {},
                     "stringValue": "3",
                     "type": "literal",
@@ -2004,6 +2140,7 @@ describe('SqlComparison', () => {
                   },
                   SqlLiteral {
                     "keywords": Object {},
+                    "parens": undefined,
                     "spacing": Object {},
                     "stringValue": "4",
                     "type": "literal",
@@ -2013,12 +2150,14 @@ describe('SqlComparison', () => {
               },
               "keywords": Object {},
               "op": "+",
+              "parens": undefined,
               "spacing": Object {},
               "type": "multi",
             },
             "keywords": Object {
               "and": "AND",
             },
+            "parens": undefined,
             "spacing": Object {
               "postAnd": " ",
               "preAnd": " ",
@@ -2035,6 +2174,7 @@ describe('SqlComparison', () => {
                 "values": Array [
                   SqlLiteral {
                     "keywords": Object {},
+                    "parens": undefined,
                     "spacing": Object {},
                     "stringValue": "1",
                     "type": "literal",
@@ -2042,6 +2182,7 @@ describe('SqlComparison', () => {
                   },
                   SqlLiteral {
                     "keywords": Object {},
+                    "parens": undefined,
                     "spacing": Object {},
                     "stringValue": "2",
                     "type": "literal",
@@ -2051,6 +2192,7 @@ describe('SqlComparison', () => {
               },
               "keywords": Object {},
               "op": "+",
+              "parens": undefined,
               "spacing": Object {},
               "type": "multi",
             },

@@ -192,6 +192,7 @@ describe('QueryRunner', () => {
                 SqlTableRef {
                   "keywords": Object {},
                   "namespaceRefName": undefined,
+                  "parens": undefined,
                   "spacing": Object {},
                   "tableRefName": RefName {
                     "name": "wikipedia",
@@ -205,6 +206,7 @@ describe('QueryRunner', () => {
             "keywords": Object {
               "from": "FROM",
             },
+            "parens": undefined,
             "spacing": Object {
               "postFrom": " ",
             },
@@ -216,6 +218,7 @@ describe('QueryRunner', () => {
               "values": Array [
                 SqlLiteral {
                   "keywords": Object {},
+                  "parens": undefined,
                   "spacing": Object {},
                   "stringValue": "1",
                   "type": "literal",
@@ -227,6 +230,7 @@ describe('QueryRunner', () => {
               "by": "BY",
               "group": "GROUP",
             },
+            "parens": undefined,
             "spacing": Object {
               "postBy": " ",
               "postGroup": " ",
@@ -248,6 +252,7 @@ describe('QueryRunner', () => {
                   "direction": "DESC",
                   "expression": SqlLiteral {
                     "keywords": Object {},
+                    "parens": undefined,
                     "spacing": Object {},
                     "stringValue": "2",
                     "type": "literal",
@@ -256,6 +261,7 @@ describe('QueryRunner', () => {
                   "keywords": Object {
                     "direction": "DESC",
                   },
+                  "parens": undefined,
                   "spacing": Object {
                     "preDirection": " ",
                   },
@@ -267,12 +273,14 @@ describe('QueryRunner', () => {
               "by": "BY",
               "order": "ORDER",
             },
+            "parens": undefined,
             "spacing": Object {
               "postBy": " ",
               "postOrder": " ",
             },
             "type": "orderByClause",
           },
+          "parens": undefined,
           "partitionedByClause": undefined,
           "replaceClause": undefined,
           "selectExpressions": SeparatedArray {
@@ -291,6 +299,7 @@ describe('QueryRunner', () => {
                 },
                 "keywords": Object {},
                 "namespaceRefName": undefined,
+                "parens": undefined,
                 "spacing": Object {},
                 "tableRefName": undefined,
                 "type": "ref",
@@ -308,6 +317,7 @@ describe('QueryRunner', () => {
                       SqlStar {
                         "keywords": Object {},
                         "namespaceRefName": undefined,
+                        "parens": undefined,
                         "spacing": Object {},
                         "tableRefName": undefined,
                         "type": "star",
@@ -319,6 +329,7 @@ describe('QueryRunner', () => {
                   "keywords": Object {
                     "functionName": "COUNT",
                   },
+                  "parens": undefined,
                   "spacing": Object {
                     "postArguments": "",
                     "postLeftParen": "",
@@ -331,6 +342,7 @@ describe('QueryRunner', () => {
                 "keywords": Object {
                   "as": "AS",
                 },
+                "parens": undefined,
                 "spacing": Object {
                   "preAlias": " ",
                   "preAs": " ",
@@ -419,6 +431,7 @@ describe('QueryRunner', () => {
                 SqlTableRef {
                   "keywords": Object {},
                   "namespaceRefName": undefined,
+                  "parens": undefined,
                   "spacing": Object {},
                   "tableRefName": RefName {
                     "name": "wikipedia",
@@ -432,6 +445,7 @@ describe('QueryRunner', () => {
             "keywords": Object {
               "from": "FROM",
             },
+            "parens": undefined,
             "spacing": Object {
               "postFrom": " ",
             },
@@ -443,6 +457,7 @@ describe('QueryRunner', () => {
               "values": Array [
                 SqlLiteral {
                   "keywords": Object {},
+                  "parens": undefined,
                   "spacing": Object {},
                   "stringValue": "1",
                   "type": "literal",
@@ -454,6 +469,7 @@ describe('QueryRunner', () => {
               "by": "BY",
               "group": "GROUP",
             },
+            "parens": undefined,
             "spacing": Object {
               "postBy": " ",
               "postGroup": " ",
@@ -475,6 +491,7 @@ describe('QueryRunner', () => {
                   "direction": "DESC",
                   "expression": SqlLiteral {
                     "keywords": Object {},
+                    "parens": undefined,
                     "spacing": Object {},
                     "stringValue": "2",
                     "type": "literal",
@@ -483,6 +500,7 @@ describe('QueryRunner', () => {
                   "keywords": Object {
                     "direction": "DESC",
                   },
+                  "parens": undefined,
                   "spacing": Object {
                     "preDirection": " ",
                   },
@@ -494,12 +512,14 @@ describe('QueryRunner', () => {
               "by": "BY",
               "order": "ORDER",
             },
+            "parens": undefined,
             "spacing": Object {
               "postBy": " ",
               "postOrder": " ",
             },
             "type": "orderByClause",
           },
+          "parens": undefined,
           "partitionedByClause": undefined,
           "replaceClause": undefined,
           "selectExpressions": SeparatedArray {
@@ -518,6 +538,7 @@ describe('QueryRunner', () => {
                 },
                 "keywords": Object {},
                 "namespaceRefName": undefined,
+                "parens": undefined,
                 "spacing": Object {},
                 "tableRefName": undefined,
                 "type": "ref",
@@ -535,6 +556,7 @@ describe('QueryRunner', () => {
                       SqlStar {
                         "keywords": Object {},
                         "namespaceRefName": undefined,
+                        "parens": undefined,
                         "spacing": Object {},
                         "tableRefName": undefined,
                         "type": "star",
@@ -546,6 +568,7 @@ describe('QueryRunner', () => {
                   "keywords": Object {
                     "functionName": "COUNT",
                   },
+                  "parens": undefined,
                   "spacing": Object {
                     "postArguments": "",
                     "postLeftParen": "",
@@ -558,6 +581,7 @@ describe('QueryRunner', () => {
                 "keywords": Object {
                   "as": "AS",
                 },
+                "parens": undefined,
                 "spacing": Object {
                   "preAlias": " ",
                   "preAs": " ",
@@ -647,6 +671,7 @@ describe('QueryRunner', () => {
                 SqlTableRef {
                   "keywords": Object {},
                   "namespaceRefName": undefined,
+                  "parens": undefined,
                   "spacing": Object {},
                   "tableRefName": RefName {
                     "name": "wikipedia",
@@ -660,6 +685,7 @@ describe('QueryRunner', () => {
             "keywords": Object {
               "from": "FROM",
             },
+            "parens": undefined,
             "spacing": Object {
               "postFrom": " ",
             },
@@ -671,6 +697,7 @@ describe('QueryRunner', () => {
               "values": Array [
                 SqlLiteral {
                   "keywords": Object {},
+                  "parens": undefined,
                   "spacing": Object {},
                   "stringValue": "1",
                   "type": "literal",
@@ -682,6 +709,7 @@ describe('QueryRunner', () => {
               "by": "BY",
               "group": "GROUP",
             },
+            "parens": undefined,
             "spacing": Object {
               "postBy": " ",
               "postGroup": " ",
@@ -703,6 +731,7 @@ describe('QueryRunner', () => {
                   "direction": "DESC",
                   "expression": SqlLiteral {
                     "keywords": Object {},
+                    "parens": undefined,
                     "spacing": Object {},
                     "stringValue": "2",
                     "type": "literal",
@@ -711,6 +740,7 @@ describe('QueryRunner', () => {
                   "keywords": Object {
                     "direction": "DESC",
                   },
+                  "parens": undefined,
                   "spacing": Object {
                     "preDirection": " ",
                   },
@@ -722,12 +752,14 @@ describe('QueryRunner', () => {
               "by": "BY",
               "order": "ORDER",
             },
+            "parens": undefined,
             "spacing": Object {
               "postBy": " ",
               "postOrder": " ",
             },
             "type": "orderByClause",
           },
+          "parens": undefined,
           "partitionedByClause": undefined,
           "replaceClause": undefined,
           "selectExpressions": SeparatedArray {
@@ -746,6 +778,7 @@ describe('QueryRunner', () => {
                 },
                 "keywords": Object {},
                 "namespaceRefName": undefined,
+                "parens": undefined,
                 "spacing": Object {},
                 "tableRefName": undefined,
                 "type": "ref",
@@ -763,6 +796,7 @@ describe('QueryRunner', () => {
                       SqlStar {
                         "keywords": Object {},
                         "namespaceRefName": undefined,
+                        "parens": undefined,
                         "spacing": Object {},
                         "tableRefName": undefined,
                         "type": "star",
@@ -774,6 +808,7 @@ describe('QueryRunner', () => {
                   "keywords": Object {
                     "functionName": "COUNT",
                   },
+                  "parens": undefined,
                   "spacing": Object {
                     "postArguments": "",
                     "postLeftParen": "",
@@ -786,6 +821,7 @@ describe('QueryRunner', () => {
                 "keywords": Object {
                   "as": "AS",
                 },
+                "parens": undefined,
                 "spacing": Object {
                   "preAlias": " ",
                   "preAs": " ",

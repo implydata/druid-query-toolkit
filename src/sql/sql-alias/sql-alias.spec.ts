@@ -30,6 +30,7 @@ describe('SqlAlias', () => {
           },
           "keywords": Object {},
           "namespaceRefName": undefined,
+          "parens": undefined,
           "spacing": Object {},
           "tableRefName": undefined,
           "type": "ref",
@@ -56,6 +57,7 @@ describe('SqlAlias', () => {
             },
             "keywords": Object {},
             "namespaceRefName": undefined,
+            "parens": undefined,
             "spacing": Object {},
             "tableRefName": undefined,
             "type": "ref",
@@ -63,6 +65,7 @@ describe('SqlAlias', () => {
           "keywords": Object {
             "as": "AS",
           },
+          "parens": undefined,
           "spacing": Object {
             "preAlias": " ",
             "preAs": " ",
@@ -91,6 +94,7 @@ describe('SqlAlias', () => {
             },
             "keywords": Object {},
             "namespaceRefName": undefined,
+            "parens": undefined,
             "spacing": Object {
               "postTableDot": "",
               "preTableDot": "",
@@ -104,6 +108,7 @@ describe('SqlAlias', () => {
           "keywords": Object {
             "as": "As",
           },
+          "parens": undefined,
           "spacing": Object {
             "preAlias": "   ",
             "preAs": "  ",
@@ -132,6 +137,7 @@ describe('SqlAlias', () => {
             },
             "keywords": Object {},
             "namespaceRefName": undefined,
+            "parens": undefined,
             "spacing": Object {
               "postTableDot": "",
               "preTableDot": "",
@@ -145,6 +151,7 @@ describe('SqlAlias', () => {
           "keywords": Object {
             "as": "",
           },
+          "parens": undefined,
           "spacing": Object {
             "preAlias": " ",
           },

@@ -13,3 +13,9 @@
  */
 
 import 'core-js/stable';
+import { format as prettyFormat } from 'pretty-format';
+
+expect.addSnapshotSerializer({
+  test: () => true,
+  print: val => prettyFormat(val, { callToJSON: false }),
+});

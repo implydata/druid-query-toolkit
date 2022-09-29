@@ -25,6 +25,7 @@ describe('SqlPlaceholder', () => {
       SqlPlaceholder {
         "customPlaceholder": undefined,
         "keywords": Object {},
+        "parens": undefined,
         "spacing": Object {},
         "type": "placeholder",
       }

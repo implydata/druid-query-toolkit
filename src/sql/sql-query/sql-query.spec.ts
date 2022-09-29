@@ -475,10 +475,12 @@ describe('SqlQuery', () => {
         SqlInsertClause {
           "columns": undefined,
           "keywords": Object {},
+          "parens": undefined,
           "spacing": Object {},
           "table": SqlTableRef {
             "keywords": Object {},
             "namespaceRefName": undefined,
+            "parens": undefined,
             "spacing": Object {},
             "tableRefName": RefName {
               "name": "hello",
@@ -762,6 +764,7 @@ describe('SqlQuery', () => {
                           "name": "druid",
                           "quotes": false,
                         },
+                        "parens": undefined,
                         "spacing": Object {
                           "postNamespaceDot": "",
                           "preNamespaceDot": "",
@@ -778,6 +781,7 @@ describe('SqlQuery', () => {
                   "keywords": Object {
                     "from": "FROM",
                   },
+                  "parens": undefined,
                   "spacing": Object {
                     "postFrom": " ",
                   },
@@ -804,6 +808,7 @@ describe('SqlQuery', () => {
                           },
                           "keywords": Object {},
                           "namespaceRefName": undefined,
+                          "parens": undefined,
                           "spacing": Object {},
                           "tableRefName": undefined,
                           "type": "ref",
@@ -811,6 +816,7 @@ describe('SqlQuery', () => {
                         "keywords": Object {
                           "direction": "DESC",
                         },
+                        "parens": undefined,
                         "spacing": Object {
                           "preDirection": " ",
                         },
@@ -822,6 +828,7 @@ describe('SqlQuery', () => {
                     "by": "BY",
                     "order": "ORDER",
                   },
+                  "parens": undefined,
                   "spacing": Object {
                     "postBy": " ",
                     "postOrder": " ",
@@ -846,6 +853,7 @@ describe('SqlQuery', () => {
                       },
                       "keywords": Object {},
                       "namespaceRefName": undefined,
+                      "parens": undefined,
                       "spacing": Object {},
                       "tableRefName": undefined,
                       "type": "ref",
@@ -868,6 +876,7 @@ describe('SqlQuery', () => {
           "keywords": Object {
             "from": "FROM",
           },
+          "parens": undefined,
           "spacing": Object {
             "postFrom": " ",
           },
@@ -885,11 +894,13 @@ describe('SqlQuery', () => {
           },
           "limit": SqlLiteral {
             "keywords": Object {},
+            "parens": undefined,
             "spacing": Object {},
             "stringValue": "2",
             "type": "literal",
             "value": 2,
           },
+          "parens": undefined,
           "spacing": Object {
             "postLimit": " ",
           },
@@ -897,6 +908,7 @@ describe('SqlQuery', () => {
         },
         "offsetClause": undefined,
         "orderByClause": undefined,
+        "parens": undefined,
         "partitionedByClause": undefined,
         "replaceClause": undefined,
         "selectExpressions": SeparatedArray {
@@ -905,6 +917,7 @@ describe('SqlQuery', () => {
             SqlStar {
               "keywords": Object {},
               "namespaceRefName": undefined,
+              "parens": undefined,
               "spacing": Object {},
               "tableRefName": undefined,
               "type": "star",
@@ -950,6 +963,7 @@ describe('SqlQuery', () => {
                   "name": "sys",
                   "quotes": false,
                 },
+                "parens": undefined,
                 "spacing": Object {
                   "postNamespaceDot": "",
                   "preNamespaceDot": "",
@@ -966,6 +980,7 @@ describe('SqlQuery', () => {
           "keywords": Object {
             "from": "FROM",
           },
+          "parens": undefined,
           "spacing": Object {
             "postFrom": " ",
           },
@@ -980,6 +995,7 @@ describe('SqlQuery', () => {
         "limitClause": undefined,
         "offsetClause": undefined,
         "orderByClause": undefined,
+        "parens": undefined,
         "partitionedByClause": undefined,
         "replaceClause": undefined,
         "selectExpressions": SeparatedArray {
@@ -1005,6 +1021,7 @@ describe('SqlQuery', () => {
               },
               "keywords": Object {},
               "namespaceRefName": undefined,
+              "parens": undefined,
               "spacing": Object {},
               "tableRefName": undefined,
               "type": "ref",
@@ -1026,6 +1043,7 @@ describe('SqlQuery', () => {
                       },
                       "keywords": Object {},
                       "namespaceRefName": undefined,
+                      "parens": undefined,
                       "spacing": Object {},
                       "tableRefName": undefined,
                       "type": "ref",
@@ -1037,6 +1055,7 @@ describe('SqlQuery', () => {
                 "keywords": Object {
                   "functionName": "SUM",
                 },
+                "parens": undefined,
                 "spacing": Object {
                   "postArguments": "",
                   "postLeftParen": "",
@@ -1049,6 +1068,7 @@ describe('SqlQuery', () => {
               "keywords": Object {
                 "as": "AS",
               },
+              "parens": undefined,
               "spacing": Object {
                 "preAlias": " ",
                 "preAs": " ",
@@ -1068,6 +1088,7 @@ describe('SqlQuery', () => {
                     SqlStar {
                       "keywords": Object {},
                       "namespaceRefName": undefined,
+                      "parens": undefined,
                       "spacing": Object {},
                       "tableRefName": undefined,
                       "type": "star",
@@ -1079,6 +1100,7 @@ describe('SqlQuery', () => {
                 "keywords": Object {
                   "functionName": "COUNT",
                 },
+                "parens": undefined,
                 "spacing": Object {
                   "postArguments": "",
                   "postLeftParen": "",
@@ -1091,6 +1113,7 @@ describe('SqlQuery', () => {
               "keywords": Object {
                 "as": "AS",
               },
+              "parens": undefined,
               "spacing": Object {
                 "preAlias": " ",
                 "preAs": " ",
@@ -1128,6 +1151,7 @@ describe('SqlQuery', () => {
             "for": "for",
             "plan": "plan",
           },
+          "parens": undefined,
           "spacing": Object {
             "postExplain": " ",
             "postPlan": " ",
@@ -1141,6 +1165,7 @@ describe('SqlQuery', () => {
               SqlTableRef {
                 "keywords": Object {},
                 "namespaceRefName": undefined,
+                "parens": undefined,
                 "spacing": Object {},
                 "tableRefName": RefName {
                   "name": "tbl",
@@ -1154,6 +1179,7 @@ describe('SqlQuery', () => {
           "keywords": Object {
             "from": "from",
           },
+          "parens": undefined,
           "spacing": Object {
             "postFrom": " ",
           },
@@ -1168,6 +1194,7 @@ describe('SqlQuery', () => {
         "limitClause": undefined,
         "offsetClause": undefined,
         "orderByClause": undefined,
+        "parens": undefined,
         "partitionedByClause": undefined,
         "replaceClause": undefined,
         "selectExpressions": SeparatedArray {
@@ -1176,6 +1203,7 @@ describe('SqlQuery', () => {
             SqlStar {
               "keywords": Object {},
               "namespaceRefName": undefined,
+              "parens": undefined,
               "spacing": Object {},
               "tableRefName": undefined,
               "type": "star",
@@ -1223,6 +1251,7 @@ describe('SqlQuery', () => {
                 "expression": SqlTableRef {
                   "keywords": Object {},
                   "namespaceRefName": undefined,
+                  "parens": undefined,
                   "spacing": Object {},
                   "tableRefName": RefName {
                     "name": "tbl",
@@ -1233,6 +1262,7 @@ describe('SqlQuery', () => {
                 "keywords": Object {
                   "as": "As",
                 },
+                "parens": undefined,
                 "spacing": Object {
                   "preAlias": " ",
                   "preAs": " ",
@@ -1245,6 +1275,7 @@ describe('SqlQuery', () => {
           "keywords": Object {
             "from": "from",
           },
+          "parens": undefined,
           "spacing": Object {
             "postFrom": " ",
           },
@@ -1259,6 +1290,7 @@ describe('SqlQuery', () => {
         "limitClause": undefined,
         "offsetClause": undefined,
         "orderByClause": undefined,
+        "parens": undefined,
         "partitionedByClause": undefined,
         "replaceClause": undefined,
         "selectExpressions": SeparatedArray {
@@ -1267,6 +1299,7 @@ describe('SqlQuery', () => {
             SqlStar {
               "keywords": Object {},
               "namespaceRefName": undefined,
+              "parens": undefined,
               "spacing": Object {},
               "tableRefName": undefined,
               "type": "star",
@@ -1286,6 +1319,7 @@ describe('SqlQuery', () => {
           "keywords": Object {
             "with": "WITH",
           },
+          "parens": undefined,
           "spacing": Object {
             "postWith": " ",
           },
@@ -1298,6 +1332,7 @@ describe('SqlQuery', () => {
                 "keywords": Object {
                   "as": "AS",
                 },
+                "parens": undefined,
                 "query": SqlQuery {
                   "clusteredByClause": undefined,
                   "decorator": undefined,
@@ -1309,6 +1344,7 @@ describe('SqlQuery', () => {
                         SqlTableRef {
                           "keywords": Object {},
                           "namespaceRefName": undefined,
+                          "parens": undefined,
                           "spacing": Object {},
                           "tableRefName": RefName {
                             "name": "emp",
@@ -1322,6 +1358,7 @@ describe('SqlQuery', () => {
                     "keywords": Object {
                       "from": "FROM",
                     },
+                    "parens": undefined,
                     "spacing": Object {
                       "postFrom": "   ",
                     },
@@ -1355,6 +1392,7 @@ describe('SqlQuery', () => {
                         },
                         "keywords": Object {},
                         "namespaceRefName": undefined,
+                        "parens": undefined,
                         "spacing": Object {},
                         "tableRefName": undefined,
                         "type": "ref",
@@ -1406,6 +1444,7 @@ describe('SqlQuery', () => {
                 SqlTableRef {
                   "keywords": Object {},
                   "namespaceRefName": undefined,
+                  "parens": undefined,
                   "spacing": Object {},
                   "tableRefName": RefName {
                     "name": "tbl",
@@ -1419,6 +1458,7 @@ describe('SqlQuery', () => {
             "keywords": Object {
               "from": "from",
             },
+            "parens": undefined,
             "spacing": Object {
               "postFrom": " ",
             },
@@ -1433,6 +1473,7 @@ describe('SqlQuery', () => {
           "limitClause": undefined,
           "offsetClause": undefined,
           "orderByClause": undefined,
+          "parens": undefined,
           "partitionedByClause": undefined,
           "replaceClause": undefined,
           "selectExpressions": SeparatedArray {
@@ -1441,6 +1482,7 @@ describe('SqlQuery', () => {
               SqlStar {
                 "keywords": Object {},
                 "namespaceRefName": undefined,
+                "parens": undefined,
                 "spacing": Object {},
                 "tableRefName": undefined,
                 "type": "star",
@@ -1467,14 +1509,17 @@ describe('SqlQuery', () => {
                 },
                 "keywords": Object {},
                 "namespaceRefName": undefined,
+                "parens": undefined,
                 "spacing": Object {},
                 "tableRefName": undefined,
                 "type": "ref",
               },
               "negated": false,
               "op": ">",
+              "parens": undefined,
               "rhs": SqlLiteral {
                 "keywords": Object {},
+                "parens": undefined,
                 "spacing": Object {},
                 "stringValue": "1",
                 "type": "literal",
@@ -1489,6 +1534,7 @@ describe('SqlQuery', () => {
             "keywords": Object {
               "where": "where",
             },
+            "parens": undefined,
             "spacing": Object {
               "postWhere": " ",
             },
@@ -1519,6 +1565,7 @@ describe('SqlQuery', () => {
                     "name": "sys",
                     "quotes": false,
                   },
+                  "parens": undefined,
                   "spacing": Object {
                     "postNamespaceDot": "",
                     "preNamespaceDot": "",
@@ -1535,6 +1582,7 @@ describe('SqlQuery', () => {
             "keywords": Object {
               "from": "FROM",
             },
+            "parens": undefined,
             "spacing": Object {
               "postFrom": " ",
             },
@@ -1549,6 +1597,7 @@ describe('SqlQuery', () => {
           "limitClause": undefined,
           "offsetClause": undefined,
           "orderByClause": undefined,
+          "parens": undefined,
           "partitionedByClause": undefined,
           "replaceClause": undefined,
           "selectExpressions": SeparatedArray {
@@ -1557,6 +1606,7 @@ describe('SqlQuery', () => {
               SqlStar {
                 "keywords": Object {},
                 "namespaceRefName": undefined,
+                "parens": undefined,
                 "spacing": Object {},
                 "tableRefName": undefined,
                 "type": "star",
@@ -1583,14 +1633,17 @@ describe('SqlQuery', () => {
                 },
                 "keywords": Object {},
                 "namespaceRefName": undefined,
+                "parens": undefined,
                 "spacing": Object {},
                 "tableRefName": undefined,
                 "type": "ref",
               },
               "negated": false,
               "op": "=",
+              "parens": undefined,
               "rhs": SqlLiteral {
                 "keywords": Object {},
+                "parens": undefined,
                 "spacing": Object {},
                 "stringValue": "0",
                 "type": "literal",
@@ -1605,6 +1658,7 @@ describe('SqlQuery', () => {
             "keywords": Object {
               "where": "WHERE",
             },
+            "parens": undefined,
             "spacing": Object {
               "postWhere": " ",
             },
@@ -1635,6 +1689,7 @@ describe('SqlQuery', () => {
                     "name": "sys",
                     "quotes": false,
                   },
+                  "parens": undefined,
                   "spacing": Object {
                     "postNamespaceDot": "",
                     "preNamespaceDot": "",
@@ -1651,6 +1706,7 @@ describe('SqlQuery', () => {
             "keywords": Object {
               "from": "FROM",
             },
+            "parens": undefined,
             "spacing": Object {
               "postFrom": " ",
             },
@@ -1665,6 +1721,7 @@ describe('SqlQuery', () => {
           "limitClause": undefined,
           "offsetClause": undefined,
           "orderByClause": undefined,
+          "parens": undefined,
           "partitionedByClause": undefined,
           "replaceClause": undefined,
           "selectExpressions": SeparatedArray {
@@ -1673,6 +1730,7 @@ describe('SqlQuery', () => {
               SqlStar {
                 "keywords": Object {},
                 "namespaceRefName": undefined,
+                "parens": undefined,
                 "spacing": Object {},
                 "tableRefName": undefined,
                 "type": "star",
@@ -1719,14 +1777,17 @@ describe('SqlQuery', () => {
                             },
                             "keywords": Object {},
                             "namespaceRefName": undefined,
+                            "parens": undefined,
                             "spacing": Object {},
                             "tableRefName": undefined,
                             "type": "ref",
                           },
                           "negated": false,
                           "op": "=",
+                          "parens": undefined,
                           "rhs": SqlLiteral {
                             "keywords": Object {},
+                            "parens": undefined,
                             "spacing": Object {},
                             "stringValue": "0",
                             "type": "literal",
@@ -1750,14 +1811,17 @@ describe('SqlQuery', () => {
                             },
                             "keywords": Object {},
                             "namespaceRefName": undefined,
+                            "parens": undefined,
                             "spacing": Object {},
                             "tableRefName": undefined,
                             "type": "ref",
                           },
                           "negated": false,
                           "op": ">",
+                          "parens": undefined,
                           "rhs": SqlLiteral {
                             "keywords": Object {},
+                            "parens": undefined,
                             "spacing": Object {},
                             "stringValue": "100",
                             "type": "literal",
@@ -1773,6 +1837,7 @@ describe('SqlQuery', () => {
                     },
                     "keywords": Object {},
                     "op": "AND",
+                    "parens": undefined,
                     "spacing": Object {},
                     "type": "multi",
                   },
@@ -1788,14 +1853,17 @@ describe('SqlQuery', () => {
                       },
                       "keywords": Object {},
                       "namespaceRefName": undefined,
+                      "parens": undefined,
                       "spacing": Object {},
                       "tableRefName": undefined,
                       "type": "ref",
                     },
                     "negated": false,
                     "op": "=",
+                    "parens": undefined,
                     "rhs": SqlLiteral {
                       "keywords": Object {},
+                      "parens": undefined,
                       "spacing": Object {},
                       "stringValue": "'value'",
                       "type": "literal",
@@ -1811,12 +1879,14 @@ describe('SqlQuery', () => {
               },
               "keywords": Object {},
               "op": "OR",
+              "parens": undefined,
               "spacing": Object {},
               "type": "multi",
             },
             "keywords": Object {
               "where": "WHERE",
             },
+            "parens": undefined,
             "spacing": Object {
               "postWhere": " ",
             },
@@ -1846,6 +1916,7 @@ describe('SqlQuery', () => {
                 SqlTableRef {
                   "keywords": Object {},
                   "namespaceRefName": undefined,
+                  "parens": undefined,
                   "spacing": Object {},
                   "tableRefName": RefName {
                     "name": "tbl",
@@ -1859,6 +1930,7 @@ describe('SqlQuery', () => {
             "keywords": Object {
               "from": "from",
             },
+            "parens": undefined,
             "spacing": Object {
               "postFrom": " ",
             },
@@ -1875,6 +1947,7 @@ describe('SqlQuery', () => {
                   },
                   "keywords": Object {},
                   "namespaceRefName": undefined,
+                  "parens": undefined,
                   "spacing": Object {},
                   "tableRefName": undefined,
                   "type": "ref",
@@ -1885,6 +1958,7 @@ describe('SqlQuery', () => {
               "by": "by",
               "group": "group",
             },
+            "parens": undefined,
             "spacing": Object {
               "postBy": " ",
               "postGroup": " ",
@@ -1899,6 +1973,7 @@ describe('SqlQuery', () => {
           "limitClause": undefined,
           "offsetClause": undefined,
           "orderByClause": undefined,
+          "parens": undefined,
           "partitionedByClause": undefined,
           "replaceClause": undefined,
           "selectExpressions": SeparatedArray {
@@ -1907,6 +1982,7 @@ describe('SqlQuery', () => {
               SqlStar {
                 "keywords": Object {},
                 "namespaceRefName": undefined,
+                "parens": undefined,
                 "spacing": Object {},
                 "tableRefName": undefined,
                 "type": "star",
@@ -1943,6 +2019,7 @@ describe('SqlQuery', () => {
                 SqlTableRef {
                   "keywords": Object {},
                   "namespaceRefName": undefined,
+                  "parens": undefined,
                   "spacing": Object {},
                   "tableRefName": RefName {
                     "name": "tbl",
@@ -1956,6 +2033,7 @@ describe('SqlQuery', () => {
             "keywords": Object {
               "from": "from",
             },
+            "parens": undefined,
             "spacing": Object {
               "postFrom": " ",
             },
@@ -1972,6 +2050,7 @@ describe('SqlQuery', () => {
                   },
                   "keywords": Object {},
                   "namespaceRefName": undefined,
+                  "parens": undefined,
                   "spacing": Object {},
                   "tableRefName": undefined,
                   "type": "ref",
@@ -1982,6 +2061,7 @@ describe('SqlQuery', () => {
               "by": "by",
               "group": "group",
             },
+            "parens": undefined,
             "spacing": Object {
               "postBy": " ",
               "postGroup": " ",
@@ -1996,6 +2076,7 @@ describe('SqlQuery', () => {
           "limitClause": undefined,
           "offsetClause": undefined,
           "orderByClause": undefined,
+          "parens": undefined,
           "partitionedByClause": undefined,
           "replaceClause": undefined,
           "selectExpressions": SeparatedArray {
@@ -2004,6 +2085,7 @@ describe('SqlQuery', () => {
               SqlStar {
                 "keywords": Object {},
                 "namespaceRefName": undefined,
+                "parens": undefined,
                 "spacing": Object {},
                 "tableRefName": undefined,
                 "type": "star",
@@ -2040,6 +2122,7 @@ describe('SqlQuery', () => {
                 SqlTableRef {
                   "keywords": Object {},
                   "namespaceRefName": undefined,
+                  "parens": undefined,
                   "spacing": Object {},
                   "tableRefName": RefName {
                     "name": "tbl",
@@ -2053,6 +2136,7 @@ describe('SqlQuery', () => {
             "keywords": Object {
               "from": "from",
             },
+            "parens": undefined,
             "spacing": Object {
               "postFrom": " ",
             },
@@ -2075,6 +2159,7 @@ describe('SqlQuery', () => {
                   },
                   "keywords": Object {},
                   "namespaceRefName": undefined,
+                  "parens": undefined,
                   "spacing": Object {},
                   "tableRefName": undefined,
                   "type": "ref",
@@ -2086,6 +2171,7 @@ describe('SqlQuery', () => {
                   },
                   "keywords": Object {},
                   "namespaceRefName": undefined,
+                  "parens": undefined,
                   "spacing": Object {},
                   "tableRefName": undefined,
                   "type": "ref",
@@ -2096,6 +2182,7 @@ describe('SqlQuery', () => {
               "by": "by",
               "group": "group",
             },
+            "parens": undefined,
             "spacing": Object {
               "postBy": " ",
               "postGroup": " ",
@@ -2124,6 +2211,7 @@ describe('SqlQuery', () => {
               SqlStar {
                 "keywords": Object {},
                 "namespaceRefName": undefined,
+                "parens": undefined,
                 "spacing": Object {},
                 "tableRefName": undefined,
                 "type": "star",
@@ -2162,6 +2250,7 @@ describe('SqlQuery', () => {
                 SqlTableRef {
                   "keywords": Object {},
                   "namespaceRefName": undefined,
+                  "parens": undefined,
                   "spacing": Object {},
                   "tableRefName": RefName {
                     "name": "tbl",
@@ -2175,6 +2264,7 @@ describe('SqlQuery', () => {
             "keywords": Object {
               "from": "from",
             },
+            "parens": undefined,
             "spacing": Object {
               "postFrom": " ",
             },
@@ -2194,14 +2284,17 @@ describe('SqlQuery', () => {
                 },
                 "keywords": Object {},
                 "namespaceRefName": undefined,
+                "parens": undefined,
                 "spacing": Object {},
                 "tableRefName": undefined,
                 "type": "ref",
               },
               "negated": false,
               "op": ">",
+              "parens": undefined,
               "rhs": SqlLiteral {
                 "keywords": Object {},
+                "parens": undefined,
                 "spacing": Object {},
                 "stringValue": "1",
                 "type": "literal",
@@ -2216,6 +2309,7 @@ describe('SqlQuery', () => {
             "keywords": Object {
               "having": "having",
             },
+            "parens": undefined,
             "spacing": Object {
               "postHaving": " ",
             },
@@ -2228,6 +2322,7 @@ describe('SqlQuery', () => {
           "limitClause": undefined,
           "offsetClause": undefined,
           "orderByClause": undefined,
+          "parens": undefined,
           "partitionedByClause": undefined,
           "replaceClause": undefined,
           "selectExpressions": SeparatedArray {
@@ -2236,6 +2331,7 @@ describe('SqlQuery', () => {
               SqlStar {
                 "keywords": Object {},
                 "namespaceRefName": undefined,
+                "parens": undefined,
                 "spacing": Object {},
                 "tableRefName": undefined,
                 "type": "star",
@@ -2275,6 +2371,7 @@ describe('SqlQuery', () => {
                     "name": "sys",
                     "quotes": false,
                   },
+                  "parens": undefined,
                   "spacing": Object {
                     "postNamespaceDot": "",
                     "preNamespaceDot": "",
@@ -2291,6 +2388,7 @@ describe('SqlQuery', () => {
             "keywords": Object {
               "from": "FROM",
             },
+            "parens": undefined,
             "spacing": Object {
               "postFrom": " ",
             },
@@ -2310,14 +2408,17 @@ describe('SqlQuery', () => {
                 },
                 "keywords": Object {},
                 "namespaceRefName": undefined,
+                "parens": undefined,
                 "spacing": Object {},
                 "tableRefName": undefined,
                 "type": "ref",
               },
               "negated": false,
               "op": "=",
+              "parens": undefined,
               "rhs": SqlLiteral {
                 "keywords": Object {},
+                "parens": undefined,
                 "spacing": Object {},
                 "stringValue": "0",
                 "type": "literal",
@@ -2332,6 +2433,7 @@ describe('SqlQuery', () => {
             "keywords": Object {
               "having": "HAVING",
             },
+            "parens": undefined,
             "spacing": Object {
               "postHaving": " ",
             },
@@ -2344,6 +2446,7 @@ describe('SqlQuery', () => {
           "limitClause": undefined,
           "offsetClause": undefined,
           "orderByClause": undefined,
+          "parens": undefined,
           "partitionedByClause": undefined,
           "replaceClause": undefined,
           "selectExpressions": SeparatedArray {
@@ -2352,6 +2455,7 @@ describe('SqlQuery', () => {
               SqlStar {
                 "keywords": Object {},
                 "namespaceRefName": undefined,
+                "parens": undefined,
                 "spacing": Object {},
                 "tableRefName": undefined,
                 "type": "star",
@@ -2391,6 +2495,7 @@ describe('SqlQuery', () => {
                     "name": "sys",
                     "quotes": false,
                   },
+                  "parens": undefined,
                   "spacing": Object {
                     "postNamespaceDot": "",
                     "preNamespaceDot": "",
@@ -2407,6 +2512,7 @@ describe('SqlQuery', () => {
             "keywords": Object {
               "from": "FROM",
             },
+            "parens": undefined,
             "spacing": Object {
               "postFrom": " ",
             },
@@ -2446,14 +2552,17 @@ describe('SqlQuery', () => {
                             },
                             "keywords": Object {},
                             "namespaceRefName": undefined,
+                            "parens": undefined,
                             "spacing": Object {},
                             "tableRefName": undefined,
                             "type": "ref",
                           },
                           "negated": false,
                           "op": "=",
+                          "parens": undefined,
                           "rhs": SqlLiteral {
                             "keywords": Object {},
+                            "parens": undefined,
                             "spacing": Object {},
                             "stringValue": "0",
                             "type": "literal",
@@ -2477,14 +2586,17 @@ describe('SqlQuery', () => {
                             },
                             "keywords": Object {},
                             "namespaceRefName": undefined,
+                            "parens": undefined,
                             "spacing": Object {},
                             "tableRefName": undefined,
                             "type": "ref",
                           },
                           "negated": false,
                           "op": ">",
+                          "parens": undefined,
                           "rhs": SqlLiteral {
                             "keywords": Object {},
+                            "parens": undefined,
                             "spacing": Object {},
                             "stringValue": "100",
                             "type": "literal",
@@ -2500,6 +2612,7 @@ describe('SqlQuery', () => {
                     },
                     "keywords": Object {},
                     "op": "AND",
+                    "parens": undefined,
                     "spacing": Object {},
                     "type": "multi",
                   },
@@ -2515,14 +2628,17 @@ describe('SqlQuery', () => {
                       },
                       "keywords": Object {},
                       "namespaceRefName": undefined,
+                      "parens": undefined,
                       "spacing": Object {},
                       "tableRefName": undefined,
                       "type": "ref",
                     },
                     "negated": false,
                     "op": "=",
+                    "parens": undefined,
                     "rhs": SqlLiteral {
                       "keywords": Object {},
+                      "parens": undefined,
                       "spacing": Object {},
                       "stringValue": "'value'",
                       "type": "literal",
@@ -2538,12 +2654,14 @@ describe('SqlQuery', () => {
               },
               "keywords": Object {},
               "op": "OR",
+              "parens": undefined,
               "spacing": Object {},
               "type": "multi",
             },
             "keywords": Object {
               "having": "HAVING",
             },
+            "parens": undefined,
             "spacing": Object {
               "postHaving": " ",
             },
@@ -2556,6 +2674,7 @@ describe('SqlQuery', () => {
           "limitClause": undefined,
           "offsetClause": undefined,
           "orderByClause": undefined,
+          "parens": undefined,
           "partitionedByClause": undefined,
           "replaceClause": undefined,
           "selectExpressions": SeparatedArray {
@@ -2564,6 +2683,7 @@ describe('SqlQuery', () => {
               SqlStar {
                 "keywords": Object {},
                 "namespaceRefName": undefined,
+                "parens": undefined,
                 "spacing": Object {},
                 "tableRefName": undefined,
                 "type": "star",
@@ -2602,6 +2722,7 @@ describe('SqlQuery', () => {
                 SqlTableRef {
                   "keywords": Object {},
                   "namespaceRefName": undefined,
+                  "parens": undefined,
                   "spacing": Object {},
                   "tableRefName": RefName {
                     "name": "tbl",
@@ -2615,6 +2736,7 @@ describe('SqlQuery', () => {
             "keywords": Object {
               "from": "from",
             },
+            "parens": undefined,
             "spacing": Object {
               "postFrom": " ",
             },
@@ -2636,12 +2758,14 @@ describe('SqlQuery', () => {
                   "direction": undefined,
                   "expression": SqlLiteral {
                     "keywords": Object {},
+                    "parens": undefined,
                     "spacing": Object {},
                     "stringValue": "1",
                     "type": "literal",
                     "value": 1,
                   },
                   "keywords": Object {},
+                  "parens": undefined,
                   "spacing": Object {},
                   "type": "orderByExpression",
                 },
@@ -2651,12 +2775,14 @@ describe('SqlQuery', () => {
               "by": "by",
               "order": "order",
             },
+            "parens": undefined,
             "spacing": Object {
               "postBy": " ",
               "postOrder": " ",
             },
             "type": "orderByClause",
           },
+          "parens": undefined,
           "partitionedByClause": undefined,
           "replaceClause": undefined,
           "selectExpressions": SeparatedArray {
@@ -2669,6 +2795,7 @@ describe('SqlQuery', () => {
                 },
                 "keywords": Object {},
                 "namespaceRefName": undefined,
+                "parens": undefined,
                 "spacing": Object {},
                 "tableRefName": undefined,
                 "type": "ref",
@@ -2705,6 +2832,7 @@ describe('SqlQuery', () => {
                 SqlTableRef {
                   "keywords": Object {},
                   "namespaceRefName": undefined,
+                  "parens": undefined,
                   "spacing": Object {},
                   "tableRefName": RefName {
                     "name": "tbl",
@@ -2718,6 +2846,7 @@ describe('SqlQuery', () => {
             "keywords": Object {
               "from": "from",
             },
+            "parens": undefined,
             "spacing": Object {
               "postFrom": " ",
             },
@@ -2744,11 +2873,13 @@ describe('SqlQuery', () => {
                     },
                     "keywords": Object {},
                     "namespaceRefName": undefined,
+                    "parens": undefined,
                     "spacing": Object {},
                     "tableRefName": undefined,
                     "type": "ref",
                   },
                   "keywords": Object {},
+                  "parens": undefined,
                   "spacing": Object {},
                   "type": "orderByExpression",
                 },
@@ -2758,12 +2889,14 @@ describe('SqlQuery', () => {
               "by": "by",
               "order": "order",
             },
+            "parens": undefined,
             "spacing": Object {
               "postBy": " ",
               "postOrder": " ",
             },
             "type": "orderByClause",
           },
+          "parens": undefined,
           "partitionedByClause": undefined,
           "replaceClause": undefined,
           "selectExpressions": SeparatedArray {
@@ -2776,6 +2909,7 @@ describe('SqlQuery', () => {
                 },
                 "keywords": Object {},
                 "namespaceRefName": undefined,
+                "parens": undefined,
                 "spacing": Object {},
                 "tableRefName": undefined,
                 "type": "ref",
@@ -2812,6 +2946,7 @@ describe('SqlQuery', () => {
                 SqlTableRef {
                   "keywords": Object {},
                   "namespaceRefName": undefined,
+                  "parens": undefined,
                   "spacing": Object {},
                   "tableRefName": RefName {
                     "name": "tbl",
@@ -2825,6 +2960,7 @@ describe('SqlQuery', () => {
             "keywords": Object {
               "from": "from",
             },
+            "parens": undefined,
             "spacing": Object {
               "postFrom": " ",
             },
@@ -2846,6 +2982,7 @@ describe('SqlQuery', () => {
                   "direction": "ASC",
                   "expression": SqlLiteral {
                     "keywords": Object {},
+                    "parens": undefined,
                     "spacing": Object {},
                     "stringValue": "1",
                     "type": "literal",
@@ -2854,6 +2991,7 @@ describe('SqlQuery', () => {
                   "keywords": Object {
                     "direction": "Asc",
                   },
+                  "parens": undefined,
                   "spacing": Object {
                     "preDirection": " ",
                   },
@@ -2865,12 +3003,14 @@ describe('SqlQuery', () => {
               "by": "by",
               "order": "order",
             },
+            "parens": undefined,
             "spacing": Object {
               "postBy": " ",
               "postOrder": " ",
             },
             "type": "orderByClause",
           },
+          "parens": undefined,
           "partitionedByClause": undefined,
           "replaceClause": undefined,
           "selectExpressions": SeparatedArray {
@@ -2883,6 +3023,7 @@ describe('SqlQuery', () => {
                 },
                 "keywords": Object {},
                 "namespaceRefName": undefined,
+                "parens": undefined,
                 "spacing": Object {},
                 "tableRefName": undefined,
                 "type": "ref",
@@ -2919,6 +3060,7 @@ describe('SqlQuery', () => {
                 SqlTableRef {
                   "keywords": Object {},
                   "namespaceRefName": undefined,
+                  "parens": undefined,
                   "spacing": Object {},
                   "tableRefName": RefName {
                     "name": "tbl",
@@ -2932,6 +3074,7 @@ describe('SqlQuery', () => {
             "keywords": Object {
               "from": "from",
             },
+            "parens": undefined,
             "spacing": Object {
               "postFrom": " ",
             },
@@ -2958,6 +3101,7 @@ describe('SqlQuery', () => {
                     },
                     "keywords": Object {},
                     "namespaceRefName": undefined,
+                    "parens": undefined,
                     "spacing": Object {},
                     "tableRefName": undefined,
                     "type": "ref",
@@ -2965,6 +3109,7 @@ describe('SqlQuery', () => {
                   "keywords": Object {
                     "direction": "DESC",
                   },
+                  "parens": undefined,
                   "spacing": Object {
                     "preDirection": " ",
                   },
@@ -2976,12 +3121,14 @@ describe('SqlQuery', () => {
               "by": "by",
               "order": "order",
             },
+            "parens": undefined,
             "spacing": Object {
               "postBy": " ",
               "postOrder": " ",
             },
             "type": "orderByClause",
           },
+          "parens": undefined,
           "partitionedByClause": undefined,
           "replaceClause": undefined,
           "selectExpressions": SeparatedArray {
@@ -3000,6 +3147,7 @@ describe('SqlQuery', () => {
                 },
                 "keywords": Object {},
                 "namespaceRefName": undefined,
+                "parens": undefined,
                 "spacing": Object {},
                 "tableRefName": undefined,
                 "type": "ref",
@@ -3011,6 +3159,7 @@ describe('SqlQuery', () => {
                 },
                 "keywords": Object {},
                 "namespaceRefName": undefined,
+                "parens": undefined,
                 "spacing": Object {},
                 "tableRefName": undefined,
                 "type": "ref",
@@ -3047,6 +3196,7 @@ describe('SqlQuery', () => {
                 SqlTableRef {
                   "keywords": Object {},
                   "namespaceRefName": undefined,
+                  "parens": undefined,
                   "spacing": Object {},
                   "tableRefName": RefName {
                     "name": "tbl",
@@ -3060,6 +3210,7 @@ describe('SqlQuery', () => {
             "keywords": Object {
               "from": "from",
             },
+            "parens": undefined,
             "spacing": Object {
               "postFrom": " ",
             },
@@ -3087,6 +3238,7 @@ describe('SqlQuery', () => {
                   "direction": "ASC",
                   "expression": SqlLiteral {
                     "keywords": Object {},
+                    "parens": undefined,
                     "spacing": Object {},
                     "stringValue": "1",
                     "type": "literal",
@@ -3095,6 +3247,7 @@ describe('SqlQuery', () => {
                   "keywords": Object {
                     "direction": "ASC",
                   },
+                  "parens": undefined,
                   "spacing": Object {
                     "preDirection": " ",
                   },
@@ -3109,11 +3262,13 @@ describe('SqlQuery', () => {
                     },
                     "keywords": Object {},
                     "namespaceRefName": undefined,
+                    "parens": undefined,
                     "spacing": Object {},
                     "tableRefName": undefined,
                     "type": "ref",
                   },
                   "keywords": Object {},
+                  "parens": undefined,
                   "spacing": Object {},
                   "type": "orderByExpression",
                 },
@@ -3123,12 +3278,14 @@ describe('SqlQuery', () => {
               "by": "by",
               "order": "order",
             },
+            "parens": undefined,
             "spacing": Object {
               "postBy": " ",
               "postOrder": " ",
             },
             "type": "orderByClause",
           },
+          "parens": undefined,
           "partitionedByClause": undefined,
           "replaceClause": undefined,
           "selectExpressions": SeparatedArray {
@@ -3141,6 +3298,7 @@ describe('SqlQuery', () => {
                 },
                 "keywords": Object {},
                 "namespaceRefName": undefined,
+                "parens": undefined,
                 "spacing": Object {},
                 "tableRefName": undefined,
                 "type": "ref",
@@ -3177,6 +3335,7 @@ describe('SqlQuery', () => {
                 SqlTableRef {
                   "keywords": Object {},
                   "namespaceRefName": undefined,
+                  "parens": undefined,
                   "spacing": Object {},
                   "tableRefName": RefName {
                     "name": "tbl",
@@ -3190,6 +3349,7 @@ describe('SqlQuery', () => {
             "keywords": Object {
               "from": "from",
             },
+            "parens": undefined,
             "spacing": Object {
               "postFrom": " ",
             },
@@ -3217,6 +3377,7 @@ describe('SqlQuery', () => {
                   "direction": "ASC",
                   "expression": SqlLiteral {
                     "keywords": Object {},
+                    "parens": undefined,
                     "spacing": Object {},
                     "stringValue": "1",
                     "type": "literal",
@@ -3225,6 +3386,7 @@ describe('SqlQuery', () => {
                   "keywords": Object {
                     "direction": "ASC",
                   },
+                  "parens": undefined,
                   "spacing": Object {
                     "preDirection": " ",
                   },
@@ -3239,6 +3401,7 @@ describe('SqlQuery', () => {
                     },
                     "keywords": Object {},
                     "namespaceRefName": undefined,
+                    "parens": undefined,
                     "spacing": Object {},
                     "tableRefName": undefined,
                     "type": "ref",
@@ -3246,6 +3409,7 @@ describe('SqlQuery', () => {
                   "keywords": Object {
                     "direction": "DESC",
                   },
+                  "parens": undefined,
                   "spacing": Object {
                     "preDirection": " ",
                   },
@@ -3257,12 +3421,14 @@ describe('SqlQuery', () => {
               "by": "by",
               "order": "order",
             },
+            "parens": undefined,
             "spacing": Object {
               "postBy": " ",
               "postOrder": " ",
             },
             "type": "orderByClause",
           },
+          "parens": undefined,
           "partitionedByClause": undefined,
           "replaceClause": undefined,
           "selectExpressions": SeparatedArray {
@@ -3281,6 +3447,7 @@ describe('SqlQuery', () => {
                 },
                 "keywords": Object {},
                 "namespaceRefName": undefined,
+                "parens": undefined,
                 "spacing": Object {},
                 "tableRefName": undefined,
                 "type": "ref",
@@ -3292,6 +3459,7 @@ describe('SqlQuery', () => {
                 },
                 "keywords": Object {},
                 "namespaceRefName": undefined,
+                "parens": undefined,
                 "spacing": Object {},
                 "tableRefName": undefined,
                 "type": "ref",
@@ -3330,6 +3498,7 @@ describe('SqlQuery', () => {
                 SqlTableRef {
                   "keywords": Object {},
                   "namespaceRefName": undefined,
+                  "parens": undefined,
                   "spacing": Object {},
                   "tableRefName": RefName {
                     "name": "tbl",
@@ -3343,6 +3512,7 @@ describe('SqlQuery', () => {
             "keywords": Object {
               "from": "from",
             },
+            "parens": undefined,
             "spacing": Object {
               "postFrom": " ",
             },
@@ -3360,11 +3530,13 @@ describe('SqlQuery', () => {
             },
             "limit": SqlLiteral {
               "keywords": Object {},
+              "parens": undefined,
               "spacing": Object {},
               "stringValue": "1",
               "type": "literal",
               "value": 1,
             },
+            "parens": undefined,
             "spacing": Object {
               "postLimit": " ",
             },
@@ -3372,6 +3544,7 @@ describe('SqlQuery', () => {
           },
           "offsetClause": undefined,
           "orderByClause": undefined,
+          "parens": undefined,
           "partitionedByClause": undefined,
           "replaceClause": undefined,
           "selectExpressions": SeparatedArray {
@@ -3380,6 +3553,7 @@ describe('SqlQuery', () => {
               SqlStar {
                 "keywords": Object {},
                 "namespaceRefName": undefined,
+                "parens": undefined,
                 "spacing": Object {},
                 "tableRefName": undefined,
                 "type": "star",
@@ -3418,6 +3592,7 @@ describe('SqlQuery', () => {
                 SqlTableRef {
                   "keywords": Object {},
                   "namespaceRefName": undefined,
+                  "parens": undefined,
                   "spacing": Object {},
                   "tableRefName": RefName {
                     "name": "tbl",
@@ -3431,6 +3606,7 @@ describe('SqlQuery', () => {
             "keywords": Object {
               "from": "from",
             },
+            "parens": undefined,
             "spacing": Object {
               "postFrom": " ",
             },
@@ -3446,6 +3622,7 @@ describe('SqlQuery', () => {
           "limitClause": undefined,
           "offsetClause": undefined,
           "orderByClause": undefined,
+          "parens": undefined,
           "partitionedByClause": undefined,
           "replaceClause": undefined,
           "selectExpressions": SeparatedArray {
@@ -3454,6 +3631,7 @@ describe('SqlQuery', () => {
               SqlStar {
                 "keywords": Object {},
                 "namespaceRefName": undefined,
+                "parens": undefined,
                 "spacing": Object {},
                 "tableRefName": undefined,
                 "type": "star",
@@ -3478,6 +3656,7 @@ describe('SqlQuery', () => {
                   SqlTableRef {
                     "keywords": Object {},
                     "namespaceRefName": undefined,
+                    "parens": undefined,
                     "spacing": Object {},
                     "tableRefName": RefName {
                       "name": "otherTable",
@@ -3491,6 +3670,7 @@ describe('SqlQuery', () => {
               "keywords": Object {
                 "from": "from",
               },
+              "parens": undefined,
               "spacing": Object {
                 "postFrom": " ",
               },
@@ -3505,6 +3685,7 @@ describe('SqlQuery', () => {
             "limitClause": undefined,
             "offsetClause": undefined,
             "orderByClause": undefined,
+            "parens": undefined,
             "partitionedByClause": undefined,
             "replaceClause": undefined,
             "selectExpressions": SeparatedArray {
@@ -3513,6 +3694,7 @@ describe('SqlQuery', () => {
                 SqlStar {
                   "keywords": Object {},
                   "namespaceRefName": undefined,
+                  "parens": undefined,
                   "spacing": Object {},
                   "tableRefName": undefined,
                   "type": "star",
@@ -3553,6 +3735,7 @@ describe('SqlQuery', () => {
                 SqlTableRef {
                   "keywords": Object {},
                   "namespaceRefName": undefined,
+                  "parens": undefined,
                   "spacing": Object {},
                   "tableRefName": RefName {
                     "name": "tbl",
@@ -3584,12 +3767,14 @@ describe('SqlQuery', () => {
                       },
                       "keywords": Object {},
                       "namespaceRefName": undefined,
+                      "parens": undefined,
                       "spacing": Object {},
                       "tableRefName": undefined,
                       "type": "ref",
                     },
                     "negated": false,
                     "op": "=",
+                    "parens": undefined,
                     "rhs": SqlRef {
                       "columnRefName": RefName {
                         "name": "col",
@@ -3597,6 +3782,7 @@ describe('SqlQuery', () => {
                       },
                       "keywords": Object {},
                       "namespaceRefName": undefined,
+                      "parens": undefined,
                       "spacing": Object {},
                       "tableRefName": undefined,
                       "type": "ref",
@@ -3607,6 +3793,7 @@ describe('SqlQuery', () => {
                     },
                     "type": "comparison",
                   },
+                  "parens": undefined,
                   "spacing": Object {
                     "postJoin": " ",
                     "postJoinType": " ",
@@ -3616,6 +3803,7 @@ describe('SqlQuery', () => {
                   "table": SqlTableRef {
                     "keywords": Object {},
                     "namespaceRefName": undefined,
+                    "parens": undefined,
                     "spacing": Object {},
                     "tableRefName": RefName {
                       "name": "anotherTable",
@@ -3630,6 +3818,7 @@ describe('SqlQuery', () => {
             "keywords": Object {
               "from": "from",
             },
+            "parens": undefined,
             "spacing": Object {
               "postFrom": " ",
               "preJoin": " ",
@@ -3645,6 +3834,7 @@ describe('SqlQuery', () => {
           "limitClause": undefined,
           "offsetClause": undefined,
           "orderByClause": undefined,
+          "parens": undefined,
           "partitionedByClause": undefined,
           "replaceClause": undefined,
           "selectExpressions": SeparatedArray {
@@ -3653,6 +3843,7 @@ describe('SqlQuery', () => {
               SqlStar {
                 "keywords": Object {},
                 "namespaceRefName": undefined,
+                "parens": undefined,
                 "spacing": Object {},
                 "tableRefName": undefined,
                 "type": "star",
@@ -3688,6 +3879,7 @@ describe('SqlQuery', () => {
                 SqlTableRef {
                   "keywords": Object {},
                   "namespaceRefName": undefined,
+                  "parens": undefined,
                   "spacing": Object {},
                   "tableRefName": RefName {
                     "name": "tbl",
@@ -3719,12 +3911,14 @@ describe('SqlQuery', () => {
                       },
                       "keywords": Object {},
                       "namespaceRefName": undefined,
+                      "parens": undefined,
                       "spacing": Object {},
                       "tableRefName": undefined,
                       "type": "ref",
                     },
                     "negated": false,
                     "op": "=",
+                    "parens": undefined,
                     "rhs": SqlRef {
                       "columnRefName": RefName {
                         "name": "col",
@@ -3732,6 +3926,7 @@ describe('SqlQuery', () => {
                       },
                       "keywords": Object {},
                       "namespaceRefName": undefined,
+                      "parens": undefined,
                       "spacing": Object {},
                       "tableRefName": undefined,
                       "type": "ref",
@@ -3742,6 +3937,7 @@ describe('SqlQuery', () => {
                     },
                     "type": "comparison",
                   },
+                  "parens": undefined,
                   "spacing": Object {
                     "postJoin": " ",
                     "postJoinType": " ",
@@ -3751,6 +3947,7 @@ describe('SqlQuery', () => {
                   "table": SqlTableRef {
                     "keywords": Object {},
                     "namespaceRefName": undefined,
+                    "parens": undefined,
                     "spacing": Object {},
                     "tableRefName": RefName {
                       "name": "anotherTable",
@@ -3765,6 +3962,7 @@ describe('SqlQuery', () => {
             "keywords": Object {
               "from": "from",
             },
+            "parens": undefined,
             "spacing": Object {
               "postFrom": " ",
               "preJoin": " ",
@@ -3780,6 +3978,7 @@ describe('SqlQuery', () => {
           "limitClause": undefined,
           "offsetClause": undefined,
           "orderByClause": undefined,
+          "parens": undefined,
           "partitionedByClause": undefined,
           "replaceClause": undefined,
           "selectExpressions": SeparatedArray {
@@ -3788,6 +3987,7 @@ describe('SqlQuery', () => {
               SqlStar {
                 "keywords": Object {},
                 "namespaceRefName": undefined,
+                "parens": undefined,
                 "spacing": Object {},
                 "tableRefName": undefined,
                 "type": "star",
@@ -3823,6 +4023,7 @@ describe('SqlQuery', () => {
                 SqlTableRef {
                   "keywords": Object {},
                   "namespaceRefName": undefined,
+                  "parens": undefined,
                   "spacing": Object {},
                   "tableRefName": RefName {
                     "name": "tbl",
@@ -3854,12 +4055,14 @@ describe('SqlQuery', () => {
                       },
                       "keywords": Object {},
                       "namespaceRefName": undefined,
+                      "parens": undefined,
                       "spacing": Object {},
                       "tableRefName": undefined,
                       "type": "ref",
                     },
                     "negated": false,
                     "op": "=",
+                    "parens": undefined,
                     "rhs": SqlRef {
                       "columnRefName": RefName {
                         "name": "col",
@@ -3867,6 +4070,7 @@ describe('SqlQuery', () => {
                       },
                       "keywords": Object {},
                       "namespaceRefName": undefined,
+                      "parens": undefined,
                       "spacing": Object {},
                       "tableRefName": undefined,
                       "type": "ref",
@@ -3877,6 +4081,7 @@ describe('SqlQuery', () => {
                     },
                     "type": "comparison",
                   },
+                  "parens": undefined,
                   "spacing": Object {
                     "postJoin": " ",
                     "postJoinType": " ",
@@ -3886,6 +4091,7 @@ describe('SqlQuery', () => {
                   "table": SqlTableRef {
                     "keywords": Object {},
                     "namespaceRefName": undefined,
+                    "parens": undefined,
                     "spacing": Object {},
                     "tableRefName": RefName {
                       "name": "anotherTable",
@@ -3900,6 +4106,7 @@ describe('SqlQuery', () => {
             "keywords": Object {
               "from": "from",
             },
+            "parens": undefined,
             "spacing": Object {
               "postFrom": " ",
               "preJoin": " ",
@@ -3915,6 +4122,7 @@ describe('SqlQuery', () => {
           "limitClause": undefined,
           "offsetClause": undefined,
           "orderByClause": undefined,
+          "parens": undefined,
           "partitionedByClause": undefined,
           "replaceClause": undefined,
           "selectExpressions": SeparatedArray {
@@ -3923,6 +4131,7 @@ describe('SqlQuery', () => {
               SqlStar {
                 "keywords": Object {},
                 "namespaceRefName": undefined,
+                "parens": undefined,
                 "spacing": Object {},
                 "tableRefName": undefined,
                 "type": "star",
@@ -3958,6 +4167,7 @@ describe('SqlQuery', () => {
                 SqlTableRef {
                   "keywords": Object {},
                   "namespaceRefName": undefined,
+                  "parens": undefined,
                   "spacing": Object {},
                   "tableRefName": RefName {
                     "name": "tbl",
@@ -3989,12 +4199,14 @@ describe('SqlQuery', () => {
                       },
                       "keywords": Object {},
                       "namespaceRefName": undefined,
+                      "parens": undefined,
                       "spacing": Object {},
                       "tableRefName": undefined,
                       "type": "ref",
                     },
                     "negated": false,
                     "op": "=",
+                    "parens": undefined,
                     "rhs": SqlRef {
                       "columnRefName": RefName {
                         "name": "col",
@@ -4002,6 +4214,7 @@ describe('SqlQuery', () => {
                       },
                       "keywords": Object {},
                       "namespaceRefName": undefined,
+                      "parens": undefined,
                       "spacing": Object {},
                       "tableRefName": undefined,
                       "type": "ref",
@@ -4012,6 +4225,7 @@ describe('SqlQuery', () => {
                     },
                     "type": "comparison",
                   },
+                  "parens": undefined,
                   "spacing": Object {
                     "postJoin": " ",
                     "postJoinType": " ",
@@ -4021,6 +4235,7 @@ describe('SqlQuery', () => {
                   "table": SqlTableRef {
                     "keywords": Object {},
                     "namespaceRefName": undefined,
+                    "parens": undefined,
                     "spacing": Object {},
                     "tableRefName": RefName {
                       "name": "anotherTable",
@@ -4035,6 +4250,7 @@ describe('SqlQuery', () => {
             "keywords": Object {
               "from": "from",
             },
+            "parens": undefined,
             "spacing": Object {
               "postFrom": " ",
               "preJoin": " ",
@@ -4050,6 +4266,7 @@ describe('SqlQuery', () => {
           "limitClause": undefined,
           "offsetClause": undefined,
           "orderByClause": undefined,
+          "parens": undefined,
           "partitionedByClause": undefined,
           "replaceClause": undefined,
           "selectExpressions": SeparatedArray {
@@ -4058,6 +4275,7 @@ describe('SqlQuery', () => {
               SqlStar {
                 "keywords": Object {},
                 "namespaceRefName": undefined,
+                "parens": undefined,
                 "spacing": Object {},
                 "tableRefName": undefined,
                 "type": "star",
@@ -4093,6 +4311,7 @@ describe('SqlQuery', () => {
                 SqlTableRef {
                   "keywords": Object {},
                   "namespaceRefName": undefined,
+                  "parens": undefined,
                   "spacing": Object {},
                   "tableRefName": RefName {
                     "name": "tbl",
@@ -4124,12 +4343,14 @@ describe('SqlQuery', () => {
                       },
                       "keywords": Object {},
                       "namespaceRefName": undefined,
+                      "parens": undefined,
                       "spacing": Object {},
                       "tableRefName": undefined,
                       "type": "ref",
                     },
                     "negated": false,
                     "op": "=",
+                    "parens": undefined,
                     "rhs": SqlRef {
                       "columnRefName": RefName {
                         "name": "col",
@@ -4137,6 +4358,7 @@ describe('SqlQuery', () => {
                       },
                       "keywords": Object {},
                       "namespaceRefName": undefined,
+                      "parens": undefined,
                       "spacing": Object {},
                       "tableRefName": undefined,
                       "type": "ref",
@@ -4147,6 +4369,7 @@ describe('SqlQuery', () => {
                     },
                     "type": "comparison",
                   },
+                  "parens": undefined,
                   "spacing": Object {
                     "postJoin": " ",
                     "postJoinType": " ",
@@ -4156,6 +4379,7 @@ describe('SqlQuery', () => {
                   "table": SqlTableRef {
                     "keywords": Object {},
                     "namespaceRefName": undefined,
+                    "parens": undefined,
                     "spacing": Object {},
                     "tableRefName": RefName {
                       "name": "anotherTable",
@@ -4170,6 +4394,7 @@ describe('SqlQuery', () => {
             "keywords": Object {
               "from": "from",
             },
+            "parens": undefined,
             "spacing": Object {
               "postFrom": " ",
               "preJoin": " ",
@@ -4185,6 +4410,7 @@ describe('SqlQuery', () => {
           "limitClause": undefined,
           "offsetClause": undefined,
           "orderByClause": undefined,
+          "parens": undefined,
           "partitionedByClause": undefined,
           "replaceClause": undefined,
           "selectExpressions": SeparatedArray {
@@ -4193,6 +4419,7 @@ describe('SqlQuery', () => {
               SqlStar {
                 "keywords": Object {},
                 "namespaceRefName": undefined,
+                "parens": undefined,
                 "spacing": Object {},
                 "tableRefName": undefined,
                 "type": "star",
@@ -4233,6 +4460,7 @@ describe('SqlQuery', () => {
                 SqlTableRef {
                   "keywords": Object {},
                   "namespaceRefName": undefined,
+                  "parens": undefined,
                   "spacing": Object {},
                   "tableRefName": RefName {
                     "name": "tbl",
@@ -4246,6 +4474,7 @@ describe('SqlQuery', () => {
             "keywords": Object {
               "from": "from",
             },
+            "parens": undefined,
             "spacing": Object {
               "postFrom": " ",
             },
@@ -4260,6 +4489,7 @@ describe('SqlQuery', () => {
           "limitClause": undefined,
           "offsetClause": undefined,
           "orderByClause": undefined,
+          "parens": undefined,
           "partitionedByClause": undefined,
           "replaceClause": undefined,
           "selectExpressions": SeparatedArray {
@@ -4272,6 +4502,7 @@ describe('SqlQuery', () => {
                 },
                 "keywords": Object {},
                 "namespaceRefName": undefined,
+                "parens": undefined,
                 "spacing": Object {},
                 "tableRefName": undefined,
                 "type": "ref",
@@ -4408,6 +4639,7 @@ describe('SqlQuery', () => {
                 SqlTableRef {
                   "keywords": Object {},
                   "namespaceRefName": undefined,
+                  "parens": undefined,
                   "spacing": Object {},
                   "tableRefName": RefName {
                     "name": "wiki",
@@ -4421,6 +4653,7 @@ describe('SqlQuery', () => {
             "keywords": Object {
               "from": "FROM",
             },
+            "parens": undefined,
             "spacing": Object {
               "postFrom": "",
             },
@@ -4437,6 +4670,7 @@ describe('SqlQuery', () => {
                   },
                   "keywords": Object {},
                   "namespaceRefName": undefined,
+                  "parens": undefined,
                   "spacing": Object {},
                   "tableRefName": undefined,
                   "type": "ref",
@@ -4447,6 +4681,7 @@ describe('SqlQuery', () => {
               "by": "BY",
               "group": "GROUP",
             },
+            "parens": undefined,
             "spacing": Object {
               "postBy": "",
               "postGroup": " ",
@@ -4473,6 +4708,7 @@ describe('SqlQuery', () => {
                     },
                     "keywords": Object {},
                     "namespaceRefName": undefined,
+                    "parens": undefined,
                     "spacing": Object {},
                     "tableRefName": undefined,
                     "type": "ref",
@@ -4480,6 +4716,7 @@ describe('SqlQuery', () => {
                   "keywords": Object {
                     "direction": "DESC",
                   },
+                  "parens": undefined,
                   "spacing": Object {
                     "preDirection": "",
                   },
@@ -4491,12 +4728,14 @@ describe('SqlQuery', () => {
               "by": "BY",
               "order": "ORDER",
             },
+            "parens": undefined,
             "spacing": Object {
               "postBy": "",
               "postOrder": " ",
             },
             "type": "orderByClause",
           },
+          "parens": undefined,
           "partitionedByClause": undefined,
           "replaceClause": undefined,
           "selectExpressions": SeparatedArray {
@@ -4520,6 +4759,7 @@ describe('SqlQuery', () => {
                 },
                 "keywords": Object {},
                 "namespaceRefName": undefined,
+                "parens": undefined,
                 "spacing": Object {},
                 "tableRefName": undefined,
                 "type": "ref",
@@ -4537,6 +4777,7 @@ describe('SqlQuery', () => {
                       SqlStar {
                         "keywords": Object {},
                         "namespaceRefName": undefined,
+                        "parens": undefined,
                         "spacing": Object {},
                         "tableRefName": undefined,
                         "type": "star",
@@ -4548,6 +4789,7 @@ describe('SqlQuery', () => {
                   "keywords": Object {
                     "functionName": "COUNT",
                   },
+                  "parens": undefined,
                   "spacing": Object {
                     "postArguments": "",
                     "postLeftParen": "",
@@ -4560,6 +4802,7 @@ describe('SqlQuery', () => {
                 "keywords": Object {
                   "as": "AS",
                 },
+                "parens": undefined,
                 "spacing": Object {
                   "preAlias": "",
                   "preAs": "",
@@ -4583,6 +4826,7 @@ describe('SqlQuery', () => {
                         },
                         "keywords": Object {},
                         "namespaceRefName": undefined,
+                        "parens": undefined,
                         "spacing": Object {},
                         "tableRefName": undefined,
                         "type": "ref",
@@ -4595,6 +4839,7 @@ describe('SqlQuery', () => {
                     "decorator": "DISTINCT",
                     "functionName": "COUNT",
                   },
+                  "parens": undefined,
                   "spacing": Object {
                     "postArguments": "",
                     "postDecorator": "",
@@ -4608,6 +4853,7 @@ describe('SqlQuery', () => {
                 "keywords": Object {
                   "as": "AS",
                 },
+                "parens": undefined,
                 "spacing": Object {
                   "preAlias": "",
                   "preAs": "",
@@ -4657,6 +4903,7 @@ describe('SqlQuery', () => {
                 SqlTableRef {
                   "keywords": Object {},
                   "namespaceRefName": undefined,
+                  "parens": undefined,
                   "spacing": Object {},
                   "tableRefName": RefName {
                     "name": "wikipedia",
@@ -4670,6 +4917,7 @@ describe('SqlQuery', () => {
             "keywords": Object {
               "from": "FROM",
             },
+            "parens": undefined,
             "spacing": Object {
               "postFrom": " ",
             },
@@ -4681,6 +4929,7 @@ describe('SqlQuery', () => {
               "values": Array [
                 SqlLiteral {
                   "keywords": Object {},
+                  "parens": undefined,
                   "spacing": Object {},
                   "stringValue": "1",
                   "type": "literal",
@@ -4692,6 +4941,7 @@ describe('SqlQuery', () => {
               "by": "BY",
               "group": "GROUP",
             },
+            "parens": undefined,
             "spacing": Object {
               "postBy": " ",
               "postGroup": " ",
@@ -4718,6 +4968,7 @@ describe('SqlQuery', () => {
                     },
                     "keywords": Object {},
                     "namespaceRefName": undefined,
+                    "parens": undefined,
                     "spacing": Object {},
                     "tableRefName": undefined,
                     "type": "ref",
@@ -4725,6 +4976,7 @@ describe('SqlQuery', () => {
                   "keywords": Object {
                     "direction": "DESC",
                   },
+                  "parens": undefined,
                   "spacing": Object {
                     "preDirection": " ",
                   },
@@ -4736,12 +4988,14 @@ describe('SqlQuery', () => {
               "by": "BY",
               "order": "ORDER",
             },
+            "parens": undefined,
             "spacing": Object {
               "postBy": " ",
               "postOrder": " ",
             },
             "type": "orderByClause",
           },
+          "parens": undefined,
           "partitionedByClause": undefined,
           "replaceClause": undefined,
           "selectExpressions": SeparatedArray {
@@ -4777,12 +5031,14 @@ describe('SqlQuery', () => {
                         },
                         "keywords": Object {},
                         "namespaceRefName": undefined,
+                        "parens": undefined,
                         "spacing": Object {},
                         "tableRefName": undefined,
                         "type": "ref",
                       },
                       SqlLiteral {
                         "keywords": Object {},
+                        "parens": undefined,
                         "spacing": Object {},
                         "stringValue": "VARCHAR",
                         "type": "literal",
@@ -4795,6 +5051,7 @@ describe('SqlQuery', () => {
                   "keywords": Object {
                     "functionName": "CAST",
                   },
+                  "parens": undefined,
                   "spacing": Object {
                     "postArguments": "",
                     "postLeftParen": "",
@@ -4807,6 +5064,7 @@ describe('SqlQuery', () => {
                 "keywords": Object {
                   "as": "AS",
                 },
+                "parens": undefined,
                 "spacing": Object {
                   "preAlias": " ",
                   "preAs": " ",
@@ -4826,6 +5084,7 @@ describe('SqlQuery', () => {
                       SqlStar {
                         "keywords": Object {},
                         "namespaceRefName": undefined,
+                        "parens": undefined,
                         "spacing": Object {},
                         "tableRefName": undefined,
                         "type": "star",
@@ -4837,6 +5096,7 @@ describe('SqlQuery', () => {
                   "keywords": Object {
                     "functionName": "COUNT",
                   },
+                  "parens": undefined,
                   "spacing": Object {
                     "postArguments": "",
                     "postLeftParen": "",
@@ -4849,6 +5109,7 @@ describe('SqlQuery', () => {
                 "keywords": Object {
                   "as": "AS",
                 },
+                "parens": undefined,
                 "spacing": Object {
                   "preAlias": " ",
                   "preAs": " ",
@@ -4894,12 +5155,14 @@ describe('SqlQuery', () => {
                       },
                       "keywords": Object {},
                       "namespaceRefName": undefined,
+                      "parens": undefined,
                       "spacing": Object {},
                       "tableRefName": undefined,
                       "type": "ref",
                     },
                     "negated": false,
                     "op": ">=",
+                    "parens": undefined,
                     "rhs": SqlMulti {
                       "args": SeparatedArray {
                         "separators": Array [
@@ -4917,6 +5180,7 @@ describe('SqlQuery', () => {
                             "keywords": Object {
                               "functionName": "CURRENT_TIMESTAMP",
                             },
+                            "parens": undefined,
                             "spacing": Object {},
                             "specialParen": "none",
                             "type": "function",
@@ -4925,6 +5189,7 @@ describe('SqlQuery', () => {
                           SqlInterval {
                             "intervalValue": SqlLiteral {
                               "keywords": Object {},
+                              "parens": undefined,
                               "spacing": Object {},
                               "stringValue": "'1'",
                               "type": "literal",
@@ -4933,6 +5198,7 @@ describe('SqlQuery', () => {
                             "keywords": Object {
                               "interval": "INTERVAL",
                             },
+                            "parens": undefined,
                             "spacing": Object {
                               "postInterval": " ",
                               "postIntervalValue": " ",
@@ -4944,6 +5210,7 @@ describe('SqlQuery', () => {
                       },
                       "keywords": Object {},
                       "op": "-",
+                      "parens": undefined,
                       "spacing": Object {},
                       "type": "multi",
                     },
@@ -4965,15 +5232,18 @@ describe('SqlQuery', () => {
                       },
                       "keywords": Object {},
                       "namespaceRefName": undefined,
+                      "parens": undefined,
                       "spacing": Object {},
                       "tableRefName": undefined,
                       "type": "ref",
                     },
                     "negated": false,
                     "op": "=",
+                    "parens": undefined,
                     "rhs": SqlPlaceholder {
                       "customPlaceholder": undefined,
                       "keywords": Object {},
+                      "parens": undefined,
                       "spacing": Object {},
                       "type": "placeholder",
                     },
@@ -4987,12 +5257,14 @@ describe('SqlQuery', () => {
               },
               "keywords": Object {},
               "op": "AND",
+              "parens": undefined,
               "spacing": Object {},
               "type": "multi",
             },
             "keywords": Object {
               "where": "WHERE",
             },
+            "parens": undefined,
             "spacing": Object {
               "postWhere": " ",
             },
@@ -5030,6 +5302,7 @@ describe('SqlQuery', () => {
               "values": Array [
                 SqlLiteral {
                   "keywords": Object {},
+                  "parens": undefined,
                   "spacing": Object {},
                   "stringValue": "2",
                   "type": "literal",
@@ -5042,6 +5315,7 @@ describe('SqlQuery', () => {
                   },
                   "keywords": Object {},
                   "namespaceRefName": undefined,
+                  "parens": undefined,
                   "spacing": Object {},
                   "tableRefName": undefined,
                   "type": "ref",
@@ -5052,6 +5326,7 @@ describe('SqlQuery', () => {
               "by": "BY",
               "clustered": "CLUSTERED",
             },
+            "parens": undefined,
             "spacing": Object {
               "postBy": " ",
               "postClustered": " ",
@@ -5067,6 +5342,7 @@ describe('SqlQuery', () => {
                 SqlTableRef {
                   "keywords": Object {},
                   "namespaceRefName": undefined,
+                  "parens": undefined,
                   "spacing": Object {},
                   "tableRefName": RefName {
                     "name": "tbl",
@@ -5080,6 +5356,7 @@ describe('SqlQuery', () => {
             "keywords": Object {
               "from": "FROM",
             },
+            "parens": undefined,
             "spacing": Object {
               "postFrom": " ",
             },
@@ -5093,6 +5370,7 @@ describe('SqlQuery', () => {
               "insert": "INSERT",
               "into": "INTO",
             },
+            "parens": undefined,
             "spacing": Object {
               "postInsert": " ",
               "postInto": " ",
@@ -5100,6 +5378,7 @@ describe('SqlQuery', () => {
             "table": SqlTableRef {
               "keywords": Object {},
               "namespaceRefName": undefined,
+              "parens": undefined,
               "spacing": Object {},
               "tableRefName": RefName {
                 "name": "tbl2",
@@ -5115,9 +5394,11 @@ describe('SqlQuery', () => {
           "limitClause": undefined,
           "offsetClause": undefined,
           "orderByClause": undefined,
+          "parens": undefined,
           "partitionedByClause": SqlPartitionedByClause {
             "expression": SqlLiteral {
               "keywords": Object {},
+              "parens": undefined,
               "spacing": Object {},
               "stringValue": "DAY",
               "type": "literal",
@@ -5127,6 +5408,7 @@ describe('SqlQuery', () => {
               "by": "BY",
               "partitioned": "PARTITIONED",
             },
+            "parens": undefined,
             "spacing": Object {
               "postBy": " ",
               "postPartitioned": " ",
@@ -5140,6 +5422,7 @@ describe('SqlQuery', () => {
               SqlStar {
                 "keywords": Object {},
                 "namespaceRefName": undefined,
+                "parens": undefined,
                 "spacing": Object {},
                 "tableRefName": undefined,
                 "type": "star",
