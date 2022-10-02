@@ -26,6 +26,7 @@ describe('SqlRef', () => {
       `"a""b"`,
       `a.b`,
       `"a""b".c`,
+      `U&"fo\\feffo"`, // \ufeff = invisible space
     ];
 
     for (const sql of queries) {
@@ -53,8 +54,8 @@ describe('SqlRef', () => {
       expect(String(SqlRef.column('user'))).toEqual(`user`);
     });
 
-    it('works with .', () => {
-      expect(String(SqlRef.column('wiki.pedia'))).toEqual(`"wiki.pedia"`);
+    it('works with . and "', () => {
+      expect(String(SqlRef.column('wiki.pe"dia'))).toEqual(`"wiki.pe""dia"`);
     });
 
     it('works with column starting with a number', () => {

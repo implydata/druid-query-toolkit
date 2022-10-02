@@ -24,6 +24,7 @@ describe('SqlLiteral', () => {
       `'lol'`,
       `U&'hello'`,
       `U&'hell''o'`,
+      `U&'hell\\\\o'`,
       `_latin1'hello'`,
       `_UTF8'hello'`,
       `_UTF8'hell''o'`,
@@ -299,7 +300,7 @@ describe('SqlLiteral', () => {
   });
 
   it('works with unicode string 1', () => {
-    const sql = `U&'fo\\00F6'`;
+    const sql = `U&'f''o\\00F6\\\\'`;
 
     backAndForth(sql);
 
@@ -308,9 +309,9 @@ describe('SqlLiteral', () => {
         "keywords": Object {},
         "parens": undefined,
         "spacing": Object {},
-        "stringValue": "U&'fo\\\\00F6'",
+        "stringValue": "U&'f''o\\\\00F6\\\\\\\\'",
         "type": "literal",
-        "value": "foö",
+        "value": "f'oö\\\\",
       }
     `);
   });
@@ -383,6 +384,7 @@ describe('SqlLiteral', () => {
       expect(String(SqlLiteral.create(BigInt(1606832560494517248)))).toEqual('1606832560494517248');
       expect(String(SqlLiteral.create(`hello`))).toEqual(`'hello'`);
       expect(String(SqlLiteral.create(`he'o`))).toEqual(`'he''o'`);
+      expect(String(SqlLiteral.create(`he\ufeffo`))).toEqual(`U&'he\\feffo'`);
       expect(String(SqlLiteral.create(new Date('2020-01-02Z')))).toEqual(`TIMESTAMP '2020-01-02'`);
       expect(String(SqlLiteral.create(new Date('2020-01-02T03:04:05Z')))).toEqual(
         `TIMESTAMP '2020-01-02 03:04:05'`,

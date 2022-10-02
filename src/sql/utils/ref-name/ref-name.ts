@@ -13,7 +13,7 @@
  */
 
 import { RESERVED_ALIASES, RESERVED_KEYWORDS } from '../../reserved-keywords';
-import { trimString } from '../general/general';
+import { needsUnicodeEscape, sqlEscapeUnicode, trimString } from '../general/general';
 
 const VALID_NAKED_NAME_REGEXP = /^[a-z_]\w*$/i;
 
@@ -89,7 +89,13 @@ export class RefName {
   public toString(): string {
     const { name, quotes } = this;
     if (!quotes) return name;
-    return `"${name.replace(/"/g, '""')}"`;
+
+    const quoteEscapedName = name.replace(/"/g, '""');
+    if (needsUnicodeEscape(quoteEscapedName)) {
+      return `U&"${sqlEscapeUnicode(quoteEscapedName)}"`;
+    } else {
+      return `"${quoteEscapedName}"`;
+    }
   }
 
   public changeName(name: string): RefName {

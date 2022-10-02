@@ -14,7 +14,7 @@
 
 import { SqlBase, SqlBaseValue, SqlType } from '../sql-base';
 import { DecomposeViaAndOptions, SqlExpression } from '../sql-expression';
-import { trimString } from '../utils';
+import { needsUnicodeEscape, sqlEscapeUnicode, trimString } from '../utils';
 
 function isDate(v: any): v is Date {
   return Boolean(v && typeof v.toISOString === 'function');
@@ -98,7 +98,12 @@ export class SqlLiteral extends SqlExpression {
   }
 
   static escapeLiteralString(str: string): string {
-    return `'${str.replace(/'/g, "''")}'`;
+    str = str.replace(/'/g, "''");
+    if (needsUnicodeEscape(str)) {
+      return `U&'${sqlEscapeUnicode(str)}'`;
+    } else {
+      return `'${str}'`;
+    }
   }
 
   static dateToTimestampValue(date: Date): string {

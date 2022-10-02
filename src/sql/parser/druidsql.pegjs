@@ -1403,7 +1403,7 @@ SingleQuotedString = "'" v:$(("''" / [^'])*) "'"
 UnicodeString = "U&"i v:SingleQuotedString
 {
   return {
-    value: v.value.replace(/\\[0-9a-f]{4}/gi, function(s) { return String.fromCharCode(parseInt(s.substr(1), 16)); }),
+    value: v.value.replace(/\\(\\|(?:[0-9a-f]{4}))/gi, function(_, s) { return s === '\\' ? '\\' : String.fromCharCode(parseInt(s, 16)); }),
     stringValue: text()
   };
 }
@@ -1483,7 +1483,7 @@ SqlRef = a:RefName b:(_ "." _ RefName)? c:(_ "." _ RefName)?
   }
 }
 
-RefName = QuotedRefName / UnquotedRefName
+RefName = QuotedRefName / UnicodeRefName / UnquotedRefName
 
 RefNameAlias = QuotedRefName / UnquotedRefNameAlias
 
@@ -1491,6 +1491,14 @@ QuotedRefName = '"' name:$(('""' / [^"])+) '"'
 {
   return new sql.RefName({
     name: name.replace(/""/g, '"'),
+    quotes: true
+  });
+}
+
+UnicodeRefName = "U&"i v:QuotedRefName
+{
+  return new sql.RefName({
+    name: v.name.replace(/\\(\\|(?:[0-9a-f]{4}))/gi, function(_, s) { return s === '\\' ? '\\' : String.fromCharCode(parseInt(s, 16)); }),
     quotes: true
   });
 }
