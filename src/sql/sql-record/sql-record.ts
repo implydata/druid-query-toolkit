@@ -14,6 +14,7 @@
 
 import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../sql-base';
 import { SqlExpression } from '../sql-expression';
+import { LiteralValue } from '../sql-literal/sql-literal';
 import { SeparatedArray, Separator } from '../utils';
 
 export interface SqlRecordValue extends SqlBaseValue {
@@ -95,6 +96,14 @@ export class SqlRecord extends SqlExpression {
     const value = this.valueOf();
     value.expressions = this.expressions.clearSeparators();
     return SqlBase.fromValue(value);
+  }
+
+  public prepend(expression: SqlExpression | LiteralValue): SqlRecord {
+    return this.changeExpressions(this.expressions.prepend(SqlExpression.wrap(expression)));
+  }
+
+  public append(expression: SqlExpression | LiteralValue): SqlRecord {
+    return this.changeExpressions(this.expressions.append(SqlExpression.wrap(expression)));
   }
 
   public unwrapIfSingleton(): SqlExpression {
