@@ -23,6 +23,7 @@ import { SqlValues } from './sql-values';
 describe('SqlValues', () => {
   it('things that work', () => {
     const queries: string[] = [
+      `VALUES (1), (2)`,
       `VALUES   (1, 2), (3, 4), (5, 6)  ORDER  BY  1  DESC`,
       `VALUES (1, 2), (3, 4), (5, 6) ORDER BY 1 DESC LIMIT 2`,
     ];

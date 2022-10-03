@@ -689,7 +689,7 @@ ComparisonOpRhsIs = op:IsToken postOp:_ not:(NotToken _)? rhs:SqlLiteral
   };
 }
 
-ComparisonOpRhsIn = op:InToken postOp:_ rhs:(SqlRecordMaybe / SqlQueryInParens)
+ComparisonOpRhsIn = op:InToken postOp:_ rhs:(SqlQueryInParens / SqlRecord)
 {
   return {
     op: op.toUpperCase(),
@@ -1303,12 +1303,14 @@ SqlRecord = row:(RowToken _)? OpenParen postLeftParen:_ head:Expression tail:(Co
   if (row) {
     value.keywords = { row: row[0] };
     value.spacing.postRow = row[1];
+  } else {
+    value.keywords = { row: '' };
   }
 
   return new sql.SqlRecord(value);
 }
 
-SqlQueryInParens = OpenParen leftSpacing:_ ex:SqlQuery rightSpacing:_ CloseParen
+SqlQueryInParens = OpenParen leftSpacing:_ ex:(SqlQueryInParens / SqlQuery) rightSpacing:_ CloseParen
 {
   return ex.addParens(leftSpacing, rightSpacing);
 }

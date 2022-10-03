@@ -423,7 +423,8 @@ export abstract class SqlBase {
   }
 
   public getKeyword(name: KeywordName, defaultKeyword: string): string {
-    return this.keywords[name] || SqlBase.capitalize(defaultKeyword);
+    const keyword = this.keywords[name];
+    return typeof keyword === 'string' ? keyword : SqlBase.capitalize(defaultKeyword);
   }
 
   protected getKeywordsWithout(...toRemove: KeywordName[]) {

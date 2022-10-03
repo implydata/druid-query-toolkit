@@ -501,6 +501,65 @@ describe('SqlComparison', () => {
     `);
   });
 
+  it('works with IN (value)', () => {
+    const sql = `X IN (1)`;
+
+    backAndForth(sql);
+
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+      SqlComparison {
+        "decorator": undefined,
+        "keywords": Object {
+          "op": "IN",
+        },
+        "lhs": SqlRef {
+          "columnRefName": RefName {
+            "name": "X",
+            "quotes": false,
+          },
+          "keywords": Object {},
+          "namespaceRefName": undefined,
+          "parens": undefined,
+          "spacing": Object {},
+          "tableRefName": undefined,
+          "type": "ref",
+        },
+        "negated": false,
+        "op": "IN",
+        "parens": undefined,
+        "rhs": SqlRecord {
+          "expressions": SeparatedArray {
+            "separators": Array [],
+            "values": Array [
+              SqlLiteral {
+                "keywords": Object {},
+                "parens": undefined,
+                "spacing": Object {},
+                "stringValue": "1",
+                "type": "literal",
+                "value": 1,
+              },
+            ],
+          },
+          "keywords": Object {
+            "row": "",
+          },
+          "parens": undefined,
+          "spacing": Object {
+            "postExpressions": "",
+            "postLeftParen": "",
+          },
+          "type": "record",
+        },
+        "spacing": Object {
+          "postOp": " ",
+          "preOp": " ",
+        },
+        "type": "comparison",
+      }
+    `);
+  });
+
   it('works with IN (values)', () => {
     const sql = `X IN (1, 2, 4 - 1)`;
 
@@ -594,7 +653,9 @@ describe('SqlComparison', () => {
               },
             ],
           },
-          "keywords": Object {},
+          "keywords": Object {
+            "row": "",
+          },
           "parens": undefined,
           "spacing": Object {
             "postExpressions": "",
@@ -705,7 +766,9 @@ describe('SqlComparison', () => {
               },
             ],
           },
-          "keywords": Object {},
+          "keywords": Object {
+            "row": "",
+          },
           "parens": undefined,
           "spacing": Object {
             "postExpressions": "",
@@ -1030,7 +1093,9 @@ describe('SqlComparison', () => {
               },
             ],
           },
-          "keywords": Object {},
+          "keywords": Object {
+            "row": "",
+          },
           "parens": undefined,
           "spacing": Object {
             "postExpressions": "",
@@ -1105,7 +1170,9 @@ describe('SqlComparison', () => {
                     },
                   ],
                 },
-                "keywords": Object {},
+                "keywords": Object {
+                  "row": "",
+                },
                 "parens": undefined,
                 "spacing": Object {
                   "postExpressions": "",
@@ -1141,7 +1208,9 @@ describe('SqlComparison', () => {
                     },
                   ],
                 },
-                "keywords": Object {},
+                "keywords": Object {
+                  "row": "",
+                },
                 "parens": undefined,
                 "spacing": Object {
                   "postExpressions": "",
@@ -1151,7 +1220,9 @@ describe('SqlComparison', () => {
               },
             ],
           },
-          "keywords": Object {},
+          "keywords": Object {
+            "row": "",
+          },
           "parens": undefined,
           "spacing": Object {
             "postExpressions": "",

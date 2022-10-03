@@ -56,7 +56,7 @@ export class SqlRecord extends SqlExpression {
       this.expressions.length() === 1 ? SqlRecord.DEFAULT_ROW_KEYWORD : '',
     );
     if (rowKeyword) {
-      rawParts.push(rowKeyword, this.getSpace('postRow'));
+      rawParts.push(rowKeyword, this.getSpace('postRow', ''));
     }
 
     rawParts.push(
