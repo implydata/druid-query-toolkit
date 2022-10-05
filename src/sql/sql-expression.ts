@@ -63,10 +63,9 @@ export abstract class SqlExpression extends SqlBase {
     return input instanceof SqlExpression ? input : SqlLiteral.create(input);
   }
 
-  static and(...args: (SqlExpression | string | undefined)[]): SqlExpression {
+  static and(...args: (SqlExpression | undefined)[]): SqlExpression {
     const compactArgs = filterMap(args, a => {
       if (!a) return;
-      a = SqlExpression.parse(a);
       if (a instanceof SqlMulti) {
         return a.ensureParens();
       }
@@ -88,10 +87,9 @@ export abstract class SqlExpression extends SqlBase {
     }
   }
 
-  static or(...args: (SqlExpression | string | undefined)[]): SqlExpression {
+  static or(...args: (SqlExpression | undefined)[]): SqlExpression {
     const compactArgs = filterMap(args, a => {
       if (!a) return;
-      a = SqlExpression.parse(a);
       if (a instanceof SqlMulti) {
         return a.ensureParens();
       }
@@ -274,11 +272,11 @@ export abstract class SqlExpression extends SqlBase {
 
   // SqlMulti
 
-  public and(expression: SqlExpression | string): SqlExpression {
+  public and(expression: SqlExpression): SqlExpression {
     return SqlExpression.and(this, expression);
   }
 
-  public or(expression: SqlExpression | string): SqlExpression {
+  public or(expression: SqlExpression): SqlExpression {
     return SqlExpression.or(this, expression);
   }
 
@@ -303,16 +301,7 @@ export abstract class SqlExpression extends SqlBase {
           return ex;
         }
 
-        let filler = fillWith[i++]!; // We checked above that i is in range
-        if (!(filler instanceof SqlExpression)) {
-          if (typeof filler === 'string') {
-            filler = SqlExpression.parse(filler);
-          } else {
-            filler = SqlLiteral.create(filler);
-          }
-        }
-
-        return filler;
+        return SqlExpression.wrap(fillWith[i++]!); // We checked above that i is in range
       }
       return ex;
     }) as SqlExpression;

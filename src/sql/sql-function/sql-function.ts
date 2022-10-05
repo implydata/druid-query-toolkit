@@ -238,7 +238,7 @@ export class SqlFunction extends SqlExpression {
     return SqlBase.fromValue(value);
   }
 
-  public changeWhereExpression(whereExpression: SqlExpression | string | undefined): this {
+  public changeWhereExpression(whereExpression: SqlExpression | undefined): this {
     if (!whereExpression) return this.changeWhereClause(undefined);
     return this.changeWhereClause(
       this.whereClause
@@ -247,7 +247,7 @@ export class SqlFunction extends SqlExpression {
     );
   }
 
-  public addWhereExpression(whereExpression: SqlExpression | string): this {
+  public addWhereExpression(whereExpression: SqlExpression): this {
     const { whereClause } = this;
     return this.changeWhereClause(
       whereClause
