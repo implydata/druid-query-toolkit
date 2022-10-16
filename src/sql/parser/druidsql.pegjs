@@ -436,10 +436,15 @@ SqlWhereClause = where:WhereToken postWhere:_ expression:Expression
   });
 }
 
-GroupByClause = group:GroupToken postGroup:__ by:ByToken postBy:_ expressions:(ExpressionList / "()")
+GroupByClause =
+  group:GroupToken
+  postGroup:__
+  by:ByToken
+  postBy:_
+  decorator:((RollupToken / CubeToken / GroupingSetsToken) _)?
+  ex:((OpenParen _ (GroupByExpressionList _)? CloseParen) / GroupByExpressionList)
 {
-  return new sql.SqlGroupByClause({
-    expressions: expressions === '()' ? null : expressions,
+  var value = {
     spacing: {
       postGroup: postGroup,
       postBy: postBy,
@@ -448,12 +453,45 @@ GroupByClause = group:GroupToken postGroup:__ by:ByToken postBy:_ expressions:(E
       group: group,
       by: by,
     },
-  });
+  };
+
+  if (decorator) {
+    var d = decorator[0].toUpperCase();
+    value.decorator = d.startsWith('GROUPING') ? 'GROUPING SETS' : d;
+    value.spacing.postDecorator = decorator[1];
+    value.keywords.decorator = decorator[0];
+  }
+
+  if (Array.isArray(ex)) {
+    value.innerParens = true;
+    value.spacing.postLeftParen = ex[1];
+
+    if (ex[2]) {
+      value.expressions = ex[2][0];
+      value.spacing.postExpressions = ex[2][1];
+    }
+  } else {
+    value.expressions = ex;
+  }
+
+  return new sql.SqlGroupByClause(value);
 }
 
-ExpressionList = head:Expression tail:(CommaSeparator Expression)*
+GroupByExpressionList = head:GroupByExpression tail:(CommaSeparator GroupByExpression)*
 {
   return makeSeparatedArray(head, tail);
+}
+
+GroupByExpression = SqlEmptyRecord / Expression
+
+SqlEmptyRecord = OpenParen postLeftParen:_ CloseParen
+{
+  return new sql.SqlRecord({
+    keywords: { row: '' },
+    spacing: {
+      postLeftParen: postLeftParen,
+    }
+  });
 }
 
 HavingClause = having:HavingToken postHaving:_ expression:Expression
@@ -1581,6 +1619,7 @@ CastToken = $("CAST"i !IdentifierPart)
 CeilToken = $("CEIL"i !IdentifierPart)
 ClusteredToken = $("CLUSTERED"i !IdentifierPart)
 CountToken = $("COUNT"i !IdentifierPart)
+CubeToken = $("CUBE"i !IdentifierPart)
 DateToken = $("DATE"i !IdentifierPart)
 DescToken = $("DESC"i !IdentifierPart)
 DistinctToken = $("DISTINCT"i !IdentifierPart)
@@ -1595,6 +1634,7 @@ FloorToken = $("FLOOR"i !IdentifierPart)
 ForToken = $("FOR"i !IdentifierPart)
 FromToken = $("FROM"i !IdentifierPart)
 GroupToken = $("GROUP"i !IdentifierPart)
+GroupingSetsToken = $("GROUPING"i !IdentifierPart __ "SETS"i !IdentifierPart)
 HavingToken = $("HAVING"i !IdentifierPart)
 InToken = $("IN"i !IdentifierPart)
 InsertToken = $("INSERT"i !IdentifierPart)
@@ -1617,6 +1657,7 @@ PartitionedToken = $("PARTITIONED"i !IdentifierPart)
 PlanToken = $("PLAN"i !IdentifierPart)
 PositionToken = $("POSITION"i !IdentifierPart)
 ReplaceToken = $("REPLACE"i !IdentifierPart)
+RollupToken = $("ROLLUP"i !IdentifierPart)
 RowToken = $("ROW"i !IdentifierPart)
 SelectToken = $("SELECT"i !IdentifierPart)
 SimilarToToken = $("SIMILAR"i !IdentifierPart __ ToToken)

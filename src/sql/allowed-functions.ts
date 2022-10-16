@@ -40,6 +40,7 @@ export const ALLOWED_FUNCTIONS = [
   'FIRST_VALUE',
   'FLOOR',
   'FUSION',
+  'GROUPING',
   'HOUR',
   'JSON_ARRAY',
   'JSON_ARRAYAGG',

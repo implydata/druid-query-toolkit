@@ -261,6 +261,7 @@ describe('SqlComparison', () => {
             "type": "fromClause",
           },
           "groupByClause": SqlGroupByClause {
+            "decorator": undefined,
             "expressions": SeparatedArray {
               "separators": Array [],
               "values": Array [
@@ -274,6 +275,7 @@ describe('SqlComparison', () => {
                 },
               ],
             },
+            "innerParens": false,
             "keywords": Object {
               "by": "BY",
               "group": "GROUP",

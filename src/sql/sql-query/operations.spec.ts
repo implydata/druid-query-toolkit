@@ -342,7 +342,7 @@ describe('SqlQuery operations', () => {
             FROM sys."github"
           `,
         )
-          .addWhere(`col > 1`)
+          .addWhere(SqlExpression.parse(`col > 1`))
           .toString(),
       ).toEqual(sane`
         SELECT *
@@ -360,7 +360,7 @@ describe('SqlQuery operations', () => {
             WHERE col > 1
           `,
         )
-          .addWhere(`colTwo > 2`)
+          .addWhere(SqlExpression.parse(`colTwo > 2`))
           .toString(),
       ).toEqual(sane`
         SELECT *
@@ -377,7 +377,7 @@ describe('SqlQuery operations', () => {
             FROM sys."github" WHERE col > 1 OR col < 5
           `,
         )
-          .addWhere(`colTwo > 2`)
+          .addWhere(SqlExpression.parse(`colTwo > 2`))
           .toString(),
       ).toEqual(sane`
         SELECT *
@@ -393,7 +393,7 @@ describe('SqlQuery operations', () => {
             FROM sys."github" WHERE (col > 1 OR col < 5) AND colTwo > 5
           `,
         )
-          .addWhere(`colTwo > 2`)
+          .addWhere(SqlExpression.parse(`colTwo > 2`))
           .toString(),
       ).toEqual(sane`
         SELECT *
@@ -727,7 +727,7 @@ describe('SqlQuery operations', () => {
         GROUP BY 2
       `);
 
-      expect(sql.addGroupBy(`reverse(col2)`).toString()).toEqual(sane`
+      expect(sql.addGroupBy(SqlExpression.parse(`reverse(col2)`)).toString()).toEqual(sane`
         select col1, min(col1) AS aliasName
         from tbl
         GROUP BY 2, reverse(col2)

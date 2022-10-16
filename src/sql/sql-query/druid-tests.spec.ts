@@ -1645,13 +1645,6 @@ describe('Druid test queries', () => {
   it('all queries work', () => {
     let bad = 0;
     for (const sql of queries) {
-      if (
-        sql.toUpperCase().includes('GROUP BY CUBE') ||
-        sql.toUpperCase().includes('GROUP BY ROLLUP') ||
-        sql.toUpperCase().includes('GROUP BY GROUPING SETS')
-      ) {
-        continue; // Grouping sets are known not to parse // ToDo: fix this
-      }
       try {
         backAndForth(sql);
       } catch (e) {
