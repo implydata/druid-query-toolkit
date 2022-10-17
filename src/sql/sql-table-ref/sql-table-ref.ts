@@ -36,6 +36,13 @@ export class SqlTableRef extends SqlExpression {
     });
   }
 
+  static createWithoutQuotes(table: string, namespace?: string) {
+    return new SqlTableRef({
+      tableRefName: RefName.create(table, false),
+      namespaceRefName: RefName.maybe(namespace, false),
+    });
+  }
+
   public readonly tableRefName: RefName;
   public readonly namespaceRefName?: RefName;
 

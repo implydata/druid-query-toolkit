@@ -51,7 +51,7 @@ describe('SqlQuery operations', () => {
       );
 
       expect(String(query.prependWith('wiki', withQuery))).toEqual(sane`
-        WITH wiki AS (SELECT * FROM "wikipedia"
+        WITH "wiki" AS (SELECT * FROM "wikipedia"
         WHERE channel = 'en')
         SELECT __time FROM "wiki"
       `);
@@ -75,7 +75,7 @@ describe('SqlQuery operations', () => {
 
       expect(String(query.prependWith('wiki2', withQuery))).toEqual(sane`
         WITH
-          wiki2 AS (SELECT * FROM "wikipedia"
+          "wiki2" AS (SELECT * FROM "wikipedia"
         WHERE channel = 'he'),
         wiki AS (SELECT * FROM "wiki2" WHERE channel = 'en')
         SELECT __time FROM "wiki"
@@ -99,7 +99,7 @@ describe('SqlQuery operations', () => {
 
       expect(String(query.prependWith('wiki', withQuery))).toEqual(sane`
         EXPLAIN PLAN FOR
-        WITH wiki AS (SELECT * FROM "wikipedia"
+        WITH "wiki" AS (SELECT * FROM "wikipedia"
         WHERE channel = 'en')
         SELECT __time FROM "wiki"
       `);
@@ -292,7 +292,7 @@ describe('SqlQuery operations', () => {
       ).toEqual(sane`
         SELECT *
         FROM sys."github"
-        ORDER BY col DESC
+        ORDER BY "col" DESC
       `);
     });
 

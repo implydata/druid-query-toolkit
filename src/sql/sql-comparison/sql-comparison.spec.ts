@@ -105,9 +105,11 @@ describe('SqlComparison', () => {
 
   describe('factories', () => {
     it('works with IN', () => {
-      expect(SqlComparison.in(SqlRef.column('x'), [1, 2, 3]).toString()).toEqual('x IN (1, 2, 3)');
+      expect(SqlComparison.in(SqlRef.column('x'), [1, 2, 3]).toString()).toEqual(
+        '"x" IN (1, 2, 3)',
+      );
       expect(SqlComparison.notIn(SqlRef.column('x'), [1, 2, 3]).toString()).toEqual(
-        'x NOT IN (1, 2, 3)',
+        '"x" NOT IN (1, 2, 3)',
       );
     });
   });

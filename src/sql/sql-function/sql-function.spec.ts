@@ -96,7 +96,7 @@ describe('SqlFunction', () => {
 
   it('.floor', () => {
     expect(SqlFunction.floor(SqlRef.column('__time'), 'Hour').toString()).toEqual(
-      'FLOOR(__time TO Hour)',
+      'FLOOR("__time" TO Hour)',
     );
   });
 

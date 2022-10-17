@@ -58,16 +58,16 @@ export class RefName {
     );
   }
 
-  static maybe(name: string | undefined, forceQuotes?: boolean): RefName | undefined {
+  static maybe(name: string | undefined, forceQuotes = true): RefName | undefined {
     if (!name) return;
     return RefName.create(name, forceQuotes);
   }
 
-  static create(name: string, forceQuotes?: boolean): RefName {
+  static create(name: string, forceQuotes = true): RefName {
     return new RefName({ name, quotes: forceQuotes || RefName.needsQuotes(name) });
   }
 
-  static alias(name: string, forceQuotes?: boolean): RefName {
+  static alias(name: string, forceQuotes = true): RefName {
     return new RefName({ name, quotes: forceQuotes || RefName.needsQuotesAlias(name) });
   }
 

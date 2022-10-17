@@ -164,15 +164,15 @@ describe('SqlAlias', () => {
   describe('.create', () => {
     expect(
       SqlAlias.create(SqlAlias.create(SqlRef.column('X'), 'name1'), 'name2').toString(),
-    ).toEqual('X AS name2');
+    ).toEqual('"X" AS "name2"');
   });
 
   describe('#as', () => {
-    const x = SqlRef.column('X').as('test');
-    const z = SqlRef.column('Z').as(RefName.create('test', true));
+    const x = SqlRef.columnWithoutQuotes('X').as('test');
+    const z = SqlRef.columnWithoutQuotes('Z').as(RefName.create('test', true));
 
     it('should work with normal string', () => {
-      expect(String(x.as('hello'))).toEqual('X AS hello');
+      expect(String(x.as('hello'))).toEqual('X AS "hello"');
     });
 
     it('should work with undefined', () => {
@@ -193,11 +193,11 @@ describe('SqlAlias', () => {
   });
 
   describe('#changeAlias', () => {
-    const x = SqlAlias.create(SqlRef.column('X'), 'test');
-    const z = SqlAlias.create(SqlRef.column('Z'), RefName.create('test', true));
+    const x = SqlAlias.create(SqlRef.columnWithoutQuotes('X'), 'test');
+    const z = SqlAlias.create(SqlRef.columnWithoutQuotes('Z'), RefName.create('test', true));
 
     it('should work with normal string', () => {
-      expect(String(x.changeAlias('hello'))).toEqual('X AS hello');
+      expect(String(x.changeAlias('hello'))).toEqual('X AS "hello"');
     });
 
     it('should preserve quotes', () => {

@@ -50,16 +50,18 @@ describe('SqlRef', () => {
       expect(String(SqlRef.column('as'))).toEqual(`"as"`);
     });
 
-    it('is cool with reserved alias', () => {
-      expect(String(SqlRef.column('user'))).toEqual(`user`);
-    });
-
     it('works with . and "', () => {
       expect(String(SqlRef.column('wiki.pe"dia'))).toEqual(`"wiki.pe""dia"`);
     });
 
     it('works with column starting with a number', () => {
       expect(String(SqlRef.column('3d'))).toEqual(`"3d"`);
+    });
+  });
+
+  describe('#columnWithoutQuotes', () => {
+    it('is cool with reserved alias', () => {
+      expect(String(SqlRef.columnWithoutQuotes('user'))).toEqual(`user`);
     });
   });
 

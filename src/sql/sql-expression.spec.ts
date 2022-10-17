@@ -106,7 +106,7 @@ describe('SqlExpression', () => {
     });
 
     describe('.fromTimeRefAndInterval', () => {
-      const timeRef = SqlRef.column('__time');
+      const timeRef = SqlRef.columnWithoutQuotes('__time');
 
       it('works for a single interval', () => {
         expect(
@@ -135,11 +135,11 @@ describe('SqlExpression', () => {
   });
 
   describe('factories (methods)', () => {
-    const x = SqlRef.column('x');
-    const y = SqlRef.column('y');
+    const x = SqlRef.columnWithoutQuotes('x');
+    const y = SqlRef.columnWithoutQuotes('y');
 
     it('works with as', () => {
-      expect(String(x.as('lol'))).toEqual('x AS lol');
+      expect(String(x.as('lol'))).toEqual('x AS "lol"');
     });
 
     it('works with toOrderByExpression', () => {
@@ -295,7 +295,7 @@ describe('SqlExpression', () => {
         SqlExpression.parse(`? < ?`)
           .fillPlaceholders([SqlRef.column('A'), 5])
           .toString(),
-      ).toEqual(`A < 5`);
+      ).toEqual(`"A" < 5`);
     });
 
     it('works in missing placeholder', () => {
@@ -303,7 +303,7 @@ describe('SqlExpression', () => {
         SqlExpression.parse(`? BETWEEN ? AND ?`)
           .fillPlaceholders([SqlRef.column('A'), 5])
           .toString(),
-      ).toEqual(`A BETWEEN 5 AND ?`);
+      ).toEqual(`"A" BETWEEN 5 AND ?`);
     });
   });
 

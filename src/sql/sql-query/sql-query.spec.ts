@@ -154,7 +154,7 @@ describe('SqlQuery', () => {
     it('works', () => {
       expect(String(SqlQuery.create(SqlTableRef.create('lol')))).toEqual(sane`
         SELECT *
-        FROM lol
+        FROM "lol"
       `);
     });
 
@@ -170,11 +170,11 @@ describe('SqlQuery', () => {
 
       expect(String(query)).toEqual(sane`
         SELECT
-          channel,
-          page,
-          user,
+          "channel",
+          "page",
+          "user",
           "as"
-        FROM lol
+        FROM "lol"
         WHERE channel  =  '#en.wikipedia'
       `);
     });
@@ -182,7 +182,7 @@ describe('SqlQuery', () => {
 
   describe('.from', () => {
     it('works', () => {
-      expect(String(SqlQuery.from(SqlTableRef.create('lol')))).toEqual(sane`
+      expect(String(SqlQuery.from(SqlTableRef.createWithoutQuotes('lol')))).toEqual(sane`
         SELECT ...
         FROM lol
       `);
@@ -486,7 +486,7 @@ describe('SqlQuery', () => {
             "spacing": Object {},
             "tableRefName": RefName {
               "name": "hello",
-              "quotes": false,
+              "quotes": true,
             },
             "type": "tableRef",
           },
