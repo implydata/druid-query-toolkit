@@ -96,7 +96,7 @@ describe('SqlFunction', () => {
 
   it('.floor', () => {
     expect(SqlFunction.floor(SqlRef.column('__time'), 'Hour').toString()).toEqual(
-      'FLOOR(__time TO Hour)',
+      'FLOOR("__time" TO Hour)',
     );
   });
 
@@ -792,14 +792,14 @@ describe('SqlFunction', () => {
       const sql = SqlExpression.parse(
         `SUM(t."lol") FILTER (WHERE t."country" = 'USA')`,
       ) as SqlFunction;
-      expect(String(sql.changeWhereExpression(`t."country" = 'UK'`))).toEqual(
+      expect(String(sql.changeWhereExpression(SqlExpression.parse(`t."country" = 'UK'`)))).toEqual(
         'SUM(t."lol") FILTER (WHERE t."country" = \'UK\')',
       );
     });
 
     it('adds', () => {
       const sql = SqlExpression.parse(`SUM(t."lol")`) as SqlFunction;
-      expect(String(sql.changeWhereExpression(`t."country" = 'UK'`))).toEqual(
+      expect(String(sql.changeWhereExpression(SqlExpression.parse(`t."country" = 'UK'`)))).toEqual(
         'SUM(t."lol") FILTER (WHERE t."country" = \'UK\')',
       );
     });
@@ -810,16 +810,16 @@ describe('SqlFunction', () => {
       const sql = SqlExpression.parse(
         `SUM(t."lol") FILTER (WHERE t."country" = 'USA' OR t."city" = 'SF')`,
       ) as SqlFunction;
-      expect(String(sql.addWhereExpression(`t."browser" = 'Chrome'`))).toEqual(
+      expect(String(sql.addWhereExpression(SqlExpression.parse(`t."browser" = 'Chrome'`)))).toEqual(
         `SUM(t."lol") FILTER (WHERE (t."country" = 'USA' OR t."city" = 'SF') AND t."browser" = 'Chrome')`,
       );
     });
 
     it('adds when nothing exists', () => {
       const sql = SqlExpression.parse(`SUM(t."lol")`) as SqlFunction;
-      expect(String(sql.changeWhereExpression(`t."browser" = 'Chrome'`))).toEqual(
-        'SUM(t."lol") FILTER (WHERE t."browser" = \'Chrome\')',
-      );
+      expect(
+        String(sql.changeWhereExpression(SqlExpression.parse(`t."browser" = 'Chrome'`))),
+      ).toEqual('SUM(t."lol") FILTER (WHERE t."browser" = \'Chrome\')');
     });
   });
 });

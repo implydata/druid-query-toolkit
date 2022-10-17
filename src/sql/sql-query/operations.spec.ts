@@ -51,7 +51,7 @@ describe('SqlQuery operations', () => {
       );
 
       expect(String(query.prependWith('wiki', withQuery))).toEqual(sane`
-        WITH wiki AS (SELECT * FROM "wikipedia"
+        WITH "wiki" AS (SELECT * FROM "wikipedia"
         WHERE channel = 'en')
         SELECT __time FROM "wiki"
       `);
@@ -75,7 +75,7 @@ describe('SqlQuery operations', () => {
 
       expect(String(query.prependWith('wiki2', withQuery))).toEqual(sane`
         WITH
-          wiki2 AS (SELECT * FROM "wikipedia"
+          "wiki2" AS (SELECT * FROM "wikipedia"
         WHERE channel = 'he'),
         wiki AS (SELECT * FROM "wiki2" WHERE channel = 'en')
         SELECT __time FROM "wiki"
@@ -99,7 +99,7 @@ describe('SqlQuery operations', () => {
 
       expect(String(query.prependWith('wiki', withQuery))).toEqual(sane`
         EXPLAIN PLAN FOR
-        WITH wiki AS (SELECT * FROM "wikipedia"
+        WITH "wiki" AS (SELECT * FROM "wikipedia"
         WHERE channel = 'en')
         SELECT __time FROM "wiki"
       `);
@@ -292,7 +292,7 @@ describe('SqlQuery operations', () => {
       ).toEqual(sane`
         SELECT *
         FROM sys."github"
-        ORDER BY col DESC
+        ORDER BY "col" DESC
       `);
     });
 
@@ -342,7 +342,7 @@ describe('SqlQuery operations', () => {
             FROM sys."github"
           `,
         )
-          .addWhere(`col > 1`)
+          .addWhere(SqlExpression.parse(`col > 1`))
           .toString(),
       ).toEqual(sane`
         SELECT *
@@ -360,7 +360,7 @@ describe('SqlQuery operations', () => {
             WHERE col > 1
           `,
         )
-          .addWhere(`colTwo > 2`)
+          .addWhere(SqlExpression.parse(`colTwo > 2`))
           .toString(),
       ).toEqual(sane`
         SELECT *
@@ -377,7 +377,7 @@ describe('SqlQuery operations', () => {
             FROM sys."github" WHERE col > 1 OR col < 5
           `,
         )
-          .addWhere(`colTwo > 2`)
+          .addWhere(SqlExpression.parse(`colTwo > 2`))
           .toString(),
       ).toEqual(sane`
         SELECT *
@@ -393,7 +393,7 @@ describe('SqlQuery operations', () => {
             FROM sys."github" WHERE (col > 1 OR col < 5) AND colTwo > 5
           `,
         )
-          .addWhere(`colTwo > 2`)
+          .addWhere(SqlExpression.parse(`colTwo > 2`))
           .toString(),
       ).toEqual(sane`
         SELECT *
@@ -727,7 +727,7 @@ describe('SqlQuery operations', () => {
         GROUP BY 2
       `);
 
-      expect(sql.addGroupBy(`reverse(col2)`).toString()).toEqual(sane`
+      expect(sql.addGroupBy(SqlExpression.parse(`reverse(col2)`)).toString()).toEqual(sane`
         select col1, min(col1) AS aliasName
         from tbl
         GROUP BY 2, reverse(col2)

@@ -35,7 +35,9 @@ describe('SqlQuery', () => {
       `Select * from tbl Limit 10 offset 5`,
       `(Select * from tbl)`,
       `Select count(*) As sums from tbl`,
-      `Select count(*) As sums from tbl GROUP BY ()`,
+      `Select count(*) As sums from tbl GROUP BY ( )`,
+      `SELECT comment, page, COUNT(*) AS "Count" FROM wikipedia GROUP BY (comment, page) ORDER BY 3 DESC`,
+      `SELECT comment, page, COUNT(*) AS "Count" FROM wikipedia GROUP BY ROLLUP (comment, page) ORDER BY 3 DESC`,
       `SELECT distinct dim1 FROM druid.foo`,
       sane`
         SELECT
@@ -152,7 +154,7 @@ describe('SqlQuery', () => {
     it('works', () => {
       expect(String(SqlQuery.create(SqlTableRef.create('lol')))).toEqual(sane`
         SELECT *
-        FROM lol
+        FROM "lol"
       `);
     });
 
@@ -164,15 +166,15 @@ describe('SqlQuery', () => {
           SqlRef.column('user'),
           SqlRef.column('as'),
         ])
-        .changeWhereExpression(`channel  =  '#en.wikipedia'`);
+        .changeWhereExpression(SqlExpression.parse(`channel  =  '#en.wikipedia'`));
 
       expect(String(query)).toEqual(sane`
         SELECT
-          channel,
-          page,
-          user,
+          "channel",
+          "page",
+          "user",
           "as"
-        FROM lol
+        FROM "lol"
         WHERE channel  =  '#en.wikipedia'
       `);
     });
@@ -180,7 +182,7 @@ describe('SqlQuery', () => {
 
   describe('.from', () => {
     it('works', () => {
-      expect(String(SqlQuery.from(SqlTableRef.create('lol')))).toEqual(sane`
+      expect(String(SqlQuery.from(SqlTableRef.createWithoutQuotes('lol')))).toEqual(sane`
         SELECT ...
         FROM lol
       `);
@@ -484,7 +486,7 @@ describe('SqlQuery', () => {
             "spacing": Object {},
             "tableRefName": RefName {
               "name": "hello",
-              "quotes": false,
+              "quotes": true,
             },
             "type": "tableRef",
           },
@@ -512,7 +514,8 @@ describe('SqlQuery', () => {
     `);
 
     it('adds last', () => {
-      expect(sql.addSelect(`"new_column" AS "New column"`).toString()).toEqual(sane`
+      const select = SqlExpression.parse(`"new_column" AS "New column"`);
+      expect(sql.addSelect(select).toString()).toEqual(sane`
         SELECT
           isAnonymous,
           cityName,
@@ -527,8 +530,8 @@ describe('SqlQuery', () => {
     });
 
     it('adds first', () => {
-      expect(sql.addSelect(`"new_column" AS "New column"`, { insertIndex: 0 }).toString())
-        .toEqual(sane`
+      const select = SqlExpression.parse(`"new_column" AS "New column"`);
+      expect(sql.addSelect(select, { insertIndex: 0 }).toString()).toEqual(sane`
         SELECT
           "new_column" AS "New column",
           isAnonymous,
@@ -543,10 +546,9 @@ describe('SqlQuery', () => {
     });
 
     it('adds grouped', () => {
+      const select = SqlExpression.parse(`UPPER(city) AS City`);
       expect(
-        sql
-          .addSelect(`UPPER(city) AS City`, { insertIndex: 'last-grouping', addToGroupBy: 'end' })
-          .toString(),
+        sql.addSelect(select, { insertIndex: 'last-grouping', addToGroupBy: 'end' }).toString(),
       ).toEqual(sane`
         SELECT
           isAnonymous,
@@ -562,9 +564,10 @@ describe('SqlQuery', () => {
     });
 
     it('adds sorted', () => {
+      const select = SqlExpression.parse(`COUNT(DISTINCT "user") AS unique_users`);
       expect(
         sql
-          .addSelect(`COUNT(DISTINCT "user") AS unique_users`, {
+          .addSelect(select, {
             insertIndex: 'last',
             addToOrderBy: 'start',
             direction: 'DESC',
@@ -585,9 +588,10 @@ describe('SqlQuery', () => {
     });
 
     it('adds grouped + sorted', () => {
+      const select = SqlExpression.parse(`UPPER(city) AS City`);
       expect(
         sql
-          .addSelect(`UPPER(city) AS City`, {
+          .addSelect(select, {
             insertIndex: 'last-grouping',
             addToGroupBy: 'end',
             addToOrderBy: 'end',
@@ -622,7 +626,8 @@ describe('SqlQuery', () => {
     `);
 
     it('adds last', () => {
-      expect(sql.changeSelect(2, `"new_column" AS "New column"`).toString()).toEqual(sane`
+      const select = SqlExpression.parse(`"new_column" AS "New column"`);
+      expect(sql.changeSelect(2, select).toString()).toEqual(sane`
         SELECT
           isAnonymous,
           cityName,
@@ -1937,6 +1942,7 @@ describe('SqlQuery', () => {
             "type": "fromClause",
           },
           "groupByClause": SqlGroupByClause {
+            "decorator": undefined,
             "expressions": SeparatedArray {
               "separators": Array [],
               "values": Array [
@@ -1954,6 +1960,7 @@ describe('SqlQuery', () => {
                 },
               ],
             },
+            "innerParens": false,
             "keywords": Object {
               "by": "by",
               "group": "group",
@@ -2040,6 +2047,7 @@ describe('SqlQuery', () => {
             "type": "fromClause",
           },
           "groupByClause": SqlGroupByClause {
+            "decorator": undefined,
             "expressions": SeparatedArray {
               "separators": Array [],
               "values": Array [
@@ -2057,6 +2065,7 @@ describe('SqlQuery', () => {
                 },
               ],
             },
+            "innerParens": false,
             "keywords": Object {
               "by": "by",
               "group": "group",
@@ -2143,6 +2152,7 @@ describe('SqlQuery', () => {
             "type": "fromClause",
           },
           "groupByClause": SqlGroupByClause {
+            "decorator": undefined,
             "expressions": SeparatedArray {
               "separators": Array [
                 Separator {
@@ -2178,6 +2188,7 @@ describe('SqlQuery', () => {
                 },
               ],
             },
+            "innerParens": false,
             "keywords": Object {
               "by": "by",
               "group": "group",
@@ -3034,6 +3045,637 @@ describe('SqlQuery', () => {
             "postSelect": " ",
             "preFromClause": " ",
             "preOrderByClause": " ",
+          },
+          "type": "query",
+          "unionQuery": undefined,
+          "whereClause": undefined,
+          "withClause": undefined,
+        }
+      `);
+    });
+
+    it('Simple select with group by with parens', () => {
+      const sql = sane`
+        SELECT
+          comment,
+          page,
+          COUNT(*) AS "Count"
+        FROM wikipedia
+        GROUP BY (comment, page)
+        ORDER BY 3 DESC
+      `;
+
+      backAndForth(sql);
+
+      expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
+        SqlQuery {
+          "clusteredByClause": undefined,
+          "decorator": undefined,
+          "explainClause": undefined,
+          "fromClause": SqlFromClause {
+            "expressions": SeparatedArray {
+              "separators": Array [],
+              "values": Array [
+                SqlTableRef {
+                  "keywords": Object {},
+                  "namespaceRefName": undefined,
+                  "parens": undefined,
+                  "spacing": Object {},
+                  "tableRefName": RefName {
+                    "name": "wikipedia",
+                    "quotes": false,
+                  },
+                  "type": "tableRef",
+                },
+              ],
+            },
+            "joinParts": undefined,
+            "keywords": Object {
+              "from": "FROM",
+            },
+            "parens": undefined,
+            "spacing": Object {
+              "postFrom": " ",
+            },
+            "type": "fromClause",
+          },
+          "groupByClause": SqlGroupByClause {
+            "decorator": undefined,
+            "expressions": SeparatedArray {
+              "separators": Array [
+                Separator {
+                  "left": "",
+                  "right": " ",
+                  "separator": ",",
+                },
+              ],
+              "values": Array [
+                SqlRef {
+                  "columnRefName": RefName {
+                    "name": "comment",
+                    "quotes": false,
+                  },
+                  "keywords": Object {},
+                  "namespaceRefName": undefined,
+                  "parens": undefined,
+                  "spacing": Object {},
+                  "tableRefName": undefined,
+                  "type": "ref",
+                },
+                SqlRef {
+                  "columnRefName": RefName {
+                    "name": "page",
+                    "quotes": false,
+                  },
+                  "keywords": Object {},
+                  "namespaceRefName": undefined,
+                  "parens": undefined,
+                  "spacing": Object {},
+                  "tableRefName": undefined,
+                  "type": "ref",
+                },
+              ],
+            },
+            "innerParens": true,
+            "keywords": Object {
+              "by": "BY",
+              "group": "GROUP",
+            },
+            "parens": undefined,
+            "spacing": Object {
+              "postBy": " ",
+              "postExpressions": "",
+              "postGroup": " ",
+              "postLeftParen": "",
+            },
+            "type": "groupByClause",
+          },
+          "havingClause": undefined,
+          "insertClause": undefined,
+          "keywords": Object {
+            "select": "SELECT",
+          },
+          "limitClause": undefined,
+          "offsetClause": undefined,
+          "orderByClause": SqlOrderByClause {
+            "expressions": SeparatedArray {
+              "separators": Array [],
+              "values": Array [
+                SqlOrderByExpression {
+                  "direction": "DESC",
+                  "expression": SqlLiteral {
+                    "keywords": Object {},
+                    "parens": undefined,
+                    "spacing": Object {},
+                    "stringValue": "3",
+                    "type": "literal",
+                    "value": 3,
+                  },
+                  "keywords": Object {
+                    "direction": "DESC",
+                  },
+                  "parens": undefined,
+                  "spacing": Object {
+                    "preDirection": " ",
+                  },
+                  "type": "orderByExpression",
+                },
+              ],
+            },
+            "keywords": Object {
+              "by": "BY",
+              "order": "ORDER",
+            },
+            "parens": undefined,
+            "spacing": Object {
+              "postBy": " ",
+              "postOrder": " ",
+            },
+            "type": "orderByClause",
+          },
+          "parens": undefined,
+          "partitionedByClause": undefined,
+          "replaceClause": undefined,
+          "selectExpressions": SeparatedArray {
+            "separators": Array [
+              Separator {
+                "left": "",
+                "right": "
+          ",
+                "separator": ",",
+              },
+              Separator {
+                "left": "",
+                "right": "
+          ",
+                "separator": ",",
+              },
+            ],
+            "values": Array [
+              SqlRef {
+                "columnRefName": RefName {
+                  "name": "comment",
+                  "quotes": false,
+                },
+                "keywords": Object {},
+                "namespaceRefName": undefined,
+                "parens": undefined,
+                "spacing": Object {},
+                "tableRefName": undefined,
+                "type": "ref",
+              },
+              SqlRef {
+                "columnRefName": RefName {
+                  "name": "page",
+                  "quotes": false,
+                },
+                "keywords": Object {},
+                "namespaceRefName": undefined,
+                "parens": undefined,
+                "spacing": Object {},
+                "tableRefName": undefined,
+                "type": "ref",
+              },
+              SqlAlias {
+                "alias": RefName {
+                  "name": "Count",
+                  "quotes": true,
+                },
+                "columns": undefined,
+                "expression": SqlFunction {
+                  "args": SeparatedArray {
+                    "separators": Array [],
+                    "values": Array [
+                      SqlStar {
+                        "keywords": Object {},
+                        "namespaceRefName": undefined,
+                        "parens": undefined,
+                        "spacing": Object {},
+                        "tableRefName": undefined,
+                        "type": "star",
+                      },
+                    ],
+                  },
+                  "decorator": undefined,
+                  "functionName": "COUNT",
+                  "keywords": Object {
+                    "functionName": "COUNT",
+                  },
+                  "parens": undefined,
+                  "spacing": Object {
+                    "postArguments": "",
+                    "postLeftParen": "",
+                    "preLeftParen": "",
+                  },
+                  "specialParen": undefined,
+                  "type": "function",
+                  "whereClause": undefined,
+                },
+                "keywords": Object {
+                  "as": "AS",
+                },
+                "parens": undefined,
+                "spacing": Object {
+                  "preAlias": " ",
+                  "preAs": " ",
+                },
+                "type": "alias",
+              },
+            ],
+          },
+          "spacing": Object {
+            "postSelect": "
+          ",
+            "preFromClause": "
+        ",
+            "preGroupByClause": "
+        ",
+            "preOrderByClause": "
+        ",
+          },
+          "type": "query",
+          "unionQuery": undefined,
+          "whereClause": undefined,
+          "withClause": undefined,
+        }
+      `);
+    });
+
+    it('Simple select with group by grouping sets', () => {
+      const sql = sane`
+        SELECT
+          comment,
+          page,
+          COUNT(*) AS "Count",
+          GROUPING(comment, page)
+        FROM wikipedia
+        GROUP BY GROUPING SETS ( (comment, page), (comment), (page), ( ) )
+        ORDER BY 3 DESC
+      `;
+
+      backAndForth(sql);
+
+      expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
+        SqlQuery {
+          "clusteredByClause": undefined,
+          "decorator": undefined,
+          "explainClause": undefined,
+          "fromClause": SqlFromClause {
+            "expressions": SeparatedArray {
+              "separators": Array [],
+              "values": Array [
+                SqlTableRef {
+                  "keywords": Object {},
+                  "namespaceRefName": undefined,
+                  "parens": undefined,
+                  "spacing": Object {},
+                  "tableRefName": RefName {
+                    "name": "wikipedia",
+                    "quotes": false,
+                  },
+                  "type": "tableRef",
+                },
+              ],
+            },
+            "joinParts": undefined,
+            "keywords": Object {
+              "from": "FROM",
+            },
+            "parens": undefined,
+            "spacing": Object {
+              "postFrom": " ",
+            },
+            "type": "fromClause",
+          },
+          "groupByClause": SqlGroupByClause {
+            "decorator": "GROUPING SETS",
+            "expressions": SeparatedArray {
+              "separators": Array [
+                Separator {
+                  "left": "",
+                  "right": " ",
+                  "separator": ",",
+                },
+                Separator {
+                  "left": "",
+                  "right": " ",
+                  "separator": ",",
+                },
+                Separator {
+                  "left": "",
+                  "right": " ",
+                  "separator": ",",
+                },
+              ],
+              "values": Array [
+                SqlRecord {
+                  "expressions": SeparatedArray {
+                    "separators": Array [
+                      Separator {
+                        "left": "",
+                        "right": " ",
+                        "separator": ",",
+                      },
+                    ],
+                    "values": Array [
+                      SqlRef {
+                        "columnRefName": RefName {
+                          "name": "comment",
+                          "quotes": false,
+                        },
+                        "keywords": Object {},
+                        "namespaceRefName": undefined,
+                        "parens": undefined,
+                        "spacing": Object {},
+                        "tableRefName": undefined,
+                        "type": "ref",
+                      },
+                      SqlRef {
+                        "columnRefName": RefName {
+                          "name": "page",
+                          "quotes": false,
+                        },
+                        "keywords": Object {},
+                        "namespaceRefName": undefined,
+                        "parens": undefined,
+                        "spacing": Object {},
+                        "tableRefName": undefined,
+                        "type": "ref",
+                      },
+                    ],
+                  },
+                  "keywords": Object {
+                    "row": "",
+                  },
+                  "parens": undefined,
+                  "spacing": Object {
+                    "postExpressions": "",
+                    "postLeftParen": "",
+                  },
+                  "type": "record",
+                },
+                SqlRef {
+                  "columnRefName": RefName {
+                    "name": "comment",
+                    "quotes": false,
+                  },
+                  "keywords": Object {},
+                  "namespaceRefName": undefined,
+                  "parens": Array [
+                    Object {
+                      "leftSpacing": "",
+                      "rightSpacing": "",
+                    },
+                  ],
+                  "spacing": Object {},
+                  "tableRefName": undefined,
+                  "type": "ref",
+                },
+                SqlRef {
+                  "columnRefName": RefName {
+                    "name": "page",
+                    "quotes": false,
+                  },
+                  "keywords": Object {},
+                  "namespaceRefName": undefined,
+                  "parens": Array [
+                    Object {
+                      "leftSpacing": "",
+                      "rightSpacing": "",
+                    },
+                  ],
+                  "spacing": Object {},
+                  "tableRefName": undefined,
+                  "type": "ref",
+                },
+                SqlRecord {
+                  "expressions": undefined,
+                  "keywords": Object {
+                    "row": "",
+                  },
+                  "parens": undefined,
+                  "spacing": Object {
+                    "postLeftParen": " ",
+                  },
+                  "type": "record",
+                },
+              ],
+            },
+            "innerParens": true,
+            "keywords": Object {
+              "by": "BY",
+              "decorator": "GROUPING SETS",
+              "group": "GROUP",
+            },
+            "parens": undefined,
+            "spacing": Object {
+              "postBy": " ",
+              "postDecorator": " ",
+              "postExpressions": " ",
+              "postGroup": " ",
+              "postLeftParen": " ",
+            },
+            "type": "groupByClause",
+          },
+          "havingClause": undefined,
+          "insertClause": undefined,
+          "keywords": Object {
+            "select": "SELECT",
+          },
+          "limitClause": undefined,
+          "offsetClause": undefined,
+          "orderByClause": SqlOrderByClause {
+            "expressions": SeparatedArray {
+              "separators": Array [],
+              "values": Array [
+                SqlOrderByExpression {
+                  "direction": "DESC",
+                  "expression": SqlLiteral {
+                    "keywords": Object {},
+                    "parens": undefined,
+                    "spacing": Object {},
+                    "stringValue": "3",
+                    "type": "literal",
+                    "value": 3,
+                  },
+                  "keywords": Object {
+                    "direction": "DESC",
+                  },
+                  "parens": undefined,
+                  "spacing": Object {
+                    "preDirection": " ",
+                  },
+                  "type": "orderByExpression",
+                },
+              ],
+            },
+            "keywords": Object {
+              "by": "BY",
+              "order": "ORDER",
+            },
+            "parens": undefined,
+            "spacing": Object {
+              "postBy": " ",
+              "postOrder": " ",
+            },
+            "type": "orderByClause",
+          },
+          "parens": undefined,
+          "partitionedByClause": undefined,
+          "replaceClause": undefined,
+          "selectExpressions": SeparatedArray {
+            "separators": Array [
+              Separator {
+                "left": "",
+                "right": "
+          ",
+                "separator": ",",
+              },
+              Separator {
+                "left": "",
+                "right": "
+          ",
+                "separator": ",",
+              },
+              Separator {
+                "left": "",
+                "right": "
+          ",
+                "separator": ",",
+              },
+            ],
+            "values": Array [
+              SqlRef {
+                "columnRefName": RefName {
+                  "name": "comment",
+                  "quotes": false,
+                },
+                "keywords": Object {},
+                "namespaceRefName": undefined,
+                "parens": undefined,
+                "spacing": Object {},
+                "tableRefName": undefined,
+                "type": "ref",
+              },
+              SqlRef {
+                "columnRefName": RefName {
+                  "name": "page",
+                  "quotes": false,
+                },
+                "keywords": Object {},
+                "namespaceRefName": undefined,
+                "parens": undefined,
+                "spacing": Object {},
+                "tableRefName": undefined,
+                "type": "ref",
+              },
+              SqlAlias {
+                "alias": RefName {
+                  "name": "Count",
+                  "quotes": true,
+                },
+                "columns": undefined,
+                "expression": SqlFunction {
+                  "args": SeparatedArray {
+                    "separators": Array [],
+                    "values": Array [
+                      SqlStar {
+                        "keywords": Object {},
+                        "namespaceRefName": undefined,
+                        "parens": undefined,
+                        "spacing": Object {},
+                        "tableRefName": undefined,
+                        "type": "star",
+                      },
+                    ],
+                  },
+                  "decorator": undefined,
+                  "functionName": "COUNT",
+                  "keywords": Object {
+                    "functionName": "COUNT",
+                  },
+                  "parens": undefined,
+                  "spacing": Object {
+                    "postArguments": "",
+                    "postLeftParen": "",
+                    "preLeftParen": "",
+                  },
+                  "specialParen": undefined,
+                  "type": "function",
+                  "whereClause": undefined,
+                },
+                "keywords": Object {
+                  "as": "AS",
+                },
+                "parens": undefined,
+                "spacing": Object {
+                  "preAlias": " ",
+                  "preAs": " ",
+                },
+                "type": "alias",
+              },
+              SqlFunction {
+                "args": SeparatedArray {
+                  "separators": Array [
+                    Separator {
+                      "left": "",
+                      "right": " ",
+                      "separator": ",",
+                    },
+                  ],
+                  "values": Array [
+                    SqlRef {
+                      "columnRefName": RefName {
+                        "name": "comment",
+                        "quotes": false,
+                      },
+                      "keywords": Object {},
+                      "namespaceRefName": undefined,
+                      "parens": undefined,
+                      "spacing": Object {},
+                      "tableRefName": undefined,
+                      "type": "ref",
+                    },
+                    SqlRef {
+                      "columnRefName": RefName {
+                        "name": "page",
+                        "quotes": false,
+                      },
+                      "keywords": Object {},
+                      "namespaceRefName": undefined,
+                      "parens": undefined,
+                      "spacing": Object {},
+                      "tableRefName": undefined,
+                      "type": "ref",
+                    },
+                  ],
+                },
+                "decorator": undefined,
+                "functionName": "GROUPING",
+                "keywords": Object {
+                  "functionName": "GROUPING",
+                },
+                "parens": undefined,
+                "spacing": Object {
+                  "postArguments": "",
+                  "postLeftParen": "",
+                  "preLeftParen": "",
+                },
+                "specialParen": undefined,
+                "type": "function",
+                "whereClause": undefined,
+              },
+            ],
+          },
+          "spacing": Object {
+            "postSelect": "
+          ",
+            "preFromClause": "
+        ",
+            "preGroupByClause": "
+        ",
+            "preOrderByClause": "
+        ",
           },
           "type": "query",
           "unionQuery": undefined,
@@ -4660,6 +5302,7 @@ describe('SqlQuery', () => {
             "type": "fromClause",
           },
           "groupByClause": SqlGroupByClause {
+            "decorator": undefined,
             "expressions": SeparatedArray {
               "separators": Array [],
               "values": Array [
@@ -4677,6 +5320,7 @@ describe('SqlQuery', () => {
                 },
               ],
             },
+            "innerParens": false,
             "keywords": Object {
               "by": "BY",
               "group": "GROUP",
@@ -4924,6 +5568,7 @@ describe('SqlQuery', () => {
             "type": "fromClause",
           },
           "groupByClause": SqlGroupByClause {
+            "decorator": undefined,
             "expressions": SeparatedArray {
               "separators": Array [],
               "values": Array [
@@ -4937,6 +5582,7 @@ describe('SqlQuery', () => {
                 },
               ],
             },
+            "innerParens": false,
             "keywords": Object {
               "by": "BY",
               "group": "GROUP",

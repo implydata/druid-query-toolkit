@@ -49,6 +49,14 @@ export class SqlRef extends SqlExpression {
     });
   }
 
+  static columnWithoutQuotes(column: string, table?: string, namespace?: string) {
+    return new SqlRef({
+      columnRefName: RefName.create(column, false),
+      tableRefName: RefName.maybe(table, false),
+      namespaceRefName: RefName.maybe(namespace, false),
+    });
+  }
+
   public readonly columnRefName: RefName;
   public readonly tableRefName?: RefName;
   public readonly namespaceRefName?: RefName;

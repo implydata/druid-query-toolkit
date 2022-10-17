@@ -25,9 +25,9 @@ export class SqlHavingClause extends SqlClause {
 
   static DEFAULT_HAVING_KEYWORD = 'HAVING';
 
-  static create(expression: SqlExpression | string): SqlHavingClause {
+  static create(expression: SqlExpression): SqlHavingClause {
     return new SqlHavingClause({
-      expression: SqlExpression.parse(expression),
+      expression,
     });
   }
 
@@ -52,9 +52,9 @@ export class SqlHavingClause extends SqlClause {
     ].join('');
   }
 
-  public changeExpression(expression: SqlExpression | string): this {
+  public changeExpression(expression: SqlExpression): this {
     const value = this.valueOf();
-    value.expression = SqlExpression.parse(expression);
+    value.expression = expression;
     return SqlBase.fromValue(value);
   }
 

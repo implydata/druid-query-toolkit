@@ -12,13 +12,14 @@
  * limitations under the License.
  */
 
+import { isEmptyArray } from '../../utils';
 import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../sql-base';
 import { SqlExpression } from '../sql-expression';
 import { LiteralValue } from '../sql-literal/sql-literal';
 import { SeparatedArray, Separator } from '../utils';
 
 export interface SqlRecordValue extends SqlBaseValue {
-  expressions: SeparatedArray<SqlExpression>;
+  expressions?: SeparatedArray<SqlExpression>;
 }
 
 export class SqlRecord extends SqlExpression {
@@ -27,15 +28,18 @@ export class SqlRecord extends SqlExpression {
   static DEFAULT_ROW_KEYWORD = 'ROW';
 
   static create(
-    expressions: SqlRecord | SeparatedArray<SqlExpression> | SqlExpression[],
+    expressions?: SqlRecord | SeparatedArray<SqlExpression> | SqlExpression[],
   ): SqlRecord {
     if (expressions instanceof SqlRecord) return expressions;
     return new SqlRecord({
-      expressions: SeparatedArray.fromArray(expressions, Separator.COMMA),
+      expressions:
+        !expressions || isEmptyArray(expressions)
+          ? undefined
+          : SeparatedArray.fromArray(expressions, Separator.COMMA),
     });
   }
 
-  public readonly expressions: SeparatedArray<SqlExpression>;
+  public readonly expressions?: SeparatedArray<SqlExpression>;
 
   constructor(options: SqlRecordValue) {
     super(options, SqlRecord.type);
@@ -53,26 +57,35 @@ export class SqlRecord extends SqlExpression {
 
     const rowKeyword = this.getKeyword(
       'row',
-      this.expressions.length() === 1 ? SqlRecord.DEFAULT_ROW_KEYWORD : '',
+      this.expressions?.length() === 1 ? SqlRecord.DEFAULT_ROW_KEYWORD : '',
     );
     if (rowKeyword) {
       rawParts.push(rowKeyword, this.getSpace('postRow', ''));
     }
 
-    rawParts.push(
-      '(',
-      this.getSpace('postLeftParen', ''),
-      this.expressions.toString(Separator.COMMA),
-      this.getSpace('postExpressions', ''),
-      ')',
-    );
+    rawParts.push('(', this.getSpace('postLeftParen', ''));
+
+    if (this.expressions) {
+      rawParts.push(
+        this.expressions.toString(Separator.COMMA),
+        this.getSpace('postExpressions', ''),
+      );
+    }
+
+    rawParts.push(')');
 
     return rawParts.join('');
   }
 
-  public changeExpressions(expressions: SeparatedArray<SqlExpression> | SqlExpression[]): this {
+  public changeExpressions(
+    expressions: SeparatedArray<SqlExpression> | SqlExpression[] | undefined,
+  ): this {
     const value = this.valueOf();
-    value.expressions = SeparatedArray.fromArray(expressions, Separator.COMMA);
+    if (!expressions || isEmptyArray(expressions)) {
+      delete value.expressions;
+    } else {
+      value.expressions = SeparatedArray.fromArray(expressions, Separator.COMMA);
+    }
     return SqlBase.fromValue(value);
   }
 
@@ -83,32 +96,43 @@ export class SqlRecord extends SqlExpression {
   ): SqlExpression | undefined {
     let ret = this;
 
-    const expressions = SqlBase.walkSeparatedArray(this.expressions, nextStack, fn, postorder);
-    if (!expressions) return;
-    if (expressions !== this.expressions) {
-      ret = ret.changeExpressions(expressions);
+    if (this.expressions) {
+      const expressions = SqlBase.walkSeparatedArray(this.expressions, nextStack, fn, postorder);
+      if (!expressions) return;
+      if (expressions !== this.expressions) {
+        ret = ret.changeExpressions(expressions);
+      }
     }
 
     return ret;
   }
 
   public clearOwnSeparators(): this {
+    if (!this.expressions) return this;
     const value = this.valueOf();
     value.expressions = this.expressions.clearSeparators();
     return SqlBase.fromValue(value);
   }
 
   public prepend(expression: SqlExpression | LiteralValue): SqlRecord {
-    return this.changeExpressions(this.expressions.prepend(SqlExpression.wrap(expression)));
+    const { expressions } = this;
+    const ex = SqlExpression.wrap(expression);
+    return this.changeExpressions(
+      expressions ? expressions.prepend(ex) : SeparatedArray.fromSingleValue(ex),
+    );
   }
 
   public append(expression: SqlExpression | LiteralValue): SqlRecord {
-    return this.changeExpressions(this.expressions.append(SqlExpression.wrap(expression)));
+    const { expressions } = this;
+    const ex = SqlExpression.wrap(expression);
+    return this.changeExpressions(
+      expressions ? expressions.append(ex) : SeparatedArray.fromSingleValue(ex),
+    );
   }
 
   public unwrapIfSingleton(): SqlExpression {
     const { expressions } = this;
-    if (expressions.length() !== 1 || this.keywords.row) return this;
+    if (expressions?.length() !== 1 || this.keywords.row) return this;
     return expressions
       .get(0)!
       .addParens(this.getSpace('postLeftParen', ''), this.getSpace('postExpressions', ''));

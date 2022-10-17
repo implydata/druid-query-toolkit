@@ -402,7 +402,7 @@ export class SqlQuery extends SqlExpression {
     return SqlBase.fromValue(value);
   }
 
-  public changeWhereExpression(whereExpression: SqlExpression | string | undefined): this {
+  public changeWhereExpression(whereExpression: SqlExpression | undefined): this {
     if (!whereExpression) return this.changeWhereClause(undefined);
     return this.changeWhereClause(
       this.whereClause
@@ -446,7 +446,7 @@ export class SqlQuery extends SqlExpression {
     return SqlBase.fromValue(value);
   }
 
-  public changeHavingExpression(havingExpression: SqlExpression | string | undefined): this {
+  public changeHavingExpression(havingExpression: SqlExpression | undefined): this {
     if (!havingExpression) return this.changeHavingClause(undefined);
     return this.changeHavingClause(
       this.havingClause
@@ -943,14 +943,12 @@ export class SqlQuery extends SqlExpression {
     }
   }
 
-  public addSelect(ex: SqlExpression | string, options: AddSelectOptions = {}): this {
-    const selectExpression = SqlExpression.parse(ex);
+  public addSelect(ex: SqlExpression, options: AddSelectOptions = {}): this {
     const { insertIndex, addToGroupBy, addToOrderBy, orderByExpression, direction } = options;
     const idx = this.decodeInsertIndex(insertIndex);
 
     const selectExpressions =
-      this.selectExpressions?.insert(idx, selectExpression) ||
-      SeparatedArray.fromSingleValue(selectExpression);
+      this.selectExpressions?.insert(idx, ex) || SeparatedArray.fromSingleValue(ex);
 
     let groupByClause = this.groupByClause?.shiftIndexes(idx);
     if (addToGroupBy) {
@@ -976,12 +974,9 @@ export class SqlQuery extends SqlExpression {
       .changeOrderByClause(orderByClause);
   }
 
-  public changeSelect(selectIndex: number, ex: SqlExpression | string): this {
+  public changeSelect(selectIndex: number, ex: SqlExpression): this {
     if (!this.selectExpressions) return this;
-    const selectExpression = SqlExpression.parse(ex);
-    return this.changeSelectExpressions(
-      this.selectExpressions.change(selectIndex, selectExpression),
-    );
+    return this.changeSelectExpressions(this.selectExpressions.change(selectIndex, ex));
   }
 
   public removeSelectIndex(selectIndex: number): this {
@@ -1102,9 +1097,8 @@ export class SqlQuery extends SqlExpression {
     return this.whereClause.expression;
   }
 
-  public addWhere(ex: SqlExpression | string) {
-    const expression = SqlExpression.parse(ex);
-    return this.changeWhereExpression(SqlExpression.and(this.getWhereExpression(), expression));
+  public addWhere(ex: SqlExpression) {
+    return this.changeWhereExpression(SqlExpression.and(this.getWhereExpression(), ex));
   }
 
   // Removes all filters on the specified column from the where clause
@@ -1147,8 +1141,7 @@ export class SqlQuery extends SqlExpression {
     return this.getGroupingExpressionInfos().map(info => info.expression);
   }
 
-  public addGroupBy(expression: SqlExpression | string) {
-    const ex = SqlExpression.parse(expression);
+  public addGroupBy(ex: SqlExpression) {
     return this.changeGroupByClause(
       this.groupByClause ? this.groupByClause.addExpression(ex) : SqlGroupByClause.create([ex]),
     );
@@ -1170,9 +1163,8 @@ export class SqlQuery extends SqlExpression {
     return this.havingClause.expression;
   }
 
-  public addHaving(ex: SqlExpression | string) {
-    const expression = SqlExpression.parse(ex);
-    return this.changeHavingExpression(SqlExpression.and(this.getHavingExpression(), expression));
+  public addHaving(ex: SqlExpression) {
+    return this.changeHavingExpression(SqlExpression.and(this.getHavingExpression(), ex));
   }
 
   public removeFromHaving(column: string) {

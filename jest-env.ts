@@ -12,7 +12,6 @@
  * limitations under the License.
  */
 
-import 'core-js/stable';
 import { format as prettyFormat } from 'pretty-format';
 
 expect.addSnapshotSerializer({

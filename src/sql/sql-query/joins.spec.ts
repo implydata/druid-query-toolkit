@@ -86,7 +86,7 @@ describe('joins', () => {
           .toString(),
       ).toMatchInlineSnapshot(`
         "SELECT countryName from wikipedia
-        LEFT JOIN lookup.country ON lookup.country.v = wikipedia.countryName"
+        LEFT JOIN \\"lookup\\".\\"country\\" ON lookup.country.v = wikipedia.countryName"
       `);
     });
 
@@ -100,7 +100,7 @@ describe('joins', () => {
           .toString(),
       ).toMatchInlineSnapshot(`
         "SELECT countryName from wikipedia
-        LEFT JOIN lookup.country ON lookup.country.v = wikipedia.countryName"
+        LEFT JOIN \\"lookup\\".\\"country\\" ON lookup.country.v = wikipedia.countryName"
       `);
     });
 
@@ -108,7 +108,7 @@ describe('joins', () => {
       expect(
         SqlQuery.parse(`SELECT countryName from wikipedia`)
           .addInnerJoin(
-            SqlRef.column('country', 'lookup'),
+            SqlRef.columnWithoutQuotes('country', 'lookup'),
             SqlExpression.parse('lookup.country.v = wikipedia.countryName'),
           )
           .toString(),

@@ -213,6 +213,7 @@ describe('QueryRunner', () => {
             "type": "fromClause",
           },
           "groupByClause": SqlGroupByClause {
+            "decorator": undefined,
             "expressions": SeparatedArray {
               "separators": Array [],
               "values": Array [
@@ -226,6 +227,7 @@ describe('QueryRunner', () => {
                 },
               ],
             },
+            "innerParens": false,
             "keywords": Object {
               "by": "BY",
               "group": "GROUP",
@@ -452,6 +454,7 @@ describe('QueryRunner', () => {
             "type": "fromClause",
           },
           "groupByClause": SqlGroupByClause {
+            "decorator": undefined,
             "expressions": SeparatedArray {
               "separators": Array [],
               "values": Array [
@@ -465,6 +468,7 @@ describe('QueryRunner', () => {
                 },
               ],
             },
+            "innerParens": false,
             "keywords": Object {
               "by": "BY",
               "group": "GROUP",
@@ -692,6 +696,7 @@ describe('QueryRunner', () => {
             "type": "fromClause",
           },
           "groupByClause": SqlGroupByClause {
+            "decorator": undefined,
             "expressions": SeparatedArray {
               "separators": Array [],
               "values": Array [
@@ -705,6 +710,7 @@ describe('QueryRunner', () => {
                 },
               ],
             },
+            "innerParens": false,
             "keywords": Object {
               "by": "BY",
               "group": "GROUP",

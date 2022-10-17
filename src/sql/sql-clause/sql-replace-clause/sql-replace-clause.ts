@@ -35,7 +35,7 @@ export class SqlReplaceClause extends SqlClause {
 
   static create(
     table: SqlReplaceClause | SqlTableRef | string,
-    where?: SqlWhereClause | SqlExpression | string,
+    where?: SqlWhereClause | SqlExpression,
   ): SqlReplaceClause {
     if (table instanceof SqlReplaceClause) return table;
     if (typeof table === 'string') {

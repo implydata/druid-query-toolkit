@@ -105,9 +105,11 @@ describe('SqlComparison', () => {
 
   describe('factories', () => {
     it('works with IN', () => {
-      expect(SqlComparison.in(SqlRef.column('x'), [1, 2, 3]).toString()).toEqual('x IN (1, 2, 3)');
+      expect(SqlComparison.in(SqlRef.column('x'), [1, 2, 3]).toString()).toEqual(
+        '"x" IN (1, 2, 3)',
+      );
       expect(SqlComparison.notIn(SqlRef.column('x'), [1, 2, 3]).toString()).toEqual(
-        'x NOT IN (1, 2, 3)',
+        '"x" NOT IN (1, 2, 3)',
       );
     });
   });
@@ -261,6 +263,7 @@ describe('SqlComparison', () => {
             "type": "fromClause",
           },
           "groupByClause": SqlGroupByClause {
+            "decorator": undefined,
             "expressions": SeparatedArray {
               "separators": Array [],
               "values": Array [
@@ -274,6 +277,7 @@ describe('SqlComparison', () => {
                 },
               ],
             },
+            "innerParens": false,
             "keywords": Object {
               "by": "BY",
               "group": "GROUP",

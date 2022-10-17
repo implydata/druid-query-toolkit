@@ -19,7 +19,11 @@ import { SqlLiteral } from '../../sql-literal/sql-literal';
 import { SeparatedArray } from '../../utils';
 import { SqlClause, SqlClauseValue } from '../sql-clause';
 
+export type SqlGroupByDecorator = 'ROLLUP' | 'CUBE' | 'GROUPING SETS';
+
 export interface SqlGroupByClauseValue extends SqlClauseValue {
+  decorator?: SqlGroupByDecorator;
+  innerParens?: boolean;
   expressions?: SeparatedArray<SqlExpression>;
 }
 
@@ -29,33 +33,60 @@ export class SqlGroupByClause extends SqlClause {
   static DEFAULT_GROUP_KEYWORD = 'GROUP';
   static DEFAULT_BY_KEYWORD = 'BY';
 
-  static create(expressions: SeparatedArray<SqlExpression> | SqlExpression[]): SqlGroupByClause {
+  static create(expressions?: SeparatedArray<SqlExpression> | SqlExpression[]): SqlGroupByClause {
     return new SqlGroupByClause({
-      expressions: isEmptyArray(expressions) ? undefined : SeparatedArray.fromArray(expressions),
+      expressions:
+        !expressions || isEmptyArray(expressions)
+          ? undefined
+          : SeparatedArray.fromArray(expressions),
     });
   }
 
+  public readonly decorator?: SqlGroupByDecorator;
+  public readonly innerParens: boolean;
   public readonly expressions?: SeparatedArray<SqlExpression>;
 
   constructor(options: SqlGroupByClauseValue) {
     super(options, SqlGroupByClause.type);
+    this.decorator = options.decorator;
+    this.innerParens = Boolean(options.innerParens);
     this.expressions = options.expressions;
   }
 
   public valueOf(): SqlGroupByClauseValue {
     const value = super.valueOf() as SqlGroupByClauseValue;
+    value.decorator = this.decorator;
+    if (this.innerParens) value.innerParens = true;
     value.expressions = this.expressions;
     return value;
   }
 
   protected _toRawString(): string {
-    return [
+    const rawParts = [
       this.getKeyword('group', SqlGroupByClause.DEFAULT_GROUP_KEYWORD),
       this.getSpace('postGroup'),
       this.getKeyword('by', SqlGroupByClause.DEFAULT_BY_KEYWORD),
       this.getSpace('postBy'),
-      this.expressions ? this.expressions.toString() : '()',
-    ].join('');
+    ];
+
+    if (this.decorator) {
+      rawParts.push(this.getKeyword('decorator', this.decorator), this.getSpace('postDecorator'));
+    }
+
+    const effectiveInnerParens = Boolean(this.innerParens || !this.expressions);
+    if (effectiveInnerParens) {
+      rawParts.push('(', this.getSpace('postLeftParen', ''));
+    }
+
+    if (this.expressions) {
+      rawParts.push(this.expressions.toString(), this.getSpace('postExpressions', ''));
+    }
+
+    if (effectiveInnerParens) {
+      rawParts.push(')');
+    }
+
+    return rawParts.join('');
   }
 
   public changeExpressions(

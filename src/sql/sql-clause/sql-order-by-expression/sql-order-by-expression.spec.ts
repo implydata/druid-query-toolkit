@@ -28,16 +28,12 @@ describe('SqlOrderByExpression', () => {
   });
 
   it('#reverseDirection', () => {
-    expect(
-      String(SqlOrderByExpression.create(SqlRef.column('x'), 'DESC').reverseDirection()),
-    ).toEqual('x ASC');
+    const x = SqlRef.columnWithoutQuotes('x');
 
-    expect(
-      String(SqlOrderByExpression.create(SqlRef.column('x'), 'ASC').reverseDirection()),
-    ).toEqual('x DESC');
+    expect(String(SqlOrderByExpression.create(x, 'DESC').reverseDirection())).toEqual('x ASC');
 
-    expect(String(SqlOrderByExpression.create(SqlRef.column('x')).reverseDirection())).toEqual(
-      'x DESC',
-    );
+    expect(String(SqlOrderByExpression.create(x, 'ASC').reverseDirection())).toEqual('x DESC');
+
+    expect(String(SqlOrderByExpression.create(x).reverseDirection())).toEqual('x DESC');
   });
 });

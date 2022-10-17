@@ -63,7 +63,7 @@ describe('SqlExpression', () => {
       });
 
       it('works in single clause case', () => {
-        expect(String(SqlExpression.and('c < 10'))).toEqual('c < 10');
+        expect(String(SqlExpression.and(SqlExpression.parse('c < 10')))).toEqual('c < 10');
       });
 
       it('works in general case', () => {
@@ -72,9 +72,9 @@ describe('SqlExpression', () => {
             SqlExpression.and(
               SqlExpression.parse('a OR b'),
               SqlExpression.parse('x AND y'),
-              'c < 10',
+              SqlExpression.parse('c < 10'),
               undefined,
-              'NOT k = 1',
+              SqlExpression.parse('NOT k = 1'),
             ),
           ),
         ).toEqual('(a OR b) AND (x AND y) AND c < 10 AND NOT k = 1');
@@ -87,7 +87,7 @@ describe('SqlExpression', () => {
       });
 
       it('works in single clause case', () => {
-        expect(String(SqlExpression.or('c < 10'))).toEqual('c < 10');
+        expect(String(SqlExpression.or(SqlExpression.parse('c < 10')))).toEqual('c < 10');
       });
 
       it('works in general case', () => {
@@ -96,9 +96,9 @@ describe('SqlExpression', () => {
             SqlExpression.or(
               SqlExpression.parse('a OR b'),
               SqlExpression.parse('x AND y'),
-              'c < 10',
+              SqlExpression.parse('c < 10'),
               undefined,
-              'NOT k = 1',
+              SqlExpression.parse('NOT k = 1'),
             ),
           ),
         ).toEqual('(a OR b) OR (x AND y) OR c < 10 OR NOT k = 1');
@@ -106,7 +106,7 @@ describe('SqlExpression', () => {
     });
 
     describe('.fromTimeRefAndInterval', () => {
-      const timeRef = SqlRef.column('__time');
+      const timeRef = SqlRef.columnWithoutQuotes('__time');
 
       it('works for a single interval', () => {
         expect(
@@ -135,11 +135,11 @@ describe('SqlExpression', () => {
   });
 
   describe('factories (methods)', () => {
-    const x = SqlRef.column('x');
-    const y = SqlRef.column('y');
+    const x = SqlRef.columnWithoutQuotes('x');
+    const y = SqlRef.columnWithoutQuotes('y');
 
     it('works with as', () => {
-      expect(String(x.as('lol'))).toEqual('x AS lol');
+      expect(String(x.as('lol'))).toEqual('x AS "lol"');
     });
 
     it('works with toOrderByExpression', () => {
@@ -291,13 +291,19 @@ describe('SqlExpression', () => {
 
   describe('#fillPlaceholders', () => {
     it('works in basic case', () => {
-      expect(SqlExpression.parse(`? < ?`).fillPlaceholders(['A', '5']).toString()).toEqual(`A < 5`);
+      expect(
+        SqlExpression.parse(`? < ?`)
+          .fillPlaceholders([SqlRef.column('A'), 5])
+          .toString(),
+      ).toEqual(`"A" < 5`);
     });
 
     it('works in missing placeholder', () => {
       expect(
-        SqlExpression.parse(`? BETWEEN ? AND ?`).fillPlaceholders(['A', '5']).toString(),
-      ).toEqual(`A BETWEEN 5 AND ?`);
+        SqlExpression.parse(`? BETWEEN ? AND ?`)
+          .fillPlaceholders([SqlRef.column('A'), 5])
+          .toString(),
+      ).toEqual(`"A" BETWEEN 5 AND ?`);
     });
   });
 

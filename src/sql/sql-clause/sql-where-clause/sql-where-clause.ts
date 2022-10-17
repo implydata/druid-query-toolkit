@@ -25,14 +25,14 @@ export class SqlWhereClause extends SqlClause {
 
   static DEFAULT_WHERE_KEYWORD = 'WHERE';
 
-  static create(expression: SqlWhereClause | SqlExpression | string): SqlWhereClause {
+  static create(expression: SqlWhereClause | SqlExpression): SqlWhereClause {
     if (expression instanceof SqlWhereClause) return expression;
     return new SqlWhereClause({
-      expression: SqlExpression.parse(expression),
+      expression,
     });
   }
 
-  static createForFunction(expression: SqlWhereClause | SqlExpression | string): SqlWhereClause {
+  static createForFunction(expression: SqlWhereClause | SqlExpression): SqlWhereClause {
     return SqlWhereClause.create(expression).addParens();
   }
 
@@ -57,9 +57,9 @@ export class SqlWhereClause extends SqlClause {
     ].join('');
   }
 
-  public changeExpression(expression: SqlExpression | string): this {
+  public changeExpression(expression: SqlExpression): this {
     const value = this.valueOf();
-    value.expression = SqlExpression.parse(expression);
+    value.expression = expression;
     return SqlBase.fromValue(value);
   }
 
