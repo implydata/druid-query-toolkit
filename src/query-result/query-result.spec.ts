@@ -16,18 +16,18 @@ import { Column } from './column';
 import { QueryResult } from './query-result';
 
 describe('QueryResult', () => {
+  const testQueryResult = new QueryResult({
+    header: Column.fromColumnNames(['A', 'B', 'C']),
+    rows: [
+      ['A', '2016-06-27T00:00:00.000Z', 876],
+      ['J', '2016-06-27T01:00:00.000Z', 870],
+      ['K', '2016-06-27T02:00:00.000Z', 960],
+    ],
+  });
+
   describe('#inflateDates', () => {
     it('works', () => {
-      const data = new QueryResult({
-        header: Column.fromColumnNames(['A', 'B', 'C']),
-        rows: [
-          ['A', '2016-06-27T00:00:00.000Z', 876],
-          ['J', '2016-06-27T01:00:00.000Z', 870],
-          ['K', '2016-06-27T02:00:00.000Z', 960],
-        ],
-      });
-
-      expect(data.inflateDatesByGuessing()).toMatchInlineSnapshot(`
+      expect(testQueryResult.inflateDatesByGuessing()).toMatchInlineSnapshot(`
         QueryResult {
           "header": Array [
             Column {
@@ -71,6 +71,48 @@ describe('QueryResult', () => {
           "sqlQueryId": undefined,
         }
       `);
+    });
+  });
+
+  describe('#toObjectArray', () => {
+    it('works', () => {
+      expect(testQueryResult.toObjectArray()).toEqual([
+        {
+          A: 'A',
+          B: '2016-06-27T00:00:00.000Z',
+          C: 876,
+        },
+        {
+          A: 'J',
+          B: '2016-06-27T01:00:00.000Z',
+          C: 870,
+        },
+        {
+          A: 'K',
+          B: '2016-06-27T02:00:00.000Z',
+          C: 960,
+        },
+      ]);
+    });
+  });
+
+  describe('#getColumnByIndex', () => {
+    it('works for invalid index', () => {
+      expect(testQueryResult.getColumnByIndex(3)).toBeUndefined();
+    });
+
+    it('works for valid index', () => {
+      expect(testQueryResult.getColumnByIndex(2)).toEqual([876, 870, 960]);
+    });
+  });
+
+  describe('#getColumnByName', () => {
+    it('works for invalid name', () => {
+      expect(testQueryResult.getColumnByName('foo')).toBeUndefined();
+    });
+
+    it('works for valid name', () => {
+      expect(testQueryResult.getColumnByName('C')).toEqual([876, 870, 960]);
     });
   });
 

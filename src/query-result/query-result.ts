@@ -404,6 +404,29 @@ export class QueryResult {
     return this.rows.length;
   }
 
+  public toObjectArray(): Record<string, any>[] {
+    const headerNames = this.getHeaderNames();
+    const n = headerNames.length;
+    return this.rows.map(row => {
+      const obj: Record<string, any> = {};
+      for (let i = 0; i < n; i++) {
+        obj[headerNames[i]!] = row[i];
+      }
+      return obj;
+    });
+  }
+
+  public getColumnByIndex(columnIndex: number): any[] | undefined {
+    if (!this.header[columnIndex]) return;
+    return this.rows.map(row => row[columnIndex]);
+  }
+
+  public getColumnByName(columnName: string): any[] | undefined {
+    const columnIndex = this.header.findIndex(h => h.name === columnName);
+    if (columnIndex < 0) return;
+    return this.getColumnByIndex(columnIndex);
+  }
+
   public getSqlOuterLimit(): number | undefined {
     const { query } = this;
     if (!query) return;
