@@ -74,6 +74,7 @@ describe('SqlExpression', () => {
               SqlExpression.parse('x AND y'),
               SqlExpression.parse('c < 10'),
               undefined,
+              SqlExpression.parse('TRUE'),
               SqlExpression.parse('NOT k = 1'),
             ),
           ),
@@ -98,6 +99,7 @@ describe('SqlExpression', () => {
               SqlExpression.parse('x AND y'),
               SqlExpression.parse('c < 10'),
               undefined,
+              SqlExpression.parse('FALSE'),
               SqlExpression.parse('NOT k = 1'),
             ),
           ),
@@ -105,14 +107,14 @@ describe('SqlExpression', () => {
       });
     });
 
-    describe('.fromTimeRefAndInterval', () => {
-      const timeRef = SqlColumn.optionalQuotes('__time');
+    describe('.fromTimeExpressionAndInterval', () => {
+      const time = SqlColumn.optionalQuotes('__time');
 
       it('works for a single interval', () => {
         expect(
           String(
-            SqlExpression.fromTimeRefAndInterval(
-              timeRef,
+            SqlExpression.fromTimeExpressionAndInterval(
+              time,
               '2022-04-30T00:00:00.000Z/2022-05-01T00:00:00.000Z',
             ),
           ),
@@ -122,7 +124,7 @@ describe('SqlExpression', () => {
       it('works for multiple intervals', () => {
         expect(
           String(
-            SqlExpression.fromTimeRefAndInterval(timeRef, [
+            SqlExpression.fromTimeExpressionAndInterval(time, [
               '2022-04-30T00:00:00.000Z/2022-04-30T01:00:00.000Z',
               '2022-04-30T02:00:00.000Z/2022-04-30T03:00:00.000Z',
             ]),

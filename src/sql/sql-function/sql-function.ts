@@ -94,12 +94,28 @@ export class SqlFunction extends SqlExpression {
     });
   }
 
-  static count(arg?: SqlExpression, filter?: SqlWhereClause | SqlExpression) {
-    return SqlFunction.simple('COUNT', [arg || SqlStar.PLAIN], filter);
+  static count(arg?: SqlExpression) {
+    return SqlFunction.simple('COUNT', [arg || SqlStar.PLAIN]);
   }
 
-  static countDistinct(arg: SqlExpression, filter?: SqlWhereClause | SqlExpression) {
-    return SqlFunction.decorated('COUNT', 'DISTINCT', [arg], filter);
+  static countDistinct(arg: SqlExpression) {
+    return SqlFunction.decorated('COUNT', 'DISTINCT', [arg]);
+  }
+
+  static sum(arg: SqlExpression) {
+    return SqlFunction.simple('SUM', [arg]);
+  }
+
+  static min(arg: SqlExpression) {
+    return SqlFunction.simple('MIN', [arg]);
+  }
+
+  static max(arg: SqlExpression) {
+    return SqlFunction.simple('MAX', [arg]);
+  }
+
+  static avg(arg: SqlExpression) {
+    return SqlFunction.simple('AVG', [arg]);
   }
 
   static cast(ex: SqlExpression, asType: string): SqlExpression {
@@ -139,10 +155,6 @@ export class SqlFunction extends SqlExpression {
       specialParen: 'square',
       args: SeparatedArray.fromArray(ex),
     });
-  }
-
-  static arrayOfLiterals(xs: LiteralValue[]) {
-    return SqlFunction.array(xs.map(x => SqlLiteral.create(x)));
   }
 
   static stringFormat(format: string | SqlLiteral, ...args: (SqlExpression | LiteralValue)[]) {

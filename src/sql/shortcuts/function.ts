@@ -27,5 +27,9 @@ F.stringFormat = SqlFunction.stringFormat;
 
 F.count = SqlFunction.count;
 F.countDistinct = SqlFunction.countDistinct;
+F.sum = SqlFunction.sum;
+F.min = SqlFunction.min;
+F.max = SqlFunction.max;
+F.avg = SqlFunction.avg;
 
 // ToDo: add way more functions here

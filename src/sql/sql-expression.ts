@@ -66,6 +66,9 @@ export abstract class SqlExpression extends SqlBase {
   static and(...args: (SqlExpression | undefined)[]): SqlExpression {
     const compactArgs = filterMap(args, a => {
       if (!a) return;
+      if (a instanceof SqlLiteral && a.value === true) {
+        return; // Skip no-op TRUE this is  a special case
+      }
       if (a instanceof SqlMulti) {
         return a.ensureParens();
       }
@@ -90,6 +93,9 @@ export abstract class SqlExpression extends SqlBase {
   static or(...args: (SqlExpression | undefined)[]): SqlExpression {
     const compactArgs = filterMap(args, a => {
       if (!a) return;
+      if (a instanceof SqlLiteral && a.value === false) {
+        return; // Skip no-op TRUE this is  a special case
+      }
       if (a instanceof SqlMulti) {
         return a.ensureParens();
       }
@@ -111,10 +117,13 @@ export abstract class SqlExpression extends SqlBase {
     }
   }
 
-  static fromTimeRefAndInterval(timeRef: SqlColumn, interval: string | string[]): SqlExpression {
+  static fromTimeExpressionAndInterval(
+    time: SqlExpression,
+    interval: string | string[],
+  ): SqlExpression {
     if (Array.isArray(interval)) {
       return SqlExpression.or(
-        ...interval.map(int => SqlExpression.fromTimeRefAndInterval(timeRef, int)),
+        ...interval.map(int => SqlExpression.fromTimeExpressionAndInterval(time, int)),
       );
     }
 
@@ -128,8 +137,12 @@ export abstract class SqlExpression extends SqlBase {
     if (isNaN(end.valueOf())) throw new Error(`can not parse the end of interval: ${interval}`);
 
     return SqlLiteral.create(start)
-      .lessThanOrEqual(timeRef)
-      .and(timeRef.lessThan(SqlLiteral.create(end)));
+      .lessThanOrEqual(time)
+      .and(time.lessThan(SqlLiteral.create(end)));
+  }
+
+  static arrayOfLiterals(xs: LiteralValue[]) {
+    return SqlFunction.array(xs.map(x => SqlLiteral.create(x)));
   }
 
   // ------------------------------

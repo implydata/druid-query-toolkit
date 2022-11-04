@@ -65,7 +65,7 @@ describe('SqlColumn', () => {
     });
   });
 
-  it('Ref with double quotes and double quoted namespace', () => {
+  it('with double quotes and double quoted namespace', () => {
     const sql = '"test"."namespace"';
 
     backAndForth(sql);
@@ -98,7 +98,7 @@ describe('SqlColumn', () => {
     `);
   });
 
-  it('Ref with double quotes and no quotes namespace', () => {
+  it('with double quotes and no quotes namespace', () => {
     const sql = '"test".namespace';
 
     backAndForth(sql);
@@ -131,7 +131,7 @@ describe('SqlColumn', () => {
     `);
   });
 
-  it('Ref with no quotes and namespace', () => {
+  it('with no quotes and namespace', () => {
     const sql = 'test.namespace';
 
     backAndForth(sql);
@@ -164,7 +164,7 @@ describe('SqlColumn', () => {
     `);
   });
 
-  it('Ref with no quotes and no namespace', () => {
+  it('with no quotes and no namespace', () => {
     const sql = 'test';
 
     backAndForth(sql);
@@ -184,7 +184,7 @@ describe('SqlColumn', () => {
     `);
   });
 
-  it('Ref with double quotes and no namespace', () => {
+  it('with double quotes and no namespace', () => {
     const sql = '"test"';
 
     backAndForth(sql);
@@ -366,7 +366,7 @@ describe('SqlColumn', () => {
 });
 
 describe('#convertToTable', () => {
-  it('Ref with double quotes upgraded', () => {
+  it('with double quotes upgraded', () => {
     const sql = `"namespace"  . "table"`;
 
     expect((SqlExpression.parse(sql) as SqlColumn).convertToTable().toString()).toEqual(sql);

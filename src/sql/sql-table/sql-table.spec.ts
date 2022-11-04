@@ -15,7 +15,7 @@
 import { SqlExpression, SqlNamespace, SqlTable } from '../..';
 import { backAndForth } from '../../test-utils';
 
-describe('SqlTableRef', () => {
+describe('SqlTable', () => {
   it('things that work', () => {
     const queries: string[] = [`hello`, `"hello"`, `"""hello"""`, `"a""b"`, `a.b`, `"a""b".c`];
 

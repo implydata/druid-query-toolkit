@@ -223,11 +223,11 @@ InsertClause =
   postInsert:__
   into:IntoToken
   postInto:__
-  table:SqlRef
+  table:SqlTable
   columns:(_ SqlColumnList)?
 {
   var value = {
-    table: table.convertToTable(),
+    table: table,
     keywords: {
       insert: insert,
       into: into
@@ -251,7 +251,8 @@ ReplaceClause =
   replace:ReplaceToken
   postReplace:__
   into:IntoToken
-  postInto:__ table:SqlRef
+  postInto:__
+  table:SqlTable
   columns:(_ SqlColumnList)?
   preOverwrite:__
   overwrite:OverwriteToken
@@ -259,7 +260,7 @@ ReplaceClause =
   allOrWhere:(AllToken / SqlWhereClause)
 {
   var value = {
-    table: table.convertToTable(),
+    table: table,
     keywords: {
       replace: replace,
       into: into,
@@ -843,7 +844,7 @@ BaseType =
 / Function
 / SqlValues
 / SqlLiteral
-/ SqlRef
+/ SqlColumn
 / SqlRecordMaybe
 / SqlQueryInParens
 
@@ -1491,7 +1492,7 @@ ArrayEntry = Number / SingleQuotedString / UnicodeString / BinaryString
 
 // ------------------------------
 
-SqlRef = a:RefName b:(_ "." _ RefName)? c:(_ "." _ RefName)?
+SqlColumn = a:RefName b:(_ "." _ RefName)? c:(_ "." _ RefName)?
 {
   if (c) {
     return new sql.SqlColumn({
@@ -1526,6 +1527,27 @@ SqlRef = a:RefName b:(_ "." _ RefName)? c:(_ "." _ RefName)?
 
   } else {
     return new sql.SqlColumn({
+      refName: a,
+    });
+  }
+}
+
+SqlTable = a:RefName b:(_ "." _ RefName)?
+{
+  if (b) {
+    return new sql.SqlTable({
+      refName: b[3],
+      spacing: {
+        postTable: b[0],
+        postDot: b[2],
+      },
+      table: new sql.SqlNamespace({
+        refName: a,
+      })
+    });
+
+  } else {
+    return new sql.SqlTable({
       refName: a,
     });
   }
