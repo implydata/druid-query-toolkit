@@ -13,7 +13,7 @@
  */
 
 import { QueryResult } from '../query-result/query-result';
-import { SqlLiteral, SqlQuery, SqlTableRef } from '../sql';
+import { SqlLiteral, SqlQuery, SqlTable } from '../sql';
 import { filterMap } from '../utils';
 
 export interface TableInfo {
@@ -41,10 +41,10 @@ export class Introspect {
     return queryResult.rows.map(r => ({ name: r[0] }));
   }
 
-  static getTableColumnIntrospectionQuery(thing: SqlTableRef | string): SqlQuery {
+  static getTableColumnIntrospectionQuery(thing: SqlTable | string): SqlQuery {
     let tableName: string;
-    if (thing instanceof SqlTableRef) {
-      tableName = thing.getTable();
+    if (thing instanceof SqlTable) {
+      tableName = thing.getName();
     } else {
       tableName = thing;
     }

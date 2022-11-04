@@ -68,33 +68,31 @@ describe('CaseExpression', () => {
                 "postWhen": " ",
                 "postWhenExpressions": " ",
               },
-              "thenExpression": SqlRef {
-                "columnRefName": RefName {
+              "thenExpression": SqlColumn {
+                "keywords": Object {},
+                "parens": undefined,
+                "refName": RefName {
                   "name": "C",
                   "quotes": false,
                 },
-                "keywords": Object {},
-                "namespaceRefName": undefined,
-                "parens": undefined,
                 "spacing": Object {},
-                "tableRefName": undefined,
-                "type": "ref",
+                "table": undefined,
+                "type": "column",
               },
               "type": "whenThenPart",
               "whenExpressions": SeparatedArray {
                 "separators": Array [],
                 "values": Array [
-                  SqlRef {
-                    "columnRefName": RefName {
+                  SqlColumn {
+                    "keywords": Object {},
+                    "parens": undefined,
+                    "refName": RefName {
                       "name": "B",
                       "quotes": false,
                     },
-                    "keywords": Object {},
-                    "namespaceRefName": undefined,
-                    "parens": undefined,
                     "spacing": Object {},
-                    "tableRefName": undefined,
-                    "type": "ref",
+                    "table": undefined,
+                    "type": "column",
                   },
                 ],
               },
@@ -112,17 +110,16 @@ describe('CaseExpression', () => {
 
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlCase {
-        "caseExpression": SqlRef {
-          "columnRefName": RefName {
+        "caseExpression": SqlColumn {
+          "keywords": Object {},
+          "parens": undefined,
+          "refName": RefName {
             "name": "A",
             "quotes": false,
           },
-          "keywords": Object {},
-          "namespaceRefName": undefined,
-          "parens": undefined,
           "spacing": Object {},
-          "tableRefName": undefined,
-          "type": "ref",
+          "table": undefined,
+          "type": "column",
         },
         "elseExpression": undefined,
         "keywords": Object {
@@ -150,33 +147,31 @@ describe('CaseExpression', () => {
                 "postWhen": " ",
                 "postWhenExpressions": " ",
               },
-              "thenExpression": SqlRef {
-                "columnRefName": RefName {
+              "thenExpression": SqlColumn {
+                "keywords": Object {},
+                "parens": undefined,
+                "refName": RefName {
                   "name": "C",
                   "quotes": false,
                 },
-                "keywords": Object {},
-                "namespaceRefName": undefined,
-                "parens": undefined,
                 "spacing": Object {},
-                "tableRefName": undefined,
-                "type": "ref",
+                "table": undefined,
+                "type": "column",
               },
               "type": "whenThenPart",
               "whenExpressions": SeparatedArray {
                 "separators": Array [],
                 "values": Array [
-                  SqlRef {
-                    "columnRefName": RefName {
+                  SqlColumn {
+                    "keywords": Object {},
+                    "parens": undefined,
+                    "refName": RefName {
                       "name": "B",
                       "quotes": false,
                     },
-                    "keywords": Object {},
-                    "namespaceRefName": undefined,
-                    "parens": undefined,
                     "spacing": Object {},
-                    "tableRefName": undefined,
-                    "type": "ref",
+                    "table": undefined,
+                    "type": "column",
                   },
                 ],
               },
@@ -194,29 +189,27 @@ describe('CaseExpression', () => {
 
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlCase {
-        "caseExpression": SqlRef {
-          "columnRefName": RefName {
+        "caseExpression": SqlColumn {
+          "keywords": Object {},
+          "parens": undefined,
+          "refName": RefName {
             "name": "A",
             "quotes": false,
           },
-          "keywords": Object {},
-          "namespaceRefName": undefined,
-          "parens": undefined,
           "spacing": Object {},
-          "tableRefName": undefined,
-          "type": "ref",
+          "table": undefined,
+          "type": "column",
         },
-        "elseExpression": SqlRef {
-          "columnRefName": RefName {
+        "elseExpression": SqlColumn {
+          "keywords": Object {},
+          "parens": undefined,
+          "refName": RefName {
             "name": "D",
             "quotes": false,
           },
-          "keywords": Object {},
-          "namespaceRefName": undefined,
-          "parens": undefined,
           "spacing": Object {},
-          "tableRefName": undefined,
-          "type": "ref",
+          "table": undefined,
+          "type": "column",
         },
         "keywords": Object {
           "case": "CASE",
@@ -246,33 +239,31 @@ describe('CaseExpression', () => {
                 "postWhen": " ",
                 "postWhenExpressions": " ",
               },
-              "thenExpression": SqlRef {
-                "columnRefName": RefName {
+              "thenExpression": SqlColumn {
+                "keywords": Object {},
+                "parens": undefined,
+                "refName": RefName {
                   "name": "C",
                   "quotes": false,
                 },
-                "keywords": Object {},
-                "namespaceRefName": undefined,
-                "parens": undefined,
                 "spacing": Object {},
-                "tableRefName": undefined,
-                "type": "ref",
+                "table": undefined,
+                "type": "column",
               },
               "type": "whenThenPart",
               "whenExpressions": SeparatedArray {
                 "separators": Array [],
                 "values": Array [
-                  SqlRef {
-                    "columnRefName": RefName {
+                  SqlColumn {
+                    "keywords": Object {},
+                    "parens": undefined,
+                    "refName": RefName {
                       "name": "B",
                       "quotes": false,
                     },
-                    "keywords": Object {},
-                    "namespaceRefName": undefined,
-                    "parens": undefined,
                     "spacing": Object {},
-                    "tableRefName": undefined,
-                    "type": "ref",
+                    "table": undefined,
+                    "type": "column",
                   },
                 ],
               },
@@ -290,17 +281,16 @@ describe('CaseExpression', () => {
 
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlCase {
-        "caseExpression": SqlRef {
-          "columnRefName": RefName {
+        "caseExpression": SqlColumn {
+          "keywords": Object {},
+          "parens": undefined,
+          "refName": RefName {
             "name": "A",
             "quotes": false,
           },
-          "keywords": Object {},
-          "namespaceRefName": undefined,
-          "parens": undefined,
           "spacing": Object {},
-          "tableRefName": undefined,
-          "type": "ref",
+          "table": undefined,
+          "type": "column",
         },
         "elseExpression": undefined,
         "keywords": Object {
@@ -328,33 +318,31 @@ describe('CaseExpression', () => {
                 "postWhen": "     ",
                 "postWhenExpressions": " ",
               },
-              "thenExpression": SqlRef {
-                "columnRefName": RefName {
+              "thenExpression": SqlColumn {
+                "keywords": Object {},
+                "parens": undefined,
+                "refName": RefName {
                   "name": "C",
                   "quotes": false,
                 },
-                "keywords": Object {},
-                "namespaceRefName": undefined,
-                "parens": undefined,
                 "spacing": Object {},
-                "tableRefName": undefined,
-                "type": "ref",
+                "table": undefined,
+                "type": "column",
               },
               "type": "whenThenPart",
               "whenExpressions": SeparatedArray {
                 "separators": Array [],
                 "values": Array [
-                  SqlRef {
-                    "columnRefName": RefName {
+                  SqlColumn {
+                    "keywords": Object {},
+                    "parens": undefined,
+                    "refName": RefName {
                       "name": "B",
                       "quotes": false,
                     },
-                    "keywords": Object {},
-                    "namespaceRefName": undefined,
-                    "parens": undefined,
                     "spacing": Object {},
-                    "tableRefName": undefined,
-                    "type": "ref",
+                    "table": undefined,
+                    "type": "column",
                   },
                 ],
               },
@@ -372,17 +360,16 @@ describe('CaseExpression', () => {
 
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlCase {
-        "caseExpression": SqlRef {
-          "columnRefName": RefName {
+        "caseExpression": SqlColumn {
+          "keywords": Object {},
+          "parens": undefined,
+          "refName": RefName {
             "name": "A",
             "quotes": false,
           },
-          "keywords": Object {},
-          "namespaceRefName": undefined,
-          "parens": undefined,
           "spacing": Object {},
-          "tableRefName": undefined,
-          "type": "ref",
+          "table": undefined,
+          "type": "column",
         },
         "elseExpression": undefined,
         "keywords": Object {
@@ -415,33 +402,31 @@ describe('CaseExpression', () => {
                 "postWhen": " ",
                 "postWhenExpressions": " ",
               },
-              "thenExpression": SqlRef {
-                "columnRefName": RefName {
+              "thenExpression": SqlColumn {
+                "keywords": Object {},
+                "parens": undefined,
+                "refName": RefName {
                   "name": "C",
                   "quotes": false,
                 },
-                "keywords": Object {},
-                "namespaceRefName": undefined,
-                "parens": undefined,
                 "spacing": Object {},
-                "tableRefName": undefined,
-                "type": "ref",
+                "table": undefined,
+                "type": "column",
               },
               "type": "whenThenPart",
               "whenExpressions": SeparatedArray {
                 "separators": Array [],
                 "values": Array [
-                  SqlRef {
-                    "columnRefName": RefName {
+                  SqlColumn {
+                    "keywords": Object {},
+                    "parens": undefined,
+                    "refName": RefName {
                       "name": "B",
                       "quotes": false,
                     },
-                    "keywords": Object {},
-                    "namespaceRefName": undefined,
-                    "parens": undefined,
                     "spacing": Object {},
-                    "tableRefName": undefined,
-                    "type": "ref",
+                    "table": undefined,
+                    "type": "column",
                   },
                 ],
               },
@@ -459,17 +444,16 @@ describe('CaseExpression', () => {
 
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlCase {
-        "caseExpression": SqlRef {
-          "columnRefName": RefName {
+        "caseExpression": SqlColumn {
+          "keywords": Object {},
+          "parens": undefined,
+          "refName": RefName {
             "name": "A",
             "quotes": false,
           },
-          "keywords": Object {},
-          "namespaceRefName": undefined,
-          "parens": undefined,
           "spacing": Object {},
-          "tableRefName": undefined,
-          "type": "ref",
+          "table": undefined,
+          "type": "column",
         },
         "elseExpression": undefined,
         "keywords": Object {
@@ -502,33 +486,31 @@ describe('CaseExpression', () => {
                 "postWhen": "   ",
                 "postWhenExpressions": " ",
               },
-              "thenExpression": SqlRef {
-                "columnRefName": RefName {
+              "thenExpression": SqlColumn {
+                "keywords": Object {},
+                "parens": undefined,
+                "refName": RefName {
                   "name": "C",
                   "quotes": false,
                 },
-                "keywords": Object {},
-                "namespaceRefName": undefined,
-                "parens": undefined,
                 "spacing": Object {},
-                "tableRefName": undefined,
-                "type": "ref",
+                "table": undefined,
+                "type": "column",
               },
               "type": "whenThenPart",
               "whenExpressions": SeparatedArray {
                 "separators": Array [],
                 "values": Array [
-                  SqlRef {
-                    "columnRefName": RefName {
+                  SqlColumn {
+                    "keywords": Object {},
+                    "parens": undefined,
+                    "refName": RefName {
                       "name": "B",
                       "quotes": false,
                     },
-                    "keywords": Object {},
-                    "namespaceRefName": undefined,
-                    "parens": undefined,
                     "spacing": Object {},
-                    "tableRefName": undefined,
-                    "type": "ref",
+                    "table": undefined,
+                    "type": "column",
                   },
                 ],
               },
@@ -546,17 +528,16 @@ describe('CaseExpression', () => {
 
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlCase {
-        "caseExpression": SqlRef {
-          "columnRefName": RefName {
+        "caseExpression": SqlColumn {
+          "keywords": Object {},
+          "parens": undefined,
+          "refName": RefName {
             "name": "A",
             "quotes": false,
           },
-          "keywords": Object {},
-          "namespaceRefName": undefined,
-          "parens": undefined,
           "spacing": Object {},
-          "tableRefName": undefined,
-          "type": "ref",
+          "table": undefined,
+          "type": "column",
         },
         "elseExpression": undefined,
         "keywords": Object {
@@ -599,29 +580,27 @@ describe('CaseExpression', () => {
                     },
                   ],
                   "values": Array [
-                    SqlRef {
-                      "columnRefName": RefName {
+                    SqlColumn {
+                      "keywords": Object {},
+                      "parens": undefined,
+                      "refName": RefName {
                         "name": "C",
                         "quotes": false,
                       },
-                      "keywords": Object {},
-                      "namespaceRefName": undefined,
-                      "parens": undefined,
                       "spacing": Object {},
-                      "tableRefName": undefined,
-                      "type": "ref",
+                      "table": undefined,
+                      "type": "column",
                     },
-                    SqlRef {
-                      "columnRefName": RefName {
+                    SqlColumn {
+                      "keywords": Object {},
+                      "parens": undefined,
+                      "refName": RefName {
                         "name": "C",
                         "quotes": false,
                       },
-                      "keywords": Object {},
-                      "namespaceRefName": undefined,
-                      "parens": undefined,
                       "spacing": Object {},
-                      "tableRefName": undefined,
-                      "type": "ref",
+                      "table": undefined,
+                      "type": "column",
                     },
                   ],
                 },
@@ -645,29 +624,27 @@ describe('CaseExpression', () => {
                         },
                       ],
                       "values": Array [
-                        SqlRef {
-                          "columnRefName": RefName {
+                        SqlColumn {
+                          "keywords": Object {},
+                          "parens": undefined,
+                          "refName": RefName {
                             "name": "B",
                             "quotes": false,
                           },
-                          "keywords": Object {},
-                          "namespaceRefName": undefined,
-                          "parens": undefined,
                           "spacing": Object {},
-                          "tableRefName": undefined,
-                          "type": "ref",
+                          "table": undefined,
+                          "type": "column",
                         },
-                        SqlRef {
-                          "columnRefName": RefName {
+                        SqlColumn {
+                          "keywords": Object {},
+                          "parens": undefined,
+                          "refName": RefName {
                             "name": "B",
                             "quotes": false,
                           },
-                          "keywords": Object {},
-                          "namespaceRefName": undefined,
-                          "parens": undefined,
                           "spacing": Object {},
-                          "tableRefName": undefined,
-                          "type": "ref",
+                          "table": undefined,
+                          "type": "column",
                         },
                       ],
                     },
@@ -719,33 +696,31 @@ describe('CaseExpression', () => {
                 "postWhen": " ",
                 "postWhenExpressions": " ",
               },
-              "thenExpression": SqlRef {
-                "columnRefName": RefName {
+              "thenExpression": SqlColumn {
+                "keywords": Object {},
+                "parens": undefined,
+                "refName": RefName {
                   "name": "C",
                   "quotes": false,
                 },
-                "keywords": Object {},
-                "namespaceRefName": undefined,
-                "parens": undefined,
                 "spacing": Object {},
-                "tableRefName": undefined,
-                "type": "ref",
+                "table": undefined,
+                "type": "column",
               },
               "type": "whenThenPart",
               "whenExpressions": SeparatedArray {
                 "separators": Array [],
                 "values": Array [
-                  SqlRef {
-                    "columnRefName": RefName {
+                  SqlColumn {
+                    "keywords": Object {},
+                    "parens": undefined,
+                    "refName": RefName {
                       "name": "B",
                       "quotes": false,
                     },
-                    "keywords": Object {},
-                    "namespaceRefName": undefined,
-                    "parens": undefined,
                     "spacing": Object {},
-                    "tableRefName": undefined,
-                    "type": "ref",
+                    "table": undefined,
+                    "type": "column",
                   },
                 ],
               },
@@ -764,17 +739,16 @@ describe('CaseExpression', () => {
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlCase {
         "caseExpression": undefined,
-        "elseExpression": SqlRef {
-          "columnRefName": RefName {
+        "elseExpression": SqlColumn {
+          "keywords": Object {},
+          "parens": undefined,
+          "refName": RefName {
             "name": "D",
             "quotes": false,
           },
-          "keywords": Object {},
-          "namespaceRefName": undefined,
-          "parens": undefined,
           "spacing": Object {},
-          "tableRefName": undefined,
-          "type": "ref",
+          "table": undefined,
+          "type": "column",
         },
         "keywords": Object {
           "case": "CASE",
@@ -803,33 +777,31 @@ describe('CaseExpression', () => {
                 "postWhen": " ",
                 "postWhenExpressions": " ",
               },
-              "thenExpression": SqlRef {
-                "columnRefName": RefName {
+              "thenExpression": SqlColumn {
+                "keywords": Object {},
+                "parens": undefined,
+                "refName": RefName {
                   "name": "C",
                   "quotes": false,
                 },
-                "keywords": Object {},
-                "namespaceRefName": undefined,
-                "parens": undefined,
                 "spacing": Object {},
-                "tableRefName": undefined,
-                "type": "ref",
+                "table": undefined,
+                "type": "column",
               },
               "type": "whenThenPart",
               "whenExpressions": SeparatedArray {
                 "separators": Array [],
                 "values": Array [
-                  SqlRef {
-                    "columnRefName": RefName {
+                  SqlColumn {
+                    "keywords": Object {},
+                    "parens": undefined,
+                    "refName": RefName {
                       "name": "B",
                       "quotes": false,
                     },
-                    "keywords": Object {},
-                    "namespaceRefName": undefined,
-                    "parens": undefined,
                     "spacing": Object {},
-                    "tableRefName": undefined,
-                    "type": "ref",
+                    "table": undefined,
+                    "type": "column",
                   },
                 ],
               },
@@ -847,17 +819,16 @@ describe('CaseExpression', () => {
 
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlCase {
-        "caseExpression": SqlRef {
-          "columnRefName": RefName {
+        "caseExpression": SqlColumn {
+          "keywords": Object {},
+          "parens": undefined,
+          "refName": RefName {
             "name": "A",
             "quotes": false,
           },
-          "keywords": Object {},
-          "namespaceRefName": undefined,
-          "parens": undefined,
           "spacing": Object {},
-          "tableRefName": undefined,
-          "type": "ref",
+          "table": undefined,
+          "type": "column",
         },
         "elseExpression": undefined,
         "keywords": Object {
@@ -885,33 +856,31 @@ describe('CaseExpression', () => {
                 "postWhen": "     ",
                 "postWhenExpressions": " ",
               },
-              "thenExpression": SqlRef {
-                "columnRefName": RefName {
+              "thenExpression": SqlColumn {
+                "keywords": Object {},
+                "parens": undefined,
+                "refName": RefName {
                   "name": "C",
                   "quotes": false,
                 },
-                "keywords": Object {},
-                "namespaceRefName": undefined,
-                "parens": undefined,
                 "spacing": Object {},
-                "tableRefName": undefined,
-                "type": "ref",
+                "table": undefined,
+                "type": "column",
               },
               "type": "whenThenPart",
               "whenExpressions": SeparatedArray {
                 "separators": Array [],
                 "values": Array [
-                  SqlRef {
-                    "columnRefName": RefName {
+                  SqlColumn {
+                    "keywords": Object {},
+                    "parens": undefined,
+                    "refName": RefName {
                       "name": "B",
                       "quotes": false,
                     },
-                    "keywords": Object {},
-                    "namespaceRefName": undefined,
-                    "parens": undefined,
                     "spacing": Object {},
-                    "tableRefName": undefined,
-                    "type": "ref",
+                    "table": undefined,
+                    "type": "column",
                   },
                 ],
               },
@@ -929,17 +898,16 @@ describe('CaseExpression', () => {
 
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlCase {
-        "caseExpression": SqlRef {
-          "columnRefName": RefName {
+        "caseExpression": SqlColumn {
+          "keywords": Object {},
+          "parens": undefined,
+          "refName": RefName {
             "name": "A",
             "quotes": false,
           },
-          "keywords": Object {},
-          "namespaceRefName": undefined,
-          "parens": undefined,
           "spacing": Object {},
-          "tableRefName": undefined,
-          "type": "ref",
+          "table": undefined,
+          "type": "column",
         },
         "elseExpression": undefined,
         "keywords": Object {
@@ -972,33 +940,31 @@ describe('CaseExpression', () => {
                 "postWhen": " ",
                 "postWhenExpressions": " ",
               },
-              "thenExpression": SqlRef {
-                "columnRefName": RefName {
+              "thenExpression": SqlColumn {
+                "keywords": Object {},
+                "parens": undefined,
+                "refName": RefName {
                   "name": "C",
                   "quotes": false,
                 },
-                "keywords": Object {},
-                "namespaceRefName": undefined,
-                "parens": undefined,
                 "spacing": Object {},
-                "tableRefName": undefined,
-                "type": "ref",
+                "table": undefined,
+                "type": "column",
               },
               "type": "whenThenPart",
               "whenExpressions": SeparatedArray {
                 "separators": Array [],
                 "values": Array [
-                  SqlRef {
-                    "columnRefName": RefName {
+                  SqlColumn {
+                    "keywords": Object {},
+                    "parens": undefined,
+                    "refName": RefName {
                       "name": "B",
                       "quotes": false,
                     },
-                    "keywords": Object {},
-                    "namespaceRefName": undefined,
-                    "parens": undefined,
                     "spacing": Object {},
-                    "tableRefName": undefined,
-                    "type": "ref",
+                    "table": undefined,
+                    "type": "column",
                   },
                 ],
               },
@@ -1016,17 +982,16 @@ describe('CaseExpression', () => {
 
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlCase {
-        "caseExpression": SqlRef {
-          "columnRefName": RefName {
+        "caseExpression": SqlColumn {
+          "keywords": Object {},
+          "parens": undefined,
+          "refName": RefName {
             "name": "A",
             "quotes": false,
           },
-          "keywords": Object {},
-          "namespaceRefName": undefined,
-          "parens": undefined,
           "spacing": Object {},
-          "tableRefName": undefined,
-          "type": "ref",
+          "table": undefined,
+          "type": "column",
         },
         "elseExpression": undefined,
         "keywords": Object {
@@ -1059,33 +1024,31 @@ describe('CaseExpression', () => {
                 "postWhen": "   ",
                 "postWhenExpressions": " ",
               },
-              "thenExpression": SqlRef {
-                "columnRefName": RefName {
+              "thenExpression": SqlColumn {
+                "keywords": Object {},
+                "parens": undefined,
+                "refName": RefName {
                   "name": "C",
                   "quotes": false,
                 },
-                "keywords": Object {},
-                "namespaceRefName": undefined,
-                "parens": undefined,
                 "spacing": Object {},
-                "tableRefName": undefined,
-                "type": "ref",
+                "table": undefined,
+                "type": "column",
               },
               "type": "whenThenPart",
               "whenExpressions": SeparatedArray {
                 "separators": Array [],
                 "values": Array [
-                  SqlRef {
-                    "columnRefName": RefName {
+                  SqlColumn {
+                    "keywords": Object {},
+                    "parens": undefined,
+                    "refName": RefName {
                       "name": "B",
                       "quotes": false,
                     },
-                    "keywords": Object {},
-                    "namespaceRefName": undefined,
-                    "parens": undefined,
                     "spacing": Object {},
-                    "tableRefName": undefined,
-                    "type": "ref",
+                    "table": undefined,
+                    "type": "column",
                   },
                 ],
               },
@@ -1103,17 +1066,16 @@ describe('CaseExpression', () => {
 
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlCase {
-        "caseExpression": SqlRef {
-          "columnRefName": RefName {
+        "caseExpression": SqlColumn {
+          "keywords": Object {},
+          "parens": undefined,
+          "refName": RefName {
             "name": "A",
             "quotes": false,
           },
-          "keywords": Object {},
-          "namespaceRefName": undefined,
-          "parens": undefined,
           "spacing": Object {},
-          "tableRefName": undefined,
-          "type": "ref",
+          "table": undefined,
+          "type": "column",
         },
         "elseExpression": undefined,
         "keywords": Object {
@@ -1156,29 +1118,27 @@ describe('CaseExpression', () => {
                     },
                   ],
                   "values": Array [
-                    SqlRef {
-                      "columnRefName": RefName {
+                    SqlColumn {
+                      "keywords": Object {},
+                      "parens": undefined,
+                      "refName": RefName {
                         "name": "C",
                         "quotes": false,
                       },
-                      "keywords": Object {},
-                      "namespaceRefName": undefined,
-                      "parens": undefined,
                       "spacing": Object {},
-                      "tableRefName": undefined,
-                      "type": "ref",
+                      "table": undefined,
+                      "type": "column",
                     },
-                    SqlRef {
-                      "columnRefName": RefName {
+                    SqlColumn {
+                      "keywords": Object {},
+                      "parens": undefined,
+                      "refName": RefName {
                         "name": "C",
                         "quotes": false,
                       },
-                      "keywords": Object {},
-                      "namespaceRefName": undefined,
-                      "parens": undefined,
                       "spacing": Object {},
-                      "tableRefName": undefined,
-                      "type": "ref",
+                      "table": undefined,
+                      "type": "column",
                     },
                   ],
                 },
@@ -1202,29 +1162,27 @@ describe('CaseExpression', () => {
                         },
                       ],
                       "values": Array [
-                        SqlRef {
-                          "columnRefName": RefName {
+                        SqlColumn {
+                          "keywords": Object {},
+                          "parens": undefined,
+                          "refName": RefName {
                             "name": "B",
                             "quotes": false,
                           },
-                          "keywords": Object {},
-                          "namespaceRefName": undefined,
-                          "parens": undefined,
                           "spacing": Object {},
-                          "tableRefName": undefined,
-                          "type": "ref",
+                          "table": undefined,
+                          "type": "column",
                         },
-                        SqlRef {
-                          "columnRefName": RefName {
+                        SqlColumn {
+                          "keywords": Object {},
+                          "parens": undefined,
+                          "refName": RefName {
                             "name": "B",
                             "quotes": false,
                           },
-                          "keywords": Object {},
-                          "namespaceRefName": undefined,
-                          "parens": undefined,
                           "spacing": Object {},
-                          "tableRefName": undefined,
-                          "type": "ref",
+                          "table": undefined,
+                          "type": "column",
                         },
                       ],
                     },
@@ -1250,17 +1208,16 @@ describe('CaseExpression', () => {
 
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlCase {
-        "caseExpression": SqlRef {
-          "columnRefName": RefName {
+        "caseExpression": SqlColumn {
+          "keywords": Object {},
+          "parens": undefined,
+          "refName": RefName {
             "name": "runner_status",
             "quotes": true,
           },
-          "keywords": Object {},
-          "namespaceRefName": undefined,
-          "parens": undefined,
           "spacing": Object {},
-          "tableRefName": undefined,
-          "type": "ref",
+          "table": undefined,
+          "type": "column",
         },
         "elseExpression": SqlLiteral {
           "keywords": Object {},

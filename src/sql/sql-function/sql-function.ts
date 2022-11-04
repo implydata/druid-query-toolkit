@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 
+import { compact } from '../../utils';
 import { ALLOWED_FUNCTIONS } from '../allowed-functions';
 import { SPECIAL_FUNCTIONS } from '../special-functions';
 import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../sql-base';
@@ -123,6 +124,15 @@ export class SqlFunction extends SqlExpression {
     });
   }
 
+  static timeFloor(
+    timestampExpr: SqlExpression,
+    period: string | SqlLiteral,
+    origin?: string | SqlLiteral,
+    timezone?: string | SqlLiteral,
+  ) {
+    return SqlFunction.simple('TIME_FLOOR', compact([timestampExpr, period, origin, timezone]));
+  }
+
   static array(ex: SqlExpression[] | SeparatedArray<SqlExpression>) {
     return new SqlFunction({
       functionName: 'ARRAY',
@@ -133,6 +143,13 @@ export class SqlFunction extends SqlExpression {
 
   static arrayOfLiterals(xs: LiteralValue[]) {
     return SqlFunction.array(xs.map(x => SqlLiteral.create(x)));
+  }
+
+  static stringFormat(format: string | SqlLiteral, ...args: (SqlExpression | LiteralValue)[]) {
+    return SqlFunction.simple(
+      'STRING_FORMAT',
+      ([format] as (SqlExpression | LiteralValue)[]).concat(args),
+    );
   }
 
   public readonly functionName: string;

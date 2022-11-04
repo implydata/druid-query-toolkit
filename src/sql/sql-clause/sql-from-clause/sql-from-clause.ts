@@ -15,7 +15,7 @@
 import { filterMap } from '../../../utils';
 import { SqlBase, SqlType, Substitutor } from '../../sql-base';
 import { SqlExpression } from '../../sql-expression';
-import { SqlTableRef } from '../../sql-table-ref/sql-table-ref';
+import { SqlTable } from '../../sql-table/sql-table';
 import { SeparatedArray } from '../../utils';
 import { SqlClause, SqlClauseValue } from '../sql-clause';
 
@@ -124,8 +124,8 @@ export class SqlFromClause extends SqlClause {
   public getFirstTableName(): string | undefined {
     return filterMap(this.expressions.values, table => {
       table = table.getUnderlyingExpression();
-      if (table instanceof SqlTableRef) {
-        return table.getTable();
+      if (table instanceof SqlTable) {
+        return table.getName();
       }
       return;
     })[0];
@@ -134,8 +134,8 @@ export class SqlFromClause extends SqlClause {
   public getFirstSchema(): string | undefined {
     return filterMap(this.expressions.values, table => {
       table = table.getUnderlyingExpression();
-      if (table instanceof SqlTableRef) {
-        return table.getNamespace();
+      if (table instanceof SqlTable) {
+        return table.getNamespaceName();
       }
       return;
     })[0];

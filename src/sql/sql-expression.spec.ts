@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlExpression, SqlLiteral, SqlRef } from '..';
+import { SqlBase, SqlColumn, SqlExpression, SqlLiteral } from '..';
 import { backAndForth, mapString } from '../test-utils';
 
 describe('SqlExpression', () => {
@@ -106,7 +106,7 @@ describe('SqlExpression', () => {
     });
 
     describe('.fromTimeRefAndInterval', () => {
-      const timeRef = SqlRef.columnWithoutQuotes('__time');
+      const timeRef = SqlColumn.optionalQuotes('__time');
 
       it('works for a single interval', () => {
         expect(
@@ -135,8 +135,8 @@ describe('SqlExpression', () => {
   });
 
   describe('factories (methods)', () => {
-    const x = SqlRef.columnWithoutQuotes('x');
-    const y = SqlRef.columnWithoutQuotes('y');
+    const x = SqlColumn.optionalQuotes('x');
+    const y = SqlColumn.optionalQuotes('y');
 
     it('works with as', () => {
       expect(String(x.as('lol'))).toEqual('x AS "lol"');
@@ -293,7 +293,7 @@ describe('SqlExpression', () => {
     it('works in basic case', () => {
       expect(
         SqlExpression.parse(`? < ?`)
-          .fillPlaceholders([SqlRef.column('A'), 5])
+          .fillPlaceholders([SqlColumn.create('A'), 5])
           .toString(),
       ).toEqual(`"A" < 5`);
     });
@@ -301,7 +301,7 @@ describe('SqlExpression', () => {
     it('works in missing placeholder', () => {
       expect(
         SqlExpression.parse(`? BETWEEN ? AND ?`)
-          .fillPlaceholders([SqlRef.column('A'), 5])
+          .fillPlaceholders([SqlColumn.create('A'), 5])
           .toString(),
       ).toEqual(`"A" BETWEEN 5 AND ?`);
     });

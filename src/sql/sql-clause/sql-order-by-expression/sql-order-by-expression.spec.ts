@@ -12,23 +12,25 @@
  * limitations under the License.
  */
 
-import { SqlOrderByExpression, SqlRef } from '../..';
+import { SqlColumn, SqlOrderByExpression } from '../..';
 
 describe('SqlOrderByExpression', () => {
   it('#getEffectiveDirection', () => {
-    expect(SqlOrderByExpression.create(SqlRef.column('x')).getEffectiveDirection()).toEqual('ASC');
-
-    expect(SqlOrderByExpression.create(SqlRef.column('x'), 'ASC').getEffectiveDirection()).toEqual(
+    expect(SqlOrderByExpression.create(SqlColumn.create('x')).getEffectiveDirection()).toEqual(
       'ASC',
     );
 
-    expect(SqlOrderByExpression.create(SqlRef.column('x'), 'DESC').getEffectiveDirection()).toEqual(
-      'DESC',
-    );
+    expect(
+      SqlOrderByExpression.create(SqlColumn.create('x'), 'ASC').getEffectiveDirection(),
+    ).toEqual('ASC');
+
+    expect(
+      SqlOrderByExpression.create(SqlColumn.create('x'), 'DESC').getEffectiveDirection(),
+    ).toEqual('DESC');
   });
 
   it('#reverseDirection', () => {
-    const x = SqlRef.columnWithoutQuotes('x');
+    const x = SqlColumn.optionalQuotes('x');
 
     expect(String(SqlOrderByExpression.create(x, 'DESC').reverseDirection())).toEqual('x ASC');
 

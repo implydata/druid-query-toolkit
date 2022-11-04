@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { SqlExpression, SqlJoinPart, SqlQuery, SqlRef } from '../..';
+import { SqlColumn, SqlExpression, SqlJoinPart, SqlQuery } from '../..';
 import { backAndForth } from '../../test-utils';
 import { sane } from '../../utils';
 
@@ -79,7 +79,7 @@ describe('joins', () => {
           .addJoin(
             SqlJoinPart.create(
               'LEFT',
-              SqlRef.column('country', 'lookup'),
+              SqlColumn.create('country', 'lookup'),
               SqlExpression.parse('lookup.country.v = wikipedia.countryName'),
             ),
           )
@@ -94,7 +94,7 @@ describe('joins', () => {
       expect(
         SqlQuery.parse(`SELECT countryName from wikipedia`)
           .addLeftJoin(
-            SqlRef.column('country', 'lookup'),
+            SqlColumn.create('country', 'lookup'),
             SqlExpression.parse('lookup.country.v = wikipedia.countryName'),
           )
           .toString(),
@@ -108,7 +108,7 @@ describe('joins', () => {
       expect(
         SqlQuery.parse(`SELECT countryName from wikipedia`)
           .addInnerJoin(
-            SqlRef.columnWithoutQuotes('country', 'lookup'),
+            SqlColumn.optionalQuotes('country', 'lookup'),
             SqlExpression.parse('lookup.country.v = wikipedia.countryName'),
           )
           .toString(),

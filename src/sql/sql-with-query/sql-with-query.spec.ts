@@ -106,16 +106,16 @@ describe('SqlWithQuery', () => {
             "expressions": SeparatedArray {
               "separators": Array [],
               "values": Array [
-                SqlTableRef {
+                SqlTable {
                   "keywords": Object {},
-                  "namespaceRefName": undefined,
+                  "namespace": undefined,
                   "parens": undefined,
-                  "spacing": Object {},
-                  "tableRefName": RefName {
+                  "refName": RefName {
                     "name": "wiki",
                     "quotes": false,
                   },
-                  "type": "tableRef",
+                  "spacing": Object {},
+                  "type": "table",
                 },
               ],
             },
@@ -151,10 +151,9 @@ describe('SqlWithQuery', () => {
             "values": Array [
               SqlStar {
                 "keywords": Object {},
-                "namespaceRefName": undefined,
                 "parens": undefined,
                 "spacing": Object {},
-                "tableRefName": undefined,
+                "table": undefined,
                 "type": "star",
               },
             ],
@@ -199,16 +198,16 @@ describe('SqlWithQuery', () => {
                     "expressions": SeparatedArray {
                       "separators": Array [],
                       "values": Array [
-                        SqlTableRef {
+                        SqlTable {
                           "keywords": Object {},
-                          "namespaceRefName": undefined,
+                          "namespace": undefined,
                           "parens": undefined,
-                          "spacing": Object {},
-                          "tableRefName": RefName {
+                          "refName": RefName {
                             "name": "wikipedia",
                             "quotes": false,
                           },
-                          "type": "tableRef",
+                          "spacing": Object {},
+                          "type": "table",
                         },
                       ],
                     },
@@ -244,10 +243,9 @@ describe('SqlWithQuery', () => {
                     "values": Array [
                       SqlStar {
                         "keywords": Object {},
-                        "namespaceRefName": undefined,
                         "parens": undefined,
                         "spacing": Object {},
-                        "tableRefName": undefined,
+                        "table": undefined,
                         "type": "star",
                       },
                     ],

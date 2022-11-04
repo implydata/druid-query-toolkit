@@ -189,16 +189,16 @@ describe('QueryRunner', () => {
             "expressions": SeparatedArray {
               "separators": Array [],
               "values": Array [
-                SqlTableRef {
+                SqlTable {
                   "keywords": Object {},
-                  "namespaceRefName": undefined,
+                  "namespace": undefined,
                   "parens": undefined,
-                  "spacing": Object {},
-                  "tableRefName": RefName {
+                  "refName": RefName {
                     "name": "wikipedia",
                     "quotes": false,
                   },
-                  "type": "tableRef",
+                  "spacing": Object {},
+                  "type": "table",
                 },
               ],
             },
@@ -294,17 +294,16 @@ describe('QueryRunner', () => {
               },
             ],
             "values": Array [
-              SqlRef {
-                "columnRefName": RefName {
+              SqlColumn {
+                "keywords": Object {},
+                "parens": undefined,
+                "refName": RefName {
                   "name": "channel",
                   "quotes": false,
                 },
-                "keywords": Object {},
-                "namespaceRefName": undefined,
-                "parens": undefined,
                 "spacing": Object {},
-                "tableRefName": undefined,
-                "type": "ref",
+                "table": undefined,
+                "type": "column",
               },
               SqlAlias {
                 "alias": RefName {
@@ -318,10 +317,9 @@ describe('QueryRunner', () => {
                     "values": Array [
                       SqlStar {
                         "keywords": Object {},
-                        "namespaceRefName": undefined,
                         "parens": undefined,
                         "spacing": Object {},
-                        "tableRefName": undefined,
+                        "table": undefined,
                         "type": "star",
                       },
                     ],
@@ -430,16 +428,16 @@ describe('QueryRunner', () => {
             "expressions": SeparatedArray {
               "separators": Array [],
               "values": Array [
-                SqlTableRef {
+                SqlTable {
                   "keywords": Object {},
-                  "namespaceRefName": undefined,
+                  "namespace": undefined,
                   "parens": undefined,
-                  "spacing": Object {},
-                  "tableRefName": RefName {
+                  "refName": RefName {
                     "name": "wikipedia",
                     "quotes": false,
                   },
-                  "type": "tableRef",
+                  "spacing": Object {},
+                  "type": "table",
                 },
               ],
             },
@@ -535,17 +533,16 @@ describe('QueryRunner', () => {
               },
             ],
             "values": Array [
-              SqlRef {
-                "columnRefName": RefName {
+              SqlColumn {
+                "keywords": Object {},
+                "parens": undefined,
+                "refName": RefName {
                   "name": "channel",
                   "quotes": false,
                 },
-                "keywords": Object {},
-                "namespaceRefName": undefined,
-                "parens": undefined,
                 "spacing": Object {},
-                "tableRefName": undefined,
-                "type": "ref",
+                "table": undefined,
+                "type": "column",
               },
               SqlAlias {
                 "alias": RefName {
@@ -559,10 +556,9 @@ describe('QueryRunner', () => {
                     "values": Array [
                       SqlStar {
                         "keywords": Object {},
-                        "namespaceRefName": undefined,
                         "parens": undefined,
                         "spacing": Object {},
-                        "tableRefName": undefined,
+                        "table": undefined,
                         "type": "star",
                       },
                     ],
@@ -672,16 +668,16 @@ describe('QueryRunner', () => {
             "expressions": SeparatedArray {
               "separators": Array [],
               "values": Array [
-                SqlTableRef {
+                SqlTable {
                   "keywords": Object {},
-                  "namespaceRefName": undefined,
+                  "namespace": undefined,
                   "parens": undefined,
-                  "spacing": Object {},
-                  "tableRefName": RefName {
+                  "refName": RefName {
                     "name": "wikipedia",
                     "quotes": false,
                   },
-                  "type": "tableRef",
+                  "spacing": Object {},
+                  "type": "table",
                 },
               ],
             },
@@ -777,17 +773,16 @@ describe('QueryRunner', () => {
               },
             ],
             "values": Array [
-              SqlRef {
-                "columnRefName": RefName {
+              SqlColumn {
+                "keywords": Object {},
+                "parens": undefined,
+                "refName": RefName {
                   "name": "channel",
                   "quotes": false,
                 },
-                "keywords": Object {},
-                "namespaceRefName": undefined,
-                "parens": undefined,
                 "spacing": Object {},
-                "tableRefName": undefined,
-                "type": "ref",
+                "table": undefined,
+                "type": "column",
               },
               SqlAlias {
                 "alias": RefName {
@@ -801,10 +796,9 @@ describe('QueryRunner', () => {
                     "values": Array [
                       SqlStar {
                         "keywords": Object {},
-                        "namespaceRefName": undefined,
                         "parens": undefined,
                         "spacing": Object {},
-                        "tableRefName": undefined,
+                        "table": undefined,
                         "type": "star",
                       },
                     ],
