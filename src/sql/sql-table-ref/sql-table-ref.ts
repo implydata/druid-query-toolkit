@@ -14,6 +14,7 @@
 
 import { SqlBase, SqlBaseValue, SqlType } from '../sql-base';
 import { SqlExpression } from '../sql-expression';
+import { SqlRef } from '../sql-ref/sql-ref';
 import { RefName } from '../utils';
 
 export interface SqlTableRefValue extends SqlBaseValue {
@@ -126,6 +127,14 @@ export class SqlTableRef extends SqlExpression {
       ret = ret.changeTableRefName(tableRefName.prettyTrim(maxLength));
     }
     return ret;
+  }
+
+  public column(column: string, forceQuotes?: boolean): SqlRef {
+    return new SqlRef({
+      columnRefName: RefName.create(column, forceQuotes),
+      tableRefName: this.tableRefName,
+      namespaceRefName: this.namespaceRefName,
+    });
   }
 }
 

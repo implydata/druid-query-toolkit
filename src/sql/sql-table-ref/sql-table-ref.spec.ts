@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { SqlExpression } from '../..';
+import { SqlExpression, SqlTableRef } from '../..';
 import { backAndForth } from '../../test-utils';
 
 describe('SqlTableRef', () => {
@@ -33,5 +33,10 @@ describe('SqlTableRef', () => {
     const sql = 'From';
 
     expect(() => SqlExpression.parse(sql)).toThrowError('Expected');
+  });
+
+  it('.column works', () => {
+    expect(String(SqlTableRef.create('hello').column('x'))).toEqual('"hello"."x"');
+    expect(String(SqlTableRef.create('hello', 'world').column('x'))).toEqual('"world"."hello"."x"');
   });
 });
