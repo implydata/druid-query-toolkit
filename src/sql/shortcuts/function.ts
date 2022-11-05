@@ -16,9 +16,9 @@ import { SqlExpression } from '../sql-expression';
 import { SqlFunction } from '../sql-function/sql-function';
 import { LiteralValue } from '../sql-literal/sql-literal';
 
-export function F(name: string, ...args: (SqlExpression | LiteralValue)[]) {
+export const F = function (name: string, ...args: (SqlExpression | LiteralValue)[]) {
   return SqlFunction.simple(name, args);
-}
+};
 
 F.cast = SqlFunction.cast;
 F.floor = SqlFunction.floor;
