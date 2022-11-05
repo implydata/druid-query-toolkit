@@ -75,17 +75,14 @@ describe('SqlFunction', () => {
 
   it('.count', () => {
     expect(SqlFunction.count().toString()).toEqual('COUNT(*)');
-    expect(SqlFunction.count(SqlStar.PLAIN, SqlExpression.parse('x > 1')).toString()).toEqual(
-      'COUNT(*) FILTER (WHERE x > 1)',
-    );
+    expect(
+      SqlFunction.count(SqlStar.PLAIN).addWhereExpression(SqlExpression.parse('x > 1')).toString(),
+    ).toEqual('COUNT(*) FILTER (WHERE x > 1)');
   });
 
   it('.countDistinct', () => {
     const x = SqlExpression.parse('x');
     expect(SqlFunction.countDistinct(x).toString()).toEqual('COUNT(DISTINCT x)');
-    expect(SqlFunction.countDistinct(x, SqlExpression.parse('x > 1')).toString()).toEqual(
-      'COUNT(DISTINCT x) FILTER (WHERE x > 1)',
-    );
   });
 
   it('.cast', () => {
