@@ -18,6 +18,7 @@ import {
   LiteralValue,
   RefName,
   SqlAlias,
+  SqlColumn,
   SqlComparison,
   SqlFunction,
   SqlLiteral,
@@ -25,7 +26,6 @@ import {
   SqlOrderByDirection,
   SqlOrderByExpression,
   SqlPlaceholder,
-  SqlRef,
   SqlUnary,
 } from '.';
 import { parseSql } from './parser';
@@ -111,7 +111,7 @@ export abstract class SqlExpression extends SqlBase {
     }
   }
 
-  static fromTimeRefAndInterval(timeRef: SqlRef, interval: string | string[]): SqlExpression {
+  static fromTimeRefAndInterval(timeRef: SqlColumn, interval: string | string[]): SqlExpression {
     if (Array.isArray(interval)) {
       return SqlExpression.or(
         ...interval.map(int => SqlExpression.fromTimeRefAndInterval(timeRef, int)),
@@ -166,7 +166,7 @@ export abstract class SqlExpression extends SqlBase {
     return SqlAlias.create(this, alias, forceQuotes);
   }
 
-  public convertToTableRef(): SqlExpression {
+  public convertToTable(): SqlExpression {
     return this;
   }
 
@@ -290,7 +290,7 @@ export abstract class SqlExpression extends SqlBase {
   }
 
   public removeColumnFromAnd(column: string): SqlExpression | undefined {
-    return this.filterAnd(ex => !ex.containsColumn(column));
+    return this.filterAnd(ex => !ex.containsColumnName(column));
   }
 
   public fillPlaceholders(fillWith: (SqlExpression | LiteralValue)[]): SqlExpression {
@@ -338,7 +338,7 @@ export abstract class SqlExpression extends SqlBase {
           }
           throw e;
         }
-      } else if (x instanceof SqlRef) {
+      } else if (x instanceof SqlColumn) {
         throw new Error('column reference outside aggregation');
       }
       return x;

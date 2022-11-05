@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { SqlExpression, SqlTableRef } from '../..';
+import { SqlExpression, SqlNamespace, SqlTable } from '../..';
 import { backAndForth } from '../../test-utils';
 
 describe('SqlTableRef', () => {
@@ -36,7 +36,9 @@ describe('SqlTableRef', () => {
   });
 
   it('.column works', () => {
-    expect(String(SqlTableRef.create('hello').column('x'))).toEqual('"hello"."x"');
-    expect(String(SqlTableRef.create('hello', 'world').column('x'))).toEqual('"world"."hello"."x"');
+    expect(String(SqlTable.create('hello').column('x'))).toEqual('"hello"."x"');
+    expect(String(SqlTable.create('hello', SqlNamespace.create('world')).column('x'))).toEqual(
+      '"world"."hello"."x"',
+    );
   });
 });

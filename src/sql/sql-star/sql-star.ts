@@ -14,11 +14,10 @@
 
 import { SqlBase, SqlBaseValue, SqlType } from '../sql-base';
 import { SqlExpression } from '../sql-expression';
-import { RefName } from '../utils';
+import { SqlTable } from '../sql-table/sql-table';
 
 export interface SqlStarValue extends SqlBaseValue {
-  tableRefName?: RefName;
-  namespaceRefName?: RefName;
+  table?: SqlTable;
 }
 
 export class SqlStar extends SqlExpression {
@@ -26,53 +25,35 @@ export class SqlStar extends SqlExpression {
 
   static PLAIN: SqlStar;
 
-  static create(
-    table?: string,
-    namespace?: string,
-    forceTableQuotes?: boolean,
-    forceNamespaceQuotes?: boolean,
-  ) {
+  static create(table?: SqlTable) {
     return new SqlStar({
-      tableRefName: RefName.maybe(table, forceTableQuotes),
-      namespaceRefName: RefName.maybe(namespace, forceNamespaceQuotes),
+      table,
     });
   }
 
-  public readonly tableRefName?: RefName;
-  public readonly namespaceRefName?: RefName;
+  public readonly table?: SqlTable;
 
   constructor(options: SqlStarValue = {}) {
     super(options, SqlStar.type);
-    this.tableRefName = options.tableRefName;
-    this.namespaceRefName = options.namespaceRefName;
+    this.table = options.table;
   }
 
   public valueOf(): SqlStarValue {
     const value = super.valueOf() as SqlStarValue;
-    value.tableRefName = this.tableRefName;
-    value.namespaceRefName = this.namespaceRefName;
+    value.table = this.table;
     return value;
   }
 
   protected _toRawString(): string {
-    const { namespaceRefName, tableRefName } = this;
+    const { table } = this;
     const rawParts: string[] = [];
 
-    if (namespaceRefName) {
+    if (table) {
       rawParts.push(
-        namespaceRefName.toString(),
-        this.getSpace('preNamespaceDot', ''),
+        table.toString(),
+        this.getSpace('postTable', ''),
         '.',
-        this.getSpace('postNamespaceDot', ''),
-      );
-    }
-
-    if (tableRefName) {
-      rawParts.push(
-        tableRefName.toString(),
-        this.getSpace('preTableDot', ''),
-        '.',
-        this.getSpace('postTableDot', ''),
+        this.getSpace('postDot', ''),
       );
     }
 
@@ -81,57 +62,31 @@ export class SqlStar extends SqlExpression {
     return rawParts.join('');
   }
 
-  public changeTableRefName(tableRefName: RefName): this {
-    const value = this.valueOf();
-    value.tableRefName = tableRefName;
-    return SqlBase.fromValue(value);
-  }
-
-  public getTable(): string | undefined {
-    return this.tableRefName?.name;
-  }
-
-  public changeTable(table: string | undefined): this {
-    const { tableRefName } = this;
+  public changeTable(table: SqlTable | undefined): this {
     const value = this.valueOf();
     if (table) {
-      value.tableRefName = tableRefName ? tableRefName.changeName(table) : RefName.create(table);
+      value.table = table;
     } else {
-      delete value.tableRefName;
+      delete value.table;
+      value.spacing = this.getSpacingWithout('postTable', 'postDot');
     }
     return SqlBase.fromValue(value);
   }
 
-  public changeNamespaceRefName(namespaceRefName: RefName): this {
-    const value = this.valueOf();
-    value.namespaceRefName = namespaceRefName;
-    return SqlBase.fromValue(value);
+  public getTableName(): string | undefined {
+    return this.table?.getName();
   }
 
-  public getNamespace(): string | undefined {
-    return this.namespaceRefName?.name;
-  }
-
-  public changeNamespace(namespace: string | undefined): this {
-    const { namespaceRefName } = this;
-    const value = this.valueOf();
-    if (namespace) {
-      value.namespaceRefName = namespaceRefName
-        ? namespaceRefName.changeName(namespace)
-        : RefName.create(namespace);
-    } else {
-      delete value.namespaceRefName;
-    }
-    return SqlBase.fromValue(value);
+  public changeTableName(table: string | undefined): this {
+    return this.changeTable(
+      table ? (this.table ? this.table.changeName(table) : SqlTable.create(table)) : undefined,
+    );
   }
 
   public prettyTrim(maxLength: number): this {
-    const { tableRefName } = this;
-    let ret = this;
-    if (tableRefName) {
-      ret = ret.changeTableRefName(tableRefName.prettyTrim(maxLength));
-    }
-    return ret;
+    const { table } = this;
+    if (!table) return this;
+    return this.changeTable(table.prettyTrim(maxLength));
   }
 }
 

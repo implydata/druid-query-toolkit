@@ -6,7 +6,7 @@ A number of tools to make working with [Druid queries](https://calcite.apache.or
 There are a number of use cases for this toolkit and one of the chief use cases can be found in Druid's own [web-console](https://druid.apache.org/docs/latest/operations/druid-console.html).
 
 Search for uses within [web-console/src](https://github.com/apache/druid/tree/master/web-console/src) for some examples.
-Specifically the [QueryView](https://github.com/apache/druid/tree/master/web-console/src/views/query-view) uses these tools a lot.
+Specifically the [query view](https://github.com/apache/druid/tree/master/web-console/src/views/workbench-view) uses these tools a lot.
 
 ## Parts
 

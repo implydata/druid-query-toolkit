@@ -41,7 +41,7 @@ export class SqlJoinPart extends SqlBase {
     }
     return new SqlJoinPart({
       joinType: joinType,
-      table: table.convertToTableRef(),
+      table: table.convertToTable(),
       onExpression: onExpression,
     });
   }
@@ -49,7 +49,7 @@ export class SqlJoinPart extends SqlBase {
   static cross(table: SqlExpression): SqlJoinPart {
     return new SqlJoinPart({
       joinType: 'CROSS',
-      table: table.convertToTableRef(),
+      table: table.convertToTable(),
     });
   }
 

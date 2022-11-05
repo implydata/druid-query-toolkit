@@ -14,7 +14,7 @@
 
 import { cleanObject, dedupe } from '../utils';
 
-import { SeparatedArray, SqlLiteral, SqlRef } from '.';
+import { SeparatedArray, SqlColumn, SqlLiteral } from '.';
 import { parseSql } from './parser';
 
 export interface Parens {
@@ -77,9 +77,10 @@ export type SqlType =
   | 'function'
   | 'case'
   | 'whenThenPart'
-  | 'ref'
+  | 'column'
   | 'star'
-  | 'tableRef'
+  | 'namespace'
+  | 'table'
   | 'unary';
 
 export type KeywordName =
@@ -141,6 +142,7 @@ export type SpaceName =
   | 'postClustered'
   | 'postColumns'
   | 'postDecorator'
+  | 'postDot'
   | 'postElse'
   | 'postEscape'
   | 'postExplain'
@@ -159,7 +161,7 @@ export type SpaceName =
   | 'postJoinType'
   | 'postLeftParen'
   | 'postLimit'
-  | 'postNamespaceDot'
+  | 'postNamespace'
   | 'postOffset'
   | 'postOn'
   | 'postOp'
@@ -173,7 +175,6 @@ export type SpaceName =
   | 'postSelect'
   | 'postSymmetric'
   | 'postTable'
-  | 'postTableDot'
   | 'postThen'
   | 'postTimestamp'
   | 'postUnion'
@@ -199,14 +200,12 @@ export type SpaceName =
   | 'preJoin'
   | 'preLeftParen'
   | 'preLimitClause'
-  | 'preNamespaceDot'
   | 'preOffsetClause'
   | 'preOn'
   | 'preOp'
   | 'preOrderByClause'
   | 'preOverwrite'
   | 'prePartitionedByClause'
-  | 'preTableDot'
   | 'preTime'
   | 'preUnion'
   | 'preWhereClause';
@@ -521,26 +520,26 @@ export abstract class SqlBase {
     return collected;
   }
 
-  public getRefs(): SqlRef[] {
-    return this.collect(b => b instanceof SqlRef) as SqlRef[];
+  public getColumns(): SqlColumn[] {
+    return this.collect(b => b instanceof SqlColumn) as SqlColumn[];
   }
 
-  public getUsedColumns(): string[] {
-    return dedupe(this.getRefs().map(x => x.getColumn())).sort();
+  public getUsedColumnNames(): string[] {
+    return dedupe(this.getColumns().map(x => x.getName())).sort();
   }
 
   public contains(thing: SqlBase): boolean {
     return this.some(b => b.equals(thing));
   }
 
-  public containsColumn(column: string): boolean {
-    return this.some(b => b instanceof SqlRef && b.getColumn() === column);
+  public containsColumnName(columnName: string): boolean {
+    return this.some(b => b instanceof SqlColumn && b.getName() === columnName);
   }
 
-  public getFirstColumn(): string | undefined {
-    const ref = this.getRefs()[0];
-    if (!ref) return;
-    return ref.getColumn();
+  public getFirstColumnName(): string | undefined {
+    const column = this.getColumns()[0];
+    if (!column) return;
+    return column.getName();
   }
 
   public prettify(options: PrettifyOptions = {}): SqlBase {
@@ -553,7 +552,7 @@ export abstract class SqlBase {
 
   public prettyTrim(maxLength: number): this {
     return this.walk(ex => {
-      if (ex instanceof SqlLiteral || ex instanceof SqlRef) {
+      if (ex instanceof SqlLiteral || ex instanceof SqlColumn) {
         return ex.prettyTrim(maxLength);
       }
       return ex;

@@ -13,9 +13,9 @@
  */
 
 import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../sql-base';
+import { SqlColumn } from '../sql-column/sql-column';
 import { SqlColumnList } from '../sql-column-list/sql-column-list';
 import { SqlExpression } from '../sql-expression';
-import { SqlRef } from '../sql-ref/sql-ref';
 import { RefName } from '../utils';
 
 export interface SqlAliasValue extends SqlBaseValue {
@@ -121,10 +121,10 @@ export class SqlAlias extends SqlExpression {
     return this;
   }
 
-  public convertToTableRef(): SqlExpression {
+  public convertToTable(): SqlExpression {
     const { expression } = this;
-    if (expression instanceof SqlRef) {
-      return this.changeExpression(expression.convertToTableRef());
+    if (expression instanceof SqlColumn) {
+      return this.changeExpression(expression.convertToTable());
     }
     return this;
   }

@@ -30,29 +30,27 @@ describe('OR expression', () => {
             },
           ],
           "values": Array [
-            SqlRef {
-              "columnRefName": RefName {
+            SqlColumn {
+              "keywords": Object {},
+              "parens": undefined,
+              "refName": RefName {
                 "name": "A",
                 "quotes": false,
               },
-              "keywords": Object {},
-              "namespaceRefName": undefined,
-              "parens": undefined,
               "spacing": Object {},
-              "tableRefName": undefined,
-              "type": "ref",
+              "table": undefined,
+              "type": "column",
             },
-            SqlRef {
-              "columnRefName": RefName {
+            SqlColumn {
+              "keywords": Object {},
+              "parens": undefined,
+              "refName": RefName {
                 "name": "B",
                 "quotes": false,
               },
-              "keywords": Object {},
-              "namespaceRefName": undefined,
-              "parens": undefined,
               "spacing": Object {},
-              "tableRefName": undefined,
-              "type": "ref",
+              "table": undefined,
+              "type": "column",
             },
           ],
         },
@@ -120,29 +118,27 @@ describe('OR expression', () => {
             },
           ],
           "values": Array [
-            SqlRef {
-              "columnRefName": RefName {
+            SqlColumn {
+              "keywords": Object {},
+              "parens": undefined,
+              "refName": RefName {
                 "name": "A",
                 "quotes": true,
               },
-              "keywords": Object {},
-              "namespaceRefName": undefined,
-              "parens": undefined,
               "spacing": Object {},
-              "tableRefName": undefined,
-              "type": "ref",
+              "table": undefined,
+              "type": "column",
             },
-            SqlRef {
-              "columnRefName": RefName {
+            SqlColumn {
+              "keywords": Object {},
+              "parens": undefined,
+              "refName": RefName {
                 "name": "B",
                 "quotes": true,
               },
-              "keywords": Object {},
-              "namespaceRefName": undefined,
-              "parens": undefined,
               "spacing": Object {},
-              "tableRefName": undefined,
-              "type": "ref",
+              "table": undefined,
+              "type": "column",
             },
           ],
         },
@@ -347,29 +343,27 @@ describe('AND expression', () => {
             },
           ],
           "values": Array [
-            SqlRef {
-              "columnRefName": RefName {
+            SqlColumn {
+              "keywords": Object {},
+              "parens": undefined,
+              "refName": RefName {
                 "name": "A",
                 "quotes": false,
               },
-              "keywords": Object {},
-              "namespaceRefName": undefined,
-              "parens": undefined,
               "spacing": Object {},
-              "tableRefName": undefined,
-              "type": "ref",
+              "table": undefined,
+              "type": "column",
             },
-            SqlRef {
-              "columnRefName": RefName {
+            SqlColumn {
+              "keywords": Object {},
+              "parens": undefined,
+              "refName": RefName {
                 "name": "B",
                 "quotes": false,
               },
-              "keywords": Object {},
-              "namespaceRefName": undefined,
-              "parens": undefined,
               "spacing": Object {},
-              "tableRefName": undefined,
-              "type": "ref",
+              "table": undefined,
+              "type": "column",
             },
           ],
         },
@@ -441,29 +435,27 @@ describe('AND expression', () => {
             },
           ],
           "values": Array [
-            SqlRef {
-              "columnRefName": RefName {
+            SqlColumn {
+              "keywords": Object {},
+              "parens": undefined,
+              "refName": RefName {
                 "name": "A",
                 "quotes": true,
               },
-              "keywords": Object {},
-              "namespaceRefName": undefined,
-              "parens": undefined,
               "spacing": Object {},
-              "tableRefName": undefined,
-              "type": "ref",
+              "table": undefined,
+              "type": "column",
             },
-            SqlRef {
-              "columnRefName": RefName {
+            SqlColumn {
+              "keywords": Object {},
+              "parens": undefined,
+              "refName": RefName {
                 "name": "B",
                 "quotes": true,
               },
-              "keywords": Object {},
-              "namespaceRefName": undefined,
-              "parens": undefined,
               "spacing": Object {},
-              "tableRefName": undefined,
-              "type": "ref",
+              "table": undefined,
+              "type": "column",
             },
           ],
         },
@@ -757,29 +749,27 @@ describe('Math expression', () => {
             },
           ],
           "values": Array [
-            SqlRef {
-              "columnRefName": RefName {
+            SqlColumn {
+              "keywords": Object {},
+              "parens": undefined,
+              "refName": RefName {
                 "name": "A",
                 "quotes": false,
               },
-              "keywords": Object {},
-              "namespaceRefName": undefined,
-              "parens": undefined,
               "spacing": Object {},
-              "tableRefName": undefined,
-              "type": "ref",
+              "table": undefined,
+              "type": "column",
             },
-            SqlRef {
-              "columnRefName": RefName {
+            SqlColumn {
+              "keywords": Object {},
+              "parens": undefined,
+              "refName": RefName {
                 "name": "B",
                 "quotes": false,
               },
-              "keywords": Object {},
-              "namespaceRefName": undefined,
-              "parens": undefined,
               "spacing": Object {},
-              "tableRefName": undefined,
-              "type": "ref",
+              "table": undefined,
+              "type": "column",
             },
           ],
         },
@@ -851,29 +841,27 @@ describe('Math expression', () => {
             },
           ],
           "values": Array [
-            SqlRef {
-              "columnRefName": RefName {
+            SqlColumn {
+              "keywords": Object {},
+              "parens": undefined,
+              "refName": RefName {
                 "name": "A",
                 "quotes": true,
               },
-              "keywords": Object {},
-              "namespaceRefName": undefined,
-              "parens": undefined,
               "spacing": Object {},
-              "tableRefName": undefined,
-              "type": "ref",
+              "table": undefined,
+              "type": "column",
             },
-            SqlRef {
-              "columnRefName": RefName {
+            SqlColumn {
+              "keywords": Object {},
+              "parens": undefined,
+              "refName": RefName {
                 "name": "B",
                 "quotes": true,
               },
-              "keywords": Object {},
-              "namespaceRefName": undefined,
-              "parens": undefined,
               "spacing": Object {},
-              "tableRefName": undefined,
-              "type": "ref",
+              "table": undefined,
+              "type": "column",
             },
           ],
         },
@@ -999,10 +987,9 @@ describe('Math expression', () => {
                 "values": Array [
                   SqlStar {
                     "keywords": Object {},
-                    "namespaceRefName": undefined,
                     "parens": undefined,
                     "spacing": Object {},
-                    "tableRefName": undefined,
+                    "table": undefined,
                     "type": "star",
                   },
                 ],
@@ -1046,10 +1033,9 @@ describe('Math expression', () => {
                       "values": Array [
                         SqlStar {
                           "keywords": Object {},
-                          "namespaceRefName": undefined,
                           "parens": undefined,
                           "spacing": Object {},
-                          "tableRefName": undefined,
+                          "table": undefined,
                           "type": "star",
                         },
                       ],
@@ -1106,17 +1092,16 @@ describe('Combined expression', () => {
             },
           ],
           "values": Array [
-            SqlRef {
-              "columnRefName": RefName {
+            SqlColumn {
+              "keywords": Object {},
+              "parens": undefined,
+              "refName": RefName {
                 "name": "A",
                 "quotes": false,
               },
-              "keywords": Object {},
-              "namespaceRefName": undefined,
-              "parens": undefined,
               "spacing": Object {},
-              "tableRefName": undefined,
-              "type": "ref",
+              "table": undefined,
+              "type": "column",
             },
             SqlMulti {
               "args": SeparatedArray {
@@ -1128,34 +1113,32 @@ describe('Combined expression', () => {
                   },
                 ],
                 "values": Array [
-                  SqlRef {
-                    "columnRefName": RefName {
+                  SqlColumn {
+                    "keywords": Object {},
+                    "parens": undefined,
+                    "refName": RefName {
                       "name": "B",
                       "quotes": false,
                     },
-                    "keywords": Object {},
-                    "namespaceRefName": undefined,
-                    "parens": undefined,
                     "spacing": Object {},
-                    "tableRefName": undefined,
-                    "type": "ref",
+                    "table": undefined,
+                    "type": "column",
                   },
                   SqlComparison {
                     "decorator": undefined,
                     "keywords": Object {
                       "op": ">",
                     },
-                    "lhs": SqlRef {
-                      "columnRefName": RefName {
+                    "lhs": SqlColumn {
+                      "keywords": Object {},
+                      "parens": undefined,
+                      "refName": RefName {
                         "name": "C",
                         "quotes": false,
                       },
-                      "keywords": Object {},
-                      "namespaceRefName": undefined,
-                      "parens": undefined,
                       "spacing": Object {},
-                      "tableRefName": undefined,
-                      "type": "ref",
+                      "table": undefined,
+                      "type": "column",
                     },
                     "negated": false,
                     "op": ">",
@@ -1170,29 +1153,27 @@ describe('Combined expression', () => {
                           },
                         ],
                         "values": Array [
-                          SqlRef {
-                            "columnRefName": RefName {
+                          SqlColumn {
+                            "keywords": Object {},
+                            "parens": undefined,
+                            "refName": RefName {
                               "name": "D",
                               "quotes": false,
                             },
-                            "keywords": Object {},
-                            "namespaceRefName": undefined,
-                            "parens": undefined,
                             "spacing": Object {},
-                            "tableRefName": undefined,
-                            "type": "ref",
+                            "table": undefined,
+                            "type": "column",
                           },
-                          SqlRef {
-                            "columnRefName": RefName {
+                          SqlColumn {
+                            "keywords": Object {},
+                            "parens": undefined,
+                            "refName": RefName {
                               "name": "E",
                               "quotes": false,
                             },
-                            "keywords": Object {},
-                            "namespaceRefName": undefined,
-                            "parens": undefined,
                             "spacing": Object {},
-                            "tableRefName": undefined,
-                            "type": "ref",
+                            "table": undefined,
+                            "type": "column",
                           },
                         ],
                       },
@@ -1268,29 +1249,27 @@ describe('Combined expression', () => {
                           },
                         ],
                         "values": Array [
-                          SqlRef {
-                            "columnRefName": RefName {
+                          SqlColumn {
+                            "keywords": Object {},
+                            "parens": undefined,
+                            "refName": RefName {
                               "name": "A",
                               "quotes": false,
                             },
-                            "keywords": Object {},
-                            "namespaceRefName": undefined,
-                            "parens": undefined,
                             "spacing": Object {},
-                            "tableRefName": undefined,
-                            "type": "ref",
+                            "table": undefined,
+                            "type": "column",
                           },
-                          SqlRef {
-                            "columnRefName": RefName {
+                          SqlColumn {
+                            "keywords": Object {},
+                            "parens": undefined,
+                            "refName": RefName {
                               "name": "B",
                               "quotes": false,
                             },
-                            "keywords": Object {},
-                            "namespaceRefName": undefined,
-                            "parens": undefined,
                             "spacing": Object {},
-                            "tableRefName": undefined,
-                            "type": "ref",
+                            "table": undefined,
+                            "type": "column",
                           },
                         ],
                       },
@@ -1303,17 +1282,16 @@ describe('Combined expression', () => {
                     "negated": false,
                     "op": ">",
                     "parens": undefined,
-                    "rhs": SqlRef {
-                      "columnRefName": RefName {
+                    "rhs": SqlColumn {
+                      "keywords": Object {},
+                      "parens": undefined,
+                      "refName": RefName {
                         "name": "C",
                         "quotes": false,
                       },
-                      "keywords": Object {},
-                      "namespaceRefName": undefined,
-                      "parens": undefined,
                       "spacing": Object {},
-                      "tableRefName": undefined,
-                      "type": "ref",
+                      "table": undefined,
+                      "type": "column",
                     },
                     "spacing": Object {
                       "postOp": " ",
@@ -1321,17 +1299,16 @@ describe('Combined expression', () => {
                     },
                     "type": "comparison",
                   },
-                  SqlRef {
-                    "columnRefName": RefName {
+                  SqlColumn {
+                    "keywords": Object {},
+                    "parens": undefined,
+                    "refName": RefName {
                       "name": "D",
                       "quotes": false,
                     },
-                    "keywords": Object {},
-                    "namespaceRefName": undefined,
-                    "parens": undefined,
                     "spacing": Object {},
-                    "tableRefName": undefined,
-                    "type": "ref",
+                    "table": undefined,
+                    "type": "column",
                   },
                 ],
               },
@@ -1341,17 +1318,16 @@ describe('Combined expression', () => {
               "spacing": Object {},
               "type": "multi",
             },
-            SqlRef {
-              "columnRefName": RefName {
+            SqlColumn {
+              "keywords": Object {},
+              "parens": undefined,
+              "refName": RefName {
                 "name": "E",
                 "quotes": false,
               },
-              "keywords": Object {},
-              "namespaceRefName": undefined,
-              "parens": undefined,
               "spacing": Object {},
-              "tableRefName": undefined,
-              "type": "ref",
+              "table": undefined,
+              "type": "column",
             },
           ],
         },
@@ -1390,34 +1366,32 @@ describe('Combined expression', () => {
                   },
                 ],
                 "values": Array [
-                  SqlRef {
-                    "columnRefName": RefName {
+                  SqlColumn {
+                    "keywords": Object {},
+                    "parens": undefined,
+                    "refName": RefName {
                       "name": "A",
                       "quotes": false,
                     },
-                    "keywords": Object {},
-                    "namespaceRefName": undefined,
-                    "parens": undefined,
                     "spacing": Object {},
-                    "tableRefName": undefined,
-                    "type": "ref",
+                    "table": undefined,
+                    "type": "column",
                   },
                   SqlComparison {
                     "decorator": undefined,
                     "keywords": Object {
                       "op": ">",
                     },
-                    "lhs": SqlRef {
-                      "columnRefName": RefName {
+                    "lhs": SqlColumn {
+                      "keywords": Object {},
+                      "parens": undefined,
+                      "refName": RefName {
                         "name": "B",
                         "quotes": false,
                       },
-                      "keywords": Object {},
-                      "namespaceRefName": undefined,
-                      "parens": undefined,
                       "spacing": Object {},
-                      "tableRefName": undefined,
-                      "type": "ref",
+                      "table": undefined,
+                      "type": "column",
                     },
                     "negated": false,
                     "op": ">",
@@ -1432,29 +1406,27 @@ describe('Combined expression', () => {
                           },
                         ],
                         "values": Array [
-                          SqlRef {
-                            "columnRefName": RefName {
+                          SqlColumn {
+                            "keywords": Object {},
+                            "parens": undefined,
+                            "refName": RefName {
                               "name": "C",
                               "quotes": false,
                             },
-                            "keywords": Object {},
-                            "namespaceRefName": undefined,
-                            "parens": undefined,
                             "spacing": Object {},
-                            "tableRefName": undefined,
-                            "type": "ref",
+                            "table": undefined,
+                            "type": "column",
                           },
-                          SqlRef {
-                            "columnRefName": RefName {
+                          SqlColumn {
+                            "keywords": Object {},
+                            "parens": undefined,
+                            "refName": RefName {
                               "name": "D",
                               "quotes": false,
                             },
-                            "keywords": Object {},
-                            "namespaceRefName": undefined,
-                            "parens": undefined,
                             "spacing": Object {},
-                            "tableRefName": undefined,
-                            "type": "ref",
+                            "table": undefined,
+                            "type": "column",
                           },
                         ],
                       },
@@ -1478,17 +1450,16 @@ describe('Combined expression', () => {
               "spacing": Object {},
               "type": "multi",
             },
-            SqlRef {
-              "columnRefName": RefName {
+            SqlColumn {
+              "keywords": Object {},
+              "parens": undefined,
+              "refName": RefName {
                 "name": "E",
                 "quotes": false,
               },
-              "keywords": Object {},
-              "namespaceRefName": undefined,
-              "parens": undefined,
               "spacing": Object {},
-              "tableRefName": undefined,
-              "type": "ref",
+              "table": undefined,
+              "type": "column",
             },
           ],
         },
@@ -1524,41 +1495,38 @@ describe('Multiple expressions', () => {
             },
           ],
           "values": Array [
-            SqlRef {
-              "columnRefName": RefName {
+            SqlColumn {
+              "keywords": Object {},
+              "parens": undefined,
+              "refName": RefName {
                 "name": "A",
                 "quotes": false,
               },
-              "keywords": Object {},
-              "namespaceRefName": undefined,
-              "parens": undefined,
               "spacing": Object {},
-              "tableRefName": undefined,
-              "type": "ref",
+              "table": undefined,
+              "type": "column",
             },
-            SqlRef {
-              "columnRefName": RefName {
+            SqlColumn {
+              "keywords": Object {},
+              "parens": undefined,
+              "refName": RefName {
                 "name": "B",
                 "quotes": false,
               },
-              "keywords": Object {},
-              "namespaceRefName": undefined,
-              "parens": undefined,
               "spacing": Object {},
-              "tableRefName": undefined,
-              "type": "ref",
+              "table": undefined,
+              "type": "column",
             },
-            SqlRef {
-              "columnRefName": RefName {
+            SqlColumn {
+              "keywords": Object {},
+              "parens": undefined,
+              "refName": RefName {
                 "name": "C",
                 "quotes": false,
               },
-              "keywords": Object {},
-              "namespaceRefName": undefined,
-              "parens": undefined,
               "spacing": Object {},
-              "tableRefName": undefined,
-              "type": "ref",
+              "table": undefined,
+              "type": "column",
             },
           ],
         },
@@ -1602,29 +1570,27 @@ describe('Multiple expressions', () => {
                   },
                 ],
                 "values": Array [
-                  SqlRef {
-                    "columnRefName": RefName {
+                  SqlColumn {
+                    "keywords": Object {},
+                    "parens": undefined,
+                    "refName": RefName {
                       "name": "A",
                       "quotes": false,
                     },
-                    "keywords": Object {},
-                    "namespaceRefName": undefined,
-                    "parens": undefined,
                     "spacing": Object {},
-                    "tableRefName": undefined,
-                    "type": "ref",
+                    "table": undefined,
+                    "type": "column",
                   },
-                  SqlRef {
-                    "columnRefName": RefName {
+                  SqlColumn {
+                    "keywords": Object {},
+                    "parens": undefined,
+                    "refName": RefName {
                       "name": "B",
                       "quotes": false,
                     },
-                    "keywords": Object {},
-                    "namespaceRefName": undefined,
-                    "parens": undefined,
                     "spacing": Object {},
-                    "tableRefName": undefined,
-                    "type": "ref",
+                    "table": undefined,
+                    "type": "column",
                   },
                 ],
               },
@@ -1644,29 +1610,27 @@ describe('Multiple expressions', () => {
                   },
                 ],
                 "values": Array [
-                  SqlRef {
-                    "columnRefName": RefName {
+                  SqlColumn {
+                    "keywords": Object {},
+                    "parens": undefined,
+                    "refName": RefName {
                       "name": "C",
                       "quotes": false,
                     },
-                    "keywords": Object {},
-                    "namespaceRefName": undefined,
-                    "parens": undefined,
                     "spacing": Object {},
-                    "tableRefName": undefined,
-                    "type": "ref",
+                    "table": undefined,
+                    "type": "column",
                   },
-                  SqlRef {
-                    "columnRefName": RefName {
+                  SqlColumn {
+                    "keywords": Object {},
+                    "parens": undefined,
+                    "refName": RefName {
                       "name": "D",
                       "quotes": false,
                     },
-                    "keywords": Object {},
-                    "namespaceRefName": undefined,
-                    "parens": undefined,
                     "spacing": Object {},
-                    "tableRefName": undefined,
-                    "type": "ref",
+                    "table": undefined,
+                    "type": "column",
                   },
                 ],
               },
@@ -1676,17 +1640,16 @@ describe('Multiple expressions', () => {
               "spacing": Object {},
               "type": "multi",
             },
-            SqlRef {
-              "columnRefName": RefName {
+            SqlColumn {
+              "keywords": Object {},
+              "parens": undefined,
+              "refName": RefName {
                 "name": "E",
                 "quotes": false,
               },
-              "keywords": Object {},
-              "namespaceRefName": undefined,
-              "parens": undefined,
               "spacing": Object {},
-              "tableRefName": undefined,
-              "type": "ref",
+              "table": undefined,
+              "type": "column",
             },
           ],
         },
@@ -1725,29 +1688,27 @@ describe('Brackets', () => {
                   },
                 ],
                 "values": Array [
-                  SqlRef {
-                    "columnRefName": RefName {
+                  SqlColumn {
+                    "keywords": Object {},
+                    "parens": undefined,
+                    "refName": RefName {
                       "name": "A",
                       "quotes": false,
                     },
-                    "keywords": Object {},
-                    "namespaceRefName": undefined,
-                    "parens": undefined,
                     "spacing": Object {},
-                    "tableRefName": undefined,
-                    "type": "ref",
+                    "table": undefined,
+                    "type": "column",
                   },
-                  SqlRef {
-                    "columnRefName": RefName {
+                  SqlColumn {
+                    "keywords": Object {},
+                    "parens": undefined,
+                    "refName": RefName {
                       "name": "b",
                       "quotes": false,
                     },
-                    "keywords": Object {},
-                    "namespaceRefName": undefined,
-                    "parens": undefined,
                     "spacing": Object {},
-                    "tableRefName": undefined,
-                    "type": "ref",
+                    "table": undefined,
+                    "type": "column",
                   },
                 ],
               },
@@ -1762,17 +1723,16 @@ describe('Brackets', () => {
               "spacing": Object {},
               "type": "multi",
             },
-            SqlRef {
-              "columnRefName": RefName {
+            SqlColumn {
+              "keywords": Object {},
+              "parens": undefined,
+              "refName": RefName {
                 "name": "c",
                 "quotes": false,
               },
-              "keywords": Object {},
-              "namespaceRefName": undefined,
-              "parens": undefined,
               "spacing": Object {},
-              "tableRefName": undefined,
-              "type": "ref",
+              "table": undefined,
+              "type": "column",
             },
           ],
         },
@@ -1811,29 +1771,27 @@ describe('Brackets', () => {
                   },
                 ],
                 "values": Array [
-                  SqlRef {
-                    "columnRefName": RefName {
+                  SqlColumn {
+                    "keywords": Object {},
+                    "parens": undefined,
+                    "refName": RefName {
                       "name": "A",
                       "quotes": false,
                     },
-                    "keywords": Object {},
-                    "namespaceRefName": undefined,
-                    "parens": undefined,
                     "spacing": Object {},
-                    "tableRefName": undefined,
-                    "type": "ref",
+                    "table": undefined,
+                    "type": "column",
                   },
-                  SqlRef {
-                    "columnRefName": RefName {
+                  SqlColumn {
+                    "keywords": Object {},
+                    "parens": undefined,
+                    "refName": RefName {
                       "name": "b",
                       "quotes": false,
                     },
-                    "keywords": Object {},
-                    "namespaceRefName": undefined,
-                    "parens": undefined,
                     "spacing": Object {},
-                    "tableRefName": undefined,
-                    "type": "ref",
+                    "table": undefined,
+                    "type": "column",
                   },
                 ],
               },
@@ -1848,17 +1806,16 @@ describe('Brackets', () => {
               "spacing": Object {},
               "type": "multi",
             },
-            SqlRef {
-              "columnRefName": RefName {
+            SqlColumn {
+              "keywords": Object {},
+              "parens": undefined,
+              "refName": RefName {
                 "name": "c",
                 "quotes": false,
               },
-              "keywords": Object {},
-              "namespaceRefName": undefined,
-              "parens": undefined,
               "spacing": Object {},
-              "tableRefName": undefined,
-              "type": "ref",
+              "table": undefined,
+              "type": "column",
             },
           ],
         },
@@ -1904,29 +1861,27 @@ describe('Brackets', () => {
                       },
                     ],
                     "values": Array [
-                      SqlRef {
-                        "columnRefName": RefName {
+                      SqlColumn {
+                        "keywords": Object {},
+                        "parens": undefined,
+                        "refName": RefName {
                           "name": "A",
                           "quotes": false,
                         },
-                        "keywords": Object {},
-                        "namespaceRefName": undefined,
-                        "parens": undefined,
                         "spacing": Object {},
-                        "tableRefName": undefined,
-                        "type": "ref",
+                        "table": undefined,
+                        "type": "column",
                       },
-                      SqlRef {
-                        "columnRefName": RefName {
+                      SqlColumn {
+                        "keywords": Object {},
+                        "parens": undefined,
+                        "refName": RefName {
                           "name": "b",
                           "quotes": false,
                         },
-                        "keywords": Object {},
-                        "namespaceRefName": undefined,
-                        "parens": undefined,
                         "spacing": Object {},
-                        "tableRefName": undefined,
-                        "type": "ref",
+                        "table": undefined,
+                        "type": "column",
                       },
                     ],
                   },
@@ -1961,17 +1916,16 @@ describe('Brackets', () => {
               },
               "type": "unary",
             },
-            SqlRef {
-              "columnRefName": RefName {
+            SqlColumn {
+              "keywords": Object {},
+              "parens": undefined,
+              "refName": RefName {
                 "name": "c",
                 "quotes": false,
               },
-              "keywords": Object {},
-              "namespaceRefName": undefined,
-              "parens": undefined,
               "spacing": Object {},
-              "tableRefName": undefined,
-              "type": "ref",
+              "table": undefined,
+              "type": "column",
             },
           ],
         },
@@ -2024,75 +1978,71 @@ describe('containsColumn', () => {
   it('nested expression', () => {
     const sql = `A > 1 AND D OR B OR C`;
 
-    expect(SqlExpression.parse(sql).containsColumn('A')).toEqual(true);
+    expect(SqlExpression.parse(sql).containsColumnName('A')).toEqual(true);
   });
 
   it('nested expression with brackets', () => {
     const sql = `(A + B ) > 1 AND D OR B OR C`;
 
-    expect(SqlExpression.parse(sql).containsColumn('A')).toEqual(true);
+    expect(SqlExpression.parse(sql).containsColumnName('A')).toEqual(true);
   });
 
   it('nested expression with brackets', () => {
     const sql = `(D + B ) > 1 AND D OR B OR C`;
 
-    expect(SqlExpression.parse(sql).containsColumn('A')).toEqual(false);
+    expect(SqlExpression.parse(sql).containsColumnName('A')).toEqual(false);
   });
 });
 
-describe('getSqlRefs', () => {
+describe('getColumns', () => {
   it('Only multi expressions', () => {
     const sql = `A > 1 AND D OR B OR C`;
 
-    expect(SqlExpression.parse(sql).getRefs()).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql).getColumns()).toMatchInlineSnapshot(`
       Array [
-        SqlRef {
-          "columnRefName": RefName {
+        SqlColumn {
+          "keywords": Object {},
+          "parens": undefined,
+          "refName": RefName {
             "name": "A",
             "quotes": false,
           },
-          "keywords": Object {},
-          "namespaceRefName": undefined,
-          "parens": undefined,
           "spacing": Object {},
-          "tableRefName": undefined,
-          "type": "ref",
+          "table": undefined,
+          "type": "column",
         },
-        SqlRef {
-          "columnRefName": RefName {
+        SqlColumn {
+          "keywords": Object {},
+          "parens": undefined,
+          "refName": RefName {
             "name": "D",
             "quotes": false,
           },
-          "keywords": Object {},
-          "namespaceRefName": undefined,
-          "parens": undefined,
           "spacing": Object {},
-          "tableRefName": undefined,
-          "type": "ref",
+          "table": undefined,
+          "type": "column",
         },
-        SqlRef {
-          "columnRefName": RefName {
+        SqlColumn {
+          "keywords": Object {},
+          "parens": undefined,
+          "refName": RefName {
             "name": "B",
             "quotes": false,
           },
-          "keywords": Object {},
-          "namespaceRefName": undefined,
-          "parens": undefined,
           "spacing": Object {},
-          "tableRefName": undefined,
-          "type": "ref",
+          "table": undefined,
+          "type": "column",
         },
-        SqlRef {
-          "columnRefName": RefName {
+        SqlColumn {
+          "keywords": Object {},
+          "parens": undefined,
+          "refName": RefName {
             "name": "C",
             "quotes": false,
           },
-          "keywords": Object {},
-          "namespaceRefName": undefined,
-          "parens": undefined,
           "spacing": Object {},
-          "tableRefName": undefined,
-          "type": "ref",
+          "table": undefined,
+          "type": "column",
         },
       ]
     `);
@@ -2101,55 +2051,51 @@ describe('getSqlRefs', () => {
   it('includes unary expressions', () => {
     const sql = `A > 1 AND D OR B OR Not C`;
 
-    expect(SqlExpression.parse(sql).getRefs()).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql).getColumns()).toMatchInlineSnapshot(`
       Array [
-        SqlRef {
-          "columnRefName": RefName {
+        SqlColumn {
+          "keywords": Object {},
+          "parens": undefined,
+          "refName": RefName {
             "name": "A",
             "quotes": false,
           },
-          "keywords": Object {},
-          "namespaceRefName": undefined,
-          "parens": undefined,
           "spacing": Object {},
-          "tableRefName": undefined,
-          "type": "ref",
+          "table": undefined,
+          "type": "column",
         },
-        SqlRef {
-          "columnRefName": RefName {
+        SqlColumn {
+          "keywords": Object {},
+          "parens": undefined,
+          "refName": RefName {
             "name": "D",
             "quotes": false,
           },
-          "keywords": Object {},
-          "namespaceRefName": undefined,
-          "parens": undefined,
           "spacing": Object {},
-          "tableRefName": undefined,
-          "type": "ref",
+          "table": undefined,
+          "type": "column",
         },
-        SqlRef {
-          "columnRefName": RefName {
+        SqlColumn {
+          "keywords": Object {},
+          "parens": undefined,
+          "refName": RefName {
             "name": "B",
             "quotes": false,
           },
-          "keywords": Object {},
-          "namespaceRefName": undefined,
-          "parens": undefined,
           "spacing": Object {},
-          "tableRefName": undefined,
-          "type": "ref",
+          "table": undefined,
+          "type": "column",
         },
-        SqlRef {
-          "columnRefName": RefName {
+        SqlColumn {
+          "keywords": Object {},
+          "parens": undefined,
+          "refName": RefName {
             "name": "C",
             "quotes": false,
           },
-          "keywords": Object {},
-          "namespaceRefName": undefined,
-          "parens": undefined,
           "spacing": Object {},
-          "tableRefName": undefined,
-          "type": "ref",
+          "table": undefined,
+          "type": "column",
         },
       ]
     `);
@@ -2158,67 +2104,62 @@ describe('getSqlRefs', () => {
   it('includes unary expressions and nested Multi Expressions', () => {
     const sql = `A > 1 AND D OR B OR Not (C Or E)`;
 
-    expect(SqlExpression.parse(sql).getRefs()).toMatchInlineSnapshot(`
+    expect(SqlExpression.parse(sql).getColumns()).toMatchInlineSnapshot(`
       Array [
-        SqlRef {
-          "columnRefName": RefName {
+        SqlColumn {
+          "keywords": Object {},
+          "parens": undefined,
+          "refName": RefName {
             "name": "A",
             "quotes": false,
           },
-          "keywords": Object {},
-          "namespaceRefName": undefined,
-          "parens": undefined,
           "spacing": Object {},
-          "tableRefName": undefined,
-          "type": "ref",
+          "table": undefined,
+          "type": "column",
         },
-        SqlRef {
-          "columnRefName": RefName {
+        SqlColumn {
+          "keywords": Object {},
+          "parens": undefined,
+          "refName": RefName {
             "name": "D",
             "quotes": false,
           },
-          "keywords": Object {},
-          "namespaceRefName": undefined,
-          "parens": undefined,
           "spacing": Object {},
-          "tableRefName": undefined,
-          "type": "ref",
+          "table": undefined,
+          "type": "column",
         },
-        SqlRef {
-          "columnRefName": RefName {
+        SqlColumn {
+          "keywords": Object {},
+          "parens": undefined,
+          "refName": RefName {
             "name": "B",
             "quotes": false,
           },
-          "keywords": Object {},
-          "namespaceRefName": undefined,
-          "parens": undefined,
           "spacing": Object {},
-          "tableRefName": undefined,
-          "type": "ref",
+          "table": undefined,
+          "type": "column",
         },
-        SqlRef {
-          "columnRefName": RefName {
+        SqlColumn {
+          "keywords": Object {},
+          "parens": undefined,
+          "refName": RefName {
             "name": "C",
             "quotes": false,
           },
-          "keywords": Object {},
-          "namespaceRefName": undefined,
-          "parens": undefined,
           "spacing": Object {},
-          "tableRefName": undefined,
-          "type": "ref",
+          "table": undefined,
+          "type": "column",
         },
-        SqlRef {
-          "columnRefName": RefName {
+        SqlColumn {
+          "keywords": Object {},
+          "parens": undefined,
+          "refName": RefName {
             "name": "E",
             "quotes": false,
           },
-          "keywords": Object {},
-          "namespaceRefName": undefined,
-          "parens": undefined,
           "spacing": Object {},
-          "tableRefName": undefined,
-          "type": "ref",
+          "table": undefined,
+          "type": "column",
         },
       ]
     `);
@@ -2245,41 +2186,38 @@ describe('getSqlRefs', () => {
             },
           ],
           "values": Array [
-            SqlRef {
-              "columnRefName": RefName {
+            SqlColumn {
+              "keywords": Object {},
+              "parens": undefined,
+              "refName": RefName {
                 "name": "A",
                 "quotes": false,
               },
-              "keywords": Object {},
-              "namespaceRefName": undefined,
-              "parens": undefined,
               "spacing": Object {},
-              "tableRefName": undefined,
-              "type": "ref",
+              "table": undefined,
+              "type": "column",
             },
-            SqlRef {
-              "columnRefName": RefName {
+            SqlColumn {
+              "keywords": Object {},
+              "parens": undefined,
+              "refName": RefName {
                 "name": "B",
                 "quotes": false,
               },
-              "keywords": Object {},
-              "namespaceRefName": undefined,
-              "parens": undefined,
               "spacing": Object {},
-              "tableRefName": undefined,
-              "type": "ref",
+              "table": undefined,
+              "type": "column",
             },
-            SqlRef {
-              "columnRefName": RefName {
+            SqlColumn {
+              "keywords": Object {},
+              "parens": undefined,
+              "refName": RefName {
                 "name": "C",
                 "quotes": false,
               },
-              "keywords": Object {},
-              "namespaceRefName": undefined,
-              "parens": undefined,
               "spacing": Object {},
-              "tableRefName": undefined,
-              "type": "ref",
+              "table": undefined,
+              "type": "column",
             },
           ],
         },
@@ -2303,17 +2241,16 @@ describe('getSqlRefs', () => {
         "keywords": Object {
           "op": "IS",
         },
-        "lhs": SqlRef {
-          "columnRefName": RefName {
+        "lhs": SqlColumn {
+          "keywords": Object {},
+          "parens": undefined,
+          "refName": RefName {
             "name": "X",
             "quotes": false,
           },
-          "keywords": Object {},
-          "namespaceRefName": undefined,
-          "parens": undefined,
           "spacing": Object {},
-          "tableRefName": undefined,
-          "type": "ref",
+          "table": undefined,
+          "type": "column",
         },
         "negated": false,
         "op": "IS",
@@ -2347,17 +2284,16 @@ describe('getSqlRefs', () => {
           "not": "NOT",
           "op": "IS",
         },
-        "lhs": SqlRef {
-          "columnRefName": RefName {
+        "lhs": SqlColumn {
+          "keywords": Object {},
+          "parens": undefined,
+          "refName": RefName {
             "name": "X",
             "quotes": false,
           },
-          "keywords": Object {},
-          "namespaceRefName": undefined,
-          "parens": undefined,
           "spacing": Object {},
-          "tableRefName": undefined,
-          "type": "ref",
+          "table": undefined,
+          "type": "column",
         },
         "negated": true,
         "op": "IS",
@@ -2392,17 +2328,16 @@ describe('getSqlRefs', () => {
           "not": "NOT",
           "op": "IS",
         },
-        "lhs": SqlRef {
-          "columnRefName": RefName {
+        "lhs": SqlColumn {
+          "keywords": Object {},
+          "parens": undefined,
+          "refName": RefName {
             "name": "X",
             "quotes": false,
           },
-          "keywords": Object {},
-          "namespaceRefName": undefined,
-          "parens": undefined,
           "spacing": Object {},
-          "tableRefName": undefined,
-          "type": "ref",
+          "table": undefined,
+          "type": "column",
         },
         "negated": true,
         "op": "IS",
@@ -2447,17 +2382,16 @@ describe('getSqlRefs', () => {
                 "not": "NOT",
                 "op": "IS",
               },
-              "lhs": SqlRef {
-                "columnRefName": RefName {
+              "lhs": SqlColumn {
+                "keywords": Object {},
+                "parens": undefined,
+                "refName": RefName {
                   "name": "X",
                   "quotes": false,
                 },
-                "keywords": Object {},
-                "namespaceRefName": undefined,
-                "parens": undefined,
                 "spacing": Object {},
-                "tableRefName": undefined,
-                "type": "ref",
+                "table": undefined,
+                "type": "column",
               },
               "negated": true,
               "op": "IS",
@@ -2482,17 +2416,16 @@ describe('getSqlRefs', () => {
               "keywords": Object {
                 "op": "<>",
               },
-              "lhs": SqlRef {
-                "columnRefName": RefName {
+              "lhs": SqlColumn {
+                "keywords": Object {},
+                "parens": undefined,
+                "refName": RefName {
                   "name": "X",
                   "quotes": false,
                 },
-                "keywords": Object {},
-                "namespaceRefName": undefined,
-                "parens": undefined,
                 "spacing": Object {},
-                "tableRefName": undefined,
-                "type": "ref",
+                "table": undefined,
+                "type": "column",
               },
               "negated": false,
               "op": "<>",

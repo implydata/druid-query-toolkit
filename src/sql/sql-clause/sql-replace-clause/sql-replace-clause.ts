@@ -15,12 +15,12 @@
 import { SqlBase, SqlType, Substitutor } from '../../sql-base';
 import { SqlColumnList } from '../../sql-column-list/sql-column-list';
 import { SqlExpression } from '../../sql-expression';
-import { SqlTableRef } from '../../sql-table-ref/sql-table-ref';
+import { SqlTable } from '../../sql-table/sql-table';
 import { SqlClause, SqlClauseValue } from '../sql-clause';
 import { SqlWhereClause } from '../sql-where-clause/sql-where-clause';
 
 export interface SqlReplaceClauseValue extends SqlClauseValue {
-  table: SqlTableRef;
+  table: SqlTable;
   columns?: SqlColumnList;
   whereClause?: SqlWhereClause;
 }
@@ -34,12 +34,12 @@ export class SqlReplaceClause extends SqlClause {
   static readonly DEFAULT_ALL_KEYWORD = 'ALL';
 
   static create(
-    table: SqlReplaceClause | SqlTableRef | string,
+    table: SqlReplaceClause | SqlTable | string,
     where?: SqlWhereClause | SqlExpression,
   ): SqlReplaceClause {
     if (table instanceof SqlReplaceClause) return table;
     if (typeof table === 'string') {
-      table = SqlTableRef.create(table);
+      table = SqlTable.create(table);
     }
 
     let whereClause: SqlWhereClause | undefined;
@@ -53,7 +53,7 @@ export class SqlReplaceClause extends SqlClause {
     });
   }
 
-  public readonly table: SqlTableRef;
+  public readonly table: SqlTable;
   public readonly columns?: SqlColumnList;
   public readonly whereClause?: SqlWhereClause;
 
@@ -100,10 +100,10 @@ export class SqlReplaceClause extends SqlClause {
     return rawParts.join('');
   }
 
-  public changeTable(table: SqlTableRef | string): this {
+  public changeTable(table: SqlTable | string): this {
     const value = this.valueOf();
     if (typeof table === 'string') {
-      table = SqlTableRef.create(table);
+      table = SqlTable.create(table);
     }
     value.table = table;
     return SqlBase.fromValue(value);
@@ -118,7 +118,7 @@ export class SqlReplaceClause extends SqlClause {
 
     const table = this.table._walkHelper(nextStack, fn, postorder);
     if (!table) return;
-    if (!(table instanceof SqlTableRef)) {
+    if (!(table instanceof SqlTable)) {
       throw new Error('must return table');
     }
     if (table !== this.table) {

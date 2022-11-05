@@ -34,11 +34,11 @@ import {
   SqlWithPart,
 } from '../sql-clause';
 import { SqlReplaceClause } from '../sql-clause/sql-replace-clause/sql-replace-clause';
+import { SqlColumn } from '../sql-column/sql-column';
 import { SqlExpression } from '../sql-expression';
 import { SqlLiteral } from '../sql-literal/sql-literal';
-import { SqlRef } from '../sql-ref/sql-ref';
 import { SqlStar } from '../sql-star/sql-star';
-import { SqlTableRef } from '../sql-table-ref/sql-table-ref';
+import { SqlTable } from '../sql-table/sql-table';
 import { clampIndex, normalizeIndex, SeparatedArray, Separator } from '../utils';
 
 const INDENT_SPACE = '\n  ';
@@ -94,7 +94,7 @@ export class SqlQuery extends SqlExpression {
       fromClause:
         from instanceof SqlFromClause
           ? from
-          : SqlFromClause.create(SeparatedArray.fromSingleValue(from.convertToTableRef())),
+          : SqlFromClause.create(SeparatedArray.fromSingleValue(from.convertToTable())),
     });
   }
 
@@ -103,7 +103,7 @@ export class SqlQuery extends SqlExpression {
       fromClause:
         from instanceof SqlFromClause
           ? from
-          : SqlFromClause.create(SeparatedArray.fromSingleValue(from.convertToTableRef())),
+          : SqlFromClause.create(SeparatedArray.fromSingleValue(from.convertToTable())),
     });
   }
 
@@ -720,11 +720,11 @@ export class SqlQuery extends SqlExpression {
 
   /* ~~~~~ INSERT ~~~~~ */
 
-  public getInsertIntoTable(): SqlTableRef | undefined {
+  public getInsertIntoTable(): SqlTable | undefined {
     return this.insertClause?.table;
   }
 
-  public changeInsertIntoTable(table: SqlTableRef | string | undefined): this {
+  public changeInsertIntoTable(table: SqlTable | string | undefined): this {
     return this.changeInsertClause(
       table
         ? this.insertClause
@@ -736,11 +736,11 @@ export class SqlQuery extends SqlExpression {
 
   /* ~~~~~ REPLACE ~~~~~ */
 
-  public getReplaceIntoTable(): SqlTableRef | undefined {
+  public getReplaceIntoTable(): SqlTable | undefined {
     return this.replaceClause?.table;
   }
 
-  public changeReplaceIntoTable(table: SqlTableRef | string | undefined): this {
+  public changeReplaceIntoTable(table: SqlTable | string | undefined): this {
     return this.changeReplaceClause(
       table
         ? this.replaceClause
@@ -752,7 +752,7 @@ export class SqlQuery extends SqlExpression {
 
   /* ~~~~~ INSERT + REPLACE ~~~~~ */
 
-  public getIngestTable(): SqlTableRef | undefined {
+  public getIngestTable(): SqlTable | undefined {
     return this.getInsertIntoTable() || this.getReplaceIntoTable();
   }
 
@@ -812,7 +812,7 @@ export class SqlQuery extends SqlExpression {
 
   public getSelectIndexesForColumn(column: string): number[] {
     return filterMap(this.getSelectExpressionsArray(), (selectExpression, i) => {
-      return selectExpression.containsColumn(column) ? i : undefined;
+      return selectExpression.containsColumnName(column) ? i : undefined;
     });
   }
 
@@ -840,8 +840,8 @@ export class SqlQuery extends SqlExpression {
       return selectIndex === ex.getIndexValue();
     }
 
-    if (allowAliasReferences && ex instanceof SqlRef) {
-      return selectExpression.getOutputName() === ex.getColumn();
+    if (allowAliasReferences && ex instanceof SqlColumn) {
+      return selectExpression.getOutputName() === ex.getName();
     }
 
     return ex.equals(selectExpression.getUnderlyingExpression());
@@ -855,9 +855,9 @@ export class SqlQuery extends SqlExpression {
       return this.isValidSelectIndex(idx) ? idx : -1;
     }
 
-    if (allowAliasReferences && ex instanceof SqlRef) {
+    if (allowAliasReferences && ex instanceof SqlColumn) {
       const refIdx = selectExpressionsArray.findIndex((selectExpression, i) => {
-        return SqlQuery.getSelectExpressionOutput(selectExpression, i) === ex.getColumn();
+        return SqlQuery.getSelectExpressionOutput(selectExpression, i) === ex.getName();
       });
       if (refIdx !== -1) {
         return refIdx;

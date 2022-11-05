@@ -23,17 +23,16 @@ describe('SqlUnary', () => {
 
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlUnary {
-        "argument": SqlRef {
-          "columnRefName": RefName {
+        "argument": SqlColumn {
+          "keywords": Object {},
+          "parens": undefined,
+          "refName": RefName {
             "name": "A",
             "quotes": false,
           },
-          "keywords": Object {},
-          "namespaceRefName": undefined,
-          "parens": undefined,
           "spacing": Object {},
-          "tableRefName": undefined,
-          "type": "ref",
+          "table": undefined,
+          "type": "column",
         },
         "keywords": Object {
           "op": "-",
@@ -55,17 +54,16 @@ describe('SqlUnary', () => {
 
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlUnary {
-        "argument": SqlRef {
-          "columnRefName": RefName {
+        "argument": SqlColumn {
+          "keywords": Object {},
+          "parens": undefined,
+          "refName": RefName {
             "name": "B",
             "quotes": false,
           },
-          "keywords": Object {},
-          "namespaceRefName": undefined,
-          "parens": undefined,
           "spacing": Object {},
-          "tableRefName": undefined,
-          "type": "ref",
+          "table": undefined,
+          "type": "column",
         },
         "keywords": Object {
           "op": "NOT",
@@ -88,17 +86,16 @@ describe('SqlUnary', () => {
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlUnary {
         "argument": SqlUnary {
-          "argument": SqlRef {
-            "columnRefName": RefName {
+          "argument": SqlColumn {
+            "keywords": Object {},
+            "parens": undefined,
+            "refName": RefName {
               "name": "B",
               "quotes": false,
             },
-            "keywords": Object {},
-            "namespaceRefName": undefined,
-            "parens": undefined,
             "spacing": Object {},
-            "tableRefName": undefined,
-            "type": "ref",
+            "table": undefined,
+            "type": "column",
           },
           "keywords": Object {
             "op": "not",
@@ -145,17 +142,16 @@ describe('SqlUnary', () => {
           ],
           "values": Array [
             SqlUnary {
-              "argument": SqlRef {
-                "columnRefName": RefName {
+              "argument": SqlColumn {
+                "keywords": Object {},
+                "parens": undefined,
+                "refName": RefName {
                   "name": "A",
                   "quotes": false,
                 },
-                "keywords": Object {},
-                "namespaceRefName": undefined,
-                "parens": undefined,
                 "spacing": Object {},
-                "tableRefName": undefined,
-                "type": "ref",
+                "table": undefined,
+                "type": "column",
               },
               "keywords": Object {
                 "op": "NOT",
@@ -168,17 +164,16 @@ describe('SqlUnary', () => {
               "type": "unary",
             },
             SqlUnary {
-              "argument": SqlRef {
-                "columnRefName": RefName {
+              "argument": SqlColumn {
+                "keywords": Object {},
+                "parens": undefined,
+                "refName": RefName {
                   "name": "B",
                   "quotes": false,
                 },
-                "keywords": Object {},
-                "namespaceRefName": undefined,
-                "parens": undefined,
                 "spacing": Object {},
-                "tableRefName": undefined,
-                "type": "ref",
+                "table": undefined,
+                "type": "column",
               },
               "keywords": Object {
                 "op": "NOT",
@@ -191,17 +186,16 @@ describe('SqlUnary', () => {
               "type": "unary",
             },
             SqlUnary {
-              "argument": SqlRef {
-                "columnRefName": RefName {
+              "argument": SqlColumn {
+                "keywords": Object {},
+                "parens": undefined,
+                "refName": RefName {
                   "name": "C",
                   "quotes": false,
                 },
-                "keywords": Object {},
-                "namespaceRefName": undefined,
-                "parens": undefined,
                 "spacing": Object {},
-                "tableRefName": undefined,
-                "type": "ref",
+                "table": undefined,
+                "type": "column",
               },
               "keywords": Object {
                 "op": "NOT",
@@ -236,32 +230,30 @@ describe('SqlUnary', () => {
           "keywords": Object {
             "op": ">",
           },
-          "lhs": SqlRef {
-            "columnRefName": RefName {
+          "lhs": SqlColumn {
+            "keywords": Object {},
+            "parens": undefined,
+            "refName": RefName {
               "name": "A",
               "quotes": false,
             },
-            "keywords": Object {},
-            "namespaceRefName": undefined,
-            "parens": undefined,
             "spacing": Object {},
-            "tableRefName": undefined,
-            "type": "ref",
+            "table": undefined,
+            "type": "column",
           },
           "negated": false,
           "op": ">",
           "parens": undefined,
-          "rhs": SqlRef {
-            "columnRefName": RefName {
+          "rhs": SqlColumn {
+            "keywords": Object {},
+            "parens": undefined,
+            "refName": RefName {
               "name": "B",
               "quotes": false,
             },
-            "keywords": Object {},
-            "namespaceRefName": undefined,
-            "parens": undefined,
             "spacing": Object {},
-            "tableRefName": undefined,
-            "type": "ref",
+            "table": undefined,
+            "type": "column",
           },
           "spacing": Object {
             "postOp": " ",
@@ -304,32 +296,30 @@ describe('SqlUnary', () => {
                 "keywords": Object {
                   "op": ">",
                 },
-                "lhs": SqlRef {
-                  "columnRefName": RefName {
+                "lhs": SqlColumn {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "refName": RefName {
                     "name": "A",
                     "quotes": false,
                   },
-                  "keywords": Object {},
-                  "namespaceRefName": undefined,
-                  "parens": undefined,
                   "spacing": Object {},
-                  "tableRefName": undefined,
-                  "type": "ref",
+                  "table": undefined,
+                  "type": "column",
                 },
                 "negated": false,
                 "op": ">",
                 "parens": undefined,
-                "rhs": SqlRef {
-                  "columnRefName": RefName {
+                "rhs": SqlColumn {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "refName": RefName {
                     "name": "B",
                     "quotes": false,
                   },
-                  "keywords": Object {},
-                  "namespaceRefName": undefined,
-                  "parens": undefined,
                   "spacing": Object {},
-                  "tableRefName": undefined,
-                  "type": "ref",
+                  "table": undefined,
+                  "type": "column",
                 },
                 "spacing": Object {
                   "postOp": " ",
@@ -353,17 +343,16 @@ describe('SqlUnary', () => {
                 "keywords": Object {
                   "op": "=",
                 },
-                "lhs": SqlRef {
-                  "columnRefName": RefName {
+                "lhs": SqlColumn {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "refName": RefName {
                     "name": "C",
                     "quotes": false,
                   },
-                  "keywords": Object {},
-                  "namespaceRefName": undefined,
-                  "parens": undefined,
                   "spacing": Object {},
-                  "tableRefName": undefined,
-                  "type": "ref",
+                  "table": undefined,
+                  "type": "column",
                 },
                 "negated": false,
                 "op": "=",
@@ -416,32 +405,30 @@ describe('SqlUnary', () => {
             "keywords": Object {
               "op": ">",
             },
-            "lhs": SqlRef {
-              "columnRefName": RefName {
+            "lhs": SqlColumn {
+              "keywords": Object {},
+              "parens": undefined,
+              "refName": RefName {
                 "name": "A",
                 "quotes": false,
               },
-              "keywords": Object {},
-              "namespaceRefName": undefined,
-              "parens": undefined,
               "spacing": Object {},
-              "tableRefName": undefined,
-              "type": "ref",
+              "table": undefined,
+              "type": "column",
             },
             "negated": false,
             "op": ">",
             "parens": undefined,
-            "rhs": SqlRef {
-              "columnRefName": RefName {
+            "rhs": SqlColumn {
+              "keywords": Object {},
+              "parens": undefined,
+              "refName": RefName {
                 "name": "B",
                 "quotes": false,
               },
-              "keywords": Object {},
-              "namespaceRefName": undefined,
-              "parens": undefined,
               "spacing": Object {},
-              "tableRefName": undefined,
-              "type": "ref",
+              "table": undefined,
+              "type": "column",
             },
             "spacing": Object {
               "postOp": " ",

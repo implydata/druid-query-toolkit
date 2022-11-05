@@ -30,7 +30,7 @@ import {
 import { SqlExpression } from '../sql-expression';
 import { SqlLiteral } from '../sql-literal/sql-literal';
 import { SqlQuery } from '../sql-query/sql-query';
-import { SqlTableRef } from '../sql-table-ref/sql-table-ref';
+import { SqlTable } from '../sql-table/sql-table';
 import { SeparatedArray } from '../utils';
 
 export interface SqlWithQueryValue extends SqlBaseValue {
@@ -389,11 +389,11 @@ export class SqlWithQuery extends SqlExpression {
 
   /* ~~~~~ INSERT ~~~~~ */
 
-  public getInsertIntoTable(): SqlTableRef | undefined {
+  public getInsertIntoTable(): SqlTable | undefined {
     return this.insertClause?.table;
   }
 
-  public changeInsertIntoTable(table: SqlTableRef | string | undefined): this {
+  public changeInsertIntoTable(table: SqlTable | string | undefined): this {
     const value = this.valueOf();
     value.insertClause = table
       ? value.insertClause
@@ -405,11 +405,11 @@ export class SqlWithQuery extends SqlExpression {
 
   /* ~~~~~ REPLACE ~~~~~ */
 
-  public getReplaceIntoTable(): SqlTableRef | undefined {
+  public getReplaceIntoTable(): SqlTable | undefined {
     return this.replaceClause?.table;
   }
 
-  public changeReplaceIntoTable(table: SqlTableRef | string | undefined): this {
+  public changeReplaceIntoTable(table: SqlTable | string | undefined): this {
     return this.changeReplaceClause(
       table
         ? this.replaceClause
@@ -421,7 +421,7 @@ export class SqlWithQuery extends SqlExpression {
 
   /* ~~~~~ INSERT + REPLACE ~~~~~ */
 
-  public getIngestTable(): SqlTableRef | undefined {
+  public getIngestTable(): SqlTable | undefined {
     return this.getInsertIntoTable() || this.getReplaceIntoTable();
   }
 

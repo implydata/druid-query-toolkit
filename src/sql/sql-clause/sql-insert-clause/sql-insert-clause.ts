@@ -14,11 +14,11 @@
 
 import { SqlBase, SqlType, Substitutor } from '../../sql-base';
 import { SqlColumnList } from '../../sql-column-list/sql-column-list';
-import { SqlTableRef } from '../../sql-table-ref/sql-table-ref';
+import { SqlTable } from '../../sql-table/sql-table';
 import { SqlClause, SqlClauseValue } from '../sql-clause';
 
 export interface SqlInsertClauseValue extends SqlClauseValue {
-  table: SqlTableRef;
+  table: SqlTable;
   columns?: SqlColumnList;
 }
 
@@ -28,17 +28,17 @@ export class SqlInsertClause extends SqlClause {
   static readonly DEFAULT_INSERT_KEYWORD = 'INSERT';
   static readonly DEFAULT_INTO_KEYWORD = 'INTO';
 
-  static create(table: SqlInsertClause | SqlTableRef | string): SqlInsertClause {
+  static create(table: SqlInsertClause | SqlTable | string): SqlInsertClause {
     if (table instanceof SqlInsertClause) return table;
     if (typeof table === 'string') {
-      table = SqlTableRef.create(table);
+      table = SqlTable.create(table);
     }
     return new SqlInsertClause({
       table,
     });
   }
 
-  public readonly table: SqlTableRef;
+  public readonly table: SqlTable;
   public readonly columns?: SqlColumnList;
 
   constructor(options: SqlInsertClauseValue) {
@@ -70,10 +70,10 @@ export class SqlInsertClause extends SqlClause {
     return rawParts.join('');
   }
 
-  public changeTable(table: SqlTableRef | string): this {
+  public changeTable(table: SqlTable | string): this {
     const value = this.valueOf();
     if (typeof table === 'string') {
-      table = SqlTableRef.create(table);
+      table = SqlTable.create(table);
     }
     value.table = table;
     return SqlBase.fromValue(value);
@@ -88,7 +88,7 @@ export class SqlInsertClause extends SqlClause {
 
     const table = this.table._walkHelper(nextStack, fn, postorder);
     if (!table) return;
-    if (!(table instanceof SqlTableRef)) {
+    if (!(table instanceof SqlTable)) {
       throw new Error('must return table');
     }
     if (table !== this.table) {

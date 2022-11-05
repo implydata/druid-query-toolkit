@@ -41,6 +41,10 @@ export function isEmptyArray(x: unknown): x is Array<unknown> {
   return Array.isArray(x) && !x.length;
 }
 
+export function compact<T>(xs: (T | undefined | false | null | '')[]): T[] {
+  return xs.filter(Boolean) as T[];
+}
+
 // To be used as a tag
 export function sane(_x: TemplateStringsArray) {
   // eslint-disable-next-line prefer-rest-params,prefer-spread

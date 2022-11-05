@@ -13,7 +13,7 @@
  */
 
 import { backAndForth } from '../../test-utils';
-import { SqlExpression, SqlFunction, SqlRef, SqlStar } from '..';
+import { SqlColumn, SqlExpression, SqlFunction, SqlStar } from '..';
 
 describe('SqlFunction', () => {
   it('things that work', () => {
@@ -95,7 +95,7 @@ describe('SqlFunction', () => {
   });
 
   it('.floor', () => {
-    expect(SqlFunction.floor(SqlRef.column('__time'), 'Hour').toString()).toEqual(
+    expect(SqlFunction.floor(SqlColumn.create('__time'), 'Hour').toString()).toEqual(
       'FLOOR("__time" TO Hour)',
     );
   });
@@ -139,17 +139,16 @@ describe('SqlFunction', () => {
         "args": SeparatedArray {
           "separators": Array [],
           "values": Array [
-            SqlRef {
-              "columnRefName": RefName {
+            SqlColumn {
+              "keywords": Object {},
+              "parens": undefined,
+              "refName": RefName {
                 "name": "A",
                 "quotes": false,
               },
-              "keywords": Object {},
-              "namespaceRefName": undefined,
-              "parens": undefined,
               "spacing": Object {},
-              "tableRefName": undefined,
-              "type": "ref",
+              "table": undefined,
+              "type": "column",
             },
           ],
         },
@@ -181,17 +180,16 @@ describe('SqlFunction', () => {
         "args": SeparatedArray {
           "separators": Array [],
           "values": Array [
-            SqlRef {
-              "columnRefName": RefName {
+            SqlColumn {
+              "keywords": Object {},
+              "parens": undefined,
+              "refName": RefName {
                 "name": "A",
                 "quotes": false,
               },
-              "keywords": Object {},
-              "namespaceRefName": undefined,
-              "parens": undefined,
               "spacing": Object {},
-              "tableRefName": undefined,
-              "type": "ref",
+              "table": undefined,
+              "type": "column",
             },
           ],
         },
@@ -344,17 +342,16 @@ describe('SqlFunction', () => {
         "args": SeparatedArray {
           "separators": Array [],
           "values": Array [
-            SqlRef {
-              "columnRefName": RefName {
+            SqlColumn {
+              "keywords": Object {},
+              "parens": undefined,
+              "refName": RefName {
                 "name": "A",
                 "quotes": false,
               },
-              "keywords": Object {},
-              "namespaceRefName": undefined,
-              "parens": undefined,
               "spacing": Object {},
-              "tableRefName": undefined,
-              "type": "ref",
+              "table": undefined,
+              "type": "column",
             },
           ],
         },
@@ -396,17 +393,16 @@ describe('SqlFunction', () => {
               "args": SeparatedArray {
                 "separators": Array [],
                 "values": Array [
-                  SqlRef {
-                    "columnRefName": RefName {
+                  SqlColumn {
+                    "keywords": Object {},
+                    "parens": undefined,
+                    "refName": RefName {
                       "name": "A",
                       "quotes": false,
                     },
-                    "keywords": Object {},
-                    "namespaceRefName": undefined,
-                    "parens": undefined,
                     "spacing": Object {},
-                    "tableRefName": undefined,
-                    "type": "ref",
+                    "table": undefined,
+                    "type": "column",
                   },
                 ],
               },
@@ -439,17 +435,16 @@ describe('SqlFunction', () => {
                     "args": SeparatedArray {
                       "separators": Array [],
                       "values": Array [
-                        SqlRef {
-                          "columnRefName": RefName {
+                        SqlColumn {
+                          "keywords": Object {},
+                          "parens": undefined,
+                          "refName": RefName {
                             "name": "B",
                             "quotes": false,
                           },
-                          "keywords": Object {},
-                          "namespaceRefName": undefined,
-                          "parens": undefined,
                           "spacing": Object {},
-                          "tableRefName": undefined,
-                          "type": "ref",
+                          "table": undefined,
+                          "type": "column",
                         },
                       ],
                     },
@@ -482,17 +477,16 @@ describe('SqlFunction', () => {
                           "args": SeparatedArray {
                             "separators": Array [],
                             "values": Array [
-                              SqlRef {
-                                "columnRefName": RefName {
+                              SqlColumn {
+                                "keywords": Object {},
+                                "parens": undefined,
+                                "refName": RefName {
                                   "name": "c",
                                   "quotes": false,
                                 },
-                                "keywords": Object {},
-                                "namespaceRefName": undefined,
-                                "parens": undefined,
                                 "spacing": Object {},
-                                "tableRefName": undefined,
-                                "type": "ref",
+                                "table": undefined,
+                                "type": "column",
                               },
                             ],
                           },
@@ -556,17 +550,16 @@ describe('SqlFunction', () => {
         "args": SeparatedArray {
           "separators": Array [],
           "values": Array [
-            SqlRef {
-              "columnRefName": RefName {
+            SqlColumn {
+              "keywords": Object {},
+              "parens": undefined,
+              "refName": RefName {
                 "name": "A",
                 "quotes": false,
               },
-              "keywords": Object {},
-              "namespaceRefName": undefined,
-              "parens": undefined,
               "spacing": Object {},
-              "tableRefName": undefined,
-              "type": "ref",
+              "table": undefined,
+              "type": "column",
             },
           ],
         },
@@ -592,17 +585,16 @@ describe('SqlFunction', () => {
             "keywords": Object {
               "op": ">",
             },
-            "lhs": SqlRef {
-              "columnRefName": RefName {
+            "lhs": SqlColumn {
+              "keywords": Object {},
+              "parens": undefined,
+              "refName": RefName {
                 "name": "val",
                 "quotes": false,
               },
-              "keywords": Object {},
-              "namespaceRefName": undefined,
-              "parens": undefined,
               "spacing": Object {},
-              "tableRefName": undefined,
-              "type": "ref",
+              "table": undefined,
+              "type": "column",
             },
             "negated": false,
             "op": ">",

@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { RefName, SqlAlias, SqlQuery, SqlRef } from '../..';
+import { RefName, SqlAlias, SqlColumn, SqlQuery } from '../..';
 import { backAndForth } from '../../test-utils';
 
 describe('SqlAlias', () => {
@@ -23,17 +23,16 @@ describe('SqlAlias', () => {
       backAndForth(sql);
 
       expect(SqlQuery.parse(sql)!.getSelectExpressionForIndex(0)).toMatchInlineSnapshot(`
-        SqlRef {
-          "columnRefName": RefName {
+        SqlColumn {
+          "keywords": Object {},
+          "parens": undefined,
+          "refName": RefName {
             "name": "city",
             "quotes": false,
           },
-          "keywords": Object {},
-          "namespaceRefName": undefined,
-          "parens": undefined,
           "spacing": Object {},
-          "tableRefName": undefined,
-          "type": "ref",
+          "table": undefined,
+          "type": "column",
         }
       `);
     });
@@ -50,17 +49,16 @@ describe('SqlAlias', () => {
             "quotes": false,
           },
           "columns": undefined,
-          "expression": SqlRef {
-            "columnRefName": RefName {
+          "expression": SqlColumn {
+            "keywords": Object {},
+            "parens": undefined,
+            "refName": RefName {
               "name": "city",
               "quotes": false,
             },
-            "keywords": Object {},
-            "namespaceRefName": undefined,
-            "parens": undefined,
             "spacing": Object {},
-            "tableRefName": undefined,
-            "type": "ref",
+            "table": undefined,
+            "type": "column",
           },
           "keywords": Object {
             "as": "AS",
@@ -87,23 +85,29 @@ describe('SqlAlias', () => {
             "quotes": false,
           },
           "columns": undefined,
-          "expression": SqlRef {
-            "columnRefName": RefName {
+          "expression": SqlColumn {
+            "keywords": Object {},
+            "parens": undefined,
+            "refName": RefName {
               "name": "city",
               "quotes": false,
             },
-            "keywords": Object {},
-            "namespaceRefName": undefined,
-            "parens": undefined,
             "spacing": Object {
-              "postTableDot": "",
-              "preTableDot": "",
+              "postDot": "",
+              "postTable": "",
             },
-            "tableRefName": RefName {
-              "name": "tbl",
-              "quotes": false,
+            "table": SqlTable {
+              "keywords": Object {},
+              "namespace": undefined,
+              "parens": undefined,
+              "refName": RefName {
+                "name": "tbl",
+                "quotes": false,
+              },
+              "spacing": Object {},
+              "type": "table",
             },
-            "type": "ref",
+            "type": "column",
           },
           "keywords": Object {
             "as": "As",
@@ -130,23 +134,29 @@ describe('SqlAlias', () => {
             "quotes": false,
           },
           "columns": undefined,
-          "expression": SqlRef {
-            "columnRefName": RefName {
+          "expression": SqlColumn {
+            "keywords": Object {},
+            "parens": undefined,
+            "refName": RefName {
               "name": "city",
               "quotes": false,
             },
-            "keywords": Object {},
-            "namespaceRefName": undefined,
-            "parens": undefined,
             "spacing": Object {
-              "postTableDot": "",
-              "preTableDot": "",
+              "postDot": "",
+              "postTable": "",
             },
-            "tableRefName": RefName {
-              "name": "tbl",
-              "quotes": false,
+            "table": SqlTable {
+              "keywords": Object {},
+              "namespace": undefined,
+              "parens": undefined,
+              "refName": RefName {
+                "name": "tbl",
+                "quotes": false,
+              },
+              "spacing": Object {},
+              "type": "table",
             },
-            "type": "ref",
+            "type": "column",
           },
           "keywords": Object {
             "as": "",
@@ -163,13 +173,13 @@ describe('SqlAlias', () => {
 
   describe('.create', () => {
     expect(
-      SqlAlias.create(SqlAlias.create(SqlRef.column('X'), 'name1'), 'name2').toString(),
+      SqlAlias.create(SqlAlias.create(SqlColumn.create('X'), 'name1'), 'name2').toString(),
     ).toEqual('"X" AS "name2"');
   });
 
   describe('#as', () => {
-    const x = SqlRef.columnWithoutQuotes('X').as('test');
-    const z = SqlRef.columnWithoutQuotes('Z').as(RefName.create('test', true));
+    const x = SqlColumn.optionalQuotes('X').as('test');
+    const z = SqlColumn.optionalQuotes('Z').as(RefName.create('test', true));
 
     it('should work with normal string', () => {
       expect(String(x.as('hello'))).toEqual('X AS "hello"');
@@ -193,8 +203,8 @@ describe('SqlAlias', () => {
   });
 
   describe('#changeAlias', () => {
-    const x = SqlAlias.create(SqlRef.columnWithoutQuotes('X'), 'test');
-    const z = SqlAlias.create(SqlRef.columnWithoutQuotes('Z'), RefName.create('test', true));
+    const x = SqlAlias.create(SqlColumn.optionalQuotes('X'), 'test');
+    const z = SqlAlias.create(SqlColumn.optionalQuotes('Z'), RefName.create('test', true));
 
     it('should work with normal string', () => {
       expect(String(x.changeAlias('hello'))).toEqual('X AS "hello"');

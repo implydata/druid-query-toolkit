@@ -89,7 +89,7 @@ describe('Uber Query', () => {
   });
 
   it('.getUsedColumns', () => {
-    expect(query.getUsedColumns()).toEqual([
+    expect(query.getUsedColumnNames()).toEqual([
       'Col1',
       'blah',
       'col',

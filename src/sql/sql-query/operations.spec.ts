@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { SqlExpression, SqlQuery, SqlRef } from '../..';
+import { SqlColumn, SqlExpression, SqlQuery } from '../..';
 import { sane } from '../../utils';
 
 function stringifyExpressions(v: any) {
@@ -159,7 +159,7 @@ describe('SqlQuery operations', () => {
       ).toEqual('sys');
     });
 
-    it('getFirstSchema from SqlRef with no nameSpace', () => {
+    it('getFirstSchema from column with no namespace', () => {
       expect(
         SqlQuery.parse(
           sane`
@@ -287,7 +287,7 @@ describe('SqlQuery operations', () => {
             FROM sys."github"
           `,
         )
-          .addOrderBy(SqlRef.column('col').toOrderByExpression('DESC'))
+          .addOrderBy(SqlColumn.create('col').toOrderByExpression('DESC'))
           .toString(),
       ).toEqual(sane`
         SELECT *
@@ -305,7 +305,7 @@ describe('SqlQuery operations', () => {
             ORDER BY col
           `,
         )
-          .addOrderBy(SqlRef.columnWithQuotes('colTwo').toOrderByExpression('ASC'))
+          .addOrderBy(SqlColumn.create('colTwo').toOrderByExpression('ASC'))
           .toString(),
       ).toEqual(sane`
         SELECT *
@@ -323,7 +323,7 @@ describe('SqlQuery operations', () => {
             ORDER BY col, colTwo ASC
           `,
         )
-          .addOrderBy(SqlRef.columnWithQuotes('colThree').toOrderByExpression())
+          .addOrderBy(SqlColumn.create('colThree').toOrderByExpression())
           .toString(),
       ).toEqual(sane`
         SELECT *
@@ -714,7 +714,7 @@ describe('SqlQuery operations', () => {
         select Count(*) from tbl
       `);
 
-      expect(sql.addGroupBy(SqlRef.columnWithQuotes('col')).toString()).toEqual(sane`
+      expect(sql.addGroupBy(SqlColumn.create('col')).toString()).toEqual(sane`
         select Count(*) from tbl
         GROUP BY "col"
       `);

@@ -227,7 +227,7 @@ InsertClause =
   columns:(_ SqlColumnList)?
 {
   var value = {
-    table: table.convertToTableRef(),
+    table: table.convertToTable(),
     keywords: {
       insert: insert,
       into: into
@@ -259,7 +259,7 @@ ReplaceClause =
   allOrWhere:(AllToken / SqlWhereClause)
 {
   var value = {
-    table: table.convertToTableRef(),
+    table: table.convertToTable(),
     keywords: {
       replace: replace,
       into: into,
@@ -366,7 +366,7 @@ SqlStarOrAliasExpression = SqlStar / SqlAlias
 FromClause = from:FromToken postFrom:_ head:SqlAlias tail:(CommaSeparator SqlAlias)* join:(_ JoinClauses)?
 {
   return new sql.SqlFromClause({
-    expressions: makeSeparatedArray(head, tail).map(function(ex) { return ex.convertToTableRef() }),
+    expressions: makeSeparatedArray(head, tail).map(function(ex) { return ex.convertToTable() }),
     joinParts: join ? join[1] : undefined,
     spacing: {
       postFrom: postFrom,
@@ -391,7 +391,7 @@ SqlJoinPart =
   on:(_ OnToken _ Expression)?
 {
   var value = {
-    table: table.convertToTableRef(),
+    table: table.convertToTable(),
   };
   var spacing = value.spacing = {
     postJoin: postJoin,
@@ -1494,31 +1494,39 @@ ArrayEntry = Number / SingleQuotedString / UnicodeString / BinaryString
 SqlRef = a:RefName b:(_ "." _ RefName)? c:(_ "." _ RefName)?
 {
   if (c) {
-    return new sql.SqlRef({
-      columnRefName: c[3],
-      tableRefName: b[3],
-      namespaceRefName: a,
+    return new sql.SqlColumn({
+      refName: c[3],
       spacing: {
-        preTableDot: c[0],
-        postTableDot: c[2],
-        preNamespaceDot: b[0],
-        postNamespaceDot: b[2],
-      }
+        postTable: c[0],
+        postDot: c[2],
+      },
+      table: new sql.SqlTable({
+        refName: b[3],
+        spacing: {
+          postNamespace: b[0],
+          postDot: b[2],
+        },
+        namespace: new sql.SqlNamespace({
+          refName: a,
+        })
+      })
     });
 
   } else if (b) {
-    return new sql.SqlRef({
-      columnRefName: b[3],
-      tableRefName: a,
+    return new sql.SqlColumn({
+      refName: b[3],
       spacing: {
-        preTableDot: b[0],
-        postTableDot: b[2],
-      }
+        postTable: b[0],
+        postDot: b[2],
+      },
+      table: new sql.SqlTable({
+        refName: a,
+      })
     });
 
   } else {
-    return new sql.SqlRef({
-      columnRefName: a,
+    return new sql.SqlColumn({
+      refName: a,
     });
   }
 }
@@ -1561,24 +1569,31 @@ UnquotedRefNameAlias = name:UnquotedRefNameFree &{ return !sql.RefName.isReserve
 
 UnquotedRefNameFree = $([a-z_]i [a-z0-9_]i*)
 
-SqlStar = namespace:(RefName _ "." _)? table:(RefName _ "." _)? "*"
+SqlStar = a:(RefName _ "." _)? b:(RefName _ "." _)? "*"
 {
-  var value = {};
-  var spacing = value.spacing = {};
+  if (!a) return sql.SqlStar.PLAIN;
 
-  if (namespace) {
-    value.namespaceRefName = namespace[0];
-    spacing.preNamespaceDot = namespace[1];
-    spacing.postNamespaceDot = namespace[3];
-  }
-
-  if (table) {
-    value.tableRefName = table[0];
-    spacing.preTableDot = table[1];
-    spacing.postTableDot = table[3];
-  }
-
-  return new sql.SqlStar(value);
+  var last = b || a;
+  return new sql.SqlStar({
+    spacing: {
+      postTable: last[1],
+      postDot: last[3],
+    },
+    table: b ?
+      new sql.SqlTable({
+        refName: b[0],
+        spacing: {
+          postNamespace: a[1],
+          postDot: a[3],
+        },
+        namespace: new sql.SqlNamespace({
+          refName: a[0],
+        })
+      }) :
+      new sql.SqlTable({
+        refName: a[0]
+      })
+  });
 }
 
 // -----------------------------------
