@@ -164,6 +164,10 @@ export class SqlFunction extends SqlExpression {
     );
   }
 
+  static regexpLike(ex: SqlExpression, pattern: string | SqlLiteral) {
+    return SqlFunction.simple('REGEXP_LIKE', [ex, pattern]);
+  }
+
   public readonly functionName: string;
   public readonly specialParen?: SpecialParen;
   public readonly args?: SeparatedArray<SqlExpression>;

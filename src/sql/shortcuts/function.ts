@@ -24,6 +24,7 @@ F.cast = SqlFunction.cast;
 F.floor = SqlFunction.floor;
 F.timeFloor = SqlFunction.timeFloor;
 F.stringFormat = SqlFunction.stringFormat;
+F.regexpLike = SqlFunction.regexpLike;
 
 F.count = SqlFunction.count;
 F.countDistinct = SqlFunction.countDistinct;

@@ -117,6 +117,10 @@ export class SqlColumn extends SqlExpression {
     );
   }
 
+  public getNamespaceName(): string | undefined {
+    return this.table?.getNamespaceName();
+  }
+
   public prettyTrim(maxLength: number): this {
     const { refName, table } = this;
     let ret = this.changeRefName(refName.prettyTrim(maxLength));
