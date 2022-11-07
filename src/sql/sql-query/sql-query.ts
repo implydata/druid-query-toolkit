@@ -88,22 +88,30 @@ export class SqlQuery extends SqlExpression {
   static readonly DEFAULT_SELECT_KEYWORD = 'SELECT';
   static readonly DEFAULT_UNION_KEYWORD = 'UNION ALL';
 
-  static create(from: SqlExpression | SqlFromClause): SqlQuery {
+  static create(from: string | SqlExpression | SqlFromClause): SqlQuery {
     return new SqlQuery({
       selectExpressions: SeparatedArray.fromSingleValue(SqlStar.PLAIN),
       fromClause:
         from instanceof SqlFromClause
           ? from
-          : SqlFromClause.create(SeparatedArray.fromSingleValue(from.convertToTable())),
+          : SqlFromClause.create(
+              SeparatedArray.fromSingleValue(
+                typeof from === 'string' ? SqlTable.create(from) : from.convertToTable(),
+              ),
+            ),
     });
   }
 
-  static from(from: SqlExpression | SqlFromClause): SqlQuery {
+  static from(from: string | SqlExpression | SqlFromClause): SqlQuery {
     return new SqlQuery({
       fromClause:
         from instanceof SqlFromClause
           ? from
-          : SqlFromClause.create(SeparatedArray.fromSingleValue(from.convertToTable())),
+          : SqlFromClause.create(
+              SeparatedArray.fromSingleValue(
+                typeof from === 'string' ? SqlTable.create(from) : from.convertToTable(),
+              ),
+            ),
     });
   }
 
