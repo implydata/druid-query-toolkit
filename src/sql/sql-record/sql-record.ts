@@ -39,6 +39,21 @@ export class SqlRecord extends SqlExpression {
     });
   }
 
+  static createWithoutKeyword(
+    expressions?: SqlRecord | SeparatedArray<SqlExpression> | SqlExpression[],
+  ): SqlRecord {
+    if (expressions instanceof SqlRecord) return expressions;
+    return new SqlRecord({
+      keywords: {
+        row: '',
+      },
+      expressions:
+        !expressions || isEmptyArray(expressions)
+          ? undefined
+          : SeparatedArray.fromArray(expressions, Separator.COMMA),
+    });
+  }
+
   public readonly expressions?: SeparatedArray<SqlExpression>;
 
   constructor(options: SqlRecordValue) {

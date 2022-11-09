@@ -105,6 +105,7 @@ describe('SqlComparison', () => {
 
   describe('factories', () => {
     it('works with IN', () => {
+      expect(SqlComparison.in(SqlColumn.create('x'), [1]).toString()).toEqual('"x" IN (1)');
       expect(SqlComparison.in(SqlColumn.create('x'), [1, 2, 3]).toString()).toEqual(
         '"x" IN (1, 2, 3)',
       );

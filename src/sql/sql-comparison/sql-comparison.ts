@@ -138,7 +138,7 @@ export class SqlComparison extends SqlExpression {
     return new SqlComparison({
       op: 'IN',
       lhs: SqlExpression.wrap(lhs),
-      rhs: SqlRecord.create(values.map(v => SqlExpression.wrap(v))),
+      rhs: SqlRecord.createWithoutKeyword(values.map(v => SqlExpression.wrap(v))),
     });
   }
 
