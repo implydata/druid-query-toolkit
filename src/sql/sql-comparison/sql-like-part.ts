@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../sql-base';
+import { SqlBase, SqlBaseValue, SqlTypeDesignator, Substitutor } from '../sql-base';
 import { SqlExpression } from '../sql-expression';
 import { SqlLiteral } from '../sql-literal/sql-literal';
 
@@ -22,7 +22,7 @@ export interface SqlLikePartValue extends SqlBaseValue {
 }
 
 export class SqlLikePart extends SqlBase {
-  static type: SqlType = 'likePart';
+  static type: SqlTypeDesignator = 'likePart';
 
   static DEFAULT_ESCAPE_KEYWORD = 'ESCAPE';
 

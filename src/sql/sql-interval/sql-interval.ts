@@ -13,7 +13,7 @@
  */
 
 import { SqlLiteral } from '..';
-import { SqlBase, SqlBaseValue, SqlType } from '../sql-base';
+import { SqlBase, SqlBaseValue, SqlTypeDesignator } from '../sql-base';
 import { SqlExpression } from '../sql-expression';
 
 export interface SqlIntervalValue extends SqlBaseValue {
@@ -22,7 +22,7 @@ export interface SqlIntervalValue extends SqlBaseValue {
 }
 
 export class SqlInterval extends SqlExpression {
-  static type: SqlType = 'interval';
+  static type: SqlTypeDesignator = 'interval';
 
   static DEFAULT_INTERVAL_KEYWORD = 'INTERVAL';
 

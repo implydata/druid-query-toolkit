@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../../sql-base';
+import { SqlBase, SqlBaseValue, SqlTypeDesignator, Substitutor } from '../../sql-base';
 import { SqlExpression } from '../../sql-expression';
 
 export type SqlJoinJoinTypeWithOn = 'LEFT' | 'RIGHT' | 'FULL' | 'INNER';
@@ -26,7 +26,7 @@ export interface SqlJoinPartValue extends SqlBaseValue {
 }
 
 export class SqlJoinPart extends SqlBase {
-  static type: SqlType = 'joinPart';
+  static type: SqlTypeDesignator = 'joinPart';
 
   static DEFAULT_JOIN_KEYWORD = 'JOIN';
   static DEFAULT_ON_KEYWORD = 'ON';

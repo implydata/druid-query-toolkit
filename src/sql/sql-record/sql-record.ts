@@ -13,7 +13,7 @@
  */
 
 import { isEmptyArray } from '../../utils';
-import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../sql-base';
+import { SqlBase, SqlBaseValue, SqlTypeDesignator, Substitutor } from '../sql-base';
 import { SqlExpression } from '../sql-expression';
 import { LiteralValue } from '../sql-literal/sql-literal';
 import { SeparatedArray, Separator } from '../utils';
@@ -23,7 +23,7 @@ export interface SqlRecordValue extends SqlBaseValue {
 }
 
 export class SqlRecord extends SqlExpression {
-  static type: SqlType = 'record';
+  static type: SqlTypeDesignator = 'record';
 
   static DEFAULT_ROW_KEYWORD = 'ROW';
 
@@ -68,15 +68,14 @@ export class SqlRecord extends SqlExpression {
   }
 
   protected _toRawString(): string {
-    const rawParts: string[] = [];
-
-    const rowKeyword = this.getKeyword(
-      'row',
-      this.expressions?.length() === 1 ? SqlRecord.DEFAULT_ROW_KEYWORD : '',
-    );
-    if (rowKeyword) {
-      rawParts.push(rowKeyword, this.getSpace('postRow', ''));
-    }
+    const rawParts: string[] = [
+      this.getKeyword(
+        'row',
+        this.expressions?.length() === 1 ? SqlRecord.DEFAULT_ROW_KEYWORD : '',
+        'postRow',
+        '',
+      ),
+    ];
 
     rawParts.push('(', this.getSpace('postLeftParen', ''));
 

@@ -14,44 +14,43 @@
 
 import { SqlBase, SqlTypeDesignator, Substitutor } from '../../sql-base';
 import { SqlExpression } from '../../sql-expression';
-import { SqlLiteral } from '../../sql-literal/sql-literal';
 import { SeparatedArray } from '../../utils';
 import { SqlClause, SqlClauseValue } from '../sql-clause';
 
-export interface SqlClusteredByClauseValue extends SqlClauseValue {
+export interface SqlPartitionByClauseValue extends SqlClauseValue {
   expressions: SeparatedArray<SqlExpression>;
 }
 
-export class SqlClusteredByClause extends SqlClause {
-  static type: SqlTypeDesignator = 'clusteredByClause';
+export class SqlPartitionByClause extends SqlClause {
+  static type: SqlTypeDesignator = 'partitionByClause';
 
-  static DEFAULT_CLUSTERED_BY_KEYWORD = 'CLUSTERED BY';
+  static DEFAULT_PARTITION_BY_KEYWORD = 'PARTITION BY';
 
   static create(
     expressions: SeparatedArray<SqlExpression> | SqlExpression[],
-  ): SqlClusteredByClause {
-    return new SqlClusteredByClause({
+  ): SqlPartitionByClause {
+    return new SqlPartitionByClause({
       expressions: SeparatedArray.fromArray(expressions),
     });
   }
 
   public readonly expressions: SeparatedArray<SqlExpression>;
 
-  constructor(options: SqlClusteredByClauseValue) {
-    super(options, SqlClusteredByClause.type);
+  constructor(options: SqlPartitionByClauseValue) {
+    super(options, SqlPartitionByClause.type);
     this.expressions = options.expressions;
   }
 
-  public valueOf(): SqlClusteredByClauseValue {
-    const value = super.valueOf() as SqlClusteredByClauseValue;
+  public valueOf(): SqlPartitionByClauseValue {
+    const value = super.valueOf() as SqlPartitionByClauseValue;
     value.expressions = this.expressions;
     return value;
   }
 
   protected _toRawString(): string {
     return [
-      this.getKeyword('clusteredBy', SqlClusteredByClause.DEFAULT_CLUSTERED_BY_KEYWORD),
-      this.getSpace('postClusteredBy'),
+      this.getKeyword('partitionBy', SqlPartitionByClause.DEFAULT_PARTITION_BY_KEYWORD),
+      this.getSpace('postPartitionBy'),
       this.expressions.toString(),
     ].join('');
   }
@@ -60,18 +59,6 @@ export class SqlClusteredByClause extends SqlClause {
     const value = this.valueOf();
     value.expressions = SeparatedArray.fromArray(expressions);
     return SqlBase.fromValue(value);
-  }
-
-  public addExpression(
-    expression: SqlExpression,
-    where: 'start' | 'end' = 'end',
-  ): SqlClusteredByClause {
-    const { expressions } = this;
-    return this.changeExpressions(
-      expressions
-        ? expressions.insert(where === 'start' ? 0 : Infinity, expression)
-        : SeparatedArray.fromSingleValue(expression),
-    );
   }
 
   public _walkInner(
@@ -89,32 +76,6 @@ export class SqlClusteredByClause extends SqlClause {
 
     return ret;
   }
-
-  public clearOwnSeparators(): this {
-    if (!this.expressions) return this;
-    const value = this.valueOf();
-    value.expressions = this.expressions.clearSeparators();
-    return SqlBase.fromValue(value);
-  }
-
-  public toArray(): readonly SqlExpression[] {
-    return this.expressions.values;
-  }
-
-  public shiftIndexes(aboveIndex: number): SqlClusteredByClause {
-    if (!this.expressions) return this;
-    return this.changeExpressions(
-      this.expressions.map(expression => {
-        if (expression instanceof SqlLiteral && expression.isIndex()) {
-          const expressionIndex = expression.getIndexValue();
-          if (aboveIndex <= expressionIndex) {
-            return expression.incrementIndex();
-          }
-        }
-        return expression;
-      }),
-    );
-  }
 }
 
-SqlBase.register(SqlClusteredByClause);
+SqlBase.register(SqlPartitionByClause);

@@ -13,7 +13,7 @@
  */
 
 import { Separator } from '../..';
-import { SqlBase, SqlBaseValue, SqlType } from '../sql-base';
+import { SqlBase, SqlBaseValue, SqlTypeDesignator } from '../sql-base';
 import { RefName, SeparatedArray } from '../utils';
 
 export interface SqlColumnListValue extends SqlBaseValue {
@@ -21,7 +21,7 @@ export interface SqlColumnListValue extends SqlBaseValue {
 }
 
 export class SqlColumnList extends SqlBase {
-  static type: SqlType = 'columnList';
+  static type: SqlTypeDesignator = 'columnList';
 
   static create(columns: SqlColumnList | SeparatedArray<RefName> | RefName[]): SqlColumnList {
     if (columns instanceof SqlColumnList) return columns;

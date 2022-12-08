@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlType, Substitutor } from '../../sql-base';
+import { SqlBase, SqlTypeDesignator, Substitutor } from '../../sql-base';
 import { SqlLiteral } from '../../sql-literal/sql-literal';
 import { SqlClause, SqlClauseValue } from '../sql-clause';
 
@@ -21,7 +21,7 @@ export interface SqlOffsetClauseValue extends SqlClauseValue {
 }
 
 export class SqlOffsetClause extends SqlClause {
-  static type: SqlType = 'offsetClause';
+  static type: SqlTypeDesignator = 'offsetClause';
 
   static DEFAULT_OFFSET_KEYWORD = 'OFFSET';
 

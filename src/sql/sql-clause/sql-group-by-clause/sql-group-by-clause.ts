@@ -13,7 +13,7 @@
  */
 
 import { isEmptyArray } from '../../../utils';
-import { SqlBase, SqlType, Substitutor } from '../../sql-base';
+import { SqlBase, SqlTypeDesignator, Substitutor } from '../../sql-base';
 import { SqlExpression } from '../../sql-expression';
 import { SqlLiteral } from '../../sql-literal/sql-literal';
 import { SeparatedArray } from '../../utils';
@@ -28,10 +28,9 @@ export interface SqlGroupByClauseValue extends SqlClauseValue {
 }
 
 export class SqlGroupByClause extends SqlClause {
-  static type: SqlType = 'groupByClause';
+  static type: SqlTypeDesignator = 'groupByClause';
 
-  static DEFAULT_GROUP_KEYWORD = 'GROUP';
-  static DEFAULT_BY_KEYWORD = 'BY';
+  static DEFAULT_GROUP_BY_KEYWORD = 'GROUP BY';
 
   static create(expressions?: SeparatedArray<SqlExpression> | SqlExpression[]): SqlGroupByClause {
     return new SqlGroupByClause({
@@ -63,10 +62,8 @@ export class SqlGroupByClause extends SqlClause {
 
   protected _toRawString(): string {
     const rawParts = [
-      this.getKeyword('group', SqlGroupByClause.DEFAULT_GROUP_KEYWORD),
-      this.getSpace('postGroup'),
-      this.getKeyword('by', SqlGroupByClause.DEFAULT_BY_KEYWORD),
-      this.getSpace('postBy'),
+      this.getKeyword('groupBy', SqlGroupByClause.DEFAULT_GROUP_BY_KEYWORD),
+      this.getSpace('postGroupBy'),
     ];
 
     if (this.decorator) {

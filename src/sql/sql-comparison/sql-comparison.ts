@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../sql-base';
+import { SqlBase, SqlBaseValue, SqlTypeDesignator, Substitutor } from '../sql-base';
 import { SqlExpression } from '../sql-expression';
 import { LiteralValue, SqlLiteral } from '../sql-literal/sql-literal';
 import { SqlRecord } from '../sql-record/sql-record';
@@ -52,7 +52,7 @@ export interface SqlComparisonValue extends SqlBaseValue {
 }
 
 export class SqlComparison extends SqlExpression {
-  static type: SqlType = 'comparison';
+  static type: SqlTypeDesignator = 'comparison';
 
   static DEFAULT_NOT_KEYWORD = 'NOT';
 

@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlType, Substitutor } from '../../sql-base';
+import { SqlBase, SqlTypeDesignator, Substitutor } from '../../sql-base';
 import { SqlExpression } from '../../sql-expression';
 import { SqlClause, SqlClauseValue } from '../sql-clause';
 
@@ -21,7 +21,7 @@ export interface SqlHavingClauseValue extends SqlClauseValue {
 }
 
 export class SqlHavingClause extends SqlClause {
-  static type: SqlType = 'havingClause';
+  static type: SqlTypeDesignator = 'havingClause';
 
   static DEFAULT_HAVING_KEYWORD = 'HAVING';
 

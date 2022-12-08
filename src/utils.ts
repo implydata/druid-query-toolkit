@@ -25,6 +25,20 @@ export function filterMap<T, Q>(xs: readonly T[], f: (x: T, i: number) => Q | un
   return xs.map(f).filter((x: Q | undefined) => typeof x !== 'undefined') as Q[];
 }
 
+export function objectMap<T, Q>(
+  obj: Record<string, T>,
+  f: (x: T, key: string) => Q | undefined,
+): Record<string, Q> {
+  const ret: Record<string, Q> = {};
+  for (const k in obj) {
+    const v = f(obj[k]!, k);
+    if (typeof v !== 'undefined') {
+      ret[k] = v;
+    }
+  }
+  return ret;
+}
+
 export function dedupe<T>(array: readonly T[], keyFn: (x: T) => string = String): T[] {
   const seen: Map<any, boolean> = new Map();
   const deduped: T[] = [];

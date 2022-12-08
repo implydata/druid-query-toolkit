@@ -231,7 +231,7 @@ describe('SqlComparison', () => {
         "rhs": SqlQuery {
           "clusteredByClause": undefined,
           "decorator": undefined,
-          "explainClause": undefined,
+          "explain": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -276,13 +276,11 @@ describe('SqlComparison', () => {
             },
             "innerParens": false,
             "keywords": Object {
-              "by": "BY",
-              "group": "GROUP",
+              "groupBy": "GROUP BY",
             },
             "parens": undefined,
             "spacing": Object {
-              "postBy": " ",
-              "postGroup": " ",
+              "postGroupBy": " ",
             },
             "type": "groupByClause",
           },
@@ -330,10 +328,13 @@ describe('SqlComparison', () => {
                       ],
                     },
                     "decorator": undefined,
-                    "functionName": "COUNT",
-                    "keywords": Object {
-                      "functionName": "COUNT",
+                    "extendClause": undefined,
+                    "functionName": RefName {
+                      "name": "COUNT",
+                      "quotes": false,
                     },
+                    "keywords": Object {},
+                    "namespace": undefined,
                     "parens": undefined,
                     "spacing": Object {
                       "postArguments": "",
@@ -343,6 +344,7 @@ describe('SqlComparison', () => {
                     "specialParen": undefined,
                     "type": "function",
                     "whereClause": undefined,
+                    "windowSpec": undefined,
                   },
                   "keywords": Object {
                     "direction": "DESC",
@@ -356,13 +358,11 @@ describe('SqlComparison', () => {
               ],
             },
             "keywords": Object {
-              "by": "BY",
-              "order": "ORDER",
+              "orderBy": "ORDER BY",
             },
             "parens": undefined,
             "spacing": Object {
-              "postBy": " ",
-              "postOrder": " ",
+              "postOrderBy": " ",
             },
             "type": "orderByClause",
           },
@@ -808,7 +808,7 @@ describe('SqlComparison', () => {
         "rhs": SqlQuery {
           "clusteredByClause": undefined,
           "decorator": undefined,
-          "explainClause": undefined,
+          "explain": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -938,7 +938,7 @@ describe('SqlComparison', () => {
         "rhs": SqlQuery {
           "clusteredByClause": undefined,
           "decorator": undefined,
-          "explainClause": undefined,
+          "explain": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],

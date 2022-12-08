@@ -159,7 +159,7 @@ describe('SqlQuery', () => {
     });
 
     it('works in advanced case', () => {
-      const query = SqlQuery.create(SqlTable.create('lol'))
+      const query = SqlQuery.create(SqlQuery.create(SqlTable.create('lol')))
         .changeSelectExpressions([
           SqlColumn.create('channel'),
           SqlColumn.create('page'),
@@ -174,7 +174,8 @@ describe('SqlQuery', () => {
           "page",
           "user",
           "as"
-        FROM "lol"
+        FROM (SELECT *
+        FROM "lol")
         WHERE channel  =  '#en.wikipedia'
       `);
     });
@@ -750,7 +751,7 @@ describe('SqlQuery', () => {
       SqlQuery {
         "clusteredByClause": undefined,
         "decorator": undefined,
-        "explainClause": undefined,
+        "explain": undefined,
         "fromClause": SqlFromClause {
           "expressions": SeparatedArray {
             "separators": Array [],
@@ -758,7 +759,7 @@ describe('SqlQuery', () => {
               SqlQuery {
                 "clusteredByClause": undefined,
                 "decorator": undefined,
-                "explainClause": undefined,
+                "explain": undefined,
                 "fromClause": SqlFromClause {
                   "expressions": SeparatedArray {
                     "separators": Array [],
@@ -835,13 +836,11 @@ describe('SqlQuery', () => {
                     ],
                   },
                   "keywords": Object {
-                    "by": "BY",
-                    "order": "ORDER",
+                    "orderBy": "ORDER BY",
                   },
                   "parens": undefined,
                   "spacing": Object {
-                    "postBy": " ",
-                    "postOrder": " ",
+                    "postOrderBy": " ",
                   },
                   "type": "orderByClause",
                 },
@@ -960,7 +959,7 @@ describe('SqlQuery', () => {
       SqlQuery {
         "clusteredByClause": undefined,
         "decorator": undefined,
-        "explainClause": undefined,
+        "explain": undefined,
         "fromClause": SqlFromClause {
           "expressions": SeparatedArray {
             "separators": Array [],
@@ -1063,10 +1062,13 @@ describe('SqlQuery', () => {
                   ],
                 },
                 "decorator": undefined,
-                "functionName": "SUM",
-                "keywords": Object {
-                  "functionName": "SUM",
+                "extendClause": undefined,
+                "functionName": RefName {
+                  "name": "SUM",
+                  "quotes": false,
                 },
+                "keywords": Object {},
+                "namespace": undefined,
                 "parens": undefined,
                 "spacing": Object {
                   "postArguments": "",
@@ -1076,6 +1078,7 @@ describe('SqlQuery', () => {
                 "specialParen": undefined,
                 "type": "function",
                 "whereClause": undefined,
+                "windowSpec": undefined,
               },
               "keywords": Object {
                 "as": "AS",
@@ -1107,10 +1110,13 @@ describe('SqlQuery', () => {
                   ],
                 },
                 "decorator": undefined,
-                "functionName": "COUNT",
-                "keywords": Object {
-                  "functionName": "COUNT",
+                "extendClause": undefined,
+                "functionName": RefName {
+                  "name": "COUNT",
+                  "quotes": false,
                 },
+                "keywords": Object {},
+                "namespace": undefined,
                 "parens": undefined,
                 "spacing": Object {
                   "postArguments": "",
@@ -1120,6 +1126,7 @@ describe('SqlQuery', () => {
                 "specialParen": undefined,
                 "type": "function",
                 "whereClause": undefined,
+                "windowSpec": undefined,
               },
               "keywords": Object {
                 "as": "AS",
@@ -1156,19 +1163,7 @@ describe('SqlQuery', () => {
       SqlQuery {
         "clusteredByClause": undefined,
         "decorator": undefined,
-        "explainClause": SqlExplainClause {
-          "keywords": Object {
-            "explain": "Explain",
-            "for": "for",
-            "plan": "plan",
-          },
-          "parens": undefined,
-          "spacing": Object {
-            "postExplain": " ",
-            "postPlan": " ",
-          },
-          "type": "explainClause",
-        },
+        "explain": true,
         "fromClause": SqlFromClause {
           "expressions": SeparatedArray {
             "separators": Array [],
@@ -1200,6 +1195,7 @@ describe('SqlQuery', () => {
         "havingClause": undefined,
         "insertClause": undefined,
         "keywords": Object {
+          "explainPlanFor": "Explain plan for",
           "select": "Select",
         },
         "limitClause": undefined,
@@ -1221,7 +1217,7 @@ describe('SqlQuery', () => {
           ],
         },
         "spacing": Object {
-          "postExplainClause": " ",
+          "postExplainPlanFor": " ",
           "postSelect": " ",
           "preFromClause": " ",
         },
@@ -1247,7 +1243,7 @@ describe('SqlQuery', () => {
       SqlQuery {
         "clusteredByClause": undefined,
         "decorator": undefined,
-        "explainClause": undefined,
+        "explain": undefined,
         "fromClause": SqlFromClause {
           "expressions": SeparatedArray {
             "separators": Array [],
@@ -1345,7 +1341,7 @@ describe('SqlQuery', () => {
                 "query": SqlQuery {
                   "clusteredByClause": undefined,
                   "decorator": undefined,
-                  "explainClause": undefined,
+                  "explain": undefined,
                   "fromClause": SqlFromClause {
                     "expressions": SeparatedArray {
                       "separators": Array [],
@@ -1444,7 +1440,7 @@ describe('SqlQuery', () => {
         SqlQuery {
           "clusteredByClause": undefined,
           "decorator": undefined,
-          "explainClause": undefined,
+          "explain": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -1560,7 +1556,7 @@ describe('SqlQuery', () => {
         SqlQuery {
           "clusteredByClause": undefined,
           "decorator": undefined,
-          "explainClause": undefined,
+          "explain": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -1688,7 +1684,7 @@ describe('SqlQuery', () => {
         SqlQuery {
           "clusteredByClause": undefined,
           "decorator": undefined,
-          "explainClause": undefined,
+          "explain": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -1920,7 +1916,7 @@ describe('SqlQuery', () => {
         SqlQuery {
           "clusteredByClause": undefined,
           "decorator": undefined,
-          "explainClause": undefined,
+          "explain": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -1968,13 +1964,11 @@ describe('SqlQuery', () => {
             },
             "innerParens": false,
             "keywords": Object {
-              "by": "by",
-              "group": "group",
+              "groupBy": "group by",
             },
             "parens": undefined,
             "spacing": Object {
-              "postBy": " ",
-              "postGroup": " ",
+              "postGroupBy": " ",
             },
             "type": "groupByClause",
           },
@@ -2023,7 +2017,7 @@ describe('SqlQuery', () => {
         SqlQuery {
           "clusteredByClause": undefined,
           "decorator": undefined,
-          "explainClause": undefined,
+          "explain": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -2071,13 +2065,11 @@ describe('SqlQuery', () => {
             },
             "innerParens": false,
             "keywords": Object {
-              "by": "by",
-              "group": "group",
+              "groupBy": "group by",
             },
             "parens": undefined,
             "spacing": Object {
-              "postBy": " ",
-              "postGroup": " ",
+              "postGroupBy": " ",
             },
             "type": "groupByClause",
           },
@@ -2126,7 +2118,7 @@ describe('SqlQuery', () => {
         SqlQuery {
           "clusteredByClause": undefined,
           "decorator": undefined,
-          "explainClause": undefined,
+          "explain": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -2191,13 +2183,11 @@ describe('SqlQuery', () => {
             },
             "innerParens": false,
             "keywords": Object {
-              "by": "by",
-              "group": "group",
+              "groupBy": "group by",
             },
             "parens": undefined,
             "spacing": Object {
-              "postBy": " ",
-              "postGroup": " ",
+              "postGroupBy": " ",
             },
             "type": "groupByClause",
           },
@@ -2253,7 +2243,7 @@ describe('SqlQuery', () => {
         SqlQuery {
           "clusteredByClause": undefined,
           "decorator": undefined,
-          "explainClause": undefined,
+          "explain": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -2369,7 +2359,7 @@ describe('SqlQuery', () => {
         SqlQuery {
           "clusteredByClause": undefined,
           "decorator": undefined,
-          "explainClause": undefined,
+          "explain": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -2497,7 +2487,7 @@ describe('SqlQuery', () => {
         SqlQuery {
           "clusteredByClause": undefined,
           "decorator": undefined,
-          "explainClause": undefined,
+          "explain": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -2729,7 +2719,7 @@ describe('SqlQuery', () => {
         SqlQuery {
           "clusteredByClause": undefined,
           "decorator": undefined,
-          "explainClause": undefined,
+          "explain": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -2787,13 +2777,11 @@ describe('SqlQuery', () => {
               ],
             },
             "keywords": Object {
-              "by": "by",
-              "order": "order",
+              "orderBy": "order by",
             },
             "parens": undefined,
             "spacing": Object {
-              "postBy": " ",
-              "postOrder": " ",
+              "postOrderBy": " ",
             },
             "type": "orderByClause",
           },
@@ -2838,7 +2826,7 @@ describe('SqlQuery', () => {
         SqlQuery {
           "clusteredByClause": undefined,
           "decorator": undefined,
-          "explainClause": undefined,
+          "explain": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -2899,13 +2887,11 @@ describe('SqlQuery', () => {
               ],
             },
             "keywords": Object {
-              "by": "by",
-              "order": "order",
+              "orderBy": "order by",
             },
             "parens": undefined,
             "spacing": Object {
-              "postBy": " ",
-              "postOrder": " ",
+              "postOrderBy": " ",
             },
             "type": "orderByClause",
           },
@@ -2950,7 +2936,7 @@ describe('SqlQuery', () => {
         SqlQuery {
           "clusteredByClause": undefined,
           "decorator": undefined,
-          "explainClause": undefined,
+          "explain": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -3012,13 +2998,11 @@ describe('SqlQuery', () => {
               ],
             },
             "keywords": Object {
-              "by": "by",
-              "order": "order",
+              "orderBy": "order by",
             },
             "parens": undefined,
             "spacing": Object {
-              "postBy": " ",
-              "postOrder": " ",
+              "postOrderBy": " ",
             },
             "type": "orderByClause",
           },
@@ -3071,7 +3055,7 @@ describe('SqlQuery', () => {
         SqlQuery {
           "clusteredByClause": undefined,
           "decorator": undefined,
-          "explainClause": undefined,
+          "explain": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -3136,14 +3120,12 @@ describe('SqlQuery', () => {
             },
             "innerParens": true,
             "keywords": Object {
-              "by": "BY",
-              "group": "GROUP",
+              "groupBy": "GROUP BY",
             },
             "parens": undefined,
             "spacing": Object {
-              "postBy": " ",
               "postExpressions": "",
-              "postGroup": " ",
+              "postGroupBy": " ",
               "postLeftParen": "",
             },
             "type": "groupByClause",
@@ -3181,13 +3163,11 @@ describe('SqlQuery', () => {
               ],
             },
             "keywords": Object {
-              "by": "BY",
-              "order": "ORDER",
+              "orderBy": "ORDER BY",
             },
             "parens": undefined,
             "spacing": Object {
-              "postBy": " ",
-              "postOrder": " ",
+              "postOrderBy": " ",
             },
             "type": "orderByClause",
           },
@@ -3252,10 +3232,13 @@ describe('SqlQuery', () => {
                     ],
                   },
                   "decorator": undefined,
-                  "functionName": "COUNT",
-                  "keywords": Object {
-                    "functionName": "COUNT",
+                  "extendClause": undefined,
+                  "functionName": RefName {
+                    "name": "COUNT",
+                    "quotes": false,
                   },
+                  "keywords": Object {},
+                  "namespace": undefined,
                   "parens": undefined,
                   "spacing": Object {
                     "postArguments": "",
@@ -3265,6 +3248,7 @@ describe('SqlQuery', () => {
                   "specialParen": undefined,
                   "type": "function",
                   "whereClause": undefined,
+                  "windowSpec": undefined,
                 },
                 "keywords": Object {
                   "as": "AS",
@@ -3314,7 +3298,7 @@ describe('SqlQuery', () => {
         SqlQuery {
           "clusteredByClause": undefined,
           "decorator": undefined,
-          "explainClause": undefined,
+          "explain": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -3454,16 +3438,14 @@ describe('SqlQuery', () => {
             },
             "innerParens": true,
             "keywords": Object {
-              "by": "BY",
               "decorator": "GROUPING SETS",
-              "group": "GROUP",
+              "groupBy": "GROUP BY",
             },
             "parens": undefined,
             "spacing": Object {
-              "postBy": " ",
               "postDecorator": " ",
               "postExpressions": " ",
-              "postGroup": " ",
+              "postGroupBy": " ",
               "postLeftParen": " ",
             },
             "type": "groupByClause",
@@ -3501,13 +3483,11 @@ describe('SqlQuery', () => {
               ],
             },
             "keywords": Object {
-              "by": "BY",
-              "order": "ORDER",
+              "orderBy": "ORDER BY",
             },
             "parens": undefined,
             "spacing": Object {
-              "postBy": " ",
-              "postOrder": " ",
+              "postOrderBy": " ",
             },
             "type": "orderByClause",
           },
@@ -3578,10 +3558,13 @@ describe('SqlQuery', () => {
                     ],
                   },
                   "decorator": undefined,
-                  "functionName": "COUNT",
-                  "keywords": Object {
-                    "functionName": "COUNT",
+                  "extendClause": undefined,
+                  "functionName": RefName {
+                    "name": "COUNT",
+                    "quotes": false,
                   },
+                  "keywords": Object {},
+                  "namespace": undefined,
                   "parens": undefined,
                   "spacing": Object {
                     "postArguments": "",
@@ -3591,6 +3574,7 @@ describe('SqlQuery', () => {
                   "specialParen": undefined,
                   "type": "function",
                   "whereClause": undefined,
+                  "windowSpec": undefined,
                 },
                 "keywords": Object {
                   "as": "AS",
@@ -3637,10 +3621,13 @@ describe('SqlQuery', () => {
                   ],
                 },
                 "decorator": undefined,
-                "functionName": "GROUPING",
-                "keywords": Object {
-                  "functionName": "GROUPING",
+                "extendClause": undefined,
+                "functionName": RefName {
+                  "name": "GROUPING",
+                  "quotes": false,
                 },
+                "keywords": Object {},
+                "namespace": undefined,
                 "parens": undefined,
                 "spacing": Object {
                   "postArguments": "",
@@ -3650,6 +3637,7 @@ describe('SqlQuery', () => {
                 "specialParen": undefined,
                 "type": "function",
                 "whereClause": undefined,
+                "windowSpec": undefined,
               },
             ],
           },
@@ -3680,7 +3668,7 @@ describe('SqlQuery', () => {
         SqlQuery {
           "clusteredByClause": undefined,
           "decorator": undefined,
-          "explainClause": undefined,
+          "explain": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -3745,13 +3733,11 @@ describe('SqlQuery', () => {
               ],
             },
             "keywords": Object {
-              "by": "by",
-              "order": "order",
+              "orderBy": "order by",
             },
             "parens": undefined,
             "spacing": Object {
-              "postBy": " ",
-              "postOrder": " ",
+              "postOrderBy": " ",
             },
             "type": "orderByClause",
           },
@@ -3813,7 +3799,7 @@ describe('SqlQuery', () => {
         SqlQuery {
           "clusteredByClause": undefined,
           "decorator": undefined,
-          "explainClause": undefined,
+          "explain": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -3899,13 +3885,11 @@ describe('SqlQuery', () => {
               ],
             },
             "keywords": Object {
-              "by": "by",
-              "order": "order",
+              "orderBy": "order by",
             },
             "parens": undefined,
             "spacing": Object {
-              "postBy": " ",
-              "postOrder": " ",
+              "postOrderBy": " ",
             },
             "type": "orderByClause",
           },
@@ -3950,7 +3934,7 @@ describe('SqlQuery', () => {
         SqlQuery {
           "clusteredByClause": undefined,
           "decorator": undefined,
-          "explainClause": undefined,
+          "explain": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -4040,13 +4024,11 @@ describe('SqlQuery', () => {
               ],
             },
             "keywords": Object {
-              "by": "by",
-              "order": "order",
+              "orderBy": "order by",
             },
             "parens": undefined,
             "spacing": Object {
-              "postBy": " ",
-              "postOrder": " ",
+              "postOrderBy": " ",
             },
             "type": "orderByClause",
           },
@@ -4110,7 +4092,7 @@ describe('SqlQuery', () => {
         SqlQuery {
           "clusteredByClause": undefined,
           "decorator": undefined,
-          "explainClause": undefined,
+          "explain": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -4203,7 +4185,7 @@ describe('SqlQuery', () => {
         SqlQuery {
           "clusteredByClause": undefined,
           "decorator": undefined,
-          "explainClause": undefined,
+          "explain": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -4266,7 +4248,7 @@ describe('SqlQuery', () => {
           "unionQuery": SqlQuery {
             "clusteredByClause": undefined,
             "decorator": undefined,
-            "explainClause": undefined,
+            "explain": undefined,
             "fromClause": SqlFromClause {
               "expressions": SeparatedArray {
                 "separators": Array [],
@@ -4344,7 +4326,7 @@ describe('SqlQuery', () => {
         SqlQuery {
           "clusteredByClause": undefined,
           "decorator": undefined,
-          "explainClause": undefined,
+          "explain": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -4485,7 +4467,7 @@ describe('SqlQuery', () => {
         SqlQuery {
           "clusteredByClause": undefined,
           "decorator": undefined,
-          "explainClause": undefined,
+          "explain": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -4626,7 +4608,7 @@ describe('SqlQuery', () => {
         SqlQuery {
           "clusteredByClause": undefined,
           "decorator": undefined,
-          "explainClause": undefined,
+          "explain": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -4767,7 +4749,7 @@ describe('SqlQuery', () => {
         SqlQuery {
           "clusteredByClause": undefined,
           "decorator": undefined,
-          "explainClause": undefined,
+          "explain": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -4908,7 +4890,7 @@ describe('SqlQuery', () => {
         SqlQuery {
           "clusteredByClause": undefined,
           "decorator": undefined,
-          "explainClause": undefined,
+          "explain": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -5054,7 +5036,7 @@ describe('SqlQuery', () => {
         SqlQuery {
           "clusteredByClause": undefined,
           "decorator": undefined,
-          "explainClause": undefined,
+          "explain": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -5232,7 +5214,7 @@ describe('SqlQuery', () => {
         SqlQuery {
           "clusteredByClause": undefined,
           "decorator": undefined,
-          "explainClause": undefined,
+          "explain": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -5280,13 +5262,11 @@ describe('SqlQuery', () => {
             },
             "innerParens": false,
             "keywords": Object {
-              "by": "BY",
-              "group": "GROUP",
+              "groupBy": "GROUP BY",
             },
             "parens": undefined,
             "spacing": Object {
-              "postBy": "",
-              "postGroup": " ",
+              "postGroupBy": "",
             },
             "type": "groupByClause",
           },
@@ -5326,13 +5306,11 @@ describe('SqlQuery', () => {
               ],
             },
             "keywords": Object {
-              "by": "BY",
-              "order": "ORDER",
+              "orderBy": "ORDER BY",
             },
             "parens": undefined,
             "spacing": Object {
-              "postBy": "",
-              "postOrder": " ",
+              "postOrderBy": "",
             },
             "type": "orderByClause",
           },
@@ -5384,10 +5362,13 @@ describe('SqlQuery', () => {
                     ],
                   },
                   "decorator": undefined,
-                  "functionName": "COUNT",
-                  "keywords": Object {
-                    "functionName": "COUNT",
+                  "extendClause": undefined,
+                  "functionName": RefName {
+                    "name": "COUNT",
+                    "quotes": false,
                   },
+                  "keywords": Object {},
+                  "namespace": undefined,
                   "parens": undefined,
                   "spacing": Object {
                     "postArguments": "",
@@ -5397,6 +5378,7 @@ describe('SqlQuery', () => {
                   "specialParen": undefined,
                   "type": "function",
                   "whereClause": undefined,
+                  "windowSpec": undefined,
                 },
                 "keywords": Object {
                   "as": "AS",
@@ -5432,11 +5414,15 @@ describe('SqlQuery', () => {
                     ],
                   },
                   "decorator": "DISTINCT",
-                  "functionName": "COUNT",
+                  "extendClause": undefined,
+                  "functionName": RefName {
+                    "name": "COUNT",
+                    "quotes": false,
+                  },
                   "keywords": Object {
                     "decorator": "DISTINCT",
-                    "functionName": "COUNT",
                   },
+                  "namespace": undefined,
                   "parens": undefined,
                   "spacing": Object {
                     "postArguments": "",
@@ -5447,6 +5433,7 @@ describe('SqlQuery', () => {
                   "specialParen": undefined,
                   "type": "function",
                   "whereClause": undefined,
+                  "windowSpec": undefined,
                 },
                 "keywords": Object {
                   "as": "AS",
@@ -5493,7 +5480,7 @@ describe('SqlQuery', () => {
         SqlQuery {
           "clusteredByClause": undefined,
           "decorator": undefined,
-          "explainClause": undefined,
+          "explain": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -5538,13 +5525,11 @@ describe('SqlQuery', () => {
             },
             "innerParens": false,
             "keywords": Object {
-              "by": "BY",
-              "group": "GROUP",
+              "groupBy": "GROUP BY",
             },
             "parens": undefined,
             "spacing": Object {
-              "postBy": " ",
-              "postGroup": " ",
+              "postGroupBy": " ",
             },
             "type": "groupByClause",
           },
@@ -5584,13 +5569,11 @@ describe('SqlQuery', () => {
               ],
             },
             "keywords": Object {
-              "by": "BY",
-              "order": "ORDER",
+              "orderBy": "ORDER BY",
             },
             "parens": undefined,
             "spacing": Object {
-              "postBy": " ",
-              "postOrder": " ",
+              "postOrderBy": " ",
             },
             "type": "orderByClause",
           },
@@ -5634,21 +5617,23 @@ describe('SqlQuery', () => {
                         "table": undefined,
                         "type": "column",
                       },
-                      SqlLiteral {
+                      SqlType {
                         "keywords": Object {},
                         "parens": undefined,
                         "spacing": Object {},
-                        "stringValue": "VARCHAR",
-                        "type": "literal",
+                        "type": "type",
                         "value": "VARCHAR",
                       },
                     ],
                   },
                   "decorator": undefined,
-                  "functionName": "CAST",
-                  "keywords": Object {
-                    "functionName": "CAST",
+                  "extendClause": undefined,
+                  "functionName": RefName {
+                    "name": "CAST",
+                    "quotes": false,
                   },
+                  "keywords": Object {},
+                  "namespace": undefined,
                   "parens": undefined,
                   "spacing": Object {
                     "postArguments": "",
@@ -5658,6 +5643,7 @@ describe('SqlQuery', () => {
                   "specialParen": undefined,
                   "type": "function",
                   "whereClause": undefined,
+                  "windowSpec": undefined,
                 },
                 "keywords": Object {
                   "as": "AS",
@@ -5689,10 +5675,13 @@ describe('SqlQuery', () => {
                     ],
                   },
                   "decorator": undefined,
-                  "functionName": "COUNT",
-                  "keywords": Object {
-                    "functionName": "COUNT",
+                  "extendClause": undefined,
+                  "functionName": RefName {
+                    "name": "COUNT",
+                    "quotes": false,
                   },
+                  "keywords": Object {},
+                  "namespace": undefined,
                   "parens": undefined,
                   "spacing": Object {
                     "postArguments": "",
@@ -5702,6 +5691,7 @@ describe('SqlQuery', () => {
                   "specialParen": undefined,
                   "type": "function",
                   "whereClause": undefined,
+                  "windowSpec": undefined,
                 },
                 "keywords": Object {
                   "as": "AS",
@@ -5772,15 +5762,19 @@ describe('SqlQuery', () => {
                           SqlFunction {
                             "args": undefined,
                             "decorator": undefined,
-                            "functionName": "CURRENT_TIMESTAMP",
-                            "keywords": Object {
-                              "functionName": "CURRENT_TIMESTAMP",
+                            "extendClause": undefined,
+                            "functionName": RefName {
+                              "name": "CURRENT_TIMESTAMP",
+                              "quotes": false,
                             },
+                            "keywords": Object {},
+                            "namespace": undefined,
                             "parens": undefined,
                             "spacing": Object {},
                             "specialParen": "none",
                             "type": "function",
                             "whereClause": undefined,
+                            "windowSpec": undefined,
                           },
                           SqlInterval {
                             "intervalValue": SqlLiteral {
@@ -5917,18 +5911,16 @@ describe('SqlQuery', () => {
               ],
             },
             "keywords": Object {
-              "by": "BY",
-              "clustered": "CLUSTERED",
+              "clusteredBy": "CLUSTERED BY",
             },
             "parens": undefined,
             "spacing": Object {
-              "postBy": " ",
-              "postClustered": " ",
+              "postClusteredBy": " ",
             },
             "type": "clusteredByClause",
           },
           "decorator": undefined,
-          "explainClause": undefined,
+          "explain": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -5999,13 +5991,11 @@ describe('SqlQuery', () => {
               "value": "DAY",
             },
             "keywords": Object {
-              "by": "BY",
-              "partitioned": "PARTITIONED",
+              "partitionedBy": "PARTITIONED BY",
             },
             "parens": undefined,
             "spacing": Object {
-              "postBy": " ",
-              "postPartitioned": " ",
+              "postPartitionedBy": " ",
             },
             "type": "partitionedByClause",
           },

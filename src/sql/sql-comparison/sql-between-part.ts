@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../sql-base';
+import { SqlBase, SqlBaseValue, SqlTypeDesignator, Substitutor } from '../sql-base';
 import { SqlExpression } from '../sql-expression';
 
 export interface SqlBetweenPartValue extends SqlBaseValue {
@@ -22,7 +22,7 @@ export interface SqlBetweenPartValue extends SqlBaseValue {
 }
 
 export class SqlBetweenPart extends SqlBase {
-  static type: SqlType = 'betweenPart';
+  static type: SqlTypeDesignator = 'betweenPart';
 
   static DEFAULT_SYMMETRIC_KEYWORD = 'SYMMETRIC';
   static DEFAULT_AND_KEYWORD = 'AND';

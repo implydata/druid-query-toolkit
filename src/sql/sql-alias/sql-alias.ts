@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../sql-base';
+import { SqlBase, SqlBaseValue, SqlTypeDesignator, Substitutor } from '../sql-base';
 import { SqlColumn } from '../sql-column/sql-column';
 import { SqlColumnList } from '../sql-column-list/sql-column-list';
 import { SqlExpression } from '../sql-expression';
@@ -25,7 +25,7 @@ export interface SqlAliasValue extends SqlBaseValue {
 }
 
 export class SqlAlias extends SqlExpression {
-  static type: SqlType = 'alias';
+  static type: SqlTypeDesignator = 'alias';
 
   static DEFAULT_AS_KEYWORD = 'AS';
 

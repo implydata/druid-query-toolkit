@@ -407,7 +407,7 @@ describe('#convertToTable', () => {
       SqlQuery {
         "clusteredByClause": undefined,
         "decorator": undefined,
-        "explainClause": undefined,
+        "explain": undefined,
         "fromClause": SqlFromClause {
           "expressions": SeparatedArray {
             "separators": Array [],

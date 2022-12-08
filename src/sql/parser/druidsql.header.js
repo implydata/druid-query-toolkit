@@ -14,12 +14,16 @@
 
 {
   function makeListMap(tail, index, head) {
-    if(head === undefined) {
+    if (head === undefined) {
       head = [];
     } else {
       head = [head];
     }
-    return head.concat(tail.map(function(t) { return t[index] }));
+    return head.concat(
+      tail.map(function (t) {
+        return t[index];
+      }),
+    );
   }
 
   function maybeMakeMulti(op, head, tail) {
@@ -42,5 +46,9 @@
 
   function makeSeparatedArray(head, tail) {
     return new sql.SeparatedArray(makeListMap(tail, 1, head), makeListMap(tail, 0));
+  }
+
+  function makeFunctionName(f) {
+    return Array.isArray(f) ? sql.RefName.functionName(f[1], true) : sql.RefName.functionName(f);
   }
 }

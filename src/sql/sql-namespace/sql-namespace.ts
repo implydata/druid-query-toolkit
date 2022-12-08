@@ -12,8 +12,10 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlBaseValue, SqlType } from '../sql-base';
+import { SqlBase, SqlBaseValue, SqlTypeDesignator } from '../sql-base';
 import { SqlExpression } from '../sql-expression';
+import { SqlFunction } from '../sql-function/sql-function';
+import { LiteralValue } from '../sql-literal/sql-literal';
 import { SqlTable } from '../sql-table/sql-table';
 import { RefName } from '../utils';
 
@@ -22,7 +24,7 @@ export interface SqlNamespaceValue extends SqlBaseValue {
 }
 
 export class SqlNamespace extends SqlExpression {
-  static type: SqlType = 'namespace';
+  static type: SqlTypeDesignator = 'namespace';
 
   static create(name: string | SqlNamespace) {
     if (name instanceof SqlNamespace) return name;
@@ -83,6 +85,10 @@ export class SqlNamespace extends SqlExpression {
 
   public tableWithOptionalQuotes(name: string): SqlTable {
     return SqlTable.optionalQuotes(name, this);
+  }
+
+  public F(name: string, ...args: (SqlExpression | LiteralValue)[]) {
+    return SqlFunction.simple(name, args).changeNamespace(this);
   }
 }
 

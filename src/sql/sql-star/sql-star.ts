@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlBaseValue, SqlType } from '../sql-base';
+import { SqlBase, SqlBaseValue, SqlTypeDesignator } from '../sql-base';
 import { SqlExpression } from '../sql-expression';
 import { SqlTable } from '../sql-table/sql-table';
 
@@ -21,7 +21,7 @@ export interface SqlStarValue extends SqlBaseValue {
 }
 
 export class SqlStar extends SqlExpression {
-  static type: SqlType = 'star';
+  static type: SqlTypeDesignator = 'star';
 
   static PLAIN: SqlStar;
 

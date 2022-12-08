@@ -13,7 +13,7 @@
  */
 
 import { isEmptyArray } from '../../utils';
-import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../sql-base';
+import { SqlBase, SqlBaseValue, SqlTypeDesignator, Substitutor } from '../sql-base';
 import {
   SqlLimitClause,
   SqlOffsetClause,
@@ -33,7 +33,7 @@ export interface SqlValuesValue extends SqlBaseValue {
 }
 
 export class SqlValues extends SqlExpression {
-  static type: SqlType = 'values';
+  static type: SqlTypeDesignator = 'values';
 
   static DEFAULT_VALUES_KEYWORD = 'VALUES';
 

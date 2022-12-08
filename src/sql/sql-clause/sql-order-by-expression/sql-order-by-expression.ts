@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../../sql-base';
+import { SqlBase, SqlBaseValue, SqlTypeDesignator, Substitutor } from '../../sql-base';
 import { SqlExpression } from '../../sql-expression';
 import { SqlLiteral } from '../../sql-literal/sql-literal';
 
@@ -24,7 +24,7 @@ export interface SqlOrderByExpressionValue extends SqlBaseValue {
 }
 
 export class SqlOrderByExpression extends SqlBase {
-  static type: SqlType = 'orderByExpression';
+  static type: SqlTypeDesignator = 'orderByExpression';
 
   static create(expression: SqlExpression, direction?: SqlOrderByDirection) {
     return new SqlOrderByExpression({

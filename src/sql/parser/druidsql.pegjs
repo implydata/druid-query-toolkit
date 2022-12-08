@@ -48,27 +48,57 @@ SqlAlias = expression:Expression alias:((_ AsToken)? _ RefNameAlias)? columns:(_
   return new sql.SqlAlias(value);
 }
 
-SqlAliasExplicitAs = expression:Expression alias:(_ AsToken _ RefNameAlias)?
-{
-  if (!alias) return expression;
+FunctionArgument = SqlLabeledExpression / Expression
 
-  return new sql.SqlAlias({
-    expression: expression,
-    alias: alias[3],
+SqlLabeledExpression = label:RefNameAlias preArrow:_ "=>" postArrow:_ expression:Expression
+{
+  return new sql.SqlLabeledExpression({
+    label: label,
     spacing: {
-      preAs: alias[0],
-      preAlias: alias[2],
+      preArrow: preArrow,
+      postArrow: postArrow
     },
-    keywords: {
-      as: alias[1],
-    },
+    expression: expression
   });
+}
+
+SqlExtendClause =
+  extend:(ExtendToken _)?
+  OpenParen
+  postLeftParen:_
+  head:SqlColumnDeclaration
+  tail:(CommaSeparator SqlColumnDeclaration)*
+  postColumnDeclarations:_
+  CloseParen
+{
+  return new sql.SqlExtendClause({
+    keywords: {
+      extend: extend ? extend[0] : ''
+    },
+    columnDeclarations: makeSeparatedArray(head, tail),
+    spacing: {
+      postExtend: extend ? extend[1] : undefined,
+      postLeftParen: postLeftParen,
+      postColumnDeclarations: postColumnDeclarations
+    }
+  });
+}
+
+SqlColumnDeclaration = column:RefName postColumn:_ columnType:SqlType
+{
+  return new sql.SqlColumnDeclaration({
+    column: column,
+    spacing: {
+      postColumn: postColumn
+    },
+    columnType: columnType
+  })
 }
 
 // ------------------------------
 
 SqlQuery =
-  explainClause:(ExplainClause _)?
+  explain:(ExplainPlanForToken _)?
   insertClause:(InsertClause _)?
   replaceClause:(ReplaceClause _)?
   heart:(((WithClause _)? QueryHeart) / (WithClause _ OpenParen _ SqlQuery _ CloseParen))
@@ -83,9 +113,10 @@ SqlQuery =
   var keywords = value.keywords = {};
   var spacing = value.spacing = {};
 
-  if (explainClause) {
-    value.explainClause = explainClause[0];
-    spacing.postExplainClause = explainClause[1];
+  if (explain) {
+    value.explain = true;
+    keywords.explainPlanFor = explain[0];
+    spacing.postExplainPlanFor = explain[1];
   }
 
   if (insertClause && replaceClause) {
@@ -199,22 +230,6 @@ QueryHeart =
     keywords: keywords,
     spacing: spacing,
   };
-}
-
-
-ExplainClause = explain:ExplainToken postExplain:__ plan:PlanToken postPlan:__ forToken:ForToken
-{
-  return new sql.SqlExplainClause({
-    keywords: {
-      explain: explain,
-      plan: plan,
-      'for': forToken
-    },
-    spacing: {
-      postExplain: postExplain,
-      postPlan: postPlan
-    }
-  });
 }
 
 
@@ -438,22 +453,18 @@ SqlWhereClause = where:WhereToken postWhere:_ expression:Expression
 }
 
 GroupByClause =
-  group:GroupToken
-  postGroup:__
-  by:ByToken
-  postBy:_
+  groupBy:GroupByToken
+  postGroupBy:_
   decorator:((RollupToken / CubeToken / GroupingSetsToken) _)?
   ex:((OpenParen _ (GroupByExpressionList _)? CloseParen) / GroupByExpressionList)
 {
   var value = {
     spacing: {
-      postGroup: postGroup,
-      postBy: postBy,
+      postGroupBy: postGroupBy
     },
     keywords: {
-      group: group,
-      by: by,
-    },
+      groupBy: groupBy
+    }
   };
 
   if (decorator) {
@@ -500,26 +511,24 @@ HavingClause = having:HavingToken postHaving:_ expression:Expression
   return new sql.SqlHavingClause({
     expression: expression,
     spacing: {
-      postHaving: postHaving,
+      postHaving: postHaving
     },
     keywords: {
-      having: having,
-    },
+      having: having
+    }
   });
 }
 
-OrderByClause = order:OrderToken postOrder:__ by:ByToken postBy:_ head:SqlOrderByExpression tail:(CommaSeparator SqlOrderByExpression)*
+OrderByClause = orderBy:OrderByToken postOrderBy:_ head:SqlOrderByExpression tail:(CommaSeparator SqlOrderByExpression)*
 {
   return new sql.SqlOrderByClause({
     expressions: makeSeparatedArray(head, tail),
     spacing: {
-      postOrder: postOrder,
-      postBy: postBy,
+      postOrderBy: postOrderBy
     },
     keywords: {
-      order: order,
-      by: by,
-    },
+      orderBy: orderBy
+    }
   });
 }
 
@@ -566,26 +575,19 @@ OffsetClause = offset:OffsetToken postOffset:_ offsetLiteral:SqlLiteral
   });
 }
 
-PartitionedByClause = partitioned:PartitionedToken postPartitioned:__ by:ByToken postBy:_ ex:(TimeUnitLiteral / Expression / (AllToken (__ TimeToken)?))
+PartitionedByClause = partitionedBy:PartitionedByToken postPartitionedBy:_ ex:(TimeUnitLiteral / Expression / (AllToken (__ TimeToken)?))
 {
   var value = {};
   var spacing = value.spacing = {
-    postPartitioned: postPartitioned,
-    postBy: postBy,
+    postPartitionedBy: postPartitionedBy
   };
   var keywords = value.keywords = {
-    partitioned: partitioned,
-    by: by,
+    partitionedBy: partitionedBy
   };
 
   if (Array.isArray(ex)) {
-    keywords.all = ex[0];
-
-    var timeKeyword = ex[1];
-    if (timeKeyword) {
-      spacing.preTime = timeKeyword[0];
-      keywords.time = timeKeyword[1];
-    }
+    var ex1 = ex[1];
+    keywords.all = ex[0] + (ex1 ? ex1.join('') : '');
   } else {
     value.expression = ex;
   }
@@ -593,18 +595,16 @@ PartitionedByClause = partitioned:PartitionedToken postPartitioned:__ by:ByToken
   return new sql.SqlPartitionedByClause(value);
 }
 
-ClusteredByClause = clustered:ClusteredToken postClustered:__ by:ByToken postBy:_ head:Expression tail:(CommaSeparator Expression)*
+ClusteredByClause = clusteredBy:ClusteredByToken postClusteredBy:_ head:Expression tail:(CommaSeparator Expression)*
 {
   return new sql.SqlClusteredByClause({
     expressions: makeSeparatedArray(head, tail),
     spacing: {
-      postClustered: postClustered,
-      postBy: postBy,
+      postClusteredBy: postClusteredBy
     },
     keywords: {
-      clustered: clustered,
-      by: by,
-    },
+      clusteredBy: clusteredBy,
+    }
   });
 }
 
@@ -968,27 +968,35 @@ Function =
 / NakedFunction
 
 GenericFunction =
-  functionName:UnquotedRefNameFree &{ return sql.SqlFunction.isValidFunctionName(functionName) }
+  functionName:RefNameFunction
+  namespaceExtra:(_ "." _ RefNameFunction)?
   preLeftParen:_
   OpenParen
   postLeftParen:_
   decorator:(FunctionDecorator _)?
-  head:SqlAliasExplicitAs?
-  tail:(CommaSeparator SqlAliasExplicitAs)*
+  head:FunctionArgument?
+  tail:(CommaSeparator FunctionArgument)*
   postArguments:_
   CloseParen
   filter:(_ FunctionFilter)?
+  window:(_ OverToken _ WindowSpec)?
+  extend:(_ SqlExtendClause)?
 {
-  var value = {
-    functionName: functionName.toUpperCase(),
-  };
+  var value = {};
   var spacing = value.spacing = {
     preLeftParen: preLeftParen,
     postLeftParen: postLeftParen,
   };
-  var keywords = value.keywords = {
-    functionName: functionName,
-  };
+  var keywords = value.keywords = {};
+
+  if (namespaceExtra) {
+    value.namespace = new sql.SqlNamespace({ refName: functionName });
+    spacing.postNamespace = namespaceExtra[0];
+    spacing.postDot = namespaceExtra[2];
+    value.functionName = namespaceExtra[3];
+  } else {
+    value.functionName = functionName;
+  }
 
   if (decorator) {
     value.decorator = decorator[0].toUpperCase();
@@ -1008,22 +1016,31 @@ GenericFunction =
     value.whereClause = filter[1].whereClause;
   }
 
+  if (window) {
+    spacing.preOver = window[0];
+    keywords.over = window[1];
+    spacing.postOver = window[2];
+    value.windowSpec = window[3];
+  }
+
+  if (extend) {
+    value.spacing.preExtend = extend[0];
+    value.extendClause = extend[1];
+  }
+
   return new sql.SqlFunction(value);
 }
 
 NakedFunction = functionName:UnquotedRefNameFree &{ return sql.SqlFunction.isNakedFunction(functionName) }
 {
   return new sql.SqlFunction({
-    functionName: functionName.toUpperCase(),
-    specialParen: 'none',
-    keywords: {
-      functionName: functionName,
-    }
+    functionName: new sql.RefName({ name: functionName, quotes: false }),
+    specialParen: 'none'
   });
 }
 
 CountFunction =
-  functionName:CountToken
+  functionName:(CountToken / ('"' CountToken '"'))
   preLeftParen:_
   OpenParen
   postLeftParen:_
@@ -1034,15 +1051,13 @@ CountFunction =
   filter:(_ FunctionFilter)?
 {
   var value = {
-    functionName: functionName.toUpperCase(),
+    functionName: makeFunctionName(functionName)
   };
   var spacing = value.spacing = {
     preLeftParen: preLeftParen,
     postLeftParen: postLeftParen,
   };
-  var keywords = value.keywords = {
-    functionName: functionName,
-  };
+  var keywords = value.keywords = {};
 
   if (decorator) {
     value.decorator = decorator[0].toUpperCase();
@@ -1070,30 +1085,23 @@ CastFunction =
   postLeftParen:_
   expr:Expression
   separator:AsSeparator
-  type:UnquotedRefNameFree
+  type:SqlType
   postArguments:_
   CloseParen
 {
-  var typeLiteral = new sql.SqlLiteral({
-    value: type,
-    stringValue: type,
-  });
   return new sql.SqlFunction({
-    functionName: functionName.toUpperCase(),
-    args: new sql.SeparatedArray([expr, typeLiteral], [separator]),
+    functionName: makeFunctionName(functionName),
+    args: new sql.SeparatedArray([expr, type], [separator]),
     spacing: {
       preLeftParen: preLeftParen,
       postLeftParen: postLeftParen,
       postArguments: postArguments,
-    },
-    keywords: {
-      functionName: functionName,
     }
   });
 }
 
 ExtractFunction =
-  functionName:ExtractToken
+  functionName:(ExtractToken / ('"' ExtractToken '"'))
   preLeftParen:_
   OpenParen
   postLeftParen:_
@@ -1108,21 +1116,18 @@ ExtractFunction =
     stringValue: unit,
   });
   return new sql.SqlFunction({
-    functionName: functionName.toUpperCase(),
+    functionName: makeFunctionName(functionName),
     args: new sql.SeparatedArray([unitLiteral, expr], [separator]),
     spacing: {
       preLeftParen: preLeftParen,
       postLeftParen: postLeftParen,
       postArguments: postArguments,
-    },
-    keywords: {
-      functionName: functionName,
     }
   });
 }
 
 TrimFunction =
-  functionName:TrimToken
+  functionName:(TrimToken / ('"' TrimToken '"'))
   preLeftParen:_
   OpenParen
   postLeftParen:_
@@ -1133,7 +1138,7 @@ TrimFunction =
   CloseParen
 {
   var value = {
-    functionName: functionName.toUpperCase(),
+    functionName: makeFunctionName(functionName),
     args: from
       ? new sql.SeparatedArray([expr, from[1]], [from[0]])
       : sql.SeparatedArray.fromSingleValue(expr),
@@ -1143,9 +1148,7 @@ TrimFunction =
     postLeftParen: postLeftParen,
     postArguments: postArguments,
   };
-  var keywords = value.keywords = {
-    functionName: functionName,
-  };
+  var keywords = value.keywords = {};
 
   if (decorator) {
     value.decorator = decorator[0].toUpperCase();
@@ -1157,7 +1160,7 @@ TrimFunction =
 }
 
 FloorCeilFunction =
-  functionName:(FloorToken / CeilToken)
+  functionName:((FloorToken / CeilToken) / ('"' (FloorToken / CeilToken) '"'))
   preLeftParen:_
   OpenParen
   postLeftParen:_
@@ -1168,21 +1171,18 @@ FloorCeilFunction =
   CloseParen
 {
   return new sql.SqlFunction({
-    functionName: functionName.toUpperCase(),
+    functionName: makeFunctionName(functionName),
     args: new sql.SeparatedArray([expr, unit], [separator]),
     spacing: {
       preLeftParen: preLeftParen,
       postLeftParen: postLeftParen,
       postArguments: postArguments,
-    },
-    keywords: {
-      functionName: functionName,
     }
   });
 }
 
 TimestampAddDiffFunction =
-  functionName:(TimestampaddToken / TimestampdiffToken)
+  functionName:((TimestampaddToken / TimestampdiffToken) / ('"' (TimestampaddToken / TimestampdiffToken) '"'))
   preLeftParen:_
   OpenParen
   postLeftParen:_
@@ -1192,10 +1192,7 @@ TimestampAddDiffFunction =
   CloseParen
 {
   var value = {
-    functionName: functionName.toUpperCase(),
-    keywords: {
-      functionName: functionName,
-    }
+    functionName: makeFunctionName(functionName)
   };
   var spacing = value.spacing = {
     preLeftParen: preLeftParen,
@@ -1225,15 +1222,12 @@ PositionFunction =
     : new sql.SeparatedArray([expr1, expr2], [inSeparator])
 
   return new sql.SqlFunction({
-    functionName: functionName.toUpperCase(),
+    functionName: makeFunctionName(functionName),
     args: args,
     spacing: {
       preLeftParen: preLeftParen,
       postLeftParen: postLeftParen,
       postArguments: postArguments,
-    },
-    keywords: {
-      functionName: functionName,
     }
   });
 }
@@ -1249,11 +1243,8 @@ ArrayFunction =
   ']'
 {
   var value = {
-    functionName: functionName.toUpperCase(),
-    specialParen: 'square',
-    keywords: {
-      functionName: functionName,
-    }
+    functionName: makeFunctionName(functionName),
+    specialParen: 'square'
   };
   var spacing = value.spacing = {
     preLeftParen: preLeftParen,
@@ -1277,6 +1268,28 @@ FunctionFilter = filterKeyword:FilterToken postFilter:_ OpenParen postLeftParen:
     postFilter: postFilter,
     whereClause: whereClause.addParens(postLeftParen, preRightParen),
   };
+}
+
+WindowSpec = OpenParen postLeftParen:_ windowName:(RefName _)? orderByClause:(OrderByClause _)? CloseParen
+{
+  var value = {};
+  var spacing = value.spacing = {
+    postLeftParen: postLeftParen
+  };
+
+  if (windowName) {
+    value.windowName = windowName[0];
+    spacing.postWindowName = windowName[1];
+  }
+
+  if (orderByClause) {
+    value.orderByClause = orderByClause[0];
+    spacing.postOrderBy = orderByClause[1];
+  }
+
+  // postPartitionBy
+
+  return new sql.SqlWindowSpec(value);
 }
 
 CommaSeparator = left:_ ',' right:_
@@ -1409,6 +1422,11 @@ NullLiteral = v:NullToken
 BooleanLiteral = v:(TrueToken / FalseToken)
 {
   return new sql.SqlLiteral(v);
+}
+
+SqlType = UnquotedRefNameFree (OpenParen _ SingleQuotedString _ CloseParen)?
+{
+  return new sql.SqlType({ value: text() });
 }
 
 /* Numbers */
@@ -1557,6 +1575,8 @@ RefName = QuotedRefName / UnicodeRefName / UnquotedRefName
 
 RefNameAlias = QuotedRefName / UnquotedRefNameAlias
 
+RefNameFunction = QuotedRefName / UnquotedRefNameFunction
+
 QuotedRefName = '"' name:$(('""' / [^"])+) '"'
 {
   return new sql.RefName({
@@ -1581,7 +1601,15 @@ UnquotedRefName = name:UnquotedRefNameFree &{ return !sql.RefName.isReservedKeyw
   });
 }
 
-UnquotedRefNameAlias = name:UnquotedRefNameFree &{ return !sql.RefName.isReservedKeyword(name) && !sql.RefName.isReservedAlias(name) }
+UnquotedRefNameAlias = name:UnquotedRefNameFree &{ return !sql.RefName.isReservedAlias(name) }
+{
+  return new sql.RefName({
+    name: text(),
+    quotes: false
+  });
+}
+
+UnquotedRefNameFunction = name:UnquotedRefNameFree &{ return !sql.RefName.isReservedFunctionName(name) }
 {
   return new sql.RefName({
     name: text(),
@@ -1650,11 +1678,10 @@ AsToken = $("AS"i !IdentifierPart)
 AscToken = $("ASC"i !IdentifierPart)
 BetweenToken = $("BETWEEN"i !IdentifierPart)
 BothToken = $("BOTH"i !IdentifierPart)
-ByToken = $("BY"i !IdentifierPart)
 CaseToken = $("CASE"i !IdentifierPart)
 CastToken = $("CAST"i !IdentifierPart)
 CeilToken = $("CEIL"i !IdentifierPart)
-ClusteredToken = $("CLUSTERED"i !IdentifierPart)
+ClusteredByToken = $("CLUSTERED"i __ "BY"i !IdentifierPart)
 CountToken = $("COUNT"i !IdentifierPart)
 CubeToken = $("CUBE"i !IdentifierPart)
 DateToken = $("DATE"i !IdentifierPart)
@@ -1663,15 +1690,15 @@ DistinctToken = $("DISTINCT"i !IdentifierPart)
 ElseToken = $("ELSE"i !IdentifierPart)
 EndToken = $("END"i !IdentifierPart)
 EscapeToken = $("ESCAPE"i !IdentifierPart)
-ExplainToken = $("EXPLAIN"i !IdentifierPart)
+ExplainPlanForToken = $("EXPLAIN"i __ "PLAN"i __ "FOR"i !IdentifierPart)
+ExtendToken = $("EXTEND"i !IdentifierPart)
 ExtractToken = $("EXTRACT"i !IdentifierPart)
 FalseToken = $("FALSE"i !IdentifierPart) { return { value: false, stringValue: text() }; }
 FilterToken= $("FILTER"i !IdentifierPart)
 FloorToken = $("FLOOR"i !IdentifierPart)
-ForToken = $("FOR"i !IdentifierPart)
 FromToken = $("FROM"i !IdentifierPart)
-GroupToken = $("GROUP"i !IdentifierPart)
-GroupingSetsToken = $("GROUPING"i !IdentifierPart __ "SETS"i !IdentifierPart)
+GroupByToken = $("GROUP"i __ "BY"i !IdentifierPart)
+GroupingSetsToken = $("GROUPING"i __ "SETS"i !IdentifierPart)
 HavingToken = $("HAVING"i !IdentifierPart)
 InToken = $("IN"i !IdentifierPart)
 InsertToken = $("INSERT"i !IdentifierPart)
@@ -1687,11 +1714,11 @@ NullToken = $("NULL"i !IdentifierPart) { return { value: null, stringValue: text
 OffsetToken = $("OFFSET"i !IdentifierPart)
 OnToken = $("ON"i !IdentifierPart)
 OrToken = $("OR"i !IdentifierPart)
-OrderToken = $("ORDER"i !IdentifierPart)
+OrderByToken = $("ORDER"i __ "BY"i !IdentifierPart)
 OuterToken = $("OUTER"i !IdentifierPart)
+OverToken = $("OVER"i !IdentifierPart)
 OverwriteToken = $("OVERWRITE"i !IdentifierPart)
-PartitionedToken = $("PARTITIONED"i !IdentifierPart)
-PlanToken = $("PLAN"i !IdentifierPart)
+PartitionedByToken = $("PARTITIONED"i __ "BY"i !IdentifierPart)
 PositionToken = $("POSITION"i !IdentifierPart)
 ReplaceToken = $("REPLACE"i !IdentifierPart)
 RollupToken = $("ROLLUP"i !IdentifierPart)
@@ -1700,6 +1727,7 @@ SelectToken = $("SELECT"i !IdentifierPart)
 SimilarToToken = $("SIMILAR"i !IdentifierPart __ ToToken)
 SomeToken = $("SOME"i !IdentifierPart)
 SymmetricToken = $("SYMMETRIC"i !IdentifierPart)
+TableToken = $("TABLE"i !IdentifierPart)
 ThenToken = $("THEN"i !IdentifierPart)
 TimeToken = $("TIME"i !IdentifierPart)
 TimestampToken = $("TIMESTAMP"i !IdentifierPart)

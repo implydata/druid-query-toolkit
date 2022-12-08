@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlBaseValue, SqlType } from '../sql-base';
+import { SqlBase, SqlBaseValue, SqlTypeDesignator } from '../sql-base';
 import { SqlExpression } from '../sql-expression';
 
 export interface SqlPlaceholderValue extends SqlBaseValue {
@@ -20,7 +20,7 @@ export interface SqlPlaceholderValue extends SqlBaseValue {
 }
 
 export class SqlPlaceholder extends SqlExpression {
-  static type: SqlType = 'placeholder';
+  static type: SqlTypeDesignator = 'placeholder';
 
   static PLACEHOLDER: SqlPlaceholder;
 

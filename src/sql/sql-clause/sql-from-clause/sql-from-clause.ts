@@ -13,9 +13,11 @@
  */
 
 import { filterMap } from '../../../utils';
-import { SqlBase, SqlType, Substitutor } from '../../sql-base';
+import { SqlBase, SqlTypeDesignator, Substitutor } from '../../sql-base';
 import { SqlExpression } from '../../sql-expression';
+import { SqlQuery } from '../../sql-query/sql-query';
 import { SqlTable } from '../../sql-table/sql-table';
+import { SqlWithQuery } from '../../sql-with-query/sql-with-query';
 import { SeparatedArray } from '../../utils';
 import { SqlClause, SqlClauseValue } from '../sql-clause';
 
@@ -27,13 +29,15 @@ export interface SqlFromClauseValue extends SqlClauseValue {
 }
 
 export class SqlFromClause extends SqlClause {
-  static type: SqlType = 'fromClause';
+  static type: SqlTypeDesignator = 'fromClause';
 
   static DEFAULT_FROM_KEYWORD = 'FROM';
 
   static create(expressions: SeparatedArray<SqlExpression> | SqlExpression[]): SqlFromClause {
     return new SqlFromClause({
-      expressions: SeparatedArray.fromArray(expressions),
+      expressions: SeparatedArray.fromArray(expressions).map(ex =>
+        ex instanceof SqlQuery || ex instanceof SqlWithQuery ? ex.ensureParens() : ex,
+      ),
     });
   }
 

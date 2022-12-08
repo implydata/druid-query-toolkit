@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlType, Substitutor } from '../../sql-base';
+import { SqlBase, SqlTypeDesignator, Substitutor } from '../../sql-base';
 import { SqlExpression } from '../../sql-expression';
 import { SqlLiteral } from '../../sql-literal/sql-literal';
 import { SqlClause, SqlClauseValue } from '../sql-clause';
@@ -22,10 +22,9 @@ export interface SqlPartitionedByClauseValue extends SqlClauseValue {
 }
 
 export class SqlPartitionedByClause extends SqlClause {
-  static type: SqlType = 'partitionedByClause';
+  static type: SqlTypeDesignator = 'partitionedByClause';
 
-  static DEFAULT_PARTITIONED_KEYWORD = 'PARTITIONED';
-  static DEFAULT_BY_KEYWORD = 'BY';
+  static DEFAULT_PARTITIONED_BY_KEYWORD = 'PARTITIONED BY';
   static DEFAULT_ALL_KEYWORD = 'ALL';
 
   static create(unit: SqlLiteral | undefined): SqlPartitionedByClause {
@@ -47,20 +46,14 @@ export class SqlPartitionedByClause extends SqlClause {
 
   protected _toRawString(): string {
     const rawParts: string[] = [
-      this.getKeyword('partitioned', SqlPartitionedByClause.DEFAULT_PARTITIONED_KEYWORD),
-      this.getSpace('postPartitioned'),
-      this.getKeyword('by', SqlPartitionedByClause.DEFAULT_BY_KEYWORD),
-      this.getSpace('postBy'),
+      this.getKeyword('partitionedBy', SqlPartitionedByClause.DEFAULT_PARTITIONED_BY_KEYWORD),
+      this.getSpace('postPartitionedBy'),
     ];
 
     if (this.expression) {
       rawParts.push(this.expression.toString());
     } else {
       rawParts.push(this.getKeyword('all', SqlPartitionedByClause.DEFAULT_ALL_KEYWORD));
-
-      if (this.keywords['time']) {
-        rawParts.push(this.getSpace('preTime'), this.keywords['time']);
-      }
     }
 
     return rawParts.join('');

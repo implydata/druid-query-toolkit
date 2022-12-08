@@ -19,6 +19,7 @@
 /* eslint-disable simple-import-sort/exports */
 export * from './utils';
 export * from './sql-base';
+export * from './sql-type/sql-type';
 export * from './sql-expression';
 export * from './sql-column-list/sql-column-list';
 export * from './sql-placeholder/sql-placeholder';
@@ -36,6 +37,8 @@ export * from './sql-comparison/sql-comparison';
 export * from './sql-case/sql-when-then-part';
 export * from './sql-case/sql-case';
 export * from './sql-alias/sql-alias';
+export * from './sql-labeled-expression/sql-labeled-expression';
+export * from './sql-window-spec/sql-window-spec';
 
 export * from './sql-clause';
 

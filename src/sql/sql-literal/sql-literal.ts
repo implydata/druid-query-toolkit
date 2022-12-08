@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlBaseValue, SqlType } from '../sql-base';
+import { SqlBase, SqlBaseValue, SqlTypeDesignator } from '../sql-base';
 import { DecomposeViaAndOptions, SqlExpression } from '../sql-expression';
 import { needsUnicodeEscape, sqlEscapeUnicode, trimString } from '../utils';
 
@@ -32,7 +32,7 @@ export interface SqlLiteralValue extends SqlBaseValue {
 }
 
 export class SqlLiteral extends SqlExpression {
-  static type: SqlType = 'literal';
+  static type: SqlTypeDesignator = 'literal';
 
   static DEFAULT_TIMESTAMP_KEYWORD = 'TIMESTAMP';
   static DEFAULT_NULL_KEYWORD = 'NULL';

@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../sql-base';
+import { SqlBase, SqlBaseValue, SqlTypeDesignator, Substitutor } from '../sql-base';
 import { SqlExpression } from '../sql-expression';
 import { SeparatedArray } from '../utils';
 
@@ -25,7 +25,7 @@ export interface SqlCaseValue extends SqlBaseValue {
 }
 
 export class SqlCase extends SqlExpression {
-  static type: SqlType = 'case';
+  static type: SqlTypeDesignator = 'case';
 
   static DEFAULT_CASE_KEYWORD = 'CASE';
   static DEFAULT_ELSE_KEYWORD = 'ELSE';

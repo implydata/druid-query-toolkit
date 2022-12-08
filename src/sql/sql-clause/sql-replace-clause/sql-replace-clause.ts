@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlType, Substitutor } from '../../sql-base';
+import { SqlBase, SqlTypeDesignator, Substitutor } from '../../sql-base';
 import { SqlColumnList } from '../../sql-column-list/sql-column-list';
 import { SqlExpression } from '../../sql-expression';
 import { SqlTable } from '../../sql-table/sql-table';
@@ -26,7 +26,7 @@ export interface SqlReplaceClauseValue extends SqlClauseValue {
 }
 
 export class SqlReplaceClause extends SqlClause {
-  static type: SqlType = 'replaceClause';
+  static type: SqlTypeDesignator = 'replaceClause';
 
   static readonly DEFAULT_REPLACE_KEYWORD = 'REPLACE';
   static readonly DEFAULT_INTO_KEYWORD = 'INTO';

@@ -14,10 +14,9 @@
 
 import { filterMap, isEmptyArray } from '../../utils';
 import { parseSql } from '../parser';
-import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../sql-base';
+import { SqlBase, SqlBaseValue, SqlTypeDesignator, Substitutor } from '../sql-base';
 import {
   SqlClusteredByClause,
-  SqlExplainClause,
   SqlFromClause,
   SqlGroupByClause,
   SqlHavingClause,
@@ -63,7 +62,7 @@ export interface AddSelectOptions {
 }
 
 export interface SqlQueryValue extends SqlBaseValue {
-  explainClause?: SqlExplainClause;
+  explain?: boolean;
   insertClause?: SqlInsertClause;
   replaceClause?: SqlReplaceClause;
   withClause?: SqlWithClause;
@@ -83,8 +82,9 @@ export interface SqlQueryValue extends SqlBaseValue {
 }
 
 export class SqlQuery extends SqlExpression {
-  static type: SqlType = 'query';
+  static type: SqlTypeDesignator = 'query';
 
+  static readonly DEFAULT_EXPLAIN_PLAN_FOR_KEYWORD = 'EXPLAIN PLAN FOR';
   static readonly DEFAULT_SELECT_KEYWORD = 'SELECT';
   static readonly DEFAULT_UNION_KEYWORD = 'UNION ALL';
 
@@ -145,7 +145,7 @@ export class SqlQuery extends SqlExpression {
     return /^EXPR\$(?:\d|[1-9]\d*)$/.test(name);
   }
 
-  public readonly explainClause?: SqlExplainClause;
+  public readonly explain?: boolean;
   public readonly insertClause?: SqlInsertClause;
   public readonly replaceClause?: SqlReplaceClause;
   public readonly withClause?: SqlWithClause;
@@ -164,7 +164,7 @@ export class SqlQuery extends SqlExpression {
 
   constructor(options: SqlQueryValue) {
     super(options, SqlQuery.type);
-    this.explainClause = options.explainClause;
+    this.explain = options.explain;
     this.insertClause = options.insertClause;
     this.replaceClause = options.replaceClause;
     if (this.insertClause && this.replaceClause) {
@@ -188,7 +188,7 @@ export class SqlQuery extends SqlExpression {
 
   public valueOf(): SqlQueryValue {
     const value = super.valueOf() as SqlQueryValue;
-    value.explainClause = this.explainClause;
+    value.explain = this.explain;
     value.insertClause = this.insertClause;
     value.replaceClause = this.replaceClause;
     value.withClause = this.withClause;
@@ -209,7 +209,7 @@ export class SqlQuery extends SqlExpression {
 
   protected _toRawString(): string {
     const {
-      explainClause,
+      explain,
       insertClause,
       replaceClause,
       withClause,
@@ -229,9 +229,12 @@ export class SqlQuery extends SqlExpression {
 
     const rawParts: string[] = [];
 
-    // Explain clause
-    if (explainClause) {
-      rawParts.push(explainClause.toString(), this.getSpace('postExplainClause', '\n'));
+    // Explain
+    if (explain) {
+      rawParts.push(
+        this.getKeyword('explainPlanFor', SqlQuery.DEFAULT_EXPLAIN_PLAN_FOR_KEYWORD),
+        this.getSpace('postExplainPlanFor', '\n'),
+      );
     }
 
     // INSERT / REPLACE clause
@@ -314,14 +317,14 @@ export class SqlQuery extends SqlExpression {
     return rawParts.join('');
   }
 
-  public changeExplainClause(explainClause: SqlExplainClause | undefined): this {
-    if (this.explainClause === explainClause) return this;
+  public changeExplain(explain: boolean): this {
+    if (this.explain === explain) return this;
     const value = this.valueOf();
-    if (explainClause) {
-      value.explainClause = explainClause;
+    if (explain) {
+      value.explain = true;
     } else {
-      delete value.explainClause;
-      value.spacing = this.getSpacingWithout('postExplainClause');
+      delete value.explain;
+      value.spacing = this.getSpacingWithout('postExplainPlanFor');
     }
     return SqlBase.fromValue(value);
   }
@@ -722,8 +725,7 @@ export class SqlQuery extends SqlExpression {
   /* ~~~~~ EXPLAIN ~~~~~ */
 
   public makeExplain(): this {
-    if (this.explainClause) return this;
-    return this.changeExplainClause(SqlExplainClause.create());
+    return this.changeExplain(true);
   }
 
   /* ~~~~~ INSERT ~~~~~ */

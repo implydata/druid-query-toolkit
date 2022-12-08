@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../sql-base';
+import { SqlBase, SqlBaseValue, SqlTypeDesignator, Substitutor } from '../sql-base';
 import { DecomposeViaAndOptions, SqlExpression } from '../sql-expression';
 import { SeparatedArray, Separator } from '../utils';
 
@@ -24,7 +24,7 @@ export interface SqlMultiValue extends SqlBaseValue {
 }
 
 export class SqlMulti extends SqlExpression {
-  static type: SqlType = 'multi';
+  static type: SqlTypeDesignator = 'multi';
 
   public readonly op: SqlMultiOp;
   public readonly args: SeparatedArray<SqlExpression>;
