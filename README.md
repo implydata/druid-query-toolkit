@@ -21,7 +21,7 @@ There are plenty of examples in the unit tests.
 
 ### SQL
 
-The SQL parser parses and models the whitespace and casing as well as the logical representation of the query allowing the query to be transofrmed in a very human friendly way.
+The SQL parser parses and models the whitespace and casing as well as the logical representation of the query allowing the query to be transformed in a very human friendly way.
 
 Here are a few examples of what the SQL parser can do:
 
@@ -84,7 +84,6 @@ Not every valid DruidSQL construct can currently be parsed, the following snippe
 - `(a, b) IN (subquery)`
 - Support `FROM "wikipedia_k" USING (k)`
 
-
-## License 
+## License
 
 [Apache 2.0](LICENSE)
