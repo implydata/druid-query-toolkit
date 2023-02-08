@@ -13,8 +13,9 @@
  */
 
 const axios = require('axios');
-const { RESERVED_KEYWORDS } = require('../build/sql/reserved-keywords');
-const { SPECIAL_FUNCTIONS } = require('../build/sql/special-functions');
+const { RefName, SqlFunction } = require('../dist/druid-query-toolkit');
+const { RESERVED_KEYWORDS } = RefName;
+const { SPECIAL_FUNCTIONS } = SqlFunction;
 
 async function main() {
   // Do basic check first

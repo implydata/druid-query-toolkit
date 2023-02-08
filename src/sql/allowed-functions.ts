@@ -94,6 +94,7 @@ export const ALLOWED_FUNCTIONS = [
   'TRANSLATE',
   'TRIM',
   'TRUNCATE',
+  'UNNEST',
   'UPPER',
   'USER',
   'VAR_POP',

@@ -51,6 +51,7 @@ describe('SqlFunction', () => {
 
       `PI`,
       `CURRENT_TIMESTAMP`,
+      `UNNEST(t)`,
     ];
 
     for (const sql of functionExpressions) {

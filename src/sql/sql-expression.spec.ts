@@ -29,6 +29,8 @@ describe('SqlExpression', () => {
       `VALUES   (1, 1 + 1),(2, 1 + 1)`,
       `VALUES('Toy' || 'ota', 2, 2+2, CURRENT_TIMESTAMP), ROW('Honda', (SELECT COUNT(*) FROM wikipedia), GREATEST(5, 1), CURRENT_TIMESTAMP - INTERVAL '1' DAY)`,
       `SELECT * FROM (VALUES   (1, 1 + 1),(2, 1 + 1)) t (a, "b")`,
+      `SELECT * FROM UNNEST(ARRAY['1','2','3'])`,
+      `SELECT * FROM "tbl", UNNEST(DATE_EXPAND(TIMESTAMP_TO_MILLIS(__time), TIMESTAMP_TO_MILLIS(__time), 'PT1S')) as unnested (dt)`,
     ];
 
     for (const sql of queries) {
