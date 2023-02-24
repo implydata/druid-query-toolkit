@@ -596,64 +596,13 @@ describe('QueryResult', () => {
             { __time: 1564887703049, added: 4996, channel: '#vi.wikipedia' },
           ],
         },
-      ];
-
-      expect(QueryResult.fromRawResult(result)).toMatchInlineSnapshot(`
-        QueryResult {
-          "header": Array [
-            Column {
-              "name": "__time",
-              "nativeType": undefined,
-              "sqlType": undefined,
-            },
-            Column {
-              "name": "added",
-              "nativeType": undefined,
-              "sqlType": undefined,
-            },
-            Column {
-              "name": "channel",
-              "nativeType": undefined,
-              "sqlType": undefined,
-            },
-          ],
-          "query": undefined,
-          "queryDuration": undefined,
-          "queryId": undefined,
-          "resultContext": undefined,
-          "rows": Array [
-            Array [
-              1564887701848,
-              471,
-              "#en.wikipedia",
-            ],
-            Array [
-              1564887701883,
-              44,
-              "#en.wikipedia",
-            ],
-            Array [
-              1564887703049,
-              4996,
-              "#vi.wikipedia",
-            ],
-          ],
-          "sqlQuery": undefined,
-          "sqlQueryId": undefined,
-        }
-      `);
-    });
-
-    it('works for scan(compactedList)', () => {
-      const result = [
         {
           segmentId:
-            'wikiticker_2019-08-04T03:00:00.000Z_2019-08-04T04:00:00.000Z_2019-08-04T03:00:00.391Z',
-          columns: ['__time', 'added', 'channel'],
+            'wikiticker_2019-08-04T03:00:00.000Z_2019-08-04T04:00:00.000Z_2019-08-04T03:00:00.399Z',
+          columns: ['__time', 'd1', 'd2'],
           events: [
-            [1564887701848, 471, '#en.wikipedia'],
-            [1564887701883, 44, '#en.wikipedia'],
-            [1564887703049, 4996, '#vi.wikipedia'],
+            { __time: 1564887701848, d1: 'va1', d2: 'vb1' },
+            { __time: 1564887701883, d1: 'va2', d2: 'vb2' },
           ],
         },
       ];
@@ -676,6 +625,16 @@ describe('QueryResult', () => {
               "nativeType": undefined,
               "sqlType": undefined,
             },
+            Column {
+              "name": "d1",
+              "nativeType": undefined,
+              "sqlType": undefined,
+            },
+            Column {
+              "name": "d2",
+              "nativeType": undefined,
+              "sqlType": undefined,
+            },
           ],
           "query": undefined,
           "queryDuration": undefined,
@@ -686,16 +645,144 @@ describe('QueryResult', () => {
               1564887701848,
               471,
               "#en.wikipedia",
+              undefined,
+              undefined,
             ],
             Array [
               1564887701883,
+              44,
+              "#en.wikipedia",
+              undefined,
+              undefined,
+            ],
+            Array [
+              1564887703049,
+              4996,
+              "#vi.wikipedia",
+              undefined,
+              undefined,
+            ],
+            Array [
+              1564887701848,
+              undefined,
+              undefined,
+              "va1",
+              "vb1",
+            ],
+            Array [
+              1564887701883,
+              undefined,
+              undefined,
+              "va2",
+              "vb2",
+            ],
+          ],
+          "sqlQuery": undefined,
+          "sqlQueryId": undefined,
+        }
+      `);
+    });
+
+    it('works for scan(compactedList)', () => {
+      const result = [
+        {
+          segmentId:
+            'wikiticker_2019-08-04T03:00:00.000Z_2019-08-04T04:00:00.000Z_2019-08-04T03:00:00.391Z',
+          columns: ['__time', 'added', 'added', 'channel'],
+          events: [
+            [1564887701848, 471, 471, '#en.wikipedia'],
+            [1564887701883, 44, 44, '#en.wikipedia'],
+          ],
+        },
+        {
+          segmentId:
+            'wikiticker_2019-08-04T03:00:00.000Z_2019-08-04T04:00:00.000Z_2019-08-04T03:00:00.392Z',
+          columns: ['__time', 'added', 'added', 'channel'],
+          events: [[1564887703049, 4996, 4996, '#vi.wikipedia']],
+        },
+        {
+          segmentId:
+            'wikiticker_2019-08-04T03:00:00.000Z_2019-08-04T04:00:00.000Z_2019-08-04T03:00:00.399Z',
+          columns: ['__time', 'd1', 'd2'],
+          events: [
+            [1564887701848, 'va1', 'vb1'],
+            [1564887701883, 'va2', 'vb2'],
+          ],
+        },
+      ];
+
+      expect(QueryResult.fromRawResult(result)).toMatchInlineSnapshot(`
+        QueryResult {
+          "header": Array [
+            Column {
+              "name": "__time",
+              "nativeType": undefined,
+              "sqlType": undefined,
+            },
+            Column {
+              "name": "added",
+              "nativeType": undefined,
+              "sqlType": undefined,
+            },
+            Column {
+              "name": "added",
+              "nativeType": undefined,
+              "sqlType": undefined,
+            },
+            Column {
+              "name": "channel",
+              "nativeType": undefined,
+              "sqlType": undefined,
+            },
+            Column {
+              "name": "d1",
+              "nativeType": undefined,
+              "sqlType": undefined,
+            },
+            Column {
+              "name": "d2",
+              "nativeType": undefined,
+              "sqlType": undefined,
+            },
+          ],
+          "query": undefined,
+          "queryDuration": undefined,
+          "queryId": undefined,
+          "resultContext": undefined,
+          "rows": Array [
+            Array [
+              1564887701848,
+              471,
+              471,
+              "#en.wikipedia",
+            ],
+            Array [
+              1564887701883,
+              44,
               44,
               "#en.wikipedia",
             ],
             Array [
               1564887703049,
               4996,
+              4996,
               "#vi.wikipedia",
+            ],
+            Array [
+              1564887701848,
+              null,
+              null,
+              null,
+              "va1",
+              "vb1",
+            ],
+            Array [
+              1564887701883,
+              null,
+              null,
+              null,
+              "va2",
+              "vb2",
             ],
           ],
           "sqlQuery": undefined,

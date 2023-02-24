@@ -265,7 +265,29 @@ export class QueryResult {
 
       // scan like
       if (Array.isArray(firstRow.columns) && Array.isArray(firstRow.events)) {
+        const firstRowColumnsKey = firstRow.columns.join('#');
         const headerNames: string[] = firstRow.columns;
+
+        // It is possible that in a scan query we will have a different header structure for different segments
+        // This code is meant to unify the columns across the different headers
+        const headerNameToIndex: Map<string, number> = new Map();
+        for (let i = 0; i < headerNames.length; i++) {
+          headerNameToIndex.set(headerNames[i]!, i);
+        }
+        const headerRemaps: (Map<string, number> | undefined)[] = data.map(({ columns }, i) => {
+          if (i === 0 || columns.join('#') === firstRowColumnsKey) return;
+          const remap: Map<string, number> = new Map();
+          for (let j = 0; j < columns.length; j++) {
+            const column = columns[j];
+            if (!headerNameToIndex.has(column)) {
+              headerNameToIndex.set(column, headerNames.length);
+              headerNames.push(column);
+            }
+            remap.set(column, j);
+          }
+          return remap;
+        });
+
         const header: Column[] = Column.fromColumnNames(headerNames);
         const firstSubRow = data.find(r => r.events[0]);
         if (!firstSubRow) return new QueryResult({ header, rows: [] });
@@ -275,7 +297,20 @@ export class QueryResult {
         if (Array.isArray(firstSubRowEvents)) {
           return new QueryResult({
             header,
-            rows: data.flatMap(({ events }) => events),
+            rows: data.flatMap(({ events }, i) => {
+              const headerRemap = headerRemaps[i];
+
+              // If there is no remap then we can use the event as-is
+              if (!headerRemap) return events;
+
+              // Apply the remap if it exists
+              return events.map((event: any[]) => {
+                return headerNames.map(column => {
+                  if (!headerRemap.has(column)) return null;
+                  return event[headerRemap.get(column)!];
+                });
+              });
+            }),
             resultContext,
           });
         }
