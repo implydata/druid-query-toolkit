@@ -58,7 +58,7 @@ describe('Uber Query', () => {
       AND col9 BETWEEN SYMMETRIC TIMESTAMP '2020-01-01' AND TIMESTAMP '2020-01-01 02:03:04'
       AND col10 NOT BETWEEN SYMMETRIC TIMESTAMP '2020-01-01' AND TIMESTAMP '2020-01-01 02:03:04'
       AND col11 LIKE '%a%'
-      AND col12 LIKE '%a%' ESCAPE 'a'
+      AND "constructor" LIKE '%a%' ESCAPE 'a'
     GROUP BY
       1,
       col7
@@ -96,7 +96,6 @@ describe('Uber Query', () => {
       'col1',
       'col10',
       'col11',
-      'col12',
       'col2',
       'col3',
       'col4',
@@ -107,6 +106,7 @@ describe('Uber Query', () => {
       'col9',
       'colA',
       'colB',
+      'constructor',
       'time',
     ]);
   });

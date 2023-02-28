@@ -26,12 +26,12 @@ export function filterMap<T, Q>(xs: readonly T[], f: (x: T, i: number) => Q | un
 }
 
 export function dedupe<T>(array: readonly T[], keyFn: (x: T) => string = String): T[] {
-  const seen: Record<any, boolean> = {};
+  const seen: Map<any, boolean> = new Map();
   const deduped: T[] = [];
   array.forEach(d => {
     const key = keyFn(d);
-    if (seen[key]) return;
-    seen[key] = true;
+    if (seen.has(key)) return;
+    seen.set(key, true);
     deduped.push(d);
   });
   return deduped;
