@@ -90,7 +90,7 @@ describe('SqlWithQuery', () => {
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlWithQuery {
         "clusteredByClause": undefined,
-        "explainClause": undefined,
+        "explain": undefined,
         "insertClause": undefined,
         "keywords": Object {},
         "limitClause": undefined,
@@ -101,7 +101,7 @@ describe('SqlWithQuery', () => {
         "query": SqlQuery {
           "clusteredByClause": undefined,
           "decorator": undefined,
-          "explainClause": undefined,
+          "explain": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -193,7 +193,7 @@ describe('SqlWithQuery', () => {
                 "query": SqlQuery {
                   "clusteredByClause": undefined,
                   "decorator": undefined,
-                  "explainClause": undefined,
+                  "explain": undefined,
                   "fromClause": SqlFromClause {
                     "expressions": SeparatedArray {
                       "separators": Array [],

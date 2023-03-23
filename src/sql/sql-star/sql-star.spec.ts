@@ -46,7 +46,7 @@ describe('SqlStar', () => {
       SqlQuery {
         "clusteredByClause": undefined,
         "decorator": undefined,
-        "explainClause": undefined,
+        "explain": undefined,
         "fromClause": undefined,
         "groupByClause": undefined,
         "havingClause": undefined,

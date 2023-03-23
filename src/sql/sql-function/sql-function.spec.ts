@@ -19,6 +19,7 @@ describe('SqlFunction', () => {
   it('things that work', () => {
     const functionExpressions: string[] = [
       `COUNT(*)`,
+      `"COUNT"(*)`,
       `COUNT(DISTINCT blah)`,
       `COUNT(ALL blah)`,
 
@@ -39,15 +40,24 @@ describe('SqlFunction', () => {
       "position(x'bb' in x'aabbccaabbcc' FROM -5)",
       "position(x'cc' in x'aabbccdd' FROM 2)",
       "position(x'' in x'aabbcc' FROM 3)",
-      "position(x'' in x'aabbcc' FROM 10)",
+      "position (x'' in x'aabbcc' FROM 10)",
 
       "trim(leading 'eh' from 'hehe__hehe')",
       "trim(trailing 'eh' from 'hehe__hehe')",
       "trim('eh' from 'hehe__hehe')",
+      `"trim" ('eh' from 'hehe__hehe')`,
 
-      `SomeFn("boo" AS "arg1")`,
+      `SomeFn("arg1" => "boo")`,
+      `"SomeFn" ("arg1" => "boo")`,
+      `"ext" .  "SomeFn" ("arg1" => "boo")`,
 
       `TABLE(extern('{...}', '{...}', '[...]'))`,
+      `"TABLE" (extern('{...}', '{...}', '[...]'))`,
+      `TABLE(extern('{...}', '{...}')) EXTEND (x VARCHAR, y BIGINT, z TYPE('COMPLEX<json>'))`,
+      `TABLE(extern('{...}', '{...}'))  (x VARCHAR, y BIGINT, z TYPE('COMPLEX<json>'))`,
+
+      `SUM(COUNT(*)) OVER ()`,
+      `SUM(COUNT(*))   Over  ("windowName"  Order by COUNT(*) Desc)`,
 
       `PI`,
       `CURRENT_TIMESTAMP`,
@@ -111,10 +121,13 @@ describe('SqlFunction', () => {
       SqlFunction {
         "args": undefined,
         "decorator": undefined,
-        "functionName": "FN",
-        "keywords": Object {
-          "functionName": "FN",
+        "extendClause": undefined,
+        "functionName": RefName {
+          "name": "FN",
+          "quotes": false,
         },
+        "keywords": Object {},
+        "namespace": undefined,
         "parens": undefined,
         "spacing": Object {
           "postLeftParen": "",
@@ -123,6 +136,7 @@ describe('SqlFunction', () => {
         "specialParen": undefined,
         "type": "function",
         "whereClause": undefined,
+        "windowSpec": undefined,
       }
     `);
   });
@@ -151,10 +165,13 @@ describe('SqlFunction', () => {
           ],
         },
         "decorator": undefined,
-        "functionName": "SUM",
-        "keywords": Object {
-          "functionName": "SUM",
+        "extendClause": undefined,
+        "functionName": RefName {
+          "name": "SUM",
+          "quotes": false,
         },
+        "keywords": Object {},
+        "namespace": undefined,
         "parens": undefined,
         "spacing": Object {
           "postArguments": "",
@@ -164,6 +181,7 @@ describe('SqlFunction', () => {
         "specialParen": undefined,
         "type": "function",
         "whereClause": undefined,
+        "windowSpec": undefined,
       }
     `);
   });
@@ -192,10 +210,13 @@ describe('SqlFunction', () => {
           ],
         },
         "decorator": undefined,
-        "functionName": "SUM",
-        "keywords": Object {
-          "functionName": "SUM",
+        "extendClause": undefined,
+        "functionName": RefName {
+          "name": "SUM",
+          "quotes": false,
         },
+        "keywords": Object {},
+        "namespace": undefined,
         "parens": Array [
           Object {
             "leftSpacing": "  ",
@@ -210,6 +231,7 @@ describe('SqlFunction', () => {
         "specialParen": undefined,
         "type": "function",
         "whereClause": undefined,
+        "windowSpec": undefined,
       }
     `);
   });
@@ -313,10 +335,13 @@ describe('SqlFunction', () => {
           ],
         },
         "decorator": undefined,
-        "functionName": "SUM",
-        "keywords": Object {
-          "functionName": "SUM",
+        "extendClause": undefined,
+        "functionName": RefName {
+          "name": "SUM",
+          "quotes": false,
         },
+        "keywords": Object {},
+        "namespace": undefined,
         "parens": undefined,
         "spacing": Object {
           "postArguments": "",
@@ -326,6 +351,7 @@ describe('SqlFunction', () => {
         "specialParen": undefined,
         "type": "function",
         "whereClause": undefined,
+        "windowSpec": undefined,
       }
     `);
   });
@@ -354,10 +380,13 @@ describe('SqlFunction', () => {
           ],
         },
         "decorator": undefined,
-        "functionName": "SUM",
-        "keywords": Object {
-          "functionName": "SUM",
+        "extendClause": undefined,
+        "functionName": RefName {
+          "name": "SUM",
+          "quotes": false,
         },
+        "keywords": Object {},
+        "namespace": undefined,
         "parens": undefined,
         "spacing": Object {
           "postArguments": "      ",
@@ -367,6 +396,7 @@ describe('SqlFunction', () => {
         "specialParen": undefined,
         "type": "function",
         "whereClause": undefined,
+        "windowSpec": undefined,
       }
     `);
   });
@@ -405,10 +435,13 @@ describe('SqlFunction', () => {
                 ],
               },
               "decorator": undefined,
-              "functionName": "SUM",
-              "keywords": Object {
-                "functionName": "Sum",
+              "extendClause": undefined,
+              "functionName": RefName {
+                "name": "Sum",
+                "quotes": false,
               },
+              "keywords": Object {},
+              "namespace": undefined,
               "parens": undefined,
               "spacing": Object {
                 "postArguments": "",
@@ -418,6 +451,7 @@ describe('SqlFunction', () => {
               "specialParen": undefined,
               "type": "function",
               "whereClause": undefined,
+              "windowSpec": undefined,
             },
             SqlMulti {
               "args": SeparatedArray {
@@ -447,10 +481,13 @@ describe('SqlFunction', () => {
                       ],
                     },
                     "decorator": undefined,
-                    "functionName": "SUM",
-                    "keywords": Object {
-                      "functionName": "SUM",
+                    "extendClause": undefined,
+                    "functionName": RefName {
+                      "name": "SUM",
+                      "quotes": false,
                     },
+                    "keywords": Object {},
+                    "namespace": undefined,
                     "parens": undefined,
                     "spacing": Object {
                       "postArguments": "",
@@ -460,6 +497,7 @@ describe('SqlFunction', () => {
                     "specialParen": undefined,
                     "type": "function",
                     "whereClause": undefined,
+                    "windowSpec": undefined,
                   },
                   SqlMulti {
                     "args": SeparatedArray {
@@ -489,10 +527,13 @@ describe('SqlFunction', () => {
                             ],
                           },
                           "decorator": undefined,
-                          "functionName": "SUM",
-                          "keywords": Object {
-                            "functionName": "SUM",
+                          "extendClause": undefined,
+                          "functionName": RefName {
+                            "name": "SUM",
+                            "quotes": false,
                           },
+                          "keywords": Object {},
+                          "namespace": undefined,
                           "parens": undefined,
                           "spacing": Object {
                             "postArguments": "",
@@ -502,6 +543,7 @@ describe('SqlFunction', () => {
                           "specialParen": undefined,
                           "type": "function",
                           "whereClause": undefined,
+                          "windowSpec": undefined,
                         },
                         SqlLiteral {
                           "keywords": Object {},
@@ -562,11 +604,15 @@ describe('SqlFunction', () => {
           ],
         },
         "decorator": undefined,
-        "functionName": "SUM",
+        "extendClause": undefined,
+        "functionName": RefName {
+          "name": "Sum",
+          "quotes": false,
+        },
         "keywords": Object {
           "filter": "Filter",
-          "functionName": "Sum",
         },
+        "namespace": undefined,
         "parens": undefined,
         "spacing": Object {
           "postArguments": "",
@@ -625,6 +671,7 @@ describe('SqlFunction', () => {
           },
           "type": "whereClause",
         },
+        "windowSpec": undefined,
       }
     `);
   });
@@ -645,6 +692,172 @@ describe('SqlFunction', () => {
     const sql = `Trim( Both A and B FROM D)`;
 
     backAndForth(sql);
+  });
+
+  it('TABLE with EXTEND', () => {
+    const sql = `TABLE(extern('{...}', '{...}')) EXTEND(x VARCHAR, y BIGINT, "z"  TYPE('COMPLEX<json>'))`;
+
+    backAndForth(sql);
+
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+      SqlFunction {
+        "args": SeparatedArray {
+          "separators": Array [],
+          "values": Array [
+            SqlFunction {
+              "args": SeparatedArray {
+                "separators": Array [
+                  Separator {
+                    "left": "",
+                    "right": " ",
+                    "separator": ",",
+                  },
+                ],
+                "values": Array [
+                  SqlLiteral {
+                    "keywords": Object {},
+                    "parens": undefined,
+                    "spacing": Object {},
+                    "stringValue": "'{...}'",
+                    "type": "literal",
+                    "value": "{...}",
+                  },
+                  SqlLiteral {
+                    "keywords": Object {},
+                    "parens": undefined,
+                    "spacing": Object {},
+                    "stringValue": "'{...}'",
+                    "type": "literal",
+                    "value": "{...}",
+                  },
+                ],
+              },
+              "decorator": undefined,
+              "extendClause": undefined,
+              "functionName": RefName {
+                "name": "extern",
+                "quotes": false,
+              },
+              "keywords": Object {},
+              "namespace": undefined,
+              "parens": undefined,
+              "spacing": Object {
+                "postArguments": "",
+                "postLeftParen": "",
+                "preLeftParen": "",
+              },
+              "specialParen": undefined,
+              "type": "function",
+              "whereClause": undefined,
+              "windowSpec": undefined,
+            },
+          ],
+        },
+        "decorator": undefined,
+        "extendClause": SqlExtendClause {
+          "columnDeclarations": SeparatedArray {
+            "separators": Array [
+              Separator {
+                "left": "",
+                "right": " ",
+                "separator": ",",
+              },
+              Separator {
+                "left": "",
+                "right": " ",
+                "separator": ",",
+              },
+            ],
+            "values": Array [
+              SqlColumnDeclaration {
+                "column": RefName {
+                  "name": "x",
+                  "quotes": false,
+                },
+                "columnType": SqlType {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "spacing": Object {},
+                  "type": "type",
+                  "value": "VARCHAR",
+                },
+                "keywords": Object {},
+                "parens": undefined,
+                "spacing": Object {
+                  "postColumn": " ",
+                },
+                "type": "columnDeclaration",
+              },
+              SqlColumnDeclaration {
+                "column": RefName {
+                  "name": "y",
+                  "quotes": false,
+                },
+                "columnType": SqlType {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "spacing": Object {},
+                  "type": "type",
+                  "value": "BIGINT",
+                },
+                "keywords": Object {},
+                "parens": undefined,
+                "spacing": Object {
+                  "postColumn": " ",
+                },
+                "type": "columnDeclaration",
+              },
+              SqlColumnDeclaration {
+                "column": RefName {
+                  "name": "z",
+                  "quotes": true,
+                },
+                "columnType": SqlType {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "spacing": Object {},
+                  "type": "type",
+                  "value": "TYPE('COMPLEX<json>')",
+                },
+                "keywords": Object {},
+                "parens": undefined,
+                "spacing": Object {
+                  "postColumn": "  ",
+                },
+                "type": "columnDeclaration",
+              },
+            ],
+          },
+          "keywords": Object {
+            "extend": "EXTEND",
+          },
+          "parens": undefined,
+          "spacing": Object {
+            "postColumnDeclarations": "",
+            "postExtend": "",
+            "postLeftParen": "",
+          },
+          "type": "extendClause",
+        },
+        "functionName": RefName {
+          "name": "TABLE",
+          "quotes": false,
+        },
+        "keywords": Object {},
+        "namespace": undefined,
+        "parens": undefined,
+        "spacing": Object {
+          "postArguments": "",
+          "postLeftParen": "",
+          "preExtend": " ",
+          "preLeftParen": "",
+        },
+        "specialParen": undefined,
+        "type": "function",
+        "whereClause": undefined,
+        "windowSpec": undefined,
+      }
+    `);
   });
 
   it('array works with array or numbers', () => {
@@ -695,10 +908,13 @@ describe('SqlFunction', () => {
           ],
         },
         "decorator": undefined,
-        "functionName": "ARRAY",
-        "keywords": Object {
-          "functionName": "Array",
+        "extendClause": undefined,
+        "functionName": RefName {
+          "name": "Array",
+          "quotes": false,
         },
+        "keywords": Object {},
+        "namespace": undefined,
         "parens": undefined,
         "spacing": Object {
           "postArguments": "  ",
@@ -708,6 +924,7 @@ describe('SqlFunction', () => {
         "specialParen": "square",
         "type": "function",
         "whereClause": undefined,
+        "windowSpec": undefined,
       }
     `);
   });
@@ -760,10 +977,13 @@ describe('SqlFunction', () => {
           ],
         },
         "decorator": undefined,
-        "functionName": "ARRAY",
-        "keywords": Object {
-          "functionName": "Array",
+        "extendClause": undefined,
+        "functionName": RefName {
+          "name": "Array",
+          "quotes": false,
         },
+        "keywords": Object {},
+        "namespace": undefined,
         "parens": undefined,
         "spacing": Object {
           "postArguments": "",
@@ -773,6 +993,7 @@ describe('SqlFunction', () => {
         "specialParen": "square",
         "type": "function",
         "whereClause": undefined,
+        "windowSpec": undefined,
       }
     `);
   });

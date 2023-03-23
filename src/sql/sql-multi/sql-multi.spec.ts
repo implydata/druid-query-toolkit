@@ -995,10 +995,13 @@ describe('Math expression', () => {
                 ],
               },
               "decorator": undefined,
-              "functionName": "COUNT",
-              "keywords": Object {
-                "functionName": "COUNT",
+              "extendClause": undefined,
+              "functionName": RefName {
+                "name": "COUNT",
+                "quotes": false,
               },
+              "keywords": Object {},
+              "namespace": undefined,
               "parens": undefined,
               "spacing": Object {
                 "postArguments": "",
@@ -1008,6 +1011,7 @@ describe('Math expression', () => {
               "specialParen": undefined,
               "type": "function",
               "whereClause": undefined,
+              "windowSpec": undefined,
             },
             SqlMulti {
               "args": SeparatedArray {
@@ -1041,10 +1045,13 @@ describe('Math expression', () => {
                       ],
                     },
                     "decorator": undefined,
-                    "functionName": "COUNT",
-                    "keywords": Object {
-                      "functionName": "COUNT",
+                    "extendClause": undefined,
+                    "functionName": RefName {
+                      "name": "COUNT",
+                      "quotes": false,
                     },
+                    "keywords": Object {},
+                    "namespace": undefined,
                     "parens": undefined,
                     "spacing": Object {
                       "postArguments": "",
@@ -1054,6 +1061,7 @@ describe('Math expression', () => {
                     "specialParen": undefined,
                     "type": "function",
                     "whereClause": undefined,
+                    "windowSpec": undefined,
                   },
                 ],
               },

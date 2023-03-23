@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlType, Substitutor } from '../../sql-base';
+import { SqlBase, SqlTypeDesignator, Substitutor } from '../../sql-base';
 import { SqlLiteral } from '../../sql-literal/sql-literal';
 import { SqlClause, SqlClauseValue } from '../sql-clause';
 
@@ -21,7 +21,7 @@ export interface SqlLimitClauseValue extends SqlClauseValue {
 }
 
 export class SqlLimitClause extends SqlClause {
-  static type: SqlType = 'limitClause';
+  static type: SqlTypeDesignator = 'limitClause';
 
   static DEFAULT_LIMIT_KEYWORD = 'LIMIT';
 

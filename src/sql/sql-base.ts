@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { cleanObject, dedupe } from '../utils';
+import { cleanObject, dedupe, objectMap } from '../utils';
 
 import { SeparatedArray, SqlColumn, SqlLiteral } from '.';
 import { parseSql } from './parser';
@@ -36,6 +36,13 @@ function pseudoRandomCapitalization(str: string): string {
     .join('');
 }
 
+function normalizeKeywordSpace(keyword: string): string {
+  return keyword
+    .replace(/\/\*.*\*\//g, ' ')
+    .replace(/--[^\n]*\n/gm, ' ')
+    .replace(/\s+/gm, ' ');
+}
+
 export type Substitutor = (t: SqlBase, stack: SqlBase[]) => SqlBase | undefined;
 export type Matcher = (t: SqlBase, stack: SqlBase[]) => boolean;
 
@@ -43,9 +50,12 @@ export interface PrettifyOptions {
   keywordCasing?: 'preserve';
 }
 
-export type SqlType =
+export type SqlTypeDesignator =
   | 'base'
+  | 'type'
   | 'columnList'
+  | 'extendClause'
+  | 'columnDeclaration'
   | 'record'
   | 'query'
   | 'withQuery'
@@ -61,12 +71,13 @@ export type SqlType =
   | 'groupByClause'
   | 'insertClause'
   | 'replaceClause'
-  | 'explainClause'
   | 'partitionedByClause'
+  | 'partitionByClause'
   | 'clusteredByClause'
   | 'withPart'
   | 'joinPart'
   | 'alias'
+  | 'labeledExpression'
   | 'betweenPart'
   | 'likePart'
   | 'comparison'
@@ -81,26 +92,25 @@ export type SqlType =
   | 'star'
   | 'namespace'
   | 'table'
-  | 'unary';
+  | 'unary'
+  | 'windowSpec';
 
 export type KeywordName =
   | 'all'
   | 'and'
   | 'as'
-  | 'by'
   | 'case'
-  | 'clustered'
+  | 'clusteredBy'
   | 'decorator'
   | 'direction'
   | 'else'
   | 'end'
   | 'escape'
-  | 'explain'
+  | 'explainPlanFor'
+  | 'extend'
   | 'filter'
-  | 'for'
   | 'from'
-  | 'functionName'
-  | 'group'
+  | 'groupBy'
   | 'having'
   | 'insert'
   | 'interval'
@@ -112,16 +122,17 @@ export type KeywordName =
   | 'offset'
   | 'on'
   | 'op'
-  | 'order'
+  | 'orderBy'
+  | 'over'
   | 'overwrite'
-  | 'partitioned'
+  | 'partitionBy'
+  | 'partitionedBy'
   | 'plan'
   | 'replace'
   | 'row'
   | 'select'
   | 'symmetric'
   | 'then'
-  | 'time'
   | 'timestamp'
   | 'union'
   | 'values'
@@ -135,22 +146,24 @@ export type SpaceName =
   | 'not'
   | 'postAnd'
   | 'postArguments'
+  | 'postArrow'
   | 'postAs'
-  | 'postBy'
   | 'postCase'
   | 'postCaseExpression'
-  | 'postClustered'
+  | 'postClusteredBy'
+  | 'postColumn'
+  | 'postColumnDeclarations'
   | 'postColumns'
   | 'postDecorator'
   | 'postDot'
   | 'postElse'
   | 'postEscape'
-  | 'postExplain'
-  | 'postExplainClause'
+  | 'postExplainPlanFor'
   | 'postExpressions'
+  | 'postExtend'
   | 'postFilter'
   | 'postFrom'
-  | 'postGroup'
+  | 'postGroupBy'
   | 'postHaving'
   | 'postInsert'
   | 'postInsertClause'
@@ -165,10 +178,11 @@ export type SpaceName =
   | 'postOffset'
   | 'postOn'
   | 'postOp'
-  | 'postOrder'
+  | 'postOrderBy'
+  | 'postOver'
   | 'postOverwrite'
-  | 'postPartitioned'
-  | 'postPlan'
+  | 'postPartitionBy'
+  | 'postPartitionedBy'
   | 'postReplace'
   | 'postReplaceClause'
   | 'postRow'
@@ -182,10 +196,12 @@ export type SpaceName =
   | 'postWhen'
   | 'postWhenExpressions'
   | 'postWhere'
+  | 'postWindowName'
   | 'postWith'
   | 'postWithClause'
   | 'preAlias'
   | 'preAnd'
+  | 'preArrow'
   | 'preAs'
   | 'preClusteredByClause'
   | 'preColumns'
@@ -193,6 +209,7 @@ export type SpaceName =
   | 'preElse'
   | 'preEnd'
   | 'preEscape'
+  | 'preExtend'
   | 'preFilter'
   | 'preFromClause'
   | 'preGroupByClause'
@@ -204,21 +221,21 @@ export type SpaceName =
   | 'preOn'
   | 'preOp'
   | 'preOrderByClause'
+  | 'preOver'
   | 'preOverwrite'
   | 'prePartitionedByClause'
-  | 'preTime'
   | 'preUnion'
   | 'preWhereClause';
 
 export interface SqlBaseValue {
-  type?: SqlType;
+  type?: SqlTypeDesignator;
   spacing?: Partial<Record<SpaceName, string>>;
   keywords?: Partial<Record<KeywordName, string>>;
   parens?: readonly Parens[];
 }
 
 export abstract class SqlBase {
-  static type: SqlType = 'base';
+  static type: SqlTypeDesignator = 'base';
 
   static parseSql(input: string | SqlBase): SqlBase {
     if (typeof input === 'string') {
@@ -289,7 +306,7 @@ export abstract class SqlBase {
     SqlBase.classMap[ex.type] = ex;
   }
 
-  static getConstructorFor(type: SqlType): typeof SqlBase {
+  static getConstructorFor(type: SqlTypeDesignator): typeof SqlBase {
     const ClassFn = SqlBase.classMap[type];
     if (!ClassFn) throw new Error(`unsupported expression type '${type}'`);
     return ClassFn;
@@ -302,12 +319,12 @@ export abstract class SqlBase {
     return new ClassFn(parameters);
   }
 
-  public type: SqlType;
+  public type: SqlTypeDesignator;
   public spacing: Record<string, string>;
   public keywords: Record<string, string>;
   public parens?: readonly Parens[];
 
-  constructor(options: SqlBaseValue, typeOverride: SqlType) {
+  constructor(options: SqlBaseValue, typeOverride: SqlTypeDesignator) {
     const type = typeOverride || options.type;
     if (!type) throw new Error(`could not determine type`);
     this.type = type;
@@ -394,6 +411,13 @@ export abstract class SqlBase {
     return SqlBase.fromValue(value);
   }
 
+  public normalizeOwnKeywordSpaces(): this {
+    if (Object.keys(this.keywords).length === 0) return this;
+    const value = this.valueOf();
+    value.keywords = objectMap(value.keywords || {}, normalizeKeywordSpace);
+    return SqlBase.fromValue(value);
+  }
+
   public clearOwnSeparators(): this {
     return this;
   }
@@ -421,9 +445,16 @@ export abstract class SqlBase {
     return ret;
   }
 
-  public getKeyword(name: KeywordName, defaultKeyword: string): string {
-    const keyword = this.keywords[name];
-    return typeof keyword === 'string' ? keyword : SqlBase.capitalize(defaultKeyword);
+  public getKeyword(
+    name: KeywordName,
+    defaultKeyword: string,
+    followSpace?: SpaceName,
+    defaultFollowSpace?: string,
+  ): string {
+    let keyword = this.keywords[name];
+    if (typeof keyword === 'undefined') keyword = SqlBase.capitalize(defaultKeyword);
+    if (keyword && followSpace) keyword += this.getSpace(followSpace, defaultFollowSpace);
+    return keyword;
   }
 
   protected getKeywordsWithout(...toRemove: KeywordName[]) {
@@ -546,7 +577,9 @@ export abstract class SqlBase {
     const { keywordCasing } = options;
     return this.walkPostorder(ex => {
       const resetSpaceEx = ex.resetOwnSpacing().clearOwnSeparators().removeOwnParenSpaces();
-      return keywordCasing === 'preserve' ? resetSpaceEx : resetSpaceEx.resetOwnKeywords();
+      return keywordCasing === 'preserve'
+        ? resetSpaceEx.normalizeOwnKeywordSpaces()
+        : resetSpaceEx.resetOwnKeywords();
     });
   }
 

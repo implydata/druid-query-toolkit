@@ -18,7 +18,6 @@
 
 /* eslint-disable simple-import-sort/exports */
 export * from './sql-clause';
-export * from './sql-explain-clause/sql-explain-clause';
 export * from './sql-order-by-expression/sql-order-by-expression';
 export * from './sql-order-by-clause/sql-order-by-clause';
 export * from './sql-from-clause/sql-join-part';
@@ -34,3 +33,5 @@ export * from './sql-with-clause/sql-with-part';
 export * from './sql-with-clause/sql-with-clause';
 export * from './sql-insert-clause/sql-insert-clause';
 export * from './sql-replace-clause/sql-replace-clause';
+export * from './sql-extend-clause/sql-column-declaration';
+export * from './sql-extend-clause/sql-extend-clause';

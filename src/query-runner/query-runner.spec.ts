@@ -184,7 +184,7 @@ describe('QueryRunner', () => {
         "sqlQuery": SqlQuery {
           "clusteredByClause": undefined,
           "decorator": undefined,
-          "explainClause": undefined,
+          "explain": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -229,13 +229,11 @@ describe('QueryRunner', () => {
             },
             "innerParens": false,
             "keywords": Object {
-              "by": "BY",
-              "group": "GROUP",
+              "groupBy": "GROUP BY",
             },
             "parens": undefined,
             "spacing": Object {
-              "postBy": " ",
-              "postGroup": " ",
+              "postGroupBy": " ",
             },
             "type": "groupByClause",
           },
@@ -272,13 +270,11 @@ describe('QueryRunner', () => {
               ],
             },
             "keywords": Object {
-              "by": "BY",
-              "order": "ORDER",
+              "orderBy": "ORDER BY",
             },
             "parens": undefined,
             "spacing": Object {
-              "postBy": " ",
-              "postOrder": " ",
+              "postOrderBy": " ",
             },
             "type": "orderByClause",
           },
@@ -325,10 +321,13 @@ describe('QueryRunner', () => {
                     ],
                   },
                   "decorator": undefined,
-                  "functionName": "COUNT",
-                  "keywords": Object {
-                    "functionName": "COUNT",
+                  "extendClause": undefined,
+                  "functionName": RefName {
+                    "name": "COUNT",
+                    "quotes": false,
                   },
+                  "keywords": Object {},
+                  "namespace": undefined,
                   "parens": undefined,
                   "spacing": Object {
                     "postArguments": "",
@@ -338,6 +337,7 @@ describe('QueryRunner', () => {
                   "specialParen": undefined,
                   "type": "function",
                   "whereClause": undefined,
+                  "windowSpec": undefined,
                 },
                 "keywords": Object {
                   "as": "AS",
@@ -423,7 +423,7 @@ describe('QueryRunner', () => {
         "sqlQuery": SqlQuery {
           "clusteredByClause": undefined,
           "decorator": undefined,
-          "explainClause": undefined,
+          "explain": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -468,13 +468,11 @@ describe('QueryRunner', () => {
             },
             "innerParens": false,
             "keywords": Object {
-              "by": "BY",
-              "group": "GROUP",
+              "groupBy": "GROUP BY",
             },
             "parens": undefined,
             "spacing": Object {
-              "postBy": " ",
-              "postGroup": " ",
+              "postGroupBy": " ",
             },
             "type": "groupByClause",
           },
@@ -511,13 +509,11 @@ describe('QueryRunner', () => {
               ],
             },
             "keywords": Object {
-              "by": "BY",
-              "order": "ORDER",
+              "orderBy": "ORDER BY",
             },
             "parens": undefined,
             "spacing": Object {
-              "postBy": " ",
-              "postOrder": " ",
+              "postOrderBy": " ",
             },
             "type": "orderByClause",
           },
@@ -564,10 +560,13 @@ describe('QueryRunner', () => {
                     ],
                   },
                   "decorator": undefined,
-                  "functionName": "COUNT",
-                  "keywords": Object {
-                    "functionName": "COUNT",
+                  "extendClause": undefined,
+                  "functionName": RefName {
+                    "name": "COUNT",
+                    "quotes": false,
                   },
+                  "keywords": Object {},
+                  "namespace": undefined,
                   "parens": undefined,
                   "spacing": Object {
                     "postArguments": "",
@@ -577,6 +576,7 @@ describe('QueryRunner', () => {
                   "specialParen": undefined,
                   "type": "function",
                   "whereClause": undefined,
+                  "windowSpec": undefined,
                 },
                 "keywords": Object {
                   "as": "AS",
@@ -663,7 +663,7 @@ describe('QueryRunner', () => {
         "sqlQuery": SqlQuery {
           "clusteredByClause": undefined,
           "decorator": undefined,
-          "explainClause": undefined,
+          "explain": undefined,
           "fromClause": SqlFromClause {
             "expressions": SeparatedArray {
               "separators": Array [],
@@ -708,13 +708,11 @@ describe('QueryRunner', () => {
             },
             "innerParens": false,
             "keywords": Object {
-              "by": "BY",
-              "group": "GROUP",
+              "groupBy": "GROUP BY",
             },
             "parens": undefined,
             "spacing": Object {
-              "postBy": " ",
-              "postGroup": " ",
+              "postGroupBy": " ",
             },
             "type": "groupByClause",
           },
@@ -751,13 +749,11 @@ describe('QueryRunner', () => {
               ],
             },
             "keywords": Object {
-              "by": "BY",
-              "order": "ORDER",
+              "orderBy": "ORDER BY",
             },
             "parens": undefined,
             "spacing": Object {
-              "postBy": " ",
-              "postOrder": " ",
+              "postOrderBy": " ",
             },
             "type": "orderByClause",
           },
@@ -804,10 +800,13 @@ describe('QueryRunner', () => {
                     ],
                   },
                   "decorator": undefined,
-                  "functionName": "COUNT",
-                  "keywords": Object {
-                    "functionName": "COUNT",
+                  "extendClause": undefined,
+                  "functionName": RefName {
+                    "name": "COUNT",
+                    "quotes": false,
                   },
+                  "keywords": Object {},
+                  "namespace": undefined,
                   "parens": undefined,
                   "spacing": Object {
                     "postArguments": "",
@@ -817,6 +816,7 @@ describe('QueryRunner', () => {
                   "specialParen": undefined,
                   "type": "function",
                   "whereClause": undefined,
+                  "windowSpec": undefined,
                 },
                 "keywords": Object {
                   "as": "AS",

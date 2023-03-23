@@ -13,7 +13,7 @@
  */
 
 import { SqlQuery, SqlValues } from '../..';
-import { SqlBase, SqlBaseValue, SqlType, Substitutor } from '../../sql-base';
+import { SqlBase, SqlBaseValue, SqlTypeDesignator, Substitutor } from '../../sql-base';
 import { SqlColumnList } from '../../sql-column-list/sql-column-list';
 import { RefName, SeparatedArray } from '../../utils';
 
@@ -24,7 +24,7 @@ export interface SqlWithPartValue extends SqlBaseValue {
 }
 
 export class SqlWithPart extends SqlBase {
-  static type: SqlType = 'withPart';
+  static type: SqlTypeDesignator = 'withPart';
 
   static DEFAULT_AS_KEYWORD = 'AS';
 

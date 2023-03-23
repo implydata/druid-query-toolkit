@@ -18,6 +18,7 @@ export const ALLOWED_FUNCTIONS = [
   'ARRAY',
   'AVG',
   'CARDINALITY',
+  'CAST',
   'CEIL',
   'CEILING',
   'CHARACTER_LENGTH',

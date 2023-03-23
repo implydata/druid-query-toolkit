@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlType, Substitutor } from '../../sql-base';
+import { SqlBase, SqlTypeDesignator, Substitutor } from '../../sql-base';
 import { SqlExpression } from '../../sql-expression';
 import { SqlLiteral } from '../../sql-literal/sql-literal';
 import { SeparatedArray } from '../../utils';
@@ -24,10 +24,9 @@ export interface SqlOrderByClauseValue extends SqlClauseValue {
 }
 
 export class SqlOrderByClause extends SqlClause {
-  static type: SqlType = 'orderByClause';
+  static type: SqlTypeDesignator = 'orderByClause';
 
-  static DEFAULT_ORDER_KEYWORD = 'ORDER';
-  static DEFAULT_BY_KEYWORD = 'BY';
+  static DEFAULT_ORDER_BY_KEYWORD = 'ORDER BY';
 
   static create(
     expressions:
@@ -61,10 +60,8 @@ export class SqlOrderByClause extends SqlClause {
 
   protected _toRawString(): string {
     return [
-      this.getKeyword('order', SqlOrderByClause.DEFAULT_ORDER_KEYWORD),
-      this.getSpace('postOrder'),
-      this.getKeyword('by', SqlOrderByClause.DEFAULT_BY_KEYWORD),
-      this.getSpace('postBy'),
+      this.getKeyword('orderBy', SqlOrderByClause.DEFAULT_ORDER_BY_KEYWORD),
+      this.getSpace('postOrderBy'),
       this.expressions.toString(),
     ].join('');
   }

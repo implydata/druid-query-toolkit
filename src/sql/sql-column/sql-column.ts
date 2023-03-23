@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlBaseValue, SqlType } from '../sql-base';
+import { SqlBase, SqlBaseValue, SqlTypeDesignator } from '../sql-base';
 import { SqlExpression } from '../sql-expression';
 import { SqlTable } from '../sql-table/sql-table';
 import { RefName } from '../utils';
@@ -23,7 +23,7 @@ export interface SqlColumnValue extends SqlBaseValue {
 }
 
 export class SqlColumn extends SqlExpression {
-  static type: SqlType = 'column';
+  static type: SqlTypeDesignator = 'column';
 
   static create(name: string | SqlColumn, table?: SqlTable | string) {
     if (name instanceof SqlColumn) {
