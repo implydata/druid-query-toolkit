@@ -24,6 +24,7 @@ export class SqlType extends SqlExpression {
 
   static VARCHAR: SqlType;
   static DOUBLE: SqlType;
+  static FLOAT: SqlType;
   static BIGINT: SqlType;
   static TIMESTAMP: SqlType;
 
@@ -40,11 +41,14 @@ export class SqlType extends SqlExpression {
       case 'double':
         return SqlType.DOUBLE;
 
+      case 'float':
+        return SqlType.FLOAT;
+
       case 'long':
         return SqlType.BIGINT;
 
       case 'complex<json>':
-        return SqlType.create('COMPLEX<json>');
+        return SqlType.create(`TYPE('COMPLEX<json>')`);
 
       default:
         return SqlType.VARCHAR;
@@ -67,11 +71,39 @@ export class SqlType extends SqlExpression {
   protected _toRawString(): string {
     return this.value;
   }
+
+  public getEffectiveType(): string {
+    const m = this.value.match(/^TYPE\((.+)\)$/i);
+    if (m) {
+      return `TYPE(${m[1]})`;
+    }
+    return this.value.toUpperCase();
+  }
+
+  public getNativeType(): string {
+    const sqlType = this.getEffectiveType();
+    switch (sqlType) {
+      case 'DOUBLE':
+      case 'FLOAT':
+        return sqlType.toLowerCase();
+
+      case 'TIMESTAMP':
+      case 'BIGINT':
+        return 'long';
+
+      case `TYPE('COMPLEX<json>')`:
+        return 'COMPLEX<json>';
+
+      default:
+        return 'string';
+    }
+  }
 }
 
 SqlBase.register(SqlType);
 
 SqlType.VARCHAR = SqlType.create('VARCHAR');
 SqlType.DOUBLE = SqlType.create('DOUBLE');
+SqlType.FLOAT = SqlType.create('FLOAT');
 SqlType.BIGINT = SqlType.create('BIGINT');
 SqlType.TIMESTAMP = SqlType.create('TIMESTAMP');
