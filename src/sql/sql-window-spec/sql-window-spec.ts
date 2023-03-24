@@ -70,6 +70,7 @@ export class SqlWindowSpec extends SqlBase {
     if (windowName) {
       value.windowName = RefName.create(windowName);
     } else {
+      delete value.windowName;
       value.spacing = this.getSpacingWithout('postWindowName');
     }
     return SqlBase.fromValue(value);

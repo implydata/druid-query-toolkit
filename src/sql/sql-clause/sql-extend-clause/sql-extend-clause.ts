@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlTypeDesignator } from '../../sql-base';
+import { SqlBase, SqlTypeDesignator, Substitutor } from '../../sql-base';
 import { SeparatedArray } from '../../utils';
 import { SqlClause, SqlClauseValue } from '../sql-clause';
 
@@ -55,6 +55,27 @@ export class SqlExtendClause extends SqlClause {
       this.getSpace('postColumnDeclarations'),
       ')',
     ].join('');
+  }
+
+  public _walkInner(
+    nextStack: SqlBase[],
+    fn: Substitutor,
+    postorder: boolean,
+  ): SqlClause | undefined {
+    let ret = this;
+
+    const columnDeclarations = SqlBase.walkSeparatedArray(
+      this.columnDeclarations,
+      nextStack,
+      fn,
+      postorder,
+    );
+    if (!columnDeclarations) return;
+    if (columnDeclarations !== this.columnDeclarations) {
+      ret = ret.changeColumnDeclarations(columnDeclarations);
+    }
+
+    return ret;
   }
 
   public changeColumnDeclarations(

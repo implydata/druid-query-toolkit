@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlBaseValue, SqlTypeDesignator } from '../../sql-base';
+import { SqlBase, SqlBaseValue, SqlTypeDesignator, Substitutor } from '../../sql-base';
 import { SqlType } from '../../sql-type/sql-type';
 import { RefName } from '../../utils';
 
@@ -49,6 +49,40 @@ export class SqlColumnDeclaration extends SqlBase {
 
   protected _toRawString(): string {
     return [this.column.toString(), this.getSpace('postColumn'), this.columnType].join('');
+  }
+
+  public _walkInner(
+    nextStack: SqlBase[],
+    fn: Substitutor,
+    postorder: boolean,
+  ): SqlColumnDeclaration | undefined {
+    let ret = this;
+
+    if (this.columnType) {
+      const columnType = this.columnType._walkHelper(nextStack, fn, postorder);
+      if (!columnType) return;
+      if (columnType !== this.columnType) {
+        ret = ret.changeColumnType(columnType as SqlType);
+      }
+    }
+
+    return ret;
+  }
+
+  public getColumnName(): string {
+    return this.column.name;
+  }
+
+  public changeColumn(column: RefName | string): this {
+    const value = this.valueOf();
+    value.column = RefName.create(column);
+    return SqlBase.fromValue(value);
+  }
+
+  public changeColumnType(columnType: SqlType | string): this {
+    const value = this.valueOf();
+    value.columnType = SqlType.create(columnType);
+    return SqlBase.fromValue(value);
   }
 }
 
