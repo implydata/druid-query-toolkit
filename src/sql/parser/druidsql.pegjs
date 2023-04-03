@@ -48,7 +48,7 @@ SqlAlias = expression:Expression alias:((_ AsToken)? _ RefNameAlias)? columns:(_
   return new sql.SqlAlias(value);
 }
 
-FunctionArgument = SqlLabeledExpression / Expression
+GeneralFunctionArgument = SqlLabeledExpression / SqlAlias
 
 SqlLabeledExpression = label:RefNameAlias preArrow:_ "=>" postArrow:_ expression:Expression
 {
@@ -974,8 +974,8 @@ GenericFunction =
   OpenParen
   postLeftParen:_
   decorator:(FunctionDecorator _)?
-  head:FunctionArgument?
-  tail:(CommaSeparator FunctionArgument)*
+  head:GeneralFunctionArgument?
+  tail:(CommaSeparator GeneralFunctionArgument)*
   postArguments:_
   CloseParen
   filter:(_ FunctionFilter)?

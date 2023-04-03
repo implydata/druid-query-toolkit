@@ -50,6 +50,7 @@ describe('SqlFunction', () => {
       `SomeFn("arg1" => "boo")`,
       `"SomeFn" ("arg1" => "boo")`,
       `"ext" .  "SomeFn" ("arg1" => "boo")`,
+      `NESTED_AGG(TIME_FLOOR(t.__time, 'P1D'), COUNT(DISTINCT t."ip") AS "daily_unique", AVG("daily_unique"))`,
 
       `TABLE(extern('{...}', '{...}', '[...]'))`,
       `"TABLE" (extern('{...}', '{...}', '[...]'))`,
