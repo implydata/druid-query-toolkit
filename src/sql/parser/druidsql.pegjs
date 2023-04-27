@@ -956,9 +956,9 @@ TimeUnitExtra =
 / "MILLENNIUM"i
 
 Function =
-  GenericFunction
-/ CountFunction
-/ CastFunction
+  CastFunction
+/ GenericFunction
+/ CountStarFunction
 / ExtractFunction
 / TrimFunction
 / FloorCeilFunction
@@ -1039,13 +1039,12 @@ NakedFunction = functionName:UnquotedRefNameFree &{ return sql.SqlFunction.isNak
   });
 }
 
-CountFunction =
+CountStarFunction =
   functionName:(CountToken / ('"' CountToken '"'))
   preLeftParen:_
   OpenParen
   postLeftParen:_
-  decorator:(FunctionDecorator _)?
-  arg:(Expression / "*")
+  "*"
   postArguments:_
   CloseParen
   filter:(_ FunctionFilter)?
@@ -1059,13 +1058,7 @@ CountFunction =
   };
   var keywords = value.keywords = {};
 
-  if (decorator) {
-    value.decorator = decorator[0].toUpperCase();
-    keywords.decorator = decorator[0];
-    spacing.postDecorator = decorator[1];
-  }
-
-  value.args = sql.SeparatedArray.fromSingleValue(arg === '*' ? sql.SqlStar.PLAIN : arg);
+  value.args = sql.SeparatedArray.fromSingleValue(sql.SqlStar.PLAIN);
   spacing.postArguments = postArguments;
 
   if (filter) {

@@ -681,6 +681,123 @@ describe('SqlFunction', () => {
     const sql = `Count(Distinct 1 + 2 AND 3 + 2)`;
 
     backAndForth(sql);
+
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+      SqlFunction {
+        "args": SeparatedArray {
+          "separators": Array [],
+          "values": Array [
+            SqlMulti {
+              "args": SeparatedArray {
+                "separators": Array [
+                  Separator {
+                    "left": " ",
+                    "right": " ",
+                    "separator": "AND",
+                  },
+                ],
+                "values": Array [
+                  SqlMulti {
+                    "args": SeparatedArray {
+                      "separators": Array [
+                        Separator {
+                          "left": " ",
+                          "right": " ",
+                          "separator": "+",
+                        },
+                      ],
+                      "values": Array [
+                        SqlLiteral {
+                          "keywords": Object {},
+                          "parens": undefined,
+                          "spacing": Object {},
+                          "stringValue": "1",
+                          "type": "literal",
+                          "value": 1,
+                        },
+                        SqlLiteral {
+                          "keywords": Object {},
+                          "parens": undefined,
+                          "spacing": Object {},
+                          "stringValue": "2",
+                          "type": "literal",
+                          "value": 2,
+                        },
+                      ],
+                    },
+                    "keywords": Object {},
+                    "op": "+",
+                    "parens": undefined,
+                    "spacing": Object {},
+                    "type": "multi",
+                  },
+                  SqlMulti {
+                    "args": SeparatedArray {
+                      "separators": Array [
+                        Separator {
+                          "left": " ",
+                          "right": " ",
+                          "separator": "+",
+                        },
+                      ],
+                      "values": Array [
+                        SqlLiteral {
+                          "keywords": Object {},
+                          "parens": undefined,
+                          "spacing": Object {},
+                          "stringValue": "3",
+                          "type": "literal",
+                          "value": 3,
+                        },
+                        SqlLiteral {
+                          "keywords": Object {},
+                          "parens": undefined,
+                          "spacing": Object {},
+                          "stringValue": "2",
+                          "type": "literal",
+                          "value": 2,
+                        },
+                      ],
+                    },
+                    "keywords": Object {},
+                    "op": "+",
+                    "parens": undefined,
+                    "spacing": Object {},
+                    "type": "multi",
+                  },
+                ],
+              },
+              "keywords": Object {},
+              "op": "AND",
+              "parens": undefined,
+              "spacing": Object {},
+              "type": "multi",
+            },
+          ],
+        },
+        "decorator": "DISTINCT",
+        "extendClause": undefined,
+        "functionName": RefName {
+          "name": "Count",
+          "quotes": false,
+        },
+        "keywords": Object {
+          "decorator": "Distinct",
+        },
+        "namespace": undefined,
+        "parens": undefined,
+        "spacing": Object {
+          "postArguments": "",
+          "postDecorator": " ",
+          "postLeftParen": "",
+          "preLeftParen": "",
+        },
+        "specialParen": undefined,
+        "type": "function",
+        "whereClause": undefined,
+        "windowSpec": undefined,
+      }
+    `);
   });
 
   it('Function with decorator and extra space', () => {
@@ -689,10 +806,156 @@ describe('SqlFunction', () => {
     backAndForth(sql);
   });
 
+  it('CAST function', () => {
+    const sql = `Cast( x AS THING)`;
+
+    backAndForth(sql);
+
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+      SqlFunction {
+        "args": SeparatedArray {
+          "separators": Array [
+            Separator {
+              "left": " ",
+              "right": " ",
+              "separator": "AS",
+            },
+          ],
+          "values": Array [
+            SqlColumn {
+              "keywords": Object {},
+              "parens": undefined,
+              "refName": RefName {
+                "name": "x",
+                "quotes": false,
+              },
+              "spacing": Object {},
+              "table": undefined,
+              "type": "column",
+            },
+            SqlType {
+              "keywords": Object {},
+              "parens": undefined,
+              "spacing": Object {},
+              "type": "type",
+              "value": "THING",
+            },
+          ],
+        },
+        "decorator": undefined,
+        "extendClause": undefined,
+        "functionName": RefName {
+          "name": "Cast",
+          "quotes": false,
+        },
+        "keywords": Object {},
+        "namespace": undefined,
+        "parens": undefined,
+        "spacing": Object {
+          "postArguments": "",
+          "postLeftParen": " ",
+          "preLeftParen": "",
+        },
+        "specialParen": undefined,
+        "type": "function",
+        "whereClause": undefined,
+        "windowSpec": undefined,
+      }
+    `);
+  });
+
   it('Trim function', () => {
     const sql = `Trim( Both A and B FROM D)`;
 
     backAndForth(sql);
+
+    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+      SqlFunction {
+        "args": SeparatedArray {
+          "separators": Array [
+            Separator {
+              "left": " ",
+              "right": " ",
+              "separator": "FROM",
+            },
+          ],
+          "values": Array [
+            SqlMulti {
+              "args": SeparatedArray {
+                "separators": Array [
+                  Separator {
+                    "left": " ",
+                    "right": " ",
+                    "separator": "and",
+                  },
+                ],
+                "values": Array [
+                  SqlColumn {
+                    "keywords": Object {},
+                    "parens": undefined,
+                    "refName": RefName {
+                      "name": "A",
+                      "quotes": false,
+                    },
+                    "spacing": Object {},
+                    "table": undefined,
+                    "type": "column",
+                  },
+                  SqlColumn {
+                    "keywords": Object {},
+                    "parens": undefined,
+                    "refName": RefName {
+                      "name": "B",
+                      "quotes": false,
+                    },
+                    "spacing": Object {},
+                    "table": undefined,
+                    "type": "column",
+                  },
+                ],
+              },
+              "keywords": Object {},
+              "op": "AND",
+              "parens": undefined,
+              "spacing": Object {},
+              "type": "multi",
+            },
+            SqlColumn {
+              "keywords": Object {},
+              "parens": undefined,
+              "refName": RefName {
+                "name": "D",
+                "quotes": false,
+              },
+              "spacing": Object {},
+              "table": undefined,
+              "type": "column",
+            },
+          ],
+        },
+        "decorator": "BOTH",
+        "extendClause": undefined,
+        "functionName": RefName {
+          "name": "Trim",
+          "quotes": false,
+        },
+        "keywords": Object {
+          "decorator": "Both",
+        },
+        "namespace": undefined,
+        "parens": undefined,
+        "spacing": Object {
+          "postArguments": "",
+          "postDecorator": " ",
+          "postLeftParen": " ",
+          "preLeftParen": "",
+        },
+        "specialParen": undefined,
+        "type": "function",
+        "whereClause": undefined,
+        "windowSpec": undefined,
+      }
+    `);
   });
 
   it('TABLE with EXTEND', () => {
