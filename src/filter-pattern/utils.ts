@@ -12,11 +12,11 @@
  * limitations under the License.
  */
 
-/* eslint-disable simple-import-sort/exports */
-export * from './utils';
-export * from './sql';
-export * from './introspect/introspect';
-export * from './query-result/column';
-export * from './query-result/query-result';
-export * from './query-runner/query-runner';
-export * from './filter-pattern';
+export function xor(a: unknown, b: unknown): boolean {
+  return Boolean(a ? !b : b);
+}
+
+export function toggle<T>(xs: readonly T[], x: T, eq?: (a: T, b: T) => boolean): T[] {
+  const e = eq || ((a, b) => a === b);
+  return xs.find(_ => e(_, x)) ? xs.filter(d => !e(d, x)) : xs.concat([x]);
+}
