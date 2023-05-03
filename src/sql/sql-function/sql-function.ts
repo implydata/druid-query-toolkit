@@ -116,13 +116,13 @@ export class SqlFunction extends SqlExpression {
     return SqlFunction.simple('AVG', [arg]);
   }
 
-  static cast(ex: SqlExpression, asType: string): SqlExpression {
+  static cast(ex: SqlExpression, asType: SqlType | string): SqlExpression {
     return new SqlFunction({
       functionName: RefName.functionName('CAST'),
       args: SeparatedArray.fromTwoValuesWithSeparator(
         ex,
         Separator.symmetricSpace('AS'),
-        SqlLiteral.direct(asType),
+        SqlType.create(asType),
       ),
     });
   }
