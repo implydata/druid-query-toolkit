@@ -147,6 +147,24 @@ export class SqlFunction extends SqlExpression {
     return SqlFunction.simple('TIME_FLOOR', compact([timestampExpr, period, origin, timezone]));
   }
 
+  static timeCeil(
+    timestampExpr: SqlExpression,
+    period: string | SqlLiteral,
+    origin?: string | SqlLiteral,
+    timezone?: string | SqlLiteral,
+  ) {
+    return SqlFunction.simple('TIME_CEIL', compact([timestampExpr, period, origin, timezone]));
+  }
+
+  static timeShift(
+    timestampExpr: SqlExpression,
+    period: string | SqlLiteral,
+    step?: number | SqlLiteral,
+    timezone?: string | SqlLiteral,
+  ) {
+    return SqlFunction.simple('TIME_SHIFT', compact([timestampExpr, period, step, timezone]));
+  }
+
   static array(ex: SqlExpression[] | SeparatedArray<SqlExpression>) {
     return new SqlFunction({
       functionName: RefName.functionName('ARRAY'),
@@ -309,9 +327,20 @@ export class SqlFunction extends SqlExpression {
 
   public getArgAsString(index: number): string | undefined {
     const arg = this.getArg(index);
-    if (!arg) return;
     if (!(arg instanceof SqlLiteral)) return;
     return arg.getStringValue();
+  }
+
+  public getArgAsNumber(index: number): number | undefined {
+    const arg = this.getArg(index);
+    if (!(arg instanceof SqlLiteral)) return;
+    return arg.getNumberValue();
+  }
+
+  public getArgAsNumberOrBigint(index: number): number | bigint | undefined {
+    const arg = this.getArg(index);
+    if (!(arg instanceof SqlLiteral)) return;
+    return arg.getNumberOrBigintValue();
   }
 
   public changeWhereClause(whereClause: SqlWhereClause | undefined): this {

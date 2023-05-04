@@ -75,7 +75,7 @@ export class SqlLimitClause extends SqlClause {
   }
 
   public getLimitValue(): number {
-    return this.limit.getNumberValue() as number;
+    return this.limit.getNumberValue()!;
   }
 }
 

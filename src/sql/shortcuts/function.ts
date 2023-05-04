@@ -23,6 +23,8 @@ export const F = function (name: string, ...args: (SqlExpression | LiteralValue)
 F.cast = SqlFunction.cast;
 F.floor = SqlFunction.floor;
 F.timeFloor = SqlFunction.timeFloor;
+F.timeCeil = SqlFunction.timeCeil;
+F.timeShift = SqlFunction.timeShift;
 F.stringFormat = SqlFunction.stringFormat;
 F.regexpLike = SqlFunction.regexpLike;
 

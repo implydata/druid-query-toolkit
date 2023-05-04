@@ -35,10 +35,11 @@ describe('filter-pattern', () => {
       `NOT REGEXP_LIKE(CAST("lol" AS VARCHAR), 'hello')`,
       `TIME_IN_INTERVAL("lol", '2022-06-30T22:56:14.123Z/2022-06-30T22:56:15.923Z')`,
       `NOT TIME_IN_INTERVAL("lol", '2022-06-30T22:56:14.123Z/2022-06-30T22:56:15.923Z')`,
-      `TIME_FLOOR("__time", 'PT1H') = TIME_FLOOR(CURRENT_TIMESTAMP, 'PT1H')`,
-      `TIME_FLOOR("__time", 'PT1H') <> TIME_FLOOR(CURRENT_TIMESTAMP, 'PT1H')`,
-      `TIME_FLOOR("__time", 'PT1H') = TIME_SHIFT(TIME_FLOOR(CURRENT_TIMESTAMP, 'PT1H'), 'PT1H', -1)`,
-      `TIME_FLOOR("__time", 'PT1H') = TIME_SHIFT(TIME_FLOOR(MAX_DATA_TIME(), 'PT1H'), 'PT1H', -1)`,
+      `TIME_SHIFT(CURRENT_TIMESTAMP, 'PT1H', -1) <= "__time" AND "__time" < CURRENT_TIMESTAMP`,
+      `NOT (TIME_SHIFT(CURRENT_TIMESTAMP, 'PT1H', -1) <= "__time" AND "__time" < CURRENT_TIMESTAMP)`,
+      `TIME_SHIFT(TIME_CEIL(CURRENT_TIMESTAMP, 'P1D'), 'PT1H', -1) <= "__time" AND "__time" < TIME_CEIL(CURRENT_TIMESTAMP, 'P1D')`,
+      `TIME_SHIFT(TIME_SHIFT(TIME_CEIL(CURRENT_TIMESTAMP, 'P1D'), 'P1D', -1), 'PT1H', -1) <= "__time" AND "__time" < TIME_SHIFT(TIME_CEIL(CURRENT_TIMESTAMP, 'P1D'), 'P1D', -1)`,
+      `TIME_SHIFT(TIME_SHIFT(TIME_CEIL(MAX_DATA_TIME(), 'P1D'), 'P1D', -1), 'PT1H', -1) <= "__time" AND "__time" < TIME_SHIFT(TIME_CEIL(MAX_DATA_TIME(), 'P1D'), 'P1D', -1)`,
     ];
 
     for (const expression of expressions) {
@@ -128,13 +129,19 @@ describe('filter-pattern', () => {
   it('works for timeRelative', () => {
     expect(
       fitFilterPattern(
-        SqlExpression.parse(`TIME_FLOOR("__time", 'PT1H') = TIME_FLOOR(CURRENT_TIMESTAMP, 'PT1H')`),
+        SqlExpression.parse(
+          `TIME_SHIFT(TIME_SHIFT(TIME_CEIL(CURRENT_TIMESTAMP, 'P1D'), 'P1D', -1), 'PT1H', -1) <= "__time" AND "__time" < TIME_SHIFT(TIME_CEIL(CURRENT_TIMESTAMP, 'P1D'), 'P1D', -1)`,
+        ),
       ),
     ).toEqual({
+      alignDuration: 'P1D',
+      alignType: 'ceil',
       anchor: 'currentTimestamp',
       column: '__time',
-      floorDuration: 'PT1H',
       negated: false,
+      rangeDuration: 'PT1H',
+      shiftDuration: 'P1D',
+      shiftStep: -1,
       type: 'timeRelative',
     });
   });

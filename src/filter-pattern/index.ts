@@ -61,19 +61,6 @@ const TYPE_TO_DESCRIPTION: Record<FilterPatternType, FilterPatternDefinition<any
   custom: CUSTOM_PATTERN_DEFINITION,
 };
 
-export function isFilterPatternValid(pattern: FilterPattern): boolean {
-  return TYPE_TO_DESCRIPTION[pattern.type].isValid(pattern);
-}
-
-export function recognizesFilterPattern(ex: SqlExpression): boolean {
-  for (const type of FILTER_PATTERN_TYPES) {
-    const pattern = TYPE_TO_DESCRIPTION[type].fit(ex);
-    if (pattern && pattern.type !== 'custom') return true;
-  }
-
-  return false;
-}
-
 export function fitFilterPattern(ex: SqlExpression): FilterPattern {
   for (const type of FILTER_PATTERN_TYPES) {
     const pattern = TYPE_TO_DESCRIPTION[type].fit(ex);
@@ -148,7 +135,7 @@ export function changeFilterPatternType(
         negated: pattern.negated,
         column: column || '?',
         anchor: 'currentTimestamp',
-        floorDuration: 'P1D',
+        rangeDuration: 'P1D',
       };
 
     case 'numberRange':

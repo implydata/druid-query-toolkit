@@ -50,6 +50,18 @@ export class SqlMulti extends SqlExpression {
     return this.args.toString(Separator.symmetricSpace(SqlBase.capitalize(this.op)));
   }
 
+  public numArgs(): number {
+    return this.args?.length() || 0;
+  }
+
+  public getArgArray(): readonly SqlExpression[] {
+    return this.args?.values || [];
+  }
+
+  public getArg(index: number): SqlExpression | undefined {
+    return this.args?.get(index);
+  }
+
   public changeArgs(args: SeparatedArray<SqlExpression>): this {
     const value = this.valueOf();
     value.args = args;

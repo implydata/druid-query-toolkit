@@ -75,7 +75,7 @@ export class SqlOffsetClause extends SqlClause {
   }
 
   public getOffsetValue(): number {
-    return this.offset.getNumberValue() as number;
+    return this.offset.getNumberValue()!;
   }
 }
 

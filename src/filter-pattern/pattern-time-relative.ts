@@ -13,10 +13,10 @@
  */
 
 import type { SqlExpression } from '../sql';
-import { C, F, RefName, SqlColumn, SqlComparison, SqlFunction, SqlLiteral } from '../sql';
+import { C, F, RefName, SqlColumn, SqlComparison, SqlFunction, SqlMulti } from '../sql';
 
 import type { FilterPatternDefinition } from './common';
-import { extractOuterNot } from './common';
+import { extractOuterNot, oneOf } from './common';
 
 function getAnchor(anchor: 'currentTimestamp' | 'maxDataTime') {
   if (anchor === 'currentTimestamp') {
@@ -36,7 +36,10 @@ export interface TimeRelativeFilterPattern {
   negated: boolean;
   column: string;
   anchor: 'currentTimestamp' | 'maxDataTime';
-  floorDuration: string;
+  rangeDuration: string;
+  rangeStep?: number;
+  alignType?: 'floor' | 'ceil';
+  alignDuration?: string;
   shiftDuration?: string;
   shiftStep?: number;
 }
@@ -46,62 +49,65 @@ export const TIME_RELATIVE_PATTERN_DEFINITION: FilterPatternDefinition<TimeRelat
     name: 'Time relative',
     fit(possibleEx: SqlExpression) {
       // Something like
-      // TIME_FLOOR(__time, 'PT1H') = TIME_FLOOR(CURRENT_TIMESTAMP, 'PT1H')
-      // TIME_FLOOR(__time, 'PT1H') = TIME_SHIFT(TIME_FLOOR(CURRENT_TIMESTAMP, 'PT1H'), 'PT1H', -1)
-      let [negated, ex] = extractOuterNot(possibleEx);
-      if (!(ex instanceof SqlComparison)) return;
+      // TIME_SHIFT(CURRENT_TIMESTAMP, 'PT1H', -1) <= __time AND __time < CURRENT_TIMESTAMP
+      // TIME_SHIFT(TIME_CEIL(CURRENT_TIMESTAMP, 'P1D'), 'PT1H', -1) <= __time AND __time < TIME_CEIL(CURRENT_TIMESTAMP, 'P1D')
+      // TIME_SHIFT(TIME_SHIFT(TIME_CEIL(CURRENT_TIMESTAMP, 'P1D'), 'P1D', -1), 'PT1H', -1) <= __time AND __time < TIME_SHIFT(TIME_CEIL(CURRENT_TIMESTAMP, 'P1D'), 'P1D', -1)
+      const [negated, ex] = extractOuterNot(possibleEx);
 
-      const { lhs, rhs, op } = ex;
-      switch (op) {
-        case '=':
-          // Nothing to do
-          break;
+      if (!(ex instanceof SqlMulti) || ex.numArgs() !== 2) return;
 
-        case '<>':
-          negated = !negated;
-          break;
+      const a = ex.getArg(0);
+      if (!(a instanceof SqlComparison) || a.op !== '<=') return;
 
-        default:
-          return;
+      const b = ex.getArg(1);
+      if (!(b instanceof SqlComparison) || b.op !== '<') return;
+
+      const columnRef = a.rhs;
+      if (!(columnRef instanceof SqlColumn) || !columnRef.equals(b.lhs)) return;
+
+      const timeShift = a.lhs;
+      if (
+        !(timeShift instanceof SqlFunction) ||
+        timeShift.getEffectiveFunctionName() !== 'TIME_SHIFT'
+      ) {
+        return;
       }
 
-      if (!(lhs instanceof SqlFunction) || lhs.getEffectiveFunctionName() !== 'TIME_FLOOR') return;
-      const columnRef = lhs.getArg(0);
-      const floorDuration = lhs.getArgAsString(1);
-      if (!(columnRef instanceof SqlColumn) || !floorDuration) return;
+      let anchorFn = timeShift.getArg(0);
+      if (!b.rhs.equals(anchorFn)) return;
 
-      if (!(rhs instanceof SqlFunction)) return;
-      let floorFn: SqlFunction;
+      const rangeDuration = timeShift.getArgAsString(1);
+      if (!rangeDuration) return;
+
+      const rangeStep = -timeShift.getArgAsNumber(2)!;
+      if (!(rangeStep > 0)) return;
+
       let shiftDuration: string | undefined;
       let shiftStep: number | undefined;
-      switch (rhs.getEffectiveFunctionName()) {
-        case 'TIME_FLOOR':
-          floorFn = rhs;
-          break;
+      if (anchorFn instanceof SqlFunction && anchorFn.getEffectiveFunctionName() === 'TIME_SHIFT') {
+        shiftDuration = anchorFn.getArgAsString(1);
+        if (!shiftDuration) return;
 
-        case 'TIME_SHIFT': {
-          const a0 = rhs.getArg(0);
-          if (!(a0 instanceof SqlFunction) || a0.getEffectiveFunctionName() !== 'TIME_FLOOR') {
-            return;
-          }
-          floorFn = a0;
+        shiftStep = anchorFn.getArgAsNumber(2);
+        if (!shiftStep) return;
 
-          shiftDuration = rhs.getArgAsString(1);
-          if (!shiftDuration) return;
-
-          const a2 = rhs.getArg(2);
-          if (!(a2 instanceof SqlLiteral) || typeof a2.value !== 'number') return;
-          shiftStep = a2.value;
-          break;
-        }
-
-        default:
-          return;
+        anchorFn = anchorFn.getArg(0);
       }
 
-      if (floorFn.getArgAsString(1) !== floorDuration) return;
+      let alignType: 'floor' | 'ceil' | undefined;
+      let alignDuration: string | undefined;
+      if (
+        anchorFn instanceof SqlFunction &&
+        oneOf(anchorFn.getEffectiveFunctionName(), 'TIME_FLOOR', 'TIME_CEIL')
+      ) {
+        alignType = anchorFn.getEffectiveFunctionName() === 'TIME_FLOOR' ? 'floor' : 'ceil';
 
-      const anchorFn = floorFn.getArg(0);
+        alignDuration = anchorFn.getArgAsString(1);
+        if (!alignDuration) return;
+
+        anchorFn = anchorFn.getArg(0);
+      }
+
       if (!(anchorFn instanceof SqlFunction)) return;
       let anchor: 'currentTimestamp' | 'maxDataTime';
       switch (anchorFn.getEffectiveFunctionName()) {
@@ -122,7 +128,10 @@ export const TIME_RELATIVE_PATTERN_DEFINITION: FilterPatternDefinition<TimeRelat
         negated,
         column: columnRef.getName(),
         anchor,
-        floorDuration,
+        rangeDuration,
+        rangeStep: rangeStep !== 1 ? rangeStep : undefined,
+        alignDuration,
+        alignType,
         shiftDuration,
         shiftStep,
       };
@@ -131,18 +140,28 @@ export const TIME_RELATIVE_PATTERN_DEFINITION: FilterPatternDefinition<TimeRelat
       return true;
     },
     toExpression(pattern): SqlExpression {
-      // TIME_FLOOR(__time, 'PT1H') = TIME_FLOOR(CURRENT_TIMESTAMP, 'PT1H')
-      return F.timeFloor(C(pattern.column), pattern.floorDuration)
-        .equal(
-          F.timeFloor(getAnchor(pattern.anchor), pattern.floorDuration).applyIf(
-            pattern.shiftDuration,
-            ex => F('TIME_SHIFT', ex, pattern.shiftDuration!, pattern.shiftStep!),
-          ),
-        )
+      let anchor = getAnchor(pattern.anchor);
+
+      if (pattern.alignType && pattern.alignDuration) {
+        anchor = F(
+          pattern.alignType === 'floor' ? 'TIME_FLOOR' : 'TIME_CEIL',
+          anchor,
+          pattern.alignDuration,
+        );
+      }
+
+      if (pattern.shiftDuration && pattern.shiftStep) {
+        anchor = F.timeShift(anchor, pattern.shiftDuration, pattern.shiftStep);
+      }
+
+      const column = C(pattern.column);
+      return F.timeShift(anchor, pattern.rangeDuration, -(pattern.rangeStep || 1))
+        .lessThanOrEqual(column)
+        .and(column.lessThan(anchor))
         .applyIf(pattern.negated, ex => ex.negate());
     },
     formatWithoutNegation(pattern) {
-      return `${pattern.column} in ${pattern.floorDuration}`;
+      return `${pattern.column} in ${pattern.rangeDuration}`;
     },
     getColumn(pattern): string | undefined {
       return pattern.column;

@@ -238,7 +238,13 @@ export class SqlLiteral extends SqlExpression {
     return isDate(this.value);
   }
 
-  public getNumberValue(): number | bigint | undefined {
+  public getNumberValue(): number | undefined {
+    const { value } = this;
+    if (typeof value !== 'number') return;
+    return value;
+  }
+
+  public getNumberOrBigintValue(): number | bigint | undefined {
     const { value } = this;
     if (typeof value !== 'number' && typeof value !== 'bigint') return;
     return value;

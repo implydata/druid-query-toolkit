@@ -54,3 +54,7 @@ export function unwrapCastAsVarchar(ex: SqlExpression): SqlExpression {
   }
   return ex;
 }
+
+export function oneOf<T>(thing: T, ...options: T[]): boolean {
+  return options.includes(thing);
+}
