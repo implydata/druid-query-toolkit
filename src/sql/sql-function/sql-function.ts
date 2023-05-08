@@ -166,6 +166,8 @@ export class SqlFunction extends SqlExpression {
   }
 
   static array(...exs: (LiteralValue | SqlExpression)[]): SqlExpression {
+    // Back compat to make the old form work
+    if (exs.length === 1 && Array.isArray(exs[0])) exs = exs[0] as any;
     return new SqlFunction({
       functionName: RefName.functionName('ARRAY'),
       specialParen: 'square',
