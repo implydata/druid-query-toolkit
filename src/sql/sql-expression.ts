@@ -12,8 +12,6 @@
  * limitations under the License.
  */
 
-import { filterMap } from '../utils';
-
 import {
   LiteralValue,
   RefName,
@@ -64,15 +62,19 @@ export abstract class SqlExpression extends SqlBase {
   }
 
   static and(...args: (SqlExpression | undefined)[]): SqlExpression {
-    const compactArgs = filterMap(args, a => {
-      if (!a) return;
+    const compactArgs = args.flatMap(a => {
+      if (!a) return [];
       if (a instanceof SqlLiteral && a.value === true) {
-        return; // Skip no-op TRUE this is  a special case
+        return []; // Skip no-op TRUE this is a special case
       }
       if (a instanceof SqlMulti) {
-        return a.ensureParens();
+        if (a.op === 'AND') {
+          return a.hasParens() ? [a] : a.getArgArray();
+        } else {
+          return a.ensureParens();
+        }
       }
-      return a;
+      return [a];
     });
 
     switch (compactArgs.length) {
@@ -91,13 +93,17 @@ export abstract class SqlExpression extends SqlBase {
   }
 
   static or(...args: (SqlExpression | undefined)[]): SqlExpression {
-    const compactArgs = filterMap(args, a => {
-      if (!a) return;
+    const compactArgs = args.flatMap(a => {
+      if (!a) return [];
       if (a instanceof SqlLiteral && a.value === false) {
-        return; // Skip no-op TRUE this is  a special case
+        return []; // Skip no-op TRUE this is a special case
       }
       if (a instanceof SqlMulti) {
-        return a.ensureParens();
+        if (a.op === 'OR') {
+          return a.hasParens() ? [a] : a.getArgArray();
+        } else {
+          return a.ensureParens();
+        }
       }
       return a;
     });

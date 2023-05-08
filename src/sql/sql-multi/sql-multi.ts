@@ -90,11 +90,6 @@ export class SqlMulti extends SqlExpression {
     return SqlBase.fromValue(value);
   }
 
-  public and(expression: SqlExpression): SqlExpression {
-    if (this.op !== 'AND') return super.and(expression);
-    return this.changeArgs(this.args.append(expression));
-  }
-
   public decomposeViaAnd(options: DecomposeViaOptions = {}): SqlExpression[] {
     if (this.op !== 'AND') return super.decomposeViaAnd(options);
     if (options.flatten) {
@@ -102,11 +97,6 @@ export class SqlMulti extends SqlExpression {
     } else {
       return this.args.values.map(v => v.changeParens([]));
     }
-  }
-
-  public or(expression: SqlExpression): SqlExpression {
-    if (this.op !== 'OR') return super.or(expression);
-    return this.changeArgs(this.args.append(expression));
   }
 
   public filterAnd(fn: (ex: SqlExpression) => boolean): SqlExpression | undefined {

@@ -365,6 +365,10 @@ export abstract class SqlBase {
     return this.parens || [];
   }
 
+  public hasParens(): boolean {
+    return Boolean(this.getParens().length);
+  }
+
   public changeParens(parens: readonly Parens[]): this {
     const newParens = parens.length ? parens : undefined;
     if (this.parens === newParens) return this;

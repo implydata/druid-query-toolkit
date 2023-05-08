@@ -73,14 +73,16 @@ describe('SqlExpression', () => {
           String(
             SqlExpression.and(
               SqlExpression.parse('a OR b'),
+              SqlExpression.parse('(c OR d)'),
               SqlExpression.parse('x AND y'),
-              SqlExpression.parse('c < 10'),
+              SqlExpression.parse('(z AND w)'),
+              SqlExpression.parse('n < 10'),
               undefined,
               SqlExpression.parse('TRUE'),
               SqlExpression.parse('NOT k = 1'),
             ),
           ),
-        ).toEqual('(a OR b) AND (x AND y) AND c < 10 AND NOT k = 1');
+        ).toEqual('(a OR b) AND (c OR d) AND x AND y AND (z AND w) AND n < 10 AND NOT k = 1');
       });
     });
 
@@ -98,14 +100,16 @@ describe('SqlExpression', () => {
           String(
             SqlExpression.or(
               SqlExpression.parse('a OR b'),
+              SqlExpression.parse('(c OR d)'),
               SqlExpression.parse('x AND y'),
-              SqlExpression.parse('c < 10'),
+              SqlExpression.parse('(z AND w)'),
+              SqlExpression.parse('n < 10'),
               undefined,
               SqlExpression.parse('FALSE'),
               SqlExpression.parse('NOT k = 1'),
             ),
           ),
-        ).toEqual('(a OR b) OR (x AND y) OR c < 10 OR NOT k = 1');
+        ).toEqual('a OR b OR (c OR d) OR (x AND y) OR (z AND w) OR n < 10 OR NOT k = 1');
       });
     });
 
