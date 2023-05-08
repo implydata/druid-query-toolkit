@@ -28,7 +28,7 @@ export class SqlUnary extends SqlExpression {
   static not(ex: SqlExpression): SqlUnary {
     return new SqlUnary({
       op: 'NOT',
-      argument: ex.type === 'multi' || ex.type === 'comparison' ? ex.addParens() : ex,
+      argument: ex.type === 'multi' || ex.type === 'comparison' ? ex.ensureParens() : ex,
     });
   }
 

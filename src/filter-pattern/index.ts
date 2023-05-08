@@ -19,6 +19,7 @@ import type { ContainsFilterPattern } from './pattern-contains';
 import { CONTAINS_PATTERN_DEFINITION } from './pattern-contains';
 import type { CustomFilterPattern } from './pattern-custom';
 import { CUSTOM_PATTERN_DEFINITION } from './pattern-custom';
+import { MV_CONTAINS_PATTERN_DEFINITION, MvContainsFilterPattern } from './pattern-mv-contains';
 import type { NumberRangeFilterPattern } from './pattern-number-range';
 import { NUMBER_RANGE_PATTERN_DEFINITION } from './pattern-number-range';
 import type { RegexpFilterPattern } from './pattern-regexp';
@@ -37,6 +38,7 @@ export type FilterPattern =
   | TimeIntervalFilterPattern
   | TimeRelativeFilterPattern
   | NumberRangeFilterPattern
+  | MvContainsFilterPattern
   | CustomFilterPattern;
 
 export type FilterPatternType = FilterPattern['type'];
@@ -48,6 +50,7 @@ export const FILTER_PATTERN_TYPES: FilterPatternType[] = [
   'timeInterval',
   'timeRelative',
   'numberRange',
+  'mvContains',
   'custom',
 ];
 
@@ -58,8 +61,17 @@ const TYPE_TO_DESCRIPTION: Record<FilterPatternType, FilterPatternDefinition<any
   timeInterval: TIME_INTERVAL_PATTERN_DEFINITION,
   timeRelative: TIME_RELATIVE_PATTERN_DEFINITION,
   numberRange: NUMBER_RANGE_PATTERN_DEFINITION,
+  mvContains: MV_CONTAINS_PATTERN_DEFINITION,
   custom: CUSTOM_PATTERN_DEFINITION,
 };
+
+export function fitFilterPatterns(ex: SqlExpression): FilterPattern[] {
+  // Check if the entire expression can fit a single pattern
+  const wholeFit = fitFilterPattern(ex);
+  if (wholeFit.type !== 'custom') return [wholeFit];
+
+  return ex.decomposeViaAnd({ flatten: false }).map(fitFilterPattern);
+}
 
 export function fitFilterPattern(ex: SqlExpression): FilterPattern {
   for (const type of FILTER_PATTERN_TYPES) {
@@ -71,6 +83,10 @@ export function fitFilterPattern(ex: SqlExpression): FilterPattern {
     negated: false,
     expression: ex,
   };
+}
+
+export function filterPatternsToExpression(patterns: FilterPattern[]): SqlExpression {
+  return SqlExpression.and(...patterns.map(filterPatternToExpression));
 }
 
 export function filterPatternToExpression(pattern: FilterPattern): SqlExpression {
@@ -147,6 +163,14 @@ export function changeFilterPatternType(
         end: 100,
         startBound: '(',
         endBound: ')',
+      };
+
+    case 'mvContains':
+      return {
+        type: 'mvContains',
+        negated: pattern.negated,
+        column: column || '?',
+        values: thing ? [thing] : [],
       };
 
     case 'custom':

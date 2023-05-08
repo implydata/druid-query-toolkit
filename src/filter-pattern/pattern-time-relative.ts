@@ -158,6 +158,7 @@ export const TIME_RELATIVE_PATTERN_DEFINITION: FilterPatternDefinition<TimeRelat
       return F.timeShift(anchor, pattern.rangeDuration, -(pattern.rangeStep || 1))
         .lessThanOrEqual(column)
         .and(column.lessThan(anchor))
+        .ensureParens()
         .applyIf(pattern.negated, ex => ex.negate());
     },
     formatWithoutNegation(pattern) {

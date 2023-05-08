@@ -13,7 +13,7 @@
  */
 
 import { SqlBase, SqlBaseValue, SqlTypeDesignator, Substitutor } from '../sql-base';
-import { DecomposeViaAndOptions, SqlExpression } from '../sql-expression';
+import { DecomposeViaOptions, SqlExpression } from '../sql-expression';
 import { SeparatedArray, Separator } from '../utils';
 
 export type SqlMultiOp = 'OR' | 'AND' | '||' | '+' | '-' | '*' | '/';
@@ -95,7 +95,7 @@ export class SqlMulti extends SqlExpression {
     return this.changeArgs(this.args.append(expression));
   }
 
-  public decomposeViaAnd(options: DecomposeViaAndOptions = {}): SqlExpression[] {
+  public decomposeViaAnd(options: DecomposeViaOptions = {}): SqlExpression[] {
     if (this.op !== 'AND') return super.decomposeViaAnd(options);
     if (options.flatten) {
       return this.args.values.flatMap(v => v.decomposeViaAnd(options));
@@ -122,6 +122,15 @@ export class SqlMulti extends SqlExpression {
     }
 
     return this.changeArgs(args);
+  }
+
+  public decomposeViaOr(options: DecomposeViaOptions = {}): SqlExpression[] {
+    if (this.op !== 'OR') return super.decomposeViaOr(options);
+    if (options.flatten) {
+      return this.args.values.flatMap(v => v.decomposeViaOr(options));
+    } else {
+      return this.args.values.map(v => v.changeParens([]));
+    }
   }
 }
 

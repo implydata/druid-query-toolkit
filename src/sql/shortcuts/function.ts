@@ -26,6 +26,7 @@ F.timeFloor = SqlFunction.timeFloor;
 F.timeCeil = SqlFunction.timeCeil;
 F.timeShift = SqlFunction.timeShift;
 F.stringFormat = SqlFunction.stringFormat;
+F.array = SqlFunction.array;
 F.regexpLike = SqlFunction.regexpLike;
 
 F.count = SqlFunction.count;

@@ -165,11 +165,11 @@ export class SqlFunction extends SqlExpression {
     return SqlFunction.simple('TIME_SHIFT', compact([timestampExpr, period, step, timezone]));
   }
 
-  static array(ex: SqlExpression[] | SeparatedArray<SqlExpression>) {
+  static array(...exs: (LiteralValue | SqlExpression)[]): SqlExpression {
     return new SqlFunction({
       functionName: RefName.functionName('ARRAY'),
       specialParen: 'square',
-      args: SeparatedArray.fromArray(ex),
+      args: SeparatedArray.fromArray(exs.map(SqlExpression.wrap)),
     });
   }
 

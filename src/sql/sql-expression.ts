@@ -32,7 +32,7 @@ import { parseSql } from './parser';
 import { SqlBase, Substitutor } from './sql-base';
 import { SeparatedArray, Separator } from './utils';
 
-export interface DecomposeViaAndOptions {
+export interface DecomposeViaOptions {
   flatten?: boolean;
 }
 
@@ -142,7 +142,7 @@ export abstract class SqlExpression extends SqlBase {
   }
 
   static arrayOfLiterals(xs: LiteralValue[]) {
-    return SqlFunction.array(xs.map(x => SqlLiteral.create(x)));
+    return SqlFunction.array(...xs);
   }
 
   // ------------------------------
@@ -293,7 +293,11 @@ export abstract class SqlExpression extends SqlBase {
     return SqlExpression.or(this, expression);
   }
 
-  public decomposeViaAnd(_options?: DecomposeViaAndOptions): SqlExpression[] {
+  public decomposeViaAnd(_options?: DecomposeViaOptions): SqlExpression[] {
+    return [this];
+  }
+
+  public decomposeViaOr(_options?: DecomposeViaOptions): SqlExpression[] {
     return [this];
   }
 

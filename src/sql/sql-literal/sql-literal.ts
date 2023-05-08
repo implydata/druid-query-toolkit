@@ -13,7 +13,7 @@
  */
 
 import { SqlBase, SqlBaseValue, SqlTypeDesignator } from '../sql-base';
-import { DecomposeViaAndOptions, SqlExpression } from '../sql-expression';
+import { DecomposeViaOptions, SqlExpression } from '../sql-expression';
 import { needsUnicodeEscape, sqlEscapeUnicode, trimString } from '../utils';
 
 function isDate(v: any): v is Date {
@@ -213,7 +213,7 @@ export class SqlLiteral extends SqlExpression {
     return this;
   }
 
-  public decomposeViaAnd(_options?: DecomposeViaAndOptions): SqlExpression[] {
+  public decomposeViaAnd(_options?: DecomposeViaOptions): SqlExpression[] {
     return this.value === true ? [] : [this];
   }
 
