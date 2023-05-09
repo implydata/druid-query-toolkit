@@ -54,6 +54,8 @@ describe('filter-pattern', () => {
       `(TIME_SHIFT(TIME_SHIFT(TIME_CEIL(CURRENT_TIMESTAMP, 'P1D'), 'P1D', -1), 'PT1H', -1) <= "__time" AND "__time" < TIME_SHIFT(TIME_CEIL(CURRENT_TIMESTAMP, 'P1D'), 'P1D', -1))`,
       `(TIME_SHIFT(TIME_SHIFT(TIME_CEIL(MAX_DATA_TIME(), 'P1D'), 'P1D', -1), 'PT1H', -1) <= "__time" AND "__time" < TIME_SHIFT(TIME_CEIL(MAX_DATA_TIME(), 'P1D'), 'P1D', -1))`,
       `MV_CONTAINS("hello", ARRAY['v1', 'v2'])`,
+      `("hi" > 0 AND "hi" < 100)`,
+      `NOT ("hi" > 0 AND "hi" < 100)`,
     ];
 
     for (const expression of expressions) {

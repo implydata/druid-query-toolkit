@@ -12,8 +12,7 @@
  * limitations under the License.
  */
 
-import type { SqlExpression } from '../sql';
-import { C, L, SqlColumn, SqlComparison, SqlLiteral, SqlMulti } from '../sql';
+import { C, L, SqlColumn, SqlComparison, SqlExpression, SqlLiteral, SqlMulti } from '../sql';
 
 import type { FilterPatternDefinition } from './common';
 import { extractOuterNot } from './common';
@@ -33,11 +32,12 @@ export const NUMBER_RANGE_PATTERN_DEFINITION: FilterPatternDefinition<NumberRang
   fit(possibleEx: SqlExpression) {
     const [negated, ex] = extractOuterNot(possibleEx);
     if (!(ex instanceof SqlMulti)) return;
-    if (ex.args.values.length !== 2) return;
+    const args = ex.getArgArray();
+    if (args.length !== 2) return;
 
-    if (!ex.args.values.every(v => v instanceof SqlComparison)) return;
+    if (!args.every(v => v instanceof SqlComparison)) return;
 
-    const values = ex.args.values as SqlComparison[];
+    const values = args as SqlComparison[];
 
     const left = values.find(v => {
       return (
@@ -89,17 +89,20 @@ export const NUMBER_RANGE_PATTERN_DEFINITION: FilterPatternDefinition<NumberRang
     return true;
   },
   toExpression(pattern): SqlExpression {
-    return SqlMulti.and(
+    const c = C(pattern.column);
+    return SqlExpression.and(
       pattern.startBound === '('
-        ? SqlComparison.greaterThan(C(pattern.column), L(pattern.start))
-        : SqlComparison.greaterThanOrEqual(C(pattern.column), L(pattern.start)),
+        ? SqlComparison.greaterThan(c, L(pattern.start))
+        : SqlComparison.greaterThanOrEqual(c, L(pattern.start)),
       pattern.endBound === ')'
-        ? SqlComparison.lessThan(C(pattern.column), L(pattern.end))
-        : SqlComparison.lessThanOrEqual(C(pattern.column), L(pattern.end)),
-    ).applyIf(pattern.negated, ex => ex.negate());
+        ? SqlComparison.lessThan(c, L(pattern.end))
+        : SqlComparison.lessThanOrEqual(c, L(pattern.end)),
+    )
+      .ensureParens()
+      .applyIf(pattern.negated, ex => ex.negate());
   },
   formatWithoutNegation(pattern) {
-    return `${pattern.startBound}${pattern.start}, ${pattern.end}${pattern.endBound}`;
+    return `${pattern.column} in ${pattern.startBound}${pattern.start}, ${pattern.end}${pattern.endBound}`;
   },
   getColumn(pattern): string | undefined {
     return pattern.column;
