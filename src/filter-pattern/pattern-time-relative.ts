@@ -43,6 +43,7 @@ export interface TimeRelativeFilterPattern {
   alignDuration?: string;
   shiftDuration?: string;
   shiftStep?: number;
+  timezone?: string;
 }
 
 export const TIME_RELATIVE_PATTERN_DEFINITION: FilterPatternDefinition<TimeRelativeFilterPattern> =
@@ -95,6 +96,8 @@ export const TIME_RELATIVE_PATTERN_DEFINITION: FilterPatternDefinition<TimeRelat
         shiftStep = anchorFn.getArgAsNumber(2);
         if (!shiftStep) return;
 
+        if (anchorFn.getArgAsString(3) !== timezone) return;
+
         anchorFn = anchorFn.getArg(0);
       }
 
@@ -108,6 +111,8 @@ export const TIME_RELATIVE_PATTERN_DEFINITION: FilterPatternDefinition<TimeRelat
 
         alignDuration = anchorFn.getArgAsString(1);
         if (!alignDuration) return;
+
+        if (anchorFn.getArgAsString(2) !== timezone) return;
 
         anchorFn = anchorFn.getArg(0);
       }
@@ -144,22 +149,22 @@ export const TIME_RELATIVE_PATTERN_DEFINITION: FilterPatternDefinition<TimeRelat
     isValid(_pattern): boolean {
       return true;
     },
-    toExpression(pattern, timezone?: string): SqlExpression {
+    toExpression(pattern): SqlExpression {
       let anchor = getAnchor(pattern.anchor);
 
       if (pattern.alignType && pattern.alignDuration) {
         anchor = F(
           pattern.alignType === 'floor' ? 'TIME_FLOOR' : 'TIME_CEIL',
-          ...compact([anchor, pattern.alignDuration, timezone]),
+          ...compact([anchor, pattern.alignDuration, pattern.timezone]),
         );
       }
 
       if (pattern.shiftDuration && pattern.shiftStep) {
-        anchor = F.timeShift(anchor, pattern.shiftDuration, pattern.shiftStep, timezone);
+        anchor = F.timeShift(anchor, pattern.shiftDuration, pattern.shiftStep, pattern.timezone);
       }
 
       const column = C(pattern.column);
-      return F.timeShift(anchor, pattern.rangeDuration, -(pattern.rangeStep || 1), timezone)
+      return F.timeShift(anchor, pattern.rangeDuration, -(pattern.rangeStep || 1), pattern.timezone)
         .lessThanOrEqual(column)
         .and(column.lessThan(anchor))
         .ensureParens()
