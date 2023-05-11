@@ -14,6 +14,7 @@
 
 import type { SqlExpression } from '../sql';
 import { C, F, RefName, SqlColumn, SqlComparison, SqlFunction, SqlMulti } from '../sql';
+import { compact } from '../utils';
 
 import type { FilterPatternDefinition } from './common';
 import { extractOuterNot, oneOf } from './common';
@@ -50,6 +51,7 @@ export const TIME_RELATIVE_PATTERN_DEFINITION: FilterPatternDefinition<TimeRelat
     fit(possibleEx: SqlExpression) {
       // Something like
       // TIME_SHIFT(CURRENT_TIMESTAMP, 'PT1H', -1) <= __time AND __time < CURRENT_TIMESTAMP
+      // TIME_SHIFT(CURRENT_TIMESTAMP, 'PT1H', -1, 'Etc/UTC') <= __time AND __time < CURRENT_TIMESTAMP
       // TIME_SHIFT(TIME_CEIL(CURRENT_TIMESTAMP, 'P1D'), 'PT1H', -1) <= __time AND __time < TIME_CEIL(CURRENT_TIMESTAMP, 'P1D')
       // TIME_SHIFT(TIME_SHIFT(TIME_CEIL(CURRENT_TIMESTAMP, 'P1D'), 'P1D', -1), 'PT1H', -1) <= __time AND __time < TIME_SHIFT(TIME_CEIL(CURRENT_TIMESTAMP, 'P1D'), 'P1D', -1)
       const [negated, ex] = extractOuterNot(possibleEx);
@@ -81,6 +83,8 @@ export const TIME_RELATIVE_PATTERN_DEFINITION: FilterPatternDefinition<TimeRelat
 
       const rangeStep = -timeShift.getArgAsNumber(2)!;
       if (!(rangeStep > 0)) return;
+
+      const timezone = timeShift.getArgAsString(3);
 
       let shiftDuration: string | undefined;
       let shiftStep: number | undefined;
@@ -134,28 +138,28 @@ export const TIME_RELATIVE_PATTERN_DEFINITION: FilterPatternDefinition<TimeRelat
         alignType,
         shiftDuration,
         shiftStep,
+        timezone,
       };
     },
     isValid(_pattern): boolean {
       return true;
     },
-    toExpression(pattern): SqlExpression {
+    toExpression(pattern, timezone?: string): SqlExpression {
       let anchor = getAnchor(pattern.anchor);
 
       if (pattern.alignType && pattern.alignDuration) {
         anchor = F(
           pattern.alignType === 'floor' ? 'TIME_FLOOR' : 'TIME_CEIL',
-          anchor,
-          pattern.alignDuration,
+          ...compact([anchor, pattern.alignDuration, timezone]),
         );
       }
 
       if (pattern.shiftDuration && pattern.shiftStep) {
-        anchor = F.timeShift(anchor, pattern.shiftDuration, pattern.shiftStep);
+        anchor = F.timeShift(anchor, pattern.shiftDuration, pattern.shiftStep, timezone);
       }
 
       const column = C(pattern.column);
-      return F.timeShift(anchor, pattern.rangeDuration, -(pattern.rangeStep || 1))
+      return F.timeShift(anchor, pattern.rangeDuration, -(pattern.rangeStep || 1), timezone)
         .lessThanOrEqual(column)
         .and(column.lessThan(anchor))
         .ensureParens()

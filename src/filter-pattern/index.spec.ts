@@ -163,6 +163,27 @@ describe('filter-pattern', () => {
       });
     });
 
+    it('works for timeRelative with timezones', () => {
+      expect(
+        fitFilterPattern(
+          SqlExpression.parse(
+            `TIME_SHIFT(TIME_SHIFT(TIME_CEIL(CURRENT_TIMESTAMP, 'P1D', 'Europe/Paris'), 'P1D', -1, 'Europe/Paris'), 'PT1H', -1, 'Europe/Paris') <= "__time" AND "__time" < TIME_SHIFT(TIME_CEIL(CURRENT_TIMESTAMP, 'P1D', 'Europe/Paris'), 'P1D', -1, 'Europe/Paris')`,
+          ),
+        ),
+      ).toEqual({
+        alignDuration: 'P1D',
+        alignType: 'ceil',
+        anchor: 'currentTimestamp',
+        column: '__time',
+        negated: false,
+        rangeDuration: 'PT1H',
+        shiftDuration: 'P1D',
+        shiftStep: -1,
+        type: 'timeRelative',
+        timezone: 'Europe/Paris',
+      });
+    });
+
     it('works for mvContains', () => {
       expect(
         fitFilterPattern(SqlExpression.parse(`MV_CONTAINS("hello", ARRAY['v1', 'v2'])`)),
