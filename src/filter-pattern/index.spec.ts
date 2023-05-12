@@ -49,10 +49,12 @@ describe('filter-pattern', () => {
       `TIME_IN_INTERVAL("lol", '2022-06-30T22:56:14.123Z/2022-06-30T22:56:15.923Z')`,
       `NOT TIME_IN_INTERVAL("lol", '2022-06-30T22:56:14.123Z/2022-06-30T22:56:15.923Z')`,
       `(TIME_SHIFT(CURRENT_TIMESTAMP, 'PT1H', -1) <= "__time" AND "__time" < CURRENT_TIMESTAMP)`,
+      `(TIME_SHIFT(CURRENT_TIMESTAMP, 'PT1H', -1, 'Europe/Paris') <= "__time" AND "__time" < CURRENT_TIMESTAMP)`,
       `NOT (TIME_SHIFT(CURRENT_TIMESTAMP, 'PT1H', -1) <= "__time" AND "__time" < CURRENT_TIMESTAMP)`,
       `(TIME_SHIFT(TIME_CEIL(CURRENT_TIMESTAMP, 'P1D'), 'PT1H', -1) <= "__time" AND "__time" < TIME_CEIL(CURRENT_TIMESTAMP, 'P1D'))`,
       `(TIME_SHIFT(TIME_SHIFT(TIME_CEIL(CURRENT_TIMESTAMP, 'P1D'), 'P1D', -1), 'PT1H', -1) <= "__time" AND "__time" < TIME_SHIFT(TIME_CEIL(CURRENT_TIMESTAMP, 'P1D'), 'P1D', -1))`,
       `(TIME_SHIFT(TIME_SHIFT(TIME_CEIL(MAX_DATA_TIME(), 'P1D'), 'P1D', -1), 'PT1H', -1) <= "__time" AND "__time" < TIME_SHIFT(TIME_CEIL(MAX_DATA_TIME(), 'P1D'), 'P1D', -1))`,
+      `(TIME_SHIFT(TIME_SHIFT(TIME_CEIL(MAX_DATA_TIME(), 'P1D', 'Europe/Paris'), 'P1D', -1, 'Europe/Paris'), 'PT1H', -1, 'Europe/Paris') <= "__time" AND "__time" < TIME_SHIFT(TIME_CEIL(MAX_DATA_TIME(), 'P1D', 'Europe/Paris'), 'P1D', -1, 'Europe/Paris'))`,
       `MV_CONTAINS("hello", ARRAY['v1', 'v2'])`,
       `("hi" > 0 AND "hi" < 100)`,
       `NOT ("hi" > 0 AND "hi" < 100)`,
@@ -161,6 +163,36 @@ describe('filter-pattern', () => {
         shiftStep: -1,
         type: 'timeRelative',
       });
+    });
+
+    it('works for timeRelative with timezones', () => {
+      expect(
+        fitFilterPattern(
+          SqlExpression.parse(
+            `TIME_SHIFT(TIME_SHIFT(TIME_CEIL(CURRENT_TIMESTAMP, 'P1D', 'Europe/Paris'), 'P1D', -1, 'Europe/Paris'), 'PT1H', -1, 'Europe/Paris') <= "__time" AND "__time" < TIME_SHIFT(TIME_CEIL(CURRENT_TIMESTAMP, 'P1D', 'Europe/Paris'), 'P1D', -1, 'Europe/Paris')`,
+          ),
+        ),
+      ).toEqual({
+        alignDuration: 'P1D',
+        alignType: 'ceil',
+        anchor: 'currentTimestamp',
+        column: '__time',
+        negated: false,
+        rangeDuration: 'PT1H',
+        shiftDuration: 'P1D',
+        shiftStep: -1,
+        type: 'timeRelative',
+        timezone: 'Europe/Paris',
+      });
+
+      // it should not work if different timezones are found
+      expect(
+        fitFilterPattern(
+          SqlExpression.parse(
+            `(TIME_SHIFT(TIME_SHIFT(TIME_CEIL(MAX_DATA_TIME(), 'P1D', 'Etc/UTC'), 'P1D', -1), 'PT1H', -1) <= "__time" AND "__time" < TIME_SHIFT(TIME_CEIL(MAX_DATA_TIME(), 'P1D'), 'P1D', -1))`,
+          ),
+        ).type,
+      ).toEqual('custom');
     });
 
     it('works for mvContains', () => {
