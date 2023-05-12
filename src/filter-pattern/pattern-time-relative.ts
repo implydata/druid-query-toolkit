@@ -14,7 +14,6 @@
 
 import type { SqlExpression } from '../sql';
 import { C, F, RefName, SqlColumn, SqlComparison, SqlFunction, SqlMulti } from '../sql';
-import { compact } from '../utils';
 
 import type { FilterPatternDefinition } from './common';
 import { extractOuterNot, oneOf } from './common';
@@ -155,7 +154,9 @@ export const TIME_RELATIVE_PATTERN_DEFINITION: FilterPatternDefinition<TimeRelat
       if (pattern.alignType && pattern.alignDuration) {
         anchor = F(
           pattern.alignType === 'floor' ? 'TIME_FLOOR' : 'TIME_CEIL',
-          ...compact([anchor, pattern.alignDuration, pattern.timezone]),
+          anchor,
+          pattern.alignDuration,
+          pattern.timezone,
         );
       }
 
