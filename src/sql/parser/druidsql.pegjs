@@ -45,14 +45,14 @@ SqlAlias = expression:Expression alias:((_ AsToken)? _ RefNameAlias)? columns:(_
   spacing.preAlias = alias[1];
   value.alias = alias[2];
 
-  return new sql.SqlAlias(value);
+  return new S.SqlAlias(value);
 }
 
 GeneralFunctionArgument = SqlLabeledExpression / SqlAlias
 
 SqlLabeledExpression = label:RefNameAlias preArrow:_ "=>" postArrow:_ expression:Expression
 {
-  return new sql.SqlLabeledExpression({
+  return new S.SqlLabeledExpression({
     label: label,
     spacing: {
       preArrow: preArrow,
@@ -71,7 +71,7 @@ SqlExtendClause =
   postColumnDeclarations:_
   CloseParen
 {
-  return new sql.SqlExtendClause({
+  return new S.SqlExtendClause({
     keywords: {
       extend: extend ? extend[0] : ''
     },
@@ -86,7 +86,7 @@ SqlExtendClause =
 
 SqlColumnDeclaration = column:RefName postColumn:_ columnType:SqlType
 {
-  return new sql.SqlColumnDeclaration({
+  return new S.SqlColumnDeclaration({
     column: column,
     spacing: {
       postColumn: postColumn
@@ -183,7 +183,7 @@ SqlQuery =
     value.unionQuery = union[1].unionQuery;
   }
 
-  return withQueryMode ? new sql.SqlWithQuery(value) : new sql.SqlQuery(value);
+  return withQueryMode ? new S.SqlWithQuery(value) : new S.SqlQuery(value);
 }
 
 
@@ -258,7 +258,7 @@ InsertClause =
     value.columns = columns[1];
   }
 
-  return new sql.SqlInsertClause(value);
+  return new S.SqlInsertClause(value);
 }
 
 
@@ -300,7 +300,7 @@ ReplaceClause =
     value.whereClause = allOrWhere;
   }
 
-  return new sql.SqlReplaceClause(value);
+  return new S.SqlReplaceClause(value);
 }
 
 
@@ -310,7 +310,7 @@ WithClause =
   head:SqlWithPart
   tail:(CommaSeparator SqlWithPart)*
 {
-  return new sql.SqlWithClause({
+  return new S.SqlWithClause({
     withParts: makeSeparatedArray(head, tail),
     keywords: {
       'with': withKeyword
@@ -345,13 +345,13 @@ SqlWithPart =
     value.columns = columns[0];
     spacing.postColumns = columns[1];
   }
-  return new sql.SqlWithPart(value);
+  return new S.SqlWithPart(value);
 }
 
 
 SqlColumnList = OpenParen postLeftParen:_? head:RefName tail:(CommaSeparator RefName)* preRightParen:_? CloseParen
 {
-  return new sql.SqlColumnList({
+  return new S.SqlColumnList({
     columns: makeSeparatedArray(head, tail)
   }).addParens(postLeftParen, preRightParen);
 }
@@ -381,7 +381,7 @@ SqlStarOrAliasExpression = SqlStar / SqlAlias
 
 FromClause = from:FromToken postFrom:_ head:SqlAlias tail:(CommaSeparator SqlAlias)* join:(_ JoinClauses)?
 {
-  return new sql.SqlFromClause({
+  return new S.SqlFromClause({
     expressions: makeSeparatedArray(head, tail).map(function(ex) { return ex.convertToTable() }),
     joinParts: join ? join[1] : undefined,
     spacing: {
@@ -431,7 +431,7 @@ SqlJoinPart =
     spacing.postOn = on[2];
     value.onExpression = on[3];
   }
-  return new sql.SqlJoinPart(value);
+  return new S.SqlJoinPart(value);
 }
 
 JoinType =
@@ -441,7 +441,7 @@ JoinType =
 
 SqlWhereClause = where:WhereToken postWhere:_ expression:Expression
 {
-  return new sql.SqlWhereClause({
+  return new S.SqlWhereClause({
     expression: expression,
     spacing: {
       postWhere: postWhere,
@@ -486,7 +486,7 @@ GroupByClause =
     value.expressions = ex;
   }
 
-  return new sql.SqlGroupByClause(value);
+  return new S.SqlGroupByClause(value);
 }
 
 GroupByExpressionList = head:GroupByExpression tail:(CommaSeparator GroupByExpression)*
@@ -498,7 +498,7 @@ GroupByExpression = SqlEmptyRecord / Expression
 
 SqlEmptyRecord = OpenParen postLeftParen:_ CloseParen
 {
-  return new sql.SqlRecord({
+  return new S.SqlRecord({
     keywords: { row: '' },
     spacing: {
       postLeftParen: postLeftParen,
@@ -508,7 +508,7 @@ SqlEmptyRecord = OpenParen postLeftParen:_ CloseParen
 
 HavingClause = having:HavingToken postHaving:_ expression:Expression
 {
-  return new sql.SqlHavingClause({
+  return new S.SqlHavingClause({
     expression: expression,
     spacing: {
       postHaving: postHaving
@@ -521,7 +521,7 @@ HavingClause = having:HavingToken postHaving:_ expression:Expression
 
 OrderByClause = orderBy:OrderByToken postOrderBy:_ head:SqlOrderByExpression tail:(CommaSeparator SqlOrderByExpression)*
 {
-  return new sql.SqlOrderByClause({
+  return new S.SqlOrderByClause({
     expressions: makeSeparatedArray(head, tail),
     spacing: {
       postOrderBy: postOrderBy
@@ -546,12 +546,12 @@ SqlOrderByExpression = expression:Expression direction:(_ (AscToken / DescToken)
     keywords.direction = direction[1];
   }
 
-  return new sql.SqlOrderByExpression(value);
+  return new S.SqlOrderByExpression(value);
 }
 
 LimitClause = limit:LimitToken postLimit:_ limitLiteral:SqlLiteral
 {
-  return new sql.SqlLimitClause({
+  return new S.SqlLimitClause({
     limit: limitLiteral,
     spacing: {
       postLimit: postLimit,
@@ -564,7 +564,7 @@ LimitClause = limit:LimitToken postLimit:_ limitLiteral:SqlLiteral
 
 OffsetClause = offset:OffsetToken postOffset:_ offsetLiteral:SqlLiteral
 {
-  return new sql.SqlOffsetClause({
+  return new S.SqlOffsetClause({
     offset: offsetLiteral,
     spacing: {
       postOffset: postOffset,
@@ -592,12 +592,12 @@ PartitionedByClause = partitionedBy:PartitionedByToken postPartitionedBy:_ ex:(T
     value.expression = ex;
   }
 
-  return new sql.SqlPartitionedByClause(value);
+  return new S.SqlPartitionedByClause(value);
 }
 
 ClusteredByClause = clusteredBy:ClusteredByToken postClusteredBy:_ head:Expression tail:(CommaSeparator Expression)*
 {
-  return new sql.SqlClusteredByClause({
+  return new S.SqlClusteredByClause({
     expressions: makeSeparatedArray(head, tail),
     spacing: {
       postClusteredBy: postClusteredBy
@@ -645,7 +645,7 @@ AndExpression = head:NotExpression tail:(_ AndToken _ NotExpression)*
 
 NotExpression = op:NotToken postOp:_ argument:NotExpression
 {
-  return new sql.SqlUnary({
+  return new S.SqlUnary({
     op: op.toUpperCase(),
     argument: argument,
     spacing: {
@@ -663,7 +663,7 @@ ComparisonExpression = lhs:AdditionExpression rhs:(_ ComparisonOpRhs)?
   if (!rhs) return lhs;
   var preOp = rhs[0];
   var opRhs = rhs[1];
-  return new sql.SqlComparison({
+  return new S.SqlComparison({
     lhs: lhs,
     op: opRhs.op,
     decorator: opRhs.decorator,
@@ -762,7 +762,7 @@ ComparisonOpRhsBetween = op:BetweenToken postOp:_ symmetricKeyword:(SymmetricTok
     op: op.toUpperCase(),
     opKeyword: op,
     postOp: postOp,
-    rhs: new sql.SqlBetweenPart(value)
+    rhs: new S.SqlBetweenPart(value)
   };
 }
 
@@ -772,7 +772,7 @@ ComparisonOpRhsLike = op:(LikeToken / SimilarToToken) postOp:_ like:AdditionExpr
     op: op.toUpperCase(),
     opKeyword: op,
     postOp: postOp,
-    rhs: escape ? new sql.SqlLikePart({
+    rhs: escape ? new S.SqlLikePart({
       like: like,
       escape: escape[3],
       spacing: {
@@ -819,7 +819,7 @@ DivisionExpression = head:UnaryExpression tail:(_ '/' _ UnaryExpression)*
 // !Number is to make sure that -3 parses as a number and not as -(3)
 UnaryExpression = op:[+-] postOp:_ !Number argument:ConcatExpression
 {
-  return new sql.SqlUnary({
+  return new S.SqlUnary({
     op: op,
     argument: argument,
     spacing: {
@@ -860,7 +860,7 @@ CaseExpression =
   preEnd:_
   end:EndToken
 {
-  return new sql.SqlCase({
+  return new S.SqlCase({
     caseExpression: caseExpression ? caseExpression[0] : undefined,
     whenThenParts: makeSeparatedArray(head, tail),
     elseExpression: elseValue ? elseValue[3] : undefined,
@@ -889,7 +889,7 @@ SqlWhenThenPart =
   postThen:_
   thenExpression:Expression
 {
-  return new sql.SqlWhenThenPart({
+  return new S.SqlWhenThenPart({
     whenExpressions: makeSeparatedArray(whenHead, whenTail),
     thenExpression: thenExpression,
     spacing: {
@@ -914,7 +914,7 @@ Interval =
   postIntervalValue:_
   unit:($(TimeUnit _ ToToken _ TimeUnit) / $(TimeUnit '_' TimeUnit) / TimeUnit)
 {
-  return new sql.SqlInterval({
+  return new S.SqlInterval({
     intervalValue: intervalValue,
     unit: unit,
     spacing: {
@@ -929,7 +929,7 @@ Interval =
 
 TimeUnitLiteral = unit:TimeUnit
 {
-  return sql.SqlLiteral.direct(unit);
+  return S.SqlLiteral.direct(unit);
 }
 
 TimeUnit =
@@ -990,7 +990,7 @@ GenericFunction =
   var keywords = value.keywords = {};
 
   if (namespaceExtra) {
-    value.namespace = new sql.SqlNamespace({ refName: functionName });
+    value.namespace = new S.SqlNamespace({ refName: functionName });
     spacing.postNamespace = namespaceExtra[0];
     spacing.postDot = namespaceExtra[2];
     value.functionName = namespaceExtra[3];
@@ -1028,13 +1028,13 @@ GenericFunction =
     value.extendClause = extend[1];
   }
 
-  return new sql.SqlFunction(value);
+  return new S.SqlFunction(value);
 }
 
-NakedFunction = functionName:UnquotedRefNameFree &{ return sql.SqlFunction.isNakedFunction(functionName) }
+NakedFunction = functionName:UnquotedRefNameFree &{ return S.SqlFunction.isNakedFunction(functionName) }
 {
-  return new sql.SqlFunction({
-    functionName: new sql.RefName({ name: functionName, quotes: false }),
+  return new S.SqlFunction({
+    functionName: new S.RefName({ name: functionName, quotes: false }),
     specialParen: 'none'
   });
 }
@@ -1058,7 +1058,7 @@ CountStarFunction =
   };
   var keywords = value.keywords = {};
 
-  value.args = sql.SeparatedArray.fromSingleValue(sql.SqlStar.PLAIN);
+  value.args = S.SeparatedArray.fromSingleValue(S.SqlStar.PLAIN);
   spacing.postArguments = postArguments;
 
   if (filter) {
@@ -1068,7 +1068,7 @@ CountStarFunction =
     value.whereClause = filter[1].whereClause;
   }
 
-  return new sql.SqlFunction(value);
+  return new S.SqlFunction(value);
 }
 
 CastFunction =
@@ -1082,9 +1082,9 @@ CastFunction =
   postArguments:_
   CloseParen
 {
-  return new sql.SqlFunction({
+  return new S.SqlFunction({
     functionName: makeFunctionName(functionName),
-    args: new sql.SeparatedArray([expr, type], [separator]),
+    args: new S.SeparatedArray([expr, type], [separator]),
     spacing: {
       preLeftParen: preLeftParen,
       postLeftParen: postLeftParen,
@@ -1104,13 +1104,13 @@ ExtractFunction =
   postArguments:_
   CloseParen
 {
-  var unitLiteral = new sql.SqlLiteral({
+  var unitLiteral = new S.SqlLiteral({
     value: unit.toUpperCase(),
     stringValue: unit,
   });
-  return new sql.SqlFunction({
+  return new S.SqlFunction({
     functionName: makeFunctionName(functionName),
-    args: new sql.SeparatedArray([unitLiteral, expr], [separator]),
+    args: new S.SeparatedArray([unitLiteral, expr], [separator]),
     spacing: {
       preLeftParen: preLeftParen,
       postLeftParen: postLeftParen,
@@ -1133,8 +1133,8 @@ TrimFunction =
   var value = {
     functionName: makeFunctionName(functionName),
     args: from
-      ? new sql.SeparatedArray([expr, from[1]], [from[0]])
-      : sql.SeparatedArray.fromSingleValue(expr),
+      ? new S.SeparatedArray([expr, from[1]], [from[0]])
+      : S.SeparatedArray.fromSingleValue(expr),
   };
   var spacing = value.spacing = {
     preLeftParen: preLeftParen,
@@ -1149,7 +1149,7 @@ TrimFunction =
     spacing.postDecorator = decorator[1];
   }
 
-  return new sql.SqlFunction(value);
+  return new S.SqlFunction(value);
 }
 
 FloorCeilFunction =
@@ -1163,9 +1163,9 @@ FloorCeilFunction =
   postArguments:_
   CloseParen
 {
-  return new sql.SqlFunction({
+  return new S.SqlFunction({
     functionName: makeFunctionName(functionName),
-    args: new sql.SeparatedArray([expr, unit], [separator]),
+    args: new S.SeparatedArray([expr, unit], [separator]),
     spacing: {
       preLeftParen: preLeftParen,
       postLeftParen: postLeftParen,
@@ -1195,7 +1195,7 @@ TimestampAddDiffFunction =
   value.args = makeSeparatedArray(unit, tail);
   spacing.postArguments = postArguments;
 
-  return new sql.SqlFunction(value);
+  return new S.SqlFunction(value);
 }
 
 PositionFunction =
@@ -1211,10 +1211,10 @@ PositionFunction =
   CloseParen
 {
   var args = extra
-    ? new sql.SeparatedArray([expr1, expr2, extra[1]], [inSeparator, extra[0]])
-    : new sql.SeparatedArray([expr1, expr2], [inSeparator])
+    ? new S.SeparatedArray([expr1, expr2, extra[1]], [inSeparator, extra[0]])
+    : new S.SeparatedArray([expr1, expr2], [inSeparator])
 
-  return new sql.SqlFunction({
+  return new S.SqlFunction({
     functionName: makeFunctionName(functionName),
     args: args,
     spacing: {
@@ -1249,7 +1249,7 @@ ArrayFunction =
     spacing.postArguments = postArguments;
   }
 
-  return new sql.SqlFunction(value);
+  return new S.SqlFunction(value);
 }
 
 FunctionDecorator = DistinctToken / AllToken;
@@ -1282,12 +1282,12 @@ WindowSpec = OpenParen postLeftParen:_ windowName:(RefName _)? orderByClause:(Or
 
   // postPartitionBy
 
-  return new sql.SqlWindowSpec(value);
+  return new S.SqlWindowSpec(value);
 }
 
 CommaSeparator = left:_ ',' right:_
 {
-  return new sql.Separator({
+  return new S.Separator({
     left: left,
     separator: ',',
     right: right,
@@ -1296,7 +1296,7 @@ CommaSeparator = left:_ ',' right:_
 
 AsSeparator = left:_ separator:AsToken right:_
 {
-  return new sql.Separator({
+  return new S.Separator({
     left: left,
     separator: separator,
     right: right,
@@ -1305,7 +1305,7 @@ AsSeparator = left:_ separator:AsToken right:_
 
 FromSeparator = left:_ separator:FromToken right:_
 {
-  return new sql.Separator({
+  return new S.Separator({
     left: left,
     separator: separator,
     right: right,
@@ -1314,7 +1314,7 @@ FromSeparator = left:_ separator:FromToken right:_
 
 ToSeparator = left:_ separator:ToToken right:_
 {
-  return new sql.Separator({
+  return new S.Separator({
     left: left,
     separator: separator,
     right: right,
@@ -1323,7 +1323,7 @@ ToSeparator = left:_ separator:ToToken right:_
 
 InSeparator = left:_ separator:InToken right:_
 {
-  return new sql.Separator({
+  return new S.Separator({
     left: left,
     separator: separator,
     right: right,
@@ -1352,7 +1352,7 @@ SqlRecord = row:(RowToken _)? OpenParen postLeftParen:_ head:Expression tail:(Co
     value.keywords = { row: '' };
   }
 
-  return new sql.SqlRecord(value);
+  return new S.SqlRecord(value);
 }
 
 SqlQueryInParens = OpenParen leftSpacing:_ ex:(SqlQueryInParens / SqlQuery) rightSpacing:_ CloseParen
@@ -1394,32 +1394,32 @@ SqlValues =
     value.offsetClause = offsetClause[1];
   }
 
-  return new sql.SqlValues(value);
+  return new S.SqlValues(value);
 }
 
 SqlPlaceholder = "?"
 {
-  return new sql.SqlPlaceholder();
+  return new S.SqlPlaceholder();
 }
 
 SqlLiteral = lit:(NullToken / TrueToken / FalseToken / Number / SingleQuotedString / UnicodeString / CharsetString / BinaryString / Timestamp)
 {
-  return new sql.SqlLiteral(lit);
+  return new S.SqlLiteral(lit);
 }
 
 NullLiteral = v:NullToken
 {
-  return new sql.SqlLiteral(v);
+  return new S.SqlLiteral(v);
 }
 
 BooleanLiteral = v:(TrueToken / FalseToken)
 {
-  return new sql.SqlLiteral(v);
+  return new S.SqlLiteral(v);
 }
 
 SqlType = UnquotedRefNameFree (OpenParen _ SingleQuotedString _ CloseParen)?
 {
-  return new sql.SqlType({ value: text() });
+  return new S.SqlType({ value: text() });
 }
 
 /* Numbers */
@@ -1506,38 +1506,38 @@ ArrayEntry = Number / SingleQuotedString / UnicodeString / BinaryString
 SqlColumn = a:RefName b:(_ "." _ RefName)? c:(_ "." _ RefName)?
 {
   if (c) {
-    return new sql.SqlColumn({
+    return new S.SqlColumn({
       refName: c[3],
       spacing: {
         postTable: c[0],
         postDot: c[2],
       },
-      table: new sql.SqlTable({
+      table: new S.SqlTable({
         refName: b[3],
         spacing: {
           postNamespace: b[0],
           postDot: b[2],
         },
-        namespace: new sql.SqlNamespace({
+        namespace: new S.SqlNamespace({
           refName: a,
         })
       })
     });
 
   } else if (b) {
-    return new sql.SqlColumn({
+    return new S.SqlColumn({
       refName: b[3],
       spacing: {
         postTable: b[0],
         postDot: b[2],
       },
-      table: new sql.SqlTable({
+      table: new S.SqlTable({
         refName: a,
       })
     });
 
   } else {
-    return new sql.SqlColumn({
+    return new S.SqlColumn({
       refName: a,
     });
   }
@@ -1546,19 +1546,19 @@ SqlColumn = a:RefName b:(_ "." _ RefName)? c:(_ "." _ RefName)?
 SqlTable = a:RefName b:(_ "." _ RefName)?
 {
   if (b) {
-    return new sql.SqlTable({
+    return new S.SqlTable({
       refName: b[3],
       spacing: {
         postTable: b[0],
         postDot: b[2],
       },
-      table: new sql.SqlNamespace({
+      table: new S.SqlNamespace({
         refName: a,
       })
     });
 
   } else {
-    return new sql.SqlTable({
+    return new S.SqlTable({
       refName: a,
     });
   }
@@ -1572,7 +1572,7 @@ RefNameFunction = QuotedRefName / UnquotedRefNameFunction
 
 QuotedRefName = '"' name:$(('""' / [^"])+) '"'
 {
-  return new sql.RefName({
+  return new S.RefName({
     name: name.replace(/""/g, '"'),
     quotes: true
   });
@@ -1580,31 +1580,31 @@ QuotedRefName = '"' name:$(('""' / [^"])+) '"'
 
 UnicodeRefName = "U&"i v:QuotedRefName
 {
-  return new sql.RefName({
+  return new S.RefName({
     name: v.name.replace(/\\(\\|(?:[0-9a-f]{4}))/gi, function(_, s) { return s === '\\' ? '\\' : String.fromCharCode(parseInt(s, 16)); }),
     quotes: true
   });
 }
 
-UnquotedRefName = name:UnquotedRefNameFree &{ return !sql.RefName.isReservedKeyword(name) }
+UnquotedRefName = name:UnquotedRefNameFree &{ return !S.RefName.isReservedKeyword(name) }
 {
-  return new sql.RefName({
+  return new S.RefName({
     name: text(),
     quotes: false
   });
 }
 
-UnquotedRefNameAlias = name:UnquotedRefNameFree &{ return !sql.RefName.isReservedAlias(name) }
+UnquotedRefNameAlias = name:UnquotedRefNameFree &{ return !S.RefName.isReservedAlias(name) }
 {
-  return new sql.RefName({
+  return new S.RefName({
     name: text(),
     quotes: false
   });
 }
 
-UnquotedRefNameFunction = name:UnquotedRefNameFree &{ return !sql.RefName.isReservedFunctionName(name) }
+UnquotedRefNameFunction = name:UnquotedRefNameFree &{ return !S.RefName.isReservedFunctionName(name) }
 {
-  return new sql.RefName({
+  return new S.RefName({
     name: text(),
     quotes: false
   });
@@ -1614,26 +1614,26 @@ UnquotedRefNameFree = $([a-z_]i [a-z0-9_]i*)
 
 SqlStar = a:(RefName _ "." _)? b:(RefName _ "." _)? "*"
 {
-  if (!a) return sql.SqlStar.PLAIN;
+  if (!a) return S.SqlStar.PLAIN;
 
   var last = b || a;
-  return new sql.SqlStar({
+  return new S.SqlStar({
     spacing: {
       postTable: last[1],
       postDot: last[3],
     },
     table: b ?
-      new sql.SqlTable({
+      new S.SqlTable({
         refName: b[0],
         spacing: {
           postNamespace: a[1],
           postDot: a[3],
         },
-        namespace: new sql.SqlNamespace({
+        namespace: new S.SqlNamespace({
           refName: a[0],
         })
       }) :
-      new sql.SqlTable({
+      new S.SqlTable({
         refName: a[0]
       })
   });

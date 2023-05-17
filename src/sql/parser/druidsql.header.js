@@ -28,15 +28,15 @@
 
   function maybeMakeMulti(op, head, tail) {
     if (!tail.length) return head;
-    return new sql.SqlMulti({
+    return new S.SqlMulti({
       op: op,
-      args: new sql.SeparatedArray(makeListMap(tail, 3, head), makeSeparatorsList(tail)),
+      args: new S.SeparatedArray(makeListMap(tail, 3, head), makeSeparatorsList(tail)),
     });
   }
 
   function makeSeparatorsList(tail) {
     return tail.map(function (t) {
-      return new sql.Separator({
+      return new S.Separator({
         left: t[0],
         separator: t[1],
         right: t[2],
@@ -45,10 +45,10 @@
   }
 
   function makeSeparatedArray(head, tail) {
-    return new sql.SeparatedArray(makeListMap(tail, 1, head), makeListMap(tail, 0));
+    return new S.SeparatedArray(makeListMap(tail, 1, head), makeListMap(tail, 0));
   }
 
   function makeFunctionName(f) {
-    return Array.isArray(f) ? sql.RefName.functionName(f[1], true) : sql.RefName.functionName(f);
+    return Array.isArray(f) ? S.RefName.functionName(f[1], true) : S.RefName.functionName(f);
   }
 }

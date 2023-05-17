@@ -31,13 +31,13 @@ try {
 }
 
 const wrappedParser = `
-var sql = require('..');
+var S = require('..');
 
 var p =
 ${parser}
 
-exports.parseSql = function parseSql(input) {  
-  return p.parse(input);  
+exports.parseSql = function parseSql(input) {
+  return p.parse(input);
 }
 `;
 
