@@ -42,28 +42,28 @@ describe('sql', () => {
   it('throws on uneven double quote wrapping (start)', () => {
     const c = C('blah');
     expect(() => sql`SELECT * FROM tbl WHERE "${c} = 5`).toThrow(
-      'the expression `"blah"` is not evenly wrapped in double quotes',
+      'Expression `"blah"` is not evenly wrapped in double quotes',
     );
   });
 
   it('throws on uneven double quote wrapping (end)', () => {
     const c = C('blah');
     expect(() => sql`SELECT * FROM tbl WHERE ${c}" = 5`).toThrow(
-      'the expression `"blah"` is not evenly wrapped in double quotes',
+      'Expression `"blah"` is not evenly wrapped in double quotes',
     );
   });
 
   it('throws on uneven single quote wrapping (start)', () => {
     const v = 'blah';
     expect(() => sql`SELECT * FROM tbl WHERE col = '${v}`).toThrow(
-      'the literal `blah` is not evenly wrapped in single quotes',
+      'Literal `blah` is not evenly wrapped in single quotes',
     );
   });
 
   it('throws on uneven single quote wrapping (end)', () => {
     const v = 'blah';
     expect(() => sql`SELECT * FROM tbl WHERE col = ${v}'`).toThrow(
-      'the literal `blah` is not evenly wrapped in single quotes',
+      'Literal `blah` is not evenly wrapped in single quotes',
     );
   });
 });

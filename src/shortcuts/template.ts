@@ -28,29 +28,29 @@ export function sql(strings: TemplateStringsArray, ...xs: any[]): SqlExpression 
       case '"': {
         // Detect ..."${x}"...
         if (afterFirstChar !== '"') {
-          throw new Error(`the expression \`${x}\` is not evenly wrapped in double quotes`);
+          throw new Error(`Expression \`${x}\` is not evenly wrapped in double quotes`);
         }
         const str = RefName.create(String(x)).toString();
-        toAdd = str.slice(1, str.length - 1);
+        toAdd = str.slice(1, -1); // Remove double quotes as they are already accounted for
         break;
       }
 
       case "'": {
         // Detect ...'${x}'...
         if (afterFirstChar !== "'") {
-          throw new Error(`the literal \`${x}\` is not evenly wrapped in single quotes`);
+          throw new Error(`Literal \`${x}\` is not evenly wrapped in single quotes`);
         }
         const str = SqlLiteral.create(String(x)).toString();
-        toAdd = str.slice(1, str.length - 1);
+        toAdd = str.slice(1, -1); // Remove single quotes as they are already accounted for
         break;
       }
 
       default:
         if (afterFirstChar === '"') {
-          throw new Error(`the expression \`${x}\` is not evenly wrapped in double quotes`);
+          throw new Error(`Expression \`${x}\` is not evenly wrapped in double quotes`);
         }
         if (afterFirstChar === "'") {
-          throw new Error(`the literal \`${x}\` is not evenly wrapped in single quotes`);
+          throw new Error(`Literal \`${x}\` is not evenly wrapped in single quotes`);
         }
         toAdd = SqlExpression.wrap(x).toString();
         break;
