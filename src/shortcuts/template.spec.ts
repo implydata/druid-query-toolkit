@@ -12,7 +12,8 @@
  * limitations under the License.
  */
 
-import { C, sql } from '.';
+import { C } from '.';
+import { sql } from './template';
 
 describe('sql', () => {
   it('works in basic case', () => {
