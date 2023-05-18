@@ -15,6 +15,7 @@
 /* eslint-disable simple-import-sort/exports */
 export * from './utils';
 export * from './sql';
+export * from './shortcuts';
 export * from './introspect/introspect';
 export * from './query-result/column';
 export * from './query-result/query-result';

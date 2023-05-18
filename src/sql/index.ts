@@ -47,5 +47,3 @@ export * from './sql-values/sql-values';
 export * from './sql-function/sql-function';
 export * from './sql-query/sql-query';
 export * from './sql-with-query/sql-with-query';
-
-export * from './shortcuts';

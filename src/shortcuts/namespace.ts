@@ -12,12 +12,12 @@
  * limitations under the License.
  */
 
-import { LiteralValue, SqlLiteral } from '../sql-literal/sql-literal';
+import { SqlNamespace } from '../sql';
 
-export function L(value: LiteralValue | SqlLiteral) {
-  return SqlLiteral.create(value);
+export function N(name: string | SqlNamespace) {
+  return SqlNamespace.create(name);
 }
 
-L.NULL = SqlLiteral.NULL;
-L.FALSE = SqlLiteral.FALSE;
-L.TRUE = SqlLiteral.TRUE;
+N.optionalQuotes = (name: string | SqlNamespace) => {
+  return SqlNamespace.optionalQuotes(name);
+};

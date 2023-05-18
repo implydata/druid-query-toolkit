@@ -12,12 +12,12 @@
  * limitations under the License.
  */
 
-import { SqlColumn } from '../sql-column/sql-column';
+import { SqlTable } from '../sql';
 
-export function C(name: string | SqlColumn) {
-  return SqlColumn.create(name);
+export function T(name: string | SqlTable) {
+  return SqlTable.create(name);
 }
 
-C.optionalQuotes = (name: string | SqlColumn) => {
-  return SqlColumn.optionalQuotes(name);
+T.optionalQuotes = (name: string | SqlTable) => {
+  return SqlTable.optionalQuotes(name);
 };

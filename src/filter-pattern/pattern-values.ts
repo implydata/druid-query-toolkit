@@ -12,8 +12,9 @@
  * limitations under the License.
  */
 
+import { C } from '../shortcuts';
 import type { LiteralValue, SqlExpression } from '../sql';
-import { C, SqlColumn, SqlComparison, SqlLiteral, SqlPlaceholder, SqlRecord } from '../sql';
+import { SqlColumn, SqlComparison, SqlLiteral, SqlPlaceholder, SqlRecord } from '../sql';
 
 import type { FilterPatternDefinition } from './common';
 import { extractOuterNot, sqlRecordGetLiteralValues } from './common';

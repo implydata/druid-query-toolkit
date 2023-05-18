@@ -12,8 +12,12 @@
  * limitations under the License.
  */
 
-export * from './column';
-export * from './function';
-export * from './literal';
-export * from './namespace';
-export * from './table';
+import { LiteralValue, SqlLiteral } from '../sql';
+
+export function L(value: LiteralValue | SqlLiteral) {
+  return SqlLiteral.create(value);
+}
+
+L.NULL = SqlLiteral.NULL;
+L.FALSE = SqlLiteral.FALSE;
+L.TRUE = SqlLiteral.TRUE;
