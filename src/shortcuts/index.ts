@@ -12,12 +12,9 @@
  * limitations under the License.
  */
 
-import { SqlNamespace } from '../sql-namespace/sql-namespace';
-
-export function N(name: string | SqlNamespace) {
-  return SqlNamespace.create(name);
-}
-
-N.optionalQuotes = (name: string | SqlNamespace) => {
-  return SqlNamespace.optionalQuotes(name);
-};
+export * from './column';
+export * from './function';
+export * from './literal';
+export * from './namespace';
+export * from './table';
+export * from './template';

@@ -12,8 +12,9 @@
  * limitations under the License.
  */
 
+import { C, F } from '../shortcuts';
 import type { SqlExpression } from '../sql';
-import { C, F, RefName, SqlColumn, SqlComparison, SqlFunction, SqlMulti } from '../sql';
+import { RefName, SqlColumn, SqlComparison, SqlFunction, SqlMulti } from '../sql';
 
 import type { FilterPatternDefinition } from './common';
 import { extractOuterNot, oneOf } from './common';

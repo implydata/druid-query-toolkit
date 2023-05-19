@@ -12,8 +12,9 @@
  * limitations under the License.
  */
 
+import { C, F } from '../shortcuts';
 import type { LiteralValue, SqlExpression } from '../sql';
-import { C, F, SqlColumn, SqlFunction, SqlLiteral } from '../sql';
+import { SqlColumn, SqlFunction, SqlLiteral } from '../sql';
 import { filterMap } from '../utils';
 
 import type { FilterPatternDefinition } from './common';
