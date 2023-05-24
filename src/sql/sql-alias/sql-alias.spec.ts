@@ -12,8 +12,8 @@
  * limitations under the License.
  */
 
-import { RefName, SqlAlias, SqlColumn, SqlQuery } from '../..';
 import { backAndForth } from '../../test-utils';
+import { RefName, SqlAlias, SqlColumn, SqlQuery } from '..';
 
 describe('SqlAlias', () => {
   describe('parses', () => {

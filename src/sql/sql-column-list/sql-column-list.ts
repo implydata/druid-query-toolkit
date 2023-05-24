@@ -12,9 +12,8 @@
  * limitations under the License.
  */
 
-import { Separator } from '../..';
 import { SqlBase, SqlBaseValue, SqlTypeDesignator } from '../sql-base';
-import { RefName, SeparatedArray } from '../utils';
+import { RefName, SeparatedArray, Separator } from '../utils';
 
 export interface SqlColumnListValue extends SqlBaseValue {
   columns: SeparatedArray<RefName>;
