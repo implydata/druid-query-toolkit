@@ -29,7 +29,6 @@ export interface NumberRangeFilterPattern {
 }
 
 export const NUMBER_RANGE_PATTERN_DEFINITION: FilterPatternDefinition<NumberRangeFilterPattern> = {
-  name: 'Number range',
   fit(possibleEx: SqlExpression) {
     const [negated, ex] = extractOuterNot(possibleEx);
     if (!(ex instanceof SqlMulti)) return;
@@ -101,12 +100,6 @@ export const NUMBER_RANGE_PATTERN_DEFINITION: FilterPatternDefinition<NumberRang
     )
       .ensureParens()
       .applyIf(pattern.negated, ex => ex.negate());
-  },
-  formatWithoutNegation(pattern) {
-    return `${pattern.column} in ${pattern.startBound}${pattern.start}, ${pattern.end}${pattern.endBound}`;
-  },
-  getColumn(pattern): string | undefined {
-    return pattern.column;
   },
   getThing(_pattern): string | undefined {
     return;

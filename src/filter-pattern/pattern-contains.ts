@@ -27,7 +27,6 @@ export interface ContainsFilterPattern {
 }
 
 export const CONTAINS_PATTERN_DEFINITION: FilterPatternDefinition<ContainsFilterPattern> = {
-  name: 'Contains',
   fit(possibleEx: SqlExpression) {
     // ICONTAINS_STRING(CAST("lol" AS VARCHAR), 'hello')
     const [negated, ex] = extractOuterNot(possibleEx);
@@ -58,12 +57,6 @@ export const CONTAINS_PATTERN_DEFINITION: FilterPatternDefinition<ContainsFilter
       pattern.negated,
       ex => ex.negate(),
     );
-  },
-  formatWithoutNegation(pattern) {
-    return `${pattern.column} ~ '${pattern.contains}'`;
-  },
-  getColumn(pattern): string | undefined {
-    return pattern.column;
   },
   getThing(pattern): string | undefined {
     return pattern.contains;

@@ -27,7 +27,6 @@ export interface RegexpFilterPattern {
 }
 
 export const REGEXP_PATTERN_DEFINITION: FilterPatternDefinition<RegexpFilterPattern> = {
-  name: 'Regular expression',
   fit(possibleEx: SqlExpression) {
     const [negated, ex] = extractOuterNot(possibleEx);
     if (!(ex instanceof SqlFunction)) return;
@@ -58,12 +57,6 @@ export const REGEXP_PATTERN_DEFINITION: FilterPatternDefinition<RegexpFilterPatt
       pattern.negated,
       ex => ex.negate(),
     );
-  },
-  formatWithoutNegation(pattern) {
-    return `${pattern.column} ~ /${pattern.regexp}/`;
-  },
-  getColumn(pattern): string | undefined {
-    return pattern.column;
   },
   getThing(pattern): string | undefined {
     return pattern.regexp;

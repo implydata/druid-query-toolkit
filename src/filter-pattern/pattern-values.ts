@@ -28,7 +28,6 @@ export interface ValuesFilterPattern {
 }
 
 export const VALUES_PATTERN_DEFINITION: FilterPatternDefinition<ValuesFilterPattern> = {
-  name: 'Values',
   fit(possibleEx: SqlExpression) {
     const [negated, ex] = extractOuterNot(possibleEx);
     if (!(ex instanceof SqlComparison)) return;
@@ -86,14 +85,6 @@ export const VALUES_PATTERN_DEFINITION: FilterPatternDefinition<ValuesFilterPatt
           : ex.in(pattern.values),
       )
       .applyIf(pattern.negated, ex => ex.negate());
-  },
-  formatWithoutNegation(pattern) {
-    return `${pattern.column}: ${pattern.values
-      .map(v => (v === '' ? 'empty' : String(v)))
-      .join(', ')}`;
-  },
-  getColumn(pattern) {
-    return pattern.column;
   },
   getThing(pattern) {
     return pattern.values.length ? String(pattern.values[0]) : undefined;

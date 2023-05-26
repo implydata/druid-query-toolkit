@@ -33,7 +33,6 @@ export interface TimeIntervalFilterPattern {
 
 export const TIME_INTERVAL_PATTERN_DEFINITION: FilterPatternDefinition<TimeIntervalFilterPattern> =
   {
-    name: 'Time interval',
     fit(possibleEx: SqlExpression) {
       // Something like
       // TIME_IN_INTERVAL("lol", '2022-06-30T22:56:14.123Z/2022-06-30T22:56:15.923Z')
@@ -75,25 +74,6 @@ export const TIME_INTERVAL_PATTERN_DEFINITION: FilterPatternDefinition<TimeInter
         C(pattern.column),
         L(`${pattern.start.toISOString()}/${pattern.end.toISOString()}`),
       ).applyIf(pattern.negated, ex => ex.negate());
-    },
-    formatWithoutNegation(pattern) {
-      let startString = pattern.start.toISOString().replace(/Z$/, '');
-      let endString = pattern.end.toISOString().replace(/Z$/, '');
-
-      if (startString.endsWith('.000') && endString.endsWith('.000')) {
-        startString = startString.replace(/\.000$/, '');
-        endString = endString.replace(/\.000$/, '');
-      }
-
-      if (startString.endsWith(':00') && endString.endsWith(':00')) {
-        startString = startString.replace(/:00$/, '');
-        endString = endString.replace(/:00$/, '');
-      }
-
-      return `${startString}/${endString}`;
-    },
-    getColumn(pattern): string | undefined {
-      return pattern.column;
     },
     getThing(_pattern): string | undefined {
       return;

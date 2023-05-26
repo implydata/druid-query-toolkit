@@ -25,7 +25,6 @@ export interface CustomFilterPattern {
 }
 
 export const CUSTOM_PATTERN_DEFINITION: FilterPatternDefinition<CustomFilterPattern> = {
-  name: 'Custom',
   fit(possibleEx: SqlExpression) {
     const [negated, ex] = extractOuterNot(possibleEx);
 
@@ -40,12 +39,6 @@ export const CUSTOM_PATTERN_DEFINITION: FilterPatternDefinition<CustomFilterPatt
   },
   toExpression(pattern): SqlExpression {
     return (pattern.expression || SqlLiteral.TRUE).applyIf(pattern.negated, ex => ex.not());
-  },
-  formatWithoutNegation(pattern) {
-    return String(pattern.expression);
-  },
-  getColumn(pattern): string | undefined {
-    return pattern.expression?.getFirstColumnName();
   },
   getThing(_pattern): string | undefined {
     return;

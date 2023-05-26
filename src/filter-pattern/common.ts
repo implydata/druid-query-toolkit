@@ -17,12 +17,9 @@ import { SqlFunction, SqlLiteral, SqlType, SqlUnary } from '../sql';
 import { filterMap } from '../utils';
 
 export interface FilterPatternDefinition<P> {
-  name: string;
   fit(ex: SqlExpression): P | undefined;
   isValid(pattern: P): boolean;
   toExpression(pattern: P): SqlExpression;
-  formatWithoutNegation(pattern: P): string;
-  getColumn(pattern: P): string | undefined;
   getThing(pattern: P): string | undefined;
 }
 

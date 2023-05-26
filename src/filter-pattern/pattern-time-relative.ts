@@ -48,7 +48,6 @@ export interface TimeRelativeFilterPattern {
 
 export const TIME_RELATIVE_PATTERN_DEFINITION: FilterPatternDefinition<TimeRelativeFilterPattern> =
   {
-    name: 'Time relative',
     fit(possibleEx: SqlExpression) {
       // Something like
       // TIME_SHIFT(CURRENT_TIMESTAMP, 'PT1H', -1) <= __time AND __time < CURRENT_TIMESTAMP
@@ -171,12 +170,6 @@ export const TIME_RELATIVE_PATTERN_DEFINITION: FilterPatternDefinition<TimeRelat
         .and(column.lessThan(anchor))
         .ensureParens()
         .applyIf(pattern.negated, ex => ex.negate());
-    },
-    formatWithoutNegation(pattern) {
-      return `${pattern.column} in ${pattern.rangeDuration}`;
-    },
-    getColumn(pattern): string | undefined {
-      return pattern.column;
     },
     getThing(_pattern): string | undefined {
       return;

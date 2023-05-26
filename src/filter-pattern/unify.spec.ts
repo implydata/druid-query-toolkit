@@ -19,7 +19,7 @@ import {
   filterPatternToExpression,
   fitFilterPattern,
   fitFilterPatterns,
-} from '.';
+} from './unify';
 
 function backAndForthNotCustom(expression: string): void {
   // Make sure it works for a single pattern

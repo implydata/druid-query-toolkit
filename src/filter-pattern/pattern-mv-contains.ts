@@ -28,7 +28,6 @@ export interface MvContainsFilterPattern {
 }
 
 export const MV_CONTAINS_PATTERN_DEFINITION: FilterPatternDefinition<MvContainsFilterPattern> = {
-  name: 'MV contains',
   fit(possibleEx: SqlExpression) {
     const [negated, ex] = extractOuterNot(possibleEx);
     if (!(ex instanceof SqlFunction)) return;
@@ -63,14 +62,6 @@ export const MV_CONTAINS_PATTERN_DEFINITION: FilterPatternDefinition<MvContainsF
       pattern.negated,
       ex => ex.negate(),
     );
-  },
-  formatWithoutNegation(pattern) {
-    return `${pattern.column} on of ${pattern.values
-      .map(v => (v === '' ? 'empty' : String(v)))
-      .join(', ')}`;
-  },
-  getColumn(pattern) {
-    return pattern.column;
   },
   getThing(pattern) {
     return pattern.values.length ? String(pattern.values[0]) : undefined;
