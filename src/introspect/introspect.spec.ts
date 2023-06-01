@@ -670,4 +670,135 @@ describe('Introspect', () => {
       ]);
     });
   });
+
+  describe('.decodeLimit0QueryColumnIntrospectionResult', () => {
+    it('works with all types', () => {
+      const queryResult = new QueryResult({
+        header: Column.fromColumnNames([
+          '__time',
+          'isRobot',
+          'country',
+          'comment',
+          'count',
+          'sum_delta',
+          'sum_deltaBucket',
+          'user',
+          'comment_length',
+          'someNumber',
+          'someNumber',
+          'someNumber',
+        ]),
+        rows: [
+          [
+            { type: 'LONG', sqlType: 'TIMESTAMP' },
+            { type: 'LONG', sqlType: 'BOOLEAN' },
+            { type: 'STRING', sqlType: 'VARCHAR' },
+            { type: 'STRING', sqlType: 'CHAR' },
+            { type: 'LONG', sqlType: 'LONG' },
+            { type: 'DOUBLE', sqlType: 'DECIMAL' },
+            { type: 'DOUBLE', sqlType: 'REAL' },
+            { type: 'DOUBLE', sqlType: 'DOUBLE' },
+            { type: 'FLOAT', sqlType: 'FLOAT' },
+            { type: 'LONG', sqlType: 'TINYINT' },
+            { type: 'LONG', sqlType: 'SMALLINT' },
+            { type: 'LONG', sqlType: 'BIGINT' },
+          ],
+        ],
+      });
+
+      expect(Introspect.decodeLimit0QueryColumnIntrospectionResult(queryResult)).toEqual([
+        {
+          name: '__time',
+          type: 'TIMESTAMP',
+        },
+        {
+          name: 'isRobot',
+          type: 'BOOLEAN',
+        },
+        {
+          name: 'country',
+          type: 'STRING',
+        },
+        {
+          name: 'comment',
+          type: 'STRING',
+        },
+        {
+          name: 'count',
+          type: 'LONG',
+        },
+        {
+          name: 'sum_delta',
+          type: 'DOUBLE',
+        },
+        {
+          name: 'sum_deltaBucket',
+          type: 'DOUBLE',
+        },
+        {
+          name: 'user',
+          type: 'DOUBLE',
+        },
+        {
+          name: 'comment_length',
+          type: 'FLOAT',
+        },
+        {
+          name: 'someNumber',
+          type: 'LONG',
+        },
+        {
+          name: 'someNumber',
+          type: 'LONG',
+        },
+        {
+          name: 'someNumber',
+          type: 'LONG',
+        },
+      ]);
+    });
+    it('works with some columns having complex data types', () => {
+      const sampleResult = new QueryResult({
+        header: Column.fromColumnNames([
+          'time',
+          'cityName',
+          'distinct_cityName',
+          'delta',
+          'deleted',
+        ]),
+        rows: [
+          [
+            { type: 'LONG', sqlType: 'TIMESTAMP' },
+            { type: 'STRING', sqlType: 'VARCHAR' },
+            { type: 'COMPLEX<HLLSketch>', sqlType: 'COMPLEX<HLLSketch>_' },
+            { type: 'LONG', sqlType: 'BIGINT' },
+            { type: 'LONG', sqlType: 'BOOLEAN' },
+          ],
+        ],
+      });
+
+      expect(Introspect.decodeLimit0QueryColumnIntrospectionResult(sampleResult)).toEqual([
+        {
+          name: 'time',
+          type: 'TIMESTAMP',
+        },
+        {
+          name: 'cityName',
+          type: 'STRING',
+        },
+        {
+          name: 'distinct_cityName',
+          type: 'COMPLEX<HLLSketch>',
+        },
+        {
+          name: 'delta',
+          type: 'LONG',
+        },
+        {
+          name: 'deleted',
+          type: 'BOOLEAN',
+        },
+      ]);
+    });
+  });
 });
