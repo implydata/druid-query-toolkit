@@ -25,6 +25,14 @@ export interface ColumnInfo {
   type: string;
 }
 
+interface Limit0QueryColumnIntrospectionQuery {
+  query: string;
+  context: Record<string, any>;
+  header?: true;
+  typesHeader?: true;
+  sqlTypesHeader?: true;
+}
+
 function guessTypeFromValue(v: any): string | undefined {
   if (v instanceof Date) return 'TIMESTAMP';
   if (v === true || v === false) return 'BOOLEAN';
@@ -69,21 +77,17 @@ export class Introspect {
 
   static getLimit0QueryColumnIntrospectionQuery(
     query: SqlQuery,
-    context: Record<string, any>,
+    context?: Record<string, any>,
     timeZone?: string,
-    sqlTypesHeader?: boolean,
-  ): Record<string, any> {
-    const payload: any = {
+  ): Limit0QueryColumnIntrospectionQuery {
+    const payload: Limit0QueryColumnIntrospectionQuery = {
       query: query.changeLimitValue(0).toString(),
+      context: { ...(context || {}), sqlTimeZone: timeZone ?? 'Etc/UTC' },
+      header: true,
+      typesHeader: true,
+      sqlTypesHeader: true,
     };
 
-    payload.context = { ...(context || {}), sqlTimeZone: timeZone ?? 'Etc/UTC' };
-
-    if (sqlTypesHeader) {
-      payload.header = true;
-      payload.typesHeader = true;
-      payload.sqlTypesHeader = true;
-    }
     return payload;
   }
 
@@ -136,12 +140,13 @@ export class Introspect {
     return filterMap(sampleRowResult.header, (column, i) => {
       const columnName = column.name;
       if (SqlQuery.isPhonyOutputName(columnName)) return;
-      let type = types[i];
+      const type = types[i];
       if (!type) {
         return;
       }
-      type = type.sqlType === 'BOOLEAN' || type.sqlType === 'TIMESTAMP' ? type.sqlType : type.type;
-      return { name: columnName, type };
+      const columnType =
+        type.sqlType === 'BOOLEAN' || type.sqlType === 'TIMESTAMP' ? type.sqlType : type.type;
+      return { name: columnName, type: columnType };
     });
   }
 
