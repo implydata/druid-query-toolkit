@@ -83,7 +83,6 @@ export class Introspect {
       payload.header = true;
       payload.typesHeader = true;
       payload.sqlTypesHeader = true;
-      payload.resultFormat = 'array';
     }
     return payload;
   }
