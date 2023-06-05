@@ -27,7 +27,6 @@ export interface ColumnInfo {
 
 interface Limit0QueryColumnIntrospectionQuery {
   query: string;
-  context: Record<string, any>;
   header?: true;
   typesHeader?: true;
   sqlTypesHeader?: true;
@@ -77,18 +76,13 @@ export class Introspect {
 
   static getLimit0QueryColumnIntrospectionQuery(
     query: SqlQuery,
-    context?: Record<string, any>,
-    timeZone?: string,
   ): Limit0QueryColumnIntrospectionQuery {
-    const payload: Limit0QueryColumnIntrospectionQuery = {
+    return {
       query: query.changeLimitValue(0).toString(),
-      context: { ...(context || {}), sqlTimeZone: timeZone ?? 'Etc/UTC' },
       header: true,
       typesHeader: true,
       sqlTypesHeader: true,
     };
-
-    return payload;
   }
 
   static getQueryColumnSampleQuery(query: SqlQuery): SqlQuery {
