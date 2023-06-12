@@ -25,6 +25,13 @@ export interface ColumnInfo {
   type: string;
 }
 
+interface Limit0QueryColumnIntrospectionQuery {
+  query: string;
+  header?: true;
+  typesHeader?: true;
+  sqlTypesHeader?: true;
+}
+
 function guessTypeFromValue(v: any): string | undefined {
   if (v instanceof Date) return 'TIMESTAMP';
   if (v === true || v === false) return 'BOOLEAN';
@@ -67,6 +74,17 @@ export class Introspect {
     return query.makeExplain();
   }
 
+  static getLimit0QueryColumnIntrospectionQuery(
+    query: SqlQuery,
+  ): Limit0QueryColumnIntrospectionQuery {
+    return {
+      query: query.changeLimitValue(0).toString(),
+      header: true,
+      typesHeader: true,
+      sqlTypesHeader: true,
+    };
+  }
+
   static getQueryColumnSampleQuery(query: SqlQuery): SqlQuery {
     return query.changeLimitValue(1);
   }
@@ -102,6 +120,28 @@ export class Introspect {
     const signature = jsonPlan[0]!.signature;
     if (!signature) throw new Error('could not find signature in JSON plan');
     return signature.map(s => s.type);
+  }
+
+  static decodeLimit0QueryColumnIntrospectionResult(sampleRowResult?: QueryResult): ColumnInfo[] {
+    const types = sampleRowResult?.rows[0];
+
+    if (!sampleRowResult || !types) return [];
+
+    if (types.length !== sampleRowResult.header.length) {
+      throw new Error('invalid result shape, bad header');
+    }
+
+    return filterMap(sampleRowResult.header, (column, i) => {
+      const columnName = column.name;
+      if (SqlQuery.isPhonyOutputName(columnName)) return;
+      const type = types[i];
+      if (!type) {
+        return;
+      }
+      const columnType =
+        type.sqlType === 'BOOLEAN' || type.sqlType === 'TIMESTAMP' ? type.sqlType : type.type;
+      return { name: columnName, type: columnType };
+    });
   }
 
   static decodeQueryColumnIntrospectionResult(
