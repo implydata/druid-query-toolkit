@@ -25,11 +25,12 @@ export interface ColumnInfo {
   type: string;
 }
 
-interface Limit0QueryColumnIntrospectionQuery {
+interface Limit0QueryColumnIntrospectionPayload {
   query: string;
   header?: true;
   typesHeader?: true;
   sqlTypesHeader?: true;
+  context?: Record<string, string>;
 }
 
 function guessTypeFromValue(v: any): string | undefined {
@@ -74,9 +75,9 @@ export class Introspect {
     return query.makeExplain();
   }
 
-  static getLimit0QueryColumnIntrospectionQuery(
+  static getLimit0QueryColumnIntrospectionPayload(
     query: SqlQuery,
-  ): Limit0QueryColumnIntrospectionQuery {
+  ): Limit0QueryColumnIntrospectionPayload {
     return {
       query: query.changeLimitValue(0).toString(),
       header: true,
