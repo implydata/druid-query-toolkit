@@ -123,23 +123,16 @@ export class Introspect {
   }
 
   static decodeLimit0QueryColumnIntrospectionResult(sampleRowResult?: QueryResult): ColumnInfo[] {
-    const types = sampleRowResult?.rows[0];
+    if (!sampleRowResult) return [];
 
-    if (!sampleRowResult || !types) return [];
-
-    if (types.length !== sampleRowResult.header.length) {
-      throw new Error('invalid result shape, bad header');
-    }
-
-    return filterMap(sampleRowResult.header, (column, i) => {
+    return filterMap(sampleRowResult.header, column => {
       const columnName = column.name;
       if (SqlQuery.isPhonyOutputName(columnName)) return;
-      const type = types[i];
-      if (!type) {
-        return;
-      }
       const columnType =
-        type.sqlType === 'BOOLEAN' || type.sqlType === 'TIMESTAMP' ? type.sqlType : type.type;
+        column.sqlType === 'BOOLEAN' || column.sqlType === 'TIMESTAMP'
+          ? column.sqlType
+          : column.nativeType;
+      if (!columnType) return;
       return { name: columnName, type: columnType };
     });
   }
