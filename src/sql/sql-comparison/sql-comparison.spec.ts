@@ -102,6 +102,20 @@ describe('SqlComparison', () => {
     });
   });
 
+  describe('negate', () => {
+    it('works', () => {
+      expect(String(SqlExpression.parse('X = 1').negate())).toEqual('X <> 1');
+      expect(String(SqlExpression.parse('X is NULL').negate())).toEqual('X IS NOT NULL');
+      expect(String(SqlExpression.parse('X is not NULL').negate())).toEqual('X IS NULL');
+      expect(String(SqlExpression.parse(`X in ('a', 'b')`).negate())).toEqual(
+        `X NOT IN ('a', 'b')`,
+      );
+      expect(String(SqlExpression.parse(`X not in ('a', 'b')`).negate())).toEqual(
+        `X IN ('a', 'b')`,
+      );
+    });
+  });
+
   it('Simple compare 1', () => {
     const sql = `A > B`;
 
