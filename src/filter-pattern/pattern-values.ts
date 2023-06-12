@@ -57,12 +57,13 @@ export const VALUES_PATTERN_DEFINITION: FilterPatternDefinition<ValuesFilterPatt
         return;
 
       case 'IN':
+      case 'NOT IN':
         if (lhs instanceof SqlColumn && rhs instanceof SqlRecord) {
           const values = sqlRecordGetLiteralValues(rhs);
           if (values) {
             return {
               type: 'values',
-              negated: xor(ex.negated, negated),
+              negated: xor(ex.hasNot(), negated),
               column: lhs.getName(),
               values,
             };

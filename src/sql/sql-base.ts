@@ -118,7 +118,6 @@ export type KeywordName =
   | 'join'
   | 'joinType'
   | 'limit'
-  | 'not'
   | 'offset'
   | 'on'
   | 'op'
@@ -143,7 +142,6 @@ export type KeywordName =
 export type SpaceName =
   | 'final'
   | 'initial'
-  | 'not'
   | 'postAnd'
   | 'postArguments'
   | 'postArrow'

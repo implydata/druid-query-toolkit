@@ -641,7 +641,6 @@ describe('SqlFunction', () => {
               "table": undefined,
               "type": "column",
             },
-            "negated": false,
             "op": ">",
             "parens": undefined,
             "rhs": SqlLiteral {

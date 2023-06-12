@@ -44,19 +44,6 @@ describe('SqlComparison', () => {
       `(browser, country) IN (ROW ('Chr' || 'ome', 'United States'), ('Firefox', 'Israel'))`,
       `(1, 2) IN (VALUES   (1, 1 + 1),(2, 1 + 1))`,
 
-      "''  similar to ''",
-      "'a' similar to 'a'",
-      "'a' similar to 'b'",
-      "'a' similar to 'A'",
-      "'a' similar to 'a_'",
-      "'a' similar to '_a'",
-      "'a' similar to '%a'",
-      "'a' similar to '%a%'",
-      "'a' similar to 'a%'",
-      "'ab'   similar to 'a_'",
-      "'ab' not similar to 'a_'",
-      "'aabc' not similar to 'ab*c+d'",
-
       '2 between 1 and 3',
       '2 between 3 and 2',
       '2 between symmetric 3 and 2',
@@ -137,7 +124,6 @@ describe('SqlComparison', () => {
           "table": undefined,
           "type": "column",
         },
-        "negated": false,
         "op": ">",
         "parens": undefined,
         "rhs": SqlColumn {
@@ -182,7 +168,6 @@ describe('SqlComparison', () => {
           "table": undefined,
           "type": "column",
         },
-        "negated": false,
         "op": "=",
         "parens": undefined,
         "rhs": SqlLiteral {
@@ -225,7 +210,6 @@ describe('SqlComparison', () => {
           "table": undefined,
           "type": "column",
         },
-        "negated": false,
         "op": "=",
         "parens": undefined,
         "rhs": SqlQuery {
@@ -434,7 +418,6 @@ describe('SqlComparison', () => {
           "table": undefined,
           "type": "column",
         },
-        "negated": false,
         "op": "IS",
         "parens": undefined,
         "rhs": SqlLiteral {
@@ -463,8 +446,7 @@ describe('SqlComparison', () => {
       SqlComparison {
         "decorator": undefined,
         "keywords": Object {
-          "not": "NOT",
-          "op": "IS",
+          "op": "IS   NOT",
         },
         "lhs": SqlColumn {
           "keywords": Object {},
@@ -477,8 +459,7 @@ describe('SqlComparison', () => {
           "table": undefined,
           "type": "column",
         },
-        "negated": true,
-        "op": "IS",
+        "op": "IS NOT",
         "parens": undefined,
         "rhs": SqlLiteral {
           "keywords": Object {},
@@ -489,8 +470,7 @@ describe('SqlComparison', () => {
           "value": null,
         },
         "spacing": Object {
-          "not": "    ",
-          "postOp": "   ",
+          "postOp": "    ",
           "preOp": "  ",
         },
         "type": "comparison",
@@ -520,7 +500,6 @@ describe('SqlComparison', () => {
           "table": undefined,
           "type": "column",
         },
-        "negated": false,
         "op": "IN",
         "parens": undefined,
         "rhs": SqlRecord {
@@ -578,7 +557,6 @@ describe('SqlComparison', () => {
           "table": undefined,
           "type": "column",
         },
-        "negated": false,
         "op": "IN",
         "parens": undefined,
         "rhs": SqlRecord {
@@ -676,8 +654,7 @@ describe('SqlComparison', () => {
       SqlComparison {
         "decorator": undefined,
         "keywords": Object {
-          "not": "NOT",
-          "op": "IN",
+          "op": "NOT IN",
         },
         "lhs": SqlColumn {
           "keywords": Object {},
@@ -690,8 +667,7 @@ describe('SqlComparison', () => {
           "table": undefined,
           "type": "column",
         },
-        "negated": true,
-        "op": "IN",
+        "op": "NOT IN",
         "parens": undefined,
         "rhs": SqlRecord {
           "expressions": SeparatedArray {
@@ -771,7 +747,6 @@ describe('SqlComparison', () => {
           "type": "record",
         },
         "spacing": Object {
-          "not": " ",
           "postOp": " ",
           "preOp": " ",
         },
@@ -802,7 +777,6 @@ describe('SqlComparison', () => {
           "table": undefined,
           "type": "column",
         },
-        "negated": false,
         "op": "IN",
         "parens": undefined,
         "rhs": SqlQuery {
@@ -918,8 +892,7 @@ describe('SqlComparison', () => {
       SqlComparison {
         "decorator": undefined,
         "keywords": Object {
-          "not": "NOT",
-          "op": "IN",
+          "op": "NOT IN",
         },
         "lhs": SqlColumn {
           "keywords": Object {},
@@ -932,8 +905,7 @@ describe('SqlComparison', () => {
           "table": undefined,
           "type": "column",
         },
-        "negated": true,
-        "op": "IN",
+        "op": "NOT IN",
         "parens": undefined,
         "rhs": SqlQuery {
           "clusteredByClause": undefined,
@@ -1027,7 +999,6 @@ describe('SqlComparison', () => {
           "withClause": undefined,
         },
         "spacing": Object {
-          "not": " ",
           "postOp": " ",
           "preOp": " ",
         },
@@ -1091,7 +1062,6 @@ describe('SqlComparison', () => {
           },
           "type": "record",
         },
-        "negated": false,
         "op": "IN",
         "parens": undefined,
         "rhs": SqlRecord {
@@ -1249,7 +1219,6 @@ describe('SqlComparison', () => {
           "table": undefined,
           "type": "column",
         },
-        "negated": false,
         "op": "BETWEEN",
         "parens": undefined,
         "rhs": SqlBetweenPart {
@@ -1304,8 +1273,7 @@ describe('SqlComparison', () => {
       SqlComparison {
         "decorator": undefined,
         "keywords": Object {
-          "not": "NOT",
-          "op": "BETWEEN",
+          "op": "NOT BETWEEN",
         },
         "lhs": SqlColumn {
           "keywords": Object {},
@@ -1318,8 +1286,7 @@ describe('SqlComparison', () => {
           "table": undefined,
           "type": "column",
         },
-        "negated": true,
-        "op": "BETWEEN",
+        "op": "NOT BETWEEN",
         "parens": undefined,
         "rhs": SqlBetweenPart {
           "end": SqlColumn {
@@ -1358,7 +1325,6 @@ describe('SqlComparison', () => {
           "type": "betweenPart",
         },
         "spacing": Object {
-          "not": " ",
           "postOp": " ",
           "preOp": " ",
         },
@@ -1389,7 +1355,6 @@ describe('SqlComparison', () => {
           "table": undefined,
           "type": "column",
         },
-        "negated": false,
         "op": "LIKE",
         "parens": undefined,
         "rhs": SqlLiteral {
@@ -1418,8 +1383,7 @@ describe('SqlComparison', () => {
       SqlComparison {
         "decorator": undefined,
         "keywords": Object {
-          "not": "NOT",
-          "op": "LIKE",
+          "op": "NOT LIKE",
         },
         "lhs": SqlColumn {
           "keywords": Object {},
@@ -1432,8 +1396,7 @@ describe('SqlComparison', () => {
           "table": undefined,
           "type": "column",
         },
-        "negated": true,
-        "op": "LIKE",
+        "op": "NOT LIKE",
         "parens": undefined,
         "rhs": SqlLiteral {
           "keywords": Object {},
@@ -1444,7 +1407,6 @@ describe('SqlComparison', () => {
           "value": "%A%",
         },
         "spacing": Object {
-          "not": " ",
           "postOp": " ",
           "preOp": " ",
         },
@@ -1462,8 +1424,7 @@ describe('SqlComparison', () => {
       SqlComparison {
         "decorator": undefined,
         "keywords": Object {
-          "not": "NOT",
-          "op": "LIKE",
+          "op": "NOT LIKE",
         },
         "lhs": SqlMulti {
           "args": SeparatedArray {
@@ -1505,8 +1466,7 @@ describe('SqlComparison', () => {
           "spacing": Object {},
           "type": "multi",
         },
-        "negated": true,
-        "op": "LIKE",
+        "op": "NOT LIKE",
         "parens": undefined,
         "rhs": SqlLikePart {
           "escape": SqlMulti {
@@ -1588,7 +1548,6 @@ describe('SqlComparison', () => {
           "type": "likePart",
         },
         "spacing": Object {
-          "not": " ",
           "postOp": " ",
           "preOp": " ",
         },
@@ -1619,7 +1578,6 @@ describe('SqlComparison', () => {
           "table": undefined,
           "type": "column",
         },
-        "negated": false,
         "op": "LIKE",
         "parens": undefined,
         "rhs": SqlLikePart {
@@ -1667,8 +1625,7 @@ describe('SqlComparison', () => {
       SqlComparison {
         "decorator": undefined,
         "keywords": Object {
-          "not": "NOT",
-          "op": "LIKE",
+          "op": "NOT LIKE",
         },
         "lhs": SqlColumn {
           "keywords": Object {},
@@ -1681,8 +1638,7 @@ describe('SqlComparison', () => {
           "table": undefined,
           "type": "column",
         },
-        "negated": true,
-        "op": "LIKE",
+        "op": "NOT LIKE",
         "parens": undefined,
         "rhs": SqlLikePart {
           "escape": SqlLiteral {
@@ -1712,7 +1668,6 @@ describe('SqlComparison', () => {
           "type": "likePart",
         },
         "spacing": Object {
-          "not": " ",
           "postOp": " ",
           "preOp": " ",
         },
@@ -1744,7 +1699,6 @@ describe('SqlComparison', () => {
             "table": undefined,
             "type": "column",
           },
-          "negated": false,
           "op": ">",
           "parens": undefined,
           "rhs": SqlColumn {
@@ -1786,7 +1740,6 @@ describe('SqlComparison', () => {
             "type": "literal",
             "value": "A",
           },
-          "negated": false,
           "op": ">",
           "parens": undefined,
           "rhs": SqlLiteral {
@@ -1828,7 +1781,6 @@ describe('SqlComparison', () => {
             "table": undefined,
             "type": "column",
           },
-          "negated": false,
           "op": ">",
           "parens": undefined,
           "rhs": SqlColumn {
@@ -1870,7 +1822,6 @@ describe('SqlComparison', () => {
             "type": "literal",
             "value": 1,
           },
-          "negated": false,
           "op": ">",
           "parens": undefined,
           "rhs": SqlLiteral {
@@ -1909,7 +1860,6 @@ describe('SqlComparison', () => {
             "type": "literal",
             "value": 1,
           },
-          "negated": undefined,
           "op": ">",
           "parens": Array [
             Object {
@@ -1956,7 +1906,6 @@ describe('SqlComparison', () => {
             "table": undefined,
             "type": "column",
           },
-          "negated": false,
           "op": "BETWEEN",
           "parens": undefined,
           "rhs": SqlBetweenPart {
@@ -2066,7 +2015,6 @@ describe('SqlComparison', () => {
                         "table": undefined,
                         "type": "column",
                       },
-                      "negated": false,
                       "op": "BETWEEN",
                       "parens": undefined,
                       "rhs": SqlBetweenPart {
@@ -2150,7 +2098,6 @@ describe('SqlComparison', () => {
             "table": undefined,
             "type": "column",
           },
-          "negated": false,
           "op": "BETWEEN",
           "parens": undefined,
           "rhs": SqlBetweenPart {
