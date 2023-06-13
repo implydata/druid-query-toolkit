@@ -1,6 +1,6 @@
 {
   "name": "druid-query-toolkit",
-  "version": "0.19.0",
+  "version": "0.19.1",
   "description": "A collection of utilities for working with Druid queries",
   "main": "dist/druid-query-toolkit.js",
   "module": "dist/druid-query-toolkit.mjs",
