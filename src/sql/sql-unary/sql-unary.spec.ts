@@ -241,7 +241,6 @@ describe('SqlUnary', () => {
             "table": undefined,
             "type": "column",
           },
-          "negated": false,
           "op": ">",
           "parens": undefined,
           "rhs": SqlColumn {
@@ -307,7 +306,6 @@ describe('SqlUnary', () => {
                   "table": undefined,
                   "type": "column",
                 },
-                "negated": false,
                 "op": ">",
                 "parens": undefined,
                 "rhs": SqlColumn {
@@ -354,7 +352,6 @@ describe('SqlUnary', () => {
                   "table": undefined,
                   "type": "column",
                 },
-                "negated": false,
                 "op": "=",
                 "parens": undefined,
                 "rhs": SqlLiteral {
@@ -416,7 +413,6 @@ describe('SqlUnary', () => {
               "table": undefined,
               "type": "column",
             },
-            "negated": false,
             "op": ">",
             "parens": undefined,
             "rhs": SqlColumn {

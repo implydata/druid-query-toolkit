@@ -1148,7 +1148,6 @@ describe('Combined expression', () => {
                       "table": undefined,
                       "type": "column",
                     },
-                    "negated": false,
                     "op": ">",
                     "parens": undefined,
                     "rhs": SqlMulti {
@@ -1287,7 +1286,6 @@ describe('Combined expression', () => {
                       "spacing": Object {},
                       "type": "multi",
                     },
-                    "negated": false,
                     "op": ">",
                     "parens": undefined,
                     "rhs": SqlColumn {
@@ -1401,7 +1399,6 @@ describe('Combined expression', () => {
                       "table": undefined,
                       "type": "column",
                     },
-                    "negated": false,
                     "op": ">",
                     "parens": undefined,
                     "rhs": SqlMulti {
@@ -2260,7 +2257,6 @@ describe('getColumns', () => {
           "table": undefined,
           "type": "column",
         },
-        "negated": false,
         "op": "IS",
         "parens": undefined,
         "rhs": SqlLiteral {
@@ -2289,8 +2285,7 @@ describe('getColumns', () => {
       SqlComparison {
         "decorator": undefined,
         "keywords": Object {
-          "not": "NOT",
-          "op": "IS",
+          "op": "IS NOT",
         },
         "lhs": SqlColumn {
           "keywords": Object {},
@@ -2303,8 +2298,7 @@ describe('getColumns', () => {
           "table": undefined,
           "type": "column",
         },
-        "negated": true,
-        "op": "IS",
+        "op": "IS NOT",
         "parens": undefined,
         "rhs": SqlLiteral {
           "keywords": Object {},
@@ -2315,7 +2309,6 @@ describe('getColumns', () => {
           "value": null,
         },
         "spacing": Object {
-          "not": " ",
           "postOp": " ",
           "preOp": " ",
         },
@@ -2333,8 +2326,7 @@ describe('getColumns', () => {
       SqlComparison {
         "decorator": undefined,
         "keywords": Object {
-          "not": "NOT",
-          "op": "IS",
+          "op": "IS NOT",
         },
         "lhs": SqlColumn {
           "keywords": Object {},
@@ -2347,8 +2339,7 @@ describe('getColumns', () => {
           "table": undefined,
           "type": "column",
         },
-        "negated": true,
-        "op": "IS",
+        "op": "IS NOT",
         "parens": undefined,
         "rhs": SqlLiteral {
           "keywords": Object {},
@@ -2359,7 +2350,6 @@ describe('getColumns', () => {
           "value": true,
         },
         "spacing": Object {
-          "not": " ",
           "postOp": " ",
           "preOp": " ",
         },
@@ -2387,8 +2377,7 @@ describe('getColumns', () => {
             SqlComparison {
               "decorator": undefined,
               "keywords": Object {
-                "not": "NOT",
-                "op": "IS",
+                "op": "IS NOT",
               },
               "lhs": SqlColumn {
                 "keywords": Object {},
@@ -2401,8 +2390,7 @@ describe('getColumns', () => {
                 "table": undefined,
                 "type": "column",
               },
-              "negated": true,
-              "op": "IS",
+              "op": "IS NOT",
               "parens": undefined,
               "rhs": SqlLiteral {
                 "keywords": Object {},
@@ -2413,7 +2401,6 @@ describe('getColumns', () => {
                 "value": null,
               },
               "spacing": Object {
-                "not": " ",
                 "postOp": " ",
                 "preOp": " ",
               },
@@ -2435,7 +2422,6 @@ describe('getColumns', () => {
                 "table": undefined,
                 "type": "column",
               },
-              "negated": false,
               "op": "<>",
               "parens": undefined,
               "rhs": SqlLiteral {

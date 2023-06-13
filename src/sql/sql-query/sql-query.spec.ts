@@ -1516,7 +1516,6 @@ describe('SqlQuery', () => {
                 "table": undefined,
                 "type": "column",
               },
-              "negated": false,
               "op": ">",
               "parens": undefined,
               "rhs": SqlLiteral {
@@ -1644,7 +1643,6 @@ describe('SqlQuery', () => {
                 "table": undefined,
                 "type": "column",
               },
-              "negated": false,
               "op": "=",
               "parens": undefined,
               "rhs": SqlLiteral {
@@ -1792,7 +1790,6 @@ describe('SqlQuery', () => {
                             "table": undefined,
                             "type": "column",
                           },
-                          "negated": false,
                           "op": "=",
                           "parens": undefined,
                           "rhs": SqlLiteral {
@@ -1825,7 +1822,6 @@ describe('SqlQuery', () => {
                             "table": undefined,
                             "type": "column",
                           },
-                          "negated": false,
                           "op": ">",
                           "parens": undefined,
                           "rhs": SqlLiteral {
@@ -1866,7 +1862,6 @@ describe('SqlQuery', () => {
                       "table": undefined,
                       "type": "column",
                     },
-                    "negated": false,
                     "op": "=",
                     "parens": undefined,
                     "rhs": SqlLiteral {
@@ -2289,7 +2284,6 @@ describe('SqlQuery', () => {
                 "table": undefined,
                 "type": "column",
               },
-              "negated": false,
               "op": ">",
               "parens": undefined,
               "rhs": SqlLiteral {
@@ -2417,7 +2411,6 @@ describe('SqlQuery', () => {
                 "table": undefined,
                 "type": "column",
               },
-              "negated": false,
               "op": "=",
               "parens": undefined,
               "rhs": SqlLiteral {
@@ -2565,7 +2558,6 @@ describe('SqlQuery', () => {
                             "table": undefined,
                             "type": "column",
                           },
-                          "negated": false,
                           "op": "=",
                           "parens": undefined,
                           "rhs": SqlLiteral {
@@ -2598,7 +2590,6 @@ describe('SqlQuery', () => {
                             "table": undefined,
                             "type": "column",
                           },
-                          "negated": false,
                           "op": ">",
                           "parens": undefined,
                           "rhs": SqlLiteral {
@@ -2639,7 +2630,6 @@ describe('SqlQuery', () => {
                       "table": undefined,
                       "type": "column",
                     },
-                    "negated": false,
                     "op": "=",
                     "parens": undefined,
                     "rhs": SqlLiteral {
@@ -4370,7 +4360,6 @@ describe('SqlQuery', () => {
                       "table": undefined,
                       "type": "column",
                     },
-                    "negated": false,
                     "op": "=",
                     "parens": undefined,
                     "rhs": SqlColumn {
@@ -4511,7 +4500,6 @@ describe('SqlQuery', () => {
                       "table": undefined,
                       "type": "column",
                     },
-                    "negated": false,
                     "op": "=",
                     "parens": undefined,
                     "rhs": SqlColumn {
@@ -4652,7 +4640,6 @@ describe('SqlQuery', () => {
                       "table": undefined,
                       "type": "column",
                     },
-                    "negated": false,
                     "op": "=",
                     "parens": undefined,
                     "rhs": SqlColumn {
@@ -4793,7 +4780,6 @@ describe('SqlQuery', () => {
                       "table": undefined,
                       "type": "column",
                     },
-                    "negated": false,
                     "op": "=",
                     "parens": undefined,
                     "rhs": SqlColumn {
@@ -4934,7 +4920,6 @@ describe('SqlQuery', () => {
                       "table": undefined,
                       "type": "column",
                     },
-                    "negated": false,
                     "op": "=",
                     "parens": undefined,
                     "rhs": SqlColumn {
@@ -5746,7 +5731,6 @@ describe('SqlQuery', () => {
                       "table": undefined,
                       "type": "column",
                     },
-                    "negated": false,
                     "op": ">=",
                     "parens": undefined,
                     "rhs": SqlMulti {
@@ -5826,7 +5810,6 @@ describe('SqlQuery', () => {
                       "table": undefined,
                       "type": "column",
                     },
-                    "negated": false,
                     "op": "=",
                     "parens": undefined,
                     "rhs": SqlPlaceholder {

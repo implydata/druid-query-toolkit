@@ -35,21 +35,11 @@ export const VALUES_PATTERN_DEFINITION: FilterPatternDefinition<ValuesFilterPatt
     const { lhs, rhs, op } = ex;
     switch (op) {
       case '=':
-        if (lhs instanceof SqlColumn && rhs instanceof SqlLiteral) {
-          return {
-            type: 'values',
-            negated,
-            column: lhs.getName(),
-            values: [rhs.value],
-          };
-        }
-        return;
-
       case '<>':
         if (lhs instanceof SqlColumn && rhs instanceof SqlLiteral) {
           return {
             type: 'values',
-            negated: !negated,
+            negated: xor(op === '<>', negated),
             column: lhs.getName(),
             values: [rhs.value],
           };
@@ -57,12 +47,13 @@ export const VALUES_PATTERN_DEFINITION: FilterPatternDefinition<ValuesFilterPatt
         return;
 
       case 'IN':
+      case 'NOT IN':
         if (lhs instanceof SqlColumn && rhs instanceof SqlRecord) {
           const values = sqlRecordGetLiteralValues(rhs);
           if (values) {
             return {
               type: 'values',
-              negated: xor(ex.negated, negated),
+              negated: xor(ex.hasNot(), negated),
               column: lhs.getName(),
               values,
             };

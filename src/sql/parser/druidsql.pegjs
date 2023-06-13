@@ -668,22 +668,19 @@ ComparisonExpression = lhs:AdditionExpression rhs:(_ ComparisonOpRhs)?
     op: opRhs.op,
     decorator: opRhs.decorator,
     rhs: opRhs.rhs,
-    negated: Boolean(opRhs.notKeyword),
     spacing: {
       preOp: opRhs.preOp ? opRhs.preOp : preOp,
       postOp: opRhs.postOp,
-      not: opRhs.preOp ? preOp : opRhs.notSpacing,
       postDecorator: opRhs.postDecorator
     },
     keywords: {
       op: opRhs.opKeyword,
-      not: opRhs.notKeyword,
       decorator: opRhs.decoratorKeyword,
     },
   });
 }
 
-ComparisonOpRhs = ComparisonOpRhsSimple / ComparisonOpRhsIs / ComparisonOpRhsIn / ComparisonOpRhsBetween / ComparisonOpRhsLike / ComparisonOpRhsNot
+ComparisonOpRhs = ComparisonOpRhsSimple / ComparisonOpRhsIs / ComparisonOpRhsIn / ComparisonOpRhsBetween / ComparisonOpRhsLike
 
 ComparisonOpRhsSimple = op:ComparisonOperator postOp:_ rhs:(AdditionExpression / (ComparisonDecorator _ SqlQueryInParens))
 {
@@ -716,29 +713,27 @@ ComparisonOperator =
 
 ComparisonDecorator = AnyToken / AllToken / SomeToken
 
-ComparisonOpRhsIs = op:IsToken postOp:_ not:(NotToken _)? rhs:SqlLiteral
+ComparisonOpRhsIs = op:(IsToken $(__ NotToken)?) postOp:_ rhs:SqlLiteral
 {
   return {
-    op: op.toUpperCase(),
-    opKeyword: op,
-    postOp: postOp,
-    rhs: rhs,
-    notKeyword: not ? not[0] : undefined,
-    notSpacing: not ? not[1] : undefined
-  };
-}
-
-ComparisonOpRhsIn = op:InToken postOp:_ rhs:(SqlQueryInParens / SqlRecord)
-{
-  return {
-    op: op.toUpperCase(),
-    opKeyword: op,
+    op: op[1] ? 'IS NOT' : 'IS',
+    opKeyword: op[1] ? op.join('') : op[0],
     postOp: postOp,
     rhs: rhs
   };
 }
 
-ComparisonOpRhsBetween = op:BetweenToken postOp:_ symmetricKeyword:(SymmetricToken _)? start:AdditionExpression preAnd:_ andKeyword:AndToken postAnd:_ end:AdditionExpression
+ComparisonOpRhsIn = op:($(NotToken __)? InToken) postOp:_ rhs:(SqlQueryInParens / SqlRecord)
+{
+  return {
+    op: op[0] ? 'NOT IN' : 'IN',
+    opKeyword: op[0] ? op.join('') : op[1],
+    postOp: postOp,
+    rhs: rhs
+  };
+}
+
+ComparisonOpRhsBetween = op:($(NotToken __)? BetweenToken) postOp:_ symmetricKeyword:(SymmetricToken _)? start:AdditionExpression preAnd:_ andKeyword:AndToken postAnd:_ end:AdditionExpression
 {
   var value = {
     start: start,
@@ -759,18 +754,18 @@ ComparisonOpRhsBetween = op:BetweenToken postOp:_ symmetricKeyword:(SymmetricTok
   }
 
   return {
-    op: op.toUpperCase(),
-    opKeyword: op,
+    op: op[0] ? 'NOT BETWEEN' : 'BETWEEN',
+    opKeyword: op[0] ? op.join('') : op[1],
     postOp: postOp,
     rhs: new S.SqlBetweenPart(value)
   };
 }
 
-ComparisonOpRhsLike = op:(LikeToken / SimilarToToken) postOp:_ like:AdditionExpression escape:(_ EscapeToken _ AdditionExpression)?
+ComparisonOpRhsLike = op:($(NotToken __)? LikeToken) postOp:_ like:AdditionExpression escape:(_ EscapeToken _ AdditionExpression)?
 {
   return {
-    op: op.toUpperCase(),
-    opKeyword: op,
+    op: op[0] ? 'NOT LIKE' : 'LIKE',
+    opKeyword: op[0] ? op.join('') : op[1],
     postOp: postOp,
     rhs: escape ? new S.SqlLikePart({
       like: like,
@@ -784,14 +779,6 @@ ComparisonOpRhsLike = op:(LikeToken / SimilarToToken) postOp:_ like:AdditionExpr
       },
     }) : like
   };
-}
-
-ComparisonOpRhsNot = notKeyword:NotToken preOp:_ opRhs:(ComparisonOpRhsIn / ComparisonOpRhsBetween / ComparisonOpRhsLike)
-{
-  return Object.assign({}, opRhs, {
-    notKeyword: notKeyword,
-    preOp: preOp
-  });
 }
 
 // -------------------------------
@@ -1717,7 +1704,6 @@ ReplaceToken = $("REPLACE"i !IdentifierPart)
 RollupToken = $("ROLLUP"i !IdentifierPart)
 RowToken = $("ROW"i !IdentifierPart)
 SelectToken = $("SELECT"i !IdentifierPart)
-SimilarToToken = $("SIMILAR"i !IdentifierPart __ ToToken)
 SomeToken = $("SOME"i !IdentifierPart)
 SymmetricToken = $("SYMMETRIC"i !IdentifierPart)
 TableToken = $("TABLE"i !IdentifierPart)
