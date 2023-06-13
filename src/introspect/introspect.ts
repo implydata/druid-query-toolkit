@@ -22,6 +22,7 @@ export interface TableInfo {
 
 interface QueryColumnIntrospectionQuery {
   query: string;
+  resultFormat: 'array';
   header: true;
   typesHeader: true;
   sqlTypesHeader: true;
@@ -38,11 +39,7 @@ export class Introspect {
   }
 
   static getQueryColumnIntrospectionQuery(query: SqlQuery | SqlTable): SqlQuery {
-    if (query instanceof SqlTable) {
-      return SqlQuery.create(query).changeLimitValue(0);
-    } else {
-      return query.changeLimitValue(0);
-    }
+    return SqlQuery.create(query).changeLimitValue(0);
   }
 
   static getQueryColumnIntrospectionPayload(
@@ -50,6 +47,7 @@ export class Introspect {
   ): QueryColumnIntrospectionQuery {
     return {
       query: Introspect.getQueryColumnIntrospectionQuery(query).toString(),
+      resultFormat: 'array',
       header: true,
       typesHeader: true,
       sqlTypesHeader: true,

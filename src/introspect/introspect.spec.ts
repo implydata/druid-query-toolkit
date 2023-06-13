@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { Column, Introspect, QueryResult } from '..';
+import { Column, Introspect, QueryResult, SqlQuery, T } from '..';
 
 describe('Introspect', () => {
   describe('.decodeTableIntrospectionResult', () => {
@@ -39,6 +39,37 @@ describe('Introspect', () => {
       });
 
       expect(Introspect.decodeTableIntrospectionResult(emptyQueryResult)).toEqual([]);
+    });
+  });
+
+  describe('.getQueryColumnIntrospectionPayload', () => {
+    it('works with table ref', () => {
+      expect(Introspect.getQueryColumnIntrospectionPayload(T('lol'))).toEqual({
+        header: true,
+        query: 'SELECT *\nFROM "lol"\nLIMIT 0',
+        resultFormat: 'array',
+        sqlTypesHeader: true,
+        typesHeader: true,
+      });
+    });
+
+    it('works with query', () => {
+      expect(
+        Introspect.getQueryColumnIntrospectionPayload(
+          SqlQuery.parse(`SELECT channel, cityName, COUNT(*) AS "Count"
+FROM "wikipedia"
+GROUP BY 1, 2
+ORDER BY 2 DESC
+      `),
+        ),
+      ).toEqual({
+        header: true,
+        query:
+          'SELECT *\nFROM (SELECT channel, cityName, COUNT(*) AS "Count"\nFROM "wikipedia"\nGROUP BY 1, 2\nORDER BY 2 DESC)\n      \nLIMIT 0',
+        resultFormat: 'array',
+        sqlTypesHeader: true,
+        typesHeader: true,
+      });
     });
   });
 
