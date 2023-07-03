@@ -44,6 +44,7 @@ export interface TimeRelativeFilterPattern {
   shiftDuration?: string;
   shiftStep?: number;
   timezone?: string;
+  origin?: string;
 }
 
 export const TIME_RELATIVE_PATTERN_DEFINITION: FilterPatternDefinition<TimeRelativeFilterPattern> =
@@ -111,7 +112,7 @@ export const TIME_RELATIVE_PATTERN_DEFINITION: FilterPatternDefinition<TimeRelat
         alignDuration = anchorFn.getArgAsString(1);
         if (!alignDuration) return;
 
-        if (anchorFn.getArgAsString(2) !== timezone) return;
+        if (anchorFn.getArgAsString(3) !== timezone) return;
 
         anchorFn = anchorFn.getArg(0);
       }
@@ -156,6 +157,7 @@ export const TIME_RELATIVE_PATTERN_DEFINITION: FilterPatternDefinition<TimeRelat
           pattern.alignType === 'floor' ? 'TIME_FLOOR' : 'TIME_CEIL',
           anchor,
           pattern.alignDuration,
+          pattern.timezone ? pattern.origin || null : undefined,
           pattern.timezone,
         );
       }
