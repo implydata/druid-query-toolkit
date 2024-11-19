@@ -12,6 +12,8 @@
  * limitations under the License.
  */
 
+import { NEWLINE, NEWLINE_INDENT, SPACE } from '../general/general';
+
 export interface SeparatorValue {
   left?: string;
   right?: string;
@@ -24,14 +26,18 @@ export class Separator {
   public separator: string;
 
   static COMMA: Separator;
-  static COMMA_NEW_LINE: Separator;
+  static COMMA_NEWLINE: Separator;
 
   static symmetricSpace(separator: string) {
-    return new Separator({ left: ' ', separator: separator, right: ' ' });
+    return new Separator({ left: SPACE, separator: separator, right: SPACE });
   }
 
   static rightSpace(separator: string) {
-    return new Separator({ separator: separator, right: ' ' });
+    return new Separator({ separator: separator, right: SPACE });
+  }
+
+  static indentSpace(separator: string) {
+    return new Separator({ left: SPACE, separator: separator, right: NEWLINE_INDENT });
   }
 
   constructor(options: SeparatorValue) {
@@ -46,4 +52,4 @@ export class Separator {
 }
 
 Separator.COMMA = Separator.rightSpace(',');
-Separator.COMMA_NEW_LINE = new Separator({ separator: ',', right: '\n' });
+Separator.COMMA_NEWLINE = new Separator({ separator: ',', right: NEWLINE });

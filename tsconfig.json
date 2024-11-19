@@ -3,6 +3,7 @@
     "allowSyntheticDefaultImports": false,
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
+    "composite": true,
     "declaration": true,
     "declarationDir": "types",
     "declarationMap": true,
@@ -17,6 +18,8 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noUncheckedIndexedAccess": true,
+    "rootDir": "src",
+    "outDir": "dist",
     "skipLibCheck": true,
     "sourceMap": true,
     "strict": true,
@@ -24,5 +27,5 @@
     "lib": ["es2020"],
     "useDefineForClassFields": false
   },
-  "include": ["src/**/*.ts"]
+  "include": ["src"]
 }

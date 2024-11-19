@@ -12,6 +12,7 @@
 /build/
 /dist/
 /types/
-/src/sql/parser/index.js
+/src/sql/parser/index.ts
 /src/sql/parser/.DS_Store
 
+_old/

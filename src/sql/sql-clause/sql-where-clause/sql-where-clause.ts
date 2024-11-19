@@ -12,9 +12,13 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlTypeDesignator, Substitutor } from '../../sql-base';
+import type { SqlTypeDesignator, Substitutor } from '../../sql-base';
+import { SqlBase } from '../../sql-base';
 import { SqlExpression } from '../../sql-expression';
-import { SqlClause, SqlClauseValue } from '../sql-clause';
+import { SqlMulti } from '../../sql-multi/sql-multi';
+import { NEWLINE_INDENT, SPACE } from '../../utils';
+import type { SqlClauseValue } from '../sql-clause';
+import { SqlClause } from '../sql-clause';
 
 export interface SqlWhereClauseValue extends SqlClauseValue {
   expression: SqlExpression;
@@ -28,7 +32,7 @@ export class SqlWhereClause extends SqlClause {
   static create(expression: SqlWhereClause | SqlExpression): SqlWhereClause {
     if (expression instanceof SqlWhereClause) return expression;
     return new SqlWhereClause({
-      expression,
+      expression: SqlExpression.verify(expression),
     });
   }
 
@@ -50,10 +54,12 @@ export class SqlWhereClause extends SqlClause {
   }
 
   protected _toRawString(): string {
+    const { expression } = this;
+    const indent = expression instanceof SqlMulti && expression.numArgs() >= 3;
     return [
       this.getKeyword('where', SqlWhereClause.DEFAULT_WHERE_KEYWORD),
-      this.getSpace('postWhere'),
-      this.expression.toString(),
+      this.getSpace('postWhere', indent ? NEWLINE_INDENT : SPACE),
+      expression.toString(),
     ].join('');
   }
 

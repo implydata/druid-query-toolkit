@@ -22,8 +22,8 @@ export interface NumberRangeFilterPattern {
   type: 'numberRange';
   negated: boolean;
   column: string;
-  start: number;
-  end: number;
+  start: number | undefined;
+  end: number | undefined;
   startBound: '(' | '[';
   endBound: ')' | ']';
 }
@@ -31,8 +31,43 @@ export interface NumberRangeFilterPattern {
 export const NUMBER_RANGE_PATTERN_DEFINITION: FilterPatternDefinition<NumberRangeFilterPattern> = {
   fit(possibleEx: SqlExpression) {
     const [negated, ex] = extractOuterNot(possibleEx);
+
+    if (ex instanceof SqlComparison) {
+      if (!(ex.rhs instanceof SqlLiteral && ex.lhs instanceof SqlColumn)) return;
+
+      const value = ex.rhs.value;
+
+      if (typeof value !== 'number' || isNaN(value)) return;
+
+      if (['>', '>='].includes(ex.op)) {
+        return {
+          type: 'numberRange',
+          column: ex.getFirstColumnName()!,
+          negated,
+          start: value,
+          end: undefined,
+          startBound: ex.op === '>' ? '(' : '[',
+          endBound: ')', // doesn't really matter
+        };
+      } else if (['<', '<='].includes(ex.op)) {
+        const value = ex.rhs.value;
+        if (typeof value !== 'number' || isNaN(value)) return;
+
+        return {
+          type: 'numberRange',
+          column: ex.getFirstColumnName()!,
+          negated,
+          start: undefined,
+          end: value,
+          startBound: '(', // doesn't really matter
+          endBound: ex.op === '<' ? ')' : ']',
+        };
+      }
+    }
+
     if (!(ex instanceof SqlMulti)) return;
     const args = ex.getArgArray();
+
     if (args.length !== 2) return;
 
     if (!args.every(v => v instanceof SqlComparison)) return;
@@ -90,13 +125,33 @@ export const NUMBER_RANGE_PATTERN_DEFINITION: FilterPatternDefinition<NumberRang
   },
   toExpression(pattern): SqlExpression {
     const c = C(pattern.column);
+
+    if (pattern.end == null && pattern.start != null) {
+      return pattern.startBound === '('
+        ? SqlComparison.greaterThan(c, L(pattern.start))
+        : SqlComparison.greaterThanOrEqual(c, L(pattern.start)).applyIf(pattern.negated, ex =>
+            ex.negate(),
+          );
+    }
+
+    if (pattern.start == null && pattern.end != null) {
+      return pattern.endBound === ')'
+        ? SqlComparison.lessThan(c, L(pattern.end))
+        : SqlComparison.lessThanOrEqual(c, L(pattern.end)).applyIf(pattern.negated, ex =>
+            ex.negate(),
+          );
+    }
+
+    const start = pattern.start ?? 0;
+    const end = pattern.end ?? 1;
+
     return SqlExpression.and(
       pattern.startBound === '('
-        ? SqlComparison.greaterThan(c, L(pattern.start))
-        : SqlComparison.greaterThanOrEqual(c, L(pattern.start)),
+        ? SqlComparison.greaterThan(c, L(start))
+        : SqlComparison.greaterThanOrEqual(c, L(start)),
       pattern.endBound === ')'
-        ? SqlComparison.lessThan(c, L(pattern.end))
-        : SqlComparison.lessThanOrEqual(c, L(pattern.end)),
+        ? SqlComparison.lessThan(c, L(end))
+        : SqlComparison.lessThanOrEqual(c, L(end)),
     )
       .ensureParens()
       .applyIf(pattern.negated, ex => ex.negate());

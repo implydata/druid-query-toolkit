@@ -1643,18 +1643,18 @@ describe('Druid test queries', () => {
   ];
 
   it('all queries work', () => {
-    let bad = 0;
+    const bad: string[] = [];
     for (const sql of queries) {
       try {
         backAndForth(sql);
       } catch (e) {
-        bad++;
+        bad.push(sql);
         console.log('=====================================');
         console.log(sql);
         console.log(e);
       }
     }
 
-    expect(bad).toEqual(0);
+    expect(bad).toEqual([]);
   });
 });

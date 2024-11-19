@@ -16,7 +16,7 @@ import { backAndForth } from '../../test-utils';
 import { sane } from '../../utils';
 import { SqlExpression } from '../sql-expression';
 
-import { SqlWithQuery } from './sql-with-query';
+import type { SqlWithQuery } from './sql-with-query';
 
 describe('SqlWithQuery', () => {
   it('things that work', () => {
@@ -74,7 +74,8 @@ describe('SqlWithQuery', () => {
     expect(String(query.flattenWith()).trim()).toEqual(sane`
       -- Leading comment
       REPLACE INTO dst OVERWRITE ALL
-      WITH wiki1 AS (SELECT * FROM wikipedia),
+      WITH
+      wiki1 AS (SELECT * FROM wikipedia),
       wiki2 AS (SELECT * FROM wikipedia),
       wiki3 AS (SELECT * FROM wiki1),
       wiki4 AS (SELECT * FROM wiki2)
@@ -274,5 +275,25 @@ describe('SqlWithQuery', () => {
         },
       }
     `);
+  });
+
+  it('handles infinite limits', () => {
+    const sql = `WITH wiki AS (SELECT * FROM wikipedia) (SELECT * FROM wiki LIMIT 10)`;
+    const query = SqlExpression.parse(sql) as SqlWithQuery;
+
+    expect(query.changeLimitValue(undefined).hasLimit()).toEqual(false);
+    expect(query.changeLimitValue(Infinity).hasLimit()).toEqual(false);
+  });
+
+  it('throws for invalid limit values', () => {
+    const sql = `WITH wiki AS (SELECT * FROM wikipedia) (SELECT * FROM wiki LIMIT 10)`;
+    const query = SqlExpression.parse(sql) as SqlWithQuery;
+
+    expect(() => query.changeLimitValue(1)).not.toThrowError();
+    expect(() => query.changeLimitValue(0)).not.toThrowError();
+    expect(() => query.changeLimitValue(-1)).toThrowError('-1 is not a valid limit value');
+    expect(() => query.changeLimitValue(-Infinity)).toThrowError(
+      '-Infinity is not a valid limit value',
+    );
   });
 });

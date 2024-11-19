@@ -13,7 +13,7 @@
  */
 
 const axios = require('axios');
-const { RefName, SqlFunction } = require('../dist/druid-query-toolkit');
+const { RefName, SqlFunction } = require('../dist');
 const { RESERVED_KEYWORDS } = RefName;
 const { SPECIAL_FUNCTIONS } = SqlFunction;
 
@@ -24,29 +24,33 @@ async function main() {
   });
 
   const legalNames = [
-    'LOCALTIME',
-    'LOCALTIMESTAMP',
-    'NOT',
-    'STREAM',
-    'EXISTS',
-    'JSON_ARRAYAGG',
     'ARRAY',
+    'CAST',
     'CLASSIFIER',
     'CONVERT',
     'CURSOR',
+    'EXISTS',
     'EXTRACT',
+    'GROUPING',
+    'JSON_ARRAYAGG',
     'JSON_EXISTS',
     'JSON_OBJECT',
     'JSON_OBJECTAGG',
     'JSON_QUERY',
     'JSON_VALUE',
+    'LOCAL',
+    'LOCALTIME',
+    'LOCALTIMESTAMP',
     'MATCH_NUMBER',
     'MULTISET',
+    'NOT',
     'OVERLAY',
     'PERIOD',
     'POSITION',
+    'STREAM',
     'SUBSTRING',
     'TABLE',
+    'UNNEST',
     'USER',
   ];
   for (const k of RESERVED_KEYWORDS) {
@@ -63,25 +67,38 @@ async function main() {
       const { errorMessage } = e.response.data;
 
       if (!errorMessage) {
-        console.error(`${k} : No error`);
+        throw new Error(`Invalid error for: ${k}`);
       } else if (
-        errorMessage.includes('No match found for function signature') ||
-        errorMessage.includes('Invalid number of arguments to function')
-      ) {
-        legalNames.push(k);
-      } else if (
-        !(
-          errorMessage.startsWith(`Encountered "${k}"`) ||
-          errorMessage.startsWith(`Encountered "("`) ||
-          errorMessage.startsWith(`Encountered "${k} ("`)
+        errorMessage.startsWith(`Incorrect syntax near the keyword '${k}' at line 1, column 8.`) ||
+        errorMessage.startsWith(
+          `Received an unexpected token [(] (line [1], column [${`SELECT ${k}(`.length}])`,
         )
       ) {
-        console.error(`${k} : ${errorMessage.split('\n')[0]}`);
+        // Truly illegal
+      } else {
+        if (
+          !(
+            errorMessage.startsWith(`No match found for function signature ${k}`) ||
+            errorMessage.startsWith(
+              `Invalid number of arguments to function '${k}'. Was expecting`,
+            ) ||
+            errorMessage.startsWith(
+              `OVER clause is necessary for window functions (line [1], column [8])`,
+            )
+          )
+        ) {
+          console.error(`${k} : ${errorMessage.split('\n')[0]}`);
+        }
+        legalNames.push(k);
       }
     }
   }
 
-  console.log(JSON.stringify(legalNames.sort()));
+  legalNames.sort();
+
+  console.log('-----------------------------');
+  console.log(`Found ${legalNames.length} legal function names:`);
+  console.log(JSON.stringify(legalNames));
 }
 
 main();

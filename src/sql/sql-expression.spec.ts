@@ -12,8 +12,8 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlColumn, SqlExpression, SqlLiteral } from '..';
-import { backAndForth, mapString } from '../test-utils';
+import { RefName, SqlBase, SqlColumn, SqlExpression, SqlLiteral } from '..';
+import { backAndForth, backAndForthPrettify, mapString } from '../test-utils';
 
 describe('SqlExpression', () => {
   it('things that work', () => {
@@ -43,6 +43,19 @@ describe('SqlExpression', () => {
     }
   });
 
+  it('things that work and prettify to themselves', () => {
+    const queries: string[] = ['1', '1 + 1', `CONCAT('a', 'b')`, `x IN ('Hello World')`];
+
+    for (const sql of queries) {
+      try {
+        backAndForthPrettify(sql, SqlExpression);
+      } catch (e) {
+        console.log(`Problem with: \`${sql}\``);
+        throw e;
+      }
+    }
+  });
+
   it('plywood expressions should not parse', () => {
     const queries: string[] = [`$lol`, `#main.sum($count)`];
 
@@ -60,6 +73,12 @@ describe('SqlExpression', () => {
 
   describe('factories (static)', () => {
     describe('.and', () => {
+      it('throws if invalid arg is fed in', () => {
+        expect(() => SqlExpression.and(SqlExpression.parse('c < 10'), 'TRUE' as any)).toThrow(
+          'must be a SqlExpression',
+        );
+      });
+
       it('works in empty case', () => {
         expect(String(SqlExpression.and())).toEqual('TRUE');
       });
@@ -87,6 +106,12 @@ describe('SqlExpression', () => {
     });
 
     describe('.or', () => {
+      it('throws if invalid arg is fed in', () => {
+        expect(() => SqlExpression.or(SqlExpression.parse('c < 10'), 'TRUE' as any)).toThrow(
+          'must be a SqlExpression',
+        );
+      });
+
       it('works in empty case', () => {
         expect(String(SqlExpression.or())).toEqual('FALSE');
       });
@@ -110,6 +135,72 @@ describe('SqlExpression', () => {
             ),
           ),
         ).toEqual('a OR b OR (c OR d) OR (x AND y) OR (z AND w) OR n < 10 OR NOT k = 1');
+      });
+    });
+
+    describe('.add', () => {
+      it('throws if invalid arg is fed in', () => {
+        expect(() => SqlExpression.add(SqlLiteral.ONE, 0 as any)).toThrow(
+          'must be a SqlExpression',
+        );
+      });
+
+      it('works in empty case', () => {
+        expect(String(SqlExpression.add())).toEqual('0.0');
+      });
+
+      it('works in single clause case', () => {
+        expect(String(SqlExpression.add(SqlExpression.parse('F(x)')))).toEqual('F(x)');
+      });
+
+      it('works in general case', () => {
+        expect(
+          String(
+            SqlExpression.add(
+              SqlExpression.parse('F(a)'),
+              SqlExpression.parse('b + c'),
+              SqlExpression.parse('d - e'),
+              SqlExpression.parse('(f + g)'),
+              undefined,
+              SqlExpression.parse('0'),
+              SqlExpression.parse('10'),
+            ),
+          ),
+        ).toEqual('F(a) + b + c + (d - e) + (f + g) + 0 + 10');
+      });
+    });
+
+    describe('.subtract', () => {
+      it('throws if invalid arg is fed in', () => {
+        expect(() => SqlExpression.subtract(SqlLiteral.ONE, 0 as any)).toThrow(
+          'must be a SqlExpression',
+        );
+      });
+
+      it('throws error in empty case', () => {
+        expect(() => SqlExpression.subtract()).toThrow(
+          'first argument to subtract must be defined',
+        );
+      });
+
+      it('works in single clause case', () => {
+        expect(String(SqlExpression.subtract(SqlExpression.parse('F(x)')))).toEqual('F(x)');
+      });
+
+      it('works in general case', () => {
+        expect(
+          String(
+            SqlExpression.subtract(
+              SqlExpression.parse('F(a)'),
+              SqlExpression.parse('b + c'),
+              SqlExpression.parse('d - e'),
+              SqlExpression.parse('(f + g)'),
+              undefined,
+              SqlExpression.parse('0'),
+              SqlExpression.parse('10'),
+            ),
+          ),
+        ).toEqual('F(a) - b - c - (d - e) - (f + g) - 0 - 10');
       });
     });
 
@@ -146,75 +237,125 @@ describe('SqlExpression', () => {
     const x = SqlColumn.optionalQuotes('x');
     const y = SqlColumn.optionalQuotes('y');
 
-    it('works with as', () => {
-      expect(String(x.as('lol'))).toEqual('x AS "lol"');
+    describe('#as', () => {
+      const x = SqlColumn.optionalQuotes('X').as('test');
+      const z = SqlColumn.optionalQuotes('Z').as(RefName.create('test', true));
+
+      it('should work with normal string', () => {
+        expect(String(x.as('hello'))).toEqual('X AS "hello"');
+      });
+
+      it('should preserve quotes', () => {
+        expect(String(z.as('hello'))).toEqual('Z AS "hello"');
+      });
+
+      it('should work with quotes if needed', () => {
+        expect(String(x.as('select'))).toEqual('X AS "select"');
+      });
+
+      it('should work with quotes if forced', () => {
+        expect(String(x.as('hello', true))).toEqual('X AS "hello"');
+      });
     });
 
-    it('works with toOrderByExpression', () => {
+    describe('#setAlias', () => {
+      const x = SqlColumn.optionalQuotes('X').setAlias('test');
+      const z = SqlColumn.optionalQuotes('Z').setAlias(RefName.create('test', true));
+
+      it('should work with normal string', () => {
+        expect(String(x.setAlias('hello'))).toEqual('X AS "hello"');
+      });
+
+      it('should work with undefined', () => {
+        expect(String(x.setAlias(undefined))).toEqual('X');
+      });
+
+      it('should preserve quotes', () => {
+        expect(String(z.setAlias('hello'))).toEqual('Z AS "hello"');
+      });
+
+      it('should work with quotes if needed', () => {
+        expect(String(x.setAlias('select'))).toEqual('X AS "select"');
+      });
+
+      it('should work with quotes if forced', () => {
+        expect(String(x.setAlias('hello', true))).toEqual('X AS "hello"');
+      });
+    });
+
+    it('#toOrderByExpression', () => {
       expect(String(x.toOrderByExpression('DESC'))).toEqual('x DESC');
     });
 
-    it('works with not', () => {
+    it('#not', () => {
       expect(String(x.not())).toEqual('NOT x');
       expect(String(SqlExpression.parse(`a < b`).not())).toEqual('NOT (a < b)');
       expect(String(SqlExpression.parse(`a OR b`).not())).toEqual('NOT (a OR b)');
       expect(String(SqlExpression.parse(`a AND b`).not())).toEqual('NOT (a AND b)');
     });
 
-    it('works with equal', () => {
+    it('#equal', () => {
       expect(String(x.equal(y))).toEqual('x = y');
     });
 
-    it('works with unequal', () => {
+    it('#unequal', () => {
       expect(String(x.unequal(y))).toEqual('x <> y');
     });
 
-    it('works with lessThan', () => {
+    it('#isNotDistinctFrom', () => {
+      expect(String(x.isNotDistinctFrom(y))).toEqual('x IS NOT DISTINCT FROM y');
+    });
+
+    it('#isDistinctFrom', () => {
+      expect(String(x.isDistinctFrom(y))).toEqual('x IS DISTINCT FROM y');
+    });
+
+    it('#lessThan', () => {
       expect(String(x.lessThan(y))).toEqual('x < y');
     });
 
-    it('works with greaterThan', () => {
+    it('#greaterThan', () => {
       expect(String(x.greaterThan(y))).toEqual('x > y');
     });
 
-    it('works with lessThanOrEqual', () => {
+    it('#lessThanOrEqual', () => {
       expect(String(x.lessThanOrEqual(y))).toEqual('x <= y');
     });
 
-    it('works with greaterThanOrEqual', () => {
+    it('#greaterThanOrEqual', () => {
       expect(String(x.greaterThanOrEqual(y))).toEqual('x >= y');
     });
 
-    it('works with isNull', () => {
+    it('#isNull', () => {
       expect(String(x.isNull())).toEqual('x IS NULL');
     });
 
-    it('works with isNotNull', () => {
+    it('#isNotNull', () => {
       expect(String(x.isNotNull())).toEqual('x IS NOT NULL');
     });
 
-    it('works with like', () => {
+    it('#like', () => {
       expect(String(x.like(y))).toEqual('x LIKE y');
       expect(String(x.like(y, '$'))).toEqual("x LIKE y ESCAPE '$'");
     });
 
-    it('works with between', () => {
+    it('#between', () => {
       expect(String(x.between(1, 5))).toEqual('x BETWEEN 1 AND 5');
     });
 
-    it('works with notBetween', () => {
+    it('#notBetween', () => {
       expect(String(x.notBetween(1, 5))).toEqual('x NOT BETWEEN 1 AND 5');
     });
 
-    it('works with betweenSymmetric', () => {
+    it('#betweenSymmetric', () => {
       expect(String(x.betweenSymmetric(5, 1))).toEqual('x BETWEEN SYMMETRIC 5 AND 1');
     });
 
-    it('works with notBetweenSymmetric', () => {
+    it('#notBetweenSymmetric', () => {
       expect(String(x.notBetweenSymmetric(5, 1))).toEqual('x NOT BETWEEN SYMMETRIC 5 AND 1');
     });
 
-    it('works with and', () => {
+    it('#and', () => {
       expect(String(x.and(y))).toEqual('x AND y');
     });
   });

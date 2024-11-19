@@ -13,8 +13,10 @@
  */
 
 import {
+  RefName,
   SqlCase,
   SqlColumn,
+  SqlColumnList,
   SqlExpression,
   SqlFunction,
   SqlLiteral,
@@ -62,6 +64,8 @@ describe('SqlQuery', () => {
         ORDER BY 4 DESC
       `,
       `SELECT w1."channel" FROM "wikipedia" w1 JOIN "wikipedia2" w2 ON w1."channel" = w2."channel"`,
+      `SELECT w1."channel" FROM "wikipedia" w1 NATURAL JOIN "wikipedia2" w2`,
+      `SELECT w1."channel" FROM "wikipedia" w1 NATURAL LEFT JOIN "wikipedia2" w2`,
       sane`
         Explain Plan For
         SELECT * FROM wikipedia t
@@ -103,6 +107,35 @@ describe('SqlQuery', () => {
         PARTITIONED  BY   ALL    TIME
         CLUSTERED BY  "hello"
       `,
+      sane`
+        INSERT INTO
+          EXTERN(
+            S3(bucket => 'your_bucket', "prefix"=>'prefix/to/files')
+          )
+        AS CSV
+        SELECT *
+        FROM tbl
+        LIMIT 100
+      `,
+      sane`
+        SELECT
+          isAnonymous,
+          cityName,
+          flags,
+          COUNT(*) AS "Count",
+          SUM(added) AS "sum_added"
+        FROM wikipedia
+        GROUP BY 1, 2, 3
+        UNION ALL
+        SELECT
+          isAnonymous,
+          cityName,
+          flags,
+          COUNT(*) AS "Count",
+          SUM(added) AS "sum_added"
+        FROM wikipedia
+        GROUP BY 1, 2, 3
+      `,
     ];
 
     for (const sql of queries) {
@@ -121,6 +154,7 @@ describe('SqlQuery', () => {
       `Selec 3`,
       `(Select * from tbl`,
       `Select count(*) As count from tbl`,
+      `Select * from tbl SELECT`,
       // `SELECT 1 AS user`,
     ];
 
@@ -174,8 +208,10 @@ describe('SqlQuery', () => {
           "page",
           "user",
           "as"
-        FROM (SELECT *
-        FROM "lol")
+        FROM (
+          SELECT *
+          FROM "lol"
+        )
         WHERE channel  =  '#en.wikipedia'
       `);
     });
@@ -477,6 +513,7 @@ describe('SqlQuery', () => {
       expect(insertSql.insertClause).toMatchInlineSnapshot(`
         SqlInsertClause {
           "columns": undefined,
+          "format": undefined,
           "keywords": Object {},
           "parens": undefined,
           "spacing": Object {},
@@ -564,6 +601,29 @@ describe('SqlQuery', () => {
       `);
     });
 
+    it('adds grouped with expression', () => {
+      const select = SqlExpression.parse(`UPPER(city) AS City`);
+      expect(
+        sql
+          .addSelect(select, {
+            insertIndex: 'last-grouping',
+            groupByExpression: SqlExpression.parse(`SUBSTR(city, 1, 2)`),
+          })
+          .toString(),
+      ).toEqual(sane`
+        SELECT
+          isAnonymous,
+          cityName,
+          flags,
+          UPPER(city) AS City,
+          COUNT(*) AS "Count",
+          SUM(added) AS "sum_added"
+        FROM wikipedia
+        GROUP BY 1, 2, 3, SUBSTR(city, 1, 2)
+        ORDER BY 5 DESC
+      `);
+    });
+
     it('adds sorted', () => {
       const select = SqlExpression.parse(`COUNT(DISTINCT "user") AS unique_users`);
       expect(
@@ -609,6 +669,57 @@ describe('SqlQuery', () => {
         FROM wikipedia
         GROUP BY 1, 2, 3, 4
         ORDER BY 5 DESC, 4
+      `);
+    });
+
+    it('works when there is a UNION ALL', () => {
+      const sql = SqlQuery.parse(sane`
+        SELECT
+          isAnonymous,
+          cityName,
+          flags,
+          COUNT(*) AS "Count",
+          SUM(added) AS "sum_added"
+        FROM wikipedia
+        GROUP BY 1, 2, 3
+        UNION ALL
+        SELECT
+          isAnonymous,
+          cityName,
+          flags,
+          COUNT(*) AS "Count",
+          SUM(added) AS "sum_added"
+        FROM wikipedia
+        GROUP BY 1, 2, 3
+      `);
+
+      const select = SqlExpression.parse(`UPPER(city) AS City`);
+      expect(
+        sql
+          .addSelect(select, {
+            insertIndex: 'last-grouping',
+            addToGroupBy: 'end',
+          })
+          .toString(),
+      ).toEqual(sane`
+        SELECT
+          isAnonymous,
+          cityName,
+          flags,
+          UPPER(city) AS City,
+          COUNT(*) AS "Count",
+          SUM(added) AS "sum_added"
+        FROM wikipedia
+        GROUP BY 1, 2, 3, 4
+        UNION ALL
+        SELECT
+          isAnonymous,
+          cityName,
+          flags,
+          COUNT(*) AS "Count",
+          SUM(added) AS "sum_added"
+        FROM wikipedia
+        GROUP BY 1, 2, 3
       `);
     });
   });
@@ -712,6 +823,41 @@ describe('SqlQuery', () => {
         FROM wikipedia
         GROUP BY ()
       `);
+    });
+  });
+
+  describe('#hasStarInSelect', () => {
+    it('works when there is no star', () => {
+      const sql = SqlQuery.parse(sane`
+        SELECT
+          isAnonymous,
+          cityName
+        FROM wikipedia
+      `);
+
+      expect(sql.hasStarInSelect()).toBe(false);
+    });
+
+    it('works when there is a star', () => {
+      const sql = SqlQuery.parse(sane`
+        SELECT
+          *,
+          cityName
+        FROM wikipedia
+      `);
+
+      expect(sql.hasStarInSelect()).toBe(true);
+    });
+
+    it('works when there is a star from a table', () => {
+      const sql = SqlQuery.parse(sane`
+        SELECT
+          t.*,
+          cityName
+        FROM wikipedia AS t
+      `);
+
+      expect(sql.hasStarInSelect()).toBe(true);
     });
   });
 
@@ -1902,327 +2048,211 @@ describe('SqlQuery', () => {
   });
 
   describe('expressions with group by clause', () => {
-    it('Simple select with group by ', () => {
-      const sql = `Select * from tbl group by col`;
+    it('works with group by on empty', () => {
+      const sql = `Select * from tbl group by (  )`;
 
       backAndForth(sql);
 
-      expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
-        SqlQuery {
-          "clusteredByClause": undefined,
+      expect(SqlQuery.parse(sql).groupByClause).toMatchInlineSnapshot(`
+        SqlGroupByClause {
           "decorator": undefined,
-          "explain": undefined,
-          "fromClause": SqlFromClause {
-            "expressions": SeparatedArray {
-              "separators": Array [],
-              "values": Array [
-                SqlTable {
-                  "keywords": Object {},
-                  "namespace": undefined,
-                  "parens": undefined,
-                  "refName": RefName {
-                    "name": "tbl",
-                    "quotes": false,
-                  },
-                  "spacing": Object {},
-                  "type": "table",
-                },
-              ],
-            },
-            "joinParts": undefined,
-            "keywords": Object {
-              "from": "from",
-            },
-            "parens": undefined,
-            "spacing": Object {
-              "postFrom": " ",
-            },
-            "type": "fromClause",
-          },
-          "groupByClause": SqlGroupByClause {
-            "decorator": undefined,
-            "expressions": SeparatedArray {
-              "separators": Array [],
-              "values": Array [
-                SqlColumn {
-                  "keywords": Object {},
-                  "parens": undefined,
-                  "refName": RefName {
-                    "name": "col",
-                    "quotes": false,
-                  },
-                  "spacing": Object {},
-                  "table": undefined,
-                  "type": "column",
-                },
-              ],
-            },
-            "innerParens": false,
-            "keywords": Object {
-              "groupBy": "group by",
-            },
-            "parens": undefined,
-            "spacing": Object {
-              "postGroupBy": " ",
-            },
-            "type": "groupByClause",
-          },
-          "havingClause": undefined,
-          "insertClause": undefined,
+          "expressions": undefined,
+          "innerParens": false,
           "keywords": Object {
-            "select": "Select",
+            "groupBy": "group by",
           },
-          "limitClause": undefined,
-          "offsetClause": undefined,
-          "orderByClause": undefined,
           "parens": undefined,
-          "partitionedByClause": undefined,
-          "replaceClause": undefined,
-          "selectExpressions": SeparatedArray {
-            "separators": Array [],
-            "values": Array [
-              SqlStar {
-                "keywords": Object {},
-                "parens": undefined,
-                "spacing": Object {},
-                "table": undefined,
-                "type": "star",
-              },
-            ],
-          },
           "spacing": Object {
-            "postSelect": " ",
-            "preFromClause": " ",
-            "preGroupByClause": " ",
+            "postGroupBy": " ",
+            "postLeftParen": "  ",
           },
-          "type": "query",
-          "unionQuery": undefined,
-          "whereClause": undefined,
-          "withClause": undefined,
+          "type": "groupByClause",
         }
       `);
     });
 
-    it('Simple select with group by ', () => {
+    it('works with group by on single expression', () => {
       const sql = `Select * from tbl group by col`;
 
       backAndForth(sql);
 
-      expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
-        SqlQuery {
-          "clusteredByClause": undefined,
+      expect(SqlQuery.parse(sql).groupByClause).toMatchInlineSnapshot(`
+        SqlGroupByClause {
           "decorator": undefined,
-          "explain": undefined,
-          "fromClause": SqlFromClause {
-            "expressions": SeparatedArray {
-              "separators": Array [],
-              "values": Array [
-                SqlTable {
-                  "keywords": Object {},
-                  "namespace": undefined,
-                  "parens": undefined,
-                  "refName": RefName {
-                    "name": "tbl",
-                    "quotes": false,
-                  },
-                  "spacing": Object {},
-                  "type": "table",
-                },
-              ],
-            },
-            "joinParts": undefined,
-            "keywords": Object {
-              "from": "from",
-            },
-            "parens": undefined,
-            "spacing": Object {
-              "postFrom": " ",
-            },
-            "type": "fromClause",
-          },
-          "groupByClause": SqlGroupByClause {
-            "decorator": undefined,
-            "expressions": SeparatedArray {
-              "separators": Array [],
-              "values": Array [
-                SqlColumn {
-                  "keywords": Object {},
-                  "parens": undefined,
-                  "refName": RefName {
-                    "name": "col",
-                    "quotes": false,
-                  },
-                  "spacing": Object {},
-                  "table": undefined,
-                  "type": "column",
-                },
-              ],
-            },
-            "innerParens": false,
-            "keywords": Object {
-              "groupBy": "group by",
-            },
-            "parens": undefined,
-            "spacing": Object {
-              "postGroupBy": " ",
-            },
-            "type": "groupByClause",
-          },
-          "havingClause": undefined,
-          "insertClause": undefined,
-          "keywords": Object {
-            "select": "Select",
-          },
-          "limitClause": undefined,
-          "offsetClause": undefined,
-          "orderByClause": undefined,
-          "parens": undefined,
-          "partitionedByClause": undefined,
-          "replaceClause": undefined,
-          "selectExpressions": SeparatedArray {
+          "expressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
-              SqlStar {
+              SqlColumn {
                 "keywords": Object {},
                 "parens": undefined,
+                "refName": RefName {
+                  "name": "col",
+                  "quotes": false,
+                },
                 "spacing": Object {},
                 "table": undefined,
-                "type": "star",
+                "type": "column",
               },
             ],
           },
-          "spacing": Object {
-            "postSelect": " ",
-            "preFromClause": " ",
-            "preGroupByClause": " ",
+          "innerParens": false,
+          "keywords": Object {
+            "groupBy": "group by",
           },
-          "type": "query",
-          "unionQuery": undefined,
-          "whereClause": undefined,
-          "withClause": undefined,
+          "parens": undefined,
+          "spacing": Object {
+            "postGroupBy": " ",
+          },
+          "type": "groupByClause",
         }
       `);
     });
 
-    it('Simple select with multiple group by clauses in brackets', () => {
-      const sql = `(Select * from tbl group by col, colTwo)`;
+    it('works with group by on single expression in parens', () => {
+      const sql = `Select * from tbl group by (  col   )`;
 
       backAndForth(sql);
 
-      expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
-        SqlQuery {
-          "clusteredByClause": undefined,
+      expect(SqlQuery.parse(sql).groupByClause).toMatchInlineSnapshot(`
+        SqlGroupByClause {
           "decorator": undefined,
-          "explain": undefined,
-          "fromClause": SqlFromClause {
-            "expressions": SeparatedArray {
-              "separators": Array [],
-              "values": Array [
-                SqlTable {
-                  "keywords": Object {},
-                  "namespace": undefined,
-                  "parens": undefined,
-                  "refName": RefName {
-                    "name": "tbl",
-                    "quotes": false,
-                  },
-                  "spacing": Object {},
-                  "type": "table",
-                },
-              ],
-            },
-            "joinParts": undefined,
-            "keywords": Object {
-              "from": "from",
-            },
-            "parens": undefined,
-            "spacing": Object {
-              "postFrom": " ",
-            },
-            "type": "fromClause",
-          },
-          "groupByClause": SqlGroupByClause {
-            "decorator": undefined,
-            "expressions": SeparatedArray {
-              "separators": Array [
-                Separator {
-                  "left": "",
-                  "right": " ",
-                  "separator": ",",
-                },
-              ],
-              "values": Array [
-                SqlColumn {
-                  "keywords": Object {},
-                  "parens": undefined,
-                  "refName": RefName {
-                    "name": "col",
-                    "quotes": false,
-                  },
-                  "spacing": Object {},
-                  "table": undefined,
-                  "type": "column",
-                },
-                SqlColumn {
-                  "keywords": Object {},
-                  "parens": undefined,
-                  "refName": RefName {
-                    "name": "colTwo",
-                    "quotes": false,
-                  },
-                  "spacing": Object {},
-                  "table": undefined,
-                  "type": "column",
-                },
-              ],
-            },
-            "innerParens": false,
-            "keywords": Object {
-              "groupBy": "group by",
-            },
-            "parens": undefined,
-            "spacing": Object {
-              "postGroupBy": " ",
-            },
-            "type": "groupByClause",
-          },
-          "havingClause": undefined,
-          "insertClause": undefined,
-          "keywords": Object {
-            "select": "Select",
-          },
-          "limitClause": undefined,
-          "offsetClause": undefined,
-          "orderByClause": undefined,
-          "parens": Array [
-            Object {
-              "leftSpacing": "",
-              "rightSpacing": "",
-            },
-          ],
-          "partitionedByClause": undefined,
-          "replaceClause": undefined,
-          "selectExpressions": SeparatedArray {
+          "expressions": SeparatedArray {
             "separators": Array [],
             "values": Array [
-              SqlStar {
+              SqlColumn {
                 "keywords": Object {},
                 "parens": undefined,
+                "refName": RefName {
+                  "name": "col",
+                  "quotes": false,
+                },
                 "spacing": Object {},
                 "table": undefined,
-                "type": "star",
+                "type": "column",
               },
             ],
           },
-          "spacing": Object {
-            "postSelect": " ",
-            "preFromClause": " ",
-            "preGroupByClause": " ",
+          "innerParens": true,
+          "keywords": Object {
+            "groupBy": "group by",
           },
-          "type": "query",
-          "unionQuery": undefined,
-          "whereClause": undefined,
-          "withClause": undefined,
+          "parens": undefined,
+          "spacing": Object {
+            "postExpressions": "   ",
+            "postGroupBy": " ",
+            "postLeftParen": "  ",
+          },
+          "type": "groupByClause",
+        }
+      `);
+    });
+
+    it('works with multiple group by expressions', () => {
+      const sql = `Select * from tbl group by col, colTwo`;
+
+      backAndForth(sql);
+
+      expect(SqlQuery.parse(sql).groupByClause).toMatchInlineSnapshot(`
+        SqlGroupByClause {
+          "decorator": undefined,
+          "expressions": SeparatedArray {
+            "separators": Array [
+              Separator {
+                "left": "",
+                "right": " ",
+                "separator": ",",
+              },
+            ],
+            "values": Array [
+              SqlColumn {
+                "keywords": Object {},
+                "parens": undefined,
+                "refName": RefName {
+                  "name": "col",
+                  "quotes": false,
+                },
+                "spacing": Object {},
+                "table": undefined,
+                "type": "column",
+              },
+              SqlColumn {
+                "keywords": Object {},
+                "parens": undefined,
+                "refName": RefName {
+                  "name": "colTwo",
+                  "quotes": false,
+                },
+                "spacing": Object {},
+                "table": undefined,
+                "type": "column",
+              },
+            ],
+          },
+          "innerParens": false,
+          "keywords": Object {
+            "groupBy": "group by",
+          },
+          "parens": undefined,
+          "spacing": Object {
+            "postGroupBy": " ",
+          },
+          "type": "groupByClause",
+        }
+      `);
+    });
+
+    it('works with multiple group by expressions in parens', () => {
+      const sql = `Select * from tbl group by (  col, colTwo   )`;
+
+      backAndForth(sql);
+
+      expect(SqlQuery.parse(sql).groupByClause).toMatchInlineSnapshot(`
+        SqlGroupByClause {
+          "decorator": undefined,
+          "expressions": SeparatedArray {
+            "separators": Array [
+              Separator {
+                "left": "",
+                "right": " ",
+                "separator": ",",
+              },
+            ],
+            "values": Array [
+              SqlColumn {
+                "keywords": Object {},
+                "parens": undefined,
+                "refName": RefName {
+                  "name": "col",
+                  "quotes": false,
+                },
+                "spacing": Object {},
+                "table": undefined,
+                "type": "column",
+              },
+              SqlColumn {
+                "keywords": Object {},
+                "parens": undefined,
+                "refName": RefName {
+                  "name": "colTwo",
+                  "quotes": false,
+                },
+                "spacing": Object {},
+                "table": undefined,
+                "type": "column",
+              },
+            ],
+          },
+          "innerParens": true,
+          "keywords": Object {
+            "groupBy": "group by",
+          },
+          "parens": undefined,
+          "spacing": Object {
+            "postExpressions": "   ",
+            "postGroupBy": " ",
+            "postLeftParen": "  ",
+          },
+          "type": "groupByClause",
         }
       `);
     });
@@ -4344,6 +4374,7 @@ describe('SqlQuery', () => {
                     "joinType": "INNER",
                     "on": "ON",
                   },
+                  "natural": undefined,
                   "onExpression": SqlComparison {
                     "decorator": undefined,
                     "keywords": Object {
@@ -4398,6 +4429,7 @@ describe('SqlQuery', () => {
                     "type": "table",
                   },
                   "type": "joinPart",
+                  "usingColumns": undefined,
                 },
               ],
             },
@@ -4484,6 +4516,7 @@ describe('SqlQuery', () => {
                     "joinType": "Left",
                     "on": "ON",
                   },
+                  "natural": undefined,
                   "onExpression": SqlComparison {
                     "decorator": undefined,
                     "keywords": Object {
@@ -4538,6 +4571,7 @@ describe('SqlQuery', () => {
                     "type": "table",
                   },
                   "type": "joinPart",
+                  "usingColumns": undefined,
                 },
               ],
             },
@@ -4624,6 +4658,7 @@ describe('SqlQuery', () => {
                     "joinType": "RIGHT",
                     "on": "ON",
                   },
+                  "natural": undefined,
                   "onExpression": SqlComparison {
                     "decorator": undefined,
                     "keywords": Object {
@@ -4678,6 +4713,7 @@ describe('SqlQuery', () => {
                     "type": "table",
                   },
                   "type": "joinPart",
+                  "usingColumns": undefined,
                 },
               ],
             },
@@ -4764,6 +4800,7 @@ describe('SqlQuery', () => {
                     "joinType": "FULL",
                     "on": "ON",
                   },
+                  "natural": undefined,
                   "onExpression": SqlComparison {
                     "decorator": undefined,
                     "keywords": Object {
@@ -4818,6 +4855,7 @@ describe('SqlQuery', () => {
                     "type": "table",
                   },
                   "type": "joinPart",
+                  "usingColumns": undefined,
                 },
               ],
             },
@@ -4904,6 +4942,7 @@ describe('SqlQuery', () => {
                     "joinType": "FULL OUTER",
                     "on": "ON",
                   },
+                  "natural": undefined,
                   "onExpression": SqlComparison {
                     "decorator": undefined,
                     "keywords": Object {
@@ -4958,6 +4997,7 @@ describe('SqlQuery', () => {
                     "type": "table",
                   },
                   "type": "joinPart",
+                  "usingColumns": undefined,
                 },
               ],
             },
@@ -5005,6 +5045,176 @@ describe('SqlQuery', () => {
           "withClause": undefined,
         }
       `);
+    });
+
+    it('Join with using', () => {
+      const sql = 'Select * from tbl INNER Join anotherTable Using (col1, col2)';
+
+      backAndForth(sql);
+
+      expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
+        SqlQuery {
+          "clusteredByClause": undefined,
+          "decorator": undefined,
+          "explain": undefined,
+          "fromClause": SqlFromClause {
+            "expressions": SeparatedArray {
+              "separators": Array [],
+              "values": Array [
+                SqlTable {
+                  "keywords": Object {},
+                  "namespace": undefined,
+                  "parens": undefined,
+                  "refName": RefName {
+                    "name": "tbl",
+                    "quotes": false,
+                  },
+                  "spacing": Object {},
+                  "type": "table",
+                },
+              ],
+            },
+            "joinParts": SeparatedArray {
+              "separators": Array [],
+              "values": Array [
+                SqlJoinPart {
+                  "joinType": "INNER",
+                  "keywords": Object {
+                    "join": "Join",
+                    "joinType": "INNER",
+                    "using": "Using",
+                  },
+                  "natural": undefined,
+                  "onExpression": undefined,
+                  "parens": undefined,
+                  "spacing": Object {
+                    "postJoin": " ",
+                    "postJoinType": " ",
+                    "postUsing": " ",
+                    "preUsing": " ",
+                  },
+                  "table": SqlTable {
+                    "keywords": Object {},
+                    "namespace": undefined,
+                    "parens": undefined,
+                    "refName": RefName {
+                      "name": "anotherTable",
+                      "quotes": false,
+                    },
+                    "spacing": Object {},
+                    "type": "table",
+                  },
+                  "type": "joinPart",
+                  "usingColumns": SqlColumnList {
+                    "columns": SeparatedArray {
+                      "separators": Array [
+                        Separator {
+                          "left": "",
+                          "right": " ",
+                          "separator": ",",
+                        },
+                      ],
+                      "values": Array [
+                        RefName {
+                          "name": "col1",
+                          "quotes": false,
+                        },
+                        RefName {
+                          "name": "col2",
+                          "quotes": false,
+                        },
+                      ],
+                    },
+                    "keywords": Object {},
+                    "parens": Array [
+                      Object {
+                        "leftSpacing": "",
+                        "rightSpacing": "",
+                      },
+                    ],
+                    "spacing": Object {},
+                    "type": "columnList",
+                  },
+                },
+              ],
+            },
+            "keywords": Object {
+              "from": "from",
+            },
+            "parens": undefined,
+            "spacing": Object {
+              "postFrom": " ",
+              "preJoin": " ",
+            },
+            "type": "fromClause",
+          },
+          "groupByClause": undefined,
+          "havingClause": undefined,
+          "insertClause": undefined,
+          "keywords": Object {
+            "select": "Select",
+          },
+          "limitClause": undefined,
+          "offsetClause": undefined,
+          "orderByClause": undefined,
+          "parens": undefined,
+          "partitionedByClause": undefined,
+          "replaceClause": undefined,
+          "selectExpressions": SeparatedArray {
+            "separators": Array [],
+            "values": Array [
+              SqlStar {
+                "keywords": Object {},
+                "parens": undefined,
+                "spacing": Object {},
+                "table": undefined,
+                "type": "star",
+              },
+            ],
+          },
+          "spacing": Object {
+            "postSelect": " ",
+            "preFromClause": " ",
+          },
+          "type": "query",
+          "unionQuery": undefined,
+          "whereClause": undefined,
+          "withClause": undefined,
+        }
+      `);
+    });
+
+    it('Join with manipulated joinConditionExpression', () => {
+      const sqlWithUsingString = 'Select * from tbl INNER Join anotherTable USING (col1, col2)';
+      const sqlWithOnString = 'Select * from tbl INNER Join anotherTable ON col = col';
+      backAndForth(sqlWithUsingString);
+      backAndForth(sqlWithOnString);
+
+      const sqlWithUsing = SqlQuery.parse(sqlWithUsingString);
+
+      const sqlWithOn = SqlQuery.parse(sqlWithOnString);
+      const columnList = SqlColumnList.create([
+        RefName.create('col1', false),
+        RefName.create('col2', false),
+      ]).ensureParens('', '');
+
+      expect(sqlWithOn.getJoins()[0]?.changeUsingColumns(columnList).toString()).toEqual(
+        sqlWithUsing.getJoins()[0]?.toString(),
+      );
+      expect(
+        sqlWithOn.getJoins()[0]?.changeOnExpression(SqlExpression.parse(`col = col`)).toString(),
+      ).toEqual(SqlQuery.parse(sqlWithOnString).getJoins()[0]?.toString());
+      expect(
+        sqlWithUsing.getJoins()[0]?.changeOnExpression(SqlExpression.parse(`col = col`)).toString(),
+      ).toEqual(sqlWithOn.getJoins()[0]?.toString());
+      expect(sqlWithUsing.getJoins()[0]?.changeUsingColumns(columnList).toString()).toEqual(
+        SqlQuery.parse(sqlWithUsingString).getJoins()[0]?.toString(),
+      );
+    });
+
+    it('Join with invalid USING syntax', () => {
+      const invalidSql = 'Select * from tbl INNER Join anotherTable Using col1 = col2';
+      expect(() => SqlQuery.parse(invalidSql)).toThrowError();
     });
   });
 
@@ -5935,6 +6145,7 @@ describe('SqlQuery', () => {
           "havingClause": undefined,
           "insertClause": SqlInsertClause {
             "columns": undefined,
+            "format": undefined,
             "keywords": Object {
               "insert": "INSERT",
               "into": "INTO",

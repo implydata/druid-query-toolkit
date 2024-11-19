@@ -12,7 +12,8 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlBaseValue, SqlTypeDesignator } from '../sql-base';
+import type { SqlBaseValue, SqlTypeDesignator } from '../sql-base';
+import { SqlBase } from '../sql-base';
 import { SqlExpression } from '../sql-expression';
 import { SqlTable } from '../sql-table/sql-table';
 import { RefName } from '../utils';

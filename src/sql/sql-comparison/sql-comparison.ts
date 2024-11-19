@@ -12,9 +12,11 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlBaseValue, SqlTypeDesignator, Substitutor } from '../sql-base';
+import type { SqlBaseValue, SqlTypeDesignator, Substitutor } from '../sql-base';
+import { SqlBase } from '../sql-base';
 import { SqlExpression } from '../sql-expression';
-import { LiteralValue, SqlLiteral } from '../sql-literal/sql-literal';
+import type { LiteralValue } from '../sql-literal/sql-literal';
+import { SqlLiteral } from '../sql-literal/sql-literal';
 import { SqlRecord } from '../sql-record/sql-record';
 
 import { SqlBetweenPart } from './sql-between-part';
@@ -29,6 +31,8 @@ export type SqlComparisonOp =
   | '>='
   | 'IS'
   | 'IS NOT'
+  | 'IS DISTINCT FROM'
+  | 'IS NOT DISTINCT FROM'
   | 'IN'
   | 'NOT IN'
   | 'LIKE'
@@ -47,6 +51,8 @@ const ANTI_OP: Record<SqlComparisonOp, SqlComparisonOp> = {
   '>=': '<',
   'IS': 'IS NOT',
   'IS NOT': 'IS',
+  'IS DISTINCT FROM': 'IS NOT DISTINCT FROM',
+  'IS NOT DISTINCT FROM': 'IS DISTINCT FROM',
   'IN': 'NOT IN',
   'NOT IN': 'IN',
   'LIKE': 'NOT LIKE',
@@ -144,6 +150,28 @@ export class SqlComparison extends SqlExpression {
     return SqlComparison.isNull(lhs).negate();
   }
 
+  static isNotDistinctFrom(
+    lhs: SqlExpression | LiteralValue,
+    rhs: SqlExpression | LiteralValue,
+  ): SqlComparison {
+    return new SqlComparison({
+      op: 'IS NOT DISTINCT FROM',
+      lhs: SqlExpression.wrap(lhs),
+      rhs: SqlExpression.wrap(rhs),
+    });
+  }
+
+  static isDistinctFrom(
+    lhs: SqlExpression | LiteralValue,
+    rhs: SqlExpression | LiteralValue,
+  ): SqlComparison {
+    return new SqlComparison({
+      op: 'IS DISTINCT FROM',
+      lhs: SqlExpression.wrap(lhs),
+      rhs: SqlExpression.wrap(rhs),
+    });
+  }
+
   static in(lhs: SqlExpression, values: (SqlExpression | LiteralValue)[]): SqlComparison {
     return new SqlComparison({
       op: 'IN',
@@ -217,6 +245,10 @@ export class SqlComparison extends SqlExpression {
     return SqlComparison.betweenSymmetric(lhs, start, end).negate();
   }
 
+  static reverseOperator(operator: SqlComparisonOp) {
+    return ANTI_OP[operator];
+  }
+
   public readonly op: SqlComparisonOp;
   public readonly lhs: SqlExpression;
   public readonly decorator?: SqlComparisonDecorator;
@@ -274,7 +306,7 @@ export class SqlComparison extends SqlExpression {
     const { op, decorator } = this;
 
     const value = this.valueOf();
-    value.op = ANTI_OP[op];
+    value.op = SqlComparison.reverseOperator(op);
     value.keywords = this.getKeywordsWithout('op');
     if (decorator) {
       value.decorator = decorator === 'ALL' ? 'ANY' : 'ALL';

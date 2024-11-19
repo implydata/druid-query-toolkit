@@ -131,6 +131,16 @@ describe('Uber Query', () => {
     expect(query.changeHavingExpression(undefined).hasHaving()).toEqual(false);
     expect(query.changeOrderByExpressions(undefined).hasOrderBy()).toEqual(false);
     expect(query.changeLimitValue(undefined).hasLimit()).toEqual(false);
+    expect(query.changeLimitValue(Infinity).hasLimit()).toEqual(false);
     expect(query.changeOffsetValue(undefined).hasOffset()).toEqual(false);
+  });
+
+  it('throws for invalid limit values', () => {
+    expect(() => query.changeLimitValue(1)).not.toThrowError();
+    expect(() => query.changeLimitValue(0)).not.toThrowError();
+    expect(() => query.changeLimitValue(-1)).toThrowError('-1 is not a valid limit value');
+    expect(() => query.changeLimitValue(-Infinity)).toThrowError(
+      '-Infinity is not a valid limit value',
+    );
   });
 });

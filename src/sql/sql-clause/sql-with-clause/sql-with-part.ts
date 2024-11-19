@@ -12,10 +12,12 @@
  * limitations under the License.
  */
 
-import { SqlQuery, SqlValues } from '../..';
-import { SqlBase, SqlBaseValue, SqlTypeDesignator, Substitutor } from '../../sql-base';
+import type { SqlQuery, SqlValues } from '../..';
+import type { SqlBaseValue, SqlTypeDesignator, Substitutor } from '../../sql-base';
+import { SqlBase } from '../../sql-base';
 import { SqlColumnList } from '../../sql-column-list/sql-column-list';
-import { RefName, SeparatedArray } from '../../utils';
+import type { SeparatedArray } from '../../utils';
+import { RefName } from '../../utils';
 
 export interface SqlWithPartValue extends SqlBaseValue {
   table: RefName;

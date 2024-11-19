@@ -26,6 +26,62 @@ describe('QueryResult', () => {
   });
 
   describe('#inflateDates', () => {
+    it('does not inflate nulls', () => {
+      expect(
+        new QueryResult({
+          header: Column.fromColumnNames(['A', 'B', 'C']),
+          rows: [
+            ['A', '2016-06-27T00:00:00.000Z', 876],
+            ['J', null, 870],
+            ['K', '2016-06-27T02:00:00.000Z', 960],
+          ],
+        }).inflateDatesByGuessing(),
+      ).toMatchInlineSnapshot(`
+        QueryResult {
+          "header": Array [
+            Column {
+              "name": "A",
+              "nativeType": undefined,
+              "sqlType": undefined,
+            },
+            Column {
+              "name": "B",
+              "nativeType": undefined,
+              "sqlType": undefined,
+            },
+            Column {
+              "name": "C",
+              "nativeType": undefined,
+              "sqlType": undefined,
+            },
+          ],
+          "query": undefined,
+          "queryDuration": undefined,
+          "queryId": undefined,
+          "resultContext": undefined,
+          "rows": Array [
+            Array [
+              "A",
+              2016-06-27T00:00:00.000Z,
+              876,
+            ],
+            Array [
+              "J",
+              null,
+              870,
+            ],
+            Array [
+              "K",
+              2016-06-27T02:00:00.000Z,
+              960,
+            ],
+          ],
+          "sqlQuery": undefined,
+          "sqlQueryId": undefined,
+        }
+      `);
+    });
+
     it('works', () => {
       expect(testQueryResult.inflateDatesByGuessing()).toMatchInlineSnapshot(`
         QueryResult {
@@ -1180,6 +1236,11 @@ describe('QueryResult', () => {
               "nativeType": undefined,
               "sqlType": undefined,
             },
+            Column {
+              "name": "aggregator",
+              "nativeType": undefined,
+              "sqlType": undefined,
+            },
           ],
           "query": undefined,
           "queryDuration": undefined,
@@ -1193,6 +1254,7 @@ describe('QueryResult', () => {
               407240380,
               null,
               null,
+              null,
             ],
             Array [
               "dim1",
@@ -1200,6 +1262,7 @@ describe('QueryResult', () => {
               false,
               100000,
               1944,
+              null,
               null,
             ],
             Array [
@@ -1209,6 +1272,11 @@ describe('QueryResult', () => {
               100000,
               null,
               null,
+              Object {
+                "fieldName": "metric1",
+                "name": "metric1",
+                "type": "longSum",
+              },
             ],
           ],
           "sqlQuery": undefined,
@@ -1413,13 +1481,19 @@ describe('QueryResult', () => {
       `);
     });
 
+    it('works with empty string result', () => {
+      expect(() => QueryResult.fromRawResult('')).toThrow(
+        `Query results were empty. This may indicate a timeout caused by an intermediate network device (such as a load balancer). Try re-running your query, using a lower limit.`,
+      );
+    });
+
     it('works with truncated string result', () => {
       const result = `{"channel":"#sv.wikipedia","added":31}
 {"channel":"#ja.wikipedia","added":125}
 {"channel":"#en.wikipedia",`;
 
       expect(() => QueryResult.fromRawResult(result)).toThrow(
-        `Query results were truncated midstream! This may indicate a server-side error or a client-side issue. Try re-running your query, or using a lower limit or a longer timeout.`,
+        `Query results were truncated midstream. This may indicate a server-side error or a client-side issue. Try re-running your query using a lower limit.`,
       );
     });
 

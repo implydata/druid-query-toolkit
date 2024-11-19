@@ -12,7 +12,8 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlBaseValue, SqlTypeDesignator } from '../sql-base';
+import type { SqlBaseValue, SqlTypeDesignator } from '../sql-base';
+import { SqlBase } from '../sql-base';
 import { SqlExpression } from '../sql-expression';
 
 export interface SqlTypeValue extends SqlBaseValue {
@@ -23,29 +24,52 @@ export class SqlType extends SqlExpression {
   static type: SqlTypeDesignator = 'type';
 
   static VARCHAR: SqlType;
+  static VARCHAR_ARRAY: SqlType;
   static DOUBLE: SqlType;
+  static DOUBLE_ARRAY: SqlType;
   static FLOAT: SqlType;
   static BIGINT: SqlType;
+  static BIGINT_ARRAY: SqlType;
   static TIMESTAMP: SqlType;
+
+  static makeEffectiveType(type: string): string {
+    const m = type.match(/^TYPE\((.+)\)$/i);
+    if (m) return `TYPE(${m[1]})`;
+    return SqlBase.normalizeKeywordSpace(type.toUpperCase());
+  }
 
   static create(value: string | SqlType): SqlType {
     if (value instanceof SqlType) return value;
 
+    const effectiveValue = SqlType.makeEffectiveType(value);
     return new SqlType({
-      value,
+      value: effectiveValue,
+      keywords: effectiveValue !== value ? { type: value } : undefined,
     });
   }
 
   static fromNativeType(value: string): SqlType {
     switch (value.toLowerCase()) {
+      case 'string':
+        return SqlType.VARCHAR;
+
+      case 'array<string>':
+        return SqlType.VARCHAR_ARRAY;
+
       case 'double':
         return SqlType.DOUBLE;
+
+      case 'array<double>':
+        return SqlType.DOUBLE_ARRAY;
 
       case 'float':
         return SqlType.FLOAT;
 
       case 'long':
         return SqlType.BIGINT;
+
+      case 'array<long>':
+        return SqlType.BIGINT_ARRAY;
 
       case 'complex<json>':
         return SqlType.create(`TYPE('COMPLEX<json>')`);
@@ -69,27 +93,35 @@ export class SqlType extends SqlExpression {
   }
 
   protected _toRawString(): string {
-    return this.value;
+    return this.getKeyword('type', this.value);
   }
 
   public getEffectiveType(): string {
-    const m = this.value.match(/^TYPE\((.+)\)$/i);
-    if (m) {
-      return `TYPE(${m[1]})`;
-    }
-    return this.value.toUpperCase();
+    return this.value;
   }
 
   public getNativeType(): string {
-    const sqlType = this.getEffectiveType();
+    const sqlType = this.value;
     switch (sqlType) {
+      case 'VARCHAR':
+        return 'string';
+
+      case 'VARCHAR ARRAY':
+        return 'ARRAY<string>';
+
       case 'DOUBLE':
       case 'FLOAT':
         return sqlType.toLowerCase();
 
+      case 'DOUBLE ARRAY':
+        return 'ARRAY<double>';
+
       case 'TIMESTAMP':
       case 'BIGINT':
         return 'long';
+
+      case 'BIGINT ARRAY':
+        return 'ARRAY<long>';
 
       case `TYPE('COMPLEX<json>')`:
         return 'COMPLEX<json>';
@@ -98,12 +130,19 @@ export class SqlType extends SqlExpression {
         return 'string';
     }
   }
+
+  public isArray(): boolean {
+    return this.value.endsWith(' ARRAY');
+  }
 }
 
 SqlBase.register(SqlType);
 
 SqlType.VARCHAR = SqlType.create('VARCHAR');
+SqlType.VARCHAR_ARRAY = SqlType.create('VARCHAR ARRAY');
 SqlType.DOUBLE = SqlType.create('DOUBLE');
+SqlType.DOUBLE_ARRAY = SqlType.create('DOUBLE ARRAY');
 SqlType.FLOAT = SqlType.create('FLOAT');
 SqlType.BIGINT = SqlType.create('BIGINT');
+SqlType.BIGINT_ARRAY = SqlType.create('BIGINT ARRAY');
 SqlType.TIMESTAMP = SqlType.create('TIMESTAMP');

@@ -14,7 +14,7 @@
 
 import { C } from '../shortcuts';
 import type { LiteralValue, SqlExpression } from '../sql';
-import { SqlColumn, SqlComparison, SqlLiteral, SqlPlaceholder, SqlRecord } from '../sql';
+import { SqlColumn, SqlComparison, SqlLiteral, SqlMulti, SqlPlaceholder, SqlRecord } from '../sql';
 
 import type { FilterPatternDefinition } from './common';
 import { extractOuterNot, sqlRecordGetLiteralValues } from './common';
@@ -30,6 +30,33 @@ export interface ValuesFilterPattern {
 export const VALUES_PATTERN_DEFINITION: FilterPatternDefinition<ValuesFilterPattern> = {
   fit(possibleEx: SqlExpression) {
     const [negated, ex] = extractOuterNot(possibleEx);
+
+    if (ex instanceof SqlMulti && (ex.op === 'OR' || ex.op === 'AND')) {
+      const args = ex.getArgArray();
+      const patterns = args.map(VALUES_PATTERN_DEFINITION.fit).filter(Boolean);
+
+      const pattern = patterns[0];
+      if (pattern && args.length === patterns.length) {
+        if (pattern.negated && ex.op === 'OR') {
+          return;
+        }
+
+        if (!pattern.negated && ex.op === 'AND') {
+          return;
+        }
+
+        for (const p of patterns.slice(1)) {
+          if (!p || p.negated !== pattern.negated || p.column !== pattern.column) {
+            return;
+          }
+
+          pattern.values.push(...p.values);
+        }
+
+        return pattern;
+      }
+    }
+
     if (!(ex instanceof SqlComparison)) return;
 
     const { lhs, rhs, op } = ex;
@@ -40,6 +67,18 @@ export const VALUES_PATTERN_DEFINITION: FilterPatternDefinition<ValuesFilterPatt
           return {
             type: 'values',
             negated: xor(op === '<>', negated),
+            column: lhs.getName(),
+            values: [rhs.value],
+          };
+        }
+        return;
+
+      case 'IS':
+      case 'IS NOT':
+        if (lhs instanceof SqlColumn && rhs instanceof SqlLiteral) {
+          return {
+            type: 'values',
+            negated: xor(op === 'IS NOT', negated),
             column: lhs.getName(),
             values: [rhs.value],
           };
@@ -68,14 +107,35 @@ export const VALUES_PATTERN_DEFINITION: FilterPatternDefinition<ValuesFilterPatt
   isValid(pattern) {
     return Array.isArray(pattern.values) && Boolean(pattern.values.length);
   },
-  toExpression(pattern) {
-    return C(pattern.column)
-      .apply(ex =>
-        pattern.values.length <= 1
-          ? ex.equal(pattern.values[0] ?? SqlPlaceholder.PLACEHOLDER)
-          : ex.in(pattern.values),
-      )
-      .applyIf(pattern.negated, ex => ex.negate());
+  toExpression({ column, values, negated }): SqlExpression {
+    if (!values.length) return SqlLiteral.TRUE;
+
+    return C(column).apply(ex => {
+      if (values.length === 1) {
+        if (values[0] === null) {
+          return negated ? ex.isNotNull() : ex.isNull();
+        }
+
+        return ex
+          .equal(values[0] ?? SqlPlaceholder.PLACEHOLDER)
+          .applyIf(negated, ex => ex.negate());
+      } else {
+        if (values.includes(null)) {
+          if (negated) {
+            return ex
+              .isNotNull()
+              .and(ex.notIn(values.filter(v => v !== null)))
+              .addParens();
+          }
+          return ex
+            .isNull()
+            .or(ex.in(values.filter(v => v !== null)))
+            .addParens();
+        }
+
+        return ex.in(values).applyIf(negated, ex => ex.negate());
+      }
+    });
   },
   getThing(pattern) {
     return pattern.values.length ? String(pattern.values[0]) : undefined;

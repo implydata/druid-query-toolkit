@@ -12,31 +12,19 @@
  * limitations under the License.
  */
 
-import { C, F } from '../shortcuts';
+import { C, F, L } from '../shortcuts';
 import type { SqlExpression } from '../sql';
-import { RefName, SqlColumn, SqlComparison, SqlFunction, SqlMulti } from '../sql';
+import { RefName, SqlColumn, SqlComparison, SqlFunction, SqlLiteral, SqlMulti } from '../sql';
 
 import type { FilterPatternDefinition } from './common';
 import { extractOuterNot, oneOf } from './common';
-
-function getAnchor(anchor: 'currentTimestamp' | 'maxDataTime') {
-  if (anchor === 'currentTimestamp') {
-    return new SqlFunction({
-      functionName: new RefName({ name: 'CURRENT_TIMESTAMP', quotes: false }),
-      specialParen: 'none',
-    });
-  } else {
-    return new SqlFunction({
-      functionName: new RefName({ name: 'MAX_DATA_TIME', quotes: false }),
-    });
-  }
-}
 
 export interface TimeRelativeFilterPattern {
   type: 'timeRelative';
   negated: boolean;
   column: string;
-  anchor: 'currentTimestamp' | 'maxDataTime';
+  anchor: 'timestamp' | 'maxDataTime';
+  anchorTimestamp?: Date;
   rangeDuration: string;
   rangeStep?: number;
   alignType?: 'floor' | 'ceil';
@@ -44,6 +32,26 @@ export interface TimeRelativeFilterPattern {
   shiftDuration?: string;
   shiftStep?: number;
   timezone?: string;
+  origin?: string;
+  startBound: '(' | '[';
+  endBound: ')' | ']';
+}
+
+function getAnchor(pattern: TimeRelativeFilterPattern) {
+  if (pattern.anchor === 'timestamp') {
+    if (pattern.anchorTimestamp) {
+      return L(pattern.anchorTimestamp);
+    } else {
+      return new SqlFunction({
+        functionName: new RefName({ name: 'CURRENT_TIMESTAMP', quotes: false }),
+        specialParen: 'none',
+      });
+    }
+  } else {
+    return new SqlFunction({
+      functionName: new RefName({ name: 'MAX_DATA_TIME', quotes: false }),
+    });
+  }
 }
 
 export const TIME_RELATIVE_PATTERN_DEFINITION: FilterPatternDefinition<TimeRelativeFilterPattern> =
@@ -51,6 +59,7 @@ export const TIME_RELATIVE_PATTERN_DEFINITION: FilterPatternDefinition<TimeRelat
     fit(possibleEx: SqlExpression) {
       // Something like
       // TIME_SHIFT(CURRENT_TIMESTAMP, 'PT1H', -1) <= __time AND __time < CURRENT_TIMESTAMP
+      // CURRENT_TIMESTAMP <= __time AND __time < TIME_SHIFT(CURRENT_TIMESTAMP, 'PT1H', 1)
       // TIME_SHIFT(CURRENT_TIMESTAMP, 'PT1H', -1, 'Etc/UTC') <= __time AND __time < CURRENT_TIMESTAMP
       // TIME_SHIFT(TIME_CEIL(CURRENT_TIMESTAMP, 'P1D'), 'PT1H', -1) <= __time AND __time < TIME_CEIL(CURRENT_TIMESTAMP, 'P1D')
       // TIME_SHIFT(TIME_SHIFT(TIME_CEIL(CURRENT_TIMESTAMP, 'P1D'), 'P1D', -1), 'PT1H', -1) <= __time AND __time < TIME_SHIFT(TIME_CEIL(CURRENT_TIMESTAMP, 'P1D'), 'P1D', -1)
@@ -59,103 +68,142 @@ export const TIME_RELATIVE_PATTERN_DEFINITION: FilterPatternDefinition<TimeRelat
       if (!(ex instanceof SqlMulti) || ex.numArgs() !== 2) return;
 
       const a = ex.getArg(0);
-      if (!(a instanceof SqlComparison) || a.op !== '<=') return;
+      if (!(a instanceof SqlComparison) || (a.op !== '<=' && a.op !== '<')) return;
 
       const b = ex.getArg(1);
-      if (!(b instanceof SqlComparison) || b.op !== '<') return;
+      if (!(b instanceof SqlComparison) || (b.op !== '<' && b.op !== '<=')) return;
 
+      const startBound = a.op === '<=' ? '[' : '(';
+      const endBound = b.op === '<' ? ')' : ']';
+
+      // Check that we use the same column in both comparisons
       const columnRef = a.rhs;
       if (!(columnRef instanceof SqlColumn) || !columnRef.equals(b.lhs)) return;
 
-      const timeShift = a.lhs;
-      if (
-        !(timeShift instanceof SqlFunction) ||
-        timeShift.getEffectiveFunctionName() !== 'TIME_SHIFT'
+      // Fit the outer timeShift it could be in a.lhs OR b.rhs
+      // a.lhs <= columnRef AND columnRef < b.rhs
+
+      let timeShift: SqlFunction;
+      let anchorEx: SqlExpression | undefined;
+      let rangeStep: number;
+      if (a.lhs instanceof SqlFunction && a.lhs.getEffectiveFunctionName() === 'TIME_SHIFT') {
+        timeShift = a.lhs;
+        anchorEx = timeShift.getArg(0);
+        if (!b.rhs.equals(anchorEx)) return;
+
+        rangeStep = -timeShift.getArgAsNumber(2)!;
+        if (!(rangeStep > 0)) return;
+      } else if (
+        b.rhs instanceof SqlFunction &&
+        b.rhs.getEffectiveFunctionName() === 'TIME_SHIFT'
       ) {
+        timeShift = b.rhs;
+        anchorEx = timeShift.getArg(0);
+        if (!a.lhs.equals(anchorEx)) return;
+
+        rangeStep = -timeShift.getArgAsNumber(2)!;
+        if (!(rangeStep < 0)) return;
+      } else {
         return;
       }
-
-      let anchorFn = timeShift.getArg(0);
-      if (!b.rhs.equals(anchorFn)) return;
 
       const rangeDuration = timeShift.getArgAsString(1);
       if (!rangeDuration) return;
 
-      const rangeStep = -timeShift.getArgAsNumber(2)!;
-      if (!(rangeStep > 0)) return;
-
       const timezone = timeShift.getArgAsString(3);
+
+      let origin;
 
       let shiftDuration: string | undefined;
       let shiftStep: number | undefined;
-      if (anchorFn instanceof SqlFunction && anchorFn.getEffectiveFunctionName() === 'TIME_SHIFT') {
-        shiftDuration = anchorFn.getArgAsString(1);
+      if (anchorEx instanceof SqlFunction && anchorEx.getEffectiveFunctionName() === 'TIME_SHIFT') {
+        shiftDuration = anchorEx.getArgAsString(1);
         if (!shiftDuration) return;
 
-        shiftStep = anchorFn.getArgAsNumber(2);
+        shiftStep = anchorEx.getArgAsNumber(2);
         if (!shiftStep) return;
 
-        if (anchorFn.getArgAsString(3) !== timezone) return;
+        if (anchorEx.getArgAsString(3) !== timezone) return;
 
-        anchorFn = anchorFn.getArg(0);
+        anchorEx = anchorEx.getArg(0);
       }
 
       let alignType: 'floor' | 'ceil' | undefined;
       let alignDuration: string | undefined;
       if (
-        anchorFn instanceof SqlFunction &&
-        oneOf(anchorFn.getEffectiveFunctionName(), 'TIME_FLOOR', 'TIME_CEIL')
+        anchorEx instanceof SqlFunction &&
+        oneOf(anchorEx.getEffectiveFunctionName(), 'TIME_FLOOR', 'TIME_CEIL')
       ) {
-        alignType = anchorFn.getEffectiveFunctionName() === 'TIME_FLOOR' ? 'floor' : 'ceil';
+        alignType = anchorEx.getEffectiveFunctionName() === 'TIME_FLOOR' ? 'floor' : 'ceil';
 
-        alignDuration = anchorFn.getArgAsString(1);
+        alignDuration = anchorEx.getArgAsString(1);
         if (!alignDuration) return;
 
-        if (anchorFn.getArgAsString(2) !== timezone) return;
+        if (anchorEx.getArgAsString(3) !== timezone) return;
+        origin = anchorEx.getArgAsString(2);
 
-        anchorFn = anchorFn.getArg(0);
+        anchorEx = anchorEx.getArg(0);
       }
 
-      if (!(anchorFn instanceof SqlFunction)) return;
-      let anchor: 'currentTimestamp' | 'maxDataTime';
-      switch (anchorFn.getEffectiveFunctionName()) {
-        case 'CURRENT_TIMESTAMP':
-          anchor = 'currentTimestamp';
-          break;
+      let anchor: TimeRelativeFilterPattern['anchor'];
+      let anchorTimestamp: Date | undefined;
+      if (anchorEx instanceof SqlFunction) {
+        switch (anchorEx.getEffectiveFunctionName()) {
+          case 'CURRENT_TIMESTAMP':
+            anchor = 'timestamp';
+            break;
 
-        case 'MAX_DATA_TIME':
-          anchor = 'maxDataTime';
-          break;
+          case 'MAX_DATA_TIME':
+            anchor = 'maxDataTime';
+            break;
 
-        default:
-          return;
+          default:
+            return;
+        }
+      } else if (anchorEx instanceof SqlLiteral) {
+        anchorTimestamp = anchorEx.getDateValue();
+        if (!anchorTimestamp) return;
+        anchor = 'timestamp';
+      } else {
+        return;
       }
 
-      return {
+      const result: TimeRelativeFilterPattern = {
         type: 'timeRelative',
         negated,
         column: columnRef.getName(),
         anchor,
         rangeDuration,
-        rangeStep: rangeStep !== 1 ? rangeStep : undefined,
-        alignDuration,
-        alignType,
-        shiftDuration,
-        shiftStep,
-        timezone,
+        startBound,
+        endBound,
       };
+
+      if (anchorTimestamp !== undefined) result.anchorTimestamp = anchorTimestamp;
+      if (rangeStep !== 1) result.rangeStep = rangeStep;
+      if (alignDuration !== undefined) result.alignDuration = alignDuration;
+      if (alignType !== undefined) result.alignType = alignType;
+      if (shiftDuration !== undefined) result.shiftDuration = shiftDuration;
+      if (shiftStep !== undefined) result.shiftStep = shiftStep;
+      if (timezone !== undefined) result.timezone = timezone;
+      if (origin !== undefined) result.origin = origin;
+
+      return result;
     },
     isValid(_pattern): boolean {
       return true;
     },
     toExpression(pattern): SqlExpression {
-      let anchor = getAnchor(pattern.anchor);
+      let anchor = getAnchor(pattern);
 
       if (pattern.alignType && pattern.alignDuration) {
         anchor = F(
           pattern.alignType === 'floor' ? 'TIME_FLOOR' : 'TIME_CEIL',
           anchor,
           pattern.alignDuration,
+          // Origin is required if a timezone is included
+          // passing null will appear in the arguments as NULL
+          // undefined will not appear in the list of arguments.
+          pattern.timezone ? pattern.origin || null : undefined,
           pattern.timezone,
         );
       }
@@ -164,10 +212,27 @@ export const TIME_RELATIVE_PATTERN_DEFINITION: FilterPatternDefinition<TimeRelat
         anchor = F.timeShift(anchor, pattern.shiftDuration, pattern.shiftStep, pattern.timezone);
       }
 
+      const rangeStep = pattern.rangeStep || 1;
+      const anchorWithRange = F.timeShift(
+        anchor,
+        pattern.rangeDuration,
+        -rangeStep,
+        pattern.timezone,
+      );
+
       const column = C(pattern.column);
-      return F.timeShift(anchor, pattern.rangeDuration, -(pattern.rangeStep || 1), pattern.timezone)
-        .lessThanOrEqual(column)
-        .and(column.lessThan(anchor))
+      return (rangeStep >= 0 ? anchorWithRange : anchor)
+        .applyIf(pattern.startBound === '[', e => e.lessThanOrEqual(column))
+        .applyIf(pattern.startBound === '(', e => e.lessThan(column))
+        .and(
+          column
+            .applyIf(pattern.endBound === ']', e =>
+              e.lessThanOrEqual(rangeStep < 0 ? anchorWithRange : anchor),
+            )
+            .applyIf(pattern.endBound === ')', e =>
+              e.lessThan(rangeStep < 0 ? anchorWithRange : anchor),
+            ),
+        )
         .ensureParens()
         .applyIf(pattern.negated, ex => ex.negate());
     },

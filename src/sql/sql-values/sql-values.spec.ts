@@ -50,10 +50,12 @@ describe('SqlValues', () => {
         SqlRecord.create([7, 8, 9].map(v => SqlLiteral.create(v))),
       ]).toString(),
     ).toEqual(sane`
-      (VALUES
-      (1, 2, 3),
-      (4, 5, 6),
-      (7, 8, 9))
+      (
+        VALUES
+        (1, 2, 3),
+        (4, 5, 6),
+        (7, 8, 9)
+      )
     `);
   });
 
@@ -71,5 +73,35 @@ describe('SqlValues', () => {
       (3, 4),
       (5, 6)
     `);
+  });
+
+  it('handles infinite limits', () => {
+    const values = SqlValues.create([
+      SqlRecord.create([1, 2, 3].map(v => SqlLiteral.create(v))),
+    ]).changeLimitValue(2);
+
+    expect(values.toString()).toEqual(sane`
+      (
+        VALUES (1, 2, 3)
+        LIMIT 2
+      )
+    `);
+    expect(values.changeLimitValue(undefined).toString()).toEqual(sane`
+      (VALUES (1, 2, 3))
+    `);
+    expect(values.changeLimitValue(Infinity).toString()).toEqual(sane`
+      (VALUES (1, 2, 3))
+    `);
+  });
+
+  it('throws for invalid limit values', () => {
+    const values = SqlValues.create([SqlRecord.create([1, 2, 3].map(v => SqlLiteral.create(v)))]);
+
+    expect(() => values.changeLimitValue(1)).not.toThrowError();
+    expect(() => values.changeLimitValue(0)).not.toThrowError();
+    expect(() => values.changeLimitValue(-1)).toThrowError('-1 is not a valid limit value');
+    expect(() => values.changeLimitValue(-Infinity)).toThrowError(
+      '-Infinity is not a valid limit value',
+    );
   });
 });

@@ -12,6 +12,25 @@
  * limitations under the License.
  */
 
-import { SqlBase } from '../sql-base';
+export type QueryPayload = DruidSqlQueryPayload | DruidRuneQueryPayload;
 
-export function parseSql(input: string): SqlBase;
+export interface DruidRuneQueryPayload {
+  queryType: string;
+  context?: Record<string, any>;
+  [k: string]: any; // No one has time to list out the full Druid native query type
+}
+
+export interface DruidSqlQueryPayload {
+  query: string;
+  context?: Record<string, any>;
+  parameters?: QueryParameter[];
+  resultFormat?: string;
+  header?: boolean;
+  typesHeader?: boolean;
+  sqlTypesHeader?: boolean;
+}
+
+export interface QueryParameter {
+  type: string;
+  value: string | number;
+}

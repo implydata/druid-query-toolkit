@@ -12,11 +12,13 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlTypeDesignator, Substitutor } from '../../sql-base';
+import type { SqlTypeDesignator, Substitutor } from '../../sql-base';
+import { SqlBase } from '../../sql-base';
 import { SeparatedArray } from '../../utils';
-import { SqlClause, SqlClauseValue } from '../sql-clause';
+import type { SqlClauseValue } from '../sql-clause';
+import { SqlClause } from '../sql-clause';
 
-import { SqlColumnDeclaration } from './sql-column-declaration';
+import type { SqlColumnDeclaration } from './sql-column-declaration';
 
 export interface SqlExtendClauseValue extends SqlClauseValue {
   columnDeclarations: SeparatedArray<SqlColumnDeclaration>;
@@ -50,9 +52,9 @@ export class SqlExtendClause extends SqlClause {
     return [
       this.getKeyword('extend', SqlExtendClause.DEFAULT_EXTEND_KEYWORD, 'postExtend'),
       '(',
-      this.getSpace('postLeftParen'),
+      this.getSpace('postLeftParen', ''),
       this.columnDeclarations.toString(),
-      this.getSpace('postColumnDeclarations'),
+      this.getSpace('postColumnDeclarations', ''),
       ')',
     ].join('');
   }

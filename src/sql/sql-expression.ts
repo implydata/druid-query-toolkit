@@ -12,23 +12,21 @@
  * limitations under the License.
  */
 
+import type { LiteralValue, RefName, SqlOrderByDirection, SqlType } from '.';
 import {
-  LiteralValue,
-  RefName,
   SqlAlias,
   SqlColumn,
   SqlComparison,
   SqlFunction,
   SqlLiteral,
   SqlMulti,
-  SqlOrderByDirection,
   SqlOrderByExpression,
   SqlPlaceholder,
   SqlUnary,
 } from '.';
-import { parseSql } from './parser';
-import { SqlBase, Substitutor } from './sql-base';
-import { SeparatedArray, Separator } from './utils';
+import { parse as parseSql } from './parser';
+import type { Substitutor } from './sql-base';
+import { SqlBase } from './sql-base';
 
 export interface DecomposeViaOptions {
   flatten?: boolean;
@@ -61,66 +59,94 @@ export abstract class SqlExpression extends SqlBase {
     return input instanceof SqlExpression ? input : SqlLiteral.create(input);
   }
 
+  static verify(input: SqlExpression): SqlExpression {
+    if (input instanceof SqlExpression) return input;
+    throw new TypeError('must be a SqlExpression');
+  }
+
   static and(...args: (SqlExpression | undefined)[]): SqlExpression {
-    const compactArgs = args.flatMap(a => {
-      if (!a) return [];
-      if (a instanceof SqlLiteral && a.value === true) {
-        return []; // Skip no-op TRUE this is a special case
-      }
-      if (a instanceof SqlMulti) {
-        if (a.op === 'AND') {
-          return a.hasParens() ? [a] : a.getArgArray();
-        } else {
-          return a.ensureParens();
+    return SqlMulti.createIfNeeded(
+      'AND',
+      args.flatMap(a => {
+        if (a == null) return [];
+        if (a instanceof SqlLiteral && a.value === true) {
+          return []; // Skip no-op TRUE this is a special case
         }
-      }
-      return [a];
-    });
-
-    switch (compactArgs.length) {
-      case 0:
-        return SqlLiteral.TRUE;
-
-      case 1:
-        return compactArgs[0]!;
-
-      default:
-        return new SqlMulti({
-          op: 'AND',
-          args: SeparatedArray.fromArray(compactArgs, Separator.symmetricSpace('AND')),
-        });
-    }
+        if (a instanceof SqlMulti) return a.flattenIfNeeded('AND');
+        return SqlExpression.verify(a);
+      }),
+    );
   }
 
   static or(...args: (SqlExpression | undefined)[]): SqlExpression {
-    const compactArgs = args.flatMap(a => {
-      if (!a) return [];
-      if (a instanceof SqlLiteral && a.value === false) {
-        return []; // Skip no-op TRUE this is a special case
-      }
-      if (a instanceof SqlMulti) {
-        if (a.op === 'OR') {
-          return a.hasParens() ? [a] : a.getArgArray();
-        } else {
-          return a.ensureParens();
+    return SqlMulti.createIfNeeded(
+      'OR',
+      args.flatMap(a => {
+        if (a == null) return [];
+        if (a instanceof SqlLiteral && a.value === false) {
+          return []; // Skip no-op FALSE this is a special case
         }
-      }
-      return a;
-    });
+        if (a instanceof SqlMulti) return a.flattenIfNeeded('OR');
+        return SqlExpression.verify(a);
+      }),
+    );
+  }
 
-    switch (compactArgs.length) {
-      case 0:
-        return SqlLiteral.FALSE;
+  static concat(...args: (SqlExpression | undefined)[]): SqlExpression {
+    return SqlMulti.createIfNeeded(
+      '||',
+      args.flatMap(a => {
+        if (a == null) return [];
+        if (a instanceof SqlMulti) return a.flattenIfNeeded('||');
+        return SqlExpression.verify(a);
+      }),
+    );
+  }
 
-      case 1:
-        return compactArgs[0]!;
+  static add(...args: (SqlExpression | undefined)[]): SqlExpression {
+    return SqlMulti.createIfNeeded(
+      '+',
+      args.flatMap(a => {
+        if (a == null) return [];
+        if (a instanceof SqlMulti) return a.flattenIfNeeded('+');
+        return SqlExpression.verify(a);
+      }),
+    );
+  }
 
-      default:
-        return new SqlMulti({
-          op: 'OR',
-          args: SeparatedArray.fromArray(compactArgs, Separator.symmetricSpace('OR')),
-        });
-    }
+  static subtract(...args: (SqlExpression | undefined)[]): SqlExpression {
+    if (!args[0]) throw new Error('first argument to subtract must be defined');
+    return SqlMulti.createIfNeeded(
+      '-',
+      args.flatMap(a => {
+        if (a == null) return [];
+        if (a instanceof SqlMulti) return a.flattenIfNeeded('+');
+        return SqlExpression.verify(a);
+      }),
+    );
+  }
+
+  static multiply(...args: (SqlExpression | undefined)[]): SqlExpression {
+    return SqlMulti.createIfNeeded(
+      '*',
+      args.flatMap(a => {
+        if (a == null) return [];
+        if (a instanceof SqlMulti) return a.flattenIfNeeded('*');
+        return SqlExpression.verify(a);
+      }),
+    );
+  }
+
+  static divide(...args: (SqlExpression | undefined)[]): SqlExpression {
+    if (!args[0]) throw new Error('first argument to divide must be defined');
+    return SqlMulti.createIfNeeded(
+      '/',
+      args.flatMap(a => {
+        if (a == null) return [];
+        if (a instanceof SqlMulti) return a.flattenIfNeeded('*');
+        return SqlExpression.verify(a);
+      }),
+    );
   }
 
   static fromTimeExpressionAndInterval(
@@ -176,7 +202,13 @@ export abstract class SqlExpression extends SqlBase {
     return this;
   }
 
-  public as(alias: RefName | string | undefined, forceQuotes?: boolean): SqlExpression {
+  // Alias
+
+  public as(alias: RefName | string, forceQuotes?: boolean): SqlAlias {
+    return SqlAlias.create(this, alias, forceQuotes);
+  }
+
+  public setAlias(alias: RefName | string | undefined, forceQuotes?: boolean): SqlExpression {
     if (!alias) return this.getUnderlyingExpression();
     return SqlAlias.create(this, alias, forceQuotes);
   }
@@ -185,19 +217,15 @@ export abstract class SqlExpression extends SqlBase {
     return SqlAlias.create(this, alias, forceQuotes);
   }
 
-  public convertToTable(): SqlExpression {
+  public getUnderlyingExpression(): SqlExpression {
     return this;
-  }
-
-  public getAliasName(): string | undefined {
-    return;
   }
 
   public getOutputName(): string | undefined {
     return;
   }
 
-  public getUnderlyingExpression(): SqlExpression {
+  public convertToTable(): SqlExpression {
     return this;
   }
 
@@ -249,6 +277,14 @@ export abstract class SqlExpression extends SqlBase {
     return SqlComparison.isNotNull(this);
   }
 
+  public isNotDistinctFrom(rhs: SqlExpression | LiteralValue): SqlComparison {
+    return SqlComparison.isNotDistinctFrom(this, rhs);
+  }
+
+  public isDistinctFrom(rhs: SqlExpression | LiteralValue): SqlComparison {
+    return SqlComparison.isDistinctFrom(this, rhs);
+  }
+
   public in(values: (SqlExpression | LiteralValue)[]): SqlComparison {
     return SqlComparison.in(this, values);
   }
@@ -291,12 +327,32 @@ export abstract class SqlExpression extends SqlBase {
 
   // SqlMulti
 
-  public and(expression: SqlExpression): SqlExpression {
-    return SqlExpression.and(this, expression);
+  public and(...expressions: SqlExpression[]): SqlExpression {
+    return SqlExpression.and(this, ...expressions);
   }
 
-  public or(expression: SqlExpression): SqlExpression {
-    return SqlExpression.or(this, expression);
+  public or(...expressions: SqlExpression[]): SqlExpression {
+    return SqlExpression.or(this, ...expressions);
+  }
+
+  public concat(...expressions: SqlExpression[]): SqlExpression {
+    return SqlExpression.concat(this, ...expressions);
+  }
+
+  public add(...expressions: SqlExpression[]): SqlExpression {
+    return SqlExpression.add(this, ...expressions);
+  }
+
+  public subtract(...expressions: SqlExpression[]): SqlExpression {
+    return SqlExpression.subtract(this, ...expressions);
+  }
+
+  public multiply(...expressions: SqlExpression[]): SqlExpression {
+    return SqlExpression.multiply(this, ...expressions);
+  }
+
+  public divide(...expressions: SqlExpression[]): SqlExpression {
+    return SqlExpression.divide(this, ...expressions);
   }
 
   public decomposeViaAnd(_options?: DecomposeViaOptions): SqlExpression[] {
@@ -332,7 +388,7 @@ export abstract class SqlExpression extends SqlBase {
 
   // SqlFunction
 
-  public cast(asType: string): SqlExpression {
+  public cast(asType: SqlType | string): SqlExpression {
     return SqlFunction.cast(this, asType);
   }
 
@@ -366,5 +422,53 @@ export abstract class SqlExpression extends SqlBase {
       }
       return x;
     }) as SqlExpression;
+  }
+
+  /**
+   * Updates a specific clause
+   * @param clause the new clause to add
+   * @returns the updated where clause
+   * @deprecated
+   */
+  public changeClauseInWhere(clause: SqlExpression | string) {
+    const parsed = SqlExpression.parse(clause);
+    if (String(this) === 'TRUE') {
+      return parsed;
+    } else {
+      let currentClauses = this.decomposeViaAnd();
+
+      const usedColumnNames = parsed.getUsedColumnNames();
+      if (usedColumnNames.length === 1) {
+        const clauseColumn = usedColumnNames[0];
+        currentClauses = currentClauses.filter(c => {
+          const cUsedColumn = c.getUsedColumnNames();
+          return cUsedColumn.length !== 1 || cUsedColumn[0] !== clauseColumn;
+        });
+      }
+
+      return SqlExpression.and(...currentClauses, parsed);
+    }
+  }
+
+  /**
+   * Toggles a specific clause
+   * @param clause the clause to toggle
+   * @returns the updated where clause
+   * @deprecated
+   */
+  public toggleClauseInWhere(clause: SqlExpression | string) {
+    const parsed = SqlExpression.parse(clause);
+    if (String(this) === 'TRUE') {
+      return parsed;
+    } else {
+      const currentClauses = this.decomposeViaAnd();
+      const currentClausesWithoutClause = currentClauses.filter(c => !c.equals(parsed));
+
+      if (currentClauses.length === currentClausesWithoutClause.length) {
+        return SqlExpression.and(...currentClauses, parsed);
+      } else {
+        return SqlExpression.and(...currentClausesWithoutClause);
+      }
+    }
   }
 }

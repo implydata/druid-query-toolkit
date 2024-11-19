@@ -47,18 +47,32 @@ describe('SqlFunction', () => {
       "trim('eh' from 'hehe__hehe')",
       `"trim" ('eh' from 'hehe__hehe')`,
 
+      `JSON_VALUE(my_json, '$.x')`,
+      `JSON_VALUE(my_json, '$.x' RETURNING DOUBLE)`,
+
       `SomeFn("arg1" => "boo")`,
       `"SomeFn" ("arg1" => "boo")`,
       `"ext" .  "SomeFn" ("arg1" => "boo")`,
+      `LOCAL(path => '/tmp/druid')`,
+      `EXTERN(LOCAL("path" => '/tmp/druid'))`,
       `NESTED_AGG(TIME_FLOOR(t.__time, 'P1D'), COUNT(DISTINCT t."ip") AS "daily_unique", AVG("daily_unique"))`,
 
       `TABLE(extern('{...}', '{...}', '[...]'))`,
       `"TABLE" (extern('{...}', '{...}', '[...]'))`,
       `TABLE(extern('{...}', '{...}')) EXTEND (x VARCHAR, y BIGINT, z TYPE('COMPLEX<json>'))`,
       `TABLE(extern('{...}', '{...}'))  (x VARCHAR, y BIGINT, z TYPE('COMPLEX<json>'))`,
+      `TABLE(extern('{...}', '{...}'))  EXTEND  (xs VARCHAR   ARRAY, ys BIGINT  ARRAY, zs DOUBLE  ARRAY)`,
 
       `SUM(COUNT(*)) OVER ()`,
       `SUM(COUNT(*))   Over  ("windowName"  Order by COUNT(*) Desc)`,
+      `ROW_NUMBER() OVER (PARTITION BY t."country", t."city" ORDER BY COUNT(*) DESC)`,
+      `ROW_NUMBER() OVER (PARTITION BY t."country", t."city" ORDER BY COUNT(*) DESC RANGE UNBOUNDED PRECEDING)`,
+      `ROW_NUMBER() OVER (PARTITION BY t."country", t."city" ORDER BY COUNT(*) DESC ROWS 5 PRECEDING)`,
+      `ROW_NUMBER() OVER (PARTITION BY t."country", t."city" ORDER BY COUNT(*) DESC RANGE CURRENT ROW)`,
+      `ROW_NUMBER() OVER (PARTITION BY t."country", t."city" ORDER BY COUNT(*) DESC RANGE 5 FOLLOWING)`,
+      `ROW_NUMBER() OVER (PARTITION BY t."country", t."city" ORDER BY COUNT(*) DESC RANGE UNBOUNDED FOLLOWING)`,
+      `ROW_NUMBER() OVER (PARTITION BY t."country", t."city" ORDER BY COUNT(*) DESC RANGE BETWEEN UNBOUNDED FOLLOWING AND CURRENT ROW)`,
+      `count(*) over (partition by cityName order by countryName rows between unbounded preceding and 1 preceding)`,
 
       `PI`,
       `CURRENT_TIMESTAMP`,
@@ -88,8 +102,11 @@ describe('SqlFunction', () => {
   it('.count', () => {
     expect(SqlFunction.count().toString()).toEqual('COUNT(*)');
     expect(
-      SqlFunction.count(SqlStar.PLAIN).addWhereExpression(SqlExpression.parse('x > 1')).toString(),
+      SqlFunction.count(SqlStar.PLAIN).addWhere(SqlExpression.parse('x > 1')).toString(),
     ).toEqual('COUNT(*) FILTER (WHERE x > 1)');
+    expect(
+      SqlFunction.count(SqlStar.PLAIN).addWhere(SqlExpression.parse('TRUE')).toString(),
+    ).toEqual('COUNT(*)');
   });
 
   it('.countDistinct', () => {
@@ -100,6 +117,16 @@ describe('SqlFunction', () => {
   it('.cast', () => {
     expect(SqlFunction.cast(SqlExpression.parse('X'), 'BIGINT').toString()).toEqual(
       'CAST(X AS BIGINT)',
+    );
+  });
+
+  it('.jsonValue', () => {
+    expect(SqlFunction.jsonValue(SqlExpression.parse('X'), '$.x').toString()).toEqual(
+      `JSON_VALUE(X, '$.x')`,
+    );
+
+    expect(SqlFunction.jsonValue(SqlExpression.parse('X'), '$.x', 'DOUBLE').toString()).toEqual(
+      `JSON_VALUE(X, '$.x' RETURNING DOUBLE)`,
     );
   });
 
@@ -806,7 +833,7 @@ describe('SqlFunction', () => {
   });
 
   it('CAST function', () => {
-    const sql = `Cast( x AS THING)`;
+    const sql = `Cast( x AS Thing)`;
 
     backAndForth(sql);
 
@@ -833,7 +860,9 @@ describe('SqlFunction', () => {
               "type": "column",
             },
             SqlType {
-              "keywords": Object {},
+              "keywords": Object {
+                "type": "Thing",
+              },
               "parens": undefined,
               "spacing": Object {},
               "type": "type",
@@ -1261,39 +1290,65 @@ describe('SqlFunction', () => {
     `);
   });
 
+  describe('#getArg', () => {
+    const fn = SqlExpression.parse(`BLAH(t."lol", 1, hello => "world")`) as SqlFunction;
+
+    it('works with number', () => {
+      expect(String(fn.getArg(0))).toEqual(`t."lol"`);
+      expect(String(fn.getArg(1))).toEqual(`1`);
+      expect(String(fn.getArg(-1))).toEqual(`hello => "world"`);
+      expect(fn.getArg(7)).toBeUndefined();
+    });
+
+    it('works with label', () => {
+      expect(String(fn.getArg('hello'))).toEqual(`"world"`);
+      expect(fn.getArg('blah')).toBeUndefined();
+    });
+  });
+
   describe('#changeWhereExpression', () => {
     it('changes', () => {
-      const sql = SqlExpression.parse(
+      const fn = SqlExpression.parse(
         `SUM(t."lol") FILTER (WHERE t."country" = 'USA')`,
       ) as SqlFunction;
-      expect(String(sql.changeWhereExpression(SqlExpression.parse(`t."country" = 'UK'`)))).toEqual(
+
+      expect(String(fn.changeWhereExpression(SqlExpression.parse(`t."country" = 'UK'`)))).toEqual(
         'SUM(t."lol") FILTER (WHERE t."country" = \'UK\')',
       );
     });
 
     it('adds', () => {
-      const sql = SqlExpression.parse(`SUM(t."lol")`) as SqlFunction;
-      expect(String(sql.changeWhereExpression(SqlExpression.parse(`t."country" = 'UK'`)))).toEqual(
+      const fn = SqlExpression.parse(`SUM(t."lol")`) as SqlFunction;
+
+      expect(String(fn.changeWhereExpression(SqlExpression.parse(`t."country" = 'UK'`)))).toEqual(
         'SUM(t."lol") FILTER (WHERE t."country" = \'UK\')',
       );
     });
   });
 
-  describe('#addWhereExpression', () => {
+  describe('#addWhere', () => {
     it('adds when something already exists', () => {
-      const sql = SqlExpression.parse(
+      const fn = SqlExpression.parse(
         `SUM(t."lol") FILTER (WHERE t."country" = 'USA' OR t."city" = 'SF')`,
       ) as SqlFunction;
-      expect(String(sql.addWhereExpression(SqlExpression.parse(`t."browser" = 'Chrome'`)))).toEqual(
+
+      expect(String(fn.addWhere(SqlExpression.parse(`t."browser" = 'Chrome'`)))).toEqual(
         `SUM(t."lol") FILTER (WHERE (t."country" = 'USA' OR t."city" = 'SF') AND t."browser" = 'Chrome')`,
       );
     });
 
     it('adds when nothing exists', () => {
-      const sql = SqlExpression.parse(`SUM(t."lol")`) as SqlFunction;
+      const fn = SqlExpression.parse(`SUM(t."lol")`) as SqlFunction;
+
       expect(
-        String(sql.changeWhereExpression(SqlExpression.parse(`t."browser" = 'Chrome'`))),
+        String(fn.changeWhereExpression(SqlExpression.parse(`t."browser" = 'Chrome'`))),
       ).toEqual('SUM(t."lol") FILTER (WHERE t."browser" = \'Chrome\')');
+    });
+
+    it('noop on NULL', () => {
+      const fn = SqlExpression.parse(`SUM(t."lol")`) as SqlFunction;
+
+      expect(String(fn.addWhere(SqlExpression.parse(`TRUE`)))).toEqual('SUM(t."lol")');
     });
   });
 });

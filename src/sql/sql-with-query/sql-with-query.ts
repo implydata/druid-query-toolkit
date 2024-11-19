@@ -13,24 +13,24 @@
  */
 
 import { isEmptyArray } from '../../utils';
-import { SqlBase, SqlBaseValue, SqlTypeDesignator, Substitutor } from '../sql-base';
+import type { SqlBaseValue, SqlTypeDesignator, Substitutor } from '../sql-base';
+import { SqlBase } from '../sql-base';
+import type { SqlOrderByExpression, SqlPartitionedByClause } from '../sql-clause';
 import {
   SqlClusteredByClause,
   SqlInsertClause,
   SqlLimitClause,
   SqlOffsetClause,
   SqlOrderByClause,
-  SqlOrderByExpression,
-  SqlPartitionedByClause,
   SqlReplaceClause,
   SqlWithClause,
   SqlWithPart,
 } from '../sql-clause';
 import { SqlExpression } from '../sql-expression';
-import { SqlLiteral } from '../sql-literal/sql-literal';
+import type { SqlLiteral } from '../sql-literal/sql-literal';
 import { SqlQuery } from '../sql-query/sql-query';
-import { SqlTable } from '../sql-table/sql-table';
-import { SeparatedArray } from '../utils';
+import type { SeparatedArray } from '../utils';
+import { NEWLINE } from '../utils';
 
 export interface SqlWithQueryValue extends SqlBaseValue {
   explain?: boolean;
@@ -114,41 +114,44 @@ export class SqlWithQuery extends SqlExpression {
     if (explain) {
       rawParts.push(
         this.getKeyword('explainPlanFor', SqlQuery.DEFAULT_EXPLAIN_PLAN_FOR_KEYWORD),
-        this.getSpace('postExplainPlanFor', '\n'),
+        this.getSpace('postExplainPlanFor', NEWLINE),
       );
     }
 
     // INSERT / REPLACE clause
     if (insertClause) {
-      rawParts.push(insertClause.toString(), this.getSpace('postInsertClause', '\n'));
+      rawParts.push(insertClause.toString(), this.getSpace('postInsertClause', NEWLINE));
     } else if (replaceClause) {
-      rawParts.push(replaceClause.toString(), this.getSpace('postReplaceClause', '\n'));
+      rawParts.push(replaceClause.toString(), this.getSpace('postReplaceClause', NEWLINE));
     }
 
     // WITH clause
-    rawParts.push(withClause.toString(), this.getSpace('postWithClause', '\n'));
+    rawParts.push(withClause.toString(), this.getSpace('postWithClause', NEWLINE));
 
     // Sub query
     rawParts.push(query.toString());
 
     if (orderByClause) {
-      rawParts.push(this.getSpace('preOrderByClause', '\n'), orderByClause.toString());
+      rawParts.push(this.getSpace('preOrderByClause', NEWLINE), orderByClause.toString());
     }
 
     if (limitClause) {
-      rawParts.push(this.getSpace('preLimitClause', '\n'), limitClause.toString());
+      rawParts.push(this.getSpace('preLimitClause', NEWLINE), limitClause.toString());
     }
 
     if (offsetClause) {
-      rawParts.push(this.getSpace('preOffsetClause', '\n'), offsetClause.toString());
+      rawParts.push(this.getSpace('preOffsetClause', NEWLINE), offsetClause.toString());
     }
 
     if (partitionedByClause) {
-      rawParts.push(this.getSpace('prePartitionedByClause', '\n'), partitionedByClause.toString());
+      rawParts.push(
+        this.getSpace('prePartitionedByClause', NEWLINE),
+        partitionedByClause.toString(),
+      );
     }
 
     if (clusteredByClause) {
-      rawParts.push(this.getSpace('preClusteredByClause', '\n'), clusteredByClause.toString());
+      rawParts.push(this.getSpace('preClusteredByClause', NEWLINE), clusteredByClause.toString());
     }
 
     return rawParts.join('');
@@ -244,8 +247,18 @@ export class SqlWithQuery extends SqlExpression {
     return SqlBase.fromValue(value);
   }
 
+  public getLimitValue(): number | undefined {
+    return this.limitClause?.getLimitValue();
+  }
+
   public changeLimitValue(limitValue: SqlLiteral | number | undefined): this {
+    if (typeof limitValue === 'number' && limitValue < 0) {
+      throw new Error(`${limitValue} is not a valid limit value`);
+    }
     if (typeof limitValue === 'undefined') return this.changeLimitClause(undefined);
+    if (typeof limitValue === 'number' && !isFinite(limitValue)) {
+      return this.changeLimitClause(undefined);
+    }
     return this.changeLimitClause(
       this.limitClause
         ? this.limitClause.changeLimit(limitValue)
@@ -263,6 +276,10 @@ export class SqlWithQuery extends SqlExpression {
       value.spacing = this.getSpacingWithout('preOffsetClause');
     }
     return SqlBase.fromValue(value);
+  }
+
+  public getOffsetValue(): number | undefined {
+    return this.offsetClause?.getOffsetValue();
   }
 
   public changeOffsetValue(offsetValue: SqlLiteral | number | undefined): this {
@@ -339,6 +356,12 @@ export class SqlWithQuery extends SqlExpression {
       ret = ret.changeWithClause(withClause as SqlWithClause);
     }
 
+    const query = this.query._walkHelper(nextStack, fn, postorder);
+    if (!query) return;
+    if (query !== this.query) {
+      ret = ret.changeQuery(query as SqlQuery);
+    }
+
     if (this.orderByClause) {
       const orderByClause = this.orderByClause._walkHelper(nextStack, fn, postorder);
       if (!orderByClause) return;
@@ -390,11 +413,11 @@ export class SqlWithQuery extends SqlExpression {
 
   /* ~~~~~ INSERT ~~~~~ */
 
-  public getInsertIntoTable(): SqlTable | undefined {
+  public getInsertIntoTable(): SqlExpression | undefined {
     return this.insertClause?.table;
   }
 
-  public changeInsertIntoTable(table: SqlTable | string | undefined): this {
+  public changeInsertIntoTable(table: SqlExpression | string | undefined): this {
     const value = this.valueOf();
     value.insertClause = table
       ? value.insertClause
@@ -406,11 +429,11 @@ export class SqlWithQuery extends SqlExpression {
 
   /* ~~~~~ REPLACE ~~~~~ */
 
-  public getReplaceIntoTable(): SqlTable | undefined {
+  public getReplaceIntoTable(): SqlExpression | undefined {
     return this.replaceClause?.table;
   }
 
-  public changeReplaceIntoTable(table: SqlTable | string | undefined): this {
+  public changeReplaceIntoTable(table: SqlExpression | string | undefined): this {
     return this.changeReplaceClause(
       table
         ? this.replaceClause
@@ -422,7 +445,7 @@ export class SqlWithQuery extends SqlExpression {
 
   /* ~~~~~ INSERT + REPLACE ~~~~~ */
 
-  public getIngestTable(): SqlTable | undefined {
+  public getIngestTable(): SqlExpression | undefined {
     return this.getInsertIntoTable() || this.getReplaceIntoTable();
   }
 

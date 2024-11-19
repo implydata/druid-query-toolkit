@@ -12,11 +12,24 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlBaseValue, SqlTypeDesignator, Substitutor } from '../sql-base';
-import { DecomposeViaOptions, SqlExpression } from '../sql-expression';
+import type { SqlBaseValue, SqlTypeDesignator, Substitutor } from '../sql-base';
+import { SqlBase } from '../sql-base';
+import type { DecomposeViaOptions } from '../sql-expression';
+import { SqlExpression } from '../sql-expression';
+import { SqlLiteral } from '../sql-literal/sql-literal';
 import { SeparatedArray, Separator } from '../utils';
 
-export type SqlMultiOp = 'OR' | 'AND' | '||' | '+' | '-' | '*' | '/';
+export type SqlMultiOp = 'AND' | 'OR' | '||' | '+' | '-' | '*' | '/';
+
+const OP_TO_ZERO: Record<SqlMultiOp, SqlLiteral> = {
+  'AND': SqlLiteral.TRUE,
+  'OR': SqlLiteral.FALSE,
+  '||': SqlLiteral.EMPTY_STRING,
+  '+': SqlLiteral.ZERO_POINT_ZERO,
+  '-': SqlLiteral.ZERO_POINT_ZERO,
+  '*': SqlLiteral.ONE_POINT_ZERO,
+  '/': SqlLiteral.ONE_POINT_ZERO,
+};
 
 export interface SqlMultiValue extends SqlBaseValue {
   op: SqlMultiOp;
@@ -25,6 +38,29 @@ export interface SqlMultiValue extends SqlBaseValue {
 
 export class SqlMulti extends SqlExpression {
   static type: SqlTypeDesignator = 'multi';
+
+  static create(
+    op: SqlMultiOp,
+    args: SeparatedArray<SqlExpression> | readonly SqlExpression[],
+  ): SqlMulti {
+    return new SqlMulti({
+      op,
+      args: SeparatedArray.fromArray(args, Separator.symmetricSpace(op)),
+    });
+  }
+
+  static createIfNeeded(op: SqlMultiOp, args: readonly SqlExpression[]): SqlExpression {
+    switch (args.length) {
+      case 0:
+        return OP_TO_ZERO[op];
+
+      case 1:
+        return args[0]!;
+
+      default:
+        return SqlMulti.create(op, args);
+    }
+  }
 
   public readonly op: SqlMultiOp;
   public readonly args: SeparatedArray<SqlExpression>;
@@ -47,7 +83,11 @@ export class SqlMulti extends SqlExpression {
   }
 
   protected _toRawString(): string {
-    return this.args.toString(Separator.symmetricSpace(SqlBase.capitalize(this.op)));
+    const { op, args } = this;
+    const sep = SqlBase.capitalize(op);
+    return args.toString(
+      args.length() >= 3 ? Separator.indentSpace(sep) : Separator.symmetricSpace(sep),
+    );
   }
 
   public numArgs(): number {
@@ -120,6 +160,14 @@ export class SqlMulti extends SqlExpression {
       return this.args.values.flatMap(v => v.decomposeViaOr(options));
     } else {
       return this.args.values.map(v => v.changeParens([]));
+    }
+  }
+
+  public flattenIfNeeded(flatteningOp: SqlMultiOp): SqlExpression | readonly SqlExpression[] {
+    if (this.op === flatteningOp) {
+      return this.hasParens() ? this : this.getArgArray();
+    } else {
+      return this.ensureParens();
     }
   }
 }

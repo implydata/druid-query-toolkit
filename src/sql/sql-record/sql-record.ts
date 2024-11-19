@@ -13,9 +13,10 @@
  */
 
 import { isEmptyArray } from '../../utils';
-import { SqlBase, SqlBaseValue, SqlTypeDesignator, Substitutor } from '../sql-base';
+import type { SqlBaseValue, SqlTypeDesignator, Substitutor } from '../sql-base';
+import { SqlBase } from '../sql-base';
 import { SqlExpression } from '../sql-expression';
-import { LiteralValue } from '../sql-literal/sql-literal';
+import type { LiteralValue } from '../sql-literal/sql-literal';
 import { SeparatedArray, Separator } from '../utils';
 
 export interface SqlRecordValue extends SqlBaseValue {
@@ -31,11 +32,16 @@ export class SqlRecord extends SqlExpression {
     expressions?: SqlRecord | SeparatedArray<SqlExpression> | SqlExpression[],
   ): SqlRecord {
     if (expressions instanceof SqlRecord) return expressions;
+    const array =
+      !expressions || isEmptyArray(expressions)
+        ? undefined
+        : SeparatedArray.fromArray(expressions, Separator.COMMA);
+
     return new SqlRecord({
-      expressions:
-        !expressions || isEmptyArray(expressions)
-          ? undefined
-          : SeparatedArray.fromArray(expressions, Separator.COMMA),
+      keywords: {
+        row: array && array.length() === 1 ? SqlRecord.DEFAULT_ROW_KEYWORD : '',
+      },
+      expressions: array,
     });
   }
 
@@ -44,9 +50,6 @@ export class SqlRecord extends SqlExpression {
   ): SqlRecord {
     if (expressions instanceof SqlRecord) return expressions;
     return new SqlRecord({
-      keywords: {
-        row: '',
-      },
       expressions:
         !expressions || isEmptyArray(expressions)
           ? undefined
@@ -68,14 +71,7 @@ export class SqlRecord extends SqlExpression {
   }
 
   protected _toRawString(): string {
-    const rawParts: string[] = [
-      this.getKeyword(
-        'row',
-        this.expressions?.length() === 1 ? SqlRecord.DEFAULT_ROW_KEYWORD : '',
-        'postRow',
-        '',
-      ),
-    ];
+    const rawParts: string[] = [this.getKeyword('row', '', 'postRow', '')];
 
     rawParts.push('(', this.getSpace('postLeftParen', ''));
 

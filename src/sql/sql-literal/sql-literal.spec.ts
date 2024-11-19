@@ -399,6 +399,13 @@ describe('SqlLiteral', () => {
       expect(() => SqlLiteral.create((() => 1) as any)).toThrow(
         'SqlLiteral invalid input of type function',
       );
+
+      expect(() => SqlLiteral.create(Infinity)).toThrow(
+        'SqlLiteral invalid numeric input Infinity',
+      );
+      expect(() => SqlLiteral.create(-Infinity)).toThrow(
+        'SqlLiteral invalid numeric input -Infinity',
+      );
     });
   });
 

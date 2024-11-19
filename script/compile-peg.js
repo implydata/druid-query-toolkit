@@ -13,7 +13,8 @@
  */
 
 const fs = require('fs');
-const peg = require('pegjs');
+const peg = require('peggy');
+const tspegjs = require('ts-pegjs');
 
 const header = fs.readFileSync('./src/sql/parser/druidsql.header.js', 'utf-8');
 const rules = fs.readFileSync('./src/sql/parser/druidsql.pegjs', 'utf-8');
@@ -22,6 +23,7 @@ let parser;
 try {
   parser = peg.generate(header + '\n\n' + rules, {
     output: 'source',
+    plugins: [tspegjs],
   });
 } catch (e) {
   console.error('Failed to compile');
@@ -31,14 +33,11 @@ try {
 }
 
 const wrappedParser = `
-var S = require('..');
+import * as S from '..';
 
-var p =
 ${parser}
 
-exports.parseSql = function parseSql(input) {
-  return p.parse(input);
-}
 `;
 
-fs.writeFileSync('./src/sql/parser/index.js', wrappedParser);
+// Write to src
+fs.writeFileSync('./src/sql/parser/index.ts', wrappedParser);

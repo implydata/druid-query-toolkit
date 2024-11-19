@@ -12,15 +12,11 @@
  * limitations under the License.
  */
 
+import type { QueryParameter, QueryPayload } from '../query-payload/query-payload';
 import { QueryResult } from '../query-result';
 import { SqlQuery } from '../sql';
 
-import { CancelToken } from './cancel-token';
-
-export interface QueryParameter {
-  type: string;
-  value: string | number;
-}
+import type { CancelToken } from './cancel-token';
 
 export interface DataAndHeaders {
   data: unknown;
@@ -28,13 +24,14 @@ export interface DataAndHeaders {
 }
 
 export type QueryExecutor = (
-  payload: any,
+  payload: QueryPayload,
   isSql: boolean,
   cancelToken?: CancelToken,
 ) => Promise<DataAndHeaders>;
 
 export interface RunQueryOptions {
-  query: string | SqlQuery | Record<string, any>;
+  query: string | SqlQuery | QueryPayload;
+  defaultQueryContext?: Record<string, any>;
   extraQueryContext?: Record<string, any>;
   queryParameters?: QueryParameter[];
   resultFormat?: string;
@@ -81,6 +78,7 @@ export class QueryRunner {
   public async runQuery(options: RunQueryOptions): Promise<QueryResult> {
     const {
       query,
+      defaultQueryContext,
       extraQueryContext,
       queryParameters,
       resultFormat,
@@ -91,11 +89,11 @@ export class QueryRunner {
     } = options;
 
     let isSql: boolean;
-    let jsonQuery: Record<string, any>;
+    let queryPayload: QueryPayload;
     let parsedQuery: SqlQuery | undefined;
     if (typeof query === 'string') {
       isSql = true;
-      jsonQuery = {
+      queryPayload = {
         query,
         resultFormat: resultFormat ?? 'array',
         header: header ?? true,
@@ -108,7 +106,7 @@ export class QueryRunner {
     } else if (query instanceof SqlQuery) {
       isSql = true;
       parsedQuery = query;
-      jsonQuery = {
+      queryPayload = {
         query: String(query),
         resultFormat: resultFormat ?? 'array',
         header: header ?? true,
@@ -116,39 +114,49 @@ export class QueryRunner {
         sqlTypesHeader: (header && sqlTypesHeader) ?? true,
       };
     } else {
-      jsonQuery = query;
-      isSql = !jsonQuery.queryType && typeof jsonQuery.query === 'string';
+      queryPayload = query;
+      isSql = !('queryType' in queryPayload) && typeof queryPayload.query === 'string';
       if (isSql) {
         try {
-          parsedQuery = SqlQuery.parse(jsonQuery.query);
+          parsedQuery = SqlQuery.parse(queryPayload.query);
         } catch {}
       }
     }
 
-    if (!QueryRunner.isEmptyContext(extraQueryContext)) {
-      jsonQuery = { ...jsonQuery, context: { ...(jsonQuery.context || {}), ...extraQueryContext } };
+    if (
+      !QueryRunner.isEmptyContext(defaultQueryContext) ||
+      !QueryRunner.isEmptyContext(extraQueryContext)
+    ) {
+      queryPayload = {
+        ...queryPayload,
+        context: {
+          ...defaultQueryContext,
+          ...(queryPayload.context || {}),
+          ...extraQueryContext,
+        },
+      };
     }
 
     if (
-      typeof jsonQuery.query === 'string' &&
+      typeof queryPayload.query === 'string' &&
       Array.isArray(queryParameters) &&
       queryParameters.length
     ) {
-      jsonQuery = { ...jsonQuery, parameters: queryParameters };
+      queryPayload = { ...queryPayload, parameters: queryParameters };
     }
 
     const startTime = QueryRunner.now();
-    const dataAndHeaders = await this.getExecutor()(jsonQuery, isSql, cancelToken);
+    const dataAndHeaders = await this.getExecutor()(queryPayload, isSql, cancelToken);
     const endTime = QueryRunner.now();
 
     if (cancelToken) cancelToken.throwIfRequested();
 
     const result = QueryResult.fromQueryAndRawResult(
-      jsonQuery,
+      queryPayload,
       dataAndHeaders.data,
       dataAndHeaders.headers,
     )
-      .attachQuery(jsonQuery, parsedQuery)
+      .attachQuery(queryPayload, parsedQuery)
       .attachQueryId(
         dataAndHeaders.headers['x-druid-query-id'],
         dataAndHeaders.headers['x-druid-sql-query-id'],

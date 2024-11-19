@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { parseSql } from '.';
+import { parse as parseSql } from '.';
 
 describe('Parser', () => {
   it('throws on invalid input', () => {

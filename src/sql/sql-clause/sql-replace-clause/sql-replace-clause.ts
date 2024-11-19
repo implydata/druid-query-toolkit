@@ -12,15 +12,17 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlTypeDesignator, Substitutor } from '../../sql-base';
-import { SqlColumnList } from '../../sql-column-list/sql-column-list';
+import type { SqlTypeDesignator, Substitutor } from '../../sql-base';
+import { SqlBase } from '../../sql-base';
+import type { SqlColumnList } from '../../sql-column-list/sql-column-list';
 import { SqlExpression } from '../../sql-expression';
 import { SqlTable } from '../../sql-table/sql-table';
-import { SqlClause, SqlClauseValue } from '../sql-clause';
+import type { SqlClauseValue } from '../sql-clause';
+import { SqlClause } from '../sql-clause';
 import { SqlWhereClause } from '../sql-where-clause/sql-where-clause';
 
 export interface SqlReplaceClauseValue extends SqlClauseValue {
-  table: SqlTable;
+  table: SqlExpression;
   columns?: SqlColumnList;
   whereClause?: SqlWhereClause;
 }
@@ -34,7 +36,7 @@ export class SqlReplaceClause extends SqlClause {
   static readonly DEFAULT_ALL_KEYWORD = 'ALL';
 
   static create(
-    table: SqlReplaceClause | SqlTable | string,
+    table: SqlReplaceClause | SqlExpression | string,
     where?: SqlWhereClause | SqlExpression,
   ): SqlReplaceClause {
     if (table instanceof SqlReplaceClause) return table;
@@ -48,12 +50,12 @@ export class SqlReplaceClause extends SqlClause {
     }
 
     return new SqlReplaceClause({
-      table,
+      table: SqlExpression.verify(table),
       whereClause,
     });
   }
 
-  public readonly table: SqlTable;
+  public readonly table: SqlExpression;
   public readonly columns?: SqlColumnList;
   public readonly whereClause?: SqlWhereClause;
 
@@ -100,7 +102,7 @@ export class SqlReplaceClause extends SqlClause {
     return rawParts.join('');
   }
 
-  public changeTable(table: SqlTable | string): this {
+  public changeTable(table: SqlExpression | string): this {
     const value = this.valueOf();
     if (typeof table === 'string') {
       table = SqlTable.create(table);
@@ -118,8 +120,8 @@ export class SqlReplaceClause extends SqlClause {
 
     const table = this.table._walkHelper(nextStack, fn, postorder);
     if (!table) return;
-    if (!(table instanceof SqlTable)) {
-      throw new Error('must return table');
+    if (!(table instanceof SqlExpression)) {
+      throw new Error('must return expression');
     }
     if (table !== this.table) {
       ret = ret.changeTable(table);

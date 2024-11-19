@@ -151,16 +151,6 @@ SqlQuery =
     Object.assign(spacing, subQuery.spacing);
   }
 
-  if (partitionedByClause) {
-    spacing.prePartitionedByClause = partitionedByClause[0];
-    value.partitionedByClause = partitionedByClause[1];
-  }
-
-  if (clusteredByClause) {
-    spacing.preClusteredByClause = clusteredByClause[0];
-    value.clusteredByClause = clusteredByClause[1];
-  }
-
   if (orderByClause) {
     spacing.preOrderByClause = orderByClause[0];
     value.orderByClause = orderByClause[1];
@@ -174,6 +164,16 @@ SqlQuery =
   if (offsetClause) {
     spacing.preOffsetClause = offsetClause[0];
     value.offsetClause = offsetClause[1];
+  }
+
+  if (partitionedByClause) {
+    spacing.prePartitionedByClause = partitionedByClause[0];
+    value.partitionedByClause = partitionedByClause[1];
+  }
+
+  if (clusteredByClause) {
+    spacing.preClusteredByClause = clusteredByClause[0];
+    value.clusteredByClause = clusteredByClause[1];
   }
 
   if (union) {
@@ -238,8 +238,9 @@ InsertClause =
   postInsert:__
   into:IntoToken
   postInto:__
-  table:SqlTable
+  table:(GenericFunction / SqlTable)
   columns:(_ SqlColumnList)?
+  format:(_ AsToken _ CsvToken)?
 {
   var value = {
     table: table,
@@ -256,6 +257,13 @@ InsertClause =
   if (columns) {
     value.spacing.preColumns = columns[0];
     value.columns = columns[1];
+  }
+
+  if (format) {
+    value.spacing.preAs = format[0];
+    value.keywords = format[1];
+    value.spacing.preFormat = format[2];
+    value.format = format[3];
   }
 
   return new S.SqlInsertClause(value);
@@ -400,11 +408,12 @@ JoinClauses = head:SqlJoinPart tail:(_ SqlJoinPart)*
 }
 
 SqlJoinPart =
+  natural:(NaturalToken _)?
   joinType:(JoinType _)?
   join:JoinToken
   postJoin:_
   table:SqlAlias
-  on:(_ OnToken _ Expression)?
+  joinCondition:((_ OnToken _ Expression) / (_ UsingToken _ SqlColumnList))?
 {
   var value = {
     table: table.convertToTable(),
@@ -416,6 +425,12 @@ SqlJoinPart =
     join: join,
   };
 
+  if (natural) {
+    value.natural = true;
+    keywords.natural = natural[0];
+    spacing.postNatural = natural[1];
+  }
+
   if (joinType) {
     var joinTypeUpper = joinType[0].toUpperCase();
     var m = joinTypeUpper.match(/^LEFT|RIGHT|FULL/);
@@ -425,12 +440,20 @@ SqlJoinPart =
     spacing.postJoinType = joinType[1];
   }
 
-  if (on) {
-    spacing.preOn = on[0];
-    keywords.on = on[1];
-    spacing.postOn = on[2];
-    value.onExpression = on[3];
+  if (joinCondition) {
+    if(joinCondition[1].toUpperCase() === 'USING'){
+      spacing.preUsing = joinCondition[0];
+      keywords.using = joinCondition[1];
+      spacing.postUsing = joinCondition[2];
+      value.usingColumns = joinCondition[3];
+    } else {
+      spacing.preOn = joinCondition[0];
+      keywords.on = joinCondition[1];
+      spacing.postOn = joinCondition[2];
+      value.onExpression = joinCondition[3];
+    }
   }
+
   return new S.SqlJoinPart(value);
 }
 
@@ -475,12 +498,15 @@ GroupByClause =
   }
 
   if (Array.isArray(ex)) {
-    value.innerParens = true;
-    value.spacing.postLeftParen = ex[1];
-
+    var postLeftParen = ex[1];
     if (ex[2]) {
+      value.innerParens = true;
       value.expressions = ex[2][0];
+      value.spacing.postLeftParen = postLeftParen;
       value.spacing.postExpressions = ex[2][1];
+    } else {
+      // Here we have `GROUP BY ()` so `innerParens` will be implicitly true
+      value.spacing.postLeftParen = postLeftParen;
     }
   } else {
     value.expressions = ex;
@@ -608,7 +634,7 @@ ClusteredByClause = clusteredBy:ClusteredByToken postClusteredBy:_ head:Expressi
   });
 }
 
-UnionClause = unionKeyword:UnionToken postUnion:_ unionQuery:SqlQuery
+UnionClause = unionKeyword:UnionAllToken postUnion:_ unionQuery:SqlQuery
 {
   return {
     unionKeyword: unionKeyword,
@@ -680,9 +706,14 @@ ComparisonExpression = lhs:AdditionExpression rhs:(_ ComparisonOpRhs)?
   });
 }
 
-ComparisonOpRhs = ComparisonOpRhsSimple / ComparisonOpRhsIs / ComparisonOpRhsIn / ComparisonOpRhsBetween / ComparisonOpRhsLike
+ComparisonOpRhs =
+  ComparisonOpRhsCompare
+/ ComparisonOpRhsIs
+/ ComparisonOpRhsIn
+/ ComparisonOpRhsBetween
+/ ComparisonOpRhsLike
 
-ComparisonOpRhsSimple = op:ComparisonOperator postOp:_ rhs:(AdditionExpression / (ComparisonDecorator _ SqlQueryInParens))
+ComparisonOpRhsCompare = op:ComparisonOperator postOp:_ rhs:(AdditionExpression / (ComparisonDecorator _ SqlQueryInParens))
 {
   const ret = {
     op: op === '!=' ? '<>' : op,
@@ -713,11 +744,11 @@ ComparisonOperator =
 
 ComparisonDecorator = AnyToken / AllToken / SomeToken
 
-ComparisonOpRhsIs = op:(IsToken $(__ NotToken)?) postOp:_ rhs:SqlLiteral
+ComparisonOpRhsIs = op:(IsToken $(__ NotToken)? $(__ DistinctToken __ FromToken)?) postOp:_ rhs:AdditionExpression
 {
   return {
-    op: op[1] ? 'IS NOT' : 'IS',
-    opKeyword: op[1] ? op.join('') : op[0],
+    op: 'IS' + (op[1] ? ' NOT' : '') + (op[2] ? ' DISTINCT FROM' : ''),
+    opKeyword: op.map(o => o ? o : '').join(''),
     postOp: postOp,
     rhs: rhs
   };
@@ -899,7 +930,7 @@ Interval =
   postInterval:_
   intervalValue:BaseType
   postIntervalValue:_
-  unit:($(TimeUnit _ ToToken _ TimeUnit) / $(TimeUnit '_' TimeUnit) / TimeUnit)
+  unit:($(TimeUnit _ ToToken _ TimeUnit) / $(TimeUnit '_' TimeUnit) / $(TimeUnit 'S'i?))
 {
   return new S.SqlInterval({
     intervalValue: intervalValue,
@@ -951,6 +982,7 @@ Function =
 / FloorCeilFunction
 / TimestampAddDiffFunction
 / PositionFunction
+/ JsonValueReturningFunction
 / ArrayFunction
 / NakedFunction
 
@@ -1035,6 +1067,7 @@ CountStarFunction =
   postArguments:_
   CloseParen
   filter:(_ FunctionFilter)?
+  window:(_ OverToken _ WindowSpec)?
 {
   var value = {
     functionName: makeFunctionName(functionName)
@@ -1055,6 +1088,13 @@ CountStarFunction =
     value.whereClause = filter[1].whereClause;
   }
 
+  if (window) {
+    spacing.preOver = window[0];
+    keywords.over = window[1];
+    spacing.postOver = window[2];
+    value.windowSpec = window[3];
+  }
+
   return new S.SqlFunction(value);
 }
 
@@ -1072,6 +1112,30 @@ CastFunction =
   return new S.SqlFunction({
     functionName: makeFunctionName(functionName),
     args: new S.SeparatedArray([expr, type], [separator]),
+    spacing: {
+      preLeftParen: preLeftParen,
+      postLeftParen: postLeftParen,
+      postArguments: postArguments,
+    }
+  });
+}
+
+JsonValueReturningFunction =
+  functionName:JsonValueToken
+  preLeftParen:_
+  OpenParen
+  postLeftParen:_
+  expr:Expression
+  commaSeparator:CommaSeparator
+  path:Expression
+  returningSeparator:ReturningSeparator
+  type:SqlType
+  postArguments:_
+  CloseParen
+{
+  return new S.SqlFunction({
+    functionName: makeFunctionName(functionName),
+    args: new S.SeparatedArray([expr, path, type], [commaSeparator, returningSeparator]),
     spacing: {
       preLeftParen: preLeftParen,
       postLeftParen: postLeftParen,
@@ -1250,16 +1314,29 @@ FunctionFilter = filterKeyword:FilterToken postFilter:_ OpenParen postLeftParen:
   };
 }
 
-WindowSpec = OpenParen postLeftParen:_ windowName:(RefName _)? orderByClause:(OrderByClause _)? CloseParen
+WindowSpec =
+  OpenParen
+  postLeftParen:_
+  windowName:(RefName _)?
+  partitionByClause:(PartitionByClause _)?
+  orderByClause:(OrderByClause _)?
+  frame:((RowsToken / RangeToken) _ (FrameBound / (BetweenToken _ FrameBound _ AndToken _ FrameBound)) _)?
+  CloseParen
 {
   var value = {};
   var spacing = value.spacing = {
     postLeftParen: postLeftParen
   };
+  var keywords = value.keywords = {};
 
   if (windowName) {
     value.windowName = windowName[0];
     spacing.postWindowName = windowName[1];
+  }
+
+  if (partitionByClause) {
+    value.partitionByClause = partitionByClause[0];
+    spacing.postPartitionBy = partitionByClause[1];
   }
 
   if (orderByClause) {
@@ -1267,9 +1344,83 @@ WindowSpec = OpenParen postLeftParen:_ windowName:(RefName _)? orderByClause:(Or
     spacing.postOrderBy = orderByClause[1];
   }
 
-  // postPartitionBy
+  if (frame) {
+    if (frame[0].toUpperCase() === 'ROWS') {
+      value.frameType = 'rows';
+      keywords.rows = frame[0];
+    } else {
+      value.frameType = 'range';
+      keywords.range = frame[0];
+    }
+
+    spacing.postFrameType = frame[1];
+
+    var b = frame[2];
+    if (Array.isArray(b)) {
+      keywords.between = b[0];
+      spacing.postBetween = b[1];
+      value.frameBound1 = b[2];
+      spacing.preAnd = b[3];
+      keywords.and = b[4];
+      spacing.postAnd = b[5];
+      value.frameBound2 = b[6];
+    } else {
+      value.frameBound1 = b;
+    }
+
+    spacing.postFrame = frame[3];
+  }
 
   return new S.SqlWindowSpec(value);
+}
+
+PartitionByClause =
+  partitionBy:PartitionByToken
+  postPartitionBy:_
+  ex:GroupByExpressionList
+{
+  return new S.SqlPartitionByClause({
+    spacing: {
+      postPartitionBy: postPartitionBy
+    },
+    keywords: {
+      partitionBy: partitionBy
+    },
+    expressions: ex
+  });
+}
+
+FrameBound = v:(CurrentRowToken / ((UnboundedToken / Digits) _ (PrecedingToken / FollowingToken)))
+{
+  if (Array.isArray(v)) {
+    var n = parseInt(v[0], 10);
+    var value = {
+      boundValue: isNaN(n) ? 'unbounded' : n,
+      keywords: {},
+      spacing: {
+        postBoundValue: v[1]
+      }
+    }
+
+    if (isNaN(n)) {
+      value.keywords.unbounded = v[0];
+    }
+
+    if (value.following = v[2].toUpperCase() === 'FOLLOWING') {
+      value.keywords.following = v[2];
+    } else {
+      value.keywords.preceding = v[2];
+    }
+
+    return new S.SqlFrameBound(value);
+  } else {
+    return new S.SqlFrameBound({
+      boundValue: 'currentRow',
+      keywords: {
+        currentRow: v
+      }
+    });
+  }
 }
 
 CommaSeparator = left:_ ',' right:_
@@ -1309,6 +1460,15 @@ ToSeparator = left:_ separator:ToToken right:_
 }
 
 InSeparator = left:_ separator:InToken right:_
+{
+  return new S.Separator({
+    left: left,
+    separator: separator,
+    right: right,
+  });
+}
+
+ReturningSeparator = left:_ separator:ReturningToken right:_
 {
   return new S.Separator({
     left: left,
@@ -1404,9 +1564,9 @@ BooleanLiteral = v:(TrueToken / FalseToken)
   return new S.SqlLiteral(v);
 }
 
-SqlType = UnquotedRefNameFree (OpenParen _ SingleQuotedString _ CloseParen)?
+SqlType = UnquotedRefNameFree (__ ArrayToken)? (OpenParen _ SingleQuotedString _ CloseParen)?
 {
-  return new S.SqlType({ value: text() });
+  return S.SqlType.create(text());
 }
 
 /* Numbers */
@@ -1663,6 +1823,8 @@ CastToken = $("CAST"i !IdentifierPart)
 CeilToken = $("CEIL"i !IdentifierPart)
 ClusteredByToken = $("CLUSTERED"i __ "BY"i !IdentifierPart)
 CountToken = $("COUNT"i !IdentifierPart)
+CsvToken = $("CSV"i !IdentifierPart)
+CurrentRowToken = $("CURRENT"i __ "ROW"i !IdentifierPart)
 CubeToken = $("CUBE"i !IdentifierPart)
 DateToken = $("DATE"i !IdentifierPart)
 DescToken = $("DESC"i !IdentifierPart)
@@ -1676,6 +1838,7 @@ ExtractToken = $("EXTRACT"i !IdentifierPart)
 FalseToken = $("FALSE"i !IdentifierPart) { return { value: false, stringValue: text() }; }
 FilterToken= $("FILTER"i !IdentifierPart)
 FloorToken = $("FLOOR"i !IdentifierPart)
+FollowingToken = $("FOLLOWING"i !IdentifierPart)
 FromToken = $("FROM"i !IdentifierPart)
 GroupByToken = $("GROUP"i __ "BY"i !IdentifierPart)
 GroupingSetsToken = $("GROUPING"i __ "SETS"i !IdentifierPart)
@@ -1686,9 +1849,11 @@ IntervalToken = $("INTERVAL"i !IdentifierPart)
 IntoToken = $("INTO"i !IdentifierPart)
 IsToken = $("IS"i !IdentifierPart)
 JoinToken = $("JOIN"i !IdentifierPart)
+JsonValueToken = $("JSON_VALUE"i !IdentifierPart)
 LeadingToken = $("LEADING"i !IdentifierPart)
 LikeToken = $("LIKE"i !IdentifierPart)
 LimitToken = $("LIMIT"i !IdentifierPart)
+NaturalToken = $("NATURAL"i !IdentifierPart)
 NotToken = $("NOT"i !IdentifierPart)
 NullToken = $("NULL"i !IdentifierPart) { return { value: null, stringValue: text() }; }
 OffsetToken = $("OFFSET"i !IdentifierPart)
@@ -1699,10 +1864,15 @@ OuterToken = $("OUTER"i !IdentifierPart)
 OverToken = $("OVER"i !IdentifierPart)
 OverwriteToken = $("OVERWRITE"i !IdentifierPart)
 PartitionedByToken = $("PARTITIONED"i __ "BY"i !IdentifierPart)
+PartitionByToken = $("PARTITION"i __ "BY"i !IdentifierPart)
 PositionToken = $("POSITION"i !IdentifierPart)
+PrecedingToken = $("PRECEDING"i !IdentifierPart)
+RangeToken = $("RANGE"i !IdentifierPart)
 ReplaceToken = $("REPLACE"i !IdentifierPart)
+ReturningToken = $("RETURNING"i !IdentifierPart)
 RollupToken = $("ROLLUP"i !IdentifierPart)
 RowToken = $("ROW"i !IdentifierPart)
+RowsToken = $("ROWS"i !IdentifierPart)
 SelectToken = $("SELECT"i !IdentifierPart)
 SomeToken = $("SOME"i !IdentifierPart)
 SymmetricToken = $("SYMMETRIC"i !IdentifierPart)
@@ -1716,7 +1886,9 @@ ToToken = $("TO"i !IdentifierPart)
 TrailingToken = $("TRAILING"i !IdentifierPart)
 TrimToken = $("TRIM"i !IdentifierPart)
 TrueToken = $("TRUE"i !IdentifierPart) { return { value: true, stringValue: text() }; }
-UnionToken = $("UNION"i !IdentifierPart __ AllToken)
+UnboundedToken = $("UNBOUNDED"i !IdentifierPart)
+UnionAllToken = $("UNION"i !IdentifierPart __ AllToken)
+UsingToken = $("USING"i !IdentifierPart)
 ValuesToken = $("VALUES"i !IdentifierPart)
 WhenToken = $("WHEN"i !IdentifierPart)
 WhereToken = $("WHERE"i !IdentifierPart)

@@ -12,7 +12,8 @@
  * limitations under the License.
  */
 
-import { LiteralValue, SqlLiteral } from '../sql';
+import type { LiteralValue } from '../sql';
+import { SqlLiteral } from '../sql';
 
 export function L(value: LiteralValue | SqlLiteral) {
   return SqlLiteral.create(value);

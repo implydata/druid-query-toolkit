@@ -12,8 +12,9 @@
  * limitations under the License.
  */
 
-import { Column, QueryResult } from '../query-result';
-import { SqlQuery, SqlTable } from '../sql';
+import type { Column, QueryResult } from '../query-result';
+import type { SqlTable } from '../sql';
+import { SqlQuery } from '../sql';
 import { dedupe } from '../utils';
 
 export interface TableInfo {

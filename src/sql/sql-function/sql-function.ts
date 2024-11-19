@@ -12,16 +12,20 @@
  * limitations under the License.
  */
 
-import { compact } from '../../utils';
+import { compact, filterMap } from '../../utils';
 import { SPECIAL_FUNCTIONS } from '../special-functions';
-import { SqlBase, SqlBaseValue, SqlTypeDesignator, Substitutor } from '../sql-base';
-import { SqlColumnDeclaration, SqlExtendClause, SqlWhereClause } from '../sql-clause';
+import type { SqlBaseValue, SqlTypeDesignator, Substitutor } from '../sql-base';
+import { SqlBase } from '../sql-base';
+import type { SqlColumnDeclaration } from '../sql-clause';
+import { SqlExtendClause, SqlWhereClause } from '../sql-clause';
 import { SqlExpression } from '../sql-expression';
-import { LiteralValue, SqlLiteral } from '../sql-literal/sql-literal';
+import { SqlLabeledExpression } from '../sql-labeled-expression/sql-labeled-expression';
+import type { LiteralValue } from '../sql-literal/sql-literal';
+import { SqlLiteral } from '../sql-literal/sql-literal';
 import { SqlNamespace } from '../sql-namespace/sql-namespace';
 import { SqlStar } from '../sql-star/sql-star';
 import { SqlType } from '../sql-type/sql-type';
-import { SqlWindowSpec } from '../sql-window-spec/sql-window-spec';
+import type { SqlWindowSpec } from '../sql-window-spec/sql-window-spec';
 import { RefName, SeparatedArray, Separator } from '../utils';
 
 const specialFunctionLookup: Record<string, boolean> = {};
@@ -116,14 +120,33 @@ export class SqlFunction extends SqlExpression {
     return SqlFunction.simple('AVG', [arg]);
   }
 
-  static cast(ex: SqlExpression, asType: SqlType | string): SqlExpression {
+  static cast(ex: SqlExpression | LiteralValue, asType: SqlType | string): SqlExpression {
     return new SqlFunction({
       functionName: RefName.functionName('CAST'),
       args: SeparatedArray.fromTwoValuesWithSeparator(
-        ex,
+        SqlExpression.wrap(ex),
         Separator.symmetricSpace('AS'),
         SqlType.create(asType),
       ),
+    });
+  }
+
+  static jsonValue(
+    ex: SqlExpression | LiteralValue,
+    path: SqlExpression | string,
+    returningType?: SqlType | string,
+  ): SqlExpression {
+    const args: SqlExpression[] = [SqlExpression.wrap(ex), SqlExpression.wrap(path)];
+    const separators: Separator[] = [Separator.COMMA];
+
+    if (returningType) {
+      args.push(SqlType.create(returningType));
+      separators.push(Separator.symmetricSpace('RETURNING'));
+    }
+
+    return new SqlFunction({
+      functionName: RefName.functionName('JSON_VALUE'),
+      args: new SeparatedArray(args, separators),
     });
   }
 
@@ -315,32 +338,62 @@ export class SqlFunction extends SqlExpression {
     return SqlBase.fromValue(value);
   }
 
+  public changeArg(index: number, arg: SqlExpression): this {
+    const { args } = this;
+    if (!args) return this;
+    return this.changeArgs(args.change(index, arg));
+  }
+
   public numArgs(): number {
-    return this.args?.length() || 0;
+    const { args } = this;
+    if (!args) return 0;
+    return args.length();
+  }
+
+  public numPositionalArgs(): number {
+    const { args } = this;
+    if (!args) return 0;
+    return args.values.filter(ex => !(ex instanceof SqlLabeledExpression)).length;
+  }
+
+  public numLabeledArgs(): number {
+    const { args } = this;
+    if (!args) return 0;
+    return args.values.filter(ex => ex instanceof SqlLabeledExpression).length;
   }
 
   public getArgArray(): readonly SqlExpression[] {
     return this.args?.values || [];
   }
 
-  public getArg(index: number): SqlExpression | undefined {
-    return this.args?.get(index);
+  public getArg(indexOrLabel: number | string): SqlExpression | undefined {
+    const { args } = this;
+    if (!args) return;
+    if (typeof indexOrLabel === 'number') {
+      return args.get(indexOrLabel);
+    } else {
+      return filterMap(args.values, ex =>
+        ex instanceof SqlLabeledExpression && ex.getLabelName() === indexOrLabel
+          ? ex.expression
+          : undefined,
+      )[0];
+    }
   }
 
-  public getArgAsString(index: number): string | undefined {
-    const arg = this.getArg(index);
+  public getArgAsString(indexOrLabel: number | string): string | undefined {
+    const arg = this.getArg(indexOrLabel);
     if (!(arg instanceof SqlLiteral)) return;
     return arg.getStringValue();
   }
 
-  public getArgAsNumber(index: number): number | undefined {
-    const arg = this.getArg(index);
+  public getArgAsNumber(indexOrLabel: number | string): number | undefined {
+    const arg = this.getArg(indexOrLabel);
     if (!(arg instanceof SqlLiteral)) return;
     return arg.getNumberValue();
   }
 
-  public getArgAsNumberOrBigint(index: number): number | bigint | undefined {
-    const arg = this.getArg(index);
+  public getArgAsNumberOrBigint(indexOrLabel: number | string): number | bigint | undefined {
+    const arg = this.getArg(indexOrLabel);
     if (!(arg instanceof SqlLiteral)) return;
     return arg.getNumberOrBigintValue();
   }
@@ -357,7 +410,10 @@ export class SqlFunction extends SqlExpression {
   }
 
   public changeWhereExpression(whereExpression: SqlExpression | undefined): this {
-    if (!whereExpression) return this.changeWhereClause(undefined);
+    if (whereExpression === this.whereClause?.expression) return this;
+    if (!whereExpression || SqlLiteral.isTrue(whereExpression)) {
+      return this.changeWhereClause(undefined);
+    }
     return this.changeWhereClause(
       this.whereClause
         ? this.whereClause.changeExpression(whereExpression)
@@ -365,13 +421,16 @@ export class SqlFunction extends SqlExpression {
     );
   }
 
+  public addWhere(...ex: SqlExpression[]) {
+    if (!ex.length) return this;
+    return this.changeWhereExpression(SqlExpression.and(this.getWhereExpression(), ...ex));
+  }
+
+  /**
+   * @description use addWhere instead
+   */
   public addWhereExpression(whereExpression: SqlExpression): this {
-    const { whereClause } = this;
-    return this.changeWhereClause(
-      whereClause
-        ? whereClause.changeExpression(whereClause.expression.and(whereExpression))
-        : SqlWhereClause.createForFunction(whereExpression),
-    );
+    return this.addWhere(whereExpression);
   }
 
   public getWhereExpression(): SqlExpression | undefined {

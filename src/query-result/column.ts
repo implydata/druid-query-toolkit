@@ -65,4 +65,9 @@ export class Column {
     const { name, sqlType } = this;
     return name === '__time' && sqlType === 'TIMESTAMP';
   }
+
+  public isNumeric(): boolean {
+    const { sqlType } = this;
+    return sqlType === 'BIGINT' || sqlType === 'FLOAT' || sqlType === 'DOUBLE';
+  }
 }
