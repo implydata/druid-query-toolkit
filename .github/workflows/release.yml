@@ -8,6 +8,7 @@ concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 env:
   CI: 'true'
+  HUSKY: 0
 
 jobs:
   release:
