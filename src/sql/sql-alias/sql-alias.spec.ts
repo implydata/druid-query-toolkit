@@ -12,18 +12,17 @@
  * limitations under the License.
  */
 
-import { backAndForth } from "../../test-utils";
-import { RefName, SqlAlias, SqlColumn, SqlQuery } from "..";
+import { backAndForth } from '../../test-utils';
+import { RefName, SqlAlias, SqlColumn, SqlQuery } from '..';
 
-describe("SqlAlias", () => {
-  describe("parses", () => {
-    it("works in no alias case", () => {
+describe('SqlAlias', () => {
+  describe('parses', () => {
+    it('works in no alias case', () => {
       const sql = `SELECT city`;
 
       backAndForth(sql);
 
-      expect(SqlQuery.parse(sql).getSelectExpressionForIndex(0))
-        .toMatchInlineSnapshot(`
+      expect(SqlQuery.parse(sql).getSelectExpressionForIndex(0)).toMatchInlineSnapshot(`
         SqlColumn {
           "keywords": Object {},
           "parens": undefined,
@@ -38,13 +37,12 @@ describe("SqlAlias", () => {
       `);
     });
 
-    it("works in basic case", () => {
+    it('works in basic case', () => {
       const sql = `SELECT city AS City`;
 
       backAndForth(sql);
 
-      expect(SqlQuery.parse(sql).getSelectExpressionForIndex(0))
-        .toMatchInlineSnapshot(`
+      expect(SqlQuery.parse(sql).getSelectExpressionForIndex(0)).toMatchInlineSnapshot(`
         SqlAlias {
           "alias": RefName {
             "name": "City",
@@ -75,13 +73,12 @@ describe("SqlAlias", () => {
       `);
     });
 
-    it("works with table prefix", () => {
+    it('works with table prefix', () => {
       const sql = `SELECT tbl.city  As   City`;
 
       backAndForth(sql);
 
-      expect(SqlQuery.parse(sql).getSelectExpressionForIndex(0))
-        .toMatchInlineSnapshot(`
+      expect(SqlQuery.parse(sql).getSelectExpressionForIndex(0)).toMatchInlineSnapshot(`
         SqlAlias {
           "alias": RefName {
             "name": "City",
@@ -125,13 +122,12 @@ describe("SqlAlias", () => {
       `);
     });
 
-    it("works without AS", () => {
+    it('works without AS', () => {
       const sql = `SELECT tbl.city City`;
 
       backAndForth(sql);
 
-      expect(SqlQuery.parse(sql).getSelectExpressionForIndex(0))
-        .toMatchInlineSnapshot(`
+      expect(SqlQuery.parse(sql).getSelectExpressionForIndex(0)).toMatchInlineSnapshot(`
         SqlAlias {
           "alias": RefName {
             "name": "City",
@@ -175,36 +171,30 @@ describe("SqlAlias", () => {
     });
   });
 
-  describe(".create", () => {
+  describe('.create', () => {
     expect(
-      SqlAlias.create(
-        SqlAlias.create(SqlColumn.create("X"), "name1"),
-        "name2"
-      ).toString()
+      SqlAlias.create(SqlAlias.create(SqlColumn.create('X'), 'name1'), 'name2').toString(),
     ).toEqual('"X" AS "name2"');
   });
 
-  describe("#changeAlias", () => {
-    const x = SqlAlias.create(SqlColumn.optionalQuotes("X"), "test");
-    const z = SqlAlias.create(
-      SqlColumn.optionalQuotes("Z"),
-      RefName.create("test", true)
-    );
+  describe('#changeAlias', () => {
+    const x = SqlAlias.create(SqlColumn.optionalQuotes('X'), 'test');
+    const z = SqlAlias.create(SqlColumn.optionalQuotes('Z'), RefName.create('test', true));
 
-    it("should work with normal string", () => {
-      expect(String(x.changeAlias("hello"))).toEqual('X AS "hello"');
+    it('should work with normal string', () => {
+      expect(String(x.changeAlias('hello'))).toEqual('X AS "hello"');
     });
 
-    it("should preserve quotes", () => {
-      expect(String(z.changeAlias("hello"))).toEqual('Z AS "hello"');
+    it('should preserve quotes', () => {
+      expect(String(z.changeAlias('hello'))).toEqual('Z AS "hello"');
     });
 
-    it("should work with quotes if needed", () => {
-      expect(String(x.changeAlias("select"))).toEqual('X AS "select"');
+    it('should work with quotes if needed', () => {
+      expect(String(x.changeAlias('select'))).toEqual('X AS "select"');
     });
 
-    it("should work with quotes if forced", () => {
-      expect(String(x.changeAlias("hello", true))).toEqual('X AS "hello"');
+    it('should work with quotes if forced', () => {
+      expect(String(x.changeAlias('hello', true))).toEqual('X AS "hello"');
     });
   });
 });

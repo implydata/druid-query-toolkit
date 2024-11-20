@@ -1,11 +1,11 @@
 const fs = require('fs-extra');
 
 function toCamelCase(string) {
-  return string.replace(/(^|-)[a-z]/g, (s) => s.replace('-', '').toUpperCase());
+  return string.replace(/(^|-)[a-z]/g, s => s.replace('-', '').toUpperCase());
 }
 
 function toSnakeCase(string) {
-  return string.replace(/(-)[a-z]/g, (s) => s.replace('-', '').toUpperCase());
+  return string.replace(/(-)[a-z]/g, s => s.replace('-', '').toUpperCase());
 }
 
 async function main() {
