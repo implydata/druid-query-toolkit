@@ -60,6 +60,7 @@ export const VALUES_PATTERN_DEFINITION: FilterPatternDefinition<ValuesFilterPatt
     if (!(ex instanceof SqlComparison)) return;
 
     const { lhs, rhs, op } = ex;
+    // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check
     switch (op) {
       case '=':
       case '<>':

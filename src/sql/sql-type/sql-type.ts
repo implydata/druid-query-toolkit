@@ -33,7 +33,7 @@ export class SqlType extends SqlExpression {
   static TIMESTAMP: SqlType;
 
   static makeEffectiveType(type: string): string {
-    const m = type.match(/^TYPE\((.+)\)$/i);
+    const m = /^TYPE\((.+)\)$/i.exec(type);
     if (m) return `TYPE(${m[1]})`;
     return SqlBase.normalizeKeywordSpace(type.toUpperCase());
   }

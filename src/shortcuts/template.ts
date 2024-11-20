@@ -24,6 +24,7 @@ export function sql(strings: TemplateStringsArray, ...xs: any[]): SqlExpression 
     const after = strings[i + 1]!;
     const afterFirstChar = after[0];
     let toAdd: string;
+    // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check
     switch (beforeLastChar) {
       case '"': {
         // Detect ..."${x}"...

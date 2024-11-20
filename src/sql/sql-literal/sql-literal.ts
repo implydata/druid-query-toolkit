@@ -53,6 +53,7 @@ export class SqlLiteral extends SqlExpression {
   static create(value: LiteralValue | SqlLiteral): SqlLiteral {
     if (value instanceof SqlLiteral) return value;
 
+    // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check
     switch (typeof value) {
       case 'object':
         if (value !== null && !isDate(value)) {
@@ -154,6 +155,7 @@ export class SqlLiteral extends SqlExpression {
     const { value, stringValue } = this;
     if (stringValue) return stringValue;
 
+    // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check
     switch (typeof value) {
       case 'object':
         if (value === null) {
@@ -234,6 +236,7 @@ export class SqlLiteral extends SqlExpression {
 
   public isInteger(): boolean {
     const { value, stringValue } = this;
+    // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check
     switch (typeof value) {
       case 'number':
         if (typeof stringValue === 'string') {
