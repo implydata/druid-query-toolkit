@@ -15,4 +15,7 @@
 /src/sql/parser/index.ts
 /src/sql/parser/.DS_Store
 
+# TypeScript cache
+*.tsbuildinfo
+
 _old/
