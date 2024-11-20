@@ -12,9 +12,10 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlBaseValue, SqlTypeDesignator, Substitutor } from '../sql-base';
+import type { SqlBaseValue, SqlTypeDesignator, Substitutor } from '../sql-base';
+import { SqlBase } from '../sql-base';
 import { SqlColumn } from '../sql-column/sql-column';
-import { SqlColumnList } from '../sql-column-list/sql-column-list';
+import type { SqlColumnList } from '../sql-column-list/sql-column-list';
 import { SqlExpression } from '../sql-expression';
 import { RefName } from '../utils';
 
@@ -34,6 +35,8 @@ export class SqlAlias extends SqlExpression {
     alias: RefName | string,
     forceQuotes?: boolean,
   ): SqlAlias {
+    expression = SqlExpression.verify(expression);
+
     if (expression instanceof SqlAlias) {
       return expression.changeAlias(alias, forceQuotes);
     }
@@ -42,7 +45,7 @@ export class SqlAlias extends SqlExpression {
       expression = expression.ensureParens();
     }
     return new SqlAlias({
-      expression: expression,
+      expression,
       alias: typeof alias === 'string' ? RefName.alias(alias, forceQuotes) : alias,
     });
   }
@@ -129,7 +132,7 @@ export class SqlAlias extends SqlExpression {
     return this;
   }
 
-  public getAliasName(): string | undefined {
+  public getAliasName(): string {
     return this.alias.name;
   }
 

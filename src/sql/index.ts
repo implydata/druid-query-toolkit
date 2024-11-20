@@ -39,6 +39,7 @@ export * from './sql-case/sql-case';
 export * from './sql-alias/sql-alias';
 export * from './sql-labeled-expression/sql-labeled-expression';
 export * from './sql-window-spec/sql-window-spec';
+export * from './sql-window-spec/sql-frame-bound';
 
 export * from './sql-clause';
 

@@ -62,7 +62,8 @@ describe('QueryRunner', () => {
   it('works with rune query', async () => {
     const queryResult = await queryRunner.runQuery({
       query: {
-        type: 'topN',
+        queryType: 'topN',
+        dataSource: 'my_data',
       },
       extraQueryContext: {
         lol: 'here',
@@ -102,7 +103,8 @@ describe('QueryRunner', () => {
           "context": Object {
             "lol": "here",
           },
-          "type": "topN",
+          "dataSource": "my_data",
+          "queryType": "topN",
         },
         "queryDuration": 1,
         "queryId": "query-id-xxx",
@@ -136,6 +138,14 @@ describe('QueryRunner', () => {
           'SELECT\n  channel, COUNT(*) AS "Count"\nFROM wikipedia\nGROUP BY 1\nORDER BY 2 DESC',
         resultFormat: 'array',
         header: true,
+        context: {
+          lol: 'hello world',
+          priority: 2,
+        },
+      },
+      defaultQueryContext: {
+        priority: 1,
+        moon: 'beam',
       },
       extraQueryContext: {
         lol: 'here',
@@ -159,6 +169,8 @@ describe('QueryRunner', () => {
         "query": Object {
           "context": Object {
             "lol": "here",
+            "moon": "beam",
+            "priority": 2,
           },
           "header": true,
           "query": "SELECT
@@ -615,6 +627,9 @@ describe('QueryRunner', () => {
       query: SqlQuery.parse(
         'SELECT\n  channel, COUNT(*) AS "Count"\nFROM wikipedia\nGROUP BY 1\nORDER BY 2 DESC',
       ),
+      defaultQueryContext: {
+        priority: 1,
+      },
       extraQueryContext: {
         lol: 'here',
       },
@@ -636,6 +651,7 @@ describe('QueryRunner', () => {
         "query": Object {
           "context": Object {
             "lol": "here",
+            "priority": 1,
           },
           "header": true,
           "query": "SELECT

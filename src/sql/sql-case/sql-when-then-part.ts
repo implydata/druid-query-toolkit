@@ -12,7 +12,8 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlBaseValue, SqlTypeDesignator, Substitutor } from '../sql-base';
+import type { SqlBaseValue, SqlTypeDesignator, Substitutor } from '../sql-base';
+import { SqlBase } from '../sql-base';
 import { SqlExpression } from '../sql-expression';
 import { SeparatedArray, Separator } from '../utils';
 
@@ -35,7 +36,7 @@ export class SqlWhenThenPart extends SqlBase {
       whenExpressions: SeparatedArray.fromArray(
         whenExpressions instanceof SqlExpression ? [whenExpressions] : whenExpressions,
       ),
-      thenExpression,
+      thenExpression: SqlExpression.verify(thenExpression),
     });
   }
 

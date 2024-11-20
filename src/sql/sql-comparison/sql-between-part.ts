@@ -12,8 +12,9 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlBaseValue, SqlTypeDesignator, Substitutor } from '../sql-base';
-import { SqlExpression } from '../sql-expression';
+import type { SqlBaseValue, SqlTypeDesignator, Substitutor } from '../sql-base';
+import { SqlBase } from '../sql-base';
+import type { SqlExpression } from '../sql-expression';
 
 export interface SqlBetweenPartValue extends SqlBaseValue {
   symmetric?: boolean;

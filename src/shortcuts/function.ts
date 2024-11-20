@@ -12,7 +12,8 @@
  * limitations under the License.
  */
 
-import { LiteralValue, SqlExpression, SqlFunction, SqlLiteral } from '../sql';
+import type { LiteralValue, SqlExpression } from '../sql';
+import { SqlFunction, SqlLiteral } from '../sql';
 
 export const F = function (name: string, ...args: (SqlExpression | LiteralValue | undefined)[]) {
   // Trim undefined values of the end

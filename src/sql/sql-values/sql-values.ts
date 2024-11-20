@@ -13,17 +13,14 @@
  */
 
 import { isEmptyArray } from '../../utils';
-import { SqlBase, SqlBaseValue, SqlTypeDesignator, Substitutor } from '../sql-base';
-import {
-  SqlLimitClause,
-  SqlOffsetClause,
-  SqlOrderByClause,
-  SqlOrderByExpression,
-} from '../sql-clause';
+import type { SqlBaseValue, SqlTypeDesignator, Substitutor } from '../sql-base';
+import { SqlBase } from '../sql-base';
+import type { SqlOrderByExpression } from '../sql-clause';
+import { SqlLimitClause, SqlOffsetClause, SqlOrderByClause } from '../sql-clause';
 import { SqlExpression } from '../sql-expression';
-import { SqlLiteral } from '../sql-literal/sql-literal';
-import { SqlRecord } from '../sql-record/sql-record';
-import { SeparatedArray, Separator } from '../utils';
+import type { SqlLiteral } from '../sql-literal/sql-literal';
+import type { SqlRecord } from '../sql-record/sql-record';
+import { NEWLINE, SeparatedArray, Separator, SPACE } from '../utils';
 
 export interface SqlValuesValue extends SqlBaseValue {
   records: SeparatedArray<SqlRecord>;
@@ -72,20 +69,20 @@ export class SqlValues extends SqlExpression {
     const multiline = records.length() > 1;
     const rawParts: string[] = [
       this.getKeyword('values', SqlValues.DEFAULT_VALUES_KEYWORD),
-      this.getSpace('postValues', multiline ? '\n' : ' '),
-      records.toString(multiline ? Separator.COMMA_NEW_LINE : Separator.COMMA),
+      this.getSpace('postValues', multiline ? NEWLINE : SPACE),
+      records.toString(multiline ? Separator.COMMA_NEWLINE : Separator.COMMA),
     ];
 
     if (orderByClause) {
-      rawParts.push(this.getSpace('preOrderByClause', '\n'), orderByClause.toString());
+      rawParts.push(this.getSpace('preOrderByClause', NEWLINE), orderByClause.toString());
     }
 
     if (limitClause) {
-      rawParts.push(this.getSpace('preLimitClause', '\n'), limitClause.toString());
+      rawParts.push(this.getSpace('preLimitClause', NEWLINE), limitClause.toString());
     }
 
     if (offsetClause) {
-      rawParts.push(this.getSpace('preOffsetClause', '\n'), offsetClause.toString());
+      rawParts.push(this.getSpace('preOffsetClause', NEWLINE), offsetClause.toString());
     }
 
     return rawParts.join('');
@@ -141,7 +138,13 @@ export class SqlValues extends SqlExpression {
   }
 
   public changeLimitValue(limitValue: SqlLiteral | number | undefined): this {
+    if (typeof limitValue === 'number' && limitValue < 0) {
+      throw new Error(`${limitValue} is not a valid limit value`);
+    }
     if (typeof limitValue === 'undefined') return this.changeLimitClause(undefined);
+    if (typeof limitValue === 'number' && !isFinite(limitValue)) {
+      return this.changeLimitClause(undefined);
+    }
     return this.changeLimitClause(
       this.limitClause
         ? this.limitClause.changeLimit(limitValue)

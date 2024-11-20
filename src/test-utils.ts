@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { parseSql } from './sql/parser';
+import { parse as parseSql } from './sql/parser';
 
 export function backAndForth(sql: string, expectedConstructor?: any): void {
   const parsed = parseSql(sql);
@@ -22,6 +22,16 @@ export function backAndForth(sql: string, expectedConstructor?: any): void {
   }
 
   expect(parsed.toString()).toEqual(sql);
+}
+
+export function backAndForthPrettify(sql: string, expectedConstructor?: any): void {
+  const parsed = parseSql(sql);
+
+  if (expectedConstructor && !(parsed instanceof expectedConstructor)) {
+    throw new Error(`${sql} did not parse to the right class`);
+  }
+
+  expect(parsed.prettify().toString()).toEqual(sql);
 }
 
 export function mapString(xs: any[]): string[] {

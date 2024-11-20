@@ -12,16 +12,16 @@
  * limitations under the License.
  */
 
-import { filterMap } from '../../../utils';
-import { SqlBase, SqlTypeDesignator, Substitutor } from '../../sql-base';
-import { SqlExpression } from '../../sql-expression';
+import type { SqlTypeDesignator, Substitutor } from '../../sql-base';
+import { SqlBase } from '../../sql-base';
+import type { SqlExpression } from '../../sql-expression';
 import { SqlQuery } from '../../sql-query/sql-query';
-import { SqlTable } from '../../sql-table/sql-table';
 import { SqlWithQuery } from '../../sql-with-query/sql-with-query';
-import { SeparatedArray } from '../../utils';
-import { SqlClause, SqlClauseValue } from '../sql-clause';
+import { NEWLINE, SeparatedArray } from '../../utils';
+import type { SqlClauseValue } from '../sql-clause';
+import { SqlClause } from '../sql-clause';
 
-import { SqlJoinPart } from './sql-join-part';
+import type { SqlJoinPart } from './sql-join-part';
 
 export interface SqlFromClauseValue extends SqlClauseValue {
   expressions: SeparatedArray<SqlExpression>;
@@ -66,7 +66,7 @@ export class SqlFromClause extends SqlClause {
     rawParts.push(this.expressions.toString());
 
     if (this.joinParts) {
-      rawParts.push(this.getSpace('preJoin', '\n'), this.joinParts.toString('\n'));
+      rawParts.push(this.getSpace('preJoin', NEWLINE), this.joinParts.toString(NEWLINE));
     }
 
     return rawParts.join('');
@@ -123,26 +123,6 @@ export class SqlFromClause extends SqlClause {
     }
 
     return SqlBase.fromValue(value);
-  }
-
-  public getFirstTableName(): string | undefined {
-    return filterMap(this.expressions.values, table => {
-      table = table.getUnderlyingExpression();
-      if (table instanceof SqlTable) {
-        return table.getName();
-      }
-      return;
-    })[0];
-  }
-
-  public getFirstSchema(): string | undefined {
-    return filterMap(this.expressions.values, table => {
-      table = table.getUnderlyingExpression();
-      if (table instanceof SqlTable) {
-        return table.getNamespaceName();
-      }
-      return;
-    })[0];
   }
 
   public hasJoin(): boolean {

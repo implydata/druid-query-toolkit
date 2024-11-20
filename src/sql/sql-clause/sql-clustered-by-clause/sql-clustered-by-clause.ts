@@ -12,11 +12,13 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlTypeDesignator, Substitutor } from '../../sql-base';
-import { SqlExpression } from '../../sql-expression';
+import type { SqlTypeDesignator, Substitutor } from '../../sql-base';
+import { SqlBase } from '../../sql-base';
+import type { SqlExpression } from '../../sql-expression';
 import { SqlLiteral } from '../../sql-literal/sql-literal';
 import { SeparatedArray } from '../../utils';
-import { SqlClause, SqlClauseValue } from '../sql-clause';
+import type { SqlClauseValue } from '../sql-clause';
+import { SqlClause } from '../sql-clause';
 
 export interface SqlClusteredByClauseValue extends SqlClauseValue {
   expressions: SeparatedArray<SqlExpression>;

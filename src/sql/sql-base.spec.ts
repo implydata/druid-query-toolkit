@@ -12,9 +12,48 @@
  * limitations under the License.
  */
 
-import { parseSql } from './parser';
+import { sane } from '../utils';
+
+import { parse as parseSql } from './parser';
+import type { SqlBase } from './sql-base';
 
 describe('SqlBase', () => {
+  describe('#addParens', () => {
+    it('works with single lines', () => {
+      expect(parseSql(`COUNT(*)`).addParens().toString()).toEqual(`(COUNT(*))`);
+    });
+
+    it('works with multiple lines', () => {
+      expect(
+        parseSql(sane`
+          SELECT
+            datasource d,
+            COUNT(*) AS num_segments
+          FROM sys.segments
+        `)
+          .addParens()
+          .toString(),
+      ).toEqual(sane`
+        (
+          SELECT
+            datasource d,
+            COUNT(*) AS num_segments
+          FROM sys.segments
+        )
+      `);
+    });
+  });
+
+  describe('#containsFunction', () => {
+    const sql: SqlBase = parseSql(`SUM(A) + COUNT(*) + 1`);
+
+    it('works', () => {
+      expect(sql.containsFunction('SUM')).toBe(true);
+      expect(sql.containsFunction('Count')).toBe(true);
+      expect(sql.containsFunction('Blah')).toBe(false);
+    });
+  });
+
   describe('#prettyTrim', () => {
     it('.toJSON', () => {
       expect(JSON.stringify({ x: parseSql(`COUNT(*)`) })).toEqual('{"x":"COUNT(*)"}');

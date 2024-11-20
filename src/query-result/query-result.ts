@@ -12,7 +12,8 @@
  * limitations under the License.
  */
 
-import { SqlQuery } from '../sql';
+import type { QueryPayload } from '../query-payload/query-payload';
+import type { SqlQuery } from '../sql';
 import { filterMap } from '../utils';
 
 import { Column } from './column';
@@ -43,7 +44,7 @@ function isAllGranularity(granularity: unknown): boolean {
 export interface QueryResultValue {
   header: readonly Column[];
   rows: readonly any[][];
-  query?: Record<string, unknown>;
+  query?: QueryPayload;
   sqlQuery?: SqlQuery;
   queryId?: string;
   sqlQueryId?: string;
@@ -55,18 +56,15 @@ export class QueryResult {
   static BLANK: QueryResult;
   static jsonParse: (str: string) => any = JSON.parse;
 
-  static shouldIncludeTimestamp(queryPayload: Record<string, unknown>): boolean {
-    return Boolean(queryPayload.granularity && !isAllGranularity(queryPayload.granularity));
+  static shouldIncludeTimestamp(queryPayload: QueryPayload): boolean {
+    return Boolean('granularity' in queryPayload && !isAllGranularity(queryPayload.granularity));
   }
 
-  static hasHeader(queryPayload: Record<string, unknown>): boolean {
+  static hasHeader(queryPayload: QueryPayload): boolean {
     return typeof queryPayload.query === 'string' && queryPayload.header === true;
   }
 
-  static hasTypeHeader(
-    queryPayload: Record<string, unknown>,
-    header: Record<string, string>,
-  ): boolean {
+  static hasTypeHeader(queryPayload: QueryPayload, header: Record<string, string>): boolean {
     return (
       QueryResult.hasHeader(queryPayload) &&
       queryPayload.typesHeader === true &&
@@ -74,10 +72,7 @@ export class QueryResult {
     );
   }
 
-  static hasSqlTypeHeader(
-    queryPayload: Record<string, unknown>,
-    header: Record<string, string>,
-  ): boolean {
+  static hasSqlTypeHeader(queryPayload: QueryPayload, header: Record<string, string>): boolean {
     return (
       QueryResult.hasHeader(queryPayload) &&
       queryPayload.sqlTypesHeader === true &&
@@ -86,7 +81,7 @@ export class QueryResult {
   }
 
   static fromQueryAndRawResult(
-    queryPayload: Record<string, unknown>,
+    queryPayload: QueryPayload,
     data: unknown,
     header: Record<string, string> = {},
   ): QueryResult {
@@ -107,11 +102,15 @@ export class QueryResult {
     hasSqlTypeHeader?: boolean,
   ): QueryResult {
     if (typeof data === 'string') {
-      if (!data.endsWith('\n')) {
-        // For more context read the section on result truncation in the Druid docs:
-        // https://druid.apache.org/docs/latest/querying/sql.html#http-post
+      if (data === '') {
         throw new Error(
-          `Query results were truncated midstream! This may indicate a server-side error or a client-side issue. Try re-running your query, or using a lower limit or a longer timeout.`,
+          `Query results were empty. This may indicate a timeout caused by an intermediate network device (such as a load balancer). Try re-running your query, using a lower limit.`,
+        );
+      } else if (!data.endsWith('\n')) {
+        // For more context read the section on result truncation in the Druid docs:
+        // https://druid.apache.org/docs/latest/api-reference/sql-api#client-side-error-handling-and-truncated-responses
+        throw new Error(
+          `Query results were truncated midstream. This may indicate a server-side error or a client-side issue. Try re-running your query using a lower limit.`,
         );
       }
 
@@ -270,13 +269,13 @@ export class QueryResult {
 
         // It is possible that in a scan query we will have a different header structure for different segments
         // This code is meant to unify the columns across the different headers
-        const headerNameToIndex: Map<string, number> = new Map();
+        const headerNameToIndex = new Map<string, number>();
         for (let i = 0; i < headerNames.length; i++) {
           headerNameToIndex.set(headerNames[i]!, i);
         }
         const headerRemaps: (Map<string, number> | undefined)[] = data.map(({ columns }, i) => {
           if (i === 0 || columns.join('#') === firstRowColumnsKey) return;
-          const remap: Map<string, number> = new Map();
+          const remap = new Map<string, number>();
           for (let j = 0; j < columns.length; j++) {
             const column = columns[j];
             if (!headerNameToIndex.has(column)) {
@@ -331,8 +330,12 @@ export class QueryResult {
 
       // segmentMetadata like
       if (typeof firstRow.id === 'string' && isObject(firstRow.columns)) {
-        const flatArray = data.flatMap(({ columns }) =>
-          Object.keys(columns).map(k => ({ column: k, ...columns[k] })),
+        const flatArray = data.flatMap(({ columns, aggregators }) =>
+          Object.entries(columns).map(([k, v]) => ({
+            column: k,
+            ...(v as any),
+            aggregator: aggregators?.[k] || null,
+          })),
         );
         return QueryResult.fromObjectArray(flatArray).changeResultContext(resultContext);
       }
@@ -368,7 +371,7 @@ export class QueryResult {
   public readonly header: readonly Column[];
   public readonly rows: readonly any[][];
 
-  public readonly query?: Record<string, unknown>;
+  public readonly query?: QueryPayload;
   public readonly sqlQuery?: SqlQuery;
 
   public readonly queryId?: string;
@@ -406,10 +409,11 @@ export class QueryResult {
     return new QueryResult(value);
   }
 
-  public attachQuery(query: Record<string, unknown>, sqlQuery?: SqlQuery): QueryResult {
+  public attachQuery(queryPayload: QueryPayload, sqlQuery?: SqlQuery): QueryResult {
     const value = this.valueOf();
-    value.query = query;
+    value.query = queryPayload;
     value.sqlQuery = sqlQuery;
+
     return new QueryResult(value);
   }
 
@@ -478,7 +482,7 @@ export class QueryResult {
       let i = 0;
       while (i < indexes.length) {
         const index = indexes[i]!;
-        if (isIsoDate(row[index])) {
+        if (row[index] == null || isIsoDate(row[index])) {
           i++;
         } else {
           indexes.splice(i, 1);
@@ -496,6 +500,7 @@ export class QueryResult {
     value.rows = this.rows.map(row => {
       row = row.slice();
       for (const index of indexes) {
+        if (row[index] == null) continue;
         row[index] = new Date(row[index]);
       }
       return row;

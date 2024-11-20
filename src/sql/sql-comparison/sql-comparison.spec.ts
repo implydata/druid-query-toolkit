@@ -18,16 +18,16 @@ import { SqlColumn, SqlComparison, SqlExpression } from '..';
 describe('SqlComparison', () => {
   it('things that work', () => {
     const queries: string[] = [
-      '1 = 2',
-      '1 != 2',
-      '1 <> 2',
+      'x = y',
+      'x != y',
+      'x <> y',
       '(1, ROW(2)) = Row (1, 1 + 1)',
 
-      '1 < 2',
-      '1 > 2',
-      '1 <= 2',
-      '1 >= 2',
-      ' 1 >= 2  ',
+      'x < y',
+      'x > y',
+      'x <= y',
+      'x >= y',
+      ' x >= y  ',
 
       `X = ANY (SELECT page FROM wikipedia GROUP BY 1 ORDER BY COUNT(*) DESC LIMIT 5)`,
       `X <> any (SELECT page FROM wikipedia GROUP BY 1 ORDER BY COUNT(*) DESC LIMIT 5)`,
@@ -43,6 +43,9 @@ describe('SqlComparison', () => {
       `X IN ((SELECT page FROM wikipedia GROUP BY 1 ORDER BY COUNT(*) DESC LIMIT 5))`,
       `(browser, country) IN (ROW ('Chr' || 'ome', 'United States'), ('Firefox', 'Israel'))`,
       `(1, 2) IN (VALUES   (1, 1 + 1),(2, 1 + 1))`,
+
+      `x IS  NOT DISTINCT FROM y`,
+      `x IS DISTINCT  FROM y`,
 
       '2 between 1 and 3',
       '2 between 3 and 2',

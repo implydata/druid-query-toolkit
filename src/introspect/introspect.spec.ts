@@ -65,7 +65,7 @@ ORDER BY 2 DESC
       ).toEqual({
         header: true,
         query:
-          'SELECT *\nFROM (SELECT channel, cityName, COUNT(*) AS "Count"\nFROM "wikipedia"\nGROUP BY 1, 2\nORDER BY 2 DESC)\n      \nLIMIT 0',
+          'SELECT *\nFROM (\n  SELECT channel, cityName, COUNT(*) AS "Count"\n  FROM "wikipedia"\n  GROUP BY 1, 2\n  ORDER BY 2 DESC\n)\n      \nLIMIT 0',
         resultFormat: 'array',
         sqlTypesHeader: true,
         typesHeader: true,

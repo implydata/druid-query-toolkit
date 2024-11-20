@@ -51,8 +51,10 @@ describe('SqlQuery operations', () => {
       );
 
       expect(String(query.prependWith('wiki', withQuery))).toEqual(sane`
-        WITH "wiki" AS (SELECT * FROM "wikipedia"
-        WHERE channel = 'en')
+        WITH "wiki" AS (
+          SELECT * FROM "wikipedia"
+          WHERE channel = 'en'
+        )
         SELECT __time FROM "wiki"
       `);
     });
@@ -75,8 +77,10 @@ describe('SqlQuery operations', () => {
 
       expect(String(query.prependWith('wiki2', withQuery))).toEqual(sane`
         WITH
-          "wiki2" AS (SELECT * FROM "wikipedia"
-        WHERE channel = 'he'),
+          "wiki2" AS (
+          SELECT * FROM "wikipedia"
+          WHERE channel = 'he'
+        ),
         wiki AS (SELECT * FROM "wiki2" WHERE channel = 'en')
         SELECT __time FROM "wiki"
       `);
@@ -99,15 +103,17 @@ describe('SqlQuery operations', () => {
 
       expect(String(query.prependWith('wiki', withQuery))).toEqual(sane`
         EXPLAIN PLAN FOR
-        WITH "wiki" AS (SELECT * FROM "wikipedia"
-        WHERE channel = 'en')
+        WITH "wiki" AS (
+          SELECT * FROM "wikipedia"
+          WHERE channel = 'en'
+        )
         SELECT __time FROM "wiki"
       `);
     });
   });
 
   describe('#getFirstTableName', () => {
-    it('getFirstTableNames', () => {
+    it('works with simple query', () => {
       expect(
         SqlQuery.parse(
           sane`
@@ -117,7 +123,7 @@ describe('SqlQuery operations', () => {
       ).toEqual('github');
     });
 
-    it('getFirstTableName with nameSpace', () => {
+    it('works with namespace', () => {
       expect(
         SqlQuery.parse(
           sane`
@@ -127,7 +133,7 @@ describe('SqlQuery operations', () => {
       ).toEqual('github');
     });
 
-    it('getFirstTableName with nameSpace and alias', () => {
+    it('works with namespace and alias', () => {
       expect(
         SqlQuery.parse(
           sane`
@@ -137,7 +143,7 @@ describe('SqlQuery operations', () => {
       ).toEqual('github');
     });
 
-    it('getFirstTableName with multiple tables', () => {
+    it('works with multiple tables', () => {
       expect(
         SqlQuery.parse(
           sane`
@@ -146,10 +152,21 @@ describe('SqlQuery operations', () => {
         ).getFirstTableName(),
       ).toEqual('github');
     });
+
+    it('works with CTE', () => {
+      expect(
+        SqlQuery.parse(
+          sane`
+            WITH x AS (SELECT * FROM "wikipedia")
+            SELECT * FROM x, sys."github" as test, sys.name
+          `,
+        ).getFirstTableName(),
+      ).toEqual('wikipedia');
+    });
   });
 
   describe('#getFirstSchema', () => {
-    it('getFirstSchema', () => {
+    it('works in simple case', () => {
       expect(
         SqlQuery.parse(
           sane`
@@ -159,7 +176,7 @@ describe('SqlQuery operations', () => {
       ).toEqual('sys');
     });
 
-    it('getFirstSchema from column with no namespace', () => {
+    it('from column with no namespace', () => {
       expect(
         SqlQuery.parse(
           sane`
@@ -169,7 +186,7 @@ describe('SqlQuery operations', () => {
       ).toBeUndefined();
     });
 
-    it('getFirstSchema from multiple tables', () => {
+    it('from multiple tables', () => {
       expect(
         SqlQuery.parse(
           sane`
@@ -186,10 +203,16 @@ describe('SqlQuery operations', () => {
         channel,
         SUBSTR(cityName, 1, 2),
         namespace AS s_namespace,
+        TRANSFORM(countryName) AS "trans",
         COUNT(*),
         SUM(added) AS "Added"
       FROM wikipedia
-      GROUP BY 1.1, namespace, SUBSTR(cityName, 1, 2), subspace -- Yes the index can be non-whole, go figure
+      GROUP BY
+        1.1, -- Yes the index can be non-whole, go figure
+        namespace,
+        SUBSTR(cityName, 1, 2),
+        subspace,
+        countryName
       ORDER BY channel, s_namespace Desc, COUNT(*), subspace ASC
       LIMIT 5
     `);
@@ -212,6 +235,7 @@ describe('SqlQuery operations', () => {
         'channel',
         'SUBSTR(cityName, 1, 2)',
         'namespace AS s_namespace',
+        'TRANSFORM(countryName) AS "trans"',
       ]);
     });
 
@@ -239,6 +263,10 @@ describe('SqlQuery operations', () => {
           orderByExpression: 'subspace ASC',
           selectIndex: -1,
         },
+        {
+          expression: 'countryName',
+          selectIndex: -1,
+        },
       ]);
     });
 
@@ -248,11 +276,17 @@ describe('SqlQuery operations', () => {
         'namespace',
         'SUBSTR(cityName, 1, 2)',
         'subspace',
+        'countryName',
       ]);
     });
 
     it('#getGroupedOutputColumns', () => {
-      expect(query.getGroupedOutputColumns()).toEqual(['channel', 'EXPR$1', 's_namespace']);
+      expect(query.getGroupedOutputColumns()).toEqual([
+        'channel',
+        'EXPR$1',
+        's_namespace',
+        'trans',
+      ]);
     });
 
     it('#getAggregateSelectExpressions', () => {
@@ -263,7 +297,7 @@ describe('SqlQuery operations', () => {
     });
 
     it('#getAggregateOutputColumns', () => {
-      expect(query.getAggregateOutputColumns()).toEqual(['EXPR$3', 'Added']);
+      expect(query.getAggregateOutputColumns()).toEqual(['EXPR$4', 'Added']);
     });
 
     it('#getEffectiveDirectionOfOutputColumn', () => {
@@ -274,7 +308,7 @@ describe('SqlQuery operations', () => {
     });
 
     it('#getOrderedOutputColumns', () => {
-      expect(query.getOrderedOutputColumns()).toEqual(['channel', 's_namespace', 'EXPR$3']);
+      expect(query.getOrderedOutputColumns()).toEqual(['channel', 's_namespace', 'EXPR$4']);
     });
   });
 
@@ -351,6 +385,22 @@ describe('SqlQuery operations', () => {
       `);
     });
 
+    it('noop on TRUE', () => {
+      expect(
+        SqlQuery.parse(
+          sane`
+            SELECT *
+            FROM sys."github"
+          `,
+        )
+          .addWhere(SqlExpression.parse(`TRUE`))
+          .toString(),
+      ).toEqual(sane`
+        SELECT *
+        FROM sys."github"
+      `);
+    });
+
     it('Single Where filter value', () => {
       expect(
         SqlQuery.parse(
@@ -394,6 +444,7 @@ describe('SqlQuery operations', () => {
           `,
         )
           .addWhere(SqlExpression.parse(`colTwo > 2`))
+          .addWhere()
           .toString(),
       ).toEqual(sane`
         SELECT *
@@ -741,16 +792,23 @@ describe('SqlQuery operations', () => {
         Select
           Distinct col1    ||    lol
         From tbl
+        Where col1 > 1 OR col2 > 2 AND col3 > 3
       `;
 
       expect(SqlQuery.parse(sql).prettify().toString()).toEqual(sane`
         SELECT DISTINCT col1 || lol
         FROM tbl
+        WHERE col1 > 1 OR (col2 > 2 AND col3 > 3)
       `);
 
-      expect(SqlQuery.parse(sql).prettify({ keywordCasing: 'preserve' }).toString()).toEqual(sane`
+      expect(
+        SqlQuery.parse(sql)
+          .prettify({ keywordCasing: 'preserve', clarifyingParens: 'disable' })
+          .toString(),
+      ).toEqual(sane`
         Select Distinct col1 || lol
         From tbl
+        Where col1 > 1 OR col2 > 2 AND col3 > 3
       `);
     });
 
@@ -776,7 +834,10 @@ describe('SqlQuery operations', () => {
           CONCAT(a, b, c),
           CASE A WHEN B THEN C WHEN D THEN E END AS m
         FROM tbl
-        WHERE __time BETWEEN TIMESTAMP '2020-01-01' AND TIMESTAMP '2020-01-02' AND goo IS NOT NULL AND NOT TRUE
+        WHERE
+          __time BETWEEN TIMESTAMP '2020-01-01' AND TIMESTAMP '2020-01-02' AND
+          goo IS NOT NULL AND
+          NOT TRUE
         GROUP BY 1
         ORDER BY 2 DESC, 3 ASC
         LIMIT 12
@@ -789,10 +850,139 @@ describe('SqlQuery operations', () => {
           Concat(a, b, c),
           Case A When B Then C WheN D Then E End As m
         From tbl
-        Where __time Between Timestamp '2020-01-01' And Timestamp '2020-01-02' AND goo is not Null AND NoT True
+        Where
+          __time Between Timestamp '2020-01-01' And Timestamp '2020-01-02' AND
+          goo is not Null AND
+          NoT True
         Group By 1
         Order By 2 Desc, 3 asC
         LimIT 12
+      `);
+    });
+
+    it('nested query', () => {
+      const sql = sane`
+        WITH
+        "kttm" AS (SELECT *
+        FROM "kttm-1"),
+        "kttm2" AS (SELECT *
+        FROM "kttm-2")
+        SELECT
+          NULLIF("b"."browser", '__NULL__') AS "browser",
+          "b"."cnt" AS "cnt",
+          "n0_0"."DAU" AS "DAU",
+          "n1_0"."DAU over 2DAU" / "n1_1"."DAU over 2DAU" AS "DAU over 2DAU"
+        FROM (
+          SELECT
+            NVL(t."browser", '__NULL__') AS "browser",
+            COUNT(*) AS "cnt"
+          FROM "kttm" AS "t"
+          WHERE t."adblock_list" = 'NoAdblock'
+          GROUP BY 1
+          ORDER BY 2
+          LIMIT 10) AS "b"
+        INNER JOIN (
+          SELECT
+          "t"."browser",
+          AVG(a1) AS "DAU"
+        FROM (
+          SELECT
+            NVL(t."browser", '__NULL__') AS "browser",
+            COUNT(DISTINCT t."forwarded_for") AS "a1"
+          FROM "kttm" AS "t"
+          WHERE t."adblock_list" = 'NoAdblock'
+          GROUP BY 1, TIME_FLOOR(t.__time, 'P1D')
+        ) AS "t"
+        GROUP BY 1) AS "n0_0" ON "b"."browser" = "n0_0"."browser"
+        INNER JOIN (SELECT
+          "t"."browser",
+          AVG(a1) AS "DAU over 2DAU"
+        FROM (SELECT
+          NVL(t."browser", '__NULL__') AS "browser",
+          COUNT(DISTINCT t."forwarded_for") AS "a1"
+        FROM "kttm" AS "t"
+        WHERE t."adblock_list" = 'NoAdblock'
+        GROUP BY 1, TIME_FLOOR(t.__time, 'P1D')) AS "t"
+        GROUP BY 1) AS "n1_0" ON "b"."browser" = "n1_0"."browser"
+        INNER JOIN (SELECT
+          "t"."browser",
+          AVG(a1) AS "DAU over 2DAU"
+        FROM (SELECT
+          NVL(t."browser", '__NULL__') AS "browser",
+          COUNT(DISTINCT t."forwarded_for") AS "a1"
+        FROM "kttm" AS "t"
+        WHERE t."adblock_list" = 'NoAdblock'
+        GROUP BY 1, TIME_FLOOR(t.__time, 'P2D')) AS "t"
+        GROUP BY 1) AS "n1_1" ON "b"."browser" = "n1_1"."browser"
+      `;
+
+      expect(SqlQuery.parse(sql).prettify().toString()).toEqual(sane`
+        WITH
+        "kttm" AS (
+          SELECT *
+          FROM "kttm-1"
+        ),
+        "kttm2" AS (
+          SELECT *
+          FROM "kttm-2"
+        )
+        SELECT
+          NULLIF("b"."browser", '__NULL__') AS "browser",
+          "b"."cnt" AS "cnt",
+          "n0_0"."DAU" AS "DAU",
+          "n1_0"."DAU over 2DAU" / "n1_1"."DAU over 2DAU" AS "DAU over 2DAU"
+        FROM (
+          SELECT
+            NVL(t."browser", '__NULL__') AS "browser",
+            COUNT(*) AS "cnt"
+          FROM "kttm" AS "t"
+          WHERE t."adblock_list" = 'NoAdblock'
+          GROUP BY 1
+          ORDER BY 2
+          LIMIT 10
+        ) AS "b"
+        INNER JOIN (
+          SELECT
+            "t"."browser",
+            AVG(a1) AS "DAU"
+          FROM (
+            SELECT
+              NVL(t."browser", '__NULL__') AS "browser",
+              COUNT(DISTINCT t."forwarded_for") AS "a1"
+            FROM "kttm" AS "t"
+            WHERE t."adblock_list" = 'NoAdblock'
+            GROUP BY 1, TIME_FLOOR(t.__time, 'P1D')
+          ) AS "t"
+          GROUP BY 1
+        ) AS "n0_0" ON "b"."browser" = "n0_0"."browser"
+        INNER JOIN (
+          SELECT
+            "t"."browser",
+            AVG(a1) AS "DAU over 2DAU"
+          FROM (
+            SELECT
+              NVL(t."browser", '__NULL__') AS "browser",
+              COUNT(DISTINCT t."forwarded_for") AS "a1"
+            FROM "kttm" AS "t"
+            WHERE t."adblock_list" = 'NoAdblock'
+            GROUP BY 1, TIME_FLOOR(t.__time, 'P1D')
+          ) AS "t"
+          GROUP BY 1
+        ) AS "n1_0" ON "b"."browser" = "n1_0"."browser"
+        INNER JOIN (
+          SELECT
+            "t"."browser",
+            AVG(a1) AS "DAU over 2DAU"
+          FROM (
+            SELECT
+              NVL(t."browser", '__NULL__') AS "browser",
+              COUNT(DISTINCT t."forwarded_for") AS "a1"
+            FROM "kttm" AS "t"
+            WHERE t."adblock_list" = 'NoAdblock'
+            GROUP BY 1, TIME_FLOOR(t.__time, 'P2D')
+          ) AS "t"
+          GROUP BY 1
+        ) AS "n1_1" ON "b"."browser" = "n1_1"."browser"
       `);
     });
   });

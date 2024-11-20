@@ -22,7 +22,7 @@ describe('SqlAlias', () => {
 
       backAndForth(sql);
 
-      expect(SqlQuery.parse(sql)!.getSelectExpressionForIndex(0)).toMatchInlineSnapshot(`
+      expect(SqlQuery.parse(sql).getSelectExpressionForIndex(0)).toMatchInlineSnapshot(`
         SqlColumn {
           "keywords": Object {},
           "parens": undefined,
@@ -42,7 +42,7 @@ describe('SqlAlias', () => {
 
       backAndForth(sql);
 
-      expect(SqlQuery.parse(sql)!.getSelectExpressionForIndex(0)).toMatchInlineSnapshot(`
+      expect(SqlQuery.parse(sql).getSelectExpressionForIndex(0)).toMatchInlineSnapshot(`
         SqlAlias {
           "alias": RefName {
             "name": "City",
@@ -78,7 +78,7 @@ describe('SqlAlias', () => {
 
       backAndForth(sql);
 
-      expect(SqlQuery.parse(sql)!.getSelectExpressionForIndex(0)).toMatchInlineSnapshot(`
+      expect(SqlQuery.parse(sql).getSelectExpressionForIndex(0)).toMatchInlineSnapshot(`
         SqlAlias {
           "alias": RefName {
             "name": "City",
@@ -127,7 +127,7 @@ describe('SqlAlias', () => {
 
       backAndForth(sql);
 
-      expect(SqlQuery.parse(sql)!.getSelectExpressionForIndex(0)).toMatchInlineSnapshot(`
+      expect(SqlQuery.parse(sql).getSelectExpressionForIndex(0)).toMatchInlineSnapshot(`
         SqlAlias {
           "alias": RefName {
             "name": "City",
@@ -175,31 +175,6 @@ describe('SqlAlias', () => {
     expect(
       SqlAlias.create(SqlAlias.create(SqlColumn.create('X'), 'name1'), 'name2').toString(),
     ).toEqual('"X" AS "name2"');
-  });
-
-  describe('#as', () => {
-    const x = SqlColumn.optionalQuotes('X').as('test');
-    const z = SqlColumn.optionalQuotes('Z').as(RefName.create('test', true));
-
-    it('should work with normal string', () => {
-      expect(String(x.as('hello'))).toEqual('X AS "hello"');
-    });
-
-    it('should work with undefined', () => {
-      expect(String(x.as(undefined))).toEqual('X');
-    });
-
-    it('should preserve quotes', () => {
-      expect(String(z.as('hello'))).toEqual('Z AS "hello"');
-    });
-
-    it('should work with quotes if needed', () => {
-      expect(String(x.as('select'))).toEqual('X AS "select"');
-    });
-
-    it('should work with quotes if forced', () => {
-      expect(String(x.as('hello', true))).toEqual('X AS "hello"');
-    });
   });
 
   describe('#changeAlias', () => {

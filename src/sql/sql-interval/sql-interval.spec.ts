@@ -17,7 +17,7 @@ import { backAndForth } from '../../test-utils';
 
 describe('SqlInterval', () => {
   it('Simple function', () => {
-    const sql = `INTERVAL '1' DAY`;
+    const sql = `INTERVAL '2' DAYS`;
 
     backAndForth(sql);
 
@@ -27,9 +27,9 @@ describe('SqlInterval', () => {
           "keywords": Object {},
           "parens": undefined,
           "spacing": Object {},
-          "stringValue": "'1'",
+          "stringValue": "'2'",
           "type": "literal",
-          "value": "1",
+          "value": "2",
         },
         "keywords": Object {
           "interval": "INTERVAL",
@@ -40,7 +40,7 @@ describe('SqlInterval', () => {
           "postIntervalValue": " ",
         },
         "type": "interval",
-        "unit": "DAY",
+        "unit": "DAYS",
       }
     `);
   });

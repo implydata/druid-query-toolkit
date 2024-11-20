@@ -14,12 +14,14 @@
 
 import { cleanObject, dedupe, objectMap } from '../utils';
 
-import { SeparatedArray, SqlColumn, SqlLiteral } from '.';
-import { parseSql } from './parser';
+import type { SeparatedArray } from '.';
+import { SqlColumn, SqlFunction, SqlLiteral, SqlMulti, SqlTable } from '.';
+import { parse as parseSql } from './parser';
+import { INDENT, NEWLINE, SPACE } from './utils';
 
 export interface Parens {
-  leftSpacing: string;
-  rightSpacing: string;
+  leftSpacing?: string;
+  rightSpacing?: string;
 }
 
 function pseudoRandomCapitalization(str: string): string {
@@ -36,18 +38,13 @@ function pseudoRandomCapitalization(str: string): string {
     .join('');
 }
 
-function normalizeKeywordSpace(keyword: string): string {
-  return keyword
-    .replace(/\/\*.*\*\//g, ' ')
-    .replace(/--[^\n]*\n/gm, ' ')
-    .replace(/\s+/gm, ' ');
-}
-
 export type Substitutor = (t: SqlBase, stack: SqlBase[]) => SqlBase | undefined;
-export type Matcher = (t: SqlBase, stack: SqlBase[]) => boolean;
+export type Predicate = (t: SqlBase, stack: SqlBase[]) => boolean;
+export type Matcher<T extends SqlBase> = (t: SqlBase, stack: SqlBase[]) => t is T;
 
 export interface PrettifyOptions {
   keywordCasing?: 'preserve';
+  clarifyingParens?: 'disable';
 }
 
 export type SqlTypeDesignator =
@@ -93,14 +90,17 @@ export type SqlTypeDesignator =
   | 'namespace'
   | 'table'
   | 'unary'
-  | 'windowSpec';
+  | 'windowSpec'
+  | 'frameBound';
 
 export type KeywordName =
   | 'all'
   | 'and'
   | 'as'
+  | 'between'
   | 'case'
   | 'clusteredBy'
+  | 'currentRow'
   | 'decorator'
   | 'direction'
   | 'else'
@@ -109,6 +109,7 @@ export type KeywordName =
   | 'explainPlanFor'
   | 'extend'
   | 'filter'
+  | 'following'
   | 'from'
   | 'groupBy'
   | 'having'
@@ -118,6 +119,7 @@ export type KeywordName =
   | 'join'
   | 'joinType'
   | 'limit'
+  | 'natural'
   | 'offset'
   | 'on'
   | 'op'
@@ -127,13 +129,19 @@ export type KeywordName =
   | 'partitionBy'
   | 'partitionedBy'
   | 'plan'
+  | 'preceding'
+  | 'range'
   | 'replace'
   | 'row'
+  | 'rows'
   | 'select'
   | 'symmetric'
   | 'then'
   | 'timestamp'
+  | 'type'
+  | 'unbounded'
   | 'union'
+  | 'using'
   | 'values'
   | 'when'
   | 'where'
@@ -146,6 +154,8 @@ export type SpaceName =
   | 'postArguments'
   | 'postArrow'
   | 'postAs'
+  | 'postBetween'
+  | 'postBoundValue'
   | 'postCase'
   | 'postCaseExpression'
   | 'postClusteredBy'
@@ -160,6 +170,8 @@ export type SpaceName =
   | 'postExpressions'
   | 'postExtend'
   | 'postFilter'
+  | 'postFrame'
+  | 'postFrameType'
   | 'postFrom'
   | 'postGroupBy'
   | 'postHaving'
@@ -173,6 +185,7 @@ export type SpaceName =
   | 'postLeftParen'
   | 'postLimit'
   | 'postNamespace'
+  | 'postNatural'
   | 'postOffset'
   | 'postOn'
   | 'postOp'
@@ -190,6 +203,7 @@ export type SpaceName =
   | 'postThen'
   | 'postTimestamp'
   | 'postUnion'
+  | 'postUsing'
   | 'postValues'
   | 'postWhen'
   | 'postWhenExpressions'
@@ -209,6 +223,7 @@ export type SpaceName =
   | 'preEscape'
   | 'preExtend'
   | 'preFilter'
+  | 'preFormat'
   | 'preFromClause'
   | 'preGroupByClause'
   | 'preHavingClause'
@@ -223,12 +238,13 @@ export type SpaceName =
   | 'preOverwrite'
   | 'prePartitionedByClause'
   | 'preUnion'
+  | 'preUsing'
   | 'preWhereClause';
 
 export interface SqlBaseValue {
   type?: SqlTypeDesignator;
-  spacing?: Partial<Record<SpaceName, string>>;
-  keywords?: Partial<Record<KeywordName, string>>;
+  spacing?: Readonly<Partial<Record<SpaceName, string>>>;
+  keywords?: Readonly<Partial<Record<KeywordName, string>>>;
   parens?: readonly Parens[];
 }
 
@@ -299,6 +315,13 @@ export abstract class SqlBase {
     return changed ? newA : a;
   }
 
+  static normalizeKeywordSpace(keyword: string): string {
+    return keyword
+      .replace(/\/\*.*\*\//g, ' ')
+      .replace(/--[^\n]*\n/gm, ' ')
+      .replace(/\s+/gm, ' ');
+  }
+
   static classMap: Record<string, typeof SqlBase> = {};
   static register(ex: typeof SqlBase): void {
     SqlBase.classMap[ex.type] = ex;
@@ -318,8 +341,8 @@ export abstract class SqlBase {
   }
 
   public type: SqlTypeDesignator;
-  public spacing: Record<string, string>;
-  public keywords: Record<string, string>;
+  public spacing: Readonly<Record<string, string>>;
+  public keywords: Readonly<Record<string, string>>;
   public parens?: readonly Parens[];
 
   constructor(options: SqlBaseValue, typeOverride: SqlTypeDesignator) {
@@ -378,8 +401,8 @@ export abstract class SqlBase {
   public addParens(leftSpacing?: string, rightSpacing?: string): this {
     return this.changeParens(
       this.getParens().concat({
-        leftSpacing: leftSpacing || '',
-        rightSpacing: rightSpacing || '',
+        leftSpacing,
+        rightSpacing,
       }),
     );
   }
@@ -391,12 +414,7 @@ export abstract class SqlBase {
 
   public removeOwnParenSpaces(): this {
     if (!this.parens) return this;
-    return this.changeParens(
-      this.parens.map(() => ({
-        leftSpacing: '',
-        rightSpacing: '',
-      })),
-    );
+    return this.changeParens(this.parens.map(() => ({})));
   }
 
   public resetOwnSpacing(): this {
@@ -416,7 +434,7 @@ export abstract class SqlBase {
   public normalizeOwnKeywordSpaces(): this {
     if (Object.keys(this.keywords).length === 0) return this;
     const value = this.valueOf();
-    value.keywords = objectMap(value.keywords || {}, normalizeKeywordSpace);
+    value.keywords = objectMap(value.keywords || {}, SqlBase.normalizeKeywordSpace);
     return SqlBase.fromValue(value);
   }
 
@@ -424,7 +442,7 @@ export abstract class SqlBase {
     return this;
   }
 
-  public getSpace(name: SpaceName, defaultSpace = ' ') {
+  public getSpace(name: SpaceName, defaultSpace = SPACE) {
     const s = this.spacing[name];
     return typeof s === 'string' ? s : defaultSpace;
   }
@@ -474,7 +492,15 @@ export abstract class SqlBase {
     let str = this._toRawString();
     if (parens) {
       for (const paren of parens) {
-        str = `(${paren.leftSpacing}${str}${paren.rightSpacing})`;
+        let { leftSpacing, rightSpacing } = paren;
+        if (typeof leftSpacing === 'undefined' && typeof rightSpacing === 'undefined') {
+          const lines = str.split('\n');
+          if (lines.length > 1) {
+            leftSpacing = rightSpacing = '\n';
+            str = lines.map(l => INDENT + l).join(NEWLINE);
+          }
+        }
+        str = `(${leftSpacing || ''}${str}${rightSpacing || ''})`;
       }
     }
     return this.getSpace('initial', '') + str + this.getSpace('final', '');
@@ -524,7 +550,7 @@ export abstract class SqlBase {
     return this.type.endsWith('Part');
   }
 
-  public some(fn: Matcher): boolean {
+  public some(fn: Predicate): boolean {
     let some = false;
     this.walk((b, s) => {
       some = some || fn(b, s);
@@ -533,7 +559,7 @@ export abstract class SqlBase {
     return some;
   }
 
-  public every(fn: Matcher): boolean {
+  public every(fn: Predicate): boolean {
     let every = true;
     this.walk((b, s) => {
       every = every && fn(b, s);
@@ -542,8 +568,8 @@ export abstract class SqlBase {
     return every;
   }
 
-  public collect(fn: Matcher): SqlBase[] {
-    const collected: SqlBase[] = [];
+  public collect<T extends SqlBase>(fn: Matcher<T>): T[] {
+    const collected: T[] = [];
     this.walk((b, s) => {
       if (fn(b, s)) {
         collected.push(b);
@@ -553,12 +579,42 @@ export abstract class SqlBase {
     return collected;
   }
 
+  public find<T extends SqlBase>(fn: Matcher<T>): T | undefined {
+    let found: T | undefined;
+    this.walk((b, s) => {
+      if (fn(b, s)) {
+        found = b;
+        return;
+      }
+      return b;
+    });
+    return found;
+  }
+
   public getColumns(): SqlColumn[] {
-    return this.collect(b => b instanceof SqlColumn) as SqlColumn[];
+    return this.collect((b): b is SqlColumn => b instanceof SqlColumn);
   }
 
   public getUsedColumnNames(): string[] {
     return dedupe(this.getColumns().map(x => x.getName())).sort();
+  }
+
+  public getTables(): SqlTable[] {
+    return this.collect((b): b is SqlTable => b instanceof SqlTable);
+  }
+
+  public getUsedTableNames(): string[] {
+    return dedupe(this.getTables().map(x => x.getName())).sort();
+  }
+
+  public getFirstTableName(): string | undefined {
+    return this.find((b): b is SqlTable => b instanceof SqlTable)?.getName();
+  }
+
+  public getFirstSchema(): string | undefined {
+    return this.find(
+      (b): b is SqlTable => b instanceof SqlTable && Boolean(b.namespace),
+    )?.getNamespaceName();
   }
 
   public contains(thing: SqlBase): boolean {
@@ -569,20 +625,41 @@ export abstract class SqlBase {
     return this.some(b => b instanceof SqlColumn && b.getName() === columnName);
   }
 
+  public containsFunction(functionName: string): boolean {
+    functionName = functionName.toUpperCase();
+    return this.some(
+      ex => ex instanceof SqlFunction && ex.getEffectiveFunctionName() === functionName,
+    );
+  }
+
   public getFirstColumnName(): string | undefined {
     const column = this.getColumns()[0];
     if (!column) return;
     return column.getName();
   }
 
-  public prettify(options: PrettifyOptions = {}): SqlBase {
-    const { keywordCasing } = options;
-    return this.walkPostorder(ex => {
+  public addClarifyingParens(): this {
+    return this.walk((ex, stack) => {
+      if (ex instanceof SqlMulti && (ex.op === 'AND' || ex.op === 'OR') && !ex.hasParens()) {
+        const parent = stack[0];
+        if (parent instanceof SqlMulti && (parent.op === 'AND' || parent.op === 'OR')) {
+          return ex.addParens();
+        }
+      }
+      return ex;
+    }) as any;
+  }
+
+  public prettify(options: PrettifyOptions = {}): this {
+    const { keywordCasing, clarifyingParens } = options;
+    return this.applyIf(clarifyingParens !== 'disable', ex =>
+      ex.addClarifyingParens(),
+    ).walkPostorder(ex => {
       const resetSpaceEx = ex.resetOwnSpacing().clearOwnSeparators().removeOwnParenSpaces();
       return keywordCasing === 'preserve'
         ? resetSpaceEx.normalizeOwnKeywordSpaces()
         : resetSpaceEx.resetOwnKeywords();
-    });
+    }) as any;
   }
 
   public prettyTrim(maxLength: number): this {
@@ -598,9 +675,18 @@ export abstract class SqlBase {
     return fn(this);
   }
 
-  public applyIf<T>(condition: unknown, fn: (self: this) => T): T | this {
-    if (!condition) return this;
-    return fn(this);
+  public applyIf<T>(
+    condition: unknown,
+    thenFn: (self: this) => T,
+    elseFn?: (self: this) => T,
+  ): T | this {
+    if (condition) {
+      return thenFn(this);
+    } else if (elseFn) {
+      return elseFn(this);
+    } else {
+      return this;
+    }
   }
 
   public applyForEach<T>(

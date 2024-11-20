@@ -12,6 +12,12 @@
  * limitations under the License.
  */
 
+export const SPACE = ' ';
+
+export const NEWLINE = '\n';
+export const INDENT = '  ';
+export const NEWLINE_INDENT = NEWLINE + INDENT;
+
 export function trimString(str: string, maxLength: number): string {
   if (str.length < maxLength) return str;
   return str.substr(0, Math.max(maxLength - 3, 1)) + '...';

@@ -12,11 +12,13 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlTypeDesignator, Substitutor } from '../../sql-base';
-import { SeparatedArray } from '../../utils';
-import { SqlClause, SqlClauseValue } from '../sql-clause';
+import type { SqlTypeDesignator, Substitutor } from '../../sql-base';
+import { SqlBase } from '../../sql-base';
+import { NEWLINE, SeparatedArray, SPACE } from '../../utils';
+import type { SqlClauseValue } from '../sql-clause';
+import { SqlClause } from '../sql-clause';
 
-import { SqlWithPart } from './sql-with-part';
+import type { SqlWithPart } from './sql-with-part';
 
 export interface SqlWithClauseValue extends SqlClauseValue {
   withParts: SeparatedArray<SqlWithPart>;
@@ -49,7 +51,7 @@ export class SqlWithClause extends SqlClause {
   protected _toRawString(): string {
     const rawParts: string[] = [
       this.getKeyword('with', SqlWithClause.DEFAULT_WITH_KEYWORD),
-      this.getSpace('postWith'),
+      this.getSpace('postWith', this.withParts.length() > 1 ? NEWLINE : SPACE),
     ];
 
     rawParts.push(this.withParts.toString(',\n'));

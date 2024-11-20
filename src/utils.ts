@@ -40,7 +40,7 @@ export function objectMap<T, Q>(
 }
 
 export function dedupe<T>(array: readonly T[], keyFn: (x: T) => string = String): T[] {
-  const seen: Map<any, boolean> = new Map();
+  const seen = new Map<any, boolean>();
   const deduped: T[] = [];
   array.forEach(d => {
     const key = keyFn(d);
@@ -51,7 +51,7 @@ export function dedupe<T>(array: readonly T[], keyFn: (x: T) => string = String)
   return deduped;
 }
 
-export function isEmptyArray(x: unknown): x is Array<unknown> {
+export function isEmptyArray(x: unknown): x is unknown[] {
   return Array.isArray(x) && !x.length;
 }
 

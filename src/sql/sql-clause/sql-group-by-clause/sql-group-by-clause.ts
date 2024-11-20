@@ -13,11 +13,13 @@
  */
 
 import { isEmptyArray } from '../../../utils';
-import { SqlBase, SqlTypeDesignator, Substitutor } from '../../sql-base';
-import { SqlExpression } from '../../sql-expression';
+import type { SqlTypeDesignator, Substitutor } from '../../sql-base';
+import { SqlBase } from '../../sql-base';
+import type { SqlExpression } from '../../sql-expression';
 import { SqlLiteral } from '../../sql-literal/sql-literal';
 import { SeparatedArray } from '../../utils';
-import { SqlClause, SqlClauseValue } from '../sql-clause';
+import type { SqlClauseValue } from '../sql-clause';
+import { SqlClause } from '../sql-clause';
 
 export type SqlGroupByDecorator = 'ROLLUP' | 'CUBE' | 'GROUPING SETS';
 
@@ -92,8 +94,19 @@ export class SqlGroupByClause extends SqlClause {
     const value = this.valueOf();
     if (!expressions || isEmptyArray(expressions)) {
       delete value.expressions;
+      delete value.innerParens;
     } else {
       value.expressions = SeparatedArray.fromArray(expressions);
+    }
+    return SqlBase.fromValue(value);
+  }
+
+  public changeInnerParens(innerParens: boolean): this {
+    const value = this.valueOf();
+    if (innerParens) {
+      value.innerParens = true;
+    } else {
+      delete value.innerParens;
     }
     return SqlBase.fromValue(value);
   }

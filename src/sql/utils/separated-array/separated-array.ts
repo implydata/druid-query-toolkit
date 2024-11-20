@@ -86,8 +86,8 @@ export class SeparatedArray<T> {
     return this.map((value, i) => (i === index ? newValue : value));
   }
 
-  public map<U>(callbackfn: (value: T, index: number) => U): SeparatedArray<U> {
-    return new SeparatedArray<U>(this.values.map(callbackfn), this.separators);
+  public map<U>(fn: (value: T, index: number) => U): SeparatedArray<U> {
+    return new SeparatedArray<U>(this.values.map(fn), this.separators);
   }
 
   public filter(fn: (value: T, index: number) => any): SeparatedArray<T> | undefined {

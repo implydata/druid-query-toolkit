@@ -144,6 +144,8 @@ export function changeFilterPatternType(
         column: column || '?',
         start: new Date('2020-01-01Z'),
         end: new Date('2022-01-01Z'),
+        startBound: '[',
+        endBound: ')',
       };
 
     case 'timeRelative':
@@ -151,8 +153,10 @@ export function changeFilterPatternType(
         type: 'timeRelative',
         negated: pattern.negated,
         column: column || '?',
-        anchor: 'currentTimestamp',
+        anchor: 'timestamp',
         rangeDuration: 'P1D',
+        startBound: '[',
+        endBound: ')',
       };
 
     case 'numberRange':

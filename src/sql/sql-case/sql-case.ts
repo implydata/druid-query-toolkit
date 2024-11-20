@@ -12,9 +12,10 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlBaseValue, SqlTypeDesignator, Substitutor } from '../sql-base';
+import type { SqlBaseValue, SqlTypeDesignator, Substitutor } from '../sql-base';
+import { SqlBase } from '../sql-base';
 import { SqlExpression } from '../sql-expression';
-import { SeparatedArray } from '../utils';
+import { SeparatedArray, SPACE } from '../utils';
 
 import { SqlWhenThenPart } from './sql-when-then-part';
 
@@ -72,7 +73,7 @@ export class SqlCase extends SqlExpression {
       rawParts.push(this.caseExpression.toString(), this.getSpace('postCaseExpression'));
     }
 
-    rawParts.push(this.whenThenParts.toString(' '));
+    rawParts.push(this.whenThenParts.toString(SPACE));
 
     if (this.elseExpression) {
       rawParts.push(

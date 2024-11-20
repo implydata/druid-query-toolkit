@@ -12,9 +12,13 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlTypeDesignator, Substitutor } from '../../sql-base';
+import type { SqlTypeDesignator, Substitutor } from '../../sql-base';
+import { SqlBase } from '../../sql-base';
 import { SqlExpression } from '../../sql-expression';
-import { SqlClause, SqlClauseValue } from '../sql-clause';
+import { SqlMulti } from '../../sql-multi/sql-multi';
+import { NEWLINE_INDENT, SPACE } from '../../utils';
+import type { SqlClauseValue } from '../sql-clause';
+import { SqlClause } from '../sql-clause';
 
 export interface SqlHavingClauseValue extends SqlClauseValue {
   expression: SqlExpression;
@@ -25,9 +29,10 @@ export class SqlHavingClause extends SqlClause {
 
   static DEFAULT_HAVING_KEYWORD = 'HAVING';
 
-  static create(expression: SqlExpression): SqlHavingClause {
+  static create(expression: SqlHavingClause | SqlExpression): SqlHavingClause {
+    if (expression instanceof SqlHavingClause) return expression;
     return new SqlHavingClause({
-      expression,
+      expression: SqlExpression.verify(expression),
     });
   }
 
@@ -45,10 +50,12 @@ export class SqlHavingClause extends SqlClause {
   }
 
   protected _toRawString(): string {
+    const { expression } = this;
+    const indent = expression instanceof SqlMulti && expression.numArgs() >= 3;
     return [
       this.getKeyword('having', SqlHavingClause.DEFAULT_HAVING_KEYWORD),
-      this.getSpace('postHaving'),
-      this.expression.toString(),
+      this.getSpace('postHaving', indent ? NEWLINE_INDENT : SPACE),
+      expression.toString(),
     ].join('');
   }
 

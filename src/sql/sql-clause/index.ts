@@ -35,3 +35,4 @@ export * from './sql-insert-clause/sql-insert-clause';
 export * from './sql-replace-clause/sql-replace-clause';
 export * from './sql-extend-clause/sql-column-declaration';
 export * from './sql-extend-clause/sql-extend-clause';
+export * from './sql-partition-by-clause/sql-partition-by-clause';

@@ -12,8 +12,10 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlBaseValue, SqlTypeDesignator } from '../sql-base';
-import { DecomposeViaOptions, SqlExpression } from '../sql-expression';
+import type { SqlBaseValue, SqlTypeDesignator } from '../sql-base';
+import { SqlBase } from '../sql-base';
+import type { DecomposeViaOptions } from '../sql-expression';
+import { SqlExpression } from '../sql-expression';
 import { needsUnicodeEscape, sqlEscapeUnicode, trimString } from '../utils';
 
 function isDate(v: any): v is Date {
@@ -43,10 +45,15 @@ export class SqlLiteral extends SqlExpression {
   static FALSE: SqlLiteral;
   static TRUE: SqlLiteral;
   static ZERO: SqlLiteral;
+  static ZERO_POINT_ZERO: SqlLiteral;
+  static ONE: SqlLiteral;
+  static ONE_POINT_ZERO: SqlLiteral;
+  static EMPTY_STRING: SqlLiteral;
 
   static create(value: LiteralValue | SqlLiteral): SqlLiteral {
     if (value instanceof SqlLiteral) return value;
 
+    // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check
     switch (typeof value) {
       case 'object':
         if (value !== null && !isDate(value)) {
@@ -54,8 +61,13 @@ export class SqlLiteral extends SqlExpression {
         }
         break;
 
-      case 'boolean':
       case 'number':
+        if (!isFinite(value)) {
+          throw new TypeError(`SqlLiteral invalid numeric input ${value}`);
+        }
+        break;
+
+      case 'boolean':
       case 'bigint':
       case 'string':
         break; // Nothing to do here
@@ -115,6 +127,10 @@ export class SqlLiteral extends SqlExpression {
       .replace(/ 00:00:00$/, '');
   }
 
+  static isTrue(ex: SqlExpression): ex is SqlLiteral {
+    return ex instanceof SqlLiteral && ex.value === true;
+  }
+
   static _equalsLiteral(expression: SqlBase, value: number) {
     return expression instanceof SqlLiteral && expression.value === value;
   }
@@ -139,6 +155,7 @@ export class SqlLiteral extends SqlExpression {
     const { value, stringValue } = this;
     if (stringValue) return stringValue;
 
+    // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check
     switch (typeof value) {
       case 'object':
         if (value === null) {
@@ -219,6 +236,7 @@ export class SqlLiteral extends SqlExpression {
 
   public isInteger(): boolean {
     const { value, stringValue } = this;
+    // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check
     switch (typeof value) {
       case 'number':
         if (typeof stringValue === 'string') {
@@ -269,3 +287,7 @@ SqlLiteral.NULL = SqlLiteral.create(null);
 SqlLiteral.FALSE = SqlLiteral.create(false);
 SqlLiteral.TRUE = SqlLiteral.create(true);
 SqlLiteral.ZERO = SqlLiteral.create(0);
+SqlLiteral.ZERO_POINT_ZERO = SqlLiteral.double(0);
+SqlLiteral.ONE = SqlLiteral.create(1);
+SqlLiteral.ONE_POINT_ZERO = SqlLiteral.double(1);
+SqlLiteral.EMPTY_STRING = SqlLiteral.create('');

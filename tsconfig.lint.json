@@ -1,0 +1,4 @@
+{
+  "extends": "./tsconfig.json",
+  "files": [".eslintrc.js", "jest-env.ts", "jest-env.ts", "script/compile-peg.js"]
+}

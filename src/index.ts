@@ -19,4 +19,5 @@ export * from './shortcuts';
 export * from './introspect/introspect';
 export * from './query-result';
 export * from './query-runner/query-runner';
+export * from './query-payload/query-payload';
 export * from './filter-pattern';

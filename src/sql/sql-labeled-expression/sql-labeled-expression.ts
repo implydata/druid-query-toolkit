@@ -12,7 +12,8 @@
  * limitations under the License.
  */
 
-import { SqlBase, SqlBaseValue, SqlTypeDesignator, Substitutor } from '../sql-base';
+import type { SqlBaseValue, SqlTypeDesignator, Substitutor } from '../sql-base';
+import { SqlBase } from '../sql-base';
 import { SqlExpression } from '../sql-expression';
 import { RefName } from '../utils';
 
@@ -100,7 +101,7 @@ export class SqlLabeledExpression extends SqlExpression {
     return ret;
   }
 
-  public getLabelName(): string | undefined {
+  public getLabelName(): string {
     return this.label.name;
   }
 
