@@ -25,8 +25,8 @@ export interface FilterPatternDefinition<P> {
 
 export function extractOuterNot(ex: SqlExpression): [boolean, SqlExpression] {
   let negated = false;
-  if (ex instanceof SqlUnary && ex.op === 'NOT') {
-    negated = true;
+  while (ex instanceof SqlUnary && ex.op === 'NOT') {
+    negated = !negated;
     ex = ex.argument.changeParens([]);
   }
   return [negated, ex];
@@ -54,4 +54,8 @@ export function unwrapCastAsVarchar(ex: SqlExpression): SqlExpression {
 
 export function oneOf<T>(thing: T, ...options: T[]): boolean {
   return options.includes(thing);
+}
+
+export function xor(a: unknown, b: unknown): boolean {
+  return Boolean(a ? !b : b);
 }

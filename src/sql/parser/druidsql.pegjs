@@ -863,7 +863,7 @@ BaseType =
 / SqlValues
 / SqlLiteral
 / SqlColumn
-/ SqlRecordMaybe
+/ SqlRecordOrExpressionInParens
 / SqlQueryInParens
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1477,7 +1477,7 @@ ReturningSeparator = left:_ separator:ReturningToken right:_
   });
 }
 
-SqlRecordMaybe = record:SqlRecord
+SqlRecordOrExpressionInParens = record:SqlRecord
 {
   return record.unwrapIfSingleton();
 }
