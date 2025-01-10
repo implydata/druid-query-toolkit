@@ -18,50 +18,86 @@ import type { ValuesFilterPattern } from './pattern-values';
 import { VALUES_PATTERN_DEFINITION } from './pattern-values';
 
 describe('pattern-values', () => {
-  const expectations: { expression: string; pattern: ValuesFilterPattern }[] = [
+  const expectations: {
+    fixedPoint: string;
+    pattern: ValuesFilterPattern;
+    otherForms?: string[];
+  }[] = [
     {
-      expression: '"DIM:cityName" IS NULL',
+      fixedPoint: `"cityName" = 'Paris'`,
       pattern: {
         type: 'values',
         negated: false,
-        column: 'DIM:cityName',
+        column: 'cityName',
+        values: ['Paris'],
+      },
+      otherForms: [
+        `'Paris' = "cityName"`,
+        `"cityName" IN ('Paris')`,
+        `NOT(NOT("cityName" = 'Paris'))`,
+      ],
+    },
+    {
+      fixedPoint: `"cityName" <> 'Paris'`,
+      pattern: {
+        type: 'values',
+        negated: true,
+        column: 'cityName',
+        values: ['Paris'],
+      },
+      otherForms: [`'Paris' <> "cityName"`, `"cityName" NOT IN ('Paris')`],
+    },
+    {
+      fixedPoint: '"cityName" IS NULL',
+      pattern: {
+        type: 'values',
+        negated: false,
+        column: 'cityName',
         values: [null],
       },
     },
     {
-      expression: '"DIM:cityName" IS NOT NULL',
+      fixedPoint: '"cityName" IS NOT NULL',
       pattern: {
         type: 'values',
         negated: true,
-        column: 'DIM:cityName',
+        column: 'cityName',
         values: [null],
       },
     },
     {
-      expression: `("DIM:cityName" IS NULL OR "DIM:cityName" IN ('Paris', 'Marseille'))`,
+      fixedPoint: `("cityName" IS NULL OR "cityName" IN ('Paris', 'Marseille'))`,
       pattern: {
         type: 'values',
         negated: false,
-        column: 'DIM:cityName',
+        column: 'cityName',
         values: [null, 'Paris', 'Marseille'],
       },
+      otherForms: [`"cityName" IS NULL OR "cityName" = 'Paris' OR "cityName" = 'Marseille'`],
     },
     {
-      expression: `("DIM:cityName" IS NOT NULL AND "DIM:cityName" NOT IN ('Paris', 'Marseille'))`,
+      fixedPoint: `("cityName" IS NOT NULL AND "cityName" NOT IN ('Paris', 'Marseille'))`,
       pattern: {
         type: 'values',
         negated: true,
-        column: 'DIM:cityName',
+        column: 'cityName',
         values: [null, 'Paris', 'Marseille'],
       },
+      otherForms: [
+        `"cityName" IS NOT NULL AND "cityName" <> 'Paris' AND "cityName" <> 'Marseille'`,
+      ],
     },
   ];
 
   describe('fit <-> toExpression', () => {
-    expectations.forEach(({ expression, pattern }) => {
-      it(`works with ${expression}`, () => {
-        expect(VALUES_PATTERN_DEFINITION.fit(SqlExpression.parse(expression))).toEqual(pattern);
-        expect(VALUES_PATTERN_DEFINITION.toExpression(pattern).toString()).toEqual(expression);
+    expectations.forEach(({ fixedPoint, pattern, otherForms }) => {
+      it(`works with ${fixedPoint}`, () => {
+        expect(VALUES_PATTERN_DEFINITION.fit(SqlExpression.parse(fixedPoint))).toEqual(pattern);
+        expect(VALUES_PATTERN_DEFINITION.toExpression(pattern).toString()).toEqual(fixedPoint);
+
+        (otherForms || []).forEach(otherForm => {
+          expect(VALUES_PATTERN_DEFINITION.fit(SqlExpression.parse(otherForm))).toEqual(pattern);
+        });
       });
     });
   });

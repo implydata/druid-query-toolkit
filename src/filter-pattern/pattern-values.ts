@@ -15,10 +15,10 @@
 import { C } from '../shortcuts';
 import type { LiteralValue, SqlExpression } from '../sql';
 import { SqlColumn, SqlComparison, SqlLiteral, SqlMulti, SqlPlaceholder, SqlRecord } from '../sql';
+import { filterMap } from '../utils';
 
 import type { FilterPatternDefinition } from './common';
-import { extractOuterNot, sqlRecordGetLiteralValues } from './common';
-import { xor } from './utils';
+import { extractOuterNot, sqlRecordGetLiteralValues, xor } from './common';
 
 export interface ValuesFilterPattern {
   type: 'values';
@@ -33,7 +33,7 @@ export const VALUES_PATTERN_DEFINITION: FilterPatternDefinition<ValuesFilterPatt
 
     if (ex instanceof SqlMulti && (ex.op === 'OR' || ex.op === 'AND')) {
       const args = ex.getArgArray();
-      const patterns = args.map(VALUES_PATTERN_DEFINITION.fit).filter(Boolean);
+      const patterns = filterMap(args, VALUES_PATTERN_DEFINITION.fit);
 
       const pattern = patterns[0];
       if (pattern && args.length === patterns.length) {
@@ -70,6 +70,13 @@ export const VALUES_PATTERN_DEFINITION: FilterPatternDefinition<ValuesFilterPatt
             negated: xor(op === '<>', negated),
             column: lhs.getName(),
             values: [rhs.value],
+          };
+        } else if (lhs instanceof SqlLiteral && rhs instanceof SqlColumn) {
+          return {
+            type: 'values',
+            negated: xor(op === '<>', negated),
+            column: rhs.getName(),
+            values: [lhs.value],
           };
         }
         return;
@@ -109,7 +116,7 @@ export const VALUES_PATTERN_DEFINITION: FilterPatternDefinition<ValuesFilterPatt
     return Array.isArray(pattern.values) && Boolean(pattern.values.length);
   },
   toExpression({ column, values, negated }): SqlExpression {
-    if (!values.length) return SqlLiteral.TRUE;
+    if (!values.length) return SqlLiteral.FALSE;
 
     return C(column).apply(ex => {
       if (values.length === 1) {

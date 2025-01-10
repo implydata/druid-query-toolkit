@@ -15,9 +15,9 @@
 import { cleanObject, dedupe, objectMap } from '../utils';
 
 import type { SeparatedArray } from '.';
-import { SqlColumn, SqlFunction, SqlLiteral, SqlMulti, SqlTable } from '.';
+import { indentLines, SqlColumn, SqlFunction, SqlLiteral, SqlMulti, SqlTable } from '.';
 import { parse as parseSql } from './parser';
-import { INDENT, NEWLINE, SPACE } from './utils';
+import { NEWLINE, SPACE } from './utils';
 
 export interface Parens {
   leftSpacing?: string;
@@ -305,9 +305,6 @@ export abstract class SqlBase {
       }
       if (ret !== v) {
         changed = true;
-        // if (ret.type !== v.type) {
-        //   throw new Error(`can not change type of array (from ${v.type} to ${ret.type})`);
-        // }
       }
       return ret;
     });
@@ -443,7 +440,7 @@ export abstract class SqlBase {
   }
 
   public getSpace(name: SpaceName, defaultSpace = SPACE) {
-    const s = this.spacing[name];
+    const s = this.spacing[name] as string | undefined;
     return typeof s === 'string' ? s : defaultSpace;
   }
 
@@ -491,16 +488,18 @@ export abstract class SqlBase {
     const { parens } = this;
     let str = this._toRawString();
     if (parens) {
+      const isMultiline = str.includes(NEWLINE);
       for (const paren of parens) {
-        let { leftSpacing, rightSpacing } = paren;
-        if (typeof leftSpacing === 'undefined' && typeof rightSpacing === 'undefined') {
-          const lines = str.split('\n');
-          if (lines.length > 1) {
-            leftSpacing = rightSpacing = '\n';
-            str = lines.map(l => INDENT + l).join(NEWLINE);
-          }
+        const { leftSpacing, rightSpacing } = paren;
+        if (
+          typeof leftSpacing === 'undefined' &&
+          typeof rightSpacing === 'undefined' &&
+          isMultiline
+        ) {
+          str = `(${NEWLINE}${indentLines(str)}${NEWLINE})`;
+        } else {
+          str = `(${leftSpacing || ''}${str}${rightSpacing || ''})`;
         }
-        str = `(${leftSpacing || ''}${str}${rightSpacing || ''})`;
       }
     }
     return this.getSpace('initial', '') + str + this.getSpace('final', '');

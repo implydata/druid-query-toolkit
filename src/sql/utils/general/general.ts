@@ -18,6 +18,13 @@ export const NEWLINE = '\n';
 export const INDENT = '  ';
 export const NEWLINE_INDENT = NEWLINE + INDENT;
 
+export function indentLines(str: string): string {
+  return str
+    .split(NEWLINE)
+    .map(l => INDENT + l)
+    .join(NEWLINE);
+}
+
 export function trimString(str: string, maxLength: number): string {
   if (str.length < maxLength) return str;
   return str.substr(0, Math.max(maxLength - 3, 1)) + '...';
