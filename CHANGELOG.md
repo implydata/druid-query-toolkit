@@ -1,5 +1,11 @@
 # druid-query-toolkit
 
+## 1.0.1
+
+### Patch Changes
+
+- 740a5f6: More filter patterns supported
+
 ## 1.0.0
 
 ### Major Changes
