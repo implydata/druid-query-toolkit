@@ -13,8 +13,15 @@
  */
 
 import { C, F, L } from '../shortcuts';
-import type { SqlExpression } from '../sql';
-import { RefName, SqlColumn, SqlComparison, SqlFunction, SqlLiteral, SqlMulti } from '../sql';
+import {
+  RefName,
+  SqlColumn,
+  SqlComparison,
+  SqlExpression,
+  SqlFunction,
+  SqlLiteral,
+  SqlMulti,
+} from '../sql';
 
 import type { FilterPatternDefinition } from './common';
 import { extractOuterNot, oneOf } from './common';
@@ -220,19 +227,13 @@ export const TIME_RELATIVE_PATTERN_DEFINITION: FilterPatternDefinition<TimeRelat
         pattern.timezone,
       );
 
+      const start = rangeStep >= 0 ? anchorWithRange : anchor;
+      const end = rangeStep < 0 ? anchorWithRange : anchor;
       const column = C(pattern.column);
-      return (rangeStep >= 0 ? anchorWithRange : anchor)
-        .applyIf(pattern.startBound === '[', e => e.lessThanOrEqual(column))
-        .applyIf(pattern.startBound === '(', e => e.lessThan(column))
-        .and(
-          column
-            .applyIf(pattern.endBound === ']', e =>
-              e.lessThanOrEqual(rangeStep < 0 ? anchorWithRange : anchor),
-            )
-            .applyIf(pattern.endBound === ')', e =>
-              e.lessThan(rangeStep < 0 ? anchorWithRange : anchor),
-            ),
-        )
+      return SqlExpression.and(
+        pattern.startBound === '[' ? start.lessThanOrEqual(column) : start.lessThan(column),
+        pattern.endBound === ']' ? column.lessThanOrEqual(end) : column.lessThan(end),
+      )
         .ensureParens()
         .applyIf(pattern.negated, ex => ex.negate());
     },

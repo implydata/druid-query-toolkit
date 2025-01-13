@@ -135,6 +135,7 @@ export class SqlMulti extends SqlExpression {
     if (options.flatten) {
       return this.args.values.flatMap(v => v.decomposeViaAnd(options));
     } else {
+      if (this.hasParens()) return [this.changeParens([])];
       return this.args.values.map(v => v.changeParens([]));
     }
   }
