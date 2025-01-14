@@ -1,5 +1,11 @@
 # druid-query-toolkit
 
+## 1.0.2
+
+### Patch Changes
+
+- e68c6a9: Do not unwrap AND in parens when not flattening
+
 ## 1.0.1
 
 ### Patch Changes
