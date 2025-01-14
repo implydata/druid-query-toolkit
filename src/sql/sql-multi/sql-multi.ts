@@ -131,12 +131,14 @@ export class SqlMulti extends SqlExpression {
   }
 
   public decomposeViaAnd(options: DecomposeViaOptions = {}): SqlExpression[] {
-    if (this.op !== 'AND') return super.decomposeViaAnd(options);
+    const { op, args } = this;
+    if (op !== 'AND') return super.decomposeViaAnd(options);
     if (options.flatten) {
-      return this.args.values.flatMap(v => v.decomposeViaAnd(options));
+      return args.values.flatMap(v => v.decomposeViaAnd(options));
     } else {
-      if (this.hasParens()) return [this.changeParens([])];
-      return this.args.values.map(v => v.changeParens([]));
+      const { preserveParens } = options;
+      if (this.hasParens()) return [preserveParens ? this : this.changeParens([])];
+      return preserveParens ? args.values.slice() : args.values.map(v => v.changeParens([]));
     }
   }
 
@@ -156,11 +158,14 @@ export class SqlMulti extends SqlExpression {
   }
 
   public decomposeViaOr(options: DecomposeViaOptions = {}): SqlExpression[] {
-    if (this.op !== 'OR') return super.decomposeViaOr(options);
+    const { op, args } = this;
+    if (op !== 'OR') return super.decomposeViaOr(options);
     if (options.flatten) {
-      return this.args.values.flatMap(v => v.decomposeViaOr(options));
+      return args.values.flatMap(v => v.decomposeViaOr(options));
     } else {
-      return this.args.values.map(v => v.changeParens([]));
+      const { preserveParens } = options;
+      if (this.hasParens()) return [preserveParens ? this : this.changeParens([])];
+      return preserveParens ? args.values.slice() : args.values.map(v => v.changeParens([]));
     }
   }
 
