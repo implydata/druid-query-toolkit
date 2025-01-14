@@ -380,6 +380,16 @@ describe('SqlExpression', () => {
         'c',
       ]);
 
+      expect(mapString(SqlExpression.parse('(a AND (b AND c))').decomposeViaAnd())).toEqual([
+        'a AND (b AND c)',
+      ]);
+
+      expect(
+        mapString(
+          SqlExpression.parse('(a AND (b AND c))').decomposeViaAnd({ preserveParens: true }),
+        ),
+      ).toEqual(['(a AND (b AND c))']);
+
       expect(mapString(SqlExpression.parse('(a AND (b AND c)) And d').decomposeViaAnd())).toEqual([
         'a AND (b AND c)',
         'd',

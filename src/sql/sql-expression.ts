@@ -30,6 +30,7 @@ import { SqlBase } from './sql-base';
 
 export interface DecomposeViaOptions {
   flatten?: boolean;
+  preserveParens?: boolean;
 }
 
 export abstract class SqlExpression extends SqlBase {
