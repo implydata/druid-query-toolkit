@@ -753,6 +753,74 @@ describe('SqlQuery', () => {
     });
   });
 
+  describe('#changeDecorator', () =>{
+    it('works', () => {
+      const sql = SqlQuery.parse(sane`
+        SELECT
+          isAnonymous,
+          cityName,
+          flags,
+          COUNT(*) AS "Count",
+          SUM(added) AS "sum_added"
+        FROM wikipedia
+        GROUP BY 1, 2, 3
+        ORDER BY 4 DESC
+      `);
+      expect(sql.changeDecorator('ALL').toString()).toEqual(sane`
+        SELECT
+          ALL
+          isAnonymous,
+          cityName,
+          flags,
+          COUNT(*) AS "Count",
+          SUM(added) AS "sum_added"
+        FROM wikipedia
+        GROUP BY 1, 2, 3
+        ORDER BY 4 DESC
+      `);
+      expect(sql.changeDecorator('DISTINCT').toString()).toEqual(sane`
+        SELECT
+          DISTINCT
+          isAnonymous,
+          cityName,
+          flags,
+          COUNT(*) AS "Count",
+          SUM(added) AS "sum_added"
+        FROM wikipedia
+        GROUP BY 1, 2, 3
+        ORDER BY 4 DESC
+      `);
+  });
+  it('can remove an existing decorator', () => {
+    const sql = SqlQuery.parse(sane`
+      SELECT
+      ALL
+        isAnonymous,
+        cityName,
+        flags,
+        COUNT(*) AS "Count",
+        SUM(added) AS "sum_added"
+      FROM (
+        SELECT * FROM wikipedia
+      ) t
+      GROUP BY 1, 2, 3
+      ORDER BY 4 DESC
+    `);
+    expect(sql.changeDecorator(undefined).toString()).toEqual(sane`
+      SELECT
+      isAnonymous,
+        cityName,
+        flags,
+        COUNT(*) AS "Count",
+        SUM(added) AS "sum_added"
+      FROM (
+        SELECT * FROM wikipedia
+      ) t
+      GROUP BY 1, 2, 3
+      ORDER BY 4 DESC
+    `);
+  })
+});
   describe('#removeSelectIndex', () => {
     const sql = SqlQuery.parse(sane`
       SELECT

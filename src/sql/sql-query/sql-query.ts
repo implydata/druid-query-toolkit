@@ -333,6 +333,13 @@ export class SqlQuery extends SqlExpression {
     return rawParts.join('');
   }
 
+  public changeDecorator(decorator: SqlQueryDecorator | undefined): this {
+  const value = this.valueOf();
+    value.decorator = decorator;
+    return SqlBase.fromValue(value)
+
+  }
+
   public changeExplain(explain: boolean): this {
     if (this.explain === explain) return this;
     const value = this.valueOf();
