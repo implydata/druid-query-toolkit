@@ -334,10 +334,9 @@ export class SqlQuery extends SqlExpression {
   }
 
   public changeDecorator(decorator: SqlQueryDecorator | undefined): this {
-  const value = this.valueOf();
+    const value = this.valueOf();
     value.decorator = decorator;
-    return SqlBase.fromValue(value)
-
+    return SqlBase.fromValue(value);
   }
 
   public changeExplain(explain: boolean): this {

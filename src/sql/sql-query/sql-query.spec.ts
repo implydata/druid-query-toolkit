@@ -753,7 +753,7 @@ describe('SqlQuery', () => {
     });
   });
 
-  describe('#changeDecorator', () =>{
+  describe('#changeDecorator', () => {
     it('works', () => {
       const sql = SqlQuery.parse(sane`
         SELECT
@@ -790,9 +790,9 @@ describe('SqlQuery', () => {
         GROUP BY 1, 2, 3
         ORDER BY 4 DESC
       `);
-  });
-  it('can remove an existing decorator', () => {
-    const sql = SqlQuery.parse(sane`
+    });
+    it('can remove an existing decorator', () => {
+      const sql = SqlQuery.parse(sane`
       SELECT
       ALL
         isAnonymous,
@@ -806,7 +806,7 @@ describe('SqlQuery', () => {
       GROUP BY 1, 2, 3
       ORDER BY 4 DESC
     `);
-    expect(sql.changeDecorator(undefined).toString()).toEqual(sane`
+      expect(sql.changeDecorator(undefined).toString()).toEqual(sane`
       SELECT
       isAnonymous,
         cityName,
@@ -819,8 +819,8 @@ describe('SqlQuery', () => {
       GROUP BY 1, 2, 3
       ORDER BY 4 DESC
     `);
-  })
-});
+    });
+  });
   describe('#removeSelectIndex', () => {
     const sql = SqlQuery.parse(sane`
       SELECT
