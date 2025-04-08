@@ -1,5 +1,11 @@
 # druid-query-toolkit
 
+## 1.0.3
+
+### Patch Changes
+
+- 6d71e89: Add `changeDecorator` method to SqlQuery
+
 ## 1.0.2
 
 ### Patch Changes
