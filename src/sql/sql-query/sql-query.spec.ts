@@ -30,7 +30,7 @@ describe('SqlQuery', () => {
   it('things that work', () => {
     const queries: string[] = [
       `Select nottingham from tbl`,
-      `Select 3`,
+      `Select 3; ; ;`,
       `Select PI as "pi"`,
       `Select * from tbl`,
       `Select * from tbl Limit 10`,

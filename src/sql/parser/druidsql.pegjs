@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-Start = initial:_? thing:(SqlQueryWithPossibleContext / SqlAlias) final:_?
+Start = initial:_? thing:(SqlQueryWithPossibleContext / SqlAlias) final:_sc?
 {
   if (initial) thing = thing.changeSpace('initial', initial);
   if (final) thing = thing.changeSpace('final', final);
@@ -1823,6 +1823,8 @@ __ "mandatory whitespace" = $(Space _)
 
 ___ "pure whitespace" = $(Space*)
 
+_sc "possible semicolon" = $(SpaceOrSemicolon* ((SingleLineComment / MultiLineComment) SpaceOrSemicolon*)* FinalSingleLineComment?)
+
 SingleLineComment = $("--" [^\n]* [\n])
 
 FinalSingleLineComment = $("--" [^\n]*)
@@ -1830,6 +1832,8 @@ FinalSingleLineComment = $("--" [^\n]*)
 MultiLineComment = $("/*" (!"*/" .)* "*/")
 
 Space = [ \t\n\r]
+
+SpaceOrSemicolon = [ \t\n\r;]
 
 OpenParen "(" = "("
 
