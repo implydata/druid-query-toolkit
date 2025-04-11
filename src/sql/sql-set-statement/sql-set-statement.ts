@@ -30,7 +30,7 @@ export class SqlSetStatement extends SqlBase {
 
   static create(key: string | RefName, value: LiteralValue | SqlLiteral): SqlSetStatement {
     return new SqlSetStatement({
-      key: RefName.create(key),
+      key: RefName.create(key, false),
       value: SqlLiteral.create(value),
     });
   }
@@ -47,8 +47,12 @@ export class SqlSetStatement extends SqlBase {
     return context;
   }
 
-  static contextToContextStatements(context: Record<string, any>): SqlSetStatement[] {
-    return Object.entries(context).map(([k, v]) => SqlSetStatement.create(k, v));
+  static contextToContextStatements(
+    context: Record<string, any> | undefined,
+  ): SqlSetStatement[] | undefined {
+    return context
+      ? Object.entries(context).map(([k, v]) => SqlSetStatement.create(k, v))
+      : undefined;
   }
 
   public readonly key: RefName;

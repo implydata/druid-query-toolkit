@@ -359,10 +359,8 @@ export class SqlQuery extends SqlExpression {
     return SqlSetStatement.contextStatementsToContext(this.contextStatements?.values);
   }
 
-  public changeContext(context: Record<string, any>): this {
-    return this.changeContextStatements(
-      Object.entries(context).map(([k, v]) => SqlSetStatement.create(k, v)),
-    );
+  public changeContext(context: Record<string, any> | undefined): this {
+    return this.changeContextStatements(SqlSetStatement.contextToContextStatements(context));
   }
 
   public changeExplain(explain: boolean): this {

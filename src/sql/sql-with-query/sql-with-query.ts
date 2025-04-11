@@ -183,9 +183,7 @@ export class SqlWithQuery extends SqlExpression {
   }
 
   public changeContext(context: Record<string, any>): this {
-    return this.changeContextStatements(
-      Object.entries(context).map(([k, v]) => SqlSetStatement.create(k, v)),
-    );
+    return this.changeContextStatements(SqlSetStatement.contextToContextStatements(context));
   }
 
   public changeExplain(explain: boolean): this {

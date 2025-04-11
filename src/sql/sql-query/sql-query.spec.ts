@@ -291,6 +291,31 @@ describe('SqlQuery', () => {
       `);
     });
 
+    it('does a replace with an if', () => {
+      const sql = `SUM(t.added) / COUNT(DISTINCT t."user") + COUNT(*)`;
+
+      const condition = SqlExpression.parse(
+        `__time BETWEEN TIMESTAMP '2020-01-01 01:00:00' AND TIMESTAMP '2020-01-01 02:00:00'`,
+      );
+      expect(
+        String(
+          SqlExpression.parse(sql).walk(x => {
+            if (x instanceof SqlColumn) {
+              if (x.getTableName() === 't') {
+                return SqlCase.ifThenElse(condition, x);
+              }
+            }
+            if (x instanceof SqlFunction && x.isCountStar()) {
+              return x.changeWhereExpression(condition);
+            }
+            return x;
+          }),
+        ),
+      ).toMatchInlineSnapshot(
+        `"SUM(CASE WHEN __time BETWEEN TIMESTAMP '2020-01-01 01:00:00' AND TIMESTAMP '2020-01-01 02:00:00' THEN t.added END) / COUNT(DISTINCT CASE WHEN __time BETWEEN TIMESTAMP '2020-01-01 01:00:00' AND TIMESTAMP '2020-01-01 02:00:00' THEN t.\\"user\\" END) + COUNT(*) FILTER (WHERE __time BETWEEN TIMESTAMP '2020-01-01 01:00:00' AND TIMESTAMP '2020-01-01 02:00:00')"`,
+      );
+    });
+
     it('has correct walk order', () => {
       const parts: string[] = [];
       sqlMaster.walk(x => {
@@ -541,6 +566,59 @@ describe('SqlQuery', () => {
       expect(String(insertSql.changeInsertIntoTable('"lol"').insertClause)).toEqual(
         `INSERT INTO """lol"""`,
       );
+    });
+  });
+
+  describe('#getContext', () => {
+    it('works with nothing', () => {
+      expect(
+        SqlQuery.parse(
+          sane`
+            SELECT *
+            FROM wikipedia
+          `,
+        ).getContext(),
+      ).toEqual({});
+    });
+
+    it('works with something', () => {
+      expect(
+        SqlQuery.parse(
+          sane`
+            SET b = 2;
+            SET c = 'hello';
+            SELECT *
+            FROM wikipedia;
+          `,
+        ).getContext(),
+      ).toEqual({
+        b: 2,
+        c: 'hello',
+      });
+    });
+  });
+
+  describe('#changeContext', () => {
+    const sql = SqlQuery.parse(sane`
+      set a = 1;
+      SELECT *
+      FROM wikipedia
+    `);
+
+    it('changes to something', () => {
+      expect(sql.changeContext({ b: 2, c: 'hello' }).toString()).toEqual(sane`
+        SET b = 2;
+        SET c = 'hello';
+        SELECT *
+        FROM wikipedia
+      `);
+    });
+
+    it('changes to nothing', () => {
+      expect(sql.changeContext(undefined).toString()).toEqual(sane`
+        SELECT *
+        FROM wikipedia
+      `);
     });
   });
 
@@ -933,31 +1011,6 @@ describe('SqlQuery', () => {
 
       expect(sql.hasStarInSelect()).toBe(true);
     });
-  });
-
-  it('does a replace with an if', () => {
-    const sql = `SUM(t.added) / COUNT(DISTINCT t."user") + COUNT(*)`;
-
-    const condition = SqlExpression.parse(
-      `__time BETWEEN TIMESTAMP '2020-01-01 01:00:00' AND TIMESTAMP '2020-01-01 02:00:00'`,
-    );
-    expect(
-      String(
-        SqlExpression.parse(sql).walk(x => {
-          if (x instanceof SqlColumn) {
-            if (x.getTableName() === 't') {
-              return SqlCase.ifThenElse(condition, x);
-            }
-          }
-          if (x instanceof SqlFunction && x.isCountStar()) {
-            return x.changeWhereExpression(condition);
-          }
-          return x;
-        }),
-      ),
-    ).toMatchInlineSnapshot(
-      `"SUM(CASE WHEN __time BETWEEN TIMESTAMP '2020-01-01 01:00:00' AND TIMESTAMP '2020-01-01 02:00:00' THEN t.added END) / COUNT(DISTINCT CASE WHEN __time BETWEEN TIMESTAMP '2020-01-01 01:00:00' AND TIMESTAMP '2020-01-01 02:00:00' THEN t.\\"user\\" END) + COUNT(*) FILTER (WHERE __time BETWEEN TIMESTAMP '2020-01-01 01:00:00' AND TIMESTAMP '2020-01-01 02:00:00')"`,
-    );
   });
 
   it('Simple subquery in from', () => {
