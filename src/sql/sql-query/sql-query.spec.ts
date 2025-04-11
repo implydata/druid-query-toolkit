@@ -33,7 +33,7 @@ describe('SqlQuery', () => {
       `Select 3; ; ;`,
       `Select PI as "pi"`,
       `Select * from tbl`,
-      `Select * from tbl Limit 10`,
+      `Select * from tbl Limit 10;`,
       `Select * from tbl Limit 10 offset 5`,
       `(Select * from tbl)`,
       `Select count(*) As sums from tbl`,
@@ -41,7 +41,7 @@ describe('SqlQuery', () => {
       `SELECT comment, page, COUNT(*) AS "Count" FROM wikipedia GROUP BY (comment, page) ORDER BY 3 DESC`,
       `SELECT comment, page, COUNT(*) AS "Count" FROM wikipedia GROUP BY ROLLUP (comment, page) ORDER BY 3 DESC`,
       `SELECT distinct dim1 FROM druid.foo`,
-      `SET a = 1;set B = 'lol';SELECT distinct dim1 FROM druid.foo`,
+      `SET a = 1;set B = 'lol';SELECT distinct dim1 FROM druid.foo;`,
       sane`
         SELECT
           datasource d,
