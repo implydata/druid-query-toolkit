@@ -29,10 +29,11 @@ import {
 import { SqlExpression } from '../sql-expression';
 import type { SqlLiteral } from '../sql-literal/sql-literal';
 import { SqlQuery } from '../sql-query/sql-query';
-import type { SeparatedArray } from '../utils';
-import { NEWLINE } from '../utils';
+import { SqlSetStatement } from '../sql-set-statement/sql-set-statement';
+import { NEWLINE, SeparatedArray } from '../utils';
 
 export interface SqlWithQueryValue extends SqlBaseValue {
+  contextStatements?: SeparatedArray<SqlSetStatement>;
   explain?: boolean;
   insertClause?: SqlInsertClause;
   replaceClause?: SqlReplaceClause;
@@ -50,6 +51,7 @@ export interface SqlWithQueryValue extends SqlBaseValue {
 export class SqlWithQuery extends SqlExpression {
   static type: SqlTypeDesignator = 'withQuery';
 
+  public readonly contextStatements?: SeparatedArray<SqlSetStatement>;
   public readonly explain?: boolean;
   public readonly insertClause?: SqlInsertClause;
   public readonly replaceClause?: SqlReplaceClause;
@@ -63,6 +65,7 @@ export class SqlWithQuery extends SqlExpression {
 
   constructor(options: SqlWithQueryValue) {
     super(options, SqlWithQuery.type);
+    this.contextStatements = options.contextStatements;
     this.explain = options.explain;
     this.insertClause = options.insertClause;
     this.replaceClause = options.replaceClause;
@@ -81,6 +84,7 @@ export class SqlWithQuery extends SqlExpression {
 
   public valueOf(): SqlWithQueryValue {
     const value = super.valueOf() as SqlWithQueryValue;
+    value.contextStatements = this.contextStatements;
     value.explain = this.explain;
     value.insertClause = this.insertClause;
     value.replaceClause = this.replaceClause;
@@ -96,6 +100,7 @@ export class SqlWithQuery extends SqlExpression {
 
   protected _toRawString(): string {
     const {
+      contextStatements,
       explain,
       insertClause,
       replaceClause,
@@ -109,6 +114,11 @@ export class SqlWithQuery extends SqlExpression {
     } = this;
 
     const rawParts: string[] = [];
+
+    // SET clauses
+    if (contextStatements) {
+      rawParts.push(contextStatements.toString(NEWLINE), this.getSpace('postSets', NEWLINE));
+    }
 
     // Explain
     if (explain) {
@@ -155,6 +165,27 @@ export class SqlWithQuery extends SqlExpression {
     }
 
     return rawParts.join('');
+  }
+
+  public changeContextStatements(
+    contextStatements: SeparatedArray<SqlSetStatement> | SqlSetStatement[] | undefined,
+  ): this {
+    const value = this.valueOf();
+    value.contextStatements =
+      contextStatements && !isEmptyArray(contextStatements)
+        ? SeparatedArray.fromArray(contextStatements)
+        : undefined;
+    return SqlBase.fromValue(value);
+  }
+
+  public getContext(): Record<string, any> {
+    return SqlSetStatement.contextStatementsToContext(this.contextStatements?.values);
+  }
+
+  public changeContext(context: Record<string, any>): this {
+    return this.changeContextStatements(
+      Object.entries(context).map(([k, v]) => SqlSetStatement.create(k, v)),
+    );
   }
 
   public changeExplain(explain: boolean): this {

@@ -41,6 +41,7 @@ describe('SqlQuery', () => {
       `SELECT comment, page, COUNT(*) AS "Count" FROM wikipedia GROUP BY (comment, page) ORDER BY 3 DESC`,
       `SELECT comment, page, COUNT(*) AS "Count" FROM wikipedia GROUP BY ROLLUP (comment, page) ORDER BY 3 DESC`,
       `SELECT distinct dim1 FROM druid.foo`,
+      `SET a = 1;set B = 'lol';SELECT distinct dim1 FROM druid.foo`,
       sane`
         SELECT
           datasource d,
@@ -135,6 +136,11 @@ describe('SqlQuery', () => {
           SUM(added) AS "sum_added"
         FROM wikipedia
         GROUP BY 1, 2, 3
+      `,
+      sane`
+        SET a = 1;
+        set B = 'lol';
+        SELECT 1 + 1
       `,
     ];
 
