@@ -91,6 +91,7 @@ describe('SqlWithQuery', () => {
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlWithQuery {
         "clusteredByClause": undefined,
+        "contextStatements": undefined,
         "explain": undefined,
         "insertClause": undefined,
         "keywords": Object {},
@@ -101,6 +102,7 @@ describe('SqlWithQuery', () => {
         "partitionedByClause": undefined,
         "query": SqlQuery {
           "clusteredByClause": undefined,
+          "contextStatements": undefined,
           "decorator": undefined,
           "explain": undefined,
           "fromClause": SqlFromClause {
@@ -193,6 +195,7 @@ describe('SqlWithQuery', () => {
                 "parens": undefined,
                 "query": SqlQuery {
                   "clusteredByClause": undefined,
+                  "contextStatements": undefined,
                   "decorator": undefined,
                   "explain": undefined,
                   "fromClause": SqlFromClause {

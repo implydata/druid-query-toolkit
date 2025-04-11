@@ -970,6 +970,7 @@ describe('SqlQuery', () => {
     expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "clusteredByClause": undefined,
+        "contextStatements": undefined,
         "decorator": undefined,
         "explain": undefined,
         "fromClause": SqlFromClause {
@@ -978,6 +979,7 @@ describe('SqlQuery', () => {
             "values": Array [
               SqlQuery {
                 "clusteredByClause": undefined,
+                "contextStatements": undefined,
                 "decorator": undefined,
                 "explain": undefined,
                 "fromClause": SqlFromClause {
@@ -1178,6 +1180,7 @@ describe('SqlQuery', () => {
     expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "clusteredByClause": undefined,
+        "contextStatements": undefined,
         "decorator": undefined,
         "explain": undefined,
         "fromClause": SqlFromClause {
@@ -1382,6 +1385,7 @@ describe('SqlQuery', () => {
     expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "clusteredByClause": undefined,
+        "contextStatements": undefined,
         "decorator": undefined,
         "explain": true,
         "fromClause": SqlFromClause {
@@ -1462,6 +1466,7 @@ describe('SqlQuery', () => {
     expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "clusteredByClause": undefined,
+        "contextStatements": undefined,
         "decorator": undefined,
         "explain": undefined,
         "fromClause": SqlFromClause {
@@ -1560,6 +1565,7 @@ describe('SqlQuery', () => {
                 "parens": undefined,
                 "query": SqlQuery {
                   "clusteredByClause": undefined,
+                  "contextStatements": undefined,
                   "decorator": undefined,
                   "explain": undefined,
                   "fromClause": SqlFromClause {
@@ -1659,6 +1665,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "clusteredByClause": undefined,
+          "contextStatements": undefined,
           "decorator": undefined,
           "explain": undefined,
           "fromClause": SqlFromClause {
@@ -1774,6 +1781,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "clusteredByClause": undefined,
+          "contextStatements": undefined,
           "decorator": undefined,
           "explain": undefined,
           "fromClause": SqlFromClause {
@@ -1901,6 +1909,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "clusteredByClause": undefined,
+          "contextStatements": undefined,
           "decorator": undefined,
           "explain": undefined,
           "fromClause": SqlFromClause {
@@ -2341,6 +2350,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "clusteredByClause": undefined,
+          "contextStatements": undefined,
           "decorator": undefined,
           "explain": undefined,
           "fromClause": SqlFromClause {
@@ -2456,6 +2466,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "clusteredByClause": undefined,
+          "contextStatements": undefined,
           "decorator": undefined,
           "explain": undefined,
           "fromClause": SqlFromClause {
@@ -2583,6 +2594,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "clusteredByClause": undefined,
+          "contextStatements": undefined,
           "decorator": undefined,
           "explain": undefined,
           "fromClause": SqlFromClause {
@@ -2812,6 +2824,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "clusteredByClause": undefined,
+          "contextStatements": undefined,
           "decorator": undefined,
           "explain": undefined,
           "fromClause": SqlFromClause {
@@ -2919,6 +2932,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "clusteredByClause": undefined,
+          "contextStatements": undefined,
           "decorator": undefined,
           "explain": undefined,
           "fromClause": SqlFromClause {
@@ -3029,6 +3043,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "clusteredByClause": undefined,
+          "contextStatements": undefined,
           "decorator": undefined,
           "explain": undefined,
           "fromClause": SqlFromClause {
@@ -3148,6 +3163,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "clusteredByClause": undefined,
+          "contextStatements": undefined,
           "decorator": undefined,
           "explain": undefined,
           "fromClause": SqlFromClause {
@@ -3391,6 +3407,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "clusteredByClause": undefined,
+          "contextStatements": undefined,
           "decorator": undefined,
           "explain": undefined,
           "fromClause": SqlFromClause {
@@ -3761,6 +3778,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "clusteredByClause": undefined,
+          "contextStatements": undefined,
           "decorator": undefined,
           "explain": undefined,
           "fromClause": SqlFromClause {
@@ -3892,6 +3910,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "clusteredByClause": undefined,
+          "contextStatements": undefined,
           "decorator": undefined,
           "explain": undefined,
           "fromClause": SqlFromClause {
@@ -4027,6 +4046,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "clusteredByClause": undefined,
+          "contextStatements": undefined,
           "decorator": undefined,
           "explain": undefined,
           "fromClause": SqlFromClause {
@@ -4185,6 +4205,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "clusteredByClause": undefined,
+          "contextStatements": undefined,
           "decorator": undefined,
           "explain": undefined,
           "fromClause": SqlFromClause {
@@ -4278,6 +4299,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "clusteredByClause": undefined,
+          "contextStatements": undefined,
           "decorator": undefined,
           "explain": undefined,
           "fromClause": SqlFromClause {
@@ -4341,6 +4363,7 @@ describe('SqlQuery', () => {
           "type": "query",
           "unionQuery": SqlQuery {
             "clusteredByClause": undefined,
+            "contextStatements": undefined,
             "decorator": undefined,
             "explain": undefined,
             "fromClause": SqlFromClause {
@@ -4419,6 +4442,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "clusteredByClause": undefined,
+          "contextStatements": undefined,
           "decorator": undefined,
           "explain": undefined,
           "fromClause": SqlFromClause {
@@ -4561,6 +4585,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "clusteredByClause": undefined,
+          "contextStatements": undefined,
           "decorator": undefined,
           "explain": undefined,
           "fromClause": SqlFromClause {
@@ -4703,6 +4728,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "clusteredByClause": undefined,
+          "contextStatements": undefined,
           "decorator": undefined,
           "explain": undefined,
           "fromClause": SqlFromClause {
@@ -4845,6 +4871,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "clusteredByClause": undefined,
+          "contextStatements": undefined,
           "decorator": undefined,
           "explain": undefined,
           "fromClause": SqlFromClause {
@@ -4987,6 +5014,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "clusteredByClause": undefined,
+          "contextStatements": undefined,
           "decorator": undefined,
           "explain": undefined,
           "fromClause": SqlFromClause {
@@ -5129,6 +5157,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "clusteredByClause": undefined,
+          "contextStatements": undefined,
           "decorator": undefined,
           "explain": undefined,
           "fromClause": SqlFromClause {
@@ -5304,6 +5333,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "clusteredByClause": undefined,
+          "contextStatements": undefined,
           "decorator": undefined,
           "explain": undefined,
           "fromClause": SqlFromClause {
@@ -5482,6 +5512,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "clusteredByClause": undefined,
+          "contextStatements": undefined,
           "decorator": undefined,
           "explain": undefined,
           "fromClause": SqlFromClause {
@@ -5748,6 +5779,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "clusteredByClause": undefined,
+          "contextStatements": undefined,
           "decorator": undefined,
           "explain": undefined,
           "fromClause": SqlFromClause {
@@ -6186,6 +6218,7 @@ describe('SqlQuery', () => {
             },
             "type": "clusteredByClause",
           },
+          "contextStatements": undefined,
           "decorator": undefined,
           "explain": undefined,
           "fromClause": SqlFromClause {

@@ -98,14 +98,14 @@ export const NUMBER_RANGE_PATTERN_DEFINITION: FilterPatternDefinition<NumberRang
       left.rhs instanceof SqlLiteral
         ? left.rhs.value
         : left.lhs instanceof SqlLiteral
-          ? left.lhs.value
-          : undefined;
+        ? left.lhs.value
+        : undefined;
     const rightValue =
       right.rhs instanceof SqlLiteral
         ? right.rhs.value
         : right.lhs instanceof SqlLiteral
-          ? right.lhs.value
-          : undefined;
+        ? right.lhs.value
+        : undefined;
 
     if (typeof leftValue !== 'number' || typeof rightValue !== 'number') return;
     if (isNaN(leftValue) || isNaN(rightValue)) return;
