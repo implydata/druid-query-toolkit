@@ -14,6 +14,7 @@
 
 import {
   RefName,
+  sql,
   SqlCase,
   SqlColumn,
   SqlColumnList,
@@ -569,29 +570,27 @@ describe('SqlQuery', () => {
     });
   });
 
-  describe('#getContext', () => {
+  describe('#hasContext / #getContext', () => {
     it('works with nothing', () => {
-      expect(
-        SqlQuery.parse(
-          sane`
-            SELECT *
-            FROM wikipedia
-          `,
-        ).getContext(),
-      ).toEqual({});
+      const query = sql`
+        SELECT *
+        FROM wikipedia
+      ` as SqlQuery;
+
+      expect(query.hasContext()).toEqual(false);
+      expect(query.getContext()).toEqual({});
     });
 
     it('works with something', () => {
-      expect(
-        SqlQuery.parse(
-          sane`
-            SET b = 2;
-            SET c = 'hello';
-            SELECT *
-            FROM wikipedia;
-          `,
-        ).getContext(),
-      ).toEqual({
+      const query = sql`
+        SET b = 2;
+        SET c = 'hello';
+        SELECT *
+        FROM wikipedia;
+      ` as SqlQuery;
+
+      expect(query.hasContext()).toEqual(true);
+      expect(query.getContext()).toEqual({
         b: 2,
         c: 'hello',
       });

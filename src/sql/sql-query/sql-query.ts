@@ -355,6 +355,10 @@ export class SqlQuery extends SqlExpression {
     return SqlBase.fromValue(value);
   }
 
+  public hasContext(): boolean {
+    return Boolean(this.contextStatements);
+  }
+
   public getContext(): Record<string, any> {
     return SqlSetStatement.contextStatementsToContext(this.contextStatements?.values);
   }
