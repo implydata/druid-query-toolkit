@@ -138,8 +138,8 @@ describe('SqlQuery', () => {
         GROUP BY 1, 2, 3
       `,
       sane`
-        SET a = 1;
-        set B = 'lol';
+        SET a = 1; ;;
+        set B = 'lol'; ; ;
         SELECT 1 + 1
       `,
     ];

@@ -97,7 +97,7 @@ SqlColumnDeclaration = column:RefName postColumn:_ columnType:SqlType
 
 // ------------------------------
 
-SqlQueryWithPossibleContext = statements:(SqlSetStatement _)* query:SqlQuery
+SqlQueryWithPossibleContext = statements:(SqlSetStatement _sc)* query:SqlQuery
 {
   if (!statements.length) return query;
   return query
