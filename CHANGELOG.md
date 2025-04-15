@@ -1,5 +1,11 @@
 # druid-query-toolkit
 
+## 1.0.4
+
+### Patch Changes
+
+- 6e40a00: Added support for SET syntax"
+
 ## 1.0.3
 
 ### Patch Changes
