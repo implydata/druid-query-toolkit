@@ -45,6 +45,7 @@ describe('SqlStar', () => {
     expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "clusteredByClause": undefined,
+        "contextStatements": undefined,
         "decorator": undefined,
         "explain": undefined,
         "fromClause": undefined,

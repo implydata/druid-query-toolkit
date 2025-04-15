@@ -195,6 +195,7 @@ describe('QueryRunner', () => {
         ],
         "sqlQuery": SqlQuery {
           "clusteredByClause": undefined,
+          "contextStatements": undefined,
           "decorator": undefined,
           "explain": undefined,
           "fromClause": SqlFromClause {
@@ -434,6 +435,7 @@ describe('QueryRunner', () => {
         ],
         "sqlQuery": SqlQuery {
           "clusteredByClause": undefined,
+          "contextStatements": undefined,
           "decorator": undefined,
           "explain": undefined,
           "fromClause": SqlFromClause {
@@ -678,6 +680,7 @@ describe('QueryRunner', () => {
         ],
         "sqlQuery": SqlQuery {
           "clusteredByClause": undefined,
+          "contextStatements": undefined,
           "decorator": undefined,
           "explain": undefined,
           "fromClause": SqlFromClause {

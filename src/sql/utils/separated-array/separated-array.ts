@@ -65,7 +65,7 @@ export class SeparatedArray<T> {
     const { values, separators } = this;
     const lastIndex = values.length - 1;
     return values
-      .map((v, i) => String(v) + (i < lastIndex ? String(separators[i] || defaultSeparator) : ''))
+      .map((v, i) => String(v) + (i < lastIndex ? String(separators[i] ?? defaultSeparator) : ''))
       .join('');
   }
 

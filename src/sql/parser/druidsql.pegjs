@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-Start = initial:_? thing:(SqlQuery / SqlAlias) final:_?
+Start = initial:_? thing:(SqlQueryWithPossibleContext / SqlAlias) final:_sc?
 {
   if (initial) thing = thing.changeSpace('initial', initial);
   if (final) thing = thing.changeSpace('final', final);
@@ -96,6 +96,33 @@ SqlColumnDeclaration = column:RefName postColumn:_ columnType:SqlType
 }
 
 // ------------------------------
+
+SqlQueryWithPossibleContext = statements:(SqlSetStatement _sc)* query:SqlQuery
+{
+  if (!statements.length) return query;
+  return query
+    .changeContextStatements(new S.SeparatedArray(
+      statements.map(function(x) { return x[0] }),
+      statements.map(function(x) { return x[1] }).slice(0, statements.length - 1)
+    ))
+    .changeSpace('postSets', statements[statements.length - 1][1]);
+}
+
+SqlSetStatement = setKeyword:SetToken postSet:_ key:RefName postKey:_ "=" postEquals:_ value:SqlLiteral postValue:_ ";"
+{
+  return new S.SqlSetStatement({
+    key: key,
+    value: value,
+    keywords: {
+      set: setKeyword
+    },
+    spacing: {
+      postSet: postSet,
+      postKey: postKey,
+      postValue: postValue
+    }
+  });
+}
 
 SqlQuery =
   explain:(ExplainPlanForToken _)?
@@ -1796,6 +1823,8 @@ __ "mandatory whitespace" = $(Space _)
 
 ___ "pure whitespace" = $(Space*)
 
+_sc "possible semicolon" = $(SpaceOrSemicolon* ((SingleLineComment / MultiLineComment) SpaceOrSemicolon*)* FinalSingleLineComment?)
+
 SingleLineComment = $("--" [^\n]* [\n])
 
 FinalSingleLineComment = $("--" [^\n]*)
@@ -1803,6 +1832,8 @@ FinalSingleLineComment = $("--" [^\n]*)
 MultiLineComment = $("/*" (!"*/" .)* "*/")
 
 Space = [ \t\n\r]
+
+SpaceOrSemicolon = [ \t\n\r;]
 
 OpenParen "(" = "("
 
@@ -1874,6 +1905,7 @@ RollupToken = $("ROLLUP"i !IdentifierPart)
 RowToken = $("ROW"i !IdentifierPart)
 RowsToken = $("ROWS"i !IdentifierPart)
 SelectToken = $("SELECT"i !IdentifierPart)
+SetToken = $("SET"i !IdentifierPart)
 SomeToken = $("SOME"i !IdentifierPart)
 SymmetricToken = $("SYMMETRIC"i !IdentifierPart)
 TableToken = $("TABLE"i !IdentifierPart)

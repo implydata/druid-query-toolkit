@@ -231,6 +231,7 @@ describe('SqlComparison', () => {
         "parens": undefined,
         "rhs": SqlQuery {
           "clusteredByClause": undefined,
+          "contextStatements": undefined,
           "decorator": undefined,
           "explain": undefined,
           "fromClause": SqlFromClause {
@@ -798,6 +799,7 @@ describe('SqlComparison', () => {
         "parens": undefined,
         "rhs": SqlQuery {
           "clusteredByClause": undefined,
+          "contextStatements": undefined,
           "decorator": undefined,
           "explain": undefined,
           "fromClause": SqlFromClause {
@@ -926,6 +928,7 @@ describe('SqlComparison', () => {
         "parens": undefined,
         "rhs": SqlQuery {
           "clusteredByClause": undefined,
+          "contextStatements": undefined,
           "decorator": undefined,
           "explain": undefined,
           "fromClause": SqlFromClause {

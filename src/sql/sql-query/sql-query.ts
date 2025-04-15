@@ -37,6 +37,7 @@ import { SqlColumn } from '../sql-column/sql-column';
 import { SqlExpression } from '../sql-expression';
 import { SqlFunction } from '../sql-function/sql-function';
 import { SqlLiteral } from '../sql-literal/sql-literal';
+import { SqlSetStatement } from '../sql-set-statement/sql-set-statement';
 import { SqlStar } from '../sql-star/sql-star';
 import { SqlTable } from '../sql-table/sql-table';
 import {
@@ -70,6 +71,7 @@ export interface AddSelectOptions {
 }
 
 export interface SqlQueryValue extends SqlBaseValue {
+  contextStatements?: SeparatedArray<SqlSetStatement>;
   explain?: boolean;
   insertClause?: SqlInsertClause;
   replaceClause?: SqlReplaceClause;
@@ -157,6 +159,7 @@ export class SqlQuery extends SqlExpression {
     return /^EXPR\$(?:\d|[1-9]\d*)$/.test(name);
   }
 
+  public readonly contextStatements?: SeparatedArray<SqlSetStatement>;
   public readonly explain?: boolean;
   public readonly insertClause?: SqlInsertClause;
   public readonly replaceClause?: SqlReplaceClause;
@@ -176,6 +179,7 @@ export class SqlQuery extends SqlExpression {
 
   constructor(options: SqlQueryValue) {
     super(options, SqlQuery.type);
+    this.contextStatements = options.contextStatements;
     this.explain = options.explain;
     this.insertClause = options.insertClause;
     this.replaceClause = options.replaceClause;
@@ -200,6 +204,7 @@ export class SqlQuery extends SqlExpression {
 
   public valueOf(): SqlQueryValue {
     const value = super.valueOf() as SqlQueryValue;
+    value.contextStatements = this.contextStatements;
     value.explain = this.explain;
     value.insertClause = this.insertClause;
     value.replaceClause = this.replaceClause;
@@ -221,6 +226,7 @@ export class SqlQuery extends SqlExpression {
 
   protected _toRawString(): string {
     const {
+      contextStatements,
       explain,
       insertClause,
       replaceClause,
@@ -240,6 +246,11 @@ export class SqlQuery extends SqlExpression {
     } = this;
 
     const rawParts: string[] = [];
+
+    // SET clauses
+    if (contextStatements) {
+      rawParts.push(contextStatements.toString(NEWLINE), this.getSpace('postSets', NEWLINE));
+    }
 
     // Explain
     if (explain) {
@@ -333,10 +344,27 @@ export class SqlQuery extends SqlExpression {
     return rawParts.join('');
   }
 
-  public changeDecorator(decorator: SqlQueryDecorator | undefined): this {
+  public changeContextStatements(
+    contextStatements: SeparatedArray<SqlSetStatement> | SqlSetStatement[] | undefined,
+  ): this {
     const value = this.valueOf();
-    value.decorator = decorator;
+    value.contextStatements =
+      contextStatements && !isEmptyArray(contextStatements)
+        ? SeparatedArray.fromArray(contextStatements)
+        : undefined;
     return SqlBase.fromValue(value);
+  }
+
+  public hasContext(): boolean {
+    return Boolean(this.contextStatements);
+  }
+
+  public getContext(): Record<string, any> {
+    return SqlSetStatement.contextStatementsToContext(this.contextStatements?.values);
+  }
+
+  public changeContext(context: Record<string, any> | undefined): this {
+    return this.changeContextStatements(SqlSetStatement.contextToContextStatements(context));
   }
 
   public changeExplain(explain: boolean): this {
@@ -384,6 +412,12 @@ export class SqlQuery extends SqlExpression {
       delete value.withClause;
       value.spacing = this.getSpacingWithout('postWithClause');
     }
+    return SqlBase.fromValue(value);
+  }
+
+  public changeDecorator(decorator: SqlQueryDecorator | undefined): this {
+    const value = this.valueOf();
+    value.decorator = decorator;
     return SqlBase.fromValue(value);
   }
 

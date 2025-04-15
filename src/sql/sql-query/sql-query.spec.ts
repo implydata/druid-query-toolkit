@@ -14,6 +14,7 @@
 
 import {
   RefName,
+  sql,
   SqlCase,
   SqlColumn,
   SqlColumnList,
@@ -30,10 +31,10 @@ describe('SqlQuery', () => {
   it('things that work', () => {
     const queries: string[] = [
       `Select nottingham from tbl`,
-      `Select 3`,
+      `Select 3; ; ;`,
       `Select PI as "pi"`,
       `Select * from tbl`,
-      `Select * from tbl Limit 10`,
+      `Select * from tbl Limit 10;`,
       `Select * from tbl Limit 10 offset 5`,
       `(Select * from tbl)`,
       `Select count(*) As sums from tbl`,
@@ -41,6 +42,7 @@ describe('SqlQuery', () => {
       `SELECT comment, page, COUNT(*) AS "Count" FROM wikipedia GROUP BY (comment, page) ORDER BY 3 DESC`,
       `SELECT comment, page, COUNT(*) AS "Count" FROM wikipedia GROUP BY ROLLUP (comment, page) ORDER BY 3 DESC`,
       `SELECT distinct dim1 FROM druid.foo`,
+      `SET a = 1;set B = 'lol';SELECT distinct dim1 FROM druid.foo;`,
       sane`
         SELECT
           datasource d,
@@ -135,6 +137,11 @@ describe('SqlQuery', () => {
           SUM(added) AS "sum_added"
         FROM wikipedia
         GROUP BY 1, 2, 3
+      `,
+      sane`
+        SET a = 1; ;;
+        set B = 'lol'; ; ;
+        SELECT 1 + 1
       `,
     ];
 
@@ -283,6 +290,31 @@ describe('SqlQuery', () => {
         ORDER BY datasource_lol DESC, 2 ASC
         LIMIT 100"
       `);
+    });
+
+    it('does a replace with an if', () => {
+      const sql = `SUM(t.added) / COUNT(DISTINCT t."user") + COUNT(*)`;
+
+      const condition = SqlExpression.parse(
+        `__time BETWEEN TIMESTAMP '2020-01-01 01:00:00' AND TIMESTAMP '2020-01-01 02:00:00'`,
+      );
+      expect(
+        String(
+          SqlExpression.parse(sql).walk(x => {
+            if (x instanceof SqlColumn) {
+              if (x.getTableName() === 't') {
+                return SqlCase.ifThenElse(condition, x);
+              }
+            }
+            if (x instanceof SqlFunction && x.isCountStar()) {
+              return x.changeWhereExpression(condition);
+            }
+            return x;
+          }),
+        ),
+      ).toMatchInlineSnapshot(
+        `"SUM(CASE WHEN __time BETWEEN TIMESTAMP '2020-01-01 01:00:00' AND TIMESTAMP '2020-01-01 02:00:00' THEN t.added END) / COUNT(DISTINCT CASE WHEN __time BETWEEN TIMESTAMP '2020-01-01 01:00:00' AND TIMESTAMP '2020-01-01 02:00:00' THEN t.\\"user\\" END) + COUNT(*) FILTER (WHERE __time BETWEEN TIMESTAMP '2020-01-01 01:00:00' AND TIMESTAMP '2020-01-01 02:00:00')"`,
+      );
     });
 
     it('has correct walk order', () => {
@@ -535,6 +567,57 @@ describe('SqlQuery', () => {
       expect(String(insertSql.changeInsertIntoTable('"lol"').insertClause)).toEqual(
         `INSERT INTO """lol"""`,
       );
+    });
+  });
+
+  describe('#hasContext / #getContext', () => {
+    it('works with nothing', () => {
+      const query = sql`
+        SELECT *
+        FROM wikipedia
+      ` as SqlQuery;
+
+      expect(query.hasContext()).toEqual(false);
+      expect(query.getContext()).toEqual({});
+    });
+
+    it('works with something', () => {
+      const query = sql`
+        SET b = 2;
+        SET c = 'hello';
+        SELECT *
+        FROM wikipedia;
+      ` as SqlQuery;
+
+      expect(query.hasContext()).toEqual(true);
+      expect(query.getContext()).toEqual({
+        b: 2,
+        c: 'hello',
+      });
+    });
+  });
+
+  describe('#changeContext', () => {
+    const sql = SqlQuery.parse(sane`
+      set a = 1;
+      SELECT *
+      FROM wikipedia
+    `);
+
+    it('changes to something', () => {
+      expect(sql.changeContext({ b: 2, c: 'hello' }).toString()).toEqual(sane`
+        SET b = 2;
+        SET c = 'hello';
+        SELECT *
+        FROM wikipedia
+      `);
+    });
+
+    it('changes to nothing', () => {
+      expect(sql.changeContext(undefined).toString()).toEqual(sane`
+        SELECT *
+        FROM wikipedia
+      `);
     });
   });
 
@@ -929,31 +1012,6 @@ describe('SqlQuery', () => {
     });
   });
 
-  it('does a replace with an if', () => {
-    const sql = `SUM(t.added) / COUNT(DISTINCT t."user") + COUNT(*)`;
-
-    const condition = SqlExpression.parse(
-      `__time BETWEEN TIMESTAMP '2020-01-01 01:00:00' AND TIMESTAMP '2020-01-01 02:00:00'`,
-    );
-    expect(
-      String(
-        SqlExpression.parse(sql).walk(x => {
-          if (x instanceof SqlColumn) {
-            if (x.getTableName() === 't') {
-              return SqlCase.ifThenElse(condition, x);
-            }
-          }
-          if (x instanceof SqlFunction && x.isCountStar()) {
-            return x.changeWhereExpression(condition);
-          }
-          return x;
-        }),
-      ),
-    ).toMatchInlineSnapshot(
-      `"SUM(CASE WHEN __time BETWEEN TIMESTAMP '2020-01-01 01:00:00' AND TIMESTAMP '2020-01-01 02:00:00' THEN t.added END) / COUNT(DISTINCT CASE WHEN __time BETWEEN TIMESTAMP '2020-01-01 01:00:00' AND TIMESTAMP '2020-01-01 02:00:00' THEN t.\\"user\\" END) + COUNT(*) FILTER (WHERE __time BETWEEN TIMESTAMP '2020-01-01 01:00:00' AND TIMESTAMP '2020-01-01 02:00:00')"`,
-    );
-  });
-
   it('Simple subquery in from', () => {
     const sql = sane`
       SELECT * FROM (SELECT dim1 FROM druid.foo ORDER BY __time DESC) LIMIT 2
@@ -964,6 +1022,7 @@ describe('SqlQuery', () => {
     expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "clusteredByClause": undefined,
+        "contextStatements": undefined,
         "decorator": undefined,
         "explain": undefined,
         "fromClause": SqlFromClause {
@@ -972,6 +1031,7 @@ describe('SqlQuery', () => {
             "values": Array [
               SqlQuery {
                 "clusteredByClause": undefined,
+                "contextStatements": undefined,
                 "decorator": undefined,
                 "explain": undefined,
                 "fromClause": SqlFromClause {
@@ -1172,6 +1232,7 @@ describe('SqlQuery', () => {
     expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "clusteredByClause": undefined,
+        "contextStatements": undefined,
         "decorator": undefined,
         "explain": undefined,
         "fromClause": SqlFromClause {
@@ -1376,6 +1437,7 @@ describe('SqlQuery', () => {
     expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "clusteredByClause": undefined,
+        "contextStatements": undefined,
         "decorator": undefined,
         "explain": true,
         "fromClause": SqlFromClause {
@@ -1456,6 +1518,7 @@ describe('SqlQuery', () => {
     expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
       SqlQuery {
         "clusteredByClause": undefined,
+        "contextStatements": undefined,
         "decorator": undefined,
         "explain": undefined,
         "fromClause": SqlFromClause {
@@ -1554,6 +1617,7 @@ describe('SqlQuery', () => {
                 "parens": undefined,
                 "query": SqlQuery {
                   "clusteredByClause": undefined,
+                  "contextStatements": undefined,
                   "decorator": undefined,
                   "explain": undefined,
                   "fromClause": SqlFromClause {
@@ -1653,6 +1717,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "clusteredByClause": undefined,
+          "contextStatements": undefined,
           "decorator": undefined,
           "explain": undefined,
           "fromClause": SqlFromClause {
@@ -1768,6 +1833,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "clusteredByClause": undefined,
+          "contextStatements": undefined,
           "decorator": undefined,
           "explain": undefined,
           "fromClause": SqlFromClause {
@@ -1895,6 +1961,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "clusteredByClause": undefined,
+          "contextStatements": undefined,
           "decorator": undefined,
           "explain": undefined,
           "fromClause": SqlFromClause {
@@ -2335,6 +2402,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "clusteredByClause": undefined,
+          "contextStatements": undefined,
           "decorator": undefined,
           "explain": undefined,
           "fromClause": SqlFromClause {
@@ -2450,6 +2518,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "clusteredByClause": undefined,
+          "contextStatements": undefined,
           "decorator": undefined,
           "explain": undefined,
           "fromClause": SqlFromClause {
@@ -2577,6 +2646,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "clusteredByClause": undefined,
+          "contextStatements": undefined,
           "decorator": undefined,
           "explain": undefined,
           "fromClause": SqlFromClause {
@@ -2806,6 +2876,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "clusteredByClause": undefined,
+          "contextStatements": undefined,
           "decorator": undefined,
           "explain": undefined,
           "fromClause": SqlFromClause {
@@ -2913,6 +2984,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "clusteredByClause": undefined,
+          "contextStatements": undefined,
           "decorator": undefined,
           "explain": undefined,
           "fromClause": SqlFromClause {
@@ -3023,6 +3095,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "clusteredByClause": undefined,
+          "contextStatements": undefined,
           "decorator": undefined,
           "explain": undefined,
           "fromClause": SqlFromClause {
@@ -3142,6 +3215,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "clusteredByClause": undefined,
+          "contextStatements": undefined,
           "decorator": undefined,
           "explain": undefined,
           "fromClause": SqlFromClause {
@@ -3385,6 +3459,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "clusteredByClause": undefined,
+          "contextStatements": undefined,
           "decorator": undefined,
           "explain": undefined,
           "fromClause": SqlFromClause {
@@ -3755,6 +3830,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "clusteredByClause": undefined,
+          "contextStatements": undefined,
           "decorator": undefined,
           "explain": undefined,
           "fromClause": SqlFromClause {
@@ -3886,6 +3962,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "clusteredByClause": undefined,
+          "contextStatements": undefined,
           "decorator": undefined,
           "explain": undefined,
           "fromClause": SqlFromClause {
@@ -4021,6 +4098,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "clusteredByClause": undefined,
+          "contextStatements": undefined,
           "decorator": undefined,
           "explain": undefined,
           "fromClause": SqlFromClause {
@@ -4179,6 +4257,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "clusteredByClause": undefined,
+          "contextStatements": undefined,
           "decorator": undefined,
           "explain": undefined,
           "fromClause": SqlFromClause {
@@ -4272,6 +4351,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "clusteredByClause": undefined,
+          "contextStatements": undefined,
           "decorator": undefined,
           "explain": undefined,
           "fromClause": SqlFromClause {
@@ -4335,6 +4415,7 @@ describe('SqlQuery', () => {
           "type": "query",
           "unionQuery": SqlQuery {
             "clusteredByClause": undefined,
+            "contextStatements": undefined,
             "decorator": undefined,
             "explain": undefined,
             "fromClause": SqlFromClause {
@@ -4413,6 +4494,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "clusteredByClause": undefined,
+          "contextStatements": undefined,
           "decorator": undefined,
           "explain": undefined,
           "fromClause": SqlFromClause {
@@ -4555,6 +4637,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "clusteredByClause": undefined,
+          "contextStatements": undefined,
           "decorator": undefined,
           "explain": undefined,
           "fromClause": SqlFromClause {
@@ -4697,6 +4780,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "clusteredByClause": undefined,
+          "contextStatements": undefined,
           "decorator": undefined,
           "explain": undefined,
           "fromClause": SqlFromClause {
@@ -4839,6 +4923,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "clusteredByClause": undefined,
+          "contextStatements": undefined,
           "decorator": undefined,
           "explain": undefined,
           "fromClause": SqlFromClause {
@@ -4981,6 +5066,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "clusteredByClause": undefined,
+          "contextStatements": undefined,
           "decorator": undefined,
           "explain": undefined,
           "fromClause": SqlFromClause {
@@ -5123,6 +5209,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "clusteredByClause": undefined,
+          "contextStatements": undefined,
           "decorator": undefined,
           "explain": undefined,
           "fromClause": SqlFromClause {
@@ -5298,6 +5385,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "clusteredByClause": undefined,
+          "contextStatements": undefined,
           "decorator": undefined,
           "explain": undefined,
           "fromClause": SqlFromClause {
@@ -5476,6 +5564,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "clusteredByClause": undefined,
+          "contextStatements": undefined,
           "decorator": undefined,
           "explain": undefined,
           "fromClause": SqlFromClause {
@@ -5742,6 +5831,7 @@ describe('SqlQuery', () => {
       expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
         SqlQuery {
           "clusteredByClause": undefined,
+          "contextStatements": undefined,
           "decorator": undefined,
           "explain": undefined,
           "fromClause": SqlFromClause {
@@ -6180,6 +6270,7 @@ describe('SqlQuery', () => {
             },
             "type": "clusteredByClause",
           },
+          "contextStatements": undefined,
           "decorator": undefined,
           "explain": undefined,
           "fromClause": SqlFromClause {
