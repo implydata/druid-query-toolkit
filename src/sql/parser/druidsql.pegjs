@@ -12,11 +12,20 @@
  * limitations under the License.
  */
 
-Start = initial:_? thing:(SqlQueryWithPossibleContext / SqlAlias) final:_sc?
+Start = initial:_ thing:(SqlQueryWithPossibleContext / SqlAlias) final:_sc
 {
   if (initial) thing = thing.changeSpace('initial', initial);
   if (final) thing = thing.changeSpace('final', final);
   return thing;
+}
+
+StartSetStatementsOnly = before:_ head:SqlSetStatement tail:(_sc SqlSetStatement)* after:$(.*)
+{
+  return {
+    before: before,
+    statements: makeSeparatedArray(head, tail),
+    after: after
+  }
 }
 
 // ------------------------------

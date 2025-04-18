@@ -170,11 +170,18 @@ export class SqlWithQuery extends SqlExpression {
   public changeContextStatements(
     contextStatements: SeparatedArray<SqlSetStatement> | SqlSetStatement[] | undefined,
   ): this {
-    const value = this.valueOf();
-    value.contextStatements =
+    const newContextStatements =
       contextStatements && !isEmptyArray(contextStatements)
         ? SeparatedArray.fromArray(contextStatements)
         : undefined;
+
+    const value = this.valueOf();
+    if (newContextStatements) {
+      value.contextStatements = newContextStatements;
+    } else {
+      delete value.contextStatements;
+      value.spacing = this.getSpacingWithout('postSets');
+    }
     return SqlBase.fromValue(value);
   }
 

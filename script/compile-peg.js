@@ -24,6 +24,7 @@ try {
   parser = peg.generate(header + '\n\n' + rules, {
     output: 'source',
     plugins: [tspegjs],
+    allowedStartRules: ['Start', 'StartSetStatementsOnly'],
   });
 } catch (e) {
   console.error('Failed to compile');

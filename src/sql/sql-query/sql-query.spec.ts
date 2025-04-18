@@ -191,16 +191,18 @@ describe('SqlQuery', () => {
     }).toThrowError('Can not have both an INSERT and a REPLACE clause');
   });
 
-  describe('.create', () => {
+  describe('.selectStarFrom', () => {
     it('works', () => {
-      expect(String(SqlQuery.create(SqlTable.create('lol')))).toEqual(sane`
+      expect(String(SqlQuery.selectStarFrom(SqlTable.create('lol')))).toEqual(sane`
         SELECT *
         FROM "lol"
       `);
     });
 
     it('works in advanced case', () => {
-      const query = SqlQuery.create(SqlQuery.create(SqlTable.create('lol')))
+      const query = SqlQuery.selectStarFrom(
+        SqlQuery.selectStarFrom(SqlTable.create('lol')).changeContext({ a: 1 }),
+      )
         .changeSelectExpressions([
           SqlColumn.create('channel'),
           SqlColumn.create('page'),
@@ -210,6 +212,7 @@ describe('SqlQuery', () => {
         .changeWhereExpression(SqlExpression.parse(`channel  =  '#en.wikipedia'`));
 
       expect(String(query)).toEqual(sane`
+        SET a = 1;
         SELECT
           "channel",
           "page",

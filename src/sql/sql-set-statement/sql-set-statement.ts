@@ -12,10 +12,13 @@
  * limitations under the License.
  */
 
+import { filterMap } from '../../utils';
+import { parse as parseSql } from '../parser';
 import type { SqlBaseValue, SqlTypeDesignator, Substitutor } from '../sql-base';
 import { SqlBase } from '../sql-base';
 import type { LiteralValue } from '../sql-literal/sql-literal';
 import { SqlLiteral } from '../sql-literal/sql-literal';
+import type { SeparatedArray } from '../utils';
 import { RefName } from '../utils';
 
 export interface SqlSetStatementValue extends SqlBaseValue {
@@ -35,6 +38,16 @@ export class SqlSetStatement extends SqlBase {
     });
   }
 
+  static parseStatementsOnly(text: string): {
+    before: string;
+    statements: SeparatedArray<SqlSetStatement>;
+    after: string;
+  } {
+    return parseSql(text, {
+      startRule: 'StartSetStatementsOnly',
+    });
+  }
+
   static contextStatementsToContext(
     contextStatements: readonly SqlSetStatement[] | undefined,
   ): Record<string, any> {
@@ -51,7 +64,9 @@ export class SqlSetStatement extends SqlBase {
     context: Record<string, any> | undefined,
   ): SqlSetStatement[] | undefined {
     return context
-      ? Object.entries(context).map(([k, v]) => SqlSetStatement.create(k, v))
+      ? filterMap(Object.entries(context), ([k, v]) =>
+          typeof v !== 'undefined' ? SqlSetStatement.create(k, v) : undefined,
+        )
       : undefined;
   }
 
