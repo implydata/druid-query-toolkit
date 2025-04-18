@@ -19,13 +19,22 @@ Start = initial:_ thing:(SqlQueryWithPossibleContext / SqlAlias) final:_sc
   return thing;
 }
 
-StartSetStatementsOnly = before:_ head:SqlSetStatement tail:(_sc SqlSetStatement)* after:$(.*)
+StartSetStatementsOnly = spaceBefore:_ statements:(SqlSetStatement _sc)* rest:$(.*)
 {
-  return {
-    before: before,
-    statements: makeSeparatedArray(head, tail),
-    after: after
+  let ret = {
+    spaceBefore: spaceBefore,
+    rest: rest
   }
+
+  if (statements.length) {
+    ret.contextStatements = new S.SeparatedArray(
+      statements.map(function(x) { return x[0] }),
+      statements.map(function(x) { return x[1] }).slice(0, statements.length - 1)
+    );
+    ret.spaceAfter = statements[statements.length - 1][1];
+  }
+
+  return ret;
 }
 
 // ------------------------------

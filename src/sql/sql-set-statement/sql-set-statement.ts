@@ -19,7 +19,7 @@ import { SqlBase } from '../sql-base';
 import type { LiteralValue } from '../sql-literal/sql-literal';
 import { SqlLiteral } from '../sql-literal/sql-literal';
 import type { SeparatedArray } from '../utils';
-import { RefName } from '../utils';
+import { NEWLINE, RefName } from '../utils';
 
 export interface SqlSetStatementValue extends SqlBaseValue {
   key: RefName;
@@ -39,13 +39,47 @@ export class SqlSetStatement extends SqlBase {
   }
 
   static parseStatementsOnly(text: string): {
-    before: string;
-    statements: SeparatedArray<SqlSetStatement>;
-    after: string;
+    spaceBefore: string;
+    contextStatements?: SeparatedArray<SqlSetStatement>;
+    spaceAfter?: string;
+    rest: string;
   } {
     return parseSql(text, {
       startRule: 'StartSetStatementsOnly',
     });
+  }
+
+  static partitionSetStatements(text: string, putSpaceWithSets = false): [string, string] {
+    const { spaceBefore, contextStatements, spaceAfter, rest } =
+      SqlSetStatement.parseStatementsOnly(text);
+
+    if (contextStatements) {
+      return [
+        spaceBefore + contextStatements.toString(NEWLINE) + (putSpaceWithSets ? spaceAfter : ''),
+        (putSpaceWithSets ? '' : spaceAfter) + rest,
+      ];
+    } else if (putSpaceWithSets) {
+      return [spaceBefore, rest];
+    } else {
+      return ['', text];
+    }
+  }
+
+  static getContextFromText(text: string): Record<string, any> {
+    const { contextStatements } = SqlSetStatement.parseStatementsOnly(text);
+    if (!contextStatements) return {};
+    return SqlSetStatement.contextStatementsToContext(contextStatements.values);
+  }
+
+  static setContextInText(text: string, context: Record<string, any>): string {
+    const { spaceBefore, spaceAfter, rest } = SqlSetStatement.parseStatementsOnly(text);
+
+    return [
+      spaceBefore,
+      SqlSetStatement.contextToContextStatements(context)?.join(NEWLINE),
+      spaceAfter || NEWLINE,
+      rest,
+    ].join('');
   }
 
   static contextStatementsToContext(
@@ -60,14 +94,10 @@ export class SqlSetStatement extends SqlBase {
     return context;
   }
 
-  static contextToContextStatements(
-    context: Record<string, any> | undefined,
-  ): SqlSetStatement[] | undefined {
-    return context
-      ? filterMap(Object.entries(context), ([k, v]) =>
-          typeof v !== 'undefined' ? SqlSetStatement.create(k, v) : undefined,
-        )
-      : undefined;
+  static contextToContextStatements(context: Record<string, any>): SqlSetStatement[] {
+    return filterMap(Object.entries(context), ([k, v]) =>
+      typeof v !== 'undefined' ? SqlSetStatement.create(k, v) : undefined,
+    );
   }
 
   public readonly key: RefName;
@@ -101,7 +131,7 @@ export class SqlSetStatement extends SqlBase {
   }
 
   public getKeyString(): string {
-    return this.key.toString();
+    return this.key.name;
   }
 
   public changeKey(key: RefName | string): this {

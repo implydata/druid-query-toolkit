@@ -194,7 +194,9 @@ export class SqlWithQuery extends SqlExpression {
   }
 
   public changeContext(context: Record<string, any>): this {
-    return this.changeContextStatements(SqlSetStatement.contextToContextStatements(context));
+    return this.changeContextStatements(
+      context ? SqlSetStatement.contextToContextStatements(context) : undefined,
+    );
   }
 
   public changeExplain(explain: boolean): this {

@@ -353,11 +353,18 @@ export class SqlQuery extends SqlExpression {
   public changeContextStatements(
     contextStatements: SeparatedArray<SqlSetStatement> | SqlSetStatement[] | undefined,
   ): this {
-    const value = this.valueOf();
-    value.contextStatements =
+    const newContextStatements =
       contextStatements && !isEmptyArray(contextStatements)
         ? SeparatedArray.fromArray(contextStatements)
         : undefined;
+
+    const value = this.valueOf();
+    if (newContextStatements) {
+      value.contextStatements = newContextStatements;
+    } else {
+      delete value.contextStatements;
+      value.spacing = this.getSpacingWithout('postSets');
+    }
     return SqlBase.fromValue(value);
   }
 
@@ -370,7 +377,9 @@ export class SqlQuery extends SqlExpression {
   }
 
   public changeContext(context: Record<string, any> | undefined): this {
-    return this.changeContextStatements(SqlSetStatement.contextToContextStatements(context));
+    return this.changeContextStatements(
+      context ? SqlSetStatement.contextToContextStatements(context) : undefined,
+    );
   }
 
   public changeExplain(explain: boolean): this {

@@ -17,70 +17,195 @@ import { sane } from '../../utils';
 import { SqlSetStatement } from './sql-set-statement';
 
 describe('SqlSetStatement', () => {
-  it('parses nothing with an error', () => {
-    expect(() =>
-      SqlSetStatement.parseStatementsOnly(sane`
-         -- Comment
-         sdfsdf
-         dsfdsf
-         sdfsdf
-      `),
-    ).toThrow();
+  describe('.parseStatementsOnly', () => {
+    it('parses nothing with an error', () => {
+      expect(
+        SqlSetStatement.parseStatementsOnly(sane`
+          -- Comment
+          sdfsdf
+          dsfdsf
+          sdfsdf
+        `),
+      ).toMatchInlineSnapshot(`
+        Object {
+          "rest": "sdfsdf
+        dsfdsf
+        sdfsdf",
+          "spaceBefore": "-- Comment
+        ",
+        }
+      `);
+    });
+
+    it('parses single statement', () => {
+      expect(
+        SqlSetStatement.parseStatementsOnly(sane`
+          -- Comment
+          Set Hello = 1;
+          sdfsdf
+          dsfdsf
+          sdfsdf
+        `),
+      ).toMatchInlineSnapshot(`
+        Object {
+          "contextStatements": SeparatedArray {
+            "separators": Array [],
+            "values": Array [
+              SqlSetStatement {
+                "key": RefName {
+                  "name": "Hello",
+                  "quotes": false,
+                },
+                "keywords": Object {
+                  "set": "Set",
+                },
+                "parens": undefined,
+                "spacing": Object {
+                  "postKey": " ",
+                  "postSet": " ",
+                  "postValue": "",
+                },
+                "type": "setStatement",
+                "value": SqlLiteral {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "spacing": Object {},
+                  "stringValue": "1",
+                  "type": "literal",
+                  "value": 1,
+                },
+              },
+            ],
+          },
+          "rest": "sdfsdf
+        dsfdsf
+        sdfsdf",
+          "spaceAfter": "
+        ",
+          "spaceBefore": "-- Comment
+        ",
+        }
+      `);
+    });
+
+    it('parses multiple statements', () => {
+      expect(
+        SqlSetStatement.parseStatementsOnly(sane`
+          -- Comment
+          Set Hello = 1;
+          SET "moon" = 'lol';
+
+          SELECT * FROM tbl
+          sdfsdf
+          dsfdsf
+          sdfsdf
+        `),
+      ).toMatchInlineSnapshot(`
+        Object {
+          "contextStatements": SeparatedArray {
+            "separators": Array [
+              "
+        ",
+            ],
+            "values": Array [
+              SqlSetStatement {
+                "key": RefName {
+                  "name": "Hello",
+                  "quotes": false,
+                },
+                "keywords": Object {
+                  "set": "Set",
+                },
+                "parens": undefined,
+                "spacing": Object {
+                  "postKey": " ",
+                  "postSet": " ",
+                  "postValue": "",
+                },
+                "type": "setStatement",
+                "value": SqlLiteral {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "spacing": Object {},
+                  "stringValue": "1",
+                  "type": "literal",
+                  "value": 1,
+                },
+              },
+              SqlSetStatement {
+                "key": RefName {
+                  "name": "moon",
+                  "quotes": true,
+                },
+                "keywords": Object {
+                  "set": "SET",
+                },
+                "parens": undefined,
+                "spacing": Object {
+                  "postKey": " ",
+                  "postSet": " ",
+                  "postValue": "",
+                },
+                "type": "setStatement",
+                "value": SqlLiteral {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "spacing": Object {},
+                  "stringValue": "'lol'",
+                  "type": "literal",
+                  "value": "lol",
+                },
+              },
+            ],
+          },
+          "rest": "SELECT * FROM tbl
+        sdfsdf
+        dsfdsf
+        sdfsdf",
+          "spaceAfter": "
+
+        ",
+          "spaceBefore": "-- Comment
+        ",
+        }
+      `);
+    });
   });
 
-  it('parses single statement', () => {
-    expect(
-      SqlSetStatement.parseStatementsOnly(sane`
+  describe('.partitionSetStatements', () => {
+    it('works when there is nothing to parse', () => {
+      const text = sane`
         -- Comment
-        Set Hello = 1;
         sdfsdf
         dsfdsf
         sdfsdf
-      `),
-    ).toMatchInlineSnapshot(`
-      Object {
-        "after": "
-      sdfsdf
-      dsfdsf
-      sdfsdf",
-        "before": "-- Comment
-      ",
-        "statements": SeparatedArray {
-          "separators": Array [],
-          "values": Array [
-            SqlSetStatement {
-              "key": RefName {
-                "name": "Hello",
-                "quotes": false,
-              },
-              "keywords": Object {
-                "set": "Set",
-              },
-              "parens": undefined,
-              "spacing": Object {
-                "postKey": " ",
-                "postSet": " ",
-                "postValue": "",
-              },
-              "type": "setStatement",
-              "value": SqlLiteral {
-                "keywords": Object {},
-                "parens": undefined,
-                "spacing": Object {},
-                "stringValue": "1",
-                "type": "literal",
-                "value": 1,
-              },
-            },
-          ],
-        },
-      }
-    `);
-  });
+      `;
 
-  it('parses multiple statements', () => {
-    expect(
-      SqlSetStatement.parseStatementsOnly(sane`
+      expect(SqlSetStatement.partitionSetStatements(text)).toEqual([
+        '',
+        sane`
+          -- Comment
+          sdfsdf
+          dsfdsf
+          sdfsdf
+        `,
+      ]);
+
+      expect(SqlSetStatement.partitionSetStatements(text, true)).toEqual([
+        sane`
+          -- Comment
+
+        `,
+        sane`
+          sdfsdf
+          dsfdsf
+          sdfsdf
+        `,
+      ]);
+    });
+
+    it('works when there is something to parse', () => {
+      const text = sane`
         -- Comment
         Set Hello = 1;
         SET "moon" = 'lol';
@@ -89,74 +214,166 @@ describe('SqlSetStatement', () => {
         sdfsdf
         dsfdsf
         sdfsdf
-      `),
-    ).toMatchInlineSnapshot(`
-      Object {
-        "after": "
+      `;
 
-      SELECT * FROM tbl
-      sdfsdf
-      dsfdsf
-      sdfsdf",
-        "before": "-- Comment
-      ",
-        "statements": SeparatedArray {
-          "separators": Array [
-            "
-      ",
-          ],
-          "values": Array [
-            SqlSetStatement {
-              "key": RefName {
-                "name": "Hello",
-                "quotes": false,
-              },
-              "keywords": Object {
-                "set": "Set",
-              },
-              "parens": undefined,
-              "spacing": Object {
-                "postKey": " ",
-                "postSet": " ",
-                "postValue": "",
-              },
-              "type": "setStatement",
-              "value": SqlLiteral {
-                "keywords": Object {},
-                "parens": undefined,
-                "spacing": Object {},
-                "stringValue": "1",
-                "type": "literal",
-                "value": 1,
-              },
-            },
-            SqlSetStatement {
-              "key": RefName {
-                "name": "moon",
-                "quotes": true,
-              },
-              "keywords": Object {
-                "set": "SET",
-              },
-              "parens": undefined,
-              "spacing": Object {
-                "postKey": " ",
-                "postSet": " ",
-                "postValue": "",
-              },
-              "type": "setStatement",
-              "value": SqlLiteral {
-                "keywords": Object {},
-                "parens": undefined,
-                "spacing": Object {},
-                "stringValue": "'lol'",
-                "type": "literal",
-                "value": "lol",
-              },
-            },
-          ],
-        },
-      }
-    `);
+      console.log(text);
+
+      expect(SqlSetStatement.partitionSetStatements(text)).toEqual([
+        sane`
+          -- Comment
+          Set Hello = 1;
+          SET "moon" = 'lol';
+        `,
+        sane`
+
+
+          SELECT * FROM tbl
+          sdfsdf
+          dsfdsf
+          sdfsdf
+        `,
+      ]);
+
+      expect(SqlSetStatement.partitionSetStatements(text, true)).toEqual([
+        sane`
+          -- Comment
+          Set Hello = 1;
+          SET "moon" = 'lol';
+
+
+        `,
+        sane`
+          SELECT * FROM tbl
+          sdfsdf
+          dsfdsf
+          sdfsdf
+        `,
+      ]);
+    });
+  });
+
+  describe('.getContextFromText', () => {
+    it('works when there is nothing to parse', () => {
+      expect(
+        SqlSetStatement.getContextFromText(sane`
+          -- SQL Haiku
+
+          Database language,
+          Queries dancing through tables,
+          Data reveals truth.
+        `),
+      ).toEqual({});
+    });
+
+    it('works when there is some SQL but no context', () => {
+      expect(
+        SqlSetStatement.getContextFromText(sane`
+          -- SQL Haiku
+
+          SELECT * FROM haihu
+
+          Database language,
+          Queries dancing through tables,
+          Data reveals truth.
+        `),
+      ).toEqual({});
+    });
+
+    it('works when there is context', () => {
+      expect(
+        SqlSetStatement.getContextFromText(sane`
+          -- SQL Haiku
+
+          SET "moon" = 'lol';
+          set "one" = 1;
+
+          Database language,
+          Queries dancing through tables,
+          Data reveals truth.
+        `),
+      ).toEqual({
+        moon: 'lol',
+        one: 1,
+      });
+    });
+  });
+
+  describe('.setContextInText', () => {
+    it('works when there is nothing to parse', () => {
+      expect(
+        SqlSetStatement.setContextInText(
+          sane`
+            -- SQL Haiku
+
+            Database language,
+            Queries dancing through tables,
+            Data reveals truth.
+          `,
+          { hello: 'world', x: 1 },
+        ),
+      ).toEqual(sane`
+        -- SQL Haiku
+
+        SET hello = 'world';
+        SET x = 1;
+        Database language,
+        Queries dancing through tables,
+        Data reveals truth.
+      `);
+    });
+
+    it('works when there is some SQL but no context', () => {
+      expect(
+        SqlSetStatement.setContextInText(
+          sane`
+            -- SQL Haiku
+
+            SELECT * FROM haihu
+
+            Database language,
+            Queries dancing through tables,
+            Data reveals truth.
+          `,
+          { hello: 'world', x: 1 },
+        ),
+      ).toEqual(sane`
+        -- SQL Haiku
+
+        SET hello = 'world';
+        SET x = 1;
+        SELECT * FROM haihu
+
+        Database language,
+        Queries dancing through tables,
+        Data reveals truth.
+      `);
+    });
+
+    it('works when there is context', () => {
+      expect(
+        SqlSetStatement.setContextInText(
+          sane`
+            -- SQL Haiku
+
+            SET "moon" = 'lol';
+            set "one" = 1;
+
+            Database language,
+            Queries dancing through tables,
+            Data reveals truth.
+          `,
+          { hello: 'world', x: 1 },
+        ),
+      ).toEqual(sane`
+        -- SQL Haiku
+
+        SET hello = 'world';
+        SET x = 1;
+
+        Database language,
+        Queries dancing through tables,
+        Data reveals truth.
+      `);
+    });
   });
 });
