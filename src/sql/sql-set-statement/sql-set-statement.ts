@@ -136,7 +136,7 @@ export class SqlSetStatement extends SqlBase {
 
   public changeKey(key: RefName | string): this {
     const value = this.valueOf();
-    value.key = RefName.create(key);
+    value.key = RefName.create(key, false);
     return SqlBase.fromValue(value);
   }
 

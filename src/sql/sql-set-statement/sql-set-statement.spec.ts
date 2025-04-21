@@ -376,4 +376,12 @@ describe('SqlSetStatement', () => {
       `);
     });
   });
+
+  describe('#changeKey', () => {
+    it('works', () => {
+      expect(SqlSetStatement.create('x', 'lol').changeKey('y').toString()).toEqual(
+        `SET y = 'lol';`,
+      );
+    });
+  });
 });
