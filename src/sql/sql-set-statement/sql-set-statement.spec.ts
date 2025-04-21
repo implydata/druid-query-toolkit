@@ -216,8 +216,6 @@ describe('SqlSetStatement', () => {
         sdfsdf
       `;
 
-      console.log(text);
-
       expect(SqlSetStatement.partitionSetStatements(text)).toEqual([
         sane`
           -- Comment

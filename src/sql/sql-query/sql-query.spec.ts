@@ -255,6 +255,7 @@ describe('SqlQuery', () => {
 
   describe('#walk', () => {
     const sqlMaster = SqlQuery.parseSql(sane`
+      SET sqlTimeZone = 'America/Los_Angeles';
       SELECT
         datasource d,
         SUM("size") AS total_size,
@@ -280,7 +281,8 @@ describe('SqlQuery', () => {
           }),
         ),
       ).toMatchInlineSnapshot(`
-        "SELECT
+        "SET sqlTimeZone = 'America/Los_Angeles';
+        SELECT
           datasource_lol d,
           SUM(\\"size_lol\\") AS total_size,
           CASE WHEN SUM(\\"size_lol\\") = 0 THEN 0 ELSE SUM(\\"size_lol\\") END AS avg_size,
@@ -328,7 +330,9 @@ describe('SqlQuery', () => {
       });
 
       expect(parts).toEqual([
-        'SELECT\n  datasource d,\n  SUM("size") AS total_size,\n  CASE WHEN SUM("size") = 0 THEN 0 ELSE SUM("size") END AS avg_size,\n  CASE WHEN SUM(num_rows) = 0 THEN 0 ELSE SUM("num_rows") END AS avg_num_rows,\n  COUNT(*) AS num_segments\nFROM sys.segments\nWHERE datasource IN (\'moon\', \'beam\') AND \'druid\' = schema\nGROUP BY datasource\nHAVING total_size > 100\nORDER BY datasource DESC, 2 ASC\nLIMIT 100',
+        'SET sqlTimeZone = \'America/Los_Angeles\';\nSELECT\n  datasource d,\n  SUM("size") AS total_size,\n  CASE WHEN SUM("size") = 0 THEN 0 ELSE SUM("size") END AS avg_size,\n  CASE WHEN SUM(num_rows) = 0 THEN 0 ELSE SUM("num_rows") END AS avg_num_rows,\n  COUNT(*) AS num_segments\nFROM sys.segments\nWHERE datasource IN (\'moon\', \'beam\') AND \'druid\' = schema\nGROUP BY datasource\nHAVING total_size > 100\nORDER BY datasource DESC, 2 ASC\nLIMIT 100',
+        "SET sqlTimeZone = 'America/Los_Angeles';",
+        "'America/Los_Angeles'",
         'datasource d',
         'datasource',
         'SUM("size") AS total_size',
@@ -393,6 +397,8 @@ describe('SqlQuery', () => {
       });
 
       expect(parts).toEqual([
+        "'America/Los_Angeles'",
+        "SET sqlTimeZone = 'America/Los_Angeles';",
         'datasource',
         'datasource d',
         '"size"',
@@ -446,7 +452,7 @@ describe('SqlQuery', () => {
         'ORDER BY datasource DESC, 2 ASC',
         '100',
         'LIMIT 100',
-        'SELECT\n  datasource d,\n  SUM("size") AS total_size,\n  CASE WHEN SUM("size") = 0 THEN 0 ELSE SUM("size") END AS avg_size,\n  CASE WHEN SUM(num_rows) = 0 THEN 0 ELSE SUM("num_rows") END AS avg_num_rows,\n  COUNT(*) AS num_segments\nFROM sys.segments\nWHERE datasource IN (\'moon\', \'beam\') AND \'druid\' = schema\nGROUP BY datasource\nHAVING total_size > 100\nORDER BY datasource DESC, 2 ASC\nLIMIT 100',
+        'SET sqlTimeZone = \'America/Los_Angeles\';\nSELECT\n  datasource d,\n  SUM("size") AS total_size,\n  CASE WHEN SUM("size") = 0 THEN 0 ELSE SUM("size") END AS avg_size,\n  CASE WHEN SUM(num_rows) = 0 THEN 0 ELSE SUM("num_rows") END AS avg_num_rows,\n  COUNT(*) AS num_segments\nFROM sys.segments\nWHERE datasource IN (\'moon\', \'beam\') AND \'druid\' = schema\nGROUP BY datasource\nHAVING total_size > 100\nORDER BY datasource DESC, 2 ASC\nLIMIT 100',
       ]);
     });
 
@@ -464,6 +470,8 @@ describe('SqlQuery', () => {
       });
 
       expect(parts).toEqual([
+        "'America/Los_Angeles'",
+        "SET sqlTimeZone = '[America/Los_Angeles]';",
         'datasource',
         '_datasource_ d',
         '"size"',
@@ -517,7 +525,7 @@ describe('SqlQuery', () => {
         'ORDER BY _datasource_ DESC, 2 ASC',
         '100',
         'LIMIT 100',
-        'SELECT\n  _datasource_ d,\n  SUM("_size_") AS total_size,\n  CASE WHEN SUM("_size_") = 0 THEN 0 ELSE SUM("_size_") END AS avg_size,\n  CASE WHEN SUM(_num_rows_) = 0 THEN 0 ELSE SUM("_num_rows_") END AS avg_num_rows,\n  COUNT(*) AS num_segments\nFROM sys.segments\nWHERE _datasource_ IN (\'[moon]\', \'[beam]\') AND \'[druid]\' = _schema_\nGROUP BY _datasource_\nHAVING _total_size_ > 100\nORDER BY _datasource_ DESC, 2 ASC\nLIMIT 100',
+        'SET sqlTimeZone = \'[America/Los_Angeles]\';\nSELECT\n  _datasource_ d,\n  SUM("_size_") AS total_size,\n  CASE WHEN SUM("_size_") = 0 THEN 0 ELSE SUM("_size_") END AS avg_size,\n  CASE WHEN SUM(_num_rows_) = 0 THEN 0 ELSE SUM("_num_rows_") END AS avg_num_rows,\n  COUNT(*) AS num_segments\nFROM sys.segments\nWHERE _datasource_ IN (\'[moon]\', \'[beam]\') AND \'[druid]\' = _schema_\nGROUP BY _datasource_\nHAVING _total_size_ > 100\nORDER BY _datasource_ DESC, 2 ASC\nLIMIT 100',
       ]);
     });
 
@@ -534,7 +542,7 @@ describe('SqlQuery', () => {
         "'druid' = schema",
         "datasource IN ('moon', 'beam') AND 'druid' = schema",
         "WHERE datasource IN ('moon', 'beam') AND 'druid' = schema",
-        'SELECT\n  datasource d,\n  SUM("size") AS total_size,\n  CASE WHEN SUM("size") = 0 THEN 0 ELSE SUM("size") END AS avg_size,\n  CASE WHEN SUM(num_rows) = 0 THEN 0 ELSE SUM("num_rows") END AS avg_num_rows,\n  COUNT(*) AS num_segments\nFROM sys.segments\nWHERE datasource IN (\'moon\', \'beam\') AND \'druid\' = schema\nGROUP BY datasource\nHAVING total_size > 100\nORDER BY datasource DESC, 2 ASC\nLIMIT 100',
+        'SET sqlTimeZone = \'America/Los_Angeles\';\nSELECT\n  datasource d,\n  SUM("size") AS total_size,\n  CASE WHEN SUM("size") = 0 THEN 0 ELSE SUM("size") END AS avg_size,\n  CASE WHEN SUM(num_rows) = 0 THEN 0 ELSE SUM("num_rows") END AS avg_num_rows,\n  COUNT(*) AS num_segments\nFROM sys.segments\nWHERE datasource IN (\'moon\', \'beam\') AND \'druid\' = schema\nGROUP BY datasource\nHAVING total_size > 100\nORDER BY datasource DESC, 2 ASC\nLIMIT 100',
       ]);
     });
   });

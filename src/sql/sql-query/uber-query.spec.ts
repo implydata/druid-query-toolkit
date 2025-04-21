@@ -18,8 +18,9 @@ import { SqlBase } from '../sql-base';
 
 import { SqlQuery } from './sql-query';
 
-describe('Uber Query', () => {
+describe('Uber query', () => {
   const sql = sane`
+    SET sqlTimeZone = 'America/Los_Angeles';
     WITH temp_t1 AS (SELECT * FROM blah), temp_t2 AS (SELECT * FROM blah2)
     SELECT
       col1 AS "Col1",
@@ -136,11 +137,9 @@ describe('Uber Query', () => {
   });
 
   it('throws for invalid limit values', () => {
-    expect(() => query.changeLimitValue(1)).not.toThrowError();
-    expect(() => query.changeLimitValue(0)).not.toThrowError();
-    expect(() => query.changeLimitValue(-1)).toThrowError('-1 is not a valid limit value');
-    expect(() => query.changeLimitValue(-Infinity)).toThrowError(
-      '-Infinity is not a valid limit value',
-    );
+    expect(() => query.changeLimitValue(1)).not.toThrow();
+    expect(() => query.changeLimitValue(0)).not.toThrow();
+    expect(() => query.changeLimitValue(-1)).toThrow('-1 is not a valid limit value');
+    expect(() => query.changeLimitValue(-Infinity)).toThrow('-Infinity is not a valid limit value');
   });
 });

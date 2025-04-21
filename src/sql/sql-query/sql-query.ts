@@ -689,6 +689,19 @@ export class SqlQuery extends SqlExpression {
   ): SqlQuery | undefined {
     let ret: SqlQuery = this;
 
+    if (this.contextStatements) {
+      const contextStatements = SqlBase.walkSeparatedArray(
+        this.contextStatements,
+        nextStack,
+        fn,
+        postorder,
+      );
+      if (!contextStatements) return;
+      if (contextStatements !== this.contextStatements) {
+        ret = ret.changeContextStatements(contextStatements);
+      }
+    }
+
     if (this.insertClause) {
       const insertClause = this.insertClause._walkHelper(nextStack, fn, postorder);
       if (!insertClause) return;
