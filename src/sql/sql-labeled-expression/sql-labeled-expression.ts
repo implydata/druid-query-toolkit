@@ -108,6 +108,10 @@ export class SqlLabeledExpression extends SqlExpression {
   public getUnderlyingExpression(): SqlExpression {
     return this.expression;
   }
+
+  public changeUnderlyingExpression(newExpression: SqlExpression): SqlExpression {
+    return this.changeExpression(newExpression);
+  }
 }
 
 SqlBase.register(SqlLabeledExpression);

@@ -222,6 +222,10 @@ export abstract class SqlExpression extends SqlBase {
     return this;
   }
 
+  public changeUnderlyingExpression(newExpression: SqlExpression): SqlExpression {
+    return newExpression;
+  }
+
   public getOutputName(): string | undefined {
     return;
   }
