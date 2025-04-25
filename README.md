@@ -82,7 +82,6 @@ For more examples, check out the unit tests.
 Not every valid DruidSQL construct can currently be parsed, the following snippets are not currently supported:
 
 - `(a, b) IN (subquery)`
-- Support `FROM "wikipedia_k" USING (k)`
 
 ## License
 

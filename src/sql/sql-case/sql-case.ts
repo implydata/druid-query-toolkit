@@ -48,6 +48,7 @@ export class SqlCase extends SqlExpression {
   public readonly caseExpression?: SqlExpression;
   public readonly whenThenParts: SeparatedArray<SqlWhenThenPart>;
   public readonly elseExpression?: SqlExpression;
+
   constructor(options: SqlCaseValue) {
     super(options, SqlCase.type);
     this.caseExpression = options.caseExpression;
