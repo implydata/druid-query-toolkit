@@ -16,23 +16,14 @@ import { backAndForth } from '../../test-utils';
 import { SqlCase, SqlExpression } from '..';
 
 describe('CaseExpression', () => {
-  it('things that work', () => {
-    const queries: string[] = [
-      `CASE WHEN (A) THEN 'hello' END`,
-      `CASE WHEN TIMESTAMP '2019-08-27 18:00:00'<=(t."__time") AND (t."__time")<TIMESTAMP '2019-08-28 00:00:00' THEN (t."__time") END`,
-      `CASE WHEN (3<="__time") THEN 1 END`,
-      `CASE WHEN (TIMESTAMP '2019-08-27 18:00:00'<=(t."__time") AND (t."__time")<TIMESTAMP '2019-08-28 00:00:00') THEN (t."__time") END`,
-      `CASE country WHEN 'United States', 'Argentina' THEN 'US' ELSE 'Blah' END`,
-    ];
-
-    for (const sql of queries) {
-      try {
-        backAndForth(sql, SqlCase);
-      } catch (e) {
-        console.log(`Problem with: \`${sql}\``);
-        throw e;
-      }
-    }
+  it.each([
+    `CASE WHEN (A) THEN 'hello' END`,
+    `CASE WHEN TIMESTAMP '2019-08-27 18:00:00'<=(t."__time") AND (t."__time")<TIMESTAMP '2019-08-28 00:00:00' THEN (t."__time") END`,
+    `CASE WHEN (3<="__time") THEN 1 END`,
+    `CASE WHEN (TIMESTAMP '2019-08-27 18:00:00'<=(t."__time") AND (t."__time")<TIMESTAMP '2019-08-28 00:00:00') THEN (t."__time") END`,
+    `CASE country WHEN 'United States', 'Argentina' THEN 'US' ELSE 'Blah' END`,
+  ])('does back and forth with %s', sql => {
+    backAndForth(sql, SqlCase);
   });
 
   it('caseless CASE Expression', () => {

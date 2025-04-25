@@ -16,49 +16,29 @@ import { SqlExpression, SqlLiteral } from '../..';
 import { backAndForth } from '../../test-utils';
 
 describe('SqlLiteral', () => {
-  it('things that work', () => {
-    const queries: string[] = [
-      `NULL`,
-      `TRUE`,
-      `FALSE`,
-      `'lol'`,
-      `U&'hello'`,
-      `U&'hell''o'`,
-      `U&'hell\\\\o'`,
-      `_latin1'hello'`,
-      `_UTF8'hello'`,
-      `_UTF8'hell''o'`,
-      `_l-1'hello'`,
-      `_8l-1'hello'`,
-      `'don''t do it'`,
-      `17.0`,
-      `123.34`,
-      `1606832560494517248`,
-    ];
-
-    for (const sql of queries) {
-      try {
-        backAndForth(sql, SqlLiteral);
-      } catch (e) {
-        console.log(`Problem with: \`${sql}\``);
-        throw e;
-      }
-    }
+  it.each([
+    `NULL`,
+    `TRUE`,
+    `FALSE`,
+    `'lol'`,
+    `U&'hello'`,
+    `U&'hell''o'`,
+    `U&'hell\\\\o'`,
+    `_latin1'hello'`,
+    `_UTF8'hello'`,
+    `_UTF8'hell''o'`,
+    `_l-1'hello'`,
+    `_8l-1'hello'`,
+    `'don''t do it'`,
+    `17.0`,
+    `123.34`,
+    `1606832560494517248`,
+  ])('does back and forth with %s', sql => {
+    backAndForth(sql, SqlLiteral);
   });
 
-  it('things that do not work', () => {
-    const queries: string[] = [`__l-1'hello'`, `_-l-1'hello'`];
-
-    for (const sql of queries) {
-      let didNotError = false;
-      try {
-        SqlExpression.parse(sql);
-        didNotError = true;
-      } catch {}
-      if (didNotError) {
-        throw new Error(`should not parse: ${sql}`);
-      }
-    }
+  it.each([`__l-1'hello'`, `_-l-1'hello'`])('invalid literal %s should not parse', sql => {
+    expect(() => SqlExpression.parse(sql)).toThrow();
   });
 
   it('Works with Null', () => {
@@ -129,28 +109,24 @@ describe('SqlLiteral', () => {
     `);
   });
 
-  it('all sorts of number literals', () => {
-    const numbersToTest = [
-      '0',
-      '0.0',
-      '0.01',
-      '.1',
-      '1',
-      '01',
-      '1.234',
-      '+1',
-      '-1',
-      '5e2',
-      '+5e+2',
-      '-5E2',
-      '-5E02',
-      '-5e-2',
-    ];
-
-    for (const num of numbersToTest) {
-      backAndForth(num);
-      expect((SqlExpression.parse(num) as SqlLiteral).value).toEqual(parseFloat(num));
-    }
+  it.each([
+    '0',
+    '0.0',
+    '0.01',
+    '.1',
+    '1',
+    '01',
+    '1.234',
+    '+1',
+    '-1',
+    '5e2',
+    '+5e+2',
+    '-5E2',
+    '-5E02',
+    '-5e-2',
+  ])('number literal %s parses to correct value', num => {
+    backAndForth(num);
+    expect((SqlExpression.parse(num) as SqlLiteral).value).toEqual(parseFloat(num));
   });
 
   it('number literals', () => {

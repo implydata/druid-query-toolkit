@@ -34,32 +34,15 @@ describe('SqlExpression', () => {
     backAndForth(sql, SqlExpression);
   });
 
-  it('things that work and prettify to themselves', () => {
-    const queries: string[] = ['1', '1 + 1', `CONCAT('a', 'b')`, `x IN ('Hello World')`];
+  it.each(['1', '1 + 1', `CONCAT('a', 'b')`, `x IN ('Hello World')`])(
+    'does back and forth prettify with %s',
+    sql => {
+      backAndForthPrettify(sql, SqlExpression);
+    },
+  );
 
-    for (const sql of queries) {
-      try {
-        backAndForthPrettify(sql, SqlExpression);
-      } catch (e) {
-        console.log(`Problem with: \`${sql}\``);
-        throw e;
-      }
-    }
-  });
-
-  it('plywood expressions should not parse', () => {
-    const queries: string[] = [`$lol`, `#main.sum($count)`];
-
-    for (const sql of queries) {
-      let didNotError = false;
-      try {
-        SqlBase.parseSql(sql);
-        didNotError = true;
-      } catch {}
-      if (didNotError) {
-        throw new Error(`should not parse: ${sql}`);
-      }
-    }
+  it.each([`$lol`, `#main.sum($count)`])('plywood expression %s should not parse', sql => {
+    expect(() => SqlBase.parseSql(sql)).toThrow();
   });
 
   describe('factories (static)', () => {
