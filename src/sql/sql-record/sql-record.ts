@@ -32,10 +32,7 @@ export class SqlRecord extends SqlExpression {
     expressions?: SqlRecord | SeparatedArray<SqlExpression> | SqlExpression[],
   ): SqlRecord {
     if (expressions instanceof SqlRecord) return expressions;
-    const array =
-      !expressions || isEmptyArray(expressions)
-        ? undefined
-        : SeparatedArray.fromArray(expressions, Separator.COMMA);
+    const array = SeparatedArray.fromPossiblyEmptyArray(expressions, Separator.COMMA);
 
     return new SqlRecord({
       keywords: {
@@ -50,10 +47,7 @@ export class SqlRecord extends SqlExpression {
   ): SqlRecord {
     if (expressions instanceof SqlRecord) return expressions;
     return new SqlRecord({
-      expressions:
-        !expressions || isEmptyArray(expressions)
-          ? undefined
-          : SeparatedArray.fromArray(expressions, Separator.COMMA),
+      expressions: SeparatedArray.fromPossiblyEmptyArray(expressions, Separator.COMMA),
     });
   }
 

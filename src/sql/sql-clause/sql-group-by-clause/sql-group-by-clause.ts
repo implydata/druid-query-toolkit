@@ -36,10 +36,7 @@ export class SqlGroupByClause extends SqlClause {
 
   static create(expressions?: SeparatedArray<SqlExpression> | SqlExpression[]): SqlGroupByClause {
     return new SqlGroupByClause({
-      expressions:
-        !expressions || isEmptyArray(expressions)
-          ? undefined
-          : SeparatedArray.fromArray(expressions),
+      expressions: SeparatedArray.fromPossiblyEmptyArray(expressions),
     });
   }
 

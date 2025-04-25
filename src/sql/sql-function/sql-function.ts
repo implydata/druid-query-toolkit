@@ -19,6 +19,7 @@ import { SqlBase } from '../sql-base';
 import type { SqlColumnDeclaration } from '../sql-clause';
 import { SqlExtendClause, SqlWhereClause } from '../sql-clause';
 import { SqlExpression } from '../sql-expression';
+import { SqlKeyValue } from '../sql-key-value/sql-key-value';
 import { SqlLabeledExpression } from '../sql-labeled-expression/sql-labeled-expression';
 import type { LiteralValue } from '../sql-literal/sql-literal';
 import { SqlLiteral } from '../sql-literal/sql-literal';
@@ -147,6 +148,32 @@ export class SqlFunction extends SqlExpression {
     return new SqlFunction({
       functionName: RefName.functionName('JSON_VALUE'),
       args: new SeparatedArray(args, separators),
+    });
+  }
+
+  static jsonObject(
+    keyValues?:
+      | SeparatedArray<SqlKeyValue>
+      | SqlKeyValue[]
+      | SqlKeyValue
+      | Record<string, SqlExpression | LiteralValue>,
+  ): SqlExpression {
+    let args: SeparatedArray<SqlKeyValue> | undefined;
+    if (keyValues instanceof SeparatedArray) {
+      args = keyValues;
+    } else if (Array.isArray(keyValues)) {
+      args = SeparatedArray.fromPossiblyEmptyArray(keyValues);
+    } else if (keyValues instanceof SqlKeyValue) {
+      args = SeparatedArray.fromSingleValue(keyValues);
+    } else if (keyValues && typeof keyValues === 'object') {
+      args = SeparatedArray.fromPossiblyEmptyArray(
+        Object.entries(keyValues).map(([key, value]) => SqlKeyValue.short(key, value)),
+      );
+    }
+
+    return new SqlFunction({
+      functionName: RefName.functionName('JSON_OBJECT'),
+      args,
     });
   }
 

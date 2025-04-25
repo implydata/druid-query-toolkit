@@ -353,11 +353,7 @@ export class SqlQuery extends SqlExpression {
   public changeContextStatements(
     contextStatements: SeparatedArray<SqlSetStatement> | SqlSetStatement[] | undefined,
   ): this {
-    const newContextStatements =
-      contextStatements && !isEmptyArray(contextStatements)
-        ? SeparatedArray.fromArray(contextStatements)
-        : undefined;
-
+    const newContextStatements = SeparatedArray.fromPossiblyEmptyArray(contextStatements);
     const value = this.valueOf();
     if (newContextStatements) {
       value.contextStatements = newContextStatements;

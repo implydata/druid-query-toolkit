@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 
+import { isEmptyArray } from '../../../utils';
 import { clampIndex, insert, normalizeIndex, Separator } from '..';
 
 export type SeparatorOrString = Separator | string;
@@ -29,6 +30,14 @@ export class SeparatedArray<T> {
       }
     }
     return new SeparatedArray<T>(xs, separators);
+  }
+
+  static fromPossiblyEmptyArray<T>(
+    xs: readonly T[] | SeparatedArray<T> | undefined,
+    separator?: SeparatorOrString,
+  ): SeparatedArray<T> | undefined {
+    if (!xs || isEmptyArray(xs)) return;
+    return SeparatedArray.fromArray(xs, separator);
   }
 
   static fromSingleValue<T>(x: T): SeparatedArray<T> {
