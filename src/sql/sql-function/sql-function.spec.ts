@@ -16,13 +16,12 @@ import { backAndForth } from '../../test-utils';
 import { SqlColumn, SqlExpression, SqlFunction, SqlKeyValue, SqlLiteral, SqlStar } from '..';
 
 describe('SqlFunction', () => {
-  it('things that work', () => {
-    const functionExpressions: string[] = [
+  describe('parsing various SQL functions', () => {
+    it.each([
       `COUNT(*)`,
       `"COUNT"(*)`,
       `COUNT(DISTINCT blah)`,
       `COUNT(ALL blah)`,
-
       "position('b' in 'abc')",
       "position('' in 'abc')",
       "position('b' in 'abcabc' FROM 3)",
@@ -41,28 +40,23 @@ describe('SqlFunction', () => {
       "position(x'cc' in x'aabbccdd' FROM 2)",
       "position(x'' in x'aabbcc' FROM 3)",
       "position (x'' in x'aabbcc' FROM 10)",
-
       "trim(leading 'eh' from 'hehe__hehe')",
       "trim(trailing 'eh' from 'hehe__hehe')",
       "trim('eh' from 'hehe__hehe')",
       `"trim" ('eh' from 'hehe__hehe')`,
-
       `JSON_VALUE(my_json, '$.x')`,
       `JSON_VALUE(my_json, '$.x' RETURNING DOUBLE)`,
-
       `SomeFn("arg1" => "boo")`,
       `"SomeFn" ("arg1" => "boo")`,
       `"ext" .  "SomeFn" ("arg1" => "boo")`,
       `LOCAL(path => '/tmp/druid')`,
       `EXTERN(LOCAL("path" => '/tmp/druid'))`,
       `NESTED_AGG(TIME_FLOOR(t.__time, 'P1D'), COUNT(DISTINCT t."ip") AS "daily_unique", AVG("daily_unique"))`,
-
       `TABLE(extern('{...}', '{...}', '[...]'))`,
       `"TABLE" (extern('{...}', '{...}', '[...]'))`,
       `TABLE(extern('{...}', '{...}')) EXTEND (x VARCHAR, y BIGINT, z TYPE('COMPLEX<json>'))`,
       `TABLE(extern('{...}', '{...}'))  (x VARCHAR, y BIGINT, z TYPE('COMPLEX<json>'))`,
       `TABLE(extern('{...}', '{...}'))  EXTEND  (xs VARCHAR   ARRAY, ys BIGINT  ARRAY, zs DOUBLE  ARRAY)`,
-
       `SUM(COUNT(*)) OVER ()`,
       `SUM(COUNT(*))   Over  ("windowName"  Order by COUNT(*) Desc)`,
       `ROW_NUMBER() OVER (PARTITION BY t."country", t."city" ORDER BY COUNT(*) DESC)`,
@@ -73,20 +67,12 @@ describe('SqlFunction', () => {
       `ROW_NUMBER() OVER (PARTITION BY t."country", t."city" ORDER BY COUNT(*) DESC RANGE UNBOUNDED FOLLOWING)`,
       `ROW_NUMBER() OVER (PARTITION BY t."country", t."city" ORDER BY COUNT(*) DESC RANGE BETWEEN UNBOUNDED FOLLOWING AND CURRENT ROW)`,
       `count(*) over (partition by cityName order by countryName rows between unbounded preceding and 1 preceding)`,
-
       `PI`,
       `CURRENT_TIMESTAMP`,
       `UNNEST(t)`,
-    ];
-
-    for (const sql of functionExpressions) {
-      try {
-        backAndForth(sql, SqlFunction);
-      } catch (e) {
-        console.log(`Problem with: \`${sql}\``);
-        throw e;
-      }
-    }
+    ])('correctly parses: %s', sql => {
+      backAndForth(sql, SqlFunction);
+    });
   });
 
   it('is smart about clearing separators', () => {

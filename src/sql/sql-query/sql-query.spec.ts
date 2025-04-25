@@ -28,8 +28,8 @@ import { backAndForth } from '../../test-utils';
 import { sane } from '../../utils';
 
 describe('SqlQuery', () => {
-  it('things that work', () => {
-    const queries: string[] = [
+  describe('valid SQL queries', () => {
+    it.each([
       `Select nottingham from tbl`,
       `Select 3; ; ;`,
       `Select PI as "pi"`,
@@ -143,38 +143,22 @@ describe('SqlQuery', () => {
         set B = 'lol'; ; ;
         SELECT 1 + 1
       `,
-    ];
-
-    for (const sql of queries) {
-      try {
-        backAndForth(sql, SqlQuery);
-      } catch (e) {
-        console.log(`Problem with: \`${sql}\``);
-        throw e;
-      }
-    }
+    ])('correctly parses: %s', sql => {
+      backAndForth(sql, SqlQuery);
+    });
   });
 
-  it('things that do not work', () => {
-    const queries: string[] = [
+  describe('invalid SQL queries', () => {
+    it.each([
       `Select nottingham from table`,
       `Selec 3`,
       `(Select * from tbl`,
       `Select count(*) As count from tbl`,
       `Select * from tbl SELECT`,
       // `SELECT 1 AS user`,
-    ];
-
-    for (const sql of queries) {
-      let didNotError = false;
-      try {
-        SqlQuery.parse(sql);
-        didNotError = true;
-      } catch {}
-      if (didNotError) {
-        throw new Error(`should not parse: ${sql}`);
-      }
-    }
+    ])('fails to parse: %s', sql => {
+      expect(() => SqlQuery.parse(sql)).toThrow();
+    });
   });
 
   it('errors on parse if there are INSERT and REPLACE clauses', () => {

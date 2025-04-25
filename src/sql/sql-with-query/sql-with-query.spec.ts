@@ -19,8 +19,8 @@ import { SqlExpression } from '../sql-expression';
 import type { SqlWithQuery } from './sql-with-query';
 
 describe('SqlWithQuery', () => {
-  it('things that work', () => {
-    const queries: string[] = [
+  describe('valid with queries', () => {
+    it.each([
       `WITH wiki AS (SELECT * FROM wikipedia) (SELECT * FROM wiki)`,
       `WITH wiki AS (SELECT * FROM wikipedia) (SELECT * FROM wiki) ORDER BY __time DESC LIMIT 3 OFFSET 0`,
       sane`
@@ -42,16 +42,9 @@ describe('SqlWithQuery', () => {
         PARTITIONED BY ALL
         CLUSTERED BY page
       `,
-    ];
-
-    for (const sql of queries) {
-      try {
-        backAndForth(sql);
-      } catch (e) {
-        console.log(`Problem with: \`${sql}\``);
-        throw e;
-      }
-    }
+    ])('correctly parses: %s', sql => {
+      backAndForth(sql);
+    });
   });
 
   it('flattenWith', () => {
