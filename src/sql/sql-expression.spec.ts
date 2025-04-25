@@ -16,31 +16,22 @@ import { RefName, SqlBase, SqlColumn, SqlExpression, SqlLiteral } from '..';
 import { backAndForth, backAndForthPrettify, mapString } from '../test-utils';
 
 describe('SqlExpression', () => {
-  it('things that work', () => {
-    const queries: string[] = [
-      '1',
-      '1 + 1',
-      `CONCAT('a', 'b')`,
-      `(Select 1)`,
-      `(TIMESTAMP '2019-08-27 18:00:00'<=(t."__time") AND (t."__time")<TIMESTAMP '2019-08-28 00:00:00')`,
-      `COALESCE(CASE WHEN (TIMESTAMP '2019-08-27 18:00:00'<=(t."__time") AND (t."__time")<TIMESTAMP '2019-08-28 00:00:00') THEN (t."__time") END, TIME_SHIFT((t."__time"), 'PT6H', 1, 'Etc/UTC'))`,
-      `TIME_FLOOR(COALESCE(CASE WHEN (TIMESTAMP '2019-08-27 18:00:00'<=(t."__time") AND (t."__time")<TIMESTAMP '2019-08-28 00:00:00') THEN (t."__time") END, TIME_SHIFT((t."__time"), 'PT6H', 1, 'Etc/UTC')), 'PT5M', NULL, 'Etc/UTC')`,
-      't AS x (a, b, "c")',
-      `VALUES   (1, 1 + 1),(2, 1 + 1)`,
-      `VALUES('Toy' || 'ota', 2, 2+2, CURRENT_TIMESTAMP), ROW('Honda', (SELECT COUNT(*) FROM wikipedia), GREATEST(5, 1), CURRENT_TIMESTAMP - INTERVAL '1' DAY)`,
-      `SELECT * FROM (VALUES   (1, 1 + 1),(2, 1 + 1)) t (a, "b")`,
-      `SELECT * FROM UNNEST(ARRAY['1','2','3'])`,
-      `SELECT * FROM "tbl", UNNEST(DATE_EXPAND(TIMESTAMP_TO_MILLIS(__time), TIMESTAMP_TO_MILLIS(__time), 'PT1S')) as unnested (dt)`,
-    ];
-
-    for (const sql of queries) {
-      try {
-        backAndForth(sql, SqlExpression);
-      } catch (e) {
-        console.log(`Problem with: \`${sql}\``);
-        throw e;
-      }
-    }
+  it.each([
+    '1',
+    '1 + 1',
+    `CONCAT('a', 'b')`,
+    `(Select 1)`,
+    `(TIMESTAMP '2019-08-27 18:00:00'<=(t."__time") AND (t."__time")<TIMESTAMP '2019-08-28 00:00:00')`,
+    `COALESCE(CASE WHEN (TIMESTAMP '2019-08-27 18:00:00'<=(t."__time") AND (t."__time")<TIMESTAMP '2019-08-28 00:00:00') THEN (t."__time") END, TIME_SHIFT((t."__time"), 'PT6H', 1, 'Etc/UTC'))`,
+    `TIME_FLOOR(COALESCE(CASE WHEN (TIMESTAMP '2019-08-27 18:00:00'<=(t."__time") AND (t."__time")<TIMESTAMP '2019-08-28 00:00:00') THEN (t."__time") END, TIME_SHIFT((t."__time"), 'PT6H', 1, 'Etc/UTC')), 'PT5M', NULL, 'Etc/UTC')`,
+    't AS x (a, b, "c")',
+    `VALUES   (1, 1 + 1),(2, 1 + 1)`,
+    `VALUES('Toy' || 'ota', 2, 2+2, CURRENT_TIMESTAMP), ROW('Honda', (SELECT COUNT(*) FROM wikipedia), GREATEST(5, 1), CURRENT_TIMESTAMP - INTERVAL '1' DAY)`,
+    `SELECT * FROM (VALUES   (1, 1 + 1),(2, 1 + 1)) t (a, "b")`,
+    `SELECT * FROM UNNEST(ARRAY['1','2','3'])`,
+    `SELECT * FROM "tbl", UNNEST(DATE_EXPAND(TIMESTAMP_TO_MILLIS(__time), TIMESTAMP_TO_MILLIS(__time), 'PT1S')) as unnested (dt)`,
+  ])('does back and forth with %s', sql => {
+    backAndForth(sql, SqlExpression);
   });
 
   it('things that work and prettify to themselves', () => {
