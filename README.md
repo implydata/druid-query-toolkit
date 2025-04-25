@@ -75,7 +75,7 @@ ORDER BY 5 DESC
  */
 ```
 
-For more examples check out the unit tests.
+For more examples, check out the unit tests.
 
 #### ToDo
 
