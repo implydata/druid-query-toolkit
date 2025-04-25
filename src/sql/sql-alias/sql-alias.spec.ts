@@ -172,9 +172,49 @@ describe('SqlAlias', () => {
   });
 
   describe('.create', () => {
-    expect(
-      SqlAlias.create(SqlAlias.create(SqlColumn.create('X'), 'name1'), 'name2').toString(),
-    ).toEqual('"X" AS "name2"');
+    it('overwrites existing alias when aliasing an already aliased expression', () => {
+      expect(
+        SqlAlias.create(SqlAlias.create(SqlColumn.create('X'), 'name1'), 'name2').toString(),
+      ).toEqual('"X" AS "name2"');
+    });
+
+    it('creates a simple alias with string column and string alias', () => {
+      expect(SqlAlias.create(SqlColumn.create('col1'), 'alias1').toString()).toEqual(
+        '"col1" AS "alias1"',
+      );
+    });
+
+    it('creates an alias with RefName object as alias', () => {
+      const refName = RefName.create('myAlias', true);
+      expect(SqlAlias.create(SqlColumn.create('col1'), refName).toString()).toEqual(
+        '"col1" AS "myAlias"',
+      );
+    });
+
+    it('auto-quotes aliases that are reserved keywords', () => {
+      expect(SqlAlias.create(SqlColumn.create('col1'), 'select').toString()).toEqual(
+        '"col1" AS "select"',
+      );
+    });
+
+    it('forces quotes when forceQuotes is true', () => {
+      expect(SqlAlias.create(SqlColumn.create('col1'), 'normal', true).toString()).toEqual(
+        '"col1" AS "normal"',
+      );
+    });
+
+    it('adds parentheses to SqlQuery expressions', () => {
+      const query = SqlQuery.create('tbl');
+      const aliasedQuery = SqlAlias.create(query, 'subq');
+      const result = aliasedQuery.toString();
+
+      // Check that the result contains the main components rather than exact formatting
+      expect(result).toContain('(');
+      expect(result).toContain(')');
+      expect(result).toContain('SELECT');
+      expect(result).toContain('FROM "tbl"');
+      expect(result).toContain('AS "subq"');
+    });
   });
 
   describe('#changeAlias', () => {
