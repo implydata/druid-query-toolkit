@@ -13,7 +13,7 @@
  */
 
 import { backAndForth } from '../../test-utils';
-import { SqlColumn, SqlExpression, SqlFunction, SqlStar } from '..';
+import { SqlColumn, SqlExpression, SqlFunction, SqlKeyValue, SqlLiteral, SqlStar } from '..';
 
 describe('SqlFunction', () => {
   it('things that work', () => {
@@ -128,6 +128,82 @@ describe('SqlFunction', () => {
     expect(SqlFunction.jsonValue(SqlExpression.parse('X'), '$.x', 'DOUBLE').toString()).toEqual(
       `JSON_VALUE(X, '$.x' RETURNING DOUBLE)`,
     );
+  });
+
+  describe('.jsonObject', () => {
+    it('with no arguments', () => {
+      expect(SqlFunction.jsonObject().toString()).toEqual('JSON_OBJECT()');
+    });
+
+    it('with object of key-value pairs', () => {
+      expect(SqlFunction.jsonObject({ name: 'John', age: 30 }).toString()).toEqual(
+        `JSON_OBJECT('name':'John', 'age':30)`,
+      );
+    });
+
+    it('with a single SqlKeyValue (longhand)', () => {
+      const keyValue = SqlKeyValue.create(SqlLiteral.create('name'), SqlLiteral.create('John'));
+      expect(SqlFunction.jsonObject(keyValue).toString()).toEqual(
+        `JSON_OBJECT(KEY 'name' VALUE 'John')`,
+      );
+    });
+
+    it('with a single SqlKeyValue (shorthand)', () => {
+      const keyValue = SqlKeyValue.short(SqlLiteral.create('name'), SqlLiteral.create('John'));
+      expect(SqlFunction.jsonObject(keyValue).toString()).toEqual(`JSON_OBJECT('name':'John')`);
+    });
+
+    it('with an array of SqlKeyValue objects (longhand)', () => {
+      const keyValues = [
+        SqlKeyValue.create(SqlLiteral.create('name'), SqlLiteral.create('John')),
+        SqlKeyValue.create(SqlLiteral.create('age'), SqlLiteral.create(30)),
+      ];
+      expect(SqlFunction.jsonObject(keyValues).toString()).toEqual(
+        `JSON_OBJECT(KEY 'name' VALUE 'John', KEY 'age' VALUE 30)`,
+      );
+    });
+
+    it('with an array of SqlKeyValue objects (shorthand)', () => {
+      const keyValues = [
+        SqlKeyValue.short(SqlLiteral.create('name'), SqlLiteral.create('John')),
+        SqlKeyValue.short(SqlLiteral.create('age'), SqlLiteral.create(30)),
+      ];
+      expect(SqlFunction.jsonObject(keyValues).toString()).toEqual(
+        `JSON_OBJECT('name':'John', 'age':30)`,
+      );
+    });
+
+    it('with mixed longhand and shorthand SqlKeyValue objects', () => {
+      const keyValues = [
+        SqlKeyValue.create(SqlLiteral.create('name'), SqlLiteral.create('John')),
+        SqlKeyValue.short(SqlLiteral.create('age'), SqlLiteral.create(30)),
+      ];
+      expect(SqlFunction.jsonObject(keyValues).toString()).toEqual(
+        `JSON_OBJECT(KEY 'name' VALUE 'John', 'age':30)`,
+      );
+    });
+
+    it('with SqlExpression keys and values', () => {
+      const keyValues = SqlKeyValue.create(
+        SqlExpression.parse('column_name'),
+        SqlExpression.parse('column_value'),
+      );
+      expect(SqlFunction.jsonObject(keyValues).toString()).toEqual(
+        'JSON_OBJECT(KEY column_name VALUE column_value)',
+      );
+    });
+
+    it('with complex expressions', () => {
+      // Create complex expressions using the builder pattern
+      const userId = SqlColumn.create('user').concat(SqlColumn.create('id'));
+      const valueAsVarchar = SqlFunction.cast(SqlColumn.create('value'), 'VARCHAR');
+
+      const keyValues = SqlKeyValue.short(userId, valueAsVarchar);
+
+      expect(SqlFunction.jsonObject(keyValues).toString()).toEqual(
+        'JSON_OBJECT("user" || "id":CAST("value" AS VARCHAR))',
+      );
+    });
   });
 
   it('.floor', () => {
