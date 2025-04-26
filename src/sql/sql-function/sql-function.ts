@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { compact, filterMap } from '../../utils';
+import { compact, filterMap, isDate } from '../../utils';
 import { SPECIAL_FUNCTIONS } from '../special-functions';
 import type { SqlBaseValue, SqlTypeDesignator, Substitutor } from '../sql-base';
 import { SqlBase } from '../sql-base';
@@ -152,11 +152,7 @@ export class SqlFunction extends SqlExpression {
   }
 
   static jsonObject(
-    keyValues?:
-      | SeparatedArray<SqlKeyValue>
-      | SqlKeyValue[]
-      | SqlKeyValue
-      | Record<string, SqlExpression | LiteralValue>,
+    keyValues?: SeparatedArray<SqlKeyValue> | SqlKeyValue[] | SqlKeyValue | Record<string, any>,
   ): SqlExpression {
     let args: SeparatedArray<SqlKeyValue> | undefined;
     if (keyValues instanceof SeparatedArray) {
@@ -167,7 +163,35 @@ export class SqlFunction extends SqlExpression {
       args = SeparatedArray.fromSingleValue(keyValues);
     } else if (keyValues && typeof keyValues === 'object') {
       args = SeparatedArray.fromPossiblyEmptyArray(
-        Object.entries(keyValues).map(([key, value]) => SqlKeyValue.short(key, value)),
+        filterMap(Object.entries(keyValues), ([k, v]) => {
+          let value: SqlExpression | LiteralValue;
+          switch (typeof v) {
+            case 'object':
+              if (!v || v instanceof SqlExpression || isDate(v)) {
+                value = v;
+              } else if (Array.isArray(v)) {
+                value = SqlFunction.array(...v);
+              } else {
+                value = SqlFunction.jsonObject(v);
+              }
+              break;
+
+            case 'undefined':
+              return;
+
+            case 'function':
+            case 'symbol':
+              throw new TypeError(`Cannot use ${typeof v} (in key ${k}) as a JSON object value`);
+
+            case 'string':
+            case 'number':
+            case 'bigint':
+            case 'boolean':
+            default:
+              value = v;
+          }
+          return SqlKeyValue.short(k, value);
+        }),
       );
     }
 
@@ -221,7 +245,7 @@ export class SqlFunction extends SqlExpression {
     return new SqlFunction({
       functionName: RefName.functionName('ARRAY'),
       specialParen: 'square',
-      args: SeparatedArray.fromArray(exs.map(SqlExpression.wrap)),
+      args: SeparatedArray.fromPossiblyEmptyArray(exs.map(SqlExpression.wrap)),
     });
   }
 

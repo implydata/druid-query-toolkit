@@ -55,6 +55,14 @@ export function isEmptyArray(x: unknown): x is unknown[] {
   return Array.isArray(x) && !x.length;
 }
 
+export function isDate(v: any): v is Date {
+  return Boolean(v && typeof v.toISOString === 'function');
+}
+
+export function isInteger(v: number): boolean {
+  return isFinite(v) && Math.floor(v) === v;
+}
+
 export function compact<T>(xs: (T | undefined | false | null | '')[]): T[] {
   return xs.filter(Boolean) as T[];
 }

@@ -119,11 +119,24 @@ describe('SqlFunction', () => {
   describe('.jsonObject', () => {
     it('with no arguments', () => {
       expect(SqlFunction.jsonObject().toString()).toEqual('JSON_OBJECT()');
+      expect(SqlFunction.jsonObject({}).toString()).toEqual('JSON_OBJECT()');
     });
 
     it('with object of key-value pairs', () => {
       expect(SqlFunction.jsonObject({ name: 'John', age: 30 }).toString()).toEqual(
         `JSON_OBJECT('name':'John', 'age':30)`,
+      );
+    });
+
+    it('with nested object', () => {
+      expect(
+        SqlFunction.jsonObject({
+          name: 'John',
+          age: { years: 30, months: 1 },
+          hobbies: ['skiing', 'sleeping'],
+        }).toString(),
+      ).toEqual(
+        `JSON_OBJECT('name':'John', 'age':JSON_OBJECT('years':30, 'months':1), 'hobbies':ARRAY['skiing', 'sleeping'])`,
       );
     });
 
@@ -200,6 +213,19 @@ describe('SqlFunction', () => {
 
   it('.arrayOfLiterals', () => {
     expect(SqlFunction.arrayOfLiterals(['a', 'b', 'c']).toString()).toEqual(`ARRAY['a', 'b', 'c']`);
+  });
+
+  it('.array', () => {
+    expect(SqlFunction.array().toString()).toEqual(`ARRAY[]`);
+    expect(SqlFunction.array('a', 'b', 'c').toString()).toEqual(`ARRAY['a', 'b', 'c']`);
+    expect(SqlFunction.array(1, 2, 3).toString()).toEqual(`ARRAY[1, 2, 3]`);
+    expect(
+      SqlFunction.array(SqlColumn.create('col1'), SqlColumn.create('col2')).toString(),
+    ).toEqual(`ARRAY["col1", "col2"]`);
+
+    // Test the backward compatibility case
+    expect(SqlFunction.array([] as any).toString()).toEqual(`ARRAY[]`);
+    expect(SqlFunction.array(['x', 'y', 'z'] as any).toString()).toEqual(`ARRAY['x', 'y', 'z']`);
   });
 
   it('Function without args', () => {
