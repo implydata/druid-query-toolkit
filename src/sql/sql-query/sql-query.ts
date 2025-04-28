@@ -40,6 +40,7 @@ import { SqlLiteral } from '../sql-literal/sql-literal';
 import { SqlSetStatement } from '../sql-set-statement/sql-set-statement';
 import { SqlStar } from '../sql-star/sql-star';
 import { SqlTable } from '../sql-table/sql-table';
+import { SqlWithQuery } from '../sql-with-query/sql-with-query';
 import {
   clampIndex,
   NEWLINE,
@@ -98,9 +99,18 @@ export class SqlQuery extends SqlExpression {
   static readonly DEFAULT_SELECT_KEYWORD = 'SELECT';
   static readonly DEFAULT_UNION_KEYWORD = 'UNION ALL';
 
-  static create(from: string | SqlExpression | SqlFromClause): SqlQuery {
+  static from(from: string | SqlExpression | SqlFromClause): SqlQuery {
+    // Extract context from the inner query if given
+    let contextStatements: SeparatedArray<SqlSetStatement> | undefined;
+    if (from instanceof SqlQuery || from instanceof SqlWithQuery) {
+      contextStatements = from.contextStatements;
+      if (contextStatements) {
+        from = from.changeContextStatements(undefined);
+      }
+    }
+
     return new SqlQuery({
-      selectExpressions: SeparatedArray.fromSingleValue(SqlStar.PLAIN),
+      contextStatements,
       fromClause:
         from instanceof SqlFromClause
           ? from
@@ -113,20 +123,16 @@ export class SqlQuery extends SqlExpression {
   }
 
   static selectStarFrom(from: string | SqlExpression | SqlFromClause): SqlQuery {
-    return SqlQuery.create(from);
+    return SqlQuery.from(from).changeSelectExpressions(
+      SeparatedArray.fromSingleValue(SqlStar.PLAIN),
+    );
   }
 
-  static from(from: string | SqlExpression | SqlFromClause): SqlQuery {
-    return new SqlQuery({
-      fromClause:
-        from instanceof SqlFromClause
-          ? from
-          : SqlFromClause.create(
-              SeparatedArray.fromSingleValue(
-                typeof from === 'string' ? SqlTable.create(from) : from.convertToTable(),
-              ),
-            ),
-    });
+  /**
+   * @deprecated use selectStarFrom instead
+   */
+  static create(from: string | SqlExpression | SqlFromClause): SqlQuery {
+    return SqlQuery.selectStarFrom(from);
   }
 
   static parse(input: string | SqlQuery): SqlQuery {
@@ -347,11 +353,14 @@ export class SqlQuery extends SqlExpression {
   public changeContextStatements(
     contextStatements: SeparatedArray<SqlSetStatement> | SqlSetStatement[] | undefined,
   ): this {
+    const newContextStatements = SeparatedArray.fromPossiblyEmptyArray(contextStatements);
     const value = this.valueOf();
-    value.contextStatements =
-      contextStatements && !isEmptyArray(contextStatements)
-        ? SeparatedArray.fromArray(contextStatements)
-        : undefined;
+    if (newContextStatements) {
+      value.contextStatements = newContextStatements;
+    } else {
+      delete value.contextStatements;
+      value.spacing = this.getSpacingWithout('postSets');
+    }
     return SqlBase.fromValue(value);
   }
 
@@ -364,7 +373,9 @@ export class SqlQuery extends SqlExpression {
   }
 
   public changeContext(context: Record<string, any> | undefined): this {
-    return this.changeContextStatements(SqlSetStatement.contextToContextStatements(context));
+    return this.changeContextStatements(
+      context ? SqlSetStatement.contextToContextStatements(context) : undefined,
+    );
   }
 
   public changeExplain(explain: boolean): this {
@@ -673,6 +684,19 @@ export class SqlQuery extends SqlExpression {
     postorder: boolean,
   ): SqlQuery | undefined {
     let ret: SqlQuery = this;
+
+    if (this.contextStatements) {
+      const contextStatements = SqlBase.walkSeparatedArray(
+        this.contextStatements,
+        nextStack,
+        fn,
+        postorder,
+      );
+      if (!contextStatements) return;
+      if (contextStatements !== this.contextStatements) {
+        ret = ret.changeContextStatements(contextStatements);
+      }
+    }
 
     if (this.insertClause) {
       const insertClause = this.insertClause._walkHelper(nextStack, fn, postorder);

@@ -12,11 +12,29 @@
  * limitations under the License.
  */
 
-Start = initial:_? thing:(SqlQueryWithPossibleContext / SqlAlias) final:_sc?
+Start = initial:_ thing:(SqlQueryWithPossibleContext / SqlAlias) final:_sc
 {
   if (initial) thing = thing.changeSpace('initial', initial);
   if (final) thing = thing.changeSpace('final', final);
   return thing;
+}
+
+StartSetStatementsOnly = spaceBefore:_ statements:(SqlSetStatement _sc)* rest:$(.*)
+{
+  let ret = {
+    spaceBefore: spaceBefore,
+    rest: rest
+  }
+
+  if (statements.length) {
+    ret.contextStatements = new S.SeparatedArray(
+      statements.map(function(x) { return x[0] }),
+      statements.map(function(x) { return x[1] }).slice(0, statements.length - 1)
+    );
+    ret.spaceAfter = statements[statements.length - 1][1];
+  }
+
+  return ret;
 }
 
 // ------------------------------
@@ -59,6 +77,38 @@ SqlLabeledExpression = label:RefNameAlias preArrow:_ "=>" postArrow:_ expression
       postArrow: postArrow
     },
     expression: expression
+  });
+}
+
+SqlKeyValue = LongKeyValueForm / ShortKeyValueForm
+
+LongKeyValueForm = keyToken:KeyToken postKey:_ key:Expression postKeyExpression:_ valueToken:ValueToken preValueExpression:_ value:Expression
+{
+  return new S.SqlKeyValue({
+    key: key,
+    value: value,
+    spacing: {
+      postKey: postKey,
+      postKeyExpression: postKeyExpression,
+      preValueExpression: preValueExpression
+    },
+    keywords: {
+      key: keyToken,
+      value: valueToken
+    }
+  });
+}
+
+ShortKeyValueForm = key:Expression postKeyExpression:_ ":" preValueExpression:_ value:Expression
+{
+  return new S.SqlKeyValue({
+    key: key,
+    value: value,
+    short: true,
+    spacing: {
+      postKeyExpression: postKeyExpression,
+      preValueExpression: preValueExpression
+    }
   });
 }
 
@@ -1010,6 +1060,7 @@ Function =
 / TimestampAddDiffFunction
 / PositionFunction
 / JsonValueReturningFunction
+/ JsonObjectFunction
 / ArrayFunction
 / NakedFunction
 
@@ -1169,6 +1220,32 @@ JsonValueReturningFunction =
       postArguments: postArguments,
     }
   });
+}
+
+JsonObjectFunction =
+  functionName:JsonObjectToken
+  preLeftParen:_
+  OpenParen
+  postLeftParen:_
+  head:SqlKeyValue?
+  tail:(CommaSeparator SqlKeyValue)*
+  postArguments:_
+  CloseParen
+{
+  var value = {
+    functionName: makeFunctionName(functionName)
+  };
+  var spacing = value.spacing = {
+    preLeftParen: preLeftParen,
+    postLeftParen: postLeftParen
+  };
+
+  if (head) {
+    value.args = makeSeparatedArray(head, tail);
+    spacing.postArguments = postArguments;
+  }
+
+  return new S.SqlFunction(value);
 }
 
 ExtractFunction =
@@ -1881,6 +1958,9 @@ IntoToken = $("INTO"i !IdentifierPart)
 IsToken = $("IS"i !IdentifierPart)
 JoinToken = $("JOIN"i !IdentifierPart)
 JsonValueToken = $("JSON_VALUE"i !IdentifierPart)
+JsonObjectToken = $("JSON_OBJECT"i !IdentifierPart)
+KeyToken = $("KEY"i !IdentifierPart)
+ValueToken = $("VALUE"i !IdentifierPart)
 LeadingToken = $("LEADING"i !IdentifierPart)
 LikeToken = $("LIKE"i !IdentifierPart)
 LimitToken = $("LIMIT"i !IdentifierPart)

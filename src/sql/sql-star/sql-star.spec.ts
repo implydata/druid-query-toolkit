@@ -16,8 +16,8 @@ import { backAndForth } from '../../test-utils';
 import { SqlExpression } from '../sql-expression';
 
 describe('SqlStar', () => {
-  it('things that work', () => {
-    const queries: string[] = [
+  describe('star expressions', () => {
+    it.each([
       'SELECT *',
       `SELECT hello. *`,
       `SELECT "hello" . *`,
@@ -25,16 +25,9 @@ describe('SqlStar', () => {
       `SELECT "a""b".*`,
       `SELECT a . b . *`,
       `SELECT "a""b".c.*`,
-    ];
-
-    for (const sql of queries) {
-      try {
-        backAndForth(sql);
-      } catch (e) {
-        console.log(`Problem with: \`${sql}\``);
-        throw e;
-      }
-    }
+    ])('correctly parses: %s', sql => {
+      backAndForth(sql);
+    });
   });
 
   it('without quotes + namespace', () => {

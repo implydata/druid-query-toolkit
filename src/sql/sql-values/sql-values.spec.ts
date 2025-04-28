@@ -21,21 +21,12 @@ import { SqlRecord } from '../sql-record/sql-record';
 import { SqlValues } from './sql-values';
 
 describe('SqlValues', () => {
-  it('things that work', () => {
-    const queries: string[] = [
-      `VALUES (1), (2)`,
-      `VALUES   (1, 2), (3, 4), (5, 6)  ORDER  BY  1  DESC`,
-      `VALUES (1, 2), (3, 4), (5, 6) ORDER BY 1 DESC LIMIT 2`,
-    ];
-
-    for (const sql of queries) {
-      try {
-        backAndForth(sql, SqlValues);
-      } catch (e) {
-        console.log(`Problem with: \`${sql}\``);
-        throw e;
-      }
-    }
+  it.each([
+    `VALUES (1), (2)`,
+    `VALUES   (1, 2), (3, 4), (5, 6)  ORDER  BY  1  DESC`,
+    `VALUES (1, 2), (3, 4), (5, 6) ORDER BY 1 DESC LIMIT 2`,
+  ])('does back and forth with %s', sql => {
+    backAndForth(sql, SqlValues);
   });
 
   it('.create', () => {

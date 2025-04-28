@@ -13,16 +13,15 @@
  */
 
 import { backAndForth } from '../../test-utils';
-import { SqlColumn, SqlExpression, SqlFunction, SqlStar } from '..';
+import { SqlColumn, SqlExpression, SqlFunction, SqlKeyValue, SqlLiteral, SqlStar } from '..';
 
 describe('SqlFunction', () => {
-  it('things that work', () => {
-    const functionExpressions: string[] = [
+  describe('parsing various SQL functions', () => {
+    it.each([
       `COUNT(*)`,
       `"COUNT"(*)`,
       `COUNT(DISTINCT blah)`,
       `COUNT(ALL blah)`,
-
       "position('b' in 'abc')",
       "position('' in 'abc')",
       "position('b' in 'abcabc' FROM 3)",
@@ -41,28 +40,23 @@ describe('SqlFunction', () => {
       "position(x'cc' in x'aabbccdd' FROM 2)",
       "position(x'' in x'aabbcc' FROM 3)",
       "position (x'' in x'aabbcc' FROM 10)",
-
       "trim(leading 'eh' from 'hehe__hehe')",
       "trim(trailing 'eh' from 'hehe__hehe')",
       "trim('eh' from 'hehe__hehe')",
       `"trim" ('eh' from 'hehe__hehe')`,
-
       `JSON_VALUE(my_json, '$.x')`,
       `JSON_VALUE(my_json, '$.x' RETURNING DOUBLE)`,
-
       `SomeFn("arg1" => "boo")`,
       `"SomeFn" ("arg1" => "boo")`,
       `"ext" .  "SomeFn" ("arg1" => "boo")`,
       `LOCAL(path => '/tmp/druid')`,
       `EXTERN(LOCAL("path" => '/tmp/druid'))`,
       `NESTED_AGG(TIME_FLOOR(t.__time, 'P1D'), COUNT(DISTINCT t."ip") AS "daily_unique", AVG("daily_unique"))`,
-
       `TABLE(extern('{...}', '{...}', '[...]'))`,
       `"TABLE" (extern('{...}', '{...}', '[...]'))`,
       `TABLE(extern('{...}', '{...}')) EXTEND (x VARCHAR, y BIGINT, z TYPE('COMPLEX<json>'))`,
       `TABLE(extern('{...}', '{...}'))  (x VARCHAR, y BIGINT, z TYPE('COMPLEX<json>'))`,
       `TABLE(extern('{...}', '{...}'))  EXTEND  (xs VARCHAR   ARRAY, ys BIGINT  ARRAY, zs DOUBLE  ARRAY)`,
-
       `SUM(COUNT(*)) OVER ()`,
       `SUM(COUNT(*))   Over  ("windowName"  Order by COUNT(*) Desc)`,
       `ROW_NUMBER() OVER (PARTITION BY t."country", t."city" ORDER BY COUNT(*) DESC)`,
@@ -73,20 +67,12 @@ describe('SqlFunction', () => {
       `ROW_NUMBER() OVER (PARTITION BY t."country", t."city" ORDER BY COUNT(*) DESC RANGE UNBOUNDED FOLLOWING)`,
       `ROW_NUMBER() OVER (PARTITION BY t."country", t."city" ORDER BY COUNT(*) DESC RANGE BETWEEN UNBOUNDED FOLLOWING AND CURRENT ROW)`,
       `count(*) over (partition by cityName order by countryName rows between unbounded preceding and 1 preceding)`,
-
       `PI`,
       `CURRENT_TIMESTAMP`,
       `UNNEST(t)`,
-    ];
-
-    for (const sql of functionExpressions) {
-      try {
-        backAndForth(sql, SqlFunction);
-      } catch (e) {
-        console.log(`Problem with: \`${sql}\``);
-        throw e;
-      }
-    }
+    ])('correctly parses: %s', sql => {
+      backAndForth(sql, SqlFunction);
+    });
   });
 
   it('is smart about clearing separators', () => {
@@ -130,6 +116,95 @@ describe('SqlFunction', () => {
     );
   });
 
+  describe('.jsonObject', () => {
+    it('with no arguments', () => {
+      expect(SqlFunction.jsonObject().toString()).toEqual('JSON_OBJECT()');
+      expect(SqlFunction.jsonObject({}).toString()).toEqual('JSON_OBJECT()');
+    });
+
+    it('with object of key-value pairs', () => {
+      expect(SqlFunction.jsonObject({ name: 'John', age: 30 }).toString()).toEqual(
+        `JSON_OBJECT('name':'John', 'age':30)`,
+      );
+    });
+
+    it('with nested object', () => {
+      expect(
+        SqlFunction.jsonObject({
+          name: 'John',
+          age: { years: 30, months: 1 },
+          hobbies: ['skiing', 'sleeping'],
+        }).toString(),
+      ).toEqual(
+        `JSON_OBJECT('name':'John', 'age':JSON_OBJECT('years':30, 'months':1), 'hobbies':ARRAY['skiing', 'sleeping'])`,
+      );
+    });
+
+    it('with a single SqlKeyValue (longhand)', () => {
+      const keyValue = SqlKeyValue.create(SqlLiteral.create('name'), SqlLiteral.create('John'));
+      expect(SqlFunction.jsonObject(keyValue).toString()).toEqual(
+        `JSON_OBJECT(KEY 'name' VALUE 'John')`,
+      );
+    });
+
+    it('with a single SqlKeyValue (shorthand)', () => {
+      const keyValue = SqlKeyValue.short(SqlLiteral.create('name'), SqlLiteral.create('John'));
+      expect(SqlFunction.jsonObject(keyValue).toString()).toEqual(`JSON_OBJECT('name':'John')`);
+    });
+
+    it('with an array of SqlKeyValue objects (longhand)', () => {
+      const keyValues = [
+        SqlKeyValue.create(SqlLiteral.create('name'), SqlLiteral.create('John')),
+        SqlKeyValue.create(SqlLiteral.create('age'), SqlLiteral.create(30)),
+      ];
+      expect(SqlFunction.jsonObject(keyValues).toString()).toEqual(
+        `JSON_OBJECT(KEY 'name' VALUE 'John', KEY 'age' VALUE 30)`,
+      );
+    });
+
+    it('with an array of SqlKeyValue objects (shorthand)', () => {
+      const keyValues = [
+        SqlKeyValue.short(SqlLiteral.create('name'), SqlLiteral.create('John')),
+        SqlKeyValue.short(SqlLiteral.create('age'), SqlLiteral.create(30)),
+      ];
+      expect(SqlFunction.jsonObject(keyValues).toString()).toEqual(
+        `JSON_OBJECT('name':'John', 'age':30)`,
+      );
+    });
+
+    it('with mixed longhand and shorthand SqlKeyValue objects', () => {
+      const keyValues = [
+        SqlKeyValue.create(SqlLiteral.create('name'), SqlLiteral.create('John')),
+        SqlKeyValue.short(SqlLiteral.create('age'), SqlLiteral.create(30)),
+      ];
+      expect(SqlFunction.jsonObject(keyValues).toString()).toEqual(
+        `JSON_OBJECT(KEY 'name' VALUE 'John', 'age':30)`,
+      );
+    });
+
+    it('with SqlExpression keys and values', () => {
+      const keyValues = SqlKeyValue.create(
+        SqlExpression.parse('column_name'),
+        SqlExpression.parse('column_value'),
+      );
+      expect(SqlFunction.jsonObject(keyValues).toString()).toEqual(
+        'JSON_OBJECT(KEY column_name VALUE column_value)',
+      );
+    });
+
+    it('with complex expressions', () => {
+      // Create complex expressions using the builder pattern
+      const userId = SqlColumn.create('user').concat(SqlColumn.create('id'));
+      const valueAsVarchar = SqlFunction.cast(SqlColumn.create('value'), 'VARCHAR');
+
+      const keyValues = SqlKeyValue.short(userId, valueAsVarchar);
+
+      expect(SqlFunction.jsonObject(keyValues).toString()).toEqual(
+        'JSON_OBJECT("user" || "id":CAST("value" AS VARCHAR))',
+      );
+    });
+  });
+
   it('.floor', () => {
     expect(SqlFunction.floor(SqlColumn.create('__time'), 'Hour').toString()).toEqual(
       'FLOOR("__time" TO Hour)',
@@ -138,6 +213,19 @@ describe('SqlFunction', () => {
 
   it('.arrayOfLiterals', () => {
     expect(SqlFunction.arrayOfLiterals(['a', 'b', 'c']).toString()).toEqual(`ARRAY['a', 'b', 'c']`);
+  });
+
+  it('.array', () => {
+    expect(SqlFunction.array().toString()).toEqual(`ARRAY[]`);
+    expect(SqlFunction.array('a', 'b', 'c').toString()).toEqual(`ARRAY['a', 'b', 'c']`);
+    expect(SqlFunction.array(1, 2, 3).toString()).toEqual(`ARRAY[1, 2, 3]`);
+    expect(
+      SqlFunction.array(SqlColumn.create('col1'), SqlColumn.create('col2')).toString(),
+    ).toEqual(`ARRAY["col1", "col2"]`);
+
+    // Test the backward compatibility case
+    expect(SqlFunction.array([] as any).toString()).toEqual(`ARRAY[]`);
+    expect(SqlFunction.array(['x', 'y', 'z'] as any).toString()).toEqual(`ARRAY['x', 'y', 'z']`);
   });
 
   it('Function without args', () => {

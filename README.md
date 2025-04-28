@@ -75,14 +75,13 @@ ORDER BY 5 DESC
  */
 ```
 
-For more examples check out the unit tests.
+For more examples, check out the unit tests.
 
 #### ToDo
 
 Not every valid DruidSQL construct can currently be parsed, the following snippets are not currently supported:
 
 - `(a, b) IN (subquery)`
-- Support `FROM "wikipedia_k" USING (k)`
 
 ## License
 

@@ -16,18 +16,12 @@ import { SqlExpression, SqlNamespace, SqlTable } from '../..';
 import { backAndForth } from '../../test-utils';
 
 describe('SqlTable', () => {
-  it('things that work', () => {
-    const queries: string[] = [`hello`, `"hello"`, `"""hello"""`, `"a""b"`, `a.b`, `"a""b".c`];
-
-    for (const sql of queries) {
-      try {
-        backAndForth(sql);
-      } catch (e) {
-        console.log(`Problem with: \`${sql}\``);
-        throw e;
-      }
-    }
-  });
+  it.each([`hello`, `"hello"`, `"""hello"""`, `"a""b"`, `a.b`, `"a""b".c`])(
+    'does back and forth with %s',
+    sql => {
+      backAndForth(sql);
+    },
+  );
 
   it('avoids reserved', () => {
     const sql = 'From';

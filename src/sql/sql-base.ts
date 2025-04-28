@@ -75,6 +75,7 @@ export type SqlTypeDesignator =
   | 'joinPart'
   | 'alias'
   | 'labeledExpression'
+  | 'keyValue'
   | 'betweenPart'
   | 'likePart'
   | 'comparison'
@@ -119,6 +120,7 @@ export type KeywordName =
   | 'into'
   | 'join'
   | 'joinType'
+  | 'key'
   | 'limit'
   | 'natural'
   | 'offset'
@@ -144,6 +146,7 @@ export type KeywordName =
   | 'unbounded'
   | 'union'
   | 'using'
+  | 'value'
   | 'values'
   | 'when'
   | 'where'
@@ -167,6 +170,7 @@ export type SpaceName =
   | 'postDecorator'
   | 'postDot'
   | 'postElse'
+  | 'postKeyExpression'
   | 'postEquals'
   | 'postEscape'
   | 'postExplainPlanFor'
@@ -246,6 +250,7 @@ export type SpaceName =
   | 'prePartitionedByClause'
   | 'preUnion'
   | 'preUsing'
+  | 'preValueExpression'
   | 'preWhereClause';
 
 export interface SqlBaseValue {

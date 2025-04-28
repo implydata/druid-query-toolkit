@@ -170,11 +170,14 @@ export class SqlWithQuery extends SqlExpression {
   public changeContextStatements(
     contextStatements: SeparatedArray<SqlSetStatement> | SqlSetStatement[] | undefined,
   ): this {
+    const newContextStatements = SeparatedArray.fromPossiblyEmptyArray(contextStatements);
     const value = this.valueOf();
-    value.contextStatements =
-      contextStatements && !isEmptyArray(contextStatements)
-        ? SeparatedArray.fromArray(contextStatements)
-        : undefined;
+    if (newContextStatements) {
+      value.contextStatements = newContextStatements;
+    } else {
+      delete value.contextStatements;
+      value.spacing = this.getSpacingWithout('postSets');
+    }
     return SqlBase.fromValue(value);
   }
 
@@ -187,7 +190,9 @@ export class SqlWithQuery extends SqlExpression {
   }
 
   public changeContext(context: Record<string, any>): this {
-    return this.changeContextStatements(SqlSetStatement.contextToContextStatements(context));
+    return this.changeContextStatements(
+      context ? SqlSetStatement.contextToContextStatements(context) : undefined,
+    );
   }
 
   public changeExplain(explain: boolean): this {
@@ -368,6 +373,19 @@ export class SqlWithQuery extends SqlExpression {
     postorder: boolean,
   ): SqlWithQuery | undefined {
     let ret: SqlWithQuery = this;
+
+    if (this.contextStatements) {
+      const contextStatements = SqlBase.walkSeparatedArray(
+        this.contextStatements,
+        nextStack,
+        fn,
+        postorder,
+      );
+      if (!contextStatements) return;
+      if (contextStatements !== this.contextStatements) {
+        ret = ret.changeContextStatements(contextStatements);
+      }
+    }
 
     if (this.insertClause) {
       const insertClause = this.insertClause._walkHelper(nextStack, fn, postorder);

@@ -40,7 +40,7 @@ export class Introspect {
   }
 
   static getQueryColumnIntrospectionQuery(query: SqlQuery | SqlTable): SqlQuery {
-    return SqlQuery.create(query).changeLimitValue(0);
+    return SqlQuery.selectStarFrom(query).changeLimitValue(0);
   }
 
   static getQueryColumnIntrospectionPayload(

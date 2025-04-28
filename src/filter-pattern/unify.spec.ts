@@ -36,8 +36,8 @@ function backAndForthNotCustom(expression: string): void {
 }
 
 describe('filter-pattern', () => {
-  it('fixed points', () => {
-    const expressions: string[] = [
+  describe('fixed point expressions', () => {
+    it.each([
       `"lol" = 'hello'`,
       `"lol" <> 'hello'`,
       `"lol" IN ('hello', 'goodbye')`,
@@ -67,28 +67,19 @@ describe('filter-pattern', () => {
       `TIMESTAMP '2022-06-30 22:56:14.123' <= "__time" AND "__time" <= TIMESTAMP '2022-06-30 22:56:15.923'`,
       `TIMESTAMP '2022-06-30 22:56:14.123' < "__time" AND "__time" <= TIMESTAMP '2022-06-30 22:56:15.923'`,
       `(TIME_FLOOR(MAX_DATA_TIME(), 'P3M', NULL, 'Etc/UTC') <= "DIM:__time" AND "DIM:__time" < TIME_SHIFT(TIME_FLOOR(MAX_DATA_TIME(), 'P3M', NULL, 'Etc/UTC'), 'P1D', 1, 'Etc/UTC'))`,
-    ];
-
-    for (const expression of expressions) {
-      try {
-        backAndForthNotCustom(expression);
-      } catch (e) {
-        console.log(`Problem with: \`${expression}\``);
-        throw e;
-      }
-    }
+    ])('correctly handles expression: %s', expression => {
+      backAndForthNotCustom(expression);
+    });
   });
 
-  it('invalid expressions', () => {
-    const expressions: string[] = [
+  describe('invalid expressions', () => {
+    it.each([
       `"__time" >= TIMESTAMP '2022-06-30 22:56:15.923' AND TIMESTAMP '2021-06-30 22:56:14.123' >= "__time"`,
       `TIMESTAMP '2021-06-30 22:56:14.123' >= "__time" AND "__time" >= TIMESTAMP '2022-06-30 22:56:15.923'`,
-    ];
-
-    for (const expression of expressions) {
+    ])('correctly handles invalid expression: %s', expression => {
       const pattern = fitFilterPattern(SqlExpression.parse(expression));
       expect(pattern.type).toEqual('custom');
-    }
+    });
   });
 
   describe('fitFilterPattern', () => {

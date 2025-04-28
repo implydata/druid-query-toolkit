@@ -1642,19 +1642,7 @@ describe('Druid test queries', () => {
     `,
   ];
 
-  it('all queries work', () => {
-    const bad: string[] = [];
-    for (const sql of queries) {
-      try {
-        backAndForth(sql);
-      } catch (e) {
-        bad.push(sql);
-        console.log('=====================================');
-        console.log(sql);
-        console.log(e);
-      }
-    }
-
-    expect(bad).toEqual([]);
+  it.each(queries)('correctly parses: %#', sql => {
+    backAndForth(sql);
   });
 });

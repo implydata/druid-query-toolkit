@@ -143,6 +143,10 @@ export class SqlAlias extends SqlExpression {
   public getUnderlyingExpression(): SqlExpression {
     return this.expression;
   }
+
+  public changeUnderlyingExpression(newExpression: SqlExpression): SqlExpression {
+    return this.changeExpression(newExpression);
+  }
 }
 
 SqlBase.register(SqlAlias);

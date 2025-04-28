@@ -16,8 +16,8 @@ import { SqlColumn, SqlExpression, SqlQuery } from '../..';
 import { backAndForth } from '../../test-utils';
 
 describe('SqlColumn', () => {
-  it('things that work', () => {
-    const queries: string[] = [
+  describe('column expressions', () => {
+    it.each([
       `hello`,
       `h`,
       `_hello`,
@@ -27,16 +27,9 @@ describe('SqlColumn', () => {
       `a.b`,
       `"a""b".c`,
       `U&"fo\\feffo"`, // \ufeff = invisible space
-    ];
-
-    for (const sql of queries) {
-      try {
-        backAndForth(sql);
-      } catch (e) {
-        console.log(`Problem with: \`${sql}\``);
-        throw e;
-      }
-    }
+    ])('correctly parses: %s', sql => {
+      backAndForth(sql);
+    });
   });
 
   it('avoids reserved', () => {

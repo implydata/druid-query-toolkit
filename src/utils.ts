@@ -55,6 +55,14 @@ export function isEmptyArray(x: unknown): x is unknown[] {
   return Array.isArray(x) && !x.length;
 }
 
+export function isDate(v: any): v is Date {
+  return Boolean(v && typeof v.toISOString === 'function');
+}
+
+export function isInteger(v: number): boolean {
+  return isFinite(v) && Math.floor(v) === v;
+}
+
 export function compact<T>(xs: (T | undefined | false | null | '')[]): T[] {
   return xs.filter(Boolean) as T[];
 }
@@ -64,13 +72,13 @@ export function sane(_x: TemplateStringsArray) {
   // eslint-disable-next-line prefer-rest-params,prefer-spread
   const str = String.raw.apply(String, arguments as any);
 
-  const match = /^\n( *)/m.exec(str);
+  const match = /^\n+( *)/m.exec(str);
   if (!match) throw new Error('sane string must start with a \\n is:' + str);
   const spaces = match[1]!.length;
 
   let lines = str.split('\n');
   lines.shift(); // Remove the first empty lines
-  lines = lines.map(line => line.substr(spaces)); // Remove indentation
+  lines = lines.map(line => line.slice(spaces)); // Remove indentation
   if (lines[lines.length - 1] === '') lines.pop(); // Remove last line if empty
 
   return lines

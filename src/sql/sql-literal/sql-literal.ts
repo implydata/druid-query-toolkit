@@ -12,19 +12,12 @@
  * limitations under the License.
  */
 
+import { isDate, isInteger } from '../../utils';
 import type { SqlBaseValue, SqlTypeDesignator } from '../sql-base';
 import { SqlBase } from '../sql-base';
 import type { DecomposeViaOptions } from '../sql-expression';
 import { SqlExpression } from '../sql-expression';
 import { needsUnicodeEscape, sqlEscapeUnicode, trimString } from '../utils';
-
-function isDate(v: any): v is Date {
-  return Boolean(v && typeof v.toISOString === 'function');
-}
-
-function isInteger(v: number): boolean {
-  return isFinite(v) && Math.floor(v) === v;
-}
 
 export type LiteralValue = null | boolean | number | bigint | string | Date;
 
