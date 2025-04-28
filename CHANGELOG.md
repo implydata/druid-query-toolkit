@@ -1,5 +1,11 @@
 # druid-query-toolkit
 
+## 1.1.0
+
+### Minor Changes
+
+- 30dec4b: Allow parsing SET statements in an otherwise unparsable string and more integrations"
+
 ## 1.0.4
 
 ### Patch Changes
