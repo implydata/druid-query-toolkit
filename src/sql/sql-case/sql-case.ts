@@ -15,6 +15,7 @@
 import type { SqlBaseValue, SqlTypeDesignator, Substitutor } from '../sql-base';
 import { SqlBase } from '../sql-base';
 import { SqlExpression } from '../sql-expression';
+import type { LiteralValue } from '../sql-literal/sql-literal';
 import { SeparatedArray, SPACE } from '../utils';
 
 import { SqlWhenThenPart } from './sql-when-then-part';
@@ -34,14 +35,15 @@ export class SqlCase extends SqlExpression {
 
   static ifThenElse(
     conditionExpression: SqlExpression,
-    thenExpression: SqlExpression,
-    elseExpression?: SqlExpression,
+    thenExpression: SqlExpression | LiteralValue,
+    elseExpression?: SqlExpression | LiteralValue,
   ) {
     return new SqlCase({
       whenThenParts: SeparatedArray.fromSingleValue(
         SqlWhenThenPart.create(conditionExpression, thenExpression),
       ),
-      elseExpression,
+      elseExpression:
+        typeof elseExpression !== 'undefined' ? SqlExpression.wrap(elseExpression) : undefined,
     });
   }
 
