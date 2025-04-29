@@ -183,7 +183,7 @@ describe('SqlQuery', () => {
       `);
     });
 
-    it('works in advanced case', () => {
+    it('works with context', () => {
       const query = SqlQuery.selectStarFrom(
         SqlQuery.selectStarFrom(SqlTable.create('lol')).changeContext({ a: 1 }),
       )
@@ -206,6 +206,33 @@ describe('SqlQuery', () => {
           SELECT *
           FROM "lol"
         )
+        WHERE channel  =  '#en.wikipedia'
+      `);
+    });
+
+    it('works with context and alias', () => {
+      const query = SqlQuery.selectStarFrom(
+        SqlQuery.selectStarFrom(SqlTable.create('lol')).changeContext({ a: 1 }).as('t'),
+      )
+        .changeSelectExpressions([
+          SqlColumn.create('channel'),
+          SqlColumn.create('page'),
+          SqlColumn.create('user'),
+          SqlColumn.create('as'),
+        ])
+        .changeWhereExpression(SqlExpression.parse(`channel  =  '#en.wikipedia'`));
+
+      expect(String(query)).toEqual(sane`
+        SET a = 1;
+        SELECT
+          "channel",
+          "page",
+          "user",
+          "as"
+        FROM (
+          SELECT *
+          FROM "lol"
+        ) AS "t"
         WHERE channel  =  '#en.wikipedia'
       `);
     });
