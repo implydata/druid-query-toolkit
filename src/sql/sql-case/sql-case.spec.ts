@@ -26,6 +26,32 @@ describe('CaseExpression', () => {
     backAndForth(sql, SqlCase);
   });
 
+  it('.ifThenElse', () => {
+    // Test with condition, then, and else
+    const condition = SqlExpression.parse('x > 5');
+    const thenExpr = SqlExpression.parse('"result is true"');
+    const elseExpr = SqlExpression.parse('"result is false"');
+
+    expect(SqlCase.ifThenElse(condition, thenExpr, elseExpr).toString()).toEqual(
+      'CASE WHEN x > 5 THEN "result is true" ELSE "result is false" END',
+    );
+
+    // Test with literal values
+    expect(SqlCase.ifThenElse(condition, 'yes', 'no').toString()).toEqual(
+      `CASE WHEN x > 5 THEN 'yes' ELSE 'no' END`,
+    );
+
+    // Test numeric literals
+    expect(SqlCase.ifThenElse(condition, 1, 0).toString()).toEqual(
+      'CASE WHEN x > 5 THEN 1 ELSE 0 END',
+    );
+
+    // Test without else expression
+    expect(SqlCase.ifThenElse(condition, thenExpr).toString()).toEqual(
+      'CASE WHEN x > 5 THEN "result is true" END',
+    );
+  });
+
   it('caseless CASE Expression', () => {
     const sql = `CASE WHEN B THEN C END`;
 

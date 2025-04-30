@@ -102,10 +102,13 @@ export class SqlQuery extends SqlExpression {
   static from(from: string | SqlExpression | SqlFromClause): SqlQuery {
     // Extract context from the inner query if given
     let contextStatements: SeparatedArray<SqlSetStatement> | undefined;
-    if (from instanceof SqlQuery || from instanceof SqlWithQuery) {
-      contextStatements = from.contextStatements;
-      if (contextStatements) {
-        from = from.changeContextStatements(undefined);
+    if (from instanceof SqlExpression) {
+      const underlyingFrom = from.getUnderlyingExpression();
+      if (underlyingFrom instanceof SqlQuery || underlyingFrom instanceof SqlWithQuery) {
+        contextStatements = underlyingFrom.contextStatements;
+        if (contextStatements) {
+          from = from.changeUnderlyingExpression(underlyingFrom.changeContextStatements(undefined));
+        }
       }
     }
 

@@ -15,6 +15,7 @@
 import type { SqlBaseValue, SqlTypeDesignator, Substitutor } from '../sql-base';
 import { SqlBase } from '../sql-base';
 import { SqlExpression } from '../sql-expression';
+import type { LiteralValue } from '../sql-literal/sql-literal';
 import { SeparatedArray, Separator } from '../utils';
 
 export interface SqlWhenThenPartValue extends SqlBaseValue {
@@ -30,13 +31,13 @@ export class SqlWhenThenPart extends SqlBase {
 
   static create(
     whenExpressions: SeparatedArray<SqlExpression> | SqlExpression[] | SqlExpression,
-    thenExpression: SqlExpression,
+    thenExpression: SqlExpression | LiteralValue,
   ): SqlWhenThenPart {
     return new SqlWhenThenPart({
       whenExpressions: SeparatedArray.fromArray(
         whenExpressions instanceof SqlExpression ? [whenExpressions] : whenExpressions,
       ),
-      thenExpression: SqlExpression.verify(thenExpression),
+      thenExpression: SqlExpression.wrap(thenExpression),
     });
   }
 
