@@ -1,5 +1,11 @@
 # druid-query-toolkit
 
+## 1.1.1
+
+### Patch Changes
+
+- 76d8d4d: Propogate context in case of an alias also
+
 ## 1.1.0
 
 ### Minor Changes
