@@ -90,7 +90,7 @@ export class SqlValues extends SqlExpression {
 
   public changeRecords(records: SeparatedArray<SqlRecord> | SqlRecord[]): this {
     const value = this.valueOf();
-    value.records = SeparatedArray.fromArray(records, Separator.COMMA);
+    value.records = SeparatedArray.fromArray(records);
     return SqlBase.fromValue(value);
   }
 

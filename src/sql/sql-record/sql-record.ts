@@ -88,7 +88,7 @@ export class SqlRecord extends SqlExpression {
     if (!expressions || isEmptyArray(expressions)) {
       delete value.expressions;
     } else {
-      value.expressions = SeparatedArray.fromArray(expressions, Separator.COMMA);
+      value.expressions = SeparatedArray.fromArray(expressions);
     }
     return SqlBase.fromValue(value);
   }

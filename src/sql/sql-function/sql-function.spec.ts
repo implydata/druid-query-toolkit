@@ -14,6 +14,7 @@
 
 import { backAndForth } from '../../test-utils';
 import { SqlColumn, SqlExpression, SqlFunction, SqlKeyValue, SqlLiteral, SqlStar } from '..';
+import { RefName, SeparatedArray, Separator } from '../utils';
 
 describe('SqlFunction', () => {
   describe('parsing various SQL functions', () => {
@@ -226,6 +227,60 @@ describe('SqlFunction', () => {
     // Test the backward compatibility case
     expect(SqlFunction.array([] as any).toString()).toEqual(`ARRAY[]`);
     expect(SqlFunction.array(['x', 'y', 'z'] as any).toString()).toEqual(`ARRAY['x', 'y', 'z']`);
+  });
+
+  describe('.simple', () => {
+    it('with string function name and array of args', () => {
+      const args = [SqlLiteral.create('A'), null, 0, false];
+      const simpleFunc = SqlFunction.simple('MY_FUNC', args);
+
+      expect(simpleFunc.getEffectiveFunctionName()).toEqual('MY_FUNC');
+      expect(simpleFunc.toString()).toEqual("MY_FUNC('A', NULL, 0, FALSE)");
+    });
+
+    it('with RefName function name and SeparatedArray of args', () => {
+      const funcName = RefName.functionName('my_func');
+      const args = SeparatedArray.fromArray([SqlLiteral.create('test')], Separator.COMMA);
+      const simpleFunc = SqlFunction.simple(funcName, args);
+
+      expect(simpleFunc.getEffectiveFunctionName()).toEqual('MY_FUNC');
+      expect(simpleFunc.toString()).toEqual("my_func('test')");
+    });
+
+    it('with filter expression', () => {
+      const filterExpr = SqlExpression.parse('x > 10');
+      const simpleFunc = SqlFunction.simple('COUNT', [SqlStar.PLAIN], filterExpr);
+
+      expect(simpleFunc.toString()).toEqual('COUNT(*) FILTER (WHERE x > 10)');
+    });
+  });
+
+  describe('.decorated', () => {
+    it('with decorator and array of args', () => {
+      const args = [SqlColumn.create('user_id')];
+      const decoratedFunc = SqlFunction.decorated('COUNT', 'DISTINCT', args);
+
+      expect(decoratedFunc.getEffectiveDecorator()).toEqual('DISTINCT');
+      expect(decoratedFunc.toString()).toEqual('COUNT(DISTINCT "user_id")');
+    });
+
+    it('with undefined decorator', () => {
+      const args = [SqlLiteral.create(42)];
+      const decoratedFunc = SqlFunction.decorated('ABS', undefined, args);
+
+      expect(decoratedFunc.getEffectiveDecorator()).toBeUndefined();
+      expect(decoratedFunc.toString()).toEqual('ABS(42)');
+    });
+
+    it('with filter expression', () => {
+      const args = [SqlColumn.create('revenue')];
+      const filterExpr = SqlExpression.parse('country = "US"');
+      const decoratedFunc = SqlFunction.decorated('SUM', 'DISTINCT', args, filterExpr);
+
+      expect(decoratedFunc.toString()).toEqual(
+        'SUM(DISTINCT "revenue") FILTER (WHERE country = "US")',
+      );
+    });
   });
 
   it('Function without args', () => {

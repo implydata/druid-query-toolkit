@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { compact, filterMap, isDate } from '../../utils';
+import { cleanFunctionArguments, filterMap, isDate } from '../../utils';
 import { SPECIAL_FUNCTIONS } from '../special-functions';
 import type { SqlBaseValue, SqlTypeDesignator, Substitutor } from '../sql-base';
 import { SqlBase } from '../sql-base';
@@ -72,10 +72,7 @@ export class SqlFunction extends SqlExpression {
   ) {
     return new SqlFunction({
       functionName: RefName.functionName(functionName),
-      args: SeparatedArray.fromArray(
-        Array.isArray(args) ? args.map(SqlExpression.wrap) : args,
-        Separator.COMMA,
-      ),
+      args: SeparatedArray.fromArray(Array.isArray(args) ? args.map(SqlExpression.wrap) : args),
       whereClause: filter ? SqlWhereClause.createForFunction(filter) : undefined,
     });
   }
@@ -89,10 +86,7 @@ export class SqlFunction extends SqlExpression {
     return new SqlFunction({
       functionName: RefName.functionName(functionName),
       decorator: decorator,
-      args: SeparatedArray.fromArray(
-        Array.isArray(args) ? args.map(SqlExpression.wrap) : args,
-        Separator.COMMA,
-      ),
+      args: SeparatedArray.fromArray(Array.isArray(args) ? args.map(SqlExpression.wrap) : args),
       whereClause: filter ? SqlWhereClause.createForFunction(filter) : undefined,
     });
   }
@@ -218,7 +212,10 @@ export class SqlFunction extends SqlExpression {
     origin?: string | SqlLiteral,
     timezone?: string | SqlLiteral,
   ) {
-    return SqlFunction.simple('TIME_FLOOR', compact([timestampExpr, period, origin, timezone]));
+    return SqlFunction.simple(
+      'TIME_FLOOR',
+      cleanFunctionArguments([timestampExpr, period, origin, timezone]),
+    );
   }
 
   static timeCeil(
@@ -227,7 +224,10 @@ export class SqlFunction extends SqlExpression {
     origin?: string | SqlLiteral,
     timezone?: string | SqlLiteral,
   ) {
-    return SqlFunction.simple('TIME_CEIL', compact([timestampExpr, period, origin, timezone]));
+    return SqlFunction.simple(
+      'TIME_CEIL',
+      cleanFunctionArguments([timestampExpr, period, origin, timezone]),
+    );
   }
 
   static timeShift(
@@ -236,7 +236,10 @@ export class SqlFunction extends SqlExpression {
     step?: number | SqlLiteral,
     timezone?: string | SqlLiteral,
   ) {
-    return SqlFunction.simple('TIME_SHIFT', compact([timestampExpr, period, step, timezone]));
+    return SqlFunction.simple(
+      'TIME_SHIFT',
+      cleanFunctionArguments([timestampExpr, period, step, timezone]),
+    );
   }
 
   static array(...exs: (LiteralValue | SqlExpression)[]): SqlExpression {
