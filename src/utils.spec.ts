@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { cleanFunctionArguments } from '../utils';
+import { cleanFunctionArguments } from './utils';
 
 describe('utils', () => {
   describe('cleanFunctionArguments', () => {
