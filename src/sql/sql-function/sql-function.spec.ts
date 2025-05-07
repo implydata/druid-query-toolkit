@@ -212,6 +212,23 @@ describe('SqlFunction', () => {
     );
   });
 
+  it('.timeShift', () => {
+    // Test with all parameters
+    expect(SqlFunction.timeShift(SqlColumn.create('__time'), 'P1D', 1, 'UTC').toString()).toEqual(
+      "TIME_SHIFT(\"__time\", 'P1D', 1, 'UTC')",
+    );
+
+    // Test with missing timezone
+    expect(SqlFunction.timeShift(SqlColumn.create('__time'), 'P1D', 1).toString()).toEqual(
+      'TIME_SHIFT("__time", \'P1D\', 1)',
+    );
+
+    // Test with zero step
+    expect(SqlFunction.timeShift(SqlColumn.create('__time'), 'P1D', 0).toString()).toEqual(
+      'TIME_SHIFT("__time", \'P1D\', 0)',
+    );
+  });
+
   it('.arrayOfLiterals', () => {
     expect(SqlFunction.arrayOfLiterals(['a', 'b', 'c']).toString()).toEqual(`ARRAY['a', 'b', 'c']`);
   });

@@ -233,7 +233,7 @@ export class SqlFunction extends SqlExpression {
   static timeShift(
     timestampExpr: SqlExpression,
     period: string | SqlLiteral,
-    step?: number | SqlLiteral,
+    step: number | SqlLiteral,
     timezone?: string | SqlLiteral,
   ) {
     return SqlFunction.simple(
