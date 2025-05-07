@@ -12,13 +12,13 @@
  * limitations under the License.
  */
 
+import { RefName } from '../helpers';
 import type { SqlBaseValue, SqlTypeDesignator } from '../sql-base';
 import { SqlBase } from '../sql-base';
 import { SqlColumn } from '../sql-column/sql-column';
 import { SqlExpression } from '../sql-expression';
 import { SqlNamespace } from '../sql-namespace/sql-namespace';
 import { SqlStar } from '../sql-star/sql-star';
-import { RefName } from '../utils';
 
 export interface SqlTableValue extends SqlBaseValue {
   refName: RefName;

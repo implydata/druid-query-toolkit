@@ -14,7 +14,7 @@
 
 import { backAndForth } from '../../test-utils';
 import { SqlColumn, SqlExpression, SqlFunction, SqlKeyValue, SqlLiteral, SqlStar } from '..';
-import { RefName, SeparatedArray, Separator } from '../utils';
+import { RefName, SeparatedArray, Separator } from '../helpers';
 
 describe('SqlFunction', () => {
   describe('parsing various SQL functions', () => {

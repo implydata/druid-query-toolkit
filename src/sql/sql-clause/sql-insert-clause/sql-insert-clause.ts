@@ -12,12 +12,12 @@
  * limitations under the License.
  */
 
+import { NEWLINE } from '../../helpers';
 import type { SqlTypeDesignator, Substitutor } from '../../sql-base';
 import { SqlBase } from '../../sql-base';
 import type { SqlColumnList } from '../../sql-column-list/sql-column-list';
 import { SqlExpression } from '../../sql-expression';
 import { SqlTable } from '../../sql-table/sql-table';
-import { NEWLINE } from '../../utils';
 import type { SqlClauseValue } from '../sql-clause';
 import { SqlClause } from '../sql-clause';
 

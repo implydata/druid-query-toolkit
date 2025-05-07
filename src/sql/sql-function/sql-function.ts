@@ -13,6 +13,7 @@
  */
 
 import { cleanFunctionArguments, filterMap, isDate } from '../../utils';
+import { RefName, SeparatedArray, Separator } from '../helpers';
 import { SPECIAL_FUNCTIONS } from '../special-functions';
 import type { SqlBaseValue, SqlTypeDesignator, Substitutor } from '../sql-base';
 import { SqlBase } from '../sql-base';
@@ -27,7 +28,6 @@ import { SqlNamespace } from '../sql-namespace/sql-namespace';
 import { SqlStar } from '../sql-star/sql-star';
 import { SqlType } from '../sql-type/sql-type';
 import type { SqlWindowSpec } from '../sql-window-spec/sql-window-spec';
-import { RefName, SeparatedArray, Separator } from '../utils';
 
 const specialFunctionLookup: Record<string, boolean> = {};
 for (const r of SPECIAL_FUNCTIONS) {

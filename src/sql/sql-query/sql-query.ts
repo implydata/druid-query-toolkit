@@ -13,6 +13,15 @@
  */
 
 import { filterMap, isEmptyArray } from '../../utils';
+import {
+  clampIndex,
+  NEWLINE,
+  NEWLINE_INDENT,
+  normalizeIndex,
+  SeparatedArray,
+  Separator,
+  SPACE,
+} from '../helpers';
 import { parse as parseSql } from '../parser';
 import type { SqlBaseValue, SqlTypeDesignator, Substitutor } from '../sql-base';
 import { SqlBase } from '../sql-base';
@@ -41,15 +50,6 @@ import { SqlSetStatement } from '../sql-set-statement/sql-set-statement';
 import { SqlStar } from '../sql-star/sql-star';
 import { SqlTable } from '../sql-table/sql-table';
 import { SqlWithQuery } from '../sql-with-query/sql-with-query';
-import {
-  clampIndex,
-  NEWLINE,
-  NEWLINE_INDENT,
-  normalizeIndex,
-  SeparatedArray,
-  Separator,
-  SPACE,
-} from '../utils';
 
 export type SqlQueryDecorator = 'ALL' | 'DISTINCT';
 
