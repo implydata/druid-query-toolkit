@@ -16,8 +16,8 @@ import { cleanObject, dedupe, objectMap } from '../utils';
 
 import type { SeparatedArray } from '.';
 import { indentLines, SqlColumn, SqlFunction, SqlLiteral, SqlMulti, SqlTable } from '.';
+import { NEWLINE, SPACE } from './helpers';
 import { parse as parseSql } from './parser';
-import { NEWLINE, SPACE } from './utils';
 
 export interface Parens {
   leftSpacing?: string;

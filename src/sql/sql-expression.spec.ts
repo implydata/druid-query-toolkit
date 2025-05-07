@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { RefName, SqlBase, SqlColumn, SqlExpression, SqlLiteral } from '..';
+import { RefName, sane, SqlBase, SqlColumn, SqlExpression, SqlLiteral } from '..';
 import { backAndForth, backAndForthPrettify, mapString } from '../test-utils';
 
 describe('SqlExpression', () => {
@@ -81,7 +81,15 @@ describe('SqlExpression', () => {
               SqlExpression.parse('NOT k = 1'),
             ),
           ),
-        ).toEqual('(a OR b) AND (c OR d) AND x AND y AND (z AND w) AND n < 10 AND NOT k = 1');
+        ).toEqual(sane`
+          (a OR b)
+            AND (c OR d)
+            AND x
+            AND y
+            AND (z AND w)
+            AND n < 10
+            AND NOT k = 1
+       `);
       });
     });
 
@@ -114,7 +122,15 @@ describe('SqlExpression', () => {
               SqlExpression.parse('NOT k = 1'),
             ),
           ),
-        ).toEqual('a OR b OR (c OR d) OR (x AND y) OR (z AND w) OR n < 10 OR NOT k = 1');
+        ).toEqual(sane`
+          a
+            OR b
+            OR (c OR d)
+            OR (x AND y)
+            OR (z AND w)
+            OR n < 10
+            OR NOT k = 1
+        `);
       });
     });
 

@@ -12,10 +12,10 @@
  * limitations under the License.
  */
 
+import type { RefName } from '../helpers';
+import { SeparatedArray, Separator } from '../helpers';
 import type { SqlBaseValue, SqlTypeDesignator } from '../sql-base';
 import { SqlBase } from '../sql-base';
-import type { RefName } from '../utils';
-import { SeparatedArray, Separator } from '../utils';
 
 export interface SqlColumnListValue extends SqlBaseValue {
   columns: SeparatedArray<RefName>;
@@ -27,7 +27,7 @@ export class SqlColumnList extends SqlBase {
   static create(columns: SqlColumnList | SeparatedArray<RefName> | RefName[]): SqlColumnList {
     if (columns instanceof SqlColumnList) return columns;
     return new SqlColumnList({
-      columns: SeparatedArray.fromArray(columns, Separator.COMMA),
+      columns: SeparatedArray.fromArray(columns),
     }).ensureParens();
   }
 
@@ -50,7 +50,7 @@ export class SqlColumnList extends SqlBase {
 
   public changeColumns(columns: SeparatedArray<RefName> | RefName[]): this {
     const value = this.valueOf();
-    value.columns = SeparatedArray.fromArray(columns, Separator.COMMA);
+    value.columns = SeparatedArray.fromArray(columns);
     return SqlBase.fromValue(value);
   }
 

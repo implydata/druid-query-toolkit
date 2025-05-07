@@ -13,11 +13,11 @@
  */
 
 import { isDate, isInteger } from '../../utils';
+import { needsUnicodeEscape, sqlEscapeUnicode, trimString } from '../helpers';
 import type { SqlBaseValue, SqlTypeDesignator } from '../sql-base';
 import { SqlBase } from '../sql-base';
 import type { DecomposeViaOptions } from '../sql-expression';
 import { SqlExpression } from '../sql-expression';
-import { needsUnicodeEscape, sqlEscapeUnicode, trimString } from '../utils';
 
 export type LiteralValue = null | boolean | number | bigint | string | Date;
 

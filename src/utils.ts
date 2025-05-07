@@ -63,8 +63,17 @@ export function isInteger(v: number): boolean {
   return isFinite(v) && Math.floor(v) === v;
 }
 
+/**
+ * @deprecated, do not use, will be removed
+ */
 export function compact<T>(xs: (T | undefined | false | null | '')[]): T[] {
   return xs.filter(Boolean) as T[];
+}
+
+export function cleanFunctionArguments<T>(xs: (T | undefined)[]): T[] {
+  let n = xs.length;
+  while (n > 0 && typeof xs[n - 1] === 'undefined') n--;
+  return xs.slice(0, n).map(x => (typeof x === 'undefined' ? null : x)) as T[];
 }
 
 // To be used as a tag

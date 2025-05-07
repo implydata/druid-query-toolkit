@@ -12,11 +12,11 @@
  * limitations under the License.
  */
 
+import { NEWLINE_INDENT, SPACE } from '../../helpers';
 import type { SqlTypeDesignator, Substitutor } from '../../sql-base';
 import { SqlBase } from '../../sql-base';
 import { SqlExpression } from '../../sql-expression';
 import { SqlMulti } from '../../sql-multi/sql-multi';
-import { NEWLINE_INDENT, SPACE } from '../../utils';
 import type { SqlClauseValue } from '../sql-clause';
 import { SqlClause } from '../sql-clause';
 

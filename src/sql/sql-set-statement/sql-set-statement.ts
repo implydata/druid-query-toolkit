@@ -13,13 +13,13 @@
  */
 
 import { filterMap } from '../../utils';
+import type { SeparatedArray } from '../helpers';
+import { NEWLINE, RefName } from '../helpers';
 import { parse as parseSql } from '../parser';
 import type { SqlBaseValue, SqlTypeDesignator, Substitutor } from '../sql-base';
 import { SqlBase } from '../sql-base';
 import type { LiteralValue } from '../sql-literal/sql-literal';
 import { SqlLiteral } from '../sql-literal/sql-literal';
-import type { SeparatedArray } from '../utils';
-import { NEWLINE, RefName } from '../utils';
 
 export interface SqlSetStatementValue extends SqlBaseValue {
   key: RefName;

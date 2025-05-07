@@ -13,6 +13,7 @@
  */
 
 import { isEmptyArray } from '../../utils';
+import { NEWLINE, SeparatedArray } from '../helpers';
 import type { SqlBaseValue, SqlTypeDesignator, Substitutor } from '../sql-base';
 import { SqlBase } from '../sql-base';
 import type { SqlOrderByExpression, SqlPartitionedByClause } from '../sql-clause';
@@ -30,7 +31,6 @@ import { SqlExpression } from '../sql-expression';
 import type { SqlLiteral } from '../sql-literal/sql-literal';
 import { SqlQuery } from '../sql-query/sql-query';
 import { SqlSetStatement } from '../sql-set-statement/sql-set-statement';
-import { NEWLINE, SeparatedArray } from '../utils';
 
 export interface SqlWithQueryValue extends SqlBaseValue {
   contextStatements?: SeparatedArray<SqlSetStatement>;

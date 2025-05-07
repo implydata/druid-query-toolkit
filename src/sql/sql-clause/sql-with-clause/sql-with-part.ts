@@ -13,11 +13,11 @@
  */
 
 import type { SqlQuery, SqlValues } from '../..';
+import type { SeparatedArray } from '../../helpers';
+import { RefName } from '../../helpers';
 import type { SqlBaseValue, SqlTypeDesignator, Substitutor } from '../../sql-base';
 import { SqlBase } from '../../sql-base';
 import { SqlColumnList } from '../../sql-column-list/sql-column-list';
-import type { SeparatedArray } from '../../utils';
-import { RefName } from '../../utils';
 
 export interface SqlWithPartValue extends SqlBaseValue {
   table: RefName;

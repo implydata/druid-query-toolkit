@@ -12,10 +12,10 @@
  * limitations under the License.
  */
 
+import { RefName } from '../helpers';
 import type { SqlBaseValue, SqlTypeDesignator, Substitutor } from '../sql-base';
 import { SqlBase } from '../sql-base';
 import { SqlExpression } from '../sql-expression';
-import { RefName } from '../utils';
 
 export interface SqlLabeledExpressionValue extends SqlBaseValue {
   label: RefName;

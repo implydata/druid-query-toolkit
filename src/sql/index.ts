@@ -17,7 +17,7 @@
 // Files can depend on the files below them by type only imported from the root.
 
 /* eslint-disable simple-import-sort/exports */
-export * from './utils';
+export * from './helpers';
 export * from './sql-base';
 export * from './sql-type/sql-type';
 export * from './sql-expression';

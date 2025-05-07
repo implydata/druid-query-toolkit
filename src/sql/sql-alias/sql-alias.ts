@@ -12,12 +12,12 @@
  * limitations under the License.
  */
 
+import { RefName } from '../helpers';
 import type { SqlBaseValue, SqlTypeDesignator, Substitutor } from '../sql-base';
 import { SqlBase } from '../sql-base';
 import { SqlColumn } from '../sql-column/sql-column';
 import type { SqlColumnList } from '../sql-column-list/sql-column-list';
 import { SqlExpression } from '../sql-expression';
-import { RefName } from '../utils';
 
 export interface SqlAliasValue extends SqlBaseValue {
   expression: SqlExpression;

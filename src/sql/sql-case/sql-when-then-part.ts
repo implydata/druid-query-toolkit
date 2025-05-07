@@ -12,11 +12,11 @@
  * limitations under the License.
  */
 
+import { SeparatedArray, Separator } from '../helpers';
 import type { SqlBaseValue, SqlTypeDesignator, Substitutor } from '../sql-base';
 import { SqlBase } from '../sql-base';
 import { SqlExpression } from '../sql-expression';
 import type { LiteralValue } from '../sql-literal/sql-literal';
-import { SeparatedArray, Separator } from '../utils';
 
 export interface SqlWhenThenPartValue extends SqlBaseValue {
   whenExpressions: SeparatedArray<SqlExpression>;

@@ -40,6 +40,10 @@ export class Separator {
     return new Separator({ left: SPACE, separator: separator, right: NEWLINE_INDENT });
   }
 
+  static newlineFirst(separator: string) {
+    return new Separator({ left: NEWLINE_INDENT, separator: separator, right: SPACE });
+  }
+
   constructor(options: SeparatorValue) {
     this.left = options.left || '';
     this.right = options.right || '';

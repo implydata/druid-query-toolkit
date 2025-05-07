@@ -12,9 +12,9 @@
  * limitations under the License.
  */
 
+import { SeparatedArray } from '../../helpers';
 import type { SqlTypeDesignator, Substitutor } from '../../sql-base';
 import { SqlBase } from '../../sql-base';
-import { SeparatedArray } from '../../utils';
 import type { SqlClauseValue } from '../sql-clause';
 import { SqlClause } from '../sql-clause';
 
