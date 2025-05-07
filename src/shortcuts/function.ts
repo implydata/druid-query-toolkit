@@ -40,4 +40,5 @@ F.min = SqlFunction.min;
 F.max = SqlFunction.max;
 F.avg = SqlFunction.avg;
 
-// ToDo: add way more functions here
+F.jsonValue = SqlFunction.jsonValue;
+F.jsonObject = SqlFunction.jsonObject;
