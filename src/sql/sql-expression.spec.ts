@@ -583,4 +583,62 @@ describe('SqlExpression', () => {
       );
     });
   });
+
+  describe('#removeColumnFromAnd', () => {
+    it('remove from single expression not AND', () => {
+      const sql = `A > 1`;
+
+      expect(String(SqlExpression.parse(sql).removeColumnFromAnd('A'))).toEqual('undefined');
+      expect(String(SqlExpression.parse(sql).removeColumnFromAnd('B'))).toEqual('A > 1');
+    });
+
+    it('remove from simple AND', () => {
+      const sql = `A AND B`;
+
+      expect(String(SqlExpression.parse(sql).removeColumnFromAnd('A'))).toEqual('B');
+    });
+
+    it('remove from single expression type multiple', () => {
+      const sql = `A AND B AND C`;
+
+      expect(String(SqlExpression.parse(sql).removeColumnFromAnd('A'))).toEqual('B AND C');
+    });
+
+    it('remove from more complex AND', () => {
+      const sql = `A AND B > 1 AND C`;
+
+      expect(String(SqlExpression.parse(sql).removeColumnFromAnd('C'))).toEqual('A AND B > 1');
+    });
+
+    it('handles nested AND comparison expression', () => {
+      const sql = `(A > 1 AND D) AND B AND C`;
+
+      expect(String(SqlExpression.parse(sql).removeColumnFromAnd('A'))).toEqual('D AND B AND C');
+    });
+
+    it('remove nested comparison expression', () => {
+      const sql = `(A > 1 OR D) AND B AND C`;
+
+      expect(String(SqlExpression.parse(sql).removeColumnFromAnd('A'))).toEqual('B AND C');
+    });
+
+    it.each([
+      'A',
+      'B',
+      'A AND B',
+      'A AND B AND C',
+      '(A AND B) AND C',
+      'A AND (B AND C)',
+      'A AND ((B AND C) AND D)',
+      '(A OR a) AND (((B OR b) AND (C OR c)) AND (D OR d))',
+    ])('invariants hold on: %s', sql => {
+      const ex = SqlExpression.parse(sql);
+
+      expect(String(ex.removeColumnFromAnd('X'))).toEqual(sql);
+
+      expect(String(ex.flatten('AND').removeColumnFromAnd('A'))).toEqual(
+        String(ex.removeColumnFromAnd('A')?.flatten('AND')),
+      );
+    });
+  });
 });
