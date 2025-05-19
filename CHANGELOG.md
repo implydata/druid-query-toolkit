@@ -1,5 +1,11 @@
 # druid-query-toolkit
 
+## 1.1.2
+
+### Patch Changes
+
+- 77ba601: Fixing arguments of SqlFunction.timeShift
+
 ## 1.1.1
 
 ### Patch Changes
