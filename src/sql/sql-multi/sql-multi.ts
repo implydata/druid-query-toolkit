@@ -12,12 +12,12 @@
  * limitations under the License.
  */
 
+import { SeparatedArray, Separator } from '../helpers';
 import type { SqlBaseValue, SqlTypeDesignator, Substitutor } from '../sql-base';
 import { SqlBase } from '../sql-base';
 import type { DecomposeViaOptions } from '../sql-expression';
 import { SqlExpression } from '../sql-expression';
 import { SqlLiteral } from '../sql-literal/sql-literal';
-import { SeparatedArray, Separator } from '../utils';
 
 export type SqlMultiOp = 'AND' | 'OR' | '||' | '+' | '-' | '*' | '/';
 
@@ -45,7 +45,7 @@ export class SqlMulti extends SqlExpression {
   ): SqlMulti {
     return new SqlMulti({
       op,
-      args: SeparatedArray.fromArray(args, Separator.symmetricSpace(op)),
+      args: SeparatedArray.fromArray(args),
     });
   }
 
@@ -86,7 +86,9 @@ export class SqlMulti extends SqlExpression {
     const { op, args } = this;
     const sep = SqlBase.capitalize(op);
     return args.toString(
-      args.length() >= 3 ? Separator.indentSpace(sep) : Separator.symmetricSpace(sep),
+      args.length() > 3 && (op === 'AND' || op === 'OR')
+        ? Separator.newlineFirst(sep)
+        : Separator.symmetricSpace(sep),
     );
   }
 

@@ -13,15 +13,11 @@
  */
 
 import type { LiteralValue, SqlExpression } from '../sql';
-import { SqlFunction, SqlLiteral } from '../sql';
+import { SqlFunction } from '../sql';
+import { cleanFunctionArguments } from '../utils';
 
 export const F = function (name: string, ...args: (SqlExpression | LiteralValue | undefined)[]) {
-  // Trim undefined values of the end
-  while (typeof args[args.length - 1] === 'undefined') args.pop();
-  return SqlFunction.simple(
-    name,
-    args.map(a => (typeof a !== 'undefined' ? a : SqlLiteral.NULL)),
-  );
+  return SqlFunction.simple(name, cleanFunctionArguments(args));
 };
 
 F.cast = SqlFunction.cast;
@@ -40,4 +36,5 @@ F.min = SqlFunction.min;
 F.max = SqlFunction.max;
 F.avg = SqlFunction.avg;
 
-// ToDo: add way more functions here
+F.jsonValue = SqlFunction.jsonValue;
+F.jsonObject = SqlFunction.jsonObject;

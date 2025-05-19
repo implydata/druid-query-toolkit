@@ -13,11 +13,11 @@
  */
 
 import { isEmptyArray } from '../../../utils';
+import { SeparatedArray } from '../../helpers';
 import type { SqlTypeDesignator, Substitutor } from '../../sql-base';
 import { SqlBase } from '../../sql-base';
 import type { SqlExpression } from '../../sql-expression';
 import { SqlLiteral } from '../../sql-literal/sql-literal';
-import { SeparatedArray } from '../../utils';
 import type { SqlClauseValue } from '../sql-clause';
 import { SqlClause } from '../sql-clause';
 

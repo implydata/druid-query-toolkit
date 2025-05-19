@@ -12,11 +12,11 @@
  * limitations under the License.
  */
 
+import { RefName } from '../helpers';
 import type { SqlBaseValue, SqlTypeDesignator, Substitutor } from '../sql-base';
 import { SqlBase } from '../sql-base';
 import type { SqlOrderByClause } from '../sql-clause';
 import type { SqlPartitionByClause } from '../sql-clause/sql-partition-by-clause/sql-partition-by-clause';
-import { RefName } from '../utils';
 
 import type { SqlFrameBound } from './sql-frame-bound';
 
@@ -176,18 +176,6 @@ export class SqlWindowSpec extends SqlBase {
 
     return ret;
   }
-
-  // public clearOwnSeparators(): this {
-  //   const value = this.valueOf();
-  //
-  //   value.expressions = this.expressions.clearSeparators();
-  //
-  //   if (this.joinParts) {
-  //     value.joinParts = this.joinParts.clearSeparators();
-  //   }
-  //
-  //   return SqlBase.fromValue(value);
-  // }
 }
 
 SqlBase.register(SqlWindowSpec);

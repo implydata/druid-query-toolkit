@@ -12,11 +12,11 @@
  * limitations under the License.
  */
 
+import { SeparatedArray, SPACE } from '../helpers';
 import type { SqlBaseValue, SqlTypeDesignator, Substitutor } from '../sql-base';
 import { SqlBase } from '../sql-base';
 import { SqlExpression } from '../sql-expression';
 import type { LiteralValue } from '../sql-literal/sql-literal';
-import { SeparatedArray, SPACE } from '../utils';
 
 import { SqlWhenThenPart } from './sql-when-then-part';
 

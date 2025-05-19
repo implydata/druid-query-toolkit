@@ -13,11 +13,11 @@
  */
 
 import { isEmptyArray } from '../../utils';
+import { SeparatedArray, Separator } from '../helpers';
 import type { SqlBaseValue, SqlTypeDesignator, Substitutor } from '../sql-base';
 import { SqlBase } from '../sql-base';
 import { SqlExpression } from '../sql-expression';
 import type { LiteralValue } from '../sql-literal/sql-literal';
-import { SeparatedArray, Separator } from '../utils';
 
 export interface SqlRecordValue extends SqlBaseValue {
   expressions?: SeparatedArray<SqlExpression>;
@@ -88,7 +88,7 @@ export class SqlRecord extends SqlExpression {
     if (!expressions || isEmptyArray(expressions)) {
       delete value.expressions;
     } else {
-      value.expressions = SeparatedArray.fromArray(expressions, Separator.COMMA);
+      value.expressions = SeparatedArray.fromArray(expressions);
     }
     return SqlBase.fromValue(value);
   }
