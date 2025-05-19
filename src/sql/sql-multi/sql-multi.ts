@@ -149,7 +149,7 @@ export class SqlMulti extends SqlExpression {
       return super.filterAnd(fn);
     }
 
-    const args = this.args.filter(fn);
+    const args = this.args.filterMap(a => a.filterAnd(fn));
     if (!args) return;
 
     if (args.length() === 1) {

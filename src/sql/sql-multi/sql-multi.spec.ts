@@ -1972,6 +1972,12 @@ describe('#removeColumnFromAnd', () => {
     expect(String(SqlExpression.parse(sql).removeColumnFromAnd('C'))).toEqual('A AND B > 1');
   });
 
+  it('handles nested AND comparison expression', () => {
+    const sql = `(A > 1 AND D) AND B AND C`;
+
+    expect(String(SqlExpression.parse(sql).removeColumnFromAnd('A'))).toEqual('D AND B AND C');
+  });
+
   it('remove nested comparison expression', () => {
     const sql = `(A > 1 OR D) AND B AND C`;
 

@@ -419,6 +419,16 @@ describe('SqlExpression', () => {
         String(SqlExpression.parse('a AND b And c').filterAnd(ex => ex.toString() !== 'b')),
       ).toEqual('a And c');
     });
+
+    it('works with nested AND', () => {
+      expect(
+        String(
+          SqlExpression.parse('a AND b And (x AND y AND b) AND (z AND b)').filterAnd(
+            ex => ex.toString() !== 'b',
+          ),
+        ),
+      ).toEqual('a And (x AND y) AND z');
+    });
   });
 
   describe('extreme', () => {
