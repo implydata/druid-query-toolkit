@@ -454,6 +454,43 @@ describe('SqlExpression', () => {
     });
   });
 
+  describe('#flatten', () => {
+    it('returns the expression as-is for non-multi expressions', () => {
+      const expr = SqlExpression.parse('a = 1');
+      expect(expr.flatten()).toBe(expr);
+    });
+
+    it('flattens nested AND expressions', () => {
+      const expr = SqlExpression.parse('a AND (b AND c)');
+      const flattened = expr.flatten();
+      expect(String(flattened)).toEqual('a AND b AND c');
+    });
+
+    it('flattens nested OR expressions', () => {
+      const expr = SqlExpression.parse('a OR (b OR c)');
+      const flattened = expr.flatten();
+      expect(String(flattened)).toEqual('a OR b OR c');
+    });
+
+    it('does not flatten when flatteningOp does not match', () => {
+      const expr = SqlExpression.parse('a AND b');
+      const flattened = expr.flatten('OR');
+      expect(flattened).toBe(expr);
+    });
+
+    it('flattens deeply nested expressions', () => {
+      const expr = SqlExpression.parse('a AND (b AND (c AND d))');
+      const flattened = expr.flatten();
+      expect(String(flattened)).toEqual('a AND b AND c AND d');
+    });
+
+    it('flattens mixed nested expressions', () => {
+      const expr = SqlExpression.parse('(a OR b) AND ((c OR d) AND e)');
+      const flattened = expr.flatten();
+      expect(String(flattened)).toEqual('(a OR b) AND (c OR d) AND e');
+    });
+  });
+
   describe('#fillPlaceholders', () => {
     it('works in basic case', () => {
       expect(

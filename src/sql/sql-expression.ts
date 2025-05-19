@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import type { LiteralValue, RefName, SqlOrderByDirection, SqlType } from '.';
+import type { LiteralValue, RefName, SqlMultiOp, SqlOrderByDirection, SqlType } from '.';
 import {
   SqlAlias,
   SqlColumn,
@@ -358,6 +358,10 @@ export abstract class SqlExpression extends SqlBase {
 
   public divide(...expressions: SqlExpression[]): SqlExpression {
     return SqlExpression.divide(this, ...expressions);
+  }
+
+  public flatten(_flatteningOp?: SqlMultiOp): SqlExpression {
+    return this;
   }
 
   public decomposeViaAnd(_options?: DecomposeViaOptions): SqlExpression[] {
