@@ -1,5 +1,11 @@
 # druid-query-toolkit
 
+## 1.1.3
+
+### Patch Changes
+
+- a7e1b22: Add flatten method and extend filterAnd for nested expressions
+
 ## 1.1.2
 
 ### Patch Changes
