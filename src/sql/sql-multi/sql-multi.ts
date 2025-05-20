@@ -132,6 +132,15 @@ export class SqlMulti extends SqlExpression {
     return SqlBase.fromValue(value);
   }
 
+  public flatten(flatteningOp?: SqlMultiOp): SqlExpression {
+    const { op, args } = this;
+    if (flatteningOp && op !== flatteningOp) return this;
+    return SqlMulti.create(
+      op,
+      args.values.flatMap(v => v.flatten(op)),
+    );
+  }
+
   public decomposeViaAnd(options: DecomposeViaOptions = {}): SqlExpression[] {
     const { op, args } = this;
     if (op !== 'AND') return super.decomposeViaAnd(options);
@@ -149,7 +158,7 @@ export class SqlMulti extends SqlExpression {
       return super.filterAnd(fn);
     }
 
-    const args = this.args.filter(fn);
+    const args = this.args.filterMap(a => a.filterAnd(fn));
     if (!args) return;
 
     if (args.length() === 1) {

@@ -16,6 +16,7 @@
 /src/sql/parser/index.ts
 /src/sql/parser/.DS_Store
 CLAUDE.md
+.claude/
 
 # TypeScript cache
 *.tsbuildinfo

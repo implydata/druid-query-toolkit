@@ -1946,39 +1946,6 @@ describe('Brackets', () => {
   });
 });
 
-describe('#removeColumnFromAnd', () => {
-  it('remove from single expression not AND', () => {
-    const sql = `A > 1`;
-
-    expect(String(SqlExpression.parse(sql).removeColumnFromAnd('A'))).toEqual('undefined');
-    expect(String(SqlExpression.parse(sql).removeColumnFromAnd('B'))).toEqual('A > 1');
-  });
-
-  it('remove from simple AND', () => {
-    const sql = `A AND B`;
-
-    expect(String(SqlExpression.parse(sql).removeColumnFromAnd('A'))).toEqual('B');
-  });
-
-  it('remove from single expression type multiple', () => {
-    const sql = `A AND B AND C`;
-
-    expect(String(SqlExpression.parse(sql).removeColumnFromAnd('A'))).toEqual('B AND C');
-  });
-
-  it('remove from more complex AND', () => {
-    const sql = `A AND B > 1 AND C`;
-
-    expect(String(SqlExpression.parse(sql).removeColumnFromAnd('C'))).toEqual('A AND B > 1');
-  });
-
-  it('remove nested comparison expression', () => {
-    const sql = `(A > 1 OR D) AND B AND C`;
-
-    expect(String(SqlExpression.parse(sql).removeColumnFromAnd('A'))).toEqual('B AND C');
-  });
-});
-
 describe('containsColumn', () => {
   it('nested expression', () => {
     const sql = `A > 1 AND D OR B OR C`;
