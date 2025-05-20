@@ -74,10 +74,11 @@ export class SqlSetStatement extends SqlBase {
   static setContextInText(text: string, context: Record<string, any>): string {
     const { spaceBefore, spaceAfter, rest } = SqlSetStatement.parseStatementsOnly(text);
 
+    const contextStatements = SqlSetStatement.contextToContextStatements(context);
     return [
       spaceBefore,
-      SqlSetStatement.contextToContextStatements(context)?.join(NEWLINE),
-      spaceAfter || NEWLINE,
+      contextStatements.join(NEWLINE),
+      spaceAfter || (contextStatements.length ? NEWLINE : ''),
       rest,
     ].join('');
   }
