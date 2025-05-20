@@ -297,6 +297,12 @@ describe('SqlSetStatement', () => {
   });
 
   describe('.setContextInText', () => {
+    it('works in very simple case', () => {
+      expect(SqlSetStatement.setContextInText('SELECT * FROM wiki', {})).toEqual(
+        'SELECT * FROM wiki',
+      );
+    });
+
     it('works when there is nothing to parse', () => {
       expect(
         SqlSetStatement.setContextInText(
