@@ -1,5 +1,11 @@
 # druid-query-toolkit
 
+## 1.1.4
+
+### Patch Changes
+
+- d3f9a75: Fix rouge new line being added when there is no context
+
 ## 1.1.3
 
 ### Patch Changes
