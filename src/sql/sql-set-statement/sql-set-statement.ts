@@ -78,7 +78,7 @@ export class SqlSetStatement extends SqlBase {
     return [
       spaceBefore,
       contextStatements.join(NEWLINE),
-      spaceAfter || (contextStatements.length ? NEWLINE : ''),
+      contextStatements.length ? spaceAfter ?? NEWLINE : '',
       rest,
     ].join('');
   }

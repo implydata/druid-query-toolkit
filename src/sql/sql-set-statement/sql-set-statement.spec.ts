@@ -297,9 +297,27 @@ describe('SqlSetStatement', () => {
   });
 
   describe('.setContextInText', () => {
-    it('works in very simple case', () => {
+    it('works in simple case 1', () => {
       expect(SqlSetStatement.setContextInText('SELECT * FROM wiki', {})).toEqual(
         'SELECT * FROM wiki',
+      );
+    });
+
+    it('works in simple case 2', () => {
+      expect(SqlSetStatement.setContextInText('\nSELECT * FROM wiki', {})).toEqual(
+        '\nSELECT * FROM wiki',
+      );
+    });
+
+    it('works in simple case 3', () => {
+      expect(SqlSetStatement.setContextInText('SET x = 1;\nSELECT * FROM wiki', {})).toEqual(
+        'SELECT * FROM wiki',
+      );
+    });
+
+    it('works in simple case 4', () => {
+      expect(SqlSetStatement.setContextInText('\n\nSET x = 1;\nSELECT * FROM wiki', {})).toEqual(
+        '\n\nSELECT * FROM wiki',
       );
     });
 
