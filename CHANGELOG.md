@@ -1,5 +1,11 @@
 # druid-query-toolkit
 
+## 1.1.5
+
+### Patch Changes
+
+- d6e628c: Fixed spacing when removing SET statements
+
 ## 1.1.4
 
 ### Patch Changes
