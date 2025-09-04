@@ -1,5 +1,12 @@
 # druid-query-toolkit
 
+## 1.2.0
+
+### Minor Changes
+
+- b94b2c1: - Switch to AbortSignal in query executor
+  - Use a single object parameter in query executor
+
 ## 1.1.5
 
 ### Patch Changes
