@@ -27,6 +27,7 @@ export type QueryExecutor = (
   payload: QueryPayload,
   isSql: boolean,
   cancelToken?: CancelToken,
+  signal?: AbortSignal,
 ) => Promise<DataAndHeaders>;
 
 export interface RunQueryOptions {
@@ -39,6 +40,7 @@ export interface RunQueryOptions {
   typesHeader?: boolean;
   sqlTypesHeader?: boolean;
   cancelToken?: CancelToken;
+  signal?: AbortSignal;
 }
 
 export type InflateDateStrategy = 'fromSqlTypes' | 'guess' | 'none';
@@ -86,6 +88,7 @@ export class QueryRunner {
       typesHeader,
       sqlTypesHeader,
       cancelToken,
+      signal,
     } = options;
 
     let isSql: boolean;
@@ -146,10 +149,11 @@ export class QueryRunner {
     }
 
     const startTime = QueryRunner.now();
-    const dataAndHeaders = await this.getExecutor()(queryPayload, isSql, cancelToken);
+    const dataAndHeaders = await this.getExecutor()(queryPayload, isSql, cancelToken, signal);
     const endTime = QueryRunner.now();
 
     if (cancelToken) cancelToken.throwIfRequested();
+    if (signal) signal.throwIfAborted();
 
     const result = QueryResult.fromQueryAndRawResult(
       queryPayload,

@@ -21,3 +21,4 @@ export * from './query-result';
 export * from './query-runner/query-runner';
 export * from './query-payload/query-payload';
 export * from './filter-pattern';
+export type * from './query-runner/cancel-token';
