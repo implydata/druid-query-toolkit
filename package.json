@@ -56,6 +56,9 @@
     "url": "https://github.com/implydata/druid-query-toolkit/issues"
   },
   "homepage": "https://github.com/implydata/druid-query-toolkit",
+  "engines": {
+    "node": ">= 14.17.0"
+  },
   "volta": {
     "node": "20.9.0"
   },
