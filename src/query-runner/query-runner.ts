@@ -16,18 +16,18 @@ import type { QueryParameter, QueryPayload } from '../query-payload/query-payloa
 import { QueryResult } from '../query-result';
 import { SqlQuery } from '../sql';
 
-import type { CancelToken } from './cancel-token';
-
 export interface DataAndHeaders {
   data: unknown;
   headers: Record<string, string>;
 }
 
-export type QueryExecutor = (
-  payload: QueryPayload,
-  isSql: boolean,
-  cancelToken?: CancelToken,
-) => Promise<DataAndHeaders>;
+export interface QueryExecutorArgs {
+  payload: QueryPayload;
+  isSql: boolean;
+  signal: AbortSignal | undefined;
+}
+
+export type QueryExecutor = (args: QueryExecutorArgs) => Promise<DataAndHeaders>;
 
 export interface RunQueryOptions {
   query: string | SqlQuery | QueryPayload;
@@ -38,7 +38,7 @@ export interface RunQueryOptions {
   header?: boolean;
   typesHeader?: boolean;
   sqlTypesHeader?: boolean;
-  cancelToken?: CancelToken;
+  signal?: AbortSignal;
 }
 
 export type InflateDateStrategy = 'fromSqlTypes' | 'guess' | 'none';
@@ -85,7 +85,7 @@ export class QueryRunner {
       header,
       typesHeader,
       sqlTypesHeader,
-      cancelToken,
+      signal,
     } = options;
 
     let isSql: boolean;
@@ -146,10 +146,10 @@ export class QueryRunner {
     }
 
     const startTime = QueryRunner.now();
-    const dataAndHeaders = await this.getExecutor()(queryPayload, isSql, cancelToken);
+    const dataAndHeaders = await this.getExecutor()({ payload: queryPayload, isSql, signal });
     const endTime = QueryRunner.now();
 
-    if (cancelToken) cancelToken.throwIfRequested();
+    if (signal) signal.throwIfAborted();
 
     const result = QueryResult.fromQueryAndRawResult(
       queryPayload,

@@ -22,7 +22,7 @@ describe('QueryRunner', () => {
 
   const queryRunner = new QueryRunner({
     // eslint-disable-next-line @typescript-eslint/require-await
-    executor: async (payload, isSql) => {
+    executor: async ({ payload, isSql }) => {
       const firstParameterValue: any =
         payload.parameters && payload.parameters.length ? payload.parameters[0].value : undefined;
 
