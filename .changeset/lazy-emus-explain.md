@@ -1,5 +1,6 @@
 ---
-'druid-query-toolkit': patch
+'druid-query-toolkit': minor
 ---
 
-Accept AbortSignal in query executor
+- Switch to AbortSignal in query executor
+- Use a single object parameter in query executor
