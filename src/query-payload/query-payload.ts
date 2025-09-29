@@ -32,5 +32,5 @@ export interface DruidSqlQueryPayload {
 
 export interface QueryParameter {
   type: string;
-  value: string | number;
+  value: string | number | any[];
 }
