@@ -1,5 +1,12 @@
 # druid-query-toolkit
 
+## 1.2.1
+
+### Patch Changes
+
+- 9a4ff78: Bump node to 20.19.5
+- 13d4a6d: Add npm trusted publishing support for automated releases via OIDC
+
 ## 1.2.0
 
 ### Minor Changes
