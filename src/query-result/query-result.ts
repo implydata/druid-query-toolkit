@@ -501,7 +501,8 @@ export class QueryResult {
       row = row.slice();
       for (const index of indexes) {
         if (row[index] == null) continue;
-        row[index] = new Date(row[index]);
+        const v = row[index];
+        row[index] = new Date(typeof v === 'bigint' ? Number(v) : v);
       }
       return row;
     });
