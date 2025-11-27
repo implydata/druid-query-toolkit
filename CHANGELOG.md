@@ -1,5 +1,11 @@
 # druid-query-toolkit
 
+## 1.2.2
+
+### Patch Changes
+
+- e780b81: inflateDatesForIndexes can deal with bigint
+
 ## 1.2.1
 
 ### Patch Changes
