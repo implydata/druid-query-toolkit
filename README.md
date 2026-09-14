@@ -82,6 +82,7 @@ For more examples, check out the unit tests.
 Not every valid DruidSQL construct can currently be parsed, the following snippets are not currently supported:
 
 - `(a, b) IN (subquery)`
+- `EXPLAIN PLAN FOR TABLE t`, `INSERT INTO dst TABLE t PARTITIONED BY ALL`, `TABLE a UNION ALL TABLE b`, and `WITH x AS (...) TABLE x` (a bare `TABLE t` and `SELECT * FROM (TABLE t)` do parse, as `SqlTableQuery`)
 
 ## License
 

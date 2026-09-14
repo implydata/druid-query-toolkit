@@ -938,6 +938,7 @@ BaseType =
 / CaseExpression
 / Function
 / SqlValues
+/ SqlTableQuery
 / SqlLiteral
 / SqlColumn
 / SqlRecordOrExpressionInParens
@@ -1609,6 +1610,19 @@ SqlRecord = row:(RowToken _)? OpenParen postLeftParen:_ head:Expression tail:(Co
 SqlQueryInParens = OpenParen leftSpacing:_ ex:(SqlQueryInParens / SqlQuery) rightSpacing:_ CloseParen
 {
   return ex.addParens(leftSpacing, rightSpacing);
+}
+
+SqlTableQuery = tableKeyword:TableToken postTable:_ table:SqlColumn &{ return !table.table || !table.table.namespace }
+{
+  return new S.SqlTableQuery({
+    table: table.convertToTable(),
+    keywords: {
+      table: tableKeyword
+    },
+    spacing: {
+      postTable: postTable
+    }
+  });
 }
 
 SqlValues =

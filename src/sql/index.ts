@@ -48,5 +48,6 @@ export * from './sql-clause';
 export * from './sql-record/sql-record';
 export * from './sql-values/sql-values';
 export * from './sql-function/sql-function';
+export * from './sql-table-query/sql-table-query';
 export * from './sql-query/sql-query';
 export * from './sql-with-query/sql-with-query';

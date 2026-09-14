@@ -17,6 +17,7 @@ import type { SqlTypeDesignator, Substitutor } from '../../sql-base';
 import { SqlBase } from '../../sql-base';
 import type { SqlExpression } from '../../sql-expression';
 import { SqlQuery } from '../../sql-query/sql-query';
+import { SqlTableQuery } from '../../sql-table-query/sql-table-query';
 import { SqlWithQuery } from '../../sql-with-query/sql-with-query';
 import type { SqlClauseValue } from '../sql-clause';
 import { SqlClause } from '../sql-clause';
@@ -36,7 +37,9 @@ export class SqlFromClause extends SqlClause {
   static create(expressions: SeparatedArray<SqlExpression> | SqlExpression[]): SqlFromClause {
     return new SqlFromClause({
       expressions: SeparatedArray.fromArray(expressions).map(ex =>
-        ex instanceof SqlQuery || ex instanceof SqlWithQuery ? ex.ensureParens() : ex,
+        ex instanceof SqlQuery || ex instanceof SqlWithQuery || ex instanceof SqlTableQuery
+          ? ex.ensureParens()
+          : ex,
       ),
     });
   }
