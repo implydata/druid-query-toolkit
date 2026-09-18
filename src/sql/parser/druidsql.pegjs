@@ -147,7 +147,7 @@ SqlColumnDeclaration = column:RefName postColumn:_ columnType:SqlType
 
 // ------------------------------
 
-SqlQueryWithPossibleContext = statements:(SqlSetStatement _sc)* query:SqlQuery
+SqlQueryWithPossibleContext = statements:(SqlSetStatement _sc)* query:SqlQueryStatement
 {
   if (!statements.length) return query;
   return query
@@ -174,16 +174,12 @@ SqlSetStatement = setKeyword:SetToken postSet:_ key:RefName postKey:_ "=" postEq
   });
 }
 
-SqlQuery =
+SqlQueryStatement =
   explain:(ExplainPlanForToken _)?
   insertClause:(InsertClause _)?
   replaceClause:(ReplaceClause _)?
-  heart:(((WithClause _)? QueryHeart) / (WithClause _ OpenParen _ SqlQuery _ CloseParen))
-  orderByClause:(_ OrderByClause)?
-  limitClause:(_ LimitClause)?
-  offsetClause:(_ OffsetClause)?
-  partitionedByClause:(_ PartitionedByClause)?
-  clusteredByClause:(_ ClusteredByClause)?
+  body:QueryBody
+  suffix:QuerySuffix
   union:(_ UnionClause)?
 {
   var value = {};
@@ -210,23 +206,78 @@ SqlQuery =
     spacing.postReplaceClause = replaceClause[1];
   }
 
-  var withQueryMode = heart.length === 7;
-  if (withQueryMode) {
-    value.withClause = heart[0];
-    spacing.postWithClause = heart[1];
-    value.query = heart[4].addParens(heart[3], heart[5]);
-  } else {
-    var withClause = heart[0];
-    if (withClause) {
-      value.withClause = withClause[0];
-      spacing.postWithClause = withClause[1];
-    }
+  // The body decides which class we build
+  Object.assign(value, body.value);
+  Object.assign(keywords, body.keywords);
+  Object.assign(spacing, body.spacing);
 
-    var subQuery = heart[1];
-    Object.assign(value, subQuery.value);
-    Object.assign(keywords, subQuery.keywords);
-    Object.assign(spacing, subQuery.spacing);
+  Object.assign(value, suffix.value);
+  Object.assign(spacing, suffix.spacing);
+
+  if (union) {
+    spacing.preUnion = union[0];
+    keywords.union = union[1].unionKeyword;
+    spacing.postUnion = union[1].postUnion;
+    value.unionQuery = union[1].unionQuery;
   }
+
+  return new body.ClassFn(value);
+}
+
+// Each alternative is discriminated by its leading token, so the order only
+// matters for keeping the common SELECT case first.
+QueryBody =
+  SelectBody
+/ WithQueryBody
+
+SelectBody = withClause:(WithClause _)? heart:QueryHeart
+{
+  var value = {};
+  var keywords = {};
+  var spacing = {};
+
+  if (withClause) {
+    value.withClause = withClause[0];
+    spacing.postWithClause = withClause[1];
+  }
+
+  Object.assign(value, heart.value);
+  Object.assign(keywords, heart.keywords);
+  Object.assign(spacing, heart.spacing);
+
+  return { ClassFn: S.SqlQuery, value: value, keywords: keywords, spacing: spacing };
+}
+
+WithQueryBody =
+  withClause:WithClause
+  postWithClause:_
+  OpenParen
+  preQuery:_
+  query:SqlQueryStatement
+  postQuery:_
+  CloseParen
+{
+  return {
+    ClassFn: S.SqlWithQuery,
+    value: {
+      withClause: withClause,
+      query: query.addParens(preQuery, postQuery)
+    },
+    keywords: {},
+    spacing: { postWithClause: postWithClause }
+  };
+}
+
+// Always succeeds; this is the single place the query suffix clauses are parsed.
+QuerySuffix =
+  orderByClause:(_ OrderByClause)?
+  limitClause:(_ LimitClause)?
+  offsetClause:(_ OffsetClause)?
+  partitionedByClause:(_ PartitionedByClause)?
+  clusteredByClause:(_ ClusteredByClause)?
+{
+  var value = {};
+  var spacing = {};
 
   if (orderByClause) {
     spacing.preOrderByClause = orderByClause[0];
@@ -253,16 +304,8 @@ SqlQuery =
     value.clusteredByClause = clusteredByClause[1];
   }
 
-  if (union) {
-    spacing.preUnion = union[0];
-    keywords.union = union[1].unionKeyword;
-    spacing.postUnion = union[1].postUnion;
-    value.unionQuery = union[1].unionQuery;
-  }
-
-  return withQueryMode ? new S.SqlWithQuery(value) : new S.SqlQuery(value);
+  return { value: value, spacing: spacing };
 }
-
 
 QueryHeart =
   select:SelectClause
@@ -717,7 +760,7 @@ ClusteredByClause = clusteredBy:ClusteredByToken postClusteredBy:_ head:Expressi
   });
 }
 
-UnionClause = unionKeyword:UnionAllToken postUnion:_ unionQuery:SqlQuery
+UnionClause = unionKeyword:UnionAllToken postUnion:_ unionQuery:SqlQueryStatement
 {
   return {
     unionKeyword: unionKeyword,
@@ -1613,7 +1656,7 @@ SqlRecord = row:(RowToken _)? OpenParen postLeftParen:_ head:Expression tail:(Co
   return new S.SqlRecord(value);
 }
 
-SqlQueryInParens = OpenParen leftSpacing:_ ex:(SqlQueryInParens / SqlQuery) rightSpacing:_ CloseParen
+SqlQueryInParens = OpenParen leftSpacing:_ ex:(SqlQueryInParens / SqlQueryStatement) rightSpacing:_ CloseParen
 {
   return ex.addParens(leftSpacing, rightSpacing);
 }
