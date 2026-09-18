@@ -114,10 +114,19 @@ describe('SqlTableQuery', () => {
   it('parses to the expected tree', () => {
     expect(SqlExpression.parse(`TABLE "druid"."kttm"`)).toMatchInlineSnapshot(`
       SqlTableQuery {
+        "clusteredByClause": undefined,
+        "contextStatements": undefined,
+        "explain": undefined,
+        "insertClause": undefined,
         "keywords": Object {
           "table": "TABLE",
         },
+        "limitClause": undefined,
+        "offsetClause": undefined,
+        "orderByClause": undefined,
         "parens": undefined,
+        "partitionedByClause": undefined,
+        "replaceClause": undefined,
         "spacing": Object {
           "postTable": " ",
         },
@@ -145,6 +154,7 @@ describe('SqlTableQuery', () => {
           "type": "table",
         },
         "type": "tableQuery",
+        "unionQuery": undefined,
       }
     `);
   });

@@ -13,17 +13,18 @@
  */
 
 import { SPACE } from '../helpers';
-import type { SqlBaseValue, SqlTypeDesignator, Substitutor } from '../sql-base';
+import type { SqlTypeDesignator, Substitutor } from '../sql-base';
 import { SqlBase } from '../sql-base';
-import { SqlExpression } from '../sql-expression';
 import type { SqlNamespace } from '../sql-namespace/sql-namespace';
+import type { SqlQueryBaseValue } from '../sql-query-base/sql-query-base';
+import { SqlQueryBase } from '../sql-query-base/sql-query-base';
 import { SqlTable } from '../sql-table/sql-table';
 
-export interface SqlTableQueryValue extends SqlBaseValue {
+export interface SqlTableQueryValue extends SqlQueryBaseValue {
   table: SqlTable;
 }
 
-export class SqlTableQuery extends SqlExpression {
+export class SqlTableQuery extends SqlQueryBase {
   static type: SqlTypeDesignator = 'tableQuery';
 
   static DEFAULT_TABLE_KEYWORD = 'TABLE';
@@ -55,7 +56,7 @@ export class SqlTableQuery extends SqlExpression {
     return value;
   }
 
-  protected _toRawString(): string {
+  protected _toRawBodyString(): string {
     return [
       this.getKeyword('table', SqlTableQuery.DEFAULT_TABLE_KEYWORD),
       this.getSpace('postTable', SPACE),
@@ -85,17 +86,16 @@ export class SqlTableQuery extends SqlExpression {
     return this.changeTable(this.table.changeNamespace(namespace));
   }
 
-  public _walkInner(
+  protected _walkInnerBody(
+    ret: this,
     nextStack: SqlBase[],
     fn: Substitutor,
     postorder: boolean,
-  ): SqlExpression | undefined {
-    let ret = this;
-
+  ): this | undefined {
     const table = this.table._walkHelper(nextStack, fn, postorder);
     if (!table) return;
     if (table !== this.table) {
-      ret = ret.changeTable(table as SqlTable);
+      return ret.changeTable(table as SqlTable);
     }
 
     return ret;
