@@ -12,11 +12,18 @@
  * limitations under the License.
  */
 
-Start = initial:_ thing:(SqlQueryWithPossibleContext / SqlAlias) final:_sc
+Start = initial:_ thing:(TopLevelStatement / SqlAlias) final:_sc
 {
   if (initial) thing = thing.changeSpace('initial', initial);
   if (final) thing = thing.changeSpace('final', final);
   return thing;
+}
+
+// Only commit to reading the input as a query statement when doing so explains all of it,
+// otherwise fall back to reading it as a general expression (e.g. `VALUES (1) AS t`).
+TopLevelStatement = query:SqlQueryWithPossibleContext &(_sc !.)
+{
+  return query;
 }
 
 StartSetStatementsOnly = spaceBefore:_ statements:(SqlSetStatement _sc)* rest:$(.*)
@@ -229,6 +236,8 @@ SqlQueryStatement =
 QueryBody =
   SelectBody
 / WithQueryBody
+/ ValuesBody
+/ TableBody
 
 SelectBody = withClause:(WithClause _)? heart:QueryHeart
 {
@@ -265,6 +274,33 @@ WithQueryBody =
     },
     keywords: {},
     spacing: { postWithClause: postWithClause }
+  };
+}
+
+ValuesBody =
+  values:ValuesToken
+  postValues:_
+  head:SqlRecord
+  tail:(CommaSeparator SqlRecord)*
+{
+  return {
+    ClassFn: S.SqlValues,
+    value: { records: makeSeparatedArray(head, tail) },
+    keywords: { values: values },
+    spacing: { postValues: postValues }
+  };
+}
+
+TableBody =
+  tableKeyword:TableToken
+  postTable:_
+  table:SqlTable
+{
+  return {
+    ClassFn: S.SqlTableQuery,
+    value: { table: table },
+    keywords: { table: tableKeyword },
+    spacing: { postTable: postTable }
   };
 }
 
@@ -1661,55 +1697,9 @@ SqlQueryInParens = OpenParen leftSpacing:_ ex:(SqlQueryInParens / SqlQueryStatem
   return ex.addParens(leftSpacing, rightSpacing);
 }
 
-SqlTableQuery = tableKeyword:TableToken postTable:_ table:SqlTable
-{
-  return new S.SqlTableQuery({
-    table: table,
-    keywords: {
-      table: tableKeyword
-    },
-    spacing: {
-      postTable: postTable
-    }
-  });
-}
+SqlTableQuery = body:TableBody { return bodyToSql(body); }
 
-SqlValues =
-  values:ValuesToken
-  postValues:_
-  head:SqlRecord
-  tail:(CommaSeparator SqlRecord)*
-  orderByClause:(_ OrderByClause)?
-  limitClause:(_ LimitClause)?
-  offsetClause:(_ OffsetClause)?
-{
-  var value = {
-    records: makeSeparatedArray(head, tail),
-    keywords: {
-      values: values
-    }
-  };
-  var spacing = value.spacing = {
-    postValues: postValues
-  };
-
-  if (orderByClause) {
-    spacing.preOrderByClause = orderByClause[0];
-    value.orderByClause = orderByClause[1];
-  }
-
-  if (limitClause) {
-    spacing.preLimitClause = limitClause[0];
-    value.limitClause = limitClause[1];
-  }
-
-  if (offsetClause) {
-    spacing.preOffsetClause = offsetClause[0];
-    value.offsetClause = offsetClause[1];
-  }
-
-  return new S.SqlValues(value);
-}
+SqlValues = body:ValuesBody { return bodyToSql(body); }
 
 SqlPlaceholder = "?"
 {

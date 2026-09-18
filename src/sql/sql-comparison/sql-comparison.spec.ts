@@ -13,9 +13,17 @@
  */
 
 import { backAndForth } from '../../test-utils';
-import { SqlColumn, SqlComparison, SqlExpression } from '..';
+import { SqlColumn, SqlComparison, SqlExpression, SqlValues } from '..';
 
 describe('SqlComparison', () => {
+  it('keeps a VALUES query as the rhs of an IN', () => {
+    const comparison = SqlExpression.parse(
+      `(1, 2) IN (VALUES (1, 1 + 1),(2, 1 + 1))`,
+    ) as SqlComparison;
+
+    expect(comparison.rhs).toBeInstanceOf(SqlValues);
+  });
+
   it.each([
     'x = y',
     'x != y',

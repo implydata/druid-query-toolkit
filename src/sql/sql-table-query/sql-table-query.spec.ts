@@ -13,6 +13,9 @@
  */
 
 import { backAndForth } from '../../test-utils';
+import { sane } from '../../utils';
+import { SqlAlias } from '../sql-alias/sql-alias';
+import type { SqlComparison } from '../sql-comparison/sql-comparison';
 import { SqlExpression } from '../sql-expression';
 import { SqlFunction } from '../sql-function/sql-function';
 import { SqlQuery } from '../sql-query/sql-query';
@@ -32,8 +35,26 @@ describe('SqlTableQuery', () => {
       `TABLE"kttm"`,
       `(TABLE "kttm")`,
       `((TABLE "kttm"))`,
+      `EXPLAIN PLAN FOR TABLE foo`,
+      `TABLE foo LIMIT 10`,
+      `TABLE foo UNION ALL TABLE bar`,
+      sane`
+        SET x = 1;
+        TABLE foo
+      `,
     ])('does back and forth with %s', sql => {
       backAndForth(sql, SqlTableQuery);
+    });
+
+    it('falls back to reading a trailing alias as an expression', () => {
+      expect(SqlExpression.parse(`TABLE foo AS t`)).toBeInstanceOf(SqlAlias);
+    });
+
+    it('keeps a TABLE query as the rhs of an IN', () => {
+      const query = SqlExpression.parse(`SELECT 1 WHERE 1 IN (TABLE "kttm")`) as SqlQuery;
+      const rhs = (query.whereClause!.expression as SqlComparison).rhs;
+
+      expect(rhs).toBeInstanceOf(SqlTableQuery);
     });
   });
 
