@@ -59,6 +59,7 @@ export class SqlInsertClause extends SqlClause {
     const value = super.valueOf() as SqlInsertClauseValue;
     value.table = this.table;
     value.columns = this.columns;
+    value.format = this.format;
     return value;
   }
 

@@ -310,12 +310,18 @@ QueryHeart =
 }
 
 
+// Only treat the target as a function when an export `AS <format>` actually follows,
+// otherwise `INSERT INTO t (a, b)` parses the column list as function arguments.
+InsertTarget =
+  fn:GenericFunction &(_ AsToken) { return fn; }
+/ SqlTable
+
 InsertClause =
   insert:InsertToken
   postInsert:__
   into:IntoToken
   postInto:__
-  table:(GenericFunction / SqlTable)
+  table:InsertTarget
   columns:(_ SqlColumnList)?
   format:(_ AsToken _ CsvToken)?
 {
@@ -338,7 +344,7 @@ InsertClause =
 
   if (format) {
     value.spacing.preAs = format[0];
-    value.keywords = format[1];
+    value.keywords.as = format[1];
     value.spacing.preFormat = format[2];
     value.format = format[3];
   }
