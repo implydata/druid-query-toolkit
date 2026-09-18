@@ -14,7 +14,7 @@
 
 import { RefName } from '../helpers';
 import type { SqlBaseValue, SqlTypeDesignator, Substitutor } from '../sql-base';
-import { SqlBase } from '../sql-base';
+import { QUERY_TYPE_DESIGNATORS, SqlBase } from '../sql-base';
 import { SqlColumn } from '../sql-column/sql-column';
 import type { SqlColumnList } from '../sql-column-list/sql-column-list';
 import { SqlExpression } from '../sql-expression';
@@ -41,7 +41,7 @@ export class SqlAlias extends SqlExpression {
       return expression.changeAlias(alias, forceQuotes);
     }
 
-    if (expression.type === 'query') {
+    if (QUERY_TYPE_DESIGNATORS.includes(expression.type)) {
       expression = expression.ensureParens();
     }
     return new SqlAlias({
