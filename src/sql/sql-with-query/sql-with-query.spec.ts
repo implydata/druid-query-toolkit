@@ -168,6 +168,7 @@ describe('SqlWithQuery', () => {
           "postWithClause": " ",
         },
         "type": "withQuery",
+        "unionQuery": undefined,
         "withClause": SqlWithClause {
           "keywords": Object {
             "with": "WITH",
