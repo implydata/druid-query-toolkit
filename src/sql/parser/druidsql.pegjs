@@ -1612,10 +1612,10 @@ SqlQueryInParens = OpenParen leftSpacing:_ ex:(SqlQueryInParens / SqlQuery) righ
   return ex.addParens(leftSpacing, rightSpacing);
 }
 
-SqlTableQuery = tableKeyword:TableToken postTable:_ table:SqlColumn &{ return !table.table || !table.table.namespace }
+SqlTableQuery = tableKeyword:TableToken postTable:_ table:SqlTable
 {
   return new S.SqlTableQuery({
-    table: table.convertToTable(),
+    table: table,
     keywords: {
       table: tableKeyword
     },
@@ -1814,10 +1814,10 @@ SqlTable = a:RefName b:(_ "." _ RefName)?
     return new S.SqlTable({
       refName: b[3],
       spacing: {
-        postTable: b[0],
+        postNamespace: b[0],
         postDot: b[2],
       },
-      table: new S.SqlNamespace({
+      namespace: new S.SqlNamespace({
         refName: a,
       })
     });
