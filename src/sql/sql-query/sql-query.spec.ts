@@ -590,6 +590,26 @@ describe('SqlQuery', () => {
         `INSERT INTO """lol"""`,
       );
     });
+
+    it('keeps the namespace of a namespaced table', () => {
+      const insertSql = SqlQuery.parse(
+        `INSERT INTO ns . tbl SELECT * FROM wikipedia PARTITIONED BY ALL`,
+      );
+
+      expect(String(insertSql)).toEqual(
+        `INSERT INTO ns . tbl SELECT * FROM wikipedia PARTITIONED BY ALL`,
+      );
+    });
+
+    it('keeps the namespace of a namespaced table when replacing', () => {
+      const replaceSql = SqlQuery.parse(
+        `REPLACE INTO ns.tbl OVERWRITE ALL SELECT * FROM wikipedia PARTITIONED BY ALL`,
+      );
+
+      expect(String(replaceSql)).toEqual(
+        `REPLACE INTO ns.tbl OVERWRITE ALL SELECT * FROM wikipedia PARTITIONED BY ALL`,
+      );
+    });
   });
 
   describe('#hasContext / #getContext', () => {
