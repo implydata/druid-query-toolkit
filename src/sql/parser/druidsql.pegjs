@@ -19,8 +19,13 @@ Start = initial:_ thing:(TopLevelStatement / SqlAlias) final:_sc
   return thing;
 }
 
-// Only commit to reading the input as a query statement when doing so explains all of it,
-// otherwise fall back to reading it as a general expression (e.g. `VALUES (1) AS t`).
+// PEG's ordered choice commits: once this alternative succeeds, Start never reconsiders it
+// to try SqlAlias, even when the rest of Start then fails. So a query rule that matched only
+// a prefix of the input would sink the whole parse instead of letting the expression reading
+// have its turn. The lookahead makes this alternative succeed only when the query explains
+// everything up to the end of the input, so the bodies that are also expressions fall
+// through when something trails them: `VALUES (1) AS t` and `TABLE foo AS t` are aliased
+// expressions, while a bare `VALUES (1)` is still a statement.
 TopLevelStatement = query:SqlQueryWithPossibleContext &(_sc !.)
 {
   return query;
