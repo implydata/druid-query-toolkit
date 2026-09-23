@@ -39,10 +39,20 @@ describe('SqlInsertClause', () => {
       expect(insertClause.format).toEqual('CSV');
     });
 
+    it('rejects a column list on an export target', () => {
+      // The column list and the export format are mutually exclusive: the target is either a
+      // function with `AS <format>` or a table with a column list, never both. If this ever
+      // parsed it would not round trip, since the clause renders the columns before the AS.
+      expect(() =>
+        SqlQuery.parse(`INSERT INTO EXTERN(S3(bucket => 'b')) AS CSV (a, b) SELECT 1`),
+      ).toThrow();
+    });
+
     it.each([
       `INSERT INTO t (a, b) SELECT 1, 2 PARTITIONED BY ALL`,
       `INSERT INTO "t" ("a", "b") SELECT 1, 2`,
       `INSERT INTO EXTERN(S3(bucket => 'b')) AS CSV SELECT * FROM tbl`,
+      `INSERT INTO EXTERN(S3(bucket => 'b'))   AS   CSV SELECT 1`,
     ])('does back and forth with %s', sql => {
       backAndForth(sql, SqlQuery);
     });

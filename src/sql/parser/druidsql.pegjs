@@ -389,46 +389,52 @@ QueryHeart =
 }
 
 
-// Only treat the target as a function when an export `AS <format>` actually follows,
-// otherwise `INSERT INTO t (a, b)` parses the column list as function arguments.
+// The two target forms take different trailers, and each rules the other out: an export
+// function takes `AS <format>`, a table takes an optional column list. Requiring the AS is
+// also what keeps `INSERT INTO t (a, b)` from parsing the column list as function
+// arguments -- with no AS the function branch fails and SqlTable wins.
 InsertTarget =
-  fn:GenericFunction &(_ AsToken) { return fn; }
-/ SqlTable
+  table:GenericFunction preAs:_ as:AsToken preFormat:_ format:CsvToken
+{
+  return {
+    table: table,
+    format: format,
+    keywords: { as: as },
+    spacing: { preAs: preAs, preFormat: preFormat }
+  };
+}
+/ table:SqlTable columns:(_ SqlColumnList)?
+{
+  var target = { table: table, keywords: {}, spacing: {} };
+
+  if (columns) {
+    target.columns = columns[1];
+    target.spacing.preColumns = columns[0];
+  }
+
+  return target;
+}
 
 InsertClause =
   insert:InsertToken
   postInsert:__
   into:IntoToken
   postInto:__
-  table:InsertTarget
-  columns:(_ SqlColumnList)?
-  format:(_ AsToken _ CsvToken)?
+  target:InsertTarget
 {
-  var value = {
-    table: table,
-    keywords: {
+  return new S.SqlInsertClause({
+    table: target.table,
+    columns: target.columns,
+    format: target.format,
+    keywords: Object.assign({
       insert: insert,
       into: into
-    },
-    spacing: {
+    }, target.keywords),
+    spacing: Object.assign({
       postInsert: postInsert,
       postInto: postInto
-    }
-  };
-
-  if (columns) {
-    value.spacing.preColumns = columns[0];
-    value.columns = columns[1];
-  }
-
-  if (format) {
-    value.spacing.preAs = format[0];
-    value.keywords.as = format[1];
-    value.spacing.preFormat = format[2];
-    value.format = format[3];
-  }
-
-  return new S.SqlInsertClause(value);
+    }, target.spacing)
+  });
 }
 
 
