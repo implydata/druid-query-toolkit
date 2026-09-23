@@ -440,13 +440,17 @@ export class SqlQuery extends SqlQueryBase {
     return SqlBase.fromValue(value);
   }
 
-  /* ~~~~~ EXPLAIN ~~~~~ */
+  public inlineMaxDataTime(maxTime: number | undefined): SqlQuery {
+    const MAX_DATA_TIME = 'MAX_DATA_TIME';
+    const maxDataTime = maxTime ? new Date(maxTime) : new Date();
 
-  /* ~~~~~ INSERT ~~~~~ */
-
-  /* ~~~~~ REPLACE ~~~~~ */
-
-  /* ~~~~~ INSERT + REPLACE ~~~~~ */
+    return this.walk(ex => {
+      if (ex instanceof SqlFunction && ex.getEffectiveFunctionName() === MAX_DATA_TIME) {
+        return SqlLiteral.create(maxDataTime);
+      }
+      return ex;
+    }) as SqlQuery;
+  }
 
   /* ~~~~~ WITH ~~~~~ */
 
@@ -896,22 +900,6 @@ export class SqlQuery extends SqlQueryBase {
 
   public removeOrderByForOutputColumn(outputColumn: string) {
     return this.removeOrderByForSelectIndex(this.getSelectIndexForOutputColumn(outputColumn));
-  }
-
-  /* ~~~~~ LIMIT ~~~~~ */
-
-  /* ~~~~~ OFFSET ~~~~~ */
-
-  public inlineMaxDataTime(maxTime: number | undefined): SqlQuery {
-    const MAX_DATA_TIME = 'MAX_DATA_TIME';
-    const maxDataTime = maxTime ? new Date(maxTime) : new Date();
-
-    return this.walk(ex => {
-      if (ex instanceof SqlFunction && ex.getEffectiveFunctionName() === MAX_DATA_TIME) {
-        return SqlLiteral.create(maxDataTime);
-      }
-      return ex;
-    }) as SqlQuery;
   }
 }
 
