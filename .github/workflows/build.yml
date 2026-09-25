@@ -17,7 +17,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           registry-url: https://registry.npmjs.org
-          node-version-file: 'package.json'
+          node-version-file: '.node-version'
           cache: 'npm'
       - run: npm install --prefer-offline --no-audit
       - name: Test
