@@ -12,11 +12,23 @@
  * limitations under the License.
  */
 
-Start = initial:_ thing:(SqlQueryWithPossibleContext / SqlAlias) final:_sc
+Start = initial:_ thing:(TopLevelStatement / SqlAlias) final:_sc
 {
   if (initial) thing = thing.changeSpace('initial', initial);
   if (final) thing = thing.changeSpace('final', final);
   return thing;
+}
+
+// PEG's ordered choice commits: once this alternative succeeds, Start never reconsiders it
+// to try SqlAlias, even when the rest of Start then fails. So a query rule that matched only
+// a prefix of the input would sink the whole parse instead of letting the expression reading
+// have its turn. The lookahead makes this alternative succeed only when the query explains
+// everything up to the end of the input, so the bodies that are also expressions fall
+// through when something trails them: `VALUES (1) AS t` and `TABLE foo AS t` are aliased
+// expressions, while a bare `VALUES (1)` is still a statement.
+TopLevelStatement = query:SqlQueryWithPossibleContext &(_sc !.)
+{
+  return query;
 }
 
 StartSetStatementsOnly = spaceBefore:_ statements:(SqlSetStatement _sc)* rest:$(.*)
@@ -147,7 +159,7 @@ SqlColumnDeclaration = column:RefName postColumn:_ columnType:SqlType
 
 // ------------------------------
 
-SqlQueryWithPossibleContext = statements:(SqlSetStatement _sc)* query:SqlQuery
+SqlQueryWithPossibleContext = statements:(SqlSetStatement _sc)* query:SqlQueryStatement
 {
   if (!statements.length) return query;
   return query
@@ -174,16 +186,12 @@ SqlSetStatement = setKeyword:SetToken postSet:_ key:RefName postKey:_ "=" postEq
   });
 }
 
-SqlQuery =
+SqlQueryStatement =
   explain:(ExplainPlanForToken _)?
   insertClause:(InsertClause _)?
   replaceClause:(ReplaceClause _)?
-  heart:(((WithClause _)? QueryHeart) / (WithClause _ OpenParen _ SqlQuery _ CloseParen))
-  orderByClause:(_ OrderByClause)?
-  limitClause:(_ LimitClause)?
-  offsetClause:(_ OffsetClause)?
-  partitionedByClause:(_ PartitionedByClause)?
-  clusteredByClause:(_ ClusteredByClause)?
+  body:QueryBody
+  suffix:QuerySuffix
   union:(_ UnionClause)?
 {
   var value = {};
@@ -210,23 +218,107 @@ SqlQuery =
     spacing.postReplaceClause = replaceClause[1];
   }
 
-  var withQueryMode = heart.length === 7;
-  if (withQueryMode) {
-    value.withClause = heart[0];
-    spacing.postWithClause = heart[1];
-    value.query = heart[4].addParens(heart[3], heart[5]);
-  } else {
-    var withClause = heart[0];
-    if (withClause) {
-      value.withClause = withClause[0];
-      spacing.postWithClause = withClause[1];
-    }
+  // The body decides which class we build
+  Object.assign(value, body.value);
+  Object.assign(keywords, body.keywords);
+  Object.assign(spacing, body.spacing);
 
-    var subQuery = heart[1];
-    Object.assign(value, subQuery.value);
-    Object.assign(keywords, subQuery.keywords);
-    Object.assign(spacing, subQuery.spacing);
+  Object.assign(value, suffix.value);
+  Object.assign(spacing, suffix.spacing);
+
+  if (union) {
+    spacing.preUnion = union[0];
+    keywords.union = union[1].unionKeyword;
+    spacing.postUnion = union[1].postUnion;
+    value.unionQuery = union[1].unionQuery;
   }
+
+  return new body.ClassFn(value);
+}
+
+// Each alternative is discriminated by its leading token, so the order only
+// matters for keeping the common SELECT case first.
+QueryBody =
+  SelectBody
+/ WithQueryBody
+/ ValuesBody
+/ TableBody
+
+SelectBody = withClause:(WithClause _)? heart:QueryHeart
+{
+  var value = {};
+  var keywords = {};
+  var spacing = {};
+
+  if (withClause) {
+    value.withClause = withClause[0];
+    spacing.postWithClause = withClause[1];
+  }
+
+  Object.assign(value, heart.value);
+  Object.assign(keywords, heart.keywords);
+  Object.assign(spacing, heart.spacing);
+
+  return { ClassFn: S.SqlQuery, value: value, keywords: keywords, spacing: spacing };
+}
+
+WithQueryBody =
+  withClause:WithClause
+  postWithClause:_
+  OpenParen
+  preQuery:_
+  query:SqlQueryStatement
+  postQuery:_
+  CloseParen
+{
+  return {
+    ClassFn: S.SqlWithQuery,
+    value: {
+      withClause: withClause,
+      query: query.addParens(preQuery, postQuery)
+    },
+    keywords: {},
+    spacing: { postWithClause: postWithClause }
+  };
+}
+
+ValuesBody =
+  values:ValuesToken
+  postValues:_
+  head:SqlRecord
+  tail:(CommaSeparator SqlRecord)*
+{
+  return {
+    ClassFn: S.SqlValues,
+    value: { records: makeSeparatedArray(head, tail) },
+    keywords: { values: values },
+    spacing: { postValues: postValues }
+  };
+}
+
+TableBody =
+  tableKeyword:TableToken
+  postTable:_
+  table:SqlTable
+{
+  return {
+    ClassFn: S.SqlTableQuery,
+    value: { table: table },
+    keywords: { table: tableKeyword },
+    spacing: { postTable: postTable }
+  };
+}
+
+// Always succeeds; this is the single place the query suffix clauses are parsed.
+QuerySuffix =
+  orderByClause:(_ OrderByClause)?
+  limitClause:(_ LimitClause)?
+  offsetClause:(_ OffsetClause)?
+  partitionedByClause:(_ PartitionedByClause)?
+  clusteredByClause:(_ ClusteredByClause)?
+{
+  var value = {};
+  var spacing = {};
 
   if (orderByClause) {
     spacing.preOrderByClause = orderByClause[0];
@@ -253,16 +345,8 @@ SqlQuery =
     value.clusteredByClause = clusteredByClause[1];
   }
 
-  if (union) {
-    spacing.preUnion = union[0];
-    keywords.union = union[1].unionKeyword;
-    spacing.postUnion = union[1].postUnion;
-    value.unionQuery = union[1].unionQuery;
-  }
-
-  return withQueryMode ? new S.SqlWithQuery(value) : new S.SqlQuery(value);
+  return { value: value, spacing: spacing };
 }
-
 
 QueryHeart =
   select:SelectClause
@@ -310,40 +394,52 @@ QueryHeart =
 }
 
 
+// The two target forms take different trailers, and each rules the other out: an export
+// function takes `AS <format>`, a table takes an optional column list. Requiring the AS is
+// also what keeps `INSERT INTO t (a, b)` from parsing the column list as function
+// arguments -- with no AS the function branch fails and SqlTable wins.
+InsertTarget =
+  table:GenericFunction preAs:_ as:AsToken preFormat:_ format:CsvToken
+{
+  return {
+    table: table,
+    format: format,
+    keywords: { as: as },
+    spacing: { preAs: preAs, preFormat: preFormat }
+  };
+}
+/ table:SqlTable columns:(_ SqlColumnList)?
+{
+  var target = { table: table, keywords: {}, spacing: {} };
+
+  if (columns) {
+    target.columns = columns[1];
+    target.spacing.preColumns = columns[0];
+  }
+
+  return target;
+}
+
 InsertClause =
   insert:InsertToken
   postInsert:__
   into:IntoToken
   postInto:__
-  table:(GenericFunction / SqlTable)
-  columns:(_ SqlColumnList)?
-  format:(_ AsToken _ CsvToken)?
+  target:InsertTarget
 {
-  var value = {
-    table: table,
-    keywords: {
+  return new S.SqlInsertClause({
+    table: target.table,
+    columns: target.columns,
+    format: target.format,
+    keywords: Object.assign({
       insert: insert,
       into: into
-    },
-    spacing: {
+    }, target.keywords),
+    spacing: Object.assign({
       postInsert: postInsert,
       postInto: postInto
-    }
-  };
-
-  if (columns) {
-    value.spacing.preColumns = columns[0];
-    value.columns = columns[1];
-  }
-
-  if (format) {
-    value.spacing.preAs = format[0];
-    value.keywords = format[1];
-    value.spacing.preFormat = format[2];
-    value.format = format[3];
-  }
-
-  return new S.SqlInsertClause(value);
+    }, target.spacing)
+  });
 }
 
 
@@ -711,7 +807,7 @@ ClusteredByClause = clusteredBy:ClusteredByToken postClusteredBy:_ head:Expressi
   });
 }
 
-UnionClause = unionKeyword:UnionAllToken postUnion:_ unionQuery:SqlQuery
+UnionClause = unionKeyword:UnionAllToken postUnion:_ unionQuery:SqlQueryStatement
 {
   return {
     unionKeyword: unionKeyword,
@@ -1607,60 +1703,14 @@ SqlRecord = row:(RowToken _)? OpenParen postLeftParen:_ head:Expression tail:(Co
   return new S.SqlRecord(value);
 }
 
-SqlQueryInParens = OpenParen leftSpacing:_ ex:(SqlQueryInParens / SqlQuery) rightSpacing:_ CloseParen
+SqlQueryInParens = OpenParen leftSpacing:_ ex:(SqlQueryInParens / SqlQueryStatement) rightSpacing:_ CloseParen
 {
   return ex.addParens(leftSpacing, rightSpacing);
 }
 
-SqlTableQuery = tableKeyword:TableToken postTable:_ table:SqlTable
-{
-  return new S.SqlTableQuery({
-    table: table,
-    keywords: {
-      table: tableKeyword
-    },
-    spacing: {
-      postTable: postTable
-    }
-  });
-}
+SqlTableQuery = body:TableBody { return bodyToSql(body); }
 
-SqlValues =
-  values:ValuesToken
-  postValues:_
-  head:SqlRecord
-  tail:(CommaSeparator SqlRecord)*
-  orderByClause:(_ OrderByClause)?
-  limitClause:(_ LimitClause)?
-  offsetClause:(_ OffsetClause)?
-{
-  var value = {
-    records: makeSeparatedArray(head, tail),
-    keywords: {
-      values: values
-    }
-  };
-  var spacing = value.spacing = {
-    postValues: postValues
-  };
-
-  if (orderByClause) {
-    spacing.preOrderByClause = orderByClause[0];
-    value.orderByClause = orderByClause[1];
-  }
-
-  if (limitClause) {
-    spacing.preLimitClause = limitClause[0];
-    value.limitClause = limitClause[1];
-  }
-
-  if (offsetClause) {
-    spacing.preOffsetClause = offsetClause[0];
-    value.offsetClause = offsetClause[1];
-  }
-
-  return new S.SqlValues(value);
-}
+SqlValues = body:ValuesBody { return bodyToSql(body); }
 
 SqlPlaceholder = "?"
 {

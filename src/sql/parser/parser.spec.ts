@@ -12,12 +12,24 @@
  * limitations under the License.
  */
 
+import { SqlAlias } from '..';
+
 import { parse as parseSql } from '.';
 
 describe('Parser', () => {
   it('throws on invalid input', () => {
     expect(() => parseSql('SELEC +')).toThrowError('Expected');
   });
+
+  // The statement rule can consume a leading VALUES / TABLE, so it only commits when it
+  // explains the whole input; otherwise these fall back to being read as expressions.
+  it.each([`VALUES (1) AS t`, `TABLE foo AS t`, `VALUES (1) AS t (x)`])(
+    'reads %s as an expression, not a statement',
+    sql => {
+      expect(parseSql(sql)).toBeInstanceOf(SqlAlias);
+      expect(String(parseSql(sql))).toEqual(sql);
+    },
+  );
 
   it('parse anything', () => {
     expect(parseSql('a OR b')).toMatchInlineSnapshot(`

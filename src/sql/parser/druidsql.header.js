@@ -48,6 +48,13 @@
     return new S.SeparatedArray(makeListMap(tail, 1, head), makeListMap(tail, 0));
   }
 
+  function bodyToSql(body) {
+    var value = Object.assign({}, body.value);
+    value.keywords = body.keywords;
+    value.spacing = body.spacing;
+    return new body.ClassFn(value);
+  }
+
   function makeFunctionName(f) {
     return Array.isArray(f) ? S.RefName.functionName(f[1], true) : S.RefName.functionName(f);
   }

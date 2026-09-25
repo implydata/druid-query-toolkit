@@ -45,6 +45,8 @@ export * from './sql-set-statement/sql-set-statement';
 
 export * from './sql-clause';
 
+export * from './sql-query-base/sql-query-base';
+
 export * from './sql-record/sql-record';
 export * from './sql-values/sql-values';
 export * from './sql-function/sql-function';

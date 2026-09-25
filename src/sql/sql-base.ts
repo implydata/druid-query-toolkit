@@ -96,6 +96,17 @@ export type SqlTypeDesignator =
   | 'windowSpec'
   | 'frameBound';
 
+/**
+ * The type designators of everything that extends SqlQueryBase. Lets code that sits above
+ * SqlQueryBase in the dependency order (and so can not import it) still recognize a query.
+ */
+export const QUERY_TYPE_DESIGNATORS: readonly SqlTypeDesignator[] = [
+  'query',
+  'withQuery',
+  'values',
+  'tableQuery',
+];
+
 export type KeywordName =
   | 'all'
   | 'and'

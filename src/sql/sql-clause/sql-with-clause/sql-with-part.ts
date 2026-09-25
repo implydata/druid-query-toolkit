@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import type { SqlQuery, SqlValues } from '../..';
+import type { SqlQuery, SqlQueryBase } from '../..';
 import type { SeparatedArray } from '../../helpers';
 import { RefName } from '../../helpers';
 import type { SqlBaseValue, SqlTypeDesignator, Substitutor } from '../../sql-base';
@@ -22,7 +22,7 @@ import { SqlColumnList } from '../../sql-column-list/sql-column-list';
 export interface SqlWithPartValue extends SqlBaseValue {
   table: RefName;
   columns?: SqlColumnList;
-  query: SqlQuery | SqlValues;
+  query: SqlQueryBase;
 }
 
 export class SqlWithPart extends SqlBase {
@@ -39,7 +39,7 @@ export class SqlWithPart extends SqlBase {
 
   public readonly table: RefName;
   public readonly columns?: SqlColumnList;
-  public readonly query: SqlQuery | SqlValues;
+  public readonly query: SqlQueryBase;
 
   constructor(options: SqlWithPartValue) {
     super(options, SqlWithPart.type);
@@ -95,7 +95,7 @@ export class SqlWithPart extends SqlBase {
     return SqlBase.fromValue(value);
   }
 
-  public changeQuery(query: SqlQuery): this {
+  public changeQuery(query: SqlQueryBase): this {
     const value = this.valueOf();
     value.query = query;
     return SqlBase.fromValue(value);
@@ -111,7 +111,7 @@ export class SqlWithPart extends SqlBase {
     const query = this.query._walkHelper(nextStack, fn, postorder);
     if (!query) return;
     if (query !== this.query) {
-      ret = ret.changeQuery(query as SqlQuery);
+      ret = ret.changeQuery(query as SqlQueryBase);
     }
 
     return ret;
