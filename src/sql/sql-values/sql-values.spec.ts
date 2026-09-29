@@ -145,10 +145,10 @@ describe('SqlValues', () => {
   it('throws for invalid limit values', () => {
     const values = SqlValues.create([SqlRecord.create([1, 2, 3].map(v => SqlLiteral.create(v)))]);
 
-    expect(() => values.changeLimitValue(1)).not.toThrowError();
-    expect(() => values.changeLimitValue(0)).not.toThrowError();
-    expect(() => values.changeLimitValue(-1)).toThrowError('-1 is not a valid limit value');
-    expect(() => values.changeLimitValue(-Infinity)).toThrowError(
+    expect(() => values.changeLimitValue(1)).not.toThrow();
+    expect(() => values.changeLimitValue(0)).not.toThrow();
+    expect(() => values.changeLimitValue(-1)).toThrow('-1 is not a valid limit value');
+    expect(() => values.changeLimitValue(-Infinity)).toThrow(
       '-Infinity is not a valid limit value',
     );
   });

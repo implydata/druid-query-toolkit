@@ -12,14 +12,15 @@
  * limitations under the License.
  */
 
-const axios = require('axios');
+const { post } = require('./http');
 const { RefName, SqlFunction } = require('../dist');
+
 const { RESERVED_KEYWORDS } = RefName;
 const { SPECIAL_FUNCTIONS } = SqlFunction;
 
 async function main() {
   // Do basic check first
-  await axios.post('http://localhost:8888/druid/v2/sql', {
+  await post('http://localhost:8888/druid/v2/sql', {
     query: `SELECT 123`,
   });
 
@@ -59,7 +60,7 @@ async function main() {
     if (legalNames.includes(k)) continue;
 
     try {
-      await axios.post('http://localhost:8888/druid/v2/sql', {
+      await post('http://localhost:8888/druid/v2/sql', {
         query: `SELECT ${k}(1)`,
       });
       legalNames.push(k);
@@ -76,17 +77,15 @@ async function main() {
       ) {
         // Truly illegal
       } else {
-        if (
-          !(
-            errorMessage.startsWith(`No match found for function signature ${k}`) ||
-            errorMessage.startsWith(
-              `Invalid number of arguments to function '${k}'. Was expecting`,
-            ) ||
-            errorMessage.startsWith(
-              `OVER clause is necessary for window functions (line [1], column [8])`,
-            )
+        if (!(
+          errorMessage.startsWith(`No match found for function signature ${k}`) ||
+          errorMessage.startsWith(
+            `Invalid number of arguments to function '${k}'. Was expecting`,
+          ) ||
+          errorMessage.startsWith(
+            `OVER clause is necessary for window functions (line [1], column [8])`,
           )
-        ) {
+        )) {
           console.error(`${k} : ${errorMessage.split('\n')[0]}`);
         }
         legalNames.push(k);

@@ -32,9 +32,7 @@ export class SqlOrderByClause extends SqlClause {
 
   static create(
     expressions:
-      | SeparatedArray<SqlOrderByExpression>
-      | SqlOrderByExpression[]
-      | SqlOrderByExpression,
+      SeparatedArray<SqlOrderByExpression> | SqlOrderByExpression[] | SqlOrderByExpression,
   ): SqlOrderByClause {
     if (expressions instanceof SqlOrderByExpression) {
       return new SqlOrderByClause({

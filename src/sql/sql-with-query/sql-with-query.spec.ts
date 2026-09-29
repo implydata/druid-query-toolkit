@@ -286,11 +286,9 @@ describe('SqlWithQuery', () => {
     const sql = `WITH wiki AS (SELECT * FROM wikipedia) (SELECT * FROM wiki LIMIT 10)`;
     const query = SqlExpression.parse(sql) as SqlWithQuery;
 
-    expect(() => query.changeLimitValue(1)).not.toThrowError();
-    expect(() => query.changeLimitValue(0)).not.toThrowError();
-    expect(() => query.changeLimitValue(-1)).toThrowError('-1 is not a valid limit value');
-    expect(() => query.changeLimitValue(-Infinity)).toThrowError(
-      '-Infinity is not a valid limit value',
-    );
+    expect(() => query.changeLimitValue(1)).not.toThrow();
+    expect(() => query.changeLimitValue(0)).not.toThrow();
+    expect(() => query.changeLimitValue(-1)).toThrow('-1 is not a valid limit value');
+    expect(() => query.changeLimitValue(-Infinity)).toThrow('-Infinity is not a valid limit value');
   });
 });
