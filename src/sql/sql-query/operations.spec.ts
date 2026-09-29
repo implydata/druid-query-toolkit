@@ -506,234 +506,153 @@ describe('SqlQuery operations', () => {
     });
   });
 
-  describe.skip('remove functions', () => {
-    it('remove col from where', () => {
-      expect(
-        SqlQuery.parse(
-          sane`
-            SELECT col0, col1, col2
-            FROM sys."github"
-            Where col AND col2
-          `,
-        )
-          .removeColumnFromWhere('col2')
-          .toString(),
-      ).toEqual(sane`
-        SELECT col0,col1,col2
-        FROM sys."github"
-        Where col2"
+  describe('#removeColumnFromWhere', () => {
+    it('removes the column from an AND', () => {
+      const query = SqlQuery.parse(sane`
+        SELECT col0, col1, col2
+        FROM github
+        WHERE col2 > 1 AND col1 > 1
+      `);
+
+      expect(query.removeColumnFromWhere('col2').toString()).toEqual(sane`
+        SELECT col0, col1, col2
+        FROM github
+        WHERE col1 > 1
       `);
     });
 
-    it('remove only col from where', () => {
+    it('removes the WHERE clause when nothing is left', () => {
       expect(
         SqlQuery.parse(
           sane`
-            SELECT col0, col1, col2
-            FROM sys."github"
-            Where col2 = '1'
-          `,
-        )
-          .removeColumnFromWhere('col2')
-          .toString(),
-      ).toEqual(sane`
-        SELECT col0,col1,col2
-        FROM sys."github""
-      `);
-    });
-
-    it('remove multiple filters for the same col', () => {
-      expect(
-        SqlQuery.parse(
-          sane`
-            SELECT col0, col1, col2
-            FROM sys."github"
-            Where col2 > '1' AND col2 < '1'
-          `,
-        )
-          .removeColumnFromWhere('col2')
-          .toString(),
-      ).toEqual(sane`
-        SELECT col0,col1,col2
-        FROM sys."github"
-        Where col2 > '1',col2 < '1'"
-      `);
-    });
-
-    it('remove multiple filters for the same col', () => {
-      expect(
-        SqlQuery.parse(
-          sane`
-            SELECT col0, col1, col2
-            FROM sys."github"
-            Where col2 > '1' AND col1 > 2 OR col2 < '1'
-          `,
+          SELECT col0, col1, col2
+          FROM github
+          WHERE col2 > '1' AND col2 < '5'
+        `,
         )
           .removeColumnFromWhere('col2')
           .toString(),
       ).toEqual(sane`
         SELECT col0, col1, col2
-        FROM sys."github"
-        Where col1 > 2"
+        FROM github
       `);
     });
 
-    it('remove only comparison expression from where', () => {
+    it('removes a whole OR that mentions the column', () => {
       expect(
         SqlQuery.parse(
           sane`
-            SELECT col0, col1, col2
-            FROM sys."github"
-            Where col2 > 1
-          `,
+          SELECT col0, col1, col2
+          FROM github
+          WHERE col2 > '1' AND col1 > 2 OR col2 < '1'
+        `,
         )
           .removeColumnFromWhere('col2')
           .toString(),
       ).toEqual(sane`
-        SELECT col0,col1,col2
-        FROM sys."github""
+        SELECT col0, col1, col2
+        FROM github
       `);
     });
 
-    it('remove only comparison expression from where', () => {
-      expect(
-        SqlQuery.parse(
-          sane`
-            SELECT col0, col1, col2
-            FROM sys."github"
-            Where col2 > 1 AND col1 > 1
-          `,
-        )
-          .removeColumnFromWhere('col2')
-          .toString(),
-      ).toEqual(sane`
-        SELECT col0,col1,col2
-        FROM sys."github"
-        Where col2 > 1"
-      `);
-    });
+    it('does nothing when the column is not in the WHERE clause', () => {
+      const sql = sane`
+        SELECT col0, col1, col2
+        FROM github
+        WHERE col1 > 1
+      `;
 
-    it('remove only col from having', () => {
-      expect(
-        SqlQuery.parse(
-          sane`
-            SELECT col0, col1, col2
-            FROM sys."github"
-            Having col2 > 1
-          `,
-        )
-          .removeFromHaving('col2')
-          .toString(),
-      ).toEqual(sane`
-        SELECT col0,col1,col2
-        FROM sys."github""
-      `);
+      expect(SqlQuery.parse(sql).removeColumnFromWhere('col2').toString()).toEqual(sql);
     });
+  });
 
-    it('remove only comparison expression from having 1', () => {
+  describe('#removeFromHaving', () => {
+    it('removes the column from an AND', () => {
       expect(
         SqlQuery.parse(
           sane`
-            SELECT col0, col1, col2
-            FROM sys."github"
-            Having col2 > 1
-          `,
-        )
-          .removeFromHaving('col2')
-          .toString(),
-      ).toEqual(sane`
-        SELECT col0,col1,col2
-        FROM sys."github""
-      `);
-    });
-
-    it('remove only comparison expression from having 2', () => {
-      expect(
-        SqlQuery.parse(
-          sane`
-            SELECT col0, col1, col2
-            FROM sys."github"
-            Having col2 > 1 AND col1 > 1
-          `,
+          SELECT col0, col1, col2
+          FROM github
+          HAVING col2 > 1 AND col1 > 1
+        `,
         )
           .removeFromHaving('col2')
           .toString(),
       ).toEqual(sane`
         SELECT col0, col1, col2
-        FROM sys."github"
-        Having col1 > 1"
+        FROM github
+        HAVING col1 > 1
       `);
     });
 
-    it('remove one numbered col from ORDER BY', () => {
+    it('removes the HAVING clause when nothing is left', () => {
       expect(
         SqlQuery.parse(
           sane`
-            SELECT col0, col1, col2
-            FROM sys."github"
-            Order By col, 2 ASC
-          `,
+          SELECT col0, col1, col2
+          FROM github
+          HAVING col2 > 1
+        `,
         )
-          .removeOrderByForOutputColumn('col')
+          .removeFromHaving('col2')
           .toString(),
       ).toEqual(sane`
         SELECT col0, col1, col2
-        FROM sys."github"
-        Order By 2 ASC"
+        FROM github
       `);
     });
+  });
 
-    it('remove col not in ORDER BY', () => {
-      expect(
-        SqlQuery.parse(
-          sane`
-            SELECT col0, col1, col2
-            FROM sys."github"
-            Order By col, col1 ASC
-          `,
-        )
-          .removeOrderByForOutputColumn('col2')
-          .toString(),
-      ).toEqual(sane`
+  describe('#removeOrderByForOutputColumn', () => {
+    const query = SqlQuery.parse(sane`
+      SELECT col0, col1, col2
+      FROM github
+      ORDER BY col0, 2 DESC, col2
+    `);
+
+    it('removes by name and by index', () => {
+      expect(query.removeOrderByForOutputColumn('col1').toString()).toEqual(sane`
         SELECT col0, col1, col2
-        FROM sys."github"
-        Order By col, col1 ASC"
+        FROM github
+        ORDER BY col0, col2
+      `);
+
+      expect(query.removeOrderByForOutputColumn('col2').toString()).toEqual(sane`
+        SELECT col0, col1, col2
+        FROM github
+        ORDER BY col0, 2 DESC
       `);
     });
 
-    it('remove one numbered col not in ORDER BY', () => {
+    it('removes the ORDER BY clause when nothing is left', () => {
       expect(
         SqlQuery.parse(
           sane`
-            SELECT col0, col1, col2
-            FROM sys."github"
-            Order By col, 3 ASC
-          `,
+          SELECT col0, col1, col2
+          FROM github
+          ORDER BY col1
+        `,
         )
           .removeOrderByForOutputColumn('col1')
           .toString(),
       ).toEqual(sane`
         SELECT col0, col1, col2
-        FROM sys."github"
-        Order By col, 3 ASC"
+        FROM github
       `);
     });
 
-    it('remove only col in ORDER BY', () => {
-      expect(
-        SqlQuery.parse(
-          sane`
-            SELECT col0, col1, col2
-            FROM sys."github"
-            Order By col1
-          `,
-        )
-          .removeOrderByForOutputColumn('col1')
-          .toString(),
-      ).toEqual(sane`
+    it('does nothing when the column is not ordered on', () => {
+      const sql = sane`
         SELECT col0, col1, col2
-        FROM sys."github""
-      `);
+        FROM github
+        ORDER BY col0, 3 ASC
+      `;
+
+      expect(SqlQuery.parse(sql).removeOrderByForOutputColumn('col1').toString()).toEqual(sql);
+    });
+
+    it('does nothing when the output column does not exist', () => {
+      expect(query.removeOrderByForOutputColumn('nope')).toBe(query);
     });
   });
 
