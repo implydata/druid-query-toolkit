@@ -79,7 +79,7 @@ describe('SqlTableQuery', () => {
   });
 
   it('rejects a three part name', () => {
-    expect(() => SqlExpression.parse(`TABLE a.b.c`)).toThrowError('Expected');
+    expect(() => SqlExpression.parse(`TABLE a.b.c`)).toThrow('Expected');
   });
 
   it('.create', () => {

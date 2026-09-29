@@ -13,7 +13,7 @@
  */
 
 const fs = require('fs');
-const axios = require('axios');
+const { get } = require('./http');
 
 const prefix = `/*
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -58,13 +58,13 @@ const postfix = `
 `;
 
 async function main() {
-  const druidRef = await axios.get(
+  const druidRef = await get(
     'https://raw.githubusercontent.com/apache/druid/master/sql/src/test/java/org/apache/druid/sql/calcite/CalciteQueryTest.java',
   );
 
-  const m = druidRef.data.match(/  "SELECT[^\n]*"(?:\s*\+\s*"[^\n]+")*,\n/gim);
-  let queries = [];
-  for (let ent of m) {
+  const m = druidRef.data.match(/ {2}"SELECT[^\n]*"(?:\s*\+\s*"[^\n]+")*,\n/gim);
+  const queries = [];
+  for (const ent of m) {
     try {
       queries.push(eval(ent.slice(0, ent.length - 2)));
     } catch (e) {

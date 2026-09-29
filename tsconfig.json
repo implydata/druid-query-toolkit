@@ -1,18 +1,16 @@
 {
   "compilerOptions": {
-    "allowSyntheticDefaultImports": false,
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
     "composite": true,
     "declaration": true,
     "declarationDir": "types",
     "declarationMap": true,
-    "esModuleInterop": false,
     "forceConsistentCasingInFileNames": true,
-    "importHelpers": true,
+    "importHelpers": false,
     "isolatedModules": true,
     "module": "commonjs",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,
     "noUnusedLocals": true,
@@ -25,6 +23,7 @@
     "strict": true,
     "target": "es2020",
     "lib": ["es2020"],
+    "types": ["node", "jest"],
     "useDefineForClassFields": false
   },
   "include": ["src"]

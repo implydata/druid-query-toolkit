@@ -163,7 +163,6 @@ export class QueryRunner {
       )
       .changeQueryDuration(endTime - startTime);
 
-    // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check
     switch (this.inflateDateStrategy) {
       case 'fromSqlTypes':
         return result.inflateDatesFromSqlTypes();

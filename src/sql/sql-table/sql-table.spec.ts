@@ -26,7 +26,7 @@ describe('SqlTable', () => {
   it('avoids reserved', () => {
     const sql = 'From';
 
-    expect(() => SqlExpression.parse(sql)).toThrowError('Expected');
+    expect(() => SqlExpression.parse(sql)).toThrow('Expected');
   });
 
   it('.column works', () => {

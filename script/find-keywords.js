@@ -14,11 +14,12 @@
 
 const fs = require('fs');
 const path = require('path');
-const axios = require('axios');
+const { execFileSync } = require('child_process');
+const { get, post } = require('./http');
 
 async function checkAsAlias(keyword) {
   try {
-    const resp = await axios.post('http://localhost:8888/druid/v2/sql', {
+    const resp = await post('http://localhost:8888/druid/v2/sql', {
       query: `SELECT 123 AS ${keyword}`,
     });
 
@@ -30,7 +31,7 @@ async function checkAsAlias(keyword) {
 
 async function checkAsReference(keyword) {
   try {
-    const resp = await axios.post('http://localhost:8888/druid/v2/sql', {
+    const resp = await post('http://localhost:8888/druid/v2/sql', {
       query: `SELECT ${keyword} FROM (SELECT 123 AS "${keyword}")`,
     });
 
@@ -42,7 +43,7 @@ async function checkAsReference(keyword) {
 
 async function main() {
   // Do basic check first
-  await axios.post('http://localhost:8888/druid/v2/sql', {
+  await post('http://localhost:8888/druid/v2/sql', {
     query: `SELECT 123`,
   });
 
@@ -56,19 +57,23 @@ async function main() {
 
   const texts = await Promise.all(
     urlsToGet.map(async url => {
-      const resp = await axios.get(url);
+      const resp = await get(url);
       return resp.data;
     }),
   );
 
   try {
-    await axios.post('http://localhost:8888/druid/v2/sql', {
+    await post('http://localhost:8888/druid/v2/sql', {
       query: `SELECT CURRENT_ROW`,
     });
   } catch (e) {
-    const errorMessage = e.response.data.errorMessage;
-    if (!errorMessage.startsWith('Encountered')) {
-      throw new Error('unexpected response from error message');
+    const errorMessage = e.response?.data?.errorMessage;
+    // Older Druid versions start with 'Encountered', newer ones with 'Incorrect syntax near'
+    if (
+      typeof errorMessage !== 'string' ||
+      !(errorMessage.startsWith('Encountered') || errorMessage.startsWith('Incorrect syntax near'))
+    ) {
+      throw new Error(`unexpected response from error message: ${errorMessage}`);
     }
     texts.push(errorMessage);
   }
@@ -84,7 +89,7 @@ async function main() {
 
   const reservedKeywords = [];
   const reservedAliases = [];
-  for (let keyword of possibleKeywords) {
+  for (const keyword of possibleKeywords) {
     if (await checkAsAlias(keyword)) {
       // All good nothing to do
     } else if (await checkAsReference(keyword)) {
@@ -98,8 +103,9 @@ async function main() {
     `Found ${reservedKeywords.length} reserved keywords and ${reservedAliases.length} reserved aliases`,
   );
 
+  const outputFile = path.join(__dirname, '../src/sql/reserved-keywords.ts');
   fs.writeFileSync(
-    path.join(__dirname, '../src/sql/reserved-keywords.ts'),
+    outputFile,
     `
 /*
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -120,6 +126,8 @@ export const RESERVED_KEYWORDS = ${JSON.stringify(reservedKeywords, undefined, 2
 export const RESERVED_ALIASES = ${JSON.stringify(reservedAliases, undefined, 2)};
 `.trim(),
   );
+
+  execFileSync('npx', ['prettier', '--write', outputFile], { stdio: 'inherit' });
 }
 
 main();

@@ -18,7 +18,7 @@ import { parse as parseSql } from '.';
 
 describe('Parser', () => {
   it('throws on invalid input', () => {
-    expect(() => parseSql('SELEC +')).toThrowError('Expected');
+    expect(() => parseSql('SELEC +')).toThrow('Expected');
   });
 
   // The statement rule can consume a leading VALUES / TABLE, so it only commits when it

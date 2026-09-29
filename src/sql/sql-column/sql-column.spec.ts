@@ -35,7 +35,7 @@ describe('SqlColumn', () => {
   it('avoids reserved', () => {
     const sql = 'From';
 
-    expect(() => SqlExpression.parse(sql)).toThrowError('Expected');
+    expect(() => SqlExpression.parse(sql)).toThrow('Expected');
   });
 
   describe('#column', () => {
@@ -354,7 +354,7 @@ describe('SqlColumn', () => {
   it('too many parts', () => {
     const sql = `"lol" . channel.boo .moo`;
 
-    expect(() => SqlExpression.parse(sql)).toThrowError();
+    expect(() => SqlExpression.parse(sql)).toThrow();
   });
 });
 

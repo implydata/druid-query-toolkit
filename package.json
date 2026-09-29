@@ -17,7 +17,7 @@
     "eslint-fix-changed-only": "npm run eslint-changed-only -- --fix",
     "prettify": "prettier --write '{src,script}/**/*.{ts,js}'",
     "prettify-check": "prettier --check '{src,script}/**/*.{ts,js}'",
-    "prepare": "husky install"
+    "prepare": "husky"
   },
   "files": [
     "dist/",
@@ -59,28 +59,23 @@
   "engines": {
     "node": ">= 14.17.0"
   },
-  "dependencies": {
-    "tslib": "^2.5.2"
-  },
   "devDependencies": {
-    "@awesome-code-style/eslint-config": "^6.0.0",
-    "@awesome-code-style/prettier-config": "^5.0.0",
-    "@changesets/changelog-github": "^0.5.0",
-    "@changesets/cli": "^2.27.10",
-    "@types/jest": "^29.5.0",
-    "@types/node": "^20.0.0",
-    "axios": "^1.7.7",
-    "eslint": "^9.15.0",
+    "@awesome-code-style/eslint-config": "^6.2.1",
+    "@awesome-code-style/prettier-config": "^5.0.2",
+    "@changesets/cli": "^3.0.3",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^24.19.0",
+    "eslint": "^9.39.5",
     "eslint-plugin-notice": "^1.0.0",
-    "fs-extra": "^10.0.1",
-    "globals": "^15.12.0",
-    "husky": "^7.0.4",
-    "jest": "^29.5.0",
+    "globals": "^17.12.0",
+    "husky": "^9.1.7",
+    "jest": "^30.5.2",
     "peggy": "^3.0.2",
-    "prettier": "^2.8.8",
-    "ts-jest": "^29.1.0",
-    "ts-pegjs": "^4.2.1",
-    "tsup": "^6.7.0",
-    "typescript": "^5.0.2"
+    "prettier": "^3.9.9",
+    "pretty-format": "^30.5.1",
+    "ts-jest": "^29.4.14",
+    "ts-pegjs": "^4.2.2",
+    "tsup": "^8.5.1",
+    "typescript": "~6.0.3"
   }
 }

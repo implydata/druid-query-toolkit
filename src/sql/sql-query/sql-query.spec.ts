@@ -172,7 +172,7 @@ describe('SqlQuery', () => {
         PARTITIONED  BY   ALL    TIME
         CLUSTERED BY  "hello"
     `);
-    }).toThrowError('Can not have both an INSERT and a REPLACE clause');
+    }).toThrow('Can not have both an INSERT and a REPLACE clause');
   });
 
   describe('.selectStarFrom', () => {
@@ -5411,7 +5411,7 @@ describe('SqlQuery', () => {
 
     it('Join with invalid USING syntax', () => {
       const invalidSql = 'Select * from tbl INNER Join anotherTable Using col1 = col2';
-      expect(() => SqlQuery.parse(invalidSql)).toThrowError();
+      expect(() => SqlQuery.parse(invalidSql)).toThrow();
     });
   });
 
