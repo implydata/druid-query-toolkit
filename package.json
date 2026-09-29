@@ -59,9 +59,6 @@
   "engines": {
     "node": ">= 14.17.0"
   },
-  "volta": {
-    "node": "20.19.5"
-  },
   "dependencies": {
     "tslib": "^2.5.2"
   },
