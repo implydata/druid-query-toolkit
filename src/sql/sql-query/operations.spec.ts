@@ -19,22 +19,7 @@ function stringifyExpressions(v: any) {
   return JSON.parse(JSON.stringify(v));
 }
 
-describe('SqlQuery operations', () => {
-  describe('#makeExplain', () => {
-    it('works', () => {
-      const query = SqlQuery.parse(
-        sane`
-          SELECT __time FROM "wiki"
-        `,
-      );
-
-      expect(String(query.makeExplain())).toEqual(sane`
-        EXPLAIN PLAN FOR
-        SELECT __time FROM "wiki"
-      `);
-    });
-  });
-
+describe('SqlQuery (operations)', () => {
   describe('#prependWith', () => {
     it('works when there is no WITH', () => {
       const withQuery = SqlQuery.parse(
@@ -112,344 +97,25 @@ describe('SqlQuery operations', () => {
     });
   });
 
-  describe('#getFirstTableName', () => {
-    it('works with simple query', () => {
-      expect(
-        SqlQuery.parse(
-          sane`
-            SELECT * FROM "github"
-          `,
-        ).getFirstTableName(),
-      ).toEqual('github');
-    });
-
-    it('works with namespace', () => {
-      expect(
-        SqlQuery.parse(
-          sane`
-            SELECT * FROM sys."github"
-          `,
-        ).getFirstTableName(),
-      ).toEqual('github');
-    });
-
-    it('works with namespace and alias', () => {
-      expect(
-        SqlQuery.parse(
-          sane`
-            SELECT * FROM sys."github" as Name
-          `,
-        ).getFirstTableName(),
-      ).toEqual('github');
-    });
-
-    it('works with multiple tables', () => {
-      expect(
-        SqlQuery.parse(
-          sane`
-            SELECT * FROM sys."github" as test, sys.name
-          `,
-        ).getFirstTableName(),
-      ).toEqual('github');
-    });
-
-    it('works with CTE', () => {
-      expect(
-        SqlQuery.parse(
-          sane`
-            WITH x AS (SELECT * FROM "wikipedia")
-            SELECT * FROM x, sys."github" as test, sys.name
-          `,
-        ).getFirstTableName(),
-      ).toEqual('wikipedia');
-    });
-  });
-
-  describe('#getFirstSchema', () => {
-    it('works in simple case', () => {
-      expect(
-        SqlQuery.parse(
-          sane`
-            SELECT * FROM sys."github"
-          `,
-        ).getFirstSchema(),
-      ).toEqual('sys');
-    });
-
-    it('from column with no namespace', () => {
-      expect(
-        SqlQuery.parse(
-          sane`
-            SELECT * FROM "github"
-          `,
-        ).getFirstSchema(),
-      ).toBeUndefined();
-    });
-
-    it('from multiple tables', () => {
-      expect(
-        SqlQuery.parse(
-          sane`
-            SELECT * FROM "github", sys."table"
-          `,
-        ).getFirstSchema(),
-      ).toEqual('sys');
-    });
-  });
-
-  describe('output columns', () => {
-    const query = SqlQuery.parse(sane`
-      SELECT
-        channel,
-        SUBSTR(cityName, 1, 2),
-        namespace AS s_namespace,
-        TRANSFORM(countryName) AS "trans",
-        COUNT(*),
-        SUM(added) AS "Added"
-      FROM wikipedia
-      GROUP BY
-        1.1, -- Yes the index can be non-whole, go figure
-        namespace,
-        SUBSTR(cityName, 1, 2),
-        subspace,
-        countryName
-      ORDER BY channel, s_namespace Desc, COUNT(*), subspace ASC
-      LIMIT 5
-    `);
-
-    it('#getSelectIndexForExpression', () => {
-      expect(query.getSelectIndexForExpression(SqlExpression.parse('channel'), false)).toEqual(0);
-      expect(
-        query.getSelectIndexForExpression(SqlExpression.parse('SUBSTR(cityName, 1, 2)'), false),
-      ).toEqual(1);
-      expect(query.getSelectIndexForExpression(SqlExpression.parse('s_namespace'), false)).toEqual(
-        -1,
-      );
-      expect(query.getSelectIndexForExpression(SqlExpression.parse('s_namespace'), true)).toEqual(
-        2,
-      );
-    });
-
-    it('#getGroupedSelectExpressions', () => {
-      expect(query.getGroupedSelectExpressions().map(String)).toEqual([
-        'channel',
-        'SUBSTR(cityName, 1, 2)',
-        'namespace AS s_namespace',
-        'TRANSFORM(countryName) AS "trans"',
-      ]);
-    });
-
-    it('#getGroupingExpressionInfos', () => {
-      expect(stringifyExpressions(query.getGroupingExpressionInfos())).toEqual([
-        {
-          expression: 'channel',
-          orderByExpression: 'channel',
-          outputColumn: 'channel',
-          selectIndex: 0,
-        },
-        {
-          expression: 'namespace',
-          orderByExpression: 's_namespace Desc',
-          outputColumn: 's_namespace',
-          selectIndex: 2,
-        },
-        {
-          expression: 'SUBSTR(cityName, 1, 2)',
-          outputColumn: 'EXPR$1',
-          selectIndex: 1,
-        },
-        {
-          expression: 'subspace',
-          orderByExpression: 'subspace ASC',
-          selectIndex: -1,
-        },
-        {
-          expression: 'countryName',
-          selectIndex: -1,
-        },
-      ]);
-    });
-
-    it('#getGroupingExpressions', () => {
-      expect(query.getGroupingExpressions()?.map(String)).toEqual([
-        'channel',
-        'namespace',
-        'SUBSTR(cityName, 1, 2)',
-        'subspace',
-        'countryName',
-      ]);
-    });
-
-    it('#getGroupedOutputColumns', () => {
-      expect(query.getGroupedOutputColumns()).toEqual([
-        'channel',
-        'EXPR$1',
-        's_namespace',
-        'trans',
-      ]);
-    });
-
-    it('#getAggregateSelectExpressions', () => {
-      expect(query.getAggregateSelectExpressions().map(String)).toEqual([
-        'COUNT(*)',
-        'SUM(added) AS "Added"',
-      ]);
-    });
-
-    it('#getAggregateOutputColumns', () => {
-      expect(query.getAggregateOutputColumns()).toEqual(['EXPR$4', 'Added']);
-    });
-
-    it('#getEffectiveDirectionOfOutputColumn', () => {
-      expect(String(query.getOrderByForOutputColumn('channel'))).toEqual('channel');
-      expect(String(query.getOrderByForOutputColumn('s_namespace'))).toEqual('s_namespace Desc');
-      expect(String(query.getOrderByForOutputColumn('Added'))).toEqual('undefined');
-      expect(String(query.getOrderByForOutputColumn('lol'))).toEqual('undefined');
-    });
-
-    it('#getOrderedOutputColumns', () => {
-      expect(query.getOrderedOutputColumns()).toEqual(['channel', 's_namespace', 'EXPR$4']);
-    });
-  });
-
-  describe('orderBy', () => {
-    it('no ORDER BY clause', () => {
-      expect(
-        SqlQuery.parse(
-          sane`
-            SELECT *
-            FROM sys."github"
-          `,
-        )
-          .addOrderBy(SqlColumn.create('col').toOrderByExpression('DESC'))
-          .toString(),
-      ).toEqual(sane`
-        SELECT *
+  describe('#getAggregateOutputColumns', () => {
+    it('lists the aggregate output columns', () => {
+      const sql = sane`
+        SELECT col0, SUM(col1) As aggregated, col2
         FROM sys."github"
-        ORDER BY "col" DESC
-      `);
+        Group By col2
+      `;
+
+      expect(SqlQuery.parse(sql).getAggregateOutputColumns()).toEqual(['col0', 'aggregated']);
     });
 
-    it('add to ORDER BY clause', () => {
-      expect(
-        SqlQuery.parse(
-          sane`
-            SELECT *
-            FROM sys."github"
-            ORDER BY col
-          `,
-        )
-          .addOrderBy(SqlColumn.create('colTwo').toOrderByExpression('ASC'))
-          .toString(),
-      ).toEqual(sane`
-        SELECT *
+    it('lists the aggregate output columns when grouping by index', () => {
+      const sql = sane`
+        SELECT col0, SUM(col1) As aggregated, col2
         FROM sys."github"
-        ORDER BY "colTwo" ASC, col
-      `);
-    });
+        Group By col2,  1, 3
+      `;
 
-    it('ORDER BY without direction', () => {
-      expect(
-        SqlQuery.parse(
-          sane`
-            SELECT *
-            FROM sys."github"
-            ORDER BY col, colTwo ASC
-          `,
-        )
-          .addOrderBy(SqlColumn.create('colThree').toOrderByExpression())
-          .toString(),
-      ).toEqual(sane`
-        SELECT *
-        FROM sys."github"
-        ORDER BY "colThree", col, colTwo ASC
-      `);
-    });
-  });
-
-  describe('#addWhere', () => {
-    it('no initial where', () => {
-      expect(
-        SqlQuery.parse(
-          sane`
-            SELECT *
-            FROM sys."github"
-          `,
-        )
-          .addWhere(SqlExpression.parse(`col > 1`))
-          .toString(),
-      ).toEqual(sane`
-        SELECT *
-        FROM sys."github"
-        WHERE col > 1
-      `);
-    });
-
-    it('noop on TRUE', () => {
-      expect(
-        SqlQuery.parse(
-          sane`
-            SELECT *
-            FROM sys."github"
-          `,
-        )
-          .addWhere(SqlExpression.parse(`TRUE`))
-          .toString(),
-      ).toEqual(sane`
-        SELECT *
-        FROM sys."github"
-      `);
-    });
-
-    it('Single Where filter value', () => {
-      expect(
-        SqlQuery.parse(
-          sane`
-            SELECT *
-            FROM sys."github"
-            WHERE col > 1
-          `,
-        )
-          .addWhere(SqlExpression.parse(`colTwo > 2`))
-          .toString(),
-      ).toEqual(sane`
-        SELECT *
-        FROM sys."github"
-        WHERE col > 1 AND colTwo > 2
-      `);
-    });
-
-    it('OR Where filter value', () => {
-      expect(
-        SqlQuery.parse(
-          sane`
-            SELECT *
-            FROM sys."github" WHERE col > 1 OR col < 5
-          `,
-        )
-          .addWhere(SqlExpression.parse(`colTwo > 2`))
-          .toString(),
-      ).toEqual(sane`
-        SELECT *
-        FROM sys."github" WHERE (col > 1 OR col < 5) AND colTwo > 2
-      `);
-    });
-
-    it('AND Where filter value', () => {
-      expect(
-        SqlQuery.parse(
-          sane`
-            SELECT *
-            FROM sys."github" WHERE (col > 1 OR col < 5) AND colTwo > 5
-          `,
-        )
-          .addWhere(SqlExpression.parse(`colTwo > 2`))
-          .addWhere()
-          .toString(),
-      ).toEqual(sane`
-        SELECT *
-        FROM sys."github" WHERE (col > 1 OR col < 5) AND colTwo > 5 AND colTwo > 2
-      `);
+      expect(SqlQuery.parse(sql).getAggregateOutputColumns()).toEqual(['aggregated']);
     });
   });
 
@@ -502,6 +168,92 @@ describe('SqlQuery operations', () => {
         FROM github
         GROUP BY 1, 2.2
         ORDER BY 2
+      `);
+    });
+  });
+
+  describe('#addWhere', () => {
+    it('no initial where', () => {
+      expect(
+        SqlQuery.parse(
+          sane`
+            SELECT *
+            FROM sys."github"
+          `,
+        )
+          .addWhere(SqlExpression.parse(`col > 1`))
+          .toString(),
+      ).toEqual(sane`
+        SELECT *
+        FROM sys."github"
+        WHERE col > 1
+      `);
+    });
+
+    it('noop on TRUE', () => {
+      expect(
+        SqlQuery.parse(
+          sane`
+            SELECT *
+            FROM sys."github"
+          `,
+        )
+          .addWhere(SqlExpression.parse(`TRUE`))
+          .toString(),
+      ).toEqual(sane`
+        SELECT *
+        FROM sys."github"
+      `);
+    });
+
+    it('adds to a single filter', () => {
+      expect(
+        SqlQuery.parse(
+          sane`
+            SELECT *
+            FROM sys."github"
+            WHERE col > 1
+          `,
+        )
+          .addWhere(SqlExpression.parse(`colTwo > 2`))
+          .toString(),
+      ).toEqual(sane`
+        SELECT *
+        FROM sys."github"
+        WHERE col > 1 AND colTwo > 2
+      `);
+    });
+
+    it('adds to an OR filter', () => {
+      expect(
+        SqlQuery.parse(
+          sane`
+            SELECT *
+            FROM sys."github" WHERE col > 1 OR col < 5
+          `,
+        )
+          .addWhere(SqlExpression.parse(`colTwo > 2`))
+          .toString(),
+      ).toEqual(sane`
+        SELECT *
+        FROM sys."github" WHERE (col > 1 OR col < 5) AND colTwo > 2
+      `);
+    });
+
+    it('adds to an AND filter', () => {
+      expect(
+        SqlQuery.parse(
+          sane`
+            SELECT *
+            FROM sys."github" WHERE (col > 1 OR col < 5) AND colTwo > 5
+          `,
+        )
+          .addWhere(SqlExpression.parse(`colTwo > 2`))
+          .addWhere()
+          .toString(),
+      ).toEqual(sane`
+        SELECT *
+        FROM sys."github" WHERE (col > 1 OR col < 5) AND colTwo > 5 AND colTwo > 2
       `);
     });
   });
@@ -563,6 +315,33 @@ describe('SqlQuery operations', () => {
       `;
 
       expect(SqlQuery.parse(sql).removeColumnFromWhere('col2').toString()).toEqual(sql);
+    });
+  });
+
+  describe('#addGroupBy', () => {
+    it('adds a GROUP BY clause', () => {
+      const sql = SqlQuery.parse(sane`
+        select Count(*) from tbl
+      `);
+
+      expect(sql.addGroupBy(SqlColumn.create('col')).toString()).toEqual(sane`
+        select Count(*) from tbl
+        GROUP BY "col"
+      `);
+    });
+
+    it('adds to an existing GROUP BY clause', () => {
+      const sql = SqlQuery.parse(sane`
+        select col1, min(col1) AS aliasName
+        from tbl
+        GROUP BY 2
+      `);
+
+      expect(sql.addGroupBy(SqlExpression.parse(`reverse(col2)`)).toString()).toEqual(sane`
+        select col1, min(col1) AS aliasName
+        from tbl
+        GROUP BY 2, reverse(col2)
+      `);
     });
   });
 
@@ -656,56 +435,162 @@ describe('SqlQuery operations', () => {
     });
   });
 
-  describe('getAggregateColumns', () => {
-    it('get all aggregate cols', () => {
-      const sql = sane`
-        SELECT col0, SUM(col1) As aggregated, col2
-        FROM sys."github"
-        Group By col2
-      `;
+  describe('#makeExplain', () => {
+    it('works', () => {
+      const query = SqlQuery.parse(
+        sane`
+          SELECT __time FROM "wiki"
+        `,
+      );
 
-      expect(SqlQuery.parse(sql).getAggregateOutputColumns()).toEqual(['col0', 'aggregated']);
-    });
-
-    it('get all aggregate cols using numbers', () => {
-      const sql = sane`
-        SELECT col0, SUM(col1) As aggregated, col2
-        FROM sys."github"
-        Group By col2,  1, 3
-      `;
-
-      expect(SqlQuery.parse(sql).getAggregateOutputColumns()).toEqual(['aggregated']);
-    });
-  });
-
-  describe('addGroupBy', () => {
-    it('add simple expression to group by', () => {
-      const sql = SqlQuery.parse(sane`
-        select Count(*) from tbl
-      `);
-
-      expect(sql.addGroupBy(SqlColumn.create('col')).toString()).toEqual(sane`
-        select Count(*) from tbl
-        GROUP BY "col"
-      `);
-    });
-
-    it('existing group by', () => {
-      const sql = SqlQuery.parse(sane`
-        select col1, min(col1) AS aliasName
-        from tbl
-        GROUP BY 2
-      `);
-
-      expect(sql.addGroupBy(SqlExpression.parse(`reverse(col2)`)).toString()).toEqual(sane`
-        select col1, min(col1) AS aliasName
-        from tbl
-        GROUP BY 2, reverse(col2)
+      expect(String(query.makeExplain())).toEqual(sane`
+        EXPLAIN PLAN FOR
+        SELECT __time FROM "wiki"
       `);
     });
   });
 
-  describe('prettify', () => {
+  describe('#addOrderBy', () => {
+    it('adds an ORDER BY clause', () => {
+      expect(
+        SqlQuery.parse(
+          sane`
+            SELECT *
+            FROM sys."github"
+          `,
+        )
+          .addOrderBy(SqlColumn.create('col').toOrderByExpression('DESC'))
+          .toString(),
+      ).toEqual(sane`
+        SELECT *
+        FROM sys."github"
+        ORDER BY "col" DESC
+      `);
+    });
+
+    it('adds to an existing ORDER BY clause', () => {
+      expect(
+        SqlQuery.parse(
+          sane`
+            SELECT *
+            FROM sys."github"
+            ORDER BY col
+          `,
+        )
+          .addOrderBy(SqlColumn.create('colTwo').toOrderByExpression('ASC'))
+          .toString(),
+      ).toEqual(sane`
+        SELECT *
+        FROM sys."github"
+        ORDER BY "colTwo" ASC, col
+      `);
+    });
+
+    it('adds an expression without a direction', () => {
+      expect(
+        SqlQuery.parse(
+          sane`
+            SELECT *
+            FROM sys."github"
+            ORDER BY col, colTwo ASC
+          `,
+        )
+          .addOrderBy(SqlColumn.create('colThree').toOrderByExpression())
+          .toString(),
+      ).toEqual(sane`
+        SELECT *
+        FROM sys."github"
+        ORDER BY "colThree", col, colTwo ASC
+      `);
+    });
+  });
+
+  describe('#getFirstTableName', () => {
+    it('works with simple query', () => {
+      expect(
+        SqlQuery.parse(
+          sane`
+            SELECT * FROM "github"
+          `,
+        ).getFirstTableName(),
+      ).toEqual('github');
+    });
+
+    it('works with namespace', () => {
+      expect(
+        SqlQuery.parse(
+          sane`
+            SELECT * FROM sys."github"
+          `,
+        ).getFirstTableName(),
+      ).toEqual('github');
+    });
+
+    it('works with namespace and alias', () => {
+      expect(
+        SqlQuery.parse(
+          sane`
+            SELECT * FROM sys."github" as Name
+          `,
+        ).getFirstTableName(),
+      ).toEqual('github');
+    });
+
+    it('works with multiple tables', () => {
+      expect(
+        SqlQuery.parse(
+          sane`
+            SELECT * FROM sys."github" as test, sys.name
+          `,
+        ).getFirstTableName(),
+      ).toEqual('github');
+    });
+
+    it('works with CTE', () => {
+      expect(
+        SqlQuery.parse(
+          sane`
+            WITH x AS (SELECT * FROM "wikipedia")
+            SELECT * FROM x, sys."github" as test, sys.name
+          `,
+        ).getFirstTableName(),
+      ).toEqual('wikipedia');
+    });
+  });
+
+  describe('#getFirstSchema', () => {
+    it('works in simple case', () => {
+      expect(
+        SqlQuery.parse(
+          sane`
+            SELECT * FROM sys."github"
+          `,
+        ).getFirstSchema(),
+      ).toEqual('sys');
+    });
+
+    it('from column with no namespace', () => {
+      expect(
+        SqlQuery.parse(
+          sane`
+            SELECT * FROM "github"
+          `,
+        ).getFirstSchema(),
+      ).toBeUndefined();
+    });
+
+    it('from multiple tables', () => {
+      expect(
+        SqlQuery.parse(
+          sane`
+            SELECT * FROM "github", sys."table"
+          `,
+        ).getFirstSchema(),
+      ).toEqual('sys');
+    });
+  });
+
+  describe('#prettify', () => {
     it('misc query 1', () => {
       const sql = sane`
         Select
@@ -899,6 +784,139 @@ describe('SqlQuery operations', () => {
           GROUP BY 1
         ) AS "n1_1" ON "b"."browser" = "n1_1"."browser"
       `);
+    });
+  });
+
+  describe('output columns', () => {
+    const query = SqlQuery.parse(sane`
+      SELECT
+        channel,
+        SUBSTR(cityName, 1, 2),
+        namespace AS s_namespace,
+        TRANSFORM(countryName) AS "trans",
+        COUNT(*),
+        SUM(added) AS "Added"
+      FROM wikipedia
+      GROUP BY
+        1.1, -- Yes the index can be non-whole, go figure
+        namespace,
+        SUBSTR(cityName, 1, 2),
+        subspace,
+        countryName
+      ORDER BY channel, s_namespace Desc, COUNT(*), subspace ASC
+      LIMIT 5
+    `);
+
+    describe('#getSelectIndexForExpression', () => {
+      it('works', () => {
+        expect(query.getSelectIndexForExpression(SqlExpression.parse('channel'), false)).toEqual(0);
+        expect(
+          query.getSelectIndexForExpression(SqlExpression.parse('SUBSTR(cityName, 1, 2)'), false),
+        ).toEqual(1);
+        expect(
+          query.getSelectIndexForExpression(SqlExpression.parse('s_namespace'), false),
+        ).toEqual(-1);
+        expect(query.getSelectIndexForExpression(SqlExpression.parse('s_namespace'), true)).toEqual(
+          2,
+        );
+      });
+    });
+
+    describe('#getGroupedSelectExpressions', () => {
+      it('works', () => {
+        expect(query.getGroupedSelectExpressions().map(String)).toEqual([
+          'channel',
+          'SUBSTR(cityName, 1, 2)',
+          'namespace AS s_namespace',
+          'TRANSFORM(countryName) AS "trans"',
+        ]);
+      });
+    });
+
+    describe('#getGroupingExpressionInfos', () => {
+      it('works', () => {
+        expect(stringifyExpressions(query.getGroupingExpressionInfos())).toEqual([
+          {
+            expression: 'channel',
+            orderByExpression: 'channel',
+            outputColumn: 'channel',
+            selectIndex: 0,
+          },
+          {
+            expression: 'namespace',
+            orderByExpression: 's_namespace Desc',
+            outputColumn: 's_namespace',
+            selectIndex: 2,
+          },
+          {
+            expression: 'SUBSTR(cityName, 1, 2)',
+            outputColumn: 'EXPR$1',
+            selectIndex: 1,
+          },
+          {
+            expression: 'subspace',
+            orderByExpression: 'subspace ASC',
+            selectIndex: -1,
+          },
+          {
+            expression: 'countryName',
+            selectIndex: -1,
+          },
+        ]);
+      });
+    });
+
+    describe('#getGroupingExpressions', () => {
+      it('works', () => {
+        expect(query.getGroupingExpressions()?.map(String)).toEqual([
+          'channel',
+          'namespace',
+          'SUBSTR(cityName, 1, 2)',
+          'subspace',
+          'countryName',
+        ]);
+      });
+    });
+
+    describe('#getGroupedOutputColumns', () => {
+      it('works', () => {
+        expect(query.getGroupedOutputColumns()).toEqual([
+          'channel',
+          'EXPR$1',
+          's_namespace',
+          'trans',
+        ]);
+      });
+    });
+
+    describe('#getAggregateSelectExpressions', () => {
+      it('works', () => {
+        expect(query.getAggregateSelectExpressions().map(String)).toEqual([
+          'COUNT(*)',
+          'SUM(added) AS "Added"',
+        ]);
+      });
+    });
+
+    describe('#getAggregateOutputColumns', () => {
+      it('works', () => {
+        expect(query.getAggregateOutputColumns()).toEqual(['EXPR$4', 'Added']);
+      });
+    });
+
+    describe('#getOrderByForOutputColumn', () => {
+      it('works', () => {
+        expect(String(query.getOrderByForOutputColumn('channel'))).toEqual('channel');
+        expect(String(query.getOrderByForOutputColumn('s_namespace'))).toEqual('s_namespace Desc');
+        expect(String(query.getOrderByForOutputColumn('Added'))).toEqual('undefined');
+        expect(String(query.getOrderByForOutputColumn('lol'))).toEqual('undefined');
+      });
+    });
+
+    describe('#getOrderedOutputColumns', () => {
+      it('works', () => {
+        expect(query.getOrderedOutputColumns()).toEqual(['channel', 's_namespace', 'EXPR$4']);
+      });
     });
   });
 });

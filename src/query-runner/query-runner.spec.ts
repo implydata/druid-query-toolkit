@@ -59,827 +59,830 @@ describe('QueryRunner', () => {
     },
   });
 
-  it('works with rune query', async () => {
-    const queryResult = await queryRunner.runQuery({
-      query: {
-        queryType: 'topN',
-        dataSource: 'my_data',
-      },
-      extraQueryContext: {
-        lol: 'here',
-      },
+  describe('#runQuery', () => {
+    it('works with rune query', async () => {
+      const queryResult = await queryRunner.runQuery({
+        query: {
+          queryType: 'topN',
+          dataSource: 'my_data',
+        },
+        extraQueryContext: {
+          lol: 'here',
+        },
+      });
+
+      expect(queryResult).toMatchInlineSnapshot(`
+        QueryResult {
+          "header": Array [
+            Column {
+              "name": "a1",
+              "nativeType": undefined,
+              "sqlType": undefined,
+            },
+            Column {
+              "name": "p0",
+              "nativeType": undefined,
+              "sqlType": undefined,
+            },
+            Column {
+              "name": "a2",
+              "nativeType": undefined,
+              "sqlType": undefined,
+            },
+            Column {
+              "name": "d0",
+              "nativeType": undefined,
+              "sqlType": undefined,
+            },
+            Column {
+              "name": "a0",
+              "nativeType": undefined,
+              "sqlType": undefined,
+            },
+          ],
+          "query": Object {
+            "context": Object {
+              "lol": "here",
+            },
+            "dataSource": "my_data",
+            "queryType": "topN",
+          },
+          "queryDuration": 1,
+          "queryId": "query-id-xxx",
+          "resultContext": undefined,
+          "rows": Array [
+            Array [
+              2068620,
+              1077329,
+              86038,
+              "#en.wikipedia",
+              6650,
+            ],
+            Array [
+              856,
+              2422,
+              3988,
+              "#sh.wikipedia",
+              3969,
+            ],
+          ],
+          "sqlQuery": undefined,
+          "sqlQueryId": undefined,
+        }
+      `);
     });
 
-    expect(queryResult).toMatchInlineSnapshot(`
-      QueryResult {
-        "header": Array [
-          Column {
-            "name": "a1",
-            "nativeType": undefined,
-            "sqlType": undefined,
+    it('works with wrapped SQL query', async () => {
+      const queryResult = await queryRunner.runQuery({
+        query: {
+          query:
+            'SELECT\n  channel, COUNT(*) AS "Count"\nFROM wikipedia\nGROUP BY 1\nORDER BY 2 DESC',
+          resultFormat: 'array',
+          header: true,
+          context: {
+            lol: 'hello world',
+            priority: 2,
           },
-          Column {
-            "name": "p0",
-            "nativeType": undefined,
-            "sqlType": undefined,
-          },
-          Column {
-            "name": "a2",
-            "nativeType": undefined,
-            "sqlType": undefined,
-          },
-          Column {
-            "name": "d0",
-            "nativeType": undefined,
-            "sqlType": undefined,
-          },
-          Column {
-            "name": "a0",
-            "nativeType": undefined,
-            "sqlType": undefined,
-          },
-        ],
-        "query": Object {
-          "context": Object {
-            "lol": "here",
-          },
-          "dataSource": "my_data",
-          "queryType": "topN",
         },
-        "queryDuration": 1,
-        "queryId": "query-id-xxx",
-        "resultContext": undefined,
-        "rows": Array [
-          Array [
-            2068620,
-            1077329,
-            86038,
-            "#en.wikipedia",
-            6650,
-          ],
-          Array [
-            856,
-            2422,
-            3988,
-            "#sh.wikipedia",
-            3969,
-          ],
-        ],
-        "sqlQuery": undefined,
-        "sqlQueryId": undefined,
-      }
-    `);
-  });
+        defaultQueryContext: {
+          priority: 1,
+          moon: 'beam',
+        },
+        extraQueryContext: {
+          lol: 'here',
+        },
+      });
 
-  it('works with wrapped SQL query', async () => {
-    const queryResult = await queryRunner.runQuery({
-      query: {
+      expect(queryResult).toMatchInlineSnapshot(`
+        QueryResult {
+          "header": Array [
+            Column {
+              "name": "channel",
+              "nativeType": undefined,
+              "sqlType": undefined,
+            },
+            Column {
+              "name": "Count",
+              "nativeType": undefined,
+              "sqlType": undefined,
+            },
+          ],
+          "query": Object {
+            "context": Object {
+              "lol": "here",
+              "moon": "beam",
+              "priority": 2,
+            },
+            "header": true,
+            "query": "SELECT
+          channel, COUNT(*) AS \\"Count\\"
+        FROM wikipedia
+        GROUP BY 1
+        ORDER BY 2 DESC",
+            "resultFormat": "array",
+          },
+          "queryDuration": 1,
+          "queryId": undefined,
+          "resultContext": undefined,
+          "rows": Array [
+            Array [
+              "#en.wikipedia",
+              6650,
+            ],
+            Array [
+              "#sh.wikipedia",
+              3969,
+            ],
+          ],
+          "sqlQuery": SqlQuery {
+            "clusteredByClause": undefined,
+            "contextStatements": undefined,
+            "decorator": undefined,
+            "explain": undefined,
+            "fromClause": SqlFromClause {
+              "expressions": SeparatedArray {
+                "separators": Array [],
+                "values": Array [
+                  SqlTable {
+                    "keywords": Object {},
+                    "namespace": undefined,
+                    "parens": undefined,
+                    "refName": RefName {
+                      "name": "wikipedia",
+                      "quotes": false,
+                    },
+                    "spacing": Object {},
+                    "type": "table",
+                  },
+                ],
+              },
+              "joinParts": undefined,
+              "keywords": Object {
+                "from": "FROM",
+              },
+              "parens": undefined,
+              "spacing": Object {
+                "postFrom": " ",
+              },
+              "type": "fromClause",
+            },
+            "groupByClause": SqlGroupByClause {
+              "decorator": undefined,
+              "expressions": SeparatedArray {
+                "separators": Array [],
+                "values": Array [
+                  SqlLiteral {
+                    "keywords": Object {},
+                    "parens": undefined,
+                    "spacing": Object {},
+                    "stringValue": "1",
+                    "type": "literal",
+                    "value": 1,
+                  },
+                ],
+              },
+              "innerParens": false,
+              "keywords": Object {
+                "groupBy": "GROUP BY",
+              },
+              "parens": undefined,
+              "spacing": Object {
+                "postGroupBy": " ",
+              },
+              "type": "groupByClause",
+            },
+            "havingClause": undefined,
+            "insertClause": undefined,
+            "keywords": Object {
+              "select": "SELECT",
+            },
+            "limitClause": undefined,
+            "offsetClause": undefined,
+            "orderByClause": SqlOrderByClause {
+              "expressions": SeparatedArray {
+                "separators": Array [],
+                "values": Array [
+                  SqlOrderByExpression {
+                    "direction": "DESC",
+                    "expression": SqlLiteral {
+                      "keywords": Object {},
+                      "parens": undefined,
+                      "spacing": Object {},
+                      "stringValue": "2",
+                      "type": "literal",
+                      "value": 2,
+                    },
+                    "keywords": Object {
+                      "direction": "DESC",
+                    },
+                    "parens": undefined,
+                    "spacing": Object {
+                      "preDirection": " ",
+                    },
+                    "type": "orderByExpression",
+                  },
+                ],
+              },
+              "keywords": Object {
+                "orderBy": "ORDER BY",
+              },
+              "parens": undefined,
+              "spacing": Object {
+                "postOrderBy": " ",
+              },
+              "type": "orderByClause",
+            },
+            "parens": undefined,
+            "partitionedByClause": undefined,
+            "replaceClause": undefined,
+            "selectExpressions": SeparatedArray {
+              "separators": Array [
+                Separator {
+                  "left": "",
+                  "right": " ",
+                  "separator": ",",
+                },
+              ],
+              "values": Array [
+                SqlColumn {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "refName": RefName {
+                    "name": "channel",
+                    "quotes": false,
+                  },
+                  "spacing": Object {},
+                  "table": undefined,
+                  "type": "column",
+                },
+                SqlAlias {
+                  "alias": RefName {
+                    "name": "Count",
+                    "quotes": true,
+                  },
+                  "columns": undefined,
+                  "expression": SqlFunction {
+                    "args": SeparatedArray {
+                      "separators": Array [],
+                      "values": Array [
+                        SqlStar {
+                          "keywords": Object {},
+                          "parens": undefined,
+                          "spacing": Object {},
+                          "table": undefined,
+                          "type": "star",
+                        },
+                      ],
+                    },
+                    "decorator": undefined,
+                    "extendClause": undefined,
+                    "functionName": RefName {
+                      "name": "COUNT",
+                      "quotes": false,
+                    },
+                    "keywords": Object {},
+                    "namespace": undefined,
+                    "parens": undefined,
+                    "spacing": Object {
+                      "postArguments": "",
+                      "postLeftParen": "",
+                      "preLeftParen": "",
+                    },
+                    "specialParen": undefined,
+                    "type": "function",
+                    "whereClause": undefined,
+                    "windowSpec": undefined,
+                  },
+                  "keywords": Object {
+                    "as": "AS",
+                  },
+                  "parens": undefined,
+                  "spacing": Object {
+                    "preAlias": " ",
+                    "preAs": " ",
+                  },
+                  "type": "alias",
+                },
+              ],
+            },
+            "spacing": Object {
+              "postSelect": "
+          ",
+              "preFromClause": "
+        ",
+              "preGroupByClause": "
+        ",
+              "preOrderByClause": "
+        ",
+            },
+            "type": "query",
+            "unionQuery": undefined,
+            "whereClause": undefined,
+            "withClause": undefined,
+          },
+          "sqlQueryId": "sql-query-id-yyy",
+        }
+      `);
+    });
+
+    it('works with unwraped SQL query', async () => {
+      const queryResult = await queryRunner.runQuery({
         query:
           'SELECT\n  channel, COUNT(*) AS "Count"\nFROM wikipedia\nGROUP BY 1\nORDER BY 2 DESC',
-        resultFormat: 'array',
-        header: true,
-        context: {
-          lol: 'hello world',
-          priority: 2,
+        extraQueryContext: {
+          lol: 'here',
         },
-      },
-      defaultQueryContext: {
-        priority: 1,
-        moon: 'beam',
-      },
-      extraQueryContext: {
-        lol: 'here',
-      },
-    });
+      });
 
-    expect(queryResult).toMatchInlineSnapshot(`
-      QueryResult {
-        "header": Array [
-          Column {
-            "name": "channel",
-            "nativeType": undefined,
-            "sqlType": undefined,
-          },
-          Column {
-            "name": "Count",
-            "nativeType": undefined,
-            "sqlType": undefined,
-          },
-        ],
-        "query": Object {
-          "context": Object {
-            "lol": "here",
-            "moon": "beam",
-            "priority": 2,
-          },
-          "header": true,
-          "query": "SELECT
-        channel, COUNT(*) AS \\"Count\\"
-      FROM wikipedia
-      GROUP BY 1
-      ORDER BY 2 DESC",
-          "resultFormat": "array",
-        },
-        "queryDuration": 1,
-        "queryId": undefined,
-        "resultContext": undefined,
-        "rows": Array [
-          Array [
-            "#en.wikipedia",
-            6650,
+      expect(queryResult).toMatchInlineSnapshot(`
+        QueryResult {
+          "header": Array [
+            Column {
+              "name": "channel",
+              "nativeType": "STRING",
+              "sqlType": "VARCHAR",
+            },
+            Column {
+              "name": "Count",
+              "nativeType": "LONG",
+              "sqlType": "BIGINT",
+            },
           ],
-          Array [
-            "#sh.wikipedia",
-            3969,
-          ],
-        ],
-        "sqlQuery": SqlQuery {
-          "clusteredByClause": undefined,
-          "contextStatements": undefined,
-          "decorator": undefined,
-          "explain": undefined,
-          "fromClause": SqlFromClause {
-            "expressions": SeparatedArray {
-              "separators": Array [],
-              "values": Array [
-                SqlTable {
-                  "keywords": Object {},
-                  "namespace": undefined,
-                  "parens": undefined,
-                  "refName": RefName {
-                    "name": "wikipedia",
-                    "quotes": false,
-                  },
-                  "spacing": Object {},
-                  "type": "table",
-                },
-              ],
+          "query": Object {
+            "context": Object {
+              "lol": "here",
             },
-            "joinParts": undefined,
-            "keywords": Object {
-              "from": "FROM",
-            },
-            "parens": undefined,
-            "spacing": Object {
-              "postFrom": " ",
-            },
-            "type": "fromClause",
+            "header": true,
+            "query": "SELECT
+          channel, COUNT(*) AS \\"Count\\"
+        FROM wikipedia
+        GROUP BY 1
+        ORDER BY 2 DESC",
+            "resultFormat": "array",
+            "sqlTypesHeader": true,
+            "typesHeader": true,
           },
-          "groupByClause": SqlGroupByClause {
+          "queryDuration": 1,
+          "queryId": undefined,
+          "resultContext": undefined,
+          "rows": Array [
+            Array [
+              "#en.wikipedia",
+              6650,
+            ],
+            Array [
+              "#sh.wikipedia",
+              3969,
+            ],
+          ],
+          "sqlQuery": SqlQuery {
+            "clusteredByClause": undefined,
+            "contextStatements": undefined,
             "decorator": undefined,
-            "expressions": SeparatedArray {
-              "separators": Array [],
-              "values": Array [
-                SqlLiteral {
-                  "keywords": Object {},
-                  "parens": undefined,
-                  "spacing": Object {},
-                  "stringValue": "1",
-                  "type": "literal",
-                  "value": 1,
-                },
-              ],
+            "explain": undefined,
+            "fromClause": SqlFromClause {
+              "expressions": SeparatedArray {
+                "separators": Array [],
+                "values": Array [
+                  SqlTable {
+                    "keywords": Object {},
+                    "namespace": undefined,
+                    "parens": undefined,
+                    "refName": RefName {
+                      "name": "wikipedia",
+                      "quotes": false,
+                    },
+                    "spacing": Object {},
+                    "type": "table",
+                  },
+                ],
+              },
+              "joinParts": undefined,
+              "keywords": Object {
+                "from": "FROM",
+              },
+              "parens": undefined,
+              "spacing": Object {
+                "postFrom": " ",
+              },
+              "type": "fromClause",
             },
-            "innerParens": false,
-            "keywords": Object {
-              "groupBy": "GROUP BY",
-            },
-            "parens": undefined,
-            "spacing": Object {
-              "postGroupBy": " ",
-            },
-            "type": "groupByClause",
-          },
-          "havingClause": undefined,
-          "insertClause": undefined,
-          "keywords": Object {
-            "select": "SELECT",
-          },
-          "limitClause": undefined,
-          "offsetClause": undefined,
-          "orderByClause": SqlOrderByClause {
-            "expressions": SeparatedArray {
-              "separators": Array [],
-              "values": Array [
-                SqlOrderByExpression {
-                  "direction": "DESC",
-                  "expression": SqlLiteral {
+            "groupByClause": SqlGroupByClause {
+              "decorator": undefined,
+              "expressions": SeparatedArray {
+                "separators": Array [],
+                "values": Array [
+                  SqlLiteral {
                     "keywords": Object {},
                     "parens": undefined,
                     "spacing": Object {},
-                    "stringValue": "2",
+                    "stringValue": "1",
                     "type": "literal",
-                    "value": 2,
+                    "value": 1,
                   },
-                  "keywords": Object {
-                    "direction": "DESC",
-                  },
-                  "parens": undefined,
-                  "spacing": Object {
-                    "preDirection": " ",
-                  },
-                  "type": "orderByExpression",
-                },
-              ],
+                ],
+              },
+              "innerParens": false,
+              "keywords": Object {
+                "groupBy": "GROUP BY",
+              },
+              "parens": undefined,
+              "spacing": Object {
+                "postGroupBy": " ",
+              },
+              "type": "groupByClause",
             },
+            "havingClause": undefined,
+            "insertClause": undefined,
             "keywords": Object {
-              "orderBy": "ORDER BY",
+              "select": "SELECT",
+            },
+            "limitClause": undefined,
+            "offsetClause": undefined,
+            "orderByClause": SqlOrderByClause {
+              "expressions": SeparatedArray {
+                "separators": Array [],
+                "values": Array [
+                  SqlOrderByExpression {
+                    "direction": "DESC",
+                    "expression": SqlLiteral {
+                      "keywords": Object {},
+                      "parens": undefined,
+                      "spacing": Object {},
+                      "stringValue": "2",
+                      "type": "literal",
+                      "value": 2,
+                    },
+                    "keywords": Object {
+                      "direction": "DESC",
+                    },
+                    "parens": undefined,
+                    "spacing": Object {
+                      "preDirection": " ",
+                    },
+                    "type": "orderByExpression",
+                  },
+                ],
+              },
+              "keywords": Object {
+                "orderBy": "ORDER BY",
+              },
+              "parens": undefined,
+              "spacing": Object {
+                "postOrderBy": " ",
+              },
+              "type": "orderByClause",
             },
             "parens": undefined,
-            "spacing": Object {
-              "postOrderBy": " ",
-            },
-            "type": "orderByClause",
-          },
-          "parens": undefined,
-          "partitionedByClause": undefined,
-          "replaceClause": undefined,
-          "selectExpressions": SeparatedArray {
-            "separators": Array [
-              Separator {
-                "left": "",
-                "right": " ",
-                "separator": ",",
-              },
-            ],
-            "values": Array [
-              SqlColumn {
-                "keywords": Object {},
-                "parens": undefined,
-                "refName": RefName {
-                  "name": "channel",
-                  "quotes": false,
+            "partitionedByClause": undefined,
+            "replaceClause": undefined,
+            "selectExpressions": SeparatedArray {
+              "separators": Array [
+                Separator {
+                  "left": "",
+                  "right": " ",
+                  "separator": ",",
                 },
-                "spacing": Object {},
-                "table": undefined,
-                "type": "column",
-              },
-              SqlAlias {
-                "alias": RefName {
-                  "name": "Count",
-                  "quotes": true,
-                },
-                "columns": undefined,
-                "expression": SqlFunction {
-                  "args": SeparatedArray {
-                    "separators": Array [],
-                    "values": Array [
-                      SqlStar {
-                        "keywords": Object {},
-                        "parens": undefined,
-                        "spacing": Object {},
-                        "table": undefined,
-                        "type": "star",
-                      },
-                    ],
-                  },
-                  "decorator": undefined,
-                  "extendClause": undefined,
-                  "functionName": RefName {
-                    "name": "COUNT",
-                    "quotes": false,
-                  },
-                  "keywords": Object {},
-                  "namespace": undefined,
-                  "parens": undefined,
-                  "spacing": Object {
-                    "postArguments": "",
-                    "postLeftParen": "",
-                    "preLeftParen": "",
-                  },
-                  "specialParen": undefined,
-                  "type": "function",
-                  "whereClause": undefined,
-                  "windowSpec": undefined,
-                },
-                "keywords": Object {
-                  "as": "AS",
-                },
-                "parens": undefined,
-                "spacing": Object {
-                  "preAlias": " ",
-                  "preAs": " ",
-                },
-                "type": "alias",
-              },
-            ],
-          },
-          "spacing": Object {
-            "postSelect": "
-        ",
-            "preFromClause": "
-      ",
-            "preGroupByClause": "
-      ",
-            "preOrderByClause": "
-      ",
-          },
-          "type": "query",
-          "unionQuery": undefined,
-          "whereClause": undefined,
-          "withClause": undefined,
-        },
-        "sqlQueryId": "sql-query-id-yyy",
-      }
-    `);
-  });
-
-  it('works with unwraped SQL query', async () => {
-    const queryResult = await queryRunner.runQuery({
-      query: 'SELECT\n  channel, COUNT(*) AS "Count"\nFROM wikipedia\nGROUP BY 1\nORDER BY 2 DESC',
-      extraQueryContext: {
-        lol: 'here',
-      },
-    });
-
-    expect(queryResult).toMatchInlineSnapshot(`
-      QueryResult {
-        "header": Array [
-          Column {
-            "name": "channel",
-            "nativeType": "STRING",
-            "sqlType": "VARCHAR",
-          },
-          Column {
-            "name": "Count",
-            "nativeType": "LONG",
-            "sqlType": "BIGINT",
-          },
-        ],
-        "query": Object {
-          "context": Object {
-            "lol": "here",
-          },
-          "header": true,
-          "query": "SELECT
-        channel, COUNT(*) AS \\"Count\\"
-      FROM wikipedia
-      GROUP BY 1
-      ORDER BY 2 DESC",
-          "resultFormat": "array",
-          "sqlTypesHeader": true,
-          "typesHeader": true,
-        },
-        "queryDuration": 1,
-        "queryId": undefined,
-        "resultContext": undefined,
-        "rows": Array [
-          Array [
-            "#en.wikipedia",
-            6650,
-          ],
-          Array [
-            "#sh.wikipedia",
-            3969,
-          ],
-        ],
-        "sqlQuery": SqlQuery {
-          "clusteredByClause": undefined,
-          "contextStatements": undefined,
-          "decorator": undefined,
-          "explain": undefined,
-          "fromClause": SqlFromClause {
-            "expressions": SeparatedArray {
-              "separators": Array [],
+              ],
               "values": Array [
-                SqlTable {
+                SqlColumn {
                   "keywords": Object {},
-                  "namespace": undefined,
                   "parens": undefined,
                   "refName": RefName {
-                    "name": "wikipedia",
+                    "name": "channel",
                     "quotes": false,
                   },
                   "spacing": Object {},
-                  "type": "table",
+                  "table": undefined,
+                  "type": "column",
                 },
-              ],
-            },
-            "joinParts": undefined,
-            "keywords": Object {
-              "from": "FROM",
-            },
-            "parens": undefined,
-            "spacing": Object {
-              "postFrom": " ",
-            },
-            "type": "fromClause",
-          },
-          "groupByClause": SqlGroupByClause {
-            "decorator": undefined,
-            "expressions": SeparatedArray {
-              "separators": Array [],
-              "values": Array [
-                SqlLiteral {
-                  "keywords": Object {},
+                SqlAlias {
+                  "alias": RefName {
+                    "name": "Count",
+                    "quotes": true,
+                  },
+                  "columns": undefined,
+                  "expression": SqlFunction {
+                    "args": SeparatedArray {
+                      "separators": Array [],
+                      "values": Array [
+                        SqlStar {
+                          "keywords": Object {},
+                          "parens": undefined,
+                          "spacing": Object {},
+                          "table": undefined,
+                          "type": "star",
+                        },
+                      ],
+                    },
+                    "decorator": undefined,
+                    "extendClause": undefined,
+                    "functionName": RefName {
+                      "name": "COUNT",
+                      "quotes": false,
+                    },
+                    "keywords": Object {},
+                    "namespace": undefined,
+                    "parens": undefined,
+                    "spacing": Object {
+                      "postArguments": "",
+                      "postLeftParen": "",
+                      "preLeftParen": "",
+                    },
+                    "specialParen": undefined,
+                    "type": "function",
+                    "whereClause": undefined,
+                    "windowSpec": undefined,
+                  },
+                  "keywords": Object {
+                    "as": "AS",
+                  },
                   "parens": undefined,
-                  "spacing": Object {},
-                  "stringValue": "1",
-                  "type": "literal",
-                  "value": 1,
+                  "spacing": Object {
+                    "preAlias": " ",
+                    "preAs": " ",
+                  },
+                  "type": "alias",
                 },
               ],
             },
-            "innerParens": false,
-            "keywords": Object {
-              "groupBy": "GROUP BY",
-            },
-            "parens": undefined,
             "spacing": Object {
-              "postGroupBy": " ",
+              "postSelect": "
+          ",
+              "preFromClause": "
+        ",
+              "preGroupByClause": "
+        ",
+              "preOrderByClause": "
+        ",
             },
-            "type": "groupByClause",
+            "type": "query",
+            "unionQuery": undefined,
+            "whereClause": undefined,
+            "withClause": undefined,
           },
-          "havingClause": undefined,
-          "insertClause": undefined,
-          "keywords": Object {
-            "select": "SELECT",
+          "sqlQueryId": "sql-query-id-yyy",
+        }
+      `);
+    });
+
+    it('works with a parsed SQL query', async () => {
+      const queryResult = await queryRunner.runQuery({
+        query: SqlQuery.parse(
+          'SELECT\n  channel, COUNT(*) AS "Count"\nFROM wikipedia\nGROUP BY 1\nORDER BY 2 DESC',
+        ),
+        defaultQueryContext: {
+          priority: 1,
+        },
+        extraQueryContext: {
+          lol: 'here',
+        },
+      });
+      expect(queryResult).toMatchInlineSnapshot(`
+        QueryResult {
+          "header": Array [
+            Column {
+              "name": "channel",
+              "nativeType": "STRING",
+              "sqlType": "VARCHAR",
+            },
+            Column {
+              "name": "Count",
+              "nativeType": "LONG",
+              "sqlType": "BIGINT",
+            },
+          ],
+          "query": Object {
+            "context": Object {
+              "lol": "here",
+              "priority": 1,
+            },
+            "header": true,
+            "query": "SELECT
+          channel, COUNT(*) AS \\"Count\\"
+        FROM wikipedia
+        GROUP BY 1
+        ORDER BY 2 DESC",
+            "resultFormat": "array",
+            "sqlTypesHeader": true,
+            "typesHeader": true,
           },
-          "limitClause": undefined,
-          "offsetClause": undefined,
-          "orderByClause": SqlOrderByClause {
-            "expressions": SeparatedArray {
-              "separators": Array [],
-              "values": Array [
-                SqlOrderByExpression {
-                  "direction": "DESC",
-                  "expression": SqlLiteral {
+          "queryDuration": 1,
+          "queryId": undefined,
+          "resultContext": undefined,
+          "rows": Array [
+            Array [
+              "#en.wikipedia",
+              6650,
+            ],
+            Array [
+              "#sh.wikipedia",
+              3969,
+            ],
+          ],
+          "sqlQuery": SqlQuery {
+            "clusteredByClause": undefined,
+            "contextStatements": undefined,
+            "decorator": undefined,
+            "explain": undefined,
+            "fromClause": SqlFromClause {
+              "expressions": SeparatedArray {
+                "separators": Array [],
+                "values": Array [
+                  SqlTable {
+                    "keywords": Object {},
+                    "namespace": undefined,
+                    "parens": undefined,
+                    "refName": RefName {
+                      "name": "wikipedia",
+                      "quotes": false,
+                    },
+                    "spacing": Object {},
+                    "type": "table",
+                  },
+                ],
+              },
+              "joinParts": undefined,
+              "keywords": Object {
+                "from": "FROM",
+              },
+              "parens": undefined,
+              "spacing": Object {
+                "postFrom": " ",
+              },
+              "type": "fromClause",
+            },
+            "groupByClause": SqlGroupByClause {
+              "decorator": undefined,
+              "expressions": SeparatedArray {
+                "separators": Array [],
+                "values": Array [
+                  SqlLiteral {
                     "keywords": Object {},
                     "parens": undefined,
                     "spacing": Object {},
-                    "stringValue": "2",
+                    "stringValue": "1",
                     "type": "literal",
-                    "value": 2,
+                    "value": 1,
                   },
-                  "keywords": Object {
-                    "direction": "DESC",
-                  },
-                  "parens": undefined,
-                  "spacing": Object {
-                    "preDirection": " ",
-                  },
-                  "type": "orderByExpression",
-                },
-              ],
+                ],
+              },
+              "innerParens": false,
+              "keywords": Object {
+                "groupBy": "GROUP BY",
+              },
+              "parens": undefined,
+              "spacing": Object {
+                "postGroupBy": " ",
+              },
+              "type": "groupByClause",
             },
+            "havingClause": undefined,
+            "insertClause": undefined,
             "keywords": Object {
-              "orderBy": "ORDER BY",
+              "select": "SELECT",
+            },
+            "limitClause": undefined,
+            "offsetClause": undefined,
+            "orderByClause": SqlOrderByClause {
+              "expressions": SeparatedArray {
+                "separators": Array [],
+                "values": Array [
+                  SqlOrderByExpression {
+                    "direction": "DESC",
+                    "expression": SqlLiteral {
+                      "keywords": Object {},
+                      "parens": undefined,
+                      "spacing": Object {},
+                      "stringValue": "2",
+                      "type": "literal",
+                      "value": 2,
+                    },
+                    "keywords": Object {
+                      "direction": "DESC",
+                    },
+                    "parens": undefined,
+                    "spacing": Object {
+                      "preDirection": " ",
+                    },
+                    "type": "orderByExpression",
+                  },
+                ],
+              },
+              "keywords": Object {
+                "orderBy": "ORDER BY",
+              },
+              "parens": undefined,
+              "spacing": Object {
+                "postOrderBy": " ",
+              },
+              "type": "orderByClause",
             },
             "parens": undefined,
-            "spacing": Object {
-              "postOrderBy": " ",
-            },
-            "type": "orderByClause",
-          },
-          "parens": undefined,
-          "partitionedByClause": undefined,
-          "replaceClause": undefined,
-          "selectExpressions": SeparatedArray {
-            "separators": Array [
-              Separator {
-                "left": "",
-                "right": " ",
-                "separator": ",",
-              },
-            ],
-            "values": Array [
-              SqlColumn {
-                "keywords": Object {},
-                "parens": undefined,
-                "refName": RefName {
-                  "name": "channel",
-                  "quotes": false,
+            "partitionedByClause": undefined,
+            "replaceClause": undefined,
+            "selectExpressions": SeparatedArray {
+              "separators": Array [
+                Separator {
+                  "left": "",
+                  "right": " ",
+                  "separator": ",",
                 },
-                "spacing": Object {},
-                "table": undefined,
-                "type": "column",
-              },
-              SqlAlias {
-                "alias": RefName {
-                  "name": "Count",
-                  "quotes": true,
-                },
-                "columns": undefined,
-                "expression": SqlFunction {
-                  "args": SeparatedArray {
-                    "separators": Array [],
-                    "values": Array [
-                      SqlStar {
-                        "keywords": Object {},
-                        "parens": undefined,
-                        "spacing": Object {},
-                        "table": undefined,
-                        "type": "star",
-                      },
-                    ],
-                  },
-                  "decorator": undefined,
-                  "extendClause": undefined,
-                  "functionName": RefName {
-                    "name": "COUNT",
-                    "quotes": false,
-                  },
-                  "keywords": Object {},
-                  "namespace": undefined,
-                  "parens": undefined,
-                  "spacing": Object {
-                    "postArguments": "",
-                    "postLeftParen": "",
-                    "preLeftParen": "",
-                  },
-                  "specialParen": undefined,
-                  "type": "function",
-                  "whereClause": undefined,
-                  "windowSpec": undefined,
-                },
-                "keywords": Object {
-                  "as": "AS",
-                },
-                "parens": undefined,
-                "spacing": Object {
-                  "preAlias": " ",
-                  "preAs": " ",
-                },
-                "type": "alias",
-              },
-            ],
-          },
-          "spacing": Object {
-            "postSelect": "
-        ",
-            "preFromClause": "
-      ",
-            "preGroupByClause": "
-      ",
-            "preOrderByClause": "
-      ",
-          },
-          "type": "query",
-          "unionQuery": undefined,
-          "whereClause": undefined,
-          "withClause": undefined,
-        },
-        "sqlQueryId": "sql-query-id-yyy",
-      }
-    `);
-  });
-
-  it('works with a parsed SQL query', async () => {
-    const queryResult = await queryRunner.runQuery({
-      query: SqlQuery.parse(
-        'SELECT\n  channel, COUNT(*) AS "Count"\nFROM wikipedia\nGROUP BY 1\nORDER BY 2 DESC',
-      ),
-      defaultQueryContext: {
-        priority: 1,
-      },
-      extraQueryContext: {
-        lol: 'here',
-      },
-    });
-    expect(queryResult).toMatchInlineSnapshot(`
-      QueryResult {
-        "header": Array [
-          Column {
-            "name": "channel",
-            "nativeType": "STRING",
-            "sqlType": "VARCHAR",
-          },
-          Column {
-            "name": "Count",
-            "nativeType": "LONG",
-            "sqlType": "BIGINT",
-          },
-        ],
-        "query": Object {
-          "context": Object {
-            "lol": "here",
-            "priority": 1,
-          },
-          "header": true,
-          "query": "SELECT
-        channel, COUNT(*) AS \\"Count\\"
-      FROM wikipedia
-      GROUP BY 1
-      ORDER BY 2 DESC",
-          "resultFormat": "array",
-          "sqlTypesHeader": true,
-          "typesHeader": true,
-        },
-        "queryDuration": 1,
-        "queryId": undefined,
-        "resultContext": undefined,
-        "rows": Array [
-          Array [
-            "#en.wikipedia",
-            6650,
-          ],
-          Array [
-            "#sh.wikipedia",
-            3969,
-          ],
-        ],
-        "sqlQuery": SqlQuery {
-          "clusteredByClause": undefined,
-          "contextStatements": undefined,
-          "decorator": undefined,
-          "explain": undefined,
-          "fromClause": SqlFromClause {
-            "expressions": SeparatedArray {
-              "separators": Array [],
+              ],
               "values": Array [
-                SqlTable {
+                SqlColumn {
                   "keywords": Object {},
-                  "namespace": undefined,
                   "parens": undefined,
                   "refName": RefName {
-                    "name": "wikipedia",
+                    "name": "channel",
                     "quotes": false,
                   },
                   "spacing": Object {},
-                  "type": "table",
+                  "table": undefined,
+                  "type": "column",
                 },
-              ],
-            },
-            "joinParts": undefined,
-            "keywords": Object {
-              "from": "FROM",
-            },
-            "parens": undefined,
-            "spacing": Object {
-              "postFrom": " ",
-            },
-            "type": "fromClause",
-          },
-          "groupByClause": SqlGroupByClause {
-            "decorator": undefined,
-            "expressions": SeparatedArray {
-              "separators": Array [],
-              "values": Array [
-                SqlLiteral {
-                  "keywords": Object {},
-                  "parens": undefined,
-                  "spacing": Object {},
-                  "stringValue": "1",
-                  "type": "literal",
-                  "value": 1,
-                },
-              ],
-            },
-            "innerParens": false,
-            "keywords": Object {
-              "groupBy": "GROUP BY",
-            },
-            "parens": undefined,
-            "spacing": Object {
-              "postGroupBy": " ",
-            },
-            "type": "groupByClause",
-          },
-          "havingClause": undefined,
-          "insertClause": undefined,
-          "keywords": Object {
-            "select": "SELECT",
-          },
-          "limitClause": undefined,
-          "offsetClause": undefined,
-          "orderByClause": SqlOrderByClause {
-            "expressions": SeparatedArray {
-              "separators": Array [],
-              "values": Array [
-                SqlOrderByExpression {
-                  "direction": "DESC",
-                  "expression": SqlLiteral {
+                SqlAlias {
+                  "alias": RefName {
+                    "name": "Count",
+                    "quotes": true,
+                  },
+                  "columns": undefined,
+                  "expression": SqlFunction {
+                    "args": SeparatedArray {
+                      "separators": Array [],
+                      "values": Array [
+                        SqlStar {
+                          "keywords": Object {},
+                          "parens": undefined,
+                          "spacing": Object {},
+                          "table": undefined,
+                          "type": "star",
+                        },
+                      ],
+                    },
+                    "decorator": undefined,
+                    "extendClause": undefined,
+                    "functionName": RefName {
+                      "name": "COUNT",
+                      "quotes": false,
+                    },
                     "keywords": Object {},
+                    "namespace": undefined,
                     "parens": undefined,
-                    "spacing": Object {},
-                    "stringValue": "2",
-                    "type": "literal",
-                    "value": 2,
+                    "spacing": Object {
+                      "postArguments": "",
+                      "postLeftParen": "",
+                      "preLeftParen": "",
+                    },
+                    "specialParen": undefined,
+                    "type": "function",
+                    "whereClause": undefined,
+                    "windowSpec": undefined,
                   },
                   "keywords": Object {
-                    "direction": "DESC",
+                    "as": "AS",
                   },
                   "parens": undefined,
                   "spacing": Object {
-                    "preDirection": " ",
+                    "preAlias": " ",
+                    "preAs": " ",
                   },
-                  "type": "orderByExpression",
+                  "type": "alias",
                 },
               ],
             },
-            "keywords": Object {
-              "orderBy": "ORDER BY",
-            },
-            "parens": undefined,
             "spacing": Object {
-              "postOrderBy": " ",
-            },
-            "type": "orderByClause",
-          },
-          "parens": undefined,
-          "partitionedByClause": undefined,
-          "replaceClause": undefined,
-          "selectExpressions": SeparatedArray {
-            "separators": Array [
-              Separator {
-                "left": "",
-                "right": " ",
-                "separator": ",",
-              },
-            ],
-            "values": Array [
-              SqlColumn {
-                "keywords": Object {},
-                "parens": undefined,
-                "refName": RefName {
-                  "name": "channel",
-                  "quotes": false,
-                },
-                "spacing": Object {},
-                "table": undefined,
-                "type": "column",
-              },
-              SqlAlias {
-                "alias": RefName {
-                  "name": "Count",
-                  "quotes": true,
-                },
-                "columns": undefined,
-                "expression": SqlFunction {
-                  "args": SeparatedArray {
-                    "separators": Array [],
-                    "values": Array [
-                      SqlStar {
-                        "keywords": Object {},
-                        "parens": undefined,
-                        "spacing": Object {},
-                        "table": undefined,
-                        "type": "star",
-                      },
-                    ],
-                  },
-                  "decorator": undefined,
-                  "extendClause": undefined,
-                  "functionName": RefName {
-                    "name": "COUNT",
-                    "quotes": false,
-                  },
-                  "keywords": Object {},
-                  "namespace": undefined,
-                  "parens": undefined,
-                  "spacing": Object {
-                    "postArguments": "",
-                    "postLeftParen": "",
-                    "preLeftParen": "",
-                  },
-                  "specialParen": undefined,
-                  "type": "function",
-                  "whereClause": undefined,
-                  "windowSpec": undefined,
-                },
-                "keywords": Object {
-                  "as": "AS",
-                },
-                "parens": undefined,
-                "spacing": Object {
-                  "preAlias": " ",
-                  "preAs": " ",
-                },
-                "type": "alias",
-              },
-            ],
-          },
-          "spacing": Object {
-            "postSelect": "
+              "postSelect": "
+          ",
+              "preFromClause": "
         ",
-            "preFromClause": "
-      ",
-            "preGroupByClause": "
-      ",
-            "preOrderByClause": "
-      ",
+              "preGroupByClause": "
+        ",
+              "preOrderByClause": "
+        ",
+            },
+            "type": "query",
+            "unionQuery": undefined,
+            "whereClause": undefined,
+            "withClause": undefined,
           },
-          "type": "query",
-          "unionQuery": undefined,
-          "whereClause": undefined,
-          "withClause": undefined,
-        },
-        "sqlQueryId": "sql-query-id-yyy",
-      }
-    `);
-  });
-
-  it('works with query parameters', async () => {
-    const queryResult = await queryRunner.runQuery({
-      query: SqlQuery.parse(
-        'SELECT\n  channel, COUNT(*) AS "Count"\nFROM wikipedia\nGROUP BY 1\nORDER BY 2 DESC',
-      ),
-      extraQueryContext: {
-        lol: 'here',
-      },
-      queryParameters: [{ type: 'VARCHAR', value: 'test-param-value' }],
+          "sqlQueryId": "sql-query-id-yyy",
+        }
+      `);
     });
 
-    expect(queryResult.sqlQueryId).toEqual('test-param-value');
+    it('works with query parameters', async () => {
+      const queryResult = await queryRunner.runQuery({
+        query: SqlQuery.parse(
+          'SELECT\n  channel, COUNT(*) AS "Count"\nFROM wikipedia\nGROUP BY 1\nORDER BY 2 DESC',
+        ),
+        extraQueryContext: {
+          lol: 'here',
+        },
+        queryParameters: [{ type: 'VARCHAR', value: 'test-param-value' }],
+      });
+
+      expect(queryResult.sqlQueryId).toEqual('test-param-value');
+    });
   });
 });

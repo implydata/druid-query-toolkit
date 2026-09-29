@@ -16,12 +16,13 @@ import { SqlExpression } from '../..';
 import { backAndForth } from '../../test-utils';
 
 describe('SqlInterval', () => {
-  it('Simple function', () => {
-    const sql = `INTERVAL '2' DAYS`;
+  describe('parses', () => {
+    it('simple interval', () => {
+      const sql = `INTERVAL '2' DAYS`;
 
-    backAndForth(sql);
+      backAndForth(sql);
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlInterval {
         "intervalValue": SqlLiteral {
           "keywords": Object {},
@@ -43,14 +44,14 @@ describe('SqlInterval', () => {
         "unit": "DAYS",
       }
     `);
-  });
+    });
 
-  it('YEAR TO MONTH interval', () => {
-    const sql = `INTERVAL '1-2' YEAR TO MONTH`;
+    it('YEAR TO MONTH interval', () => {
+      const sql = `INTERVAL '1-2' YEAR TO MONTH`;
 
-    backAndForth(sql);
+      backAndForth(sql);
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlInterval {
         "intervalValue": SqlLiteral {
           "keywords": Object {},
@@ -72,14 +73,14 @@ describe('SqlInterval', () => {
         "unit": "YEAR TO MONTH",
       }
     `);
-  });
+    });
 
-  it('YEAR TO MONTH interval', () => {
-    const sql = `INTERVAL '1-2' YEAR_MONTH`;
+    it('YEAR_MONTH interval', () => {
+      const sql = `INTERVAL '1-2' YEAR_MONTH`;
 
-    backAndForth(sql);
+      backAndForth(sql);
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlInterval {
         "intervalValue": SqlLiteral {
           "keywords": Object {},
@@ -101,5 +102,6 @@ describe('SqlInterval', () => {
         "unit": "YEAR_MONTH",
       }
     `);
+    });
   });
 });

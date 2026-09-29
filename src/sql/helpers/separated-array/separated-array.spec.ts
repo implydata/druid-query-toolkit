@@ -22,33 +22,45 @@ describe('SeparatedArray', () => {
     [Separator.rightSpace(','), Separator.symmetricSpace(';')],
   );
 
-  it('works in basic case', () => {
-    expect(String(a)).toEqual('1, 2 ; 3');
+  describe('#toString', () => {
+    it('works', () => {
+      expect(String(a)).toEqual('1, 2 ; 3');
+    });
   });
 
-  it('#change', () => {
-    expect(String(a.change(1, 7))).toEqual('1, 7 ; 3');
+  describe('#change', () => {
+    it('changes a value', () => {
+      expect(String(a.change(1, 7))).toEqual('1, 7 ; 3');
+    });
   });
 
-  it('#remove', () => {
-    expect(String(a.remove(0))).toEqual('2 ; 3');
-    expect(String(a.remove(1))).toEqual('1 ; 3');
-    expect(String(a.remove(2))).toEqual('1, 2');
+  describe('#remove', () => {
+    it('removes a value', () => {
+      expect(String(a.remove(0))).toEqual('2 ; 3');
+      expect(String(a.remove(1))).toEqual('1 ; 3');
+      expect(String(a.remove(2))).toEqual('1, 2');
+    });
   });
 
-  it('#insert', () => {
-    expect(String(a.insert(0, 7))).toEqual('7, 1, 2 ; 3');
-    expect(String(a.insert(1, 7))).toEqual('1, 7, 2 ; 3');
-    expect(String(a.insert(2, 7))).toEqual('1, 2 ; 7 ; 3');
-    expect(String(a.insert(3, 7))).toEqual('1, 2 ; 3 ; 7');
-    expect(String(a.insert(4, 7))).toEqual('1, 2 ; 3 ; 7');
+  describe('#insert', () => {
+    it('inserts a value', () => {
+      expect(String(a.insert(0, 7))).toEqual('7, 1, 2 ; 3');
+      expect(String(a.insert(1, 7))).toEqual('1, 7, 2 ; 3');
+      expect(String(a.insert(2, 7))).toEqual('1, 2 ; 7 ; 3');
+      expect(String(a.insert(3, 7))).toEqual('1, 2 ; 3 ; 7');
+      expect(String(a.insert(4, 7))).toEqual('1, 2 ; 3 ; 7');
+    });
   });
 
-  it('#prepend', () => {
-    expect(String(a.prepend(7))).toEqual('7, 1, 2 ; 3');
+  describe('#prepend', () => {
+    it('prepends a value', () => {
+      expect(String(a.prepend(7))).toEqual('7, 1, 2 ; 3');
+    });
   });
 
-  it('#append', () => {
-    expect(String(a.append(7))).toEqual('1, 2 ; 3 ; 7');
+  describe('#append', () => {
+    it('appends a value', () => {
+      expect(String(a.append(7))).toEqual('1, 2 ; 3 ; 7');
+    });
   });
 });

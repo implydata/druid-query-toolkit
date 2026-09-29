@@ -17,6 +17,58 @@ import { NEWLINE_INDENT, SPACE } from '../general/general';
 import { Separator } from './separator';
 
 describe('Separator', () => {
+  describe('.COMMA', () => {
+    it('is a comma with right space', () => {
+      expect(Separator.COMMA.toString()).toBe(', ');
+    });
+  });
+
+  describe('.COMMA_NEWLINE', () => {
+    it('is a comma with newline on right', () => {
+      expect(Separator.COMMA_NEWLINE.toString()).toBe(',\n');
+    });
+  });
+
+  describe('.symmetricSpace', () => {
+    it('creates a separator with spaces on both sides', () => {
+      const separator = Separator.symmetricSpace('AND');
+      expect(separator.left).toBe(SPACE);
+      expect(separator.separator).toBe('AND');
+      expect(separator.right).toBe(SPACE);
+      expect(separator.toString()).toBe(' AND ');
+    });
+  });
+
+  describe('.rightSpace', () => {
+    it('creates a separator with space only on the right', () => {
+      const separator = Separator.rightSpace('AND');
+      expect(separator.left).toBe('');
+      expect(separator.separator).toBe('AND');
+      expect(separator.right).toBe(SPACE);
+      expect(separator.toString()).toBe('AND ');
+    });
+  });
+
+  describe('.indentSpace', () => {
+    it('creates a separator with space on left and newline+indent on right', () => {
+      const separator = Separator.indentSpace('AND');
+      expect(separator.left).toBe(SPACE);
+      expect(separator.separator).toBe('AND');
+      expect(separator.right).toBe(NEWLINE_INDENT);
+      expect(separator.toString()).toBe(' AND\n  ');
+    });
+  });
+
+  describe('.newlineFirst', () => {
+    it('creates a separator with newline+indent on left and space on right', () => {
+      const separator = Separator.newlineFirst('AND');
+      expect(separator.left).toBe(NEWLINE_INDENT);
+      expect(separator.separator).toBe('AND');
+      expect(separator.right).toBe(SPACE);
+      expect(separator.toString()).toBe('\n  AND ');
+    });
+  });
+
   describe('constructor', () => {
     it('creates a separator with provided options', () => {
       const separator = new Separator({ left: 'left', separator: 'SEP', right: 'right' });
@@ -33,7 +85,7 @@ describe('Separator', () => {
     });
   });
 
-  describe('toString', () => {
+  describe('#toString', () => {
     it('joins left, separator, and right values', () => {
       const separator = new Separator({ left: 'left', separator: 'SEP', right: 'right' });
       expect(separator.toString()).toBe('leftSEPright');
@@ -42,58 +94,6 @@ describe('Separator', () => {
     it('handles empty left and right values', () => {
       const separator = new Separator({ separator: 'SEP' });
       expect(separator.toString()).toBe('SEP');
-    });
-  });
-
-  describe('static methods', () => {
-    describe('symmetricSpace', () => {
-      it('creates a separator with spaces on both sides', () => {
-        const separator = Separator.symmetricSpace('AND');
-        expect(separator.left).toBe(SPACE);
-        expect(separator.separator).toBe('AND');
-        expect(separator.right).toBe(SPACE);
-        expect(separator.toString()).toBe(' AND ');
-      });
-    });
-
-    describe('rightSpace', () => {
-      it('creates a separator with space only on the right', () => {
-        const separator = Separator.rightSpace('AND');
-        expect(separator.left).toBe('');
-        expect(separator.separator).toBe('AND');
-        expect(separator.right).toBe(SPACE);
-        expect(separator.toString()).toBe('AND ');
-      });
-    });
-
-    describe('indentSpace', () => {
-      it('creates a separator with space on left and newline+indent on right', () => {
-        const separator = Separator.indentSpace('AND');
-        expect(separator.left).toBe(SPACE);
-        expect(separator.separator).toBe('AND');
-        expect(separator.right).toBe(NEWLINE_INDENT);
-        expect(separator.toString()).toBe(' AND\n  ');
-      });
-    });
-
-    describe('newlineFirst', () => {
-      it('creates a separator with newline+indent on left and space on right', () => {
-        const separator = Separator.newlineFirst('AND');
-        expect(separator.left).toBe(NEWLINE_INDENT);
-        expect(separator.separator).toBe('AND');
-        expect(separator.right).toBe(SPACE);
-        expect(separator.toString()).toBe('\n  AND ');
-      });
-    });
-  });
-
-  describe('static properties', () => {
-    it('COMMA is a comma with right space', () => {
-      expect(Separator.COMMA.toString()).toBe(', ');
-    });
-
-    it('COMMA_NEWLINE is a comma with newline on right', () => {
-      expect(Separator.COMMA_NEWLINE.toString()).toBe(',\n');
     });
   });
 });

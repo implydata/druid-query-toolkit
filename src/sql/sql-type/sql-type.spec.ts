@@ -16,27 +16,31 @@ import type { SqlFunction } from '../..';
 import { SqlExpression, SqlType } from '../..';
 
 describe('SqlType', () => {
-  it('works for varchar', () => {
-    const varcharType = SqlType.create('varchar');
-    expect(varcharType.toString()).toEqual('varchar');
-    expect(varcharType.isArray()).toBeFalsy();
-    expect(varcharType.value).toEqual('VARCHAR');
-    expect(varcharType.getNativeType()).toEqual('string');
+  describe('parses', () => {
+    it('works when parsed with mixed case', () => {
+      const cast = SqlExpression.parse('CAST(X AS varchar)') as SqlFunction;
+      const type = cast.getCastType()!;
+      expect(type.toString()).toEqual('varchar');
+      expect(type.value).toEqual('VARCHAR');
+      expect(type.getNativeType()).toEqual('string');
+    });
   });
 
-  it('works for arrays', () => {
-    const arrayType = SqlType.create('varchar /* lol */ array');
-    expect(arrayType.toString()).toEqual('varchar /* lol */ array');
-    expect(arrayType.isArray()).toBeTruthy();
-    expect(arrayType.value).toEqual('VARCHAR ARRAY');
-    expect(arrayType.getNativeType()).toEqual('ARRAY<string>');
-  });
+  describe('.create', () => {
+    it('works for varchar', () => {
+      const varcharType = SqlType.create('varchar');
+      expect(varcharType.toString()).toEqual('varchar');
+      expect(varcharType.isArray()).toBeFalsy();
+      expect(varcharType.value).toEqual('VARCHAR');
+      expect(varcharType.getNativeType()).toEqual('string');
+    });
 
-  it('works when parsed with mixed case', () => {
-    const cast = SqlExpression.parse('CAST(X AS varchar)') as SqlFunction;
-    const type = cast.getCastType()!;
-    expect(type.toString()).toEqual('varchar');
-    expect(type.value).toEqual('VARCHAR');
-    expect(type.getNativeType()).toEqual('string');
+    it('works for arrays', () => {
+      const arrayType = SqlType.create('varchar /* lol */ array');
+      expect(arrayType.toString()).toEqual('varchar /* lol */ array');
+      expect(arrayType.isArray()).toBeTruthy();
+      expect(arrayType.value).toEqual('VARCHAR ARRAY');
+      expect(arrayType.getNativeType()).toEqual('ARRAY<string>');
+    });
   });
 });

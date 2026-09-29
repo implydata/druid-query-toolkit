@@ -15,11 +15,13 @@
 import { SqlExpression } from '../..';
 import { backAndForth } from '../../test-utils';
 
-describe('OR expression', () => {
-  it('single expression with unquoted string', () => {
-    const sql = `A OR B`;
+describe('SqlMulti', () => {
+  describe('parses', () => {
+    describe('OR', () => {
+      it('single expression with unquoted string', () => {
+        const sql = `A OR B`;
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "args": SeparatedArray {
           "separators": Array [
@@ -61,12 +63,12 @@ describe('OR expression', () => {
         "type": "multi",
       }
     `);
-  });
+      });
 
-  it('single expression with single quoted string', () => {
-    const sql = `'A' OR 'B'`;
+      it('single expression with single quoted string', () => {
+        const sql = `'A' OR 'B'`;
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "args": SeparatedArray {
           "separators": Array [
@@ -102,12 +104,12 @@ describe('OR expression', () => {
         "type": "multi",
       }
     `);
-  });
+      });
 
-  it('single expression with double quoted string', () => {
-    const sql = `"A" OR "B"`;
+      it('single expression with double quoted string', () => {
+        const sql = `"A" OR "B"`;
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "args": SeparatedArray {
           "separators": Array [
@@ -149,12 +151,12 @@ describe('OR expression', () => {
         "type": "multi",
       }
     `);
-  });
+      });
 
-  it('single expression with numbers', () => {
-    const sql = `1 OR 2`;
+      it('single expression with numbers', () => {
+        const sql = `1 OR 2`;
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "args": SeparatedArray {
           "separators": Array [
@@ -190,12 +192,12 @@ describe('OR expression', () => {
         "type": "multi",
       }
     `);
-  });
+      });
 
-  it('brackets', () => {
-    const sql = `(1 OR 2)`;
+      it('brackets', () => {
+        const sql = `(1 OR 2)`;
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "args": SeparatedArray {
           "separators": Array [
@@ -236,12 +238,12 @@ describe('OR expression', () => {
         "type": "multi",
       }
     `);
-  });
+      });
 
-  it('strange spacing and brackets', () => {
-    const sql = `1   OR 2`;
+      it('strange spacing', () => {
+        const sql = `1   OR 2`;
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "args": SeparatedArray {
           "separators": Array [
@@ -277,12 +279,12 @@ describe('OR expression', () => {
         "type": "multi",
       }
     `);
-  });
+      });
 
-  it('strange spacing and brackets', () => {
-    const sql = `( 1   OR 2 )`;
+      it('strange spacing and brackets', () => {
+        const sql = `( 1   OR 2 )`;
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "args": SeparatedArray {
           "separators": Array [
@@ -323,16 +325,16 @@ describe('OR expression', () => {
         "type": "multi",
       }
     `);
-  });
-});
+      });
+    });
 
-describe('AND expression', () => {
-  it('single expression with unquoted string', () => {
-    const sql = `A AND B`;
+    describe('AND', () => {
+      it('single expression with unquoted string', () => {
+        const sql = `A AND B`;
 
-    backAndForth(sql);
+        backAndForth(sql);
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "args": SeparatedArray {
           "separators": Array [
@@ -374,14 +376,14 @@ describe('AND expression', () => {
         "type": "multi",
       }
     `);
-  });
+      });
 
-  it('single expression with single quoted string', () => {
-    const sql = `'A' AND 'B'`;
+      it('single expression with single quoted string', () => {
+        const sql = `'A' AND 'B'`;
 
-    backAndForth(sql);
+        backAndForth(sql);
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "args": SeparatedArray {
           "separators": Array [
@@ -417,14 +419,14 @@ describe('AND expression', () => {
         "type": "multi",
       }
     `);
-  });
+      });
 
-  it('single expression with double quoted string', () => {
-    const sql = `"A" AND "B"`;
+      it('single expression with double quoted string', () => {
+        const sql = `"A" AND "B"`;
 
-    backAndForth(sql);
+        backAndForth(sql);
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "args": SeparatedArray {
           "separators": Array [
@@ -466,14 +468,14 @@ describe('AND expression', () => {
         "type": "multi",
       }
     `);
-  });
+      });
 
-  it('single expression with numbers', () => {
-    const sql = `1 AND 2`;
+      it('single expression with numbers', () => {
+        const sql = `1 AND 2`;
 
-    backAndForth(sql);
+        backAndForth(sql);
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "args": SeparatedArray {
           "separators": Array [
@@ -509,14 +511,14 @@ describe('AND expression', () => {
         "type": "multi",
       }
     `);
-  });
+      });
 
-  it('brackets', () => {
-    const sql = `(1 AND 2)`;
+      it('brackets', () => {
+        const sql = `(1 AND 2)`;
 
-    backAndForth(sql);
+        backAndForth(sql);
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "args": SeparatedArray {
           "separators": Array [
@@ -557,16 +559,16 @@ describe('AND expression', () => {
         "type": "multi",
       }
     `);
-  });
-});
+      });
+    });
 
-describe('Math expression', () => {
-  it('Addition', () => {
-    const sql = `1 + 2`;
+    describe('math', () => {
+      it('addition', () => {
+        const sql = `1 + 2`;
 
-    backAndForth(sql);
+        backAndForth(sql);
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "args": SeparatedArray {
           "separators": Array [
@@ -602,14 +604,14 @@ describe('Math expression', () => {
         "type": "multi",
       }
     `);
-  });
+      });
 
-  it('Subtraction', () => {
-    const sql = `1 - 2`;
+      it('subtraction', () => {
+        const sql = `1 - 2`;
 
-    backAndForth(sql);
+        backAndForth(sql);
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "args": SeparatedArray {
           "separators": Array [
@@ -645,14 +647,14 @@ describe('Math expression', () => {
         "type": "multi",
       }
     `);
-  });
+      });
 
-  it('Multiplication', () => {
-    const sql = `1 * 2`;
+      it('multiplication', () => {
+        const sql = `1 * 2`;
 
-    backAndForth(sql);
+        backAndForth(sql);
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "args": SeparatedArray {
           "separators": Array [
@@ -688,14 +690,14 @@ describe('Math expression', () => {
         "type": "multi",
       }
     `);
-  });
+      });
 
-  it('Division', () => {
-    const sql = `1 / 2`;
+      it('division', () => {
+        const sql = `1 / 2`;
 
-    backAndForth(sql);
+        backAndForth(sql);
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "args": SeparatedArray {
           "separators": Array [
@@ -731,14 +733,14 @@ describe('Math expression', () => {
         "type": "multi",
       }
     `);
-  });
+      });
 
-  it('single expression with unquoted string', () => {
-    const sql = `A + B`;
+      it('single expression with unquoted string', () => {
+        const sql = `A + B`;
 
-    backAndForth(sql);
+        backAndForth(sql);
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "args": SeparatedArray {
           "separators": Array [
@@ -780,14 +782,14 @@ describe('Math expression', () => {
         "type": "multi",
       }
     `);
-  });
+      });
 
-  it('single expression with single quoted string', () => {
-    const sql = `'A' + 'B'`;
+      it('single expression with single quoted string', () => {
+        const sql = `'A' + 'B'`;
 
-    backAndForth(sql);
+        backAndForth(sql);
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "args": SeparatedArray {
           "separators": Array [
@@ -823,14 +825,14 @@ describe('Math expression', () => {
         "type": "multi",
       }
     `);
-  });
+      });
 
-  it('single expression with double quoted string', () => {
-    const sql = `"A" + "B"`;
+      it('single expression with double quoted string', () => {
+        const sql = `"A" + "B"`;
 
-    backAndForth(sql);
+        backAndForth(sql);
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "args": SeparatedArray {
           "separators": Array [
@@ -872,14 +874,14 @@ describe('Math expression', () => {
         "type": "multi",
       }
     `);
-  });
+      });
 
-  it('single expression with numbers', () => {
-    const sql = `1 + 2`;
+      it('single expression with numbers', () => {
+        const sql = `1 + 2`;
 
-    backAndForth(sql);
+        backAndForth(sql);
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "args": SeparatedArray {
           "separators": Array [
@@ -915,14 +917,14 @@ describe('Math expression', () => {
         "type": "multi",
       }
     `);
-  });
+      });
 
-  it('brackets', () => {
-    const sql = `(1 + 2)`;
+      it('brackets', () => {
+        const sql = `(1 + 2)`;
 
-    backAndForth(sql);
+        backAndForth(sql);
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "args": SeparatedArray {
           "separators": Array [
@@ -963,14 +965,14 @@ describe('Math expression', () => {
         "type": "multi",
       }
     `);
-  });
+      });
 
-  it('Decimal', () => {
-    const sql = `COUNT(*) * 1.0 / COUNT(*)`;
+      it('decimal', () => {
+        const sql = `COUNT(*) * 1.0 / COUNT(*)`;
 
-    backAndForth(sql);
+        backAndForth(sql);
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "args": SeparatedArray {
           "separators": Array [
@@ -1080,16 +1082,16 @@ describe('Math expression', () => {
         "type": "multi",
       }
     `);
-  });
-});
+      });
+    });
 
-describe('Combined expression', () => {
-  it('Every expression', () => {
-    const sql = `A OR B AND C > D + E`;
+    describe('combined', () => {
+      it('every expression', () => {
+        const sql = `A OR B AND C > D + E`;
 
-    backAndForth(sql);
+        backAndForth(sql);
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "args": SeparatedArray {
           "separators": Array [
@@ -1213,14 +1215,14 @@ describe('Combined expression', () => {
         "type": "multi",
       }
     `);
-  });
+      });
 
-  it('Every expression out of order', () => {
-    const sql = `A + B > C AND D OR E`;
+      it('every expression out of order', () => {
+        const sql = `A + B > C AND D OR E`;
 
-    backAndForth(sql);
+        backAndForth(sql);
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "args": SeparatedArray {
           "separators": Array [
@@ -1344,14 +1346,14 @@ describe('Combined expression', () => {
         "type": "multi",
       }
     `);
-  });
+      });
 
-  it('Every expression out of order', () => {
-    const sql = `A AND B > C + D OR E`;
+      it('every expression in another order', () => {
+        const sql = `A AND B > C + D OR E`;
 
-    backAndForth(sql);
+        backAndForth(sql);
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "args": SeparatedArray {
           "separators": Array [
@@ -1475,16 +1477,16 @@ describe('Combined expression', () => {
         "type": "multi",
       }
     `);
-  });
-});
+      });
+    });
 
-describe('Multiple expressions', () => {
-  it('Multiple Or ', () => {
-    const sql = `A OR B OR C`;
+    describe('multiple expressions', () => {
+      it('multiple ORs', () => {
+        const sql = `A OR B OR C`;
 
-    backAndForth(sql);
+        backAndForth(sql);
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "args": SeparatedArray {
           "separators": Array [
@@ -1542,14 +1544,14 @@ describe('Multiple expressions', () => {
         "type": "multi",
       }
     `);
-  });
+      });
 
-  it('Multiple ANDs and ORs', () => {
-    const sql = `A AND B OR C AND D OR E`;
+      it('multiple ANDs and ORs', () => {
+        const sql = `A AND B OR C AND D OR E`;
 
-    backAndForth(sql);
+        backAndForth(sql);
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "args": SeparatedArray {
           "separators": Array [
@@ -1665,14 +1667,14 @@ describe('Multiple expressions', () => {
         "type": "multi",
       }
     `);
-  });
-});
+      });
+    });
 
-describe('Brackets', () => {
-  it('Changing order of operations', () => {
-    const sql = `(A AND b) OR c`;
+    describe('brackets', () => {
+      it('changing order of operations', () => {
+        const sql = `(A AND b) OR c`;
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "args": SeparatedArray {
           "separators": Array [
@@ -1749,13 +1751,13 @@ describe('Brackets', () => {
       }
     `);
 
-    backAndForth(sql);
-  });
+        backAndForth(sql);
+      });
 
-  it('Wrapping Expression', () => {
-    const sql = `((A + b) OR c)`;
+      it('wrapping expression', () => {
+        const sql = `((A + b) OR c)`;
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "args": SeparatedArray {
           "separators": Array [
@@ -1837,13 +1839,13 @@ describe('Brackets', () => {
       }
     `);
 
-    backAndForth(sql);
-  });
+        backAndForth(sql);
+      });
 
-  it('Changing order of operations', () => {
-    const sql = `NOT NOT (A + b) OR c`;
+      it('changing order of operations with NOT', () => {
+        const sql = `NOT NOT (A + b) OR c`;
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "args": SeparatedArray {
           "separators": Array [
@@ -1942,35 +1944,16 @@ describe('Brackets', () => {
       }
     `);
 
-    backAndForth(sql);
-  });
-});
-
-describe('containsColumn', () => {
-  it('nested expression', () => {
-    const sql = `A > 1 AND D OR B OR C`;
-
-    expect(SqlExpression.parse(sql).containsColumnName('A')).toEqual(true);
+        backAndForth(sql);
+      });
+    });
   });
 
-  it('nested expression with brackets', () => {
-    const sql = `(A + B ) > 1 AND D OR B OR C`;
+  describe('#getColumns', () => {
+    it('only multi expressions', () => {
+      const sql = `A > 1 AND D OR B OR C`;
 
-    expect(SqlExpression.parse(sql).containsColumnName('A')).toEqual(true);
-  });
-
-  it('nested expression with brackets', () => {
-    const sql = `(D + B ) > 1 AND D OR B OR C`;
-
-    expect(SqlExpression.parse(sql).containsColumnName('A')).toEqual(false);
-  });
-});
-
-describe('getColumns', () => {
-  it('Only multi expressions', () => {
-    const sql = `A > 1 AND D OR B OR C`;
-
-    expect(SqlExpression.parse(sql).getColumns()).toMatchInlineSnapshot(`
+      expect(SqlExpression.parse(sql).getColumns()).toMatchInlineSnapshot(`
       Array [
         SqlColumn {
           "keywords": Object {},
@@ -2018,12 +2001,12 @@ describe('getColumns', () => {
         },
       ]
     `);
-  });
+    });
 
-  it('includes unary expressions', () => {
-    const sql = `A > 1 AND D OR B OR Not C`;
+    it('includes unary expressions', () => {
+      const sql = `A > 1 AND D OR B OR Not C`;
 
-    expect(SqlExpression.parse(sql).getColumns()).toMatchInlineSnapshot(`
+      expect(SqlExpression.parse(sql).getColumns()).toMatchInlineSnapshot(`
       Array [
         SqlColumn {
           "keywords": Object {},
@@ -2071,12 +2054,12 @@ describe('getColumns', () => {
         },
       ]
     `);
-  });
+    });
 
-  it('includes unary expressions and nested Multi Expressions', () => {
-    const sql = `A > 1 AND D OR B OR Not (C Or E)`;
+    it('includes unary expressions and nested Multi Expressions', () => {
+      const sql = `A > 1 AND D OR B OR Not (C Or E)`;
 
-    expect(SqlExpression.parse(sql).getColumns()).toMatchInlineSnapshot(`
+      expect(SqlExpression.parse(sql).getColumns()).toMatchInlineSnapshot(`
       Array [
         SqlColumn {
           "keywords": Object {},
@@ -2135,14 +2118,14 @@ describe('getColumns', () => {
         },
       ]
     `);
-  });
+    });
 
-  it('Concat function', () => {
-    const sql = `A || B || C`;
+    it('concat function', () => {
+      const sql = `A || B || C`;
 
-    backAndForth(sql);
+      backAndForth(sql);
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "args": SeparatedArray {
           "separators": Array [
@@ -2200,14 +2183,14 @@ describe('getColumns', () => {
         "type": "multi",
       }
     `);
-  });
+    });
 
-  it('IS function', () => {
-    const sql = `X IS NULL`;
+    it('IS function', () => {
+      const sql = `X IS NULL`;
 
-    backAndForth(sql);
+      backAndForth(sql);
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "decorator": undefined,
         "keywords": Object {
@@ -2241,14 +2224,14 @@ describe('getColumns', () => {
         "type": "comparison",
       }
     `);
-  });
+    });
 
-  it('IS NOT NULL', () => {
-    const sql = `X IS NOT NULL`;
+    it('IS NOT NULL', () => {
+      const sql = `X IS NOT NULL`;
 
-    backAndForth(sql);
+      backAndForth(sql);
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "decorator": undefined,
         "keywords": Object {
@@ -2282,14 +2265,14 @@ describe('getColumns', () => {
         "type": "comparison",
       }
     `);
-  });
+    });
 
-  it('IS NOT TRUE', () => {
-    const sql = `X IS NOT TRUE`;
+    it('IS NOT TRUE', () => {
+      const sql = `X IS NOT TRUE`;
 
-    backAndForth(sql);
+      backAndForth(sql);
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "decorator": undefined,
         "keywords": Object {
@@ -2323,14 +2306,14 @@ describe('getColumns', () => {
         "type": "comparison",
       }
     `);
-  });
+    });
 
-  it('Nested IS Not function', () => {
-    const sql = `X IS NOT NULL AND X <> ''`;
+    it('nested IS NOT function', () => {
+      const sql = `X IS NOT NULL AND X <> ''`;
 
-    backAndForth(sql);
+      backAndForth(sql);
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlMulti {
         "args": SeparatedArray {
           "separators": Array [
@@ -2414,5 +2397,26 @@ describe('getColumns', () => {
         "type": "multi",
       }
     `);
+    });
+  });
+
+  describe('#containsColumnName', () => {
+    it('nested expression', () => {
+      const sql = `A > 1 AND D OR B OR C`;
+
+      expect(SqlExpression.parse(sql).containsColumnName('A')).toEqual(true);
+    });
+
+    it('nested expression with brackets', () => {
+      const sql = `(A + B ) > 1 AND D OR B OR C`;
+
+      expect(SqlExpression.parse(sql).containsColumnName('A')).toEqual(true);
+    });
+
+    it('nested expression with brackets without the column', () => {
+      const sql = `(D + B ) > 1 AND D OR B OR C`;
+
+      expect(SqlExpression.parse(sql).containsColumnName('A')).toEqual(false);
+    });
   });
 });

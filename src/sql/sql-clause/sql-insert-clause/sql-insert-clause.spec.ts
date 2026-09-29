@@ -18,7 +18,7 @@ import { SqlQuery } from '../../sql-query/sql-query';
 import { SqlTable } from '../../sql-table/sql-table';
 
 describe('SqlInsertClause', () => {
-  describe('insert target', () => {
+  describe('parses', () => {
     it('parses a column list as columns, not as function arguments', () => {
       const query = SqlQuery.parse(`INSERT INTO t (a, b) SELECT 1, 2 PARTITIONED BY ALL`);
       const insertClause = query.insertClause!;
@@ -39,15 +39,6 @@ describe('SqlInsertClause', () => {
       expect(insertClause.format).toEqual('CSV');
     });
 
-    it('rejects a column list on an export target', () => {
-      // The column list and the export format are mutually exclusive: the target is either a
-      // function with `AS <format>` or a table with a column list, never both. If this ever
-      // parsed it would not round trip, since the clause renders the columns before the AS.
-      expect(() =>
-        SqlQuery.parse(`INSERT INTO EXTERN(S3(bucket => 'b')) AS CSV (a, b) SELECT 1`),
-      ).toThrow();
-    });
-
     it.each([
       `INSERT INTO t (a, b) SELECT 1, 2 PARTITIONED BY ALL`,
       `INSERT INTO "t" ("a", "b") SELECT 1, 2`,
@@ -56,9 +47,7 @@ describe('SqlInsertClause', () => {
     ])('does back and forth with %s', sql => {
       backAndForth(sql, SqlQuery);
     });
-  });
 
-  describe('AS <format>', () => {
     it('preserves the casing of the INSERT, INTO and AS keywords', () => {
       const sql = `insert into extern(local(x => 'y')) as csv SELECT 1`;
       const query = SqlQuery.parse(sql);
@@ -70,7 +59,20 @@ describe('SqlInsertClause', () => {
       });
       expect(String(query)).toEqual(sql);
     });
+  });
 
+  describe('does not parse', () => {
+    it('rejects a column list on an export target', () => {
+      // The column list and the export format are mutually exclusive: the target is either a
+      // function with `AS <format>` or a table with a column list, never both. If this ever
+      // parsed it would not round trip, since the clause renders the columns before the AS.
+      expect(() =>
+        SqlQuery.parse(`INSERT INTO EXTERN(S3(bucket => 'b')) AS CSV (a, b) SELECT 1`),
+      ).toThrow();
+    });
+  });
+
+  describe('#changeTable', () => {
     it('keeps the format when the clause is changed', () => {
       const query = SqlQuery.parse(`INSERT INTO EXTERN(S3(bucket => 'b')) AS CSV SELECT 1`);
       const changed = query.insertClause!.changeTable('t');

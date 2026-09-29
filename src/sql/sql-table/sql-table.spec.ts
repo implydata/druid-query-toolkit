@@ -16,23 +16,29 @@ import { SqlExpression, SqlNamespace, SqlTable } from '../..';
 import { backAndForth } from '../../test-utils';
 
 describe('SqlTable', () => {
-  it.each([`hello`, `"hello"`, `"""hello"""`, `"a""b"`, `a.b`, `"a""b".c`])(
-    'does back and forth with %s',
-    sql => {
-      backAndForth(sql);
-    },
-  );
-
-  it('avoids reserved', () => {
-    const sql = 'From';
-
-    expect(() => SqlExpression.parse(sql)).toThrow('Expected');
+  describe('parses', () => {
+    it.each([`hello`, `"hello"`, `"""hello"""`, `"a""b"`, `a.b`, `"a""b".c`])(
+      'does back and forth with %s',
+      sql => {
+        backAndForth(sql);
+      },
+    );
   });
 
-  it('.column works', () => {
-    expect(String(SqlTable.create('hello').column('x'))).toEqual('"hello"."x"');
-    expect(String(SqlTable.create('hello', SqlNamespace.create('world')).column('x'))).toEqual(
-      '"world"."hello"."x"',
-    );
+  describe('does not parse', () => {
+    it('rejects a reserved keyword', () => {
+      const sql = 'From';
+
+      expect(() => SqlExpression.parse(sql)).toThrow('Expected');
+    });
+  });
+
+  describe('#column', () => {
+    it('makes a column in the table', () => {
+      expect(String(SqlTable.create('hello').column('x'))).toEqual('"hello"."x"');
+      expect(String(SqlTable.create('hello', SqlNamespace.create('world')).column('x'))).toEqual(
+        '"world"."hello"."x"',
+      );
+    });
   });
 });

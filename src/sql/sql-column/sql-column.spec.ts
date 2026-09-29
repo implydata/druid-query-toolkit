@@ -16,7 +16,7 @@ import { SqlColumn, SqlExpression, SqlQuery } from '../..';
 import { backAndForth } from '../../test-utils';
 
 describe('SqlColumn', () => {
-  describe('column expressions', () => {
+  describe('parses', () => {
     it.each([
       `hello`,
       `h`,
@@ -30,15 +30,406 @@ describe('SqlColumn', () => {
     ])('correctly parses: %s', sql => {
       backAndForth(sql);
     });
+
+    it('works with double quotes and double quoted namespace', () => {
+      const sql = '"test"."namespace"';
+
+      backAndForth(sql);
+
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        SqlColumn {
+          "keywords": Object {},
+          "parens": undefined,
+          "refName": RefName {
+            "name": "namespace",
+            "quotes": true,
+          },
+          "spacing": Object {
+            "postDot": "",
+            "postTable": "",
+          },
+          "table": SqlTable {
+            "keywords": Object {},
+            "namespace": undefined,
+            "parens": undefined,
+            "refName": RefName {
+              "name": "test",
+              "quotes": true,
+            },
+            "spacing": Object {},
+            "type": "table",
+          },
+          "type": "column",
+        }
+      `);
+    });
+
+    it('works with double quotes and no quotes namespace', () => {
+      const sql = '"test".namespace';
+
+      backAndForth(sql);
+
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        SqlColumn {
+          "keywords": Object {},
+          "parens": undefined,
+          "refName": RefName {
+            "name": "namespace",
+            "quotes": false,
+          },
+          "spacing": Object {
+            "postDot": "",
+            "postTable": "",
+          },
+          "table": SqlTable {
+            "keywords": Object {},
+            "namespace": undefined,
+            "parens": undefined,
+            "refName": RefName {
+              "name": "test",
+              "quotes": true,
+            },
+            "spacing": Object {},
+            "type": "table",
+          },
+          "type": "column",
+        }
+      `);
+    });
+
+    it('works with no quotes and namespace', () => {
+      const sql = 'test.namespace';
+
+      backAndForth(sql);
+
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        SqlColumn {
+          "keywords": Object {},
+          "parens": undefined,
+          "refName": RefName {
+            "name": "namespace",
+            "quotes": false,
+          },
+          "spacing": Object {
+            "postDot": "",
+            "postTable": "",
+          },
+          "table": SqlTable {
+            "keywords": Object {},
+            "namespace": undefined,
+            "parens": undefined,
+            "refName": RefName {
+              "name": "test",
+              "quotes": false,
+            },
+            "spacing": Object {},
+            "type": "table",
+          },
+          "type": "column",
+        }
+      `);
+    });
+
+    it('works with no quotes and no namespace', () => {
+      const sql = 'test';
+
+      backAndForth(sql);
+
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        SqlColumn {
+          "keywords": Object {},
+          "parens": undefined,
+          "refName": RefName {
+            "name": "test",
+            "quotes": false,
+          },
+          "spacing": Object {},
+          "table": undefined,
+          "type": "column",
+        }
+      `);
+    });
+
+    it('works with double quotes and no namespace', () => {
+      const sql = '"test"';
+
+      backAndForth(sql);
+
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        SqlColumn {
+          "keywords": Object {},
+          "parens": undefined,
+          "refName": RefName {
+            "name": "test",
+            "quotes": true,
+          },
+          "spacing": Object {},
+          "table": undefined,
+          "type": "column",
+        }
+      `);
+    });
+
+    it('works with quotes', () => {
+      const sql = `"page"`;
+
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        SqlColumn {
+          "keywords": Object {},
+          "parens": undefined,
+          "refName": RefName {
+            "name": "page",
+            "quotes": true,
+          },
+          "spacing": Object {},
+          "table": undefined,
+          "type": "column",
+        }
+      `);
+    });
+
+    it('works without quotes', () => {
+      const sql = `channel`;
+
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        SqlColumn {
+          "keywords": Object {},
+          "parens": undefined,
+          "refName": RefName {
+            "name": "channel",
+            "quotes": false,
+          },
+          "spacing": Object {},
+          "table": undefined,
+          "type": "column",
+        }
+      `);
+    });
+
+    it('works without quotes + namespace', () => {
+      const sql = `"lol" . channel`;
+
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        SqlColumn {
+          "keywords": Object {},
+          "parens": undefined,
+          "refName": RefName {
+            "name": "channel",
+            "quotes": false,
+          },
+          "spacing": Object {
+            "postDot": " ",
+            "postTable": " ",
+          },
+          "table": SqlTable {
+            "keywords": Object {},
+            "namespace": undefined,
+            "parens": undefined,
+            "refName": RefName {
+              "name": "lol",
+              "quotes": true,
+            },
+            "spacing": Object {},
+            "type": "table",
+          },
+          "type": "column",
+        }
+      `);
+    });
+
+    it('works without quotes + table + parens', () => {
+      const sql = `(( "lol" . channel)   )`;
+
+      backAndForth(sql);
+
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        SqlColumn {
+          "keywords": Object {},
+          "parens": Array [
+            Object {
+              "leftSpacing": " ",
+              "rightSpacing": "",
+            },
+            Object {
+              "leftSpacing": "",
+              "rightSpacing": "   ",
+            },
+          ],
+          "refName": RefName {
+            "name": "channel",
+            "quotes": false,
+          },
+          "spacing": Object {
+            "postDot": " ",
+            "postTable": " ",
+          },
+          "table": SqlTable {
+            "keywords": Object {},
+            "namespace": undefined,
+            "parens": undefined,
+            "refName": RefName {
+              "name": "lol",
+              "quotes": true,
+            },
+            "spacing": Object {},
+            "type": "table",
+          },
+          "type": "column",
+        }
+      `);
+    });
+
+    it('works with column.table.namespace', () => {
+      const sql = `"lol"  .  channel  .  boo`;
+
+      backAndForth(sql);
+
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        SqlColumn {
+          "keywords": Object {},
+          "parens": undefined,
+          "refName": RefName {
+            "name": "boo",
+            "quotes": false,
+          },
+          "spacing": Object {
+            "postDot": "  ",
+            "postTable": "  ",
+          },
+          "table": SqlTable {
+            "keywords": Object {},
+            "namespace": SqlNamespace {
+              "keywords": Object {},
+              "parens": undefined,
+              "refName": RefName {
+                "name": "lol",
+                "quotes": true,
+              },
+              "spacing": Object {},
+              "type": "namespace",
+            },
+            "parens": undefined,
+            "refName": RefName {
+              "name": "channel",
+              "quotes": false,
+            },
+            "spacing": Object {
+              "postDot": "  ",
+              "postNamespace": "  ",
+            },
+            "type": "table",
+          },
+          "type": "column",
+        }
+      `);
+    });
+
+    it('upgrades a column in FROM to a table', () => {
+      const sql = `select tbl from sys.segments`;
+
+      backAndForth(sql);
+
+      expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
+        SqlQuery {
+          "clusteredByClause": undefined,
+          "contextStatements": undefined,
+          "decorator": undefined,
+          "explain": undefined,
+          "fromClause": SqlFromClause {
+            "expressions": SeparatedArray {
+              "separators": Array [],
+              "values": Array [
+                SqlTable {
+                  "keywords": Object {},
+                  "namespace": SqlNamespace {
+                    "keywords": Object {},
+                    "parens": undefined,
+                    "refName": RefName {
+                      "name": "sys",
+                      "quotes": false,
+                    },
+                    "spacing": Object {},
+                    "type": "namespace",
+                  },
+                  "parens": undefined,
+                  "refName": RefName {
+                    "name": "segments",
+                    "quotes": false,
+                  },
+                  "spacing": Object {
+                    "postDot": "",
+                    "postNamespace": "",
+                  },
+                  "type": "table",
+                },
+              ],
+            },
+            "joinParts": undefined,
+            "keywords": Object {
+              "from": "from",
+            },
+            "parens": undefined,
+            "spacing": Object {
+              "postFrom": " ",
+            },
+            "type": "fromClause",
+          },
+          "groupByClause": undefined,
+          "havingClause": undefined,
+          "insertClause": undefined,
+          "keywords": Object {
+            "select": "select",
+          },
+          "limitClause": undefined,
+          "offsetClause": undefined,
+          "orderByClause": undefined,
+          "parens": undefined,
+          "partitionedByClause": undefined,
+          "replaceClause": undefined,
+          "selectExpressions": SeparatedArray {
+            "separators": Array [],
+            "values": Array [
+              SqlColumn {
+                "keywords": Object {},
+                "parens": undefined,
+                "refName": RefName {
+                  "name": "tbl",
+                  "quotes": false,
+                },
+                "spacing": Object {},
+                "table": undefined,
+                "type": "column",
+              },
+            ],
+          },
+          "spacing": Object {
+            "postSelect": " ",
+            "preFromClause": " ",
+          },
+          "type": "query",
+          "unionQuery": undefined,
+          "whereClause": undefined,
+          "withClause": undefined,
+        }
+      `);
+    });
   });
 
-  it('avoids reserved', () => {
-    const sql = 'From';
+  describe('does not parse', () => {
+    it('rejects a reserved keyword', () => {
+      const sql = 'From';
 
-    expect(() => SqlExpression.parse(sql)).toThrow('Expected');
+      expect(() => SqlExpression.parse(sql)).toThrow('Expected');
+    });
+
+    it('rejects too many parts', () => {
+      const sql = `"lol" . channel.boo .moo`;
+
+      expect(() => SqlExpression.parse(sql)).toThrow();
+    });
   });
 
-  describe('#column', () => {
+  describe('.create', () => {
     it('works with reserved word', () => {
       expect(String(SqlColumn.create('as'))).toEqual(`"as"`);
     });
@@ -52,284 +443,26 @@ describe('SqlColumn', () => {
     });
   });
 
-  describe('#columnWithoutQuotes', () => {
-    it('is cool with reserved alias', () => {
+  describe('.optionalQuotes', () => {
+    it('does not quote a reserved alias', () => {
       expect(String(SqlColumn.optionalQuotes('user'))).toEqual(`user`);
     });
   });
 
-  it('with double quotes and double quoted namespace', () => {
-    const sql = '"test"."namespace"';
+  describe('#convertToTable', () => {
+    it('converts a namespaced column with double quotes', () => {
+      const sql = `"namespace"  . "table"`;
 
-    backAndForth(sql);
+      expect((SqlExpression.parse(sql) as SqlColumn).convertToTable().toString()).toEqual(sql);
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlColumn {
-        "keywords": Object {},
-        "parens": undefined,
-        "refName": RefName {
-          "name": "namespace",
-          "quotes": true,
-        },
-        "spacing": Object {
-          "postDot": "",
-          "postTable": "",
-        },
-        "table": SqlTable {
-          "keywords": Object {},
-          "namespace": undefined,
-          "parens": undefined,
-          "refName": RefName {
-            "name": "test",
-            "quotes": true,
-          },
-          "spacing": Object {},
-          "type": "table",
-        },
-        "type": "column",
-      }
-    `);
-  });
-
-  it('with double quotes and no quotes namespace', () => {
-    const sql = '"test".namespace';
-
-    backAndForth(sql);
-
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlColumn {
-        "keywords": Object {},
-        "parens": undefined,
-        "refName": RefName {
-          "name": "namespace",
-          "quotes": false,
-        },
-        "spacing": Object {
-          "postDot": "",
-          "postTable": "",
-        },
-        "table": SqlTable {
-          "keywords": Object {},
-          "namespace": undefined,
-          "parens": undefined,
-          "refName": RefName {
-            "name": "test",
-            "quotes": true,
-          },
-          "spacing": Object {},
-          "type": "table",
-        },
-        "type": "column",
-      }
-    `);
-  });
-
-  it('with no quotes and namespace', () => {
-    const sql = 'test.namespace';
-
-    backAndForth(sql);
-
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlColumn {
-        "keywords": Object {},
-        "parens": undefined,
-        "refName": RefName {
-          "name": "namespace",
-          "quotes": false,
-        },
-        "spacing": Object {
-          "postDot": "",
-          "postTable": "",
-        },
-        "table": SqlTable {
-          "keywords": Object {},
-          "namespace": undefined,
-          "parens": undefined,
-          "refName": RefName {
-            "name": "test",
-            "quotes": false,
-          },
-          "spacing": Object {},
-          "type": "table",
-        },
-        "type": "column",
-      }
-    `);
-  });
-
-  it('with no quotes and no namespace', () => {
-    const sql = 'test';
-
-    backAndForth(sql);
-
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlColumn {
-        "keywords": Object {},
-        "parens": undefined,
-        "refName": RefName {
-          "name": "test",
-          "quotes": false,
-        },
-        "spacing": Object {},
-        "table": undefined,
-        "type": "column",
-      }
-    `);
-  });
-
-  it('with double quotes and no namespace', () => {
-    const sql = '"test"';
-
-    backAndForth(sql);
-
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlColumn {
-        "keywords": Object {},
-        "parens": undefined,
-        "refName": RefName {
-          "name": "test",
-          "quotes": true,
-        },
-        "spacing": Object {},
-        "table": undefined,
-        "type": "column",
-      }
-    `);
-  });
-
-  it('quotes', () => {
-    const sql = `"page"`;
-
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlColumn {
-        "keywords": Object {},
-        "parens": undefined,
-        "refName": RefName {
-          "name": "page",
-          "quotes": true,
-        },
-        "spacing": Object {},
-        "table": undefined,
-        "type": "column",
-      }
-    `);
-  });
-
-  it('without quotes', () => {
-    const sql = `channel`;
-
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlColumn {
-        "keywords": Object {},
-        "parens": undefined,
-        "refName": RefName {
-          "name": "channel",
-          "quotes": false,
-        },
-        "spacing": Object {},
-        "table": undefined,
-        "type": "column",
-      }
-    `);
-  });
-
-  it('without quotes + namespace', () => {
-    const sql = `"lol" . channel`;
-
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlColumn {
-        "keywords": Object {},
-        "parens": undefined,
-        "refName": RefName {
-          "name": "channel",
-          "quotes": false,
-        },
-        "spacing": Object {
-          "postDot": " ",
-          "postTable": " ",
-        },
-        "table": SqlTable {
-          "keywords": Object {},
-          "namespace": undefined,
-          "parens": undefined,
-          "refName": RefName {
-            "name": "lol",
-            "quotes": true,
-          },
-          "spacing": Object {},
-          "type": "table",
-        },
-        "type": "column",
-      }
-    `);
-  });
-
-  it('without quotes + table + parens', () => {
-    const sql = `(( "lol" . channel)   )`;
-
-    backAndForth(sql);
-
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlColumn {
-        "keywords": Object {},
-        "parens": Array [
-          Object {
-            "leftSpacing": " ",
-            "rightSpacing": "",
-          },
-          Object {
-            "leftSpacing": "",
-            "rightSpacing": "   ",
-          },
-        ],
-        "refName": RefName {
-          "name": "channel",
-          "quotes": false,
-        },
-        "spacing": Object {
-          "postDot": " ",
-          "postTable": " ",
-        },
-        "table": SqlTable {
-          "keywords": Object {},
-          "namespace": undefined,
-          "parens": undefined,
-          "refName": RefName {
-            "name": "lol",
-            "quotes": true,
-          },
-          "spacing": Object {},
-          "type": "table",
-        },
-        "type": "column",
-      }
-    `);
-  });
-
-  it('column.table.namespace', () => {
-    const sql = `"lol"  .  channel  .  boo`;
-
-    backAndForth(sql);
-
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlColumn {
-        "keywords": Object {},
-        "parens": undefined,
-        "refName": RefName {
-          "name": "boo",
-          "quotes": false,
-        },
-        "spacing": Object {
-          "postDot": "  ",
-          "postTable": "  ",
-        },
-        "table": SqlTable {
+      expect((SqlExpression.parse(sql) as SqlColumn).convertToTable()).toMatchInlineSnapshot(`
+        SqlTable {
           "keywords": Object {},
           "namespace": SqlNamespace {
             "keywords": Object {},
             "parens": undefined,
             "refName": RefName {
-              "name": "lol",
+              "name": "namespace",
               "quotes": true,
             },
             "spacing": Object {},
@@ -337,147 +470,16 @@ describe('SqlColumn', () => {
           },
           "parens": undefined,
           "refName": RefName {
-            "name": "channel",
-            "quotes": false,
+            "name": "table",
+            "quotes": true,
           },
           "spacing": Object {
-            "postDot": "  ",
+            "postDot": " ",
             "postNamespace": "  ",
           },
           "type": "table",
-        },
-        "type": "column",
-      }
-    `);
-  });
-
-  it('too many parts', () => {
-    const sql = `"lol" . channel.boo .moo`;
-
-    expect(() => SqlExpression.parse(sql)).toThrow();
-  });
-});
-
-describe('#convertToTable', () => {
-  it('with double quotes upgraded', () => {
-    const sql = `"namespace"  . "table"`;
-
-    expect((SqlExpression.parse(sql) as SqlColumn).convertToTable().toString()).toEqual(sql);
-
-    expect((SqlExpression.parse(sql) as SqlColumn).convertToTable()).toMatchInlineSnapshot(`
-      SqlTable {
-        "keywords": Object {},
-        "namespace": SqlNamespace {
-          "keywords": Object {},
-          "parens": undefined,
-          "refName": RefName {
-            "name": "namespace",
-            "quotes": true,
-          },
-          "spacing": Object {},
-          "type": "namespace",
-        },
-        "parens": undefined,
-        "refName": RefName {
-          "name": "table",
-          "quotes": true,
-        },
-        "spacing": Object {
-          "postDot": " ",
-          "postNamespace": "  ",
-        },
-        "type": "table",
-      }
-    `);
-  });
-
-  it('SqlColumn in select should be upgraded', () => {
-    const sql = `select tbl from sys.segments`;
-
-    backAndForth(sql);
-
-    expect(SqlQuery.parse(sql)).toMatchInlineSnapshot(`
-      SqlQuery {
-        "clusteredByClause": undefined,
-        "contextStatements": undefined,
-        "decorator": undefined,
-        "explain": undefined,
-        "fromClause": SqlFromClause {
-          "expressions": SeparatedArray {
-            "separators": Array [],
-            "values": Array [
-              SqlTable {
-                "keywords": Object {},
-                "namespace": SqlNamespace {
-                  "keywords": Object {},
-                  "parens": undefined,
-                  "refName": RefName {
-                    "name": "sys",
-                    "quotes": false,
-                  },
-                  "spacing": Object {},
-                  "type": "namespace",
-                },
-                "parens": undefined,
-                "refName": RefName {
-                  "name": "segments",
-                  "quotes": false,
-                },
-                "spacing": Object {
-                  "postDot": "",
-                  "postNamespace": "",
-                },
-                "type": "table",
-              },
-            ],
-          },
-          "joinParts": undefined,
-          "keywords": Object {
-            "from": "from",
-          },
-          "parens": undefined,
-          "spacing": Object {
-            "postFrom": " ",
-          },
-          "type": "fromClause",
-        },
-        "groupByClause": undefined,
-        "havingClause": undefined,
-        "insertClause": undefined,
-        "keywords": Object {
-          "select": "select",
-        },
-        "limitClause": undefined,
-        "offsetClause": undefined,
-        "orderByClause": undefined,
-        "parens": undefined,
-        "partitionedByClause": undefined,
-        "replaceClause": undefined,
-        "selectExpressions": SeparatedArray {
-          "separators": Array [],
-          "values": Array [
-            SqlColumn {
-              "keywords": Object {},
-              "parens": undefined,
-              "refName": RefName {
-                "name": "tbl",
-                "quotes": false,
-              },
-              "spacing": Object {},
-              "table": undefined,
-              "type": "column",
-            },
-          ],
-        },
-        "spacing": Object {
-          "postSelect": " ",
-          "preFromClause": " ",
-        },
-        "type": "query",
-        "unionQuery": undefined,
-        "whereClause": undefined,
-        "withClause": undefined,
-      }
-    `);
+        }
+      `);
+    });
   });
 });

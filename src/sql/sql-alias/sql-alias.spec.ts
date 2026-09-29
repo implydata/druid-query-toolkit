@@ -221,19 +221,19 @@ describe('SqlAlias', () => {
     const x = SqlAlias.create(SqlColumn.optionalQuotes('X'), 'test');
     const z = SqlAlias.create(SqlColumn.optionalQuotes('Z'), RefName.create('test', true));
 
-    it('should work with normal string', () => {
+    it('works with normal string', () => {
       expect(String(x.changeAlias('hello'))).toEqual('X AS "hello"');
     });
 
-    it('should preserve quotes', () => {
+    it('preserves quotes', () => {
       expect(String(z.changeAlias('hello'))).toEqual('Z AS "hello"');
     });
 
-    it('should work with quotes if needed', () => {
+    it('works with quotes if needed', () => {
       expect(String(x.changeAlias('select'))).toEqual('X AS "select"');
     });
 
-    it('should work with quotes if forced', () => {
+    it('works with quotes if forced', () => {
       expect(String(x.changeAlias('hello', true))).toEqual('X AS "hello"');
     });
   });

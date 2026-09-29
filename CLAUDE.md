@@ -25,6 +25,14 @@ Node is pinned in `.node-version`, managed by mise (`mise exec -- <cmd>` if it i
 
 ## Testing conventions
 
+- A spec sits next to its source file (`foo.ts` → `foo.spec.ts`). A large class can split into topical files (e.g. `src/sql/sql-query/joins.spec.ts`).
+- Each spec has exactly one top-level `describe`, named after the class under test (`SqlCase`), or after the module for plain functions (`utils`). Topical files use `ClassName (topic)`, e.g. `SqlQuery (joins)`.
+- Inside it, sections go in this order:
+  1. `describe('parses')` for round trips and parse structure, then `describe('does not parse')` for parse failures. Sub-describes such as `describe('OR')` are fine for grouping.
+  2. Static members as `describe('.name')`, in source order.
+  3. Instance members as `describe('#name')`, in source order. Inherited members come after the class's own.
+  4. Anything that spans several members last, in a plainly named `describe`.
+- Every member gets its own `describe`, even with a single test. Add new tests to the existing group for that member rather than a new one. `it` names are lower case and say what happens (`it('removes the clause when nothing is left')`), not the member name.
 - Parser round trips use `backAndForth(sql, ExpectedClass)` from `src/test-utils.ts`, which asserts that the SQL parses to that class and prints back identically.
 - Tests lean heavily on `toMatchInlineSnapshot`. `jest-env.ts` installs a serializer with `callToJSON: false`, so snapshots show the real object structure instead of `toJSON()` output.
 

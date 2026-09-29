@@ -16,63 +16,67 @@ import { SqlAlias } from '..';
 
 import { parse as parseSql } from '.';
 
-describe('Parser', () => {
-  it('throws on invalid input', () => {
-    expect(() => parseSql('SELEC +')).toThrow('Expected');
+describe('parser', () => {
+  describe('parses', () => {
+    // The statement rule can consume a leading VALUES / TABLE, so it only commits when it
+    // explains the whole input; otherwise these fall back to being read as expressions.
+    it.each([`VALUES (1) AS t`, `TABLE foo AS t`, `VALUES (1) AS t (x)`])(
+      'reads %s as an expression, not a statement',
+      sql => {
+        expect(parseSql(sql)).toBeInstanceOf(SqlAlias);
+        expect(String(parseSql(sql))).toEqual(sql);
+      },
+    );
+
+    it('parses an expression', () => {
+      expect(parseSql('a OR b')).toMatchInlineSnapshot(`
+        SqlMulti {
+          "args": SeparatedArray {
+            "separators": Array [
+              Separator {
+                "left": " ",
+                "right": " ",
+                "separator": "OR",
+              },
+            ],
+            "values": Array [
+              SqlColumn {
+                "keywords": Object {},
+                "parens": undefined,
+                "refName": RefName {
+                  "name": "a",
+                  "quotes": false,
+                },
+                "spacing": Object {},
+                "table": undefined,
+                "type": "column",
+              },
+              SqlColumn {
+                "keywords": Object {},
+                "parens": undefined,
+                "refName": RefName {
+                  "name": "b",
+                  "quotes": false,
+                },
+                "spacing": Object {},
+                "table": undefined,
+                "type": "column",
+              },
+            ],
+          },
+          "keywords": Object {},
+          "op": "OR",
+          "parens": undefined,
+          "spacing": Object {},
+          "type": "multi",
+        }
+      `);
+    });
   });
 
-  // The statement rule can consume a leading VALUES / TABLE, so it only commits when it
-  // explains the whole input; otherwise these fall back to being read as expressions.
-  it.each([`VALUES (1) AS t`, `TABLE foo AS t`, `VALUES (1) AS t (x)`])(
-    'reads %s as an expression, not a statement',
-    sql => {
-      expect(parseSql(sql)).toBeInstanceOf(SqlAlias);
-      expect(String(parseSql(sql))).toEqual(sql);
-    },
-  );
-
-  it('parse anything', () => {
-    expect(parseSql('a OR b')).toMatchInlineSnapshot(`
-      SqlMulti {
-        "args": SeparatedArray {
-          "separators": Array [
-            Separator {
-              "left": " ",
-              "right": " ",
-              "separator": "OR",
-            },
-          ],
-          "values": Array [
-            SqlColumn {
-              "keywords": Object {},
-              "parens": undefined,
-              "refName": RefName {
-                "name": "a",
-                "quotes": false,
-              },
-              "spacing": Object {},
-              "table": undefined,
-              "type": "column",
-            },
-            SqlColumn {
-              "keywords": Object {},
-              "parens": undefined,
-              "refName": RefName {
-                "name": "b",
-                "quotes": false,
-              },
-              "spacing": Object {},
-              "table": undefined,
-              "type": "column",
-            },
-          ],
-        },
-        "keywords": Object {},
-        "op": "OR",
-        "parens": undefined,
-        "spacing": Object {},
-        "type": "multi",
-      }
-    `);
+  describe('does not parse', () => {
+    it('throws on invalid input', () => {
+      expect(() => parseSql('SELEC +')).toThrow('Expected');
+    });
   });
 });

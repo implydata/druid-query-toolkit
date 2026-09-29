@@ -19,7 +19,7 @@ import { SqlExpression } from '../sql-expression';
 import type { SqlWithQuery } from './sql-with-query';
 
 describe('SqlWithQuery', () => {
-  describe('valid with queries', () => {
+  describe('parses', () => {
     it.each([
       `WITH wiki AS (SELECT * FROM wikipedia) (SELECT * FROM wiki)`,
       `WITH wiki AS (SELECT * FROM wikipedia) (SELECT * FROM wiki) ORDER BY __time DESC LIMIT 3 OFFSET 0`,
@@ -45,250 +45,256 @@ describe('SqlWithQuery', () => {
     ])('correctly parses: %s', sql => {
       backAndForth(sql);
     });
-  });
 
-  it('flattenWith', () => {
-    const sql = sane`
-      -- Leading comment
-      REPLACE INTO dst OVERWRITE ALL
-      WITH wiki1 AS (SELECT * FROM wikipedia), wiki2 AS (SELECT * FROM wikipedia)
-      (
-        WITH wiki3 AS (SELECT * FROM wiki1), wiki4 AS (SELECT * FROM wiki2)
-        (
-          SELECT * FROM wiki2 LIMIT 100
-        )
-      )
-      PARTITIONED BY ALL
-      -- Trailing comment
-    `;
+    it('parses to the expected tree', () => {
+      const sql = `WITH wiki AS (SELECT * FROM wikipedia) (SELECT * FROM wiki)`;
 
-    const query = SqlExpression.parse(sql) as SqlWithQuery;
-
-    expect(String(query.flattenWith()).trim()).toEqual(sane`
-      -- Leading comment
-      REPLACE INTO dst OVERWRITE ALL
-      WITH
-      wiki1 AS (SELECT * FROM wikipedia),
-      wiki2 AS (SELECT * FROM wikipedia),
-      wiki3 AS (SELECT * FROM wiki1),
-      wiki4 AS (SELECT * FROM wiki2)
-      SELECT * FROM wiki2 LIMIT 100
-      PARTITIONED BY ALL
-      -- Trailing comment
-    `);
-  });
-
-  it('matches snapshot', () => {
-    const sql = `WITH wiki AS (SELECT * FROM wikipedia) (SELECT * FROM wiki)`;
-
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlWithQuery {
-        "clusteredByClause": undefined,
-        "contextStatements": undefined,
-        "explain": undefined,
-        "insertClause": undefined,
-        "keywords": Object {},
-        "limitClause": undefined,
-        "offsetClause": undefined,
-        "orderByClause": undefined,
-        "parens": undefined,
-        "partitionedByClause": undefined,
-        "query": SqlQuery {
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        SqlWithQuery {
           "clusteredByClause": undefined,
           "contextStatements": undefined,
-          "decorator": undefined,
           "explain": undefined,
-          "fromClause": SqlFromClause {
-            "expressions": SeparatedArray {
-              "separators": Array [],
-              "values": Array [
-                SqlTable {
-                  "keywords": Object {},
-                  "namespace": undefined,
-                  "parens": undefined,
-                  "refName": RefName {
-                    "name": "wiki",
-                    "quotes": false,
-                  },
-                  "spacing": Object {},
-                  "type": "table",
-                },
-              ],
-            },
-            "joinParts": undefined,
-            "keywords": Object {
-              "from": "FROM",
-            },
-            "parens": undefined,
-            "spacing": Object {
-              "postFrom": " ",
-            },
-            "type": "fromClause",
-          },
-          "groupByClause": undefined,
-          "havingClause": undefined,
           "insertClause": undefined,
-          "keywords": Object {
-            "select": "SELECT",
-          },
+          "keywords": Object {},
           "limitClause": undefined,
           "offsetClause": undefined,
           "orderByClause": undefined,
-          "parens": Array [
-            Object {
-              "leftSpacing": "",
-              "rightSpacing": "",
-            },
-          ],
+          "parens": undefined,
           "partitionedByClause": undefined,
-          "replaceClause": undefined,
-          "selectExpressions": SeparatedArray {
-            "separators": Array [],
-            "values": Array [
-              SqlStar {
-                "keywords": Object {},
-                "parens": undefined,
-                "spacing": Object {},
-                "table": undefined,
-                "type": "star",
+          "query": SqlQuery {
+            "clusteredByClause": undefined,
+            "contextStatements": undefined,
+            "decorator": undefined,
+            "explain": undefined,
+            "fromClause": SqlFromClause {
+              "expressions": SeparatedArray {
+                "separators": Array [],
+                "values": Array [
+                  SqlTable {
+                    "keywords": Object {},
+                    "namespace": undefined,
+                    "parens": undefined,
+                    "refName": RefName {
+                      "name": "wiki",
+                      "quotes": false,
+                    },
+                    "spacing": Object {},
+                    "type": "table",
+                  },
+                ],
+              },
+              "joinParts": undefined,
+              "keywords": Object {
+                "from": "FROM",
+              },
+              "parens": undefined,
+              "spacing": Object {
+                "postFrom": " ",
+              },
+              "type": "fromClause",
+            },
+            "groupByClause": undefined,
+            "havingClause": undefined,
+            "insertClause": undefined,
+            "keywords": Object {
+              "select": "SELECT",
+            },
+            "limitClause": undefined,
+            "offsetClause": undefined,
+            "orderByClause": undefined,
+            "parens": Array [
+              Object {
+                "leftSpacing": "",
+                "rightSpacing": "",
               },
             ],
-          },
-          "spacing": Object {
-            "postSelect": " ",
-            "preFromClause": " ",
-          },
-          "type": "query",
-          "unionQuery": undefined,
-          "whereClause": undefined,
-          "withClause": undefined,
-        },
-        "replaceClause": undefined,
-        "spacing": Object {
-          "postWithClause": " ",
-        },
-        "type": "withQuery",
-        "unionQuery": undefined,
-        "withClause": SqlWithClause {
-          "keywords": Object {
-            "with": "WITH",
-          },
-          "parens": undefined,
-          "spacing": Object {
-            "postWith": " ",
-          },
-          "type": "withClause",
-          "withParts": SeparatedArray {
-            "separators": Array [],
-            "values": Array [
-              SqlWithPart {
-                "columns": undefined,
-                "keywords": Object {
-                  "as": "AS",
+            "partitionedByClause": undefined,
+            "replaceClause": undefined,
+            "selectExpressions": SeparatedArray {
+              "separators": Array [],
+              "values": Array [
+                SqlStar {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "spacing": Object {},
+                  "table": undefined,
+                  "type": "star",
                 },
-                "parens": undefined,
-                "query": SqlQuery {
-                  "clusteredByClause": undefined,
-                  "contextStatements": undefined,
-                  "decorator": undefined,
-                  "explain": undefined,
-                  "fromClause": SqlFromClause {
-                    "expressions": SeparatedArray {
+              ],
+            },
+            "spacing": Object {
+              "postSelect": " ",
+              "preFromClause": " ",
+            },
+            "type": "query",
+            "unionQuery": undefined,
+            "whereClause": undefined,
+            "withClause": undefined,
+          },
+          "replaceClause": undefined,
+          "spacing": Object {
+            "postWithClause": " ",
+          },
+          "type": "withQuery",
+          "unionQuery": undefined,
+          "withClause": SqlWithClause {
+            "keywords": Object {
+              "with": "WITH",
+            },
+            "parens": undefined,
+            "spacing": Object {
+              "postWith": " ",
+            },
+            "type": "withClause",
+            "withParts": SeparatedArray {
+              "separators": Array [],
+              "values": Array [
+                SqlWithPart {
+                  "columns": undefined,
+                  "keywords": Object {
+                    "as": "AS",
+                  },
+                  "parens": undefined,
+                  "query": SqlQuery {
+                    "clusteredByClause": undefined,
+                    "contextStatements": undefined,
+                    "decorator": undefined,
+                    "explain": undefined,
+                    "fromClause": SqlFromClause {
+                      "expressions": SeparatedArray {
+                        "separators": Array [],
+                        "values": Array [
+                          SqlTable {
+                            "keywords": Object {},
+                            "namespace": undefined,
+                            "parens": undefined,
+                            "refName": RefName {
+                              "name": "wikipedia",
+                              "quotes": false,
+                            },
+                            "spacing": Object {},
+                            "type": "table",
+                          },
+                        ],
+                      },
+                      "joinParts": undefined,
+                      "keywords": Object {
+                        "from": "FROM",
+                      },
+                      "parens": undefined,
+                      "spacing": Object {
+                        "postFrom": " ",
+                      },
+                      "type": "fromClause",
+                    },
+                    "groupByClause": undefined,
+                    "havingClause": undefined,
+                    "insertClause": undefined,
+                    "keywords": Object {
+                      "select": "SELECT",
+                    },
+                    "limitClause": undefined,
+                    "offsetClause": undefined,
+                    "orderByClause": undefined,
+                    "parens": Array [
+                      Object {
+                        "leftSpacing": "",
+                        "rightSpacing": "",
+                      },
+                    ],
+                    "partitionedByClause": undefined,
+                    "replaceClause": undefined,
+                    "selectExpressions": SeparatedArray {
                       "separators": Array [],
                       "values": Array [
-                        SqlTable {
+                        SqlStar {
                           "keywords": Object {},
-                          "namespace": undefined,
                           "parens": undefined,
-                          "refName": RefName {
-                            "name": "wikipedia",
-                            "quotes": false,
-                          },
                           "spacing": Object {},
-                          "type": "table",
+                          "table": undefined,
+                          "type": "star",
                         },
                       ],
                     },
-                    "joinParts": undefined,
-                    "keywords": Object {
-                      "from": "FROM",
-                    },
-                    "parens": undefined,
                     "spacing": Object {
-                      "postFrom": " ",
+                      "postSelect": " ",
+                      "preFromClause": " ",
                     },
-                    "type": "fromClause",
-                  },
-                  "groupByClause": undefined,
-                  "havingClause": undefined,
-                  "insertClause": undefined,
-                  "keywords": Object {
-                    "select": "SELECT",
-                  },
-                  "limitClause": undefined,
-                  "offsetClause": undefined,
-                  "orderByClause": undefined,
-                  "parens": Array [
-                    Object {
-                      "leftSpacing": "",
-                      "rightSpacing": "",
-                    },
-                  ],
-                  "partitionedByClause": undefined,
-                  "replaceClause": undefined,
-                  "selectExpressions": SeparatedArray {
-                    "separators": Array [],
-                    "values": Array [
-                      SqlStar {
-                        "keywords": Object {},
-                        "parens": undefined,
-                        "spacing": Object {},
-                        "table": undefined,
-                        "type": "star",
-                      },
-                    ],
+                    "type": "query",
+                    "unionQuery": undefined,
+                    "whereClause": undefined,
+                    "withClause": undefined,
                   },
                   "spacing": Object {
-                    "postSelect": " ",
-                    "preFromClause": " ",
+                    "postAs": " ",
+                    "postTable": " ",
                   },
-                  "type": "query",
-                  "unionQuery": undefined,
-                  "whereClause": undefined,
-                  "withClause": undefined,
+                  "table": RefName {
+                    "name": "wiki",
+                    "quotes": false,
+                  },
+                  "type": "withPart",
                 },
-                "spacing": Object {
-                  "postAs": " ",
-                  "postTable": " ",
-                },
-                "table": RefName {
-                  "name": "wiki",
-                  "quotes": false,
-                },
-                "type": "withPart",
-              },
-            ],
+              ],
+            },
           },
-        },
-      }
-    `);
+        }
+      `);
+    });
   });
 
-  it('handles infinite limits', () => {
-    const sql = `WITH wiki AS (SELECT * FROM wikipedia) (SELECT * FROM wiki LIMIT 10)`;
-    const query = SqlExpression.parse(sql) as SqlWithQuery;
+  describe('#flattenWith', () => {
+    it('flattens nested WITH clauses into one', () => {
+      const sql = sane`
+        -- Leading comment
+        REPLACE INTO dst OVERWRITE ALL
+        WITH wiki1 AS (SELECT * FROM wikipedia), wiki2 AS (SELECT * FROM wikipedia)
+        (
+          WITH wiki3 AS (SELECT * FROM wiki1), wiki4 AS (SELECT * FROM wiki2)
+          (
+            SELECT * FROM wiki2 LIMIT 100
+          )
+        )
+        PARTITIONED BY ALL
+        -- Trailing comment
+      `;
 
-    expect(query.changeLimitValue(undefined).hasLimit()).toEqual(false);
-    expect(query.changeLimitValue(Infinity).hasLimit()).toEqual(false);
+      const query = SqlExpression.parse(sql) as SqlWithQuery;
+
+      expect(String(query.flattenWith()).trim()).toEqual(sane`
+        -- Leading comment
+        REPLACE INTO dst OVERWRITE ALL
+        WITH
+        wiki1 AS (SELECT * FROM wikipedia),
+        wiki2 AS (SELECT * FROM wikipedia),
+        wiki3 AS (SELECT * FROM wiki1),
+        wiki4 AS (SELECT * FROM wiki2)
+        SELECT * FROM wiki2 LIMIT 100
+        PARTITIONED BY ALL
+        -- Trailing comment
+      `);
+    });
   });
 
-  it('throws for invalid limit values', () => {
-    const sql = `WITH wiki AS (SELECT * FROM wikipedia) (SELECT * FROM wiki LIMIT 10)`;
-    const query = SqlExpression.parse(sql) as SqlWithQuery;
+  describe('#changeLimitValue', () => {
+    it('handles infinite limits', () => {
+      const sql = `WITH wiki AS (SELECT * FROM wikipedia) (SELECT * FROM wiki LIMIT 10)`;
+      const query = SqlExpression.parse(sql) as SqlWithQuery;
 
-    expect(() => query.changeLimitValue(1)).not.toThrow();
-    expect(() => query.changeLimitValue(0)).not.toThrow();
-    expect(() => query.changeLimitValue(-1)).toThrow('-1 is not a valid limit value');
-    expect(() => query.changeLimitValue(-Infinity)).toThrow('-Infinity is not a valid limit value');
+      expect(query.changeLimitValue(undefined).hasLimit()).toEqual(false);
+      expect(query.changeLimitValue(Infinity).hasLimit()).toEqual(false);
+    });
+
+    it('throws for invalid limit values', () => {
+      const sql = `WITH wiki AS (SELECT * FROM wikipedia) (SELECT * FROM wiki LIMIT 10)`;
+      const query = SqlExpression.parse(sql) as SqlWithQuery;
+
+      expect(() => query.changeLimitValue(1)).not.toThrow();
+      expect(() => query.changeLimitValue(0)).not.toThrow();
+      expect(() => query.changeLimitValue(-1)).toThrow('-1 is not a valid limit value');
+      expect(() => query.changeLimitValue(-Infinity)).toThrow(
+        '-Infinity is not a valid limit value',
+      );
+    });
   });
 });

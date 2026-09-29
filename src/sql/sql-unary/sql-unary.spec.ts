@@ -16,76 +16,45 @@ import { SqlExpression } from '../..';
 import { backAndForth } from '../../test-utils';
 
 describe('SqlUnary', () => {
-  it('minus', () => {
-    const sql = `-A`;
+  describe('parses', () => {
+    it('minus', () => {
+      const sql = `-A`;
 
-    backAndForth(sql);
+      backAndForth(sql);
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlUnary {
-        "argument": SqlColumn {
-          "keywords": Object {},
-          "parens": undefined,
-          "refName": RefName {
-            "name": "A",
-            "quotes": false,
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        SqlUnary {
+          "argument": SqlColumn {
+            "keywords": Object {},
+            "parens": undefined,
+            "refName": RefName {
+              "name": "A",
+              "quotes": false,
+            },
+            "spacing": Object {},
+            "table": undefined,
+            "type": "column",
           },
-          "spacing": Object {},
-          "table": undefined,
-          "type": "column",
-        },
-        "keywords": Object {
+          "keywords": Object {
+            "op": "-",
+          },
           "op": "-",
-        },
-        "op": "-",
-        "parens": undefined,
-        "spacing": Object {
-          "postOp": "",
-        },
-        "type": "unary",
-      }
-    `);
-  });
-
-  it('single not expression', () => {
-    const sql = `NOT B`;
-
-    backAndForth(sql);
-
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlUnary {
-        "argument": SqlColumn {
-          "keywords": Object {},
           "parens": undefined,
-          "refName": RefName {
-            "name": "B",
-            "quotes": false,
+          "spacing": Object {
+            "postOp": "",
           },
-          "spacing": Object {},
-          "table": undefined,
-          "type": "column",
-        },
-        "keywords": Object {
-          "op": "NOT",
-        },
-        "op": "NOT",
-        "parens": undefined,
-        "spacing": Object {
-          "postOp": " ",
-        },
-        "type": "unary",
-      }
-    `);
-  });
+          "type": "unary",
+        }
+      `);
+    });
 
-  it('double not expression', () => {
-    const sql = `NOT not B`;
+    it('single not expression', () => {
+      const sql = `NOT B`;
 
-    backAndForth(sql);
+      backAndForth(sql);
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlUnary {
-        "argument": SqlUnary {
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        SqlUnary {
           "argument": SqlColumn {
             "keywords": Object {},
             "parens": undefined,
@@ -98,7 +67,7 @@ describe('SqlUnary', () => {
             "type": "column",
           },
           "keywords": Object {
-            "op": "not",
+            "op": "NOT",
           },
           "op": "NOT",
           "parens": undefined,
@@ -106,196 +75,75 @@ describe('SqlUnary', () => {
             "postOp": " ",
           },
           "type": "unary",
-        },
-        "keywords": Object {
-          "op": "NOT",
-        },
-        "op": "NOT",
-        "parens": undefined,
-        "spacing": Object {
-          "postOp": " ",
-        },
-        "type": "unary",
-      }
-    `);
-  });
+        }
+      `);
+    });
 
-  it('multiple not expressions', () => {
-    const sql = `NOT A AND NOT B AND NOT C`;
+    it('double not expression', () => {
+      const sql = `NOT not B`;
 
-    backAndForth(sql);
+      backAndForth(sql);
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlMulti {
-        "args": SeparatedArray {
-          "separators": Array [
-            Separator {
-              "left": " ",
-              "right": " ",
-              "separator": "AND",
-            },
-            Separator {
-              "left": " ",
-              "right": " ",
-              "separator": "AND",
-            },
-          ],
-          "values": Array [
-            SqlUnary {
-              "argument": SqlColumn {
-                "keywords": Object {},
-                "parens": undefined,
-                "refName": RefName {
-                  "name": "A",
-                  "quotes": false,
-                },
-                "spacing": Object {},
-                "table": undefined,
-                "type": "column",
-              },
-              "keywords": Object {
-                "op": "NOT",
-              },
-              "op": "NOT",
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        SqlUnary {
+          "argument": SqlUnary {
+            "argument": SqlColumn {
+              "keywords": Object {},
               "parens": undefined,
-              "spacing": Object {
-                "postOp": " ",
+              "refName": RefName {
+                "name": "B",
+                "quotes": false,
               },
-              "type": "unary",
+              "spacing": Object {},
+              "table": undefined,
+              "type": "column",
             },
-            SqlUnary {
-              "argument": SqlColumn {
-                "keywords": Object {},
-                "parens": undefined,
-                "refName": RefName {
-                  "name": "B",
-                  "quotes": false,
-                },
-                "spacing": Object {},
-                "table": undefined,
-                "type": "column",
-              },
-              "keywords": Object {
-                "op": "NOT",
-              },
-              "op": "NOT",
-              "parens": undefined,
-              "spacing": Object {
-                "postOp": " ",
-              },
-              "type": "unary",
+            "keywords": Object {
+              "op": "not",
             },
-            SqlUnary {
-              "argument": SqlColumn {
-                "keywords": Object {},
-                "parens": undefined,
-                "refName": RefName {
-                  "name": "C",
-                  "quotes": false,
-                },
-                "spacing": Object {},
-                "table": undefined,
-                "type": "column",
-              },
-              "keywords": Object {
-                "op": "NOT",
-              },
-              "op": "NOT",
-              "parens": undefined,
-              "spacing": Object {
-                "postOp": " ",
-              },
-              "type": "unary",
+            "op": "NOT",
+            "parens": undefined,
+            "spacing": Object {
+              "postOp": " ",
             },
-          ],
-        },
-        "keywords": Object {},
-        "op": "AND",
-        "parens": undefined,
-        "spacing": Object {},
-        "type": "multi",
-      }
-    `);
-  });
-
-  it('Not containing an expression', () => {
-    const sql = `NOT A > B`;
-
-    backAndForth(sql);
-
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlUnary {
-        "argument": SqlComparison {
-          "decorator": undefined,
+            "type": "unary",
+          },
           "keywords": Object {
-            "op": ">",
+            "op": "NOT",
           },
-          "lhs": SqlColumn {
-            "keywords": Object {},
-            "parens": undefined,
-            "refName": RefName {
-              "name": "A",
-              "quotes": false,
-            },
-            "spacing": Object {},
-            "table": undefined,
-            "type": "column",
-          },
-          "op": ">",
+          "op": "NOT",
           "parens": undefined,
-          "rhs": SqlColumn {
-            "keywords": Object {},
-            "parens": undefined,
-            "refName": RefName {
-              "name": "B",
-              "quotes": false,
-            },
-            "spacing": Object {},
-            "table": undefined,
-            "type": "column",
-          },
           "spacing": Object {
             "postOp": " ",
-            "preOp": " ",
           },
-          "type": "comparison",
-        },
-        "keywords": Object {
-          "op": "NOT",
-        },
-        "op": "NOT",
-        "parens": undefined,
-        "spacing": Object {
-          "postOp": " ",
-        },
-        "type": "unary",
-      }
-    `);
-  });
+          "type": "unary",
+        }
+      `);
+    });
 
-  it('Multiple Not expressions containing an expression', () => {
-    const sql = `NOT A > B OR Not C = 'D'`;
+    it('multiple not expressions', () => {
+      const sql = `NOT A AND NOT B AND NOT C`;
 
-    backAndForth(sql);
+      backAndForth(sql);
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlMulti {
-        "args": SeparatedArray {
-          "separators": Array [
-            Separator {
-              "left": " ",
-              "right": " ",
-              "separator": "OR",
-            },
-          ],
-          "values": Array [
-            SqlUnary {
-              "argument": SqlComparison {
-                "decorator": undefined,
-                "keywords": Object {
-                  "op": ">",
-                },
-                "lhs": SqlColumn {
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        SqlMulti {
+          "args": SeparatedArray {
+            "separators": Array [
+              Separator {
+                "left": " ",
+                "right": " ",
+                "separator": "AND",
+              },
+              Separator {
+                "left": " ",
+                "right": " ",
+                "separator": "AND",
+              },
+            ],
+            "values": Array [
+              SqlUnary {
+                "argument": SqlColumn {
                   "keywords": Object {},
                   "parens": undefined,
                   "refName": RefName {
@@ -306,9 +154,18 @@ describe('SqlUnary', () => {
                   "table": undefined,
                   "type": "column",
                 },
-                "op": ">",
+                "keywords": Object {
+                  "op": "NOT",
+                },
+                "op": "NOT",
                 "parens": undefined,
-                "rhs": SqlColumn {
+                "spacing": Object {
+                  "postOp": " ",
+                },
+                "type": "unary",
+              },
+              SqlUnary {
+                "argument": SqlColumn {
                   "keywords": Object {},
                   "parens": undefined,
                   "refName": RefName {
@@ -319,29 +176,18 @@ describe('SqlUnary', () => {
                   "table": undefined,
                   "type": "column",
                 },
+                "keywords": Object {
+                  "op": "NOT",
+                },
+                "op": "NOT",
+                "parens": undefined,
                 "spacing": Object {
                   "postOp": " ",
-                  "preOp": " ",
                 },
-                "type": "comparison",
+                "type": "unary",
               },
-              "keywords": Object {
-                "op": "NOT",
-              },
-              "op": "NOT",
-              "parens": undefined,
-              "spacing": Object {
-                "postOp": " ",
-              },
-              "type": "unary",
-            },
-            SqlUnary {
-              "argument": SqlComparison {
-                "decorator": undefined,
-                "keywords": Object {
-                  "op": "=",
-                },
-                "lhs": SqlColumn {
+              SqlUnary {
+                "argument": SqlColumn {
                   "keywords": Object {},
                   "parens": undefined,
                   "refName": RefName {
@@ -352,51 +198,34 @@ describe('SqlUnary', () => {
                   "table": undefined,
                   "type": "column",
                 },
-                "op": "=",
-                "parens": undefined,
-                "rhs": SqlLiteral {
-                  "keywords": Object {},
-                  "parens": undefined,
-                  "spacing": Object {},
-                  "stringValue": "'D'",
-                  "type": "literal",
-                  "value": "D",
+                "keywords": Object {
+                  "op": "NOT",
                 },
+                "op": "NOT",
+                "parens": undefined,
                 "spacing": Object {
                   "postOp": " ",
-                  "preOp": " ",
                 },
-                "type": "comparison",
+                "type": "unary",
               },
-              "keywords": Object {
-                "op": "Not",
-              },
-              "op": "NOT",
-              "parens": undefined,
-              "spacing": Object {
-                "postOp": " ",
-              },
-              "type": "unary",
-            },
-          ],
-        },
-        "keywords": Object {},
-        "op": "OR",
-        "parens": undefined,
-        "spacing": Object {},
-        "type": "multi",
-      }
-    `);
-  });
+            ],
+          },
+          "keywords": Object {},
+          "op": "AND",
+          "parens": undefined,
+          "spacing": Object {},
+          "type": "multi",
+        }
+      `);
+    });
 
-  it('Nested Not Expressions', () => {
-    const sql = `NOT NOT A > B`;
+    it('not containing an expression', () => {
+      const sql = `NOT A > B`;
 
-    backAndForth(sql);
+      backAndForth(sql);
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlUnary {
-        "argument": SqlUnary {
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        SqlUnary {
           "argument": SqlComparison {
             "decorator": undefined,
             "keywords": Object {
@@ -441,17 +270,190 @@ describe('SqlUnary', () => {
             "postOp": " ",
           },
           "type": "unary",
-        },
-        "keywords": Object {
+        }
+      `);
+    });
+
+    it('multiple not expressions containing an expression', () => {
+      const sql = `NOT A > B OR Not C = 'D'`;
+
+      backAndForth(sql);
+
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        SqlMulti {
+          "args": SeparatedArray {
+            "separators": Array [
+              Separator {
+                "left": " ",
+                "right": " ",
+                "separator": "OR",
+              },
+            ],
+            "values": Array [
+              SqlUnary {
+                "argument": SqlComparison {
+                  "decorator": undefined,
+                  "keywords": Object {
+                    "op": ">",
+                  },
+                  "lhs": SqlColumn {
+                    "keywords": Object {},
+                    "parens": undefined,
+                    "refName": RefName {
+                      "name": "A",
+                      "quotes": false,
+                    },
+                    "spacing": Object {},
+                    "table": undefined,
+                    "type": "column",
+                  },
+                  "op": ">",
+                  "parens": undefined,
+                  "rhs": SqlColumn {
+                    "keywords": Object {},
+                    "parens": undefined,
+                    "refName": RefName {
+                      "name": "B",
+                      "quotes": false,
+                    },
+                    "spacing": Object {},
+                    "table": undefined,
+                    "type": "column",
+                  },
+                  "spacing": Object {
+                    "postOp": " ",
+                    "preOp": " ",
+                  },
+                  "type": "comparison",
+                },
+                "keywords": Object {
+                  "op": "NOT",
+                },
+                "op": "NOT",
+                "parens": undefined,
+                "spacing": Object {
+                  "postOp": " ",
+                },
+                "type": "unary",
+              },
+              SqlUnary {
+                "argument": SqlComparison {
+                  "decorator": undefined,
+                  "keywords": Object {
+                    "op": "=",
+                  },
+                  "lhs": SqlColumn {
+                    "keywords": Object {},
+                    "parens": undefined,
+                    "refName": RefName {
+                      "name": "C",
+                      "quotes": false,
+                    },
+                    "spacing": Object {},
+                    "table": undefined,
+                    "type": "column",
+                  },
+                  "op": "=",
+                  "parens": undefined,
+                  "rhs": SqlLiteral {
+                    "keywords": Object {},
+                    "parens": undefined,
+                    "spacing": Object {},
+                    "stringValue": "'D'",
+                    "type": "literal",
+                    "value": "D",
+                  },
+                  "spacing": Object {
+                    "postOp": " ",
+                    "preOp": " ",
+                  },
+                  "type": "comparison",
+                },
+                "keywords": Object {
+                  "op": "Not",
+                },
+                "op": "NOT",
+                "parens": undefined,
+                "spacing": Object {
+                  "postOp": " ",
+                },
+                "type": "unary",
+              },
+            ],
+          },
+          "keywords": Object {},
+          "op": "OR",
+          "parens": undefined,
+          "spacing": Object {},
+          "type": "multi",
+        }
+      `);
+    });
+
+    it('nested not expressions', () => {
+      const sql = `NOT NOT A > B`;
+
+      backAndForth(sql);
+
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        SqlUnary {
+          "argument": SqlUnary {
+            "argument": SqlComparison {
+              "decorator": undefined,
+              "keywords": Object {
+                "op": ">",
+              },
+              "lhs": SqlColumn {
+                "keywords": Object {},
+                "parens": undefined,
+                "refName": RefName {
+                  "name": "A",
+                  "quotes": false,
+                },
+                "spacing": Object {},
+                "table": undefined,
+                "type": "column",
+              },
+              "op": ">",
+              "parens": undefined,
+              "rhs": SqlColumn {
+                "keywords": Object {},
+                "parens": undefined,
+                "refName": RefName {
+                  "name": "B",
+                  "quotes": false,
+                },
+                "spacing": Object {},
+                "table": undefined,
+                "type": "column",
+              },
+              "spacing": Object {
+                "postOp": " ",
+                "preOp": " ",
+              },
+              "type": "comparison",
+            },
+            "keywords": Object {
+              "op": "NOT",
+            },
+            "op": "NOT",
+            "parens": undefined,
+            "spacing": Object {
+              "postOp": " ",
+            },
+            "type": "unary",
+          },
+          "keywords": Object {
+            "op": "NOT",
+          },
           "op": "NOT",
-        },
-        "op": "NOT",
-        "parens": undefined,
-        "spacing": Object {
-          "postOp": " ",
-        },
-        "type": "unary",
-      }
-    `);
+          "parens": undefined,
+          "spacing": Object {
+            "postOp": " ",
+          },
+          "type": "unary",
+        }
+      `);
+    });
   });
 });

@@ -35,50 +35,36 @@ function backAndForthNotCustom(expression: string): void {
   expect(filterPatternsToExpression(patterns).toString()).toEqual(expression);
 }
 
-describe('filter-pattern', () => {
-  describe('fixed point expressions', () => {
-    it.each([
-      `"lol" = 'hello'`,
-      `"lol" <> 'hello'`,
-      `"lol" IN ('hello', 'goodbye')`,
-      `"lol" NOT IN ('hello', 'goodbye')`,
-      `ICONTAINS_STRING(CAST("lol" AS VARCHAR), 'hello')`,
-      `NOT ICONTAINS_STRING(CAST("lol" AS VARCHAR), 'hello')`,
-      `REGEXP_LIKE(CAST("lol" AS VARCHAR), 'hello')`,
-      `NOT REGEXP_LIKE(CAST("lol" AS VARCHAR), 'hello')`,
-      `TIME_IN_INTERVAL("lol", '2022-06-30T22:56:14.123Z/2022-06-30T22:56:15.923Z')`,
-      `NOT TIME_IN_INTERVAL("lol", '2022-06-30T22:56:14.123Z/2022-06-30T22:56:15.923Z')`,
-      `(TIME_SHIFT(CURRENT_TIMESTAMP, 'PT1H', -1) <= "__time" AND "__time" < CURRENT_TIMESTAMP)`,
-      `(TIME_SHIFT(CURRENT_TIMESTAMP, 'PT1H', -1, 'Europe/Paris') <= "__time" AND "__time" < CURRENT_TIMESTAMP)`,
-      `NOT (TIME_SHIFT(CURRENT_TIMESTAMP, 'PT1H', -1) <= "__time" AND "__time" < CURRENT_TIMESTAMP)`,
-      `(TIME_SHIFT(TIME_CEIL(CURRENT_TIMESTAMP, 'P1D'), 'PT1H', -1) <= "__time" AND "__time" < TIME_CEIL(CURRENT_TIMESTAMP, 'P1D'))`,
-      `(TIME_SHIFT(TIME_SHIFT(TIME_CEIL(CURRENT_TIMESTAMP, 'P1D'), 'P1D', -1), 'PT1H', -1) <= "__time" AND "__time" < TIME_SHIFT(TIME_CEIL(CURRENT_TIMESTAMP, 'P1D'), 'P1D', -1))`,
-      `(TIME_SHIFT(TIME_SHIFT(TIME_CEIL(MAX_DATA_TIME(), 'P1D'), 'P1D', -1), 'PT1H', -1) <= "__time" AND "__time" < TIME_SHIFT(TIME_CEIL(MAX_DATA_TIME(), 'P1D'), 'P1D', -1))`,
-      `(TIME_SHIFT(TIME_SHIFT(TIME_CEIL(MAX_DATA_TIME(), 'P1D', NULL, 'Europe/Paris'), 'P1D', -1, 'Europe/Paris'), 'PT1H', -1, 'Europe/Paris') <= "__time" AND "__time" < TIME_SHIFT(TIME_CEIL(MAX_DATA_TIME(), 'P1D', NULL, 'Europe/Paris'), 'P1D', -1, 'Europe/Paris'))`,
-      `(TIME_SHIFT(TIME_SHIFT(TIME_CEIL(TIMESTAMP '2024-01-12 18:30:00', 'P1D'), 'P1D', -1), 'PT1H', -1) <= "__time" AND "__time" < TIME_SHIFT(TIME_CEIL(TIMESTAMP '2024-01-12 18:30:00', 'P1D'), 'P1D', -1))`,
-      `(TIME_SHIFT(TIMESTAMP '2024-01-12 18:31:00', 'P1D', -1, 'Etc/UTC') <= "__time" AND "__time" < TIMESTAMP '2024-01-12 18:31:00')`,
-      `MV_CONTAINS("hello", ARRAY['v1', 'v2'])`,
-      `("hi" > 0 AND "hi" < 100)`,
-      `"hi" > 0`,
-      `"hi" >= 0`,
-      `"hi" < 0`,
-      `"hi" <= 0`,
-      `NOT ("hi" > 0 AND "hi" < 100)`,
-      `TIMESTAMP '2022-06-30 22:56:14.123' <= "__time" AND "__time" <= TIMESTAMP '2022-06-30 22:56:15.923'`,
-      `TIMESTAMP '2022-06-30 22:56:14.123' < "__time" AND "__time" <= TIMESTAMP '2022-06-30 22:56:15.923'`,
-      `(TIME_FLOOR(MAX_DATA_TIME(), 'P3M', NULL, 'Etc/UTC') <= "DIM:__time" AND "DIM:__time" < TIME_SHIFT(TIME_FLOOR(MAX_DATA_TIME(), 'P3M', NULL, 'Etc/UTC'), 'P1D', 1, 'Etc/UTC'))`,
-    ])('correctly handles expression: %s', expression => {
-      backAndForthNotCustom(expression);
-    });
-  });
-
-  describe('invalid expressions', () => {
-    it.each([
-      `"__time" >= TIMESTAMP '2022-06-30 22:56:15.923' AND TIMESTAMP '2021-06-30 22:56:14.123' >= "__time"`,
-      `TIMESTAMP '2021-06-30 22:56:14.123' >= "__time" AND "__time" >= TIMESTAMP '2022-06-30 22:56:15.923'`,
-    ])('correctly handles invalid expression: %s', expression => {
-      const pattern = fitFilterPattern(SqlExpression.parse(expression));
-      expect(pattern.type).toEqual('custom');
+describe('unify', () => {
+  describe('fitFilterPatterns', () => {
+    it('works in a general case', () => {
+      expect(
+        fitFilterPatterns(
+          SqlExpression.parse(
+            `(TIME_SHIFT(TIME_SHIFT(TIME_CEIL(CURRENT_TIMESTAMP, 'P1D'), 'P1D', -1), 'PT1H', -1) <= "__time" AND "__time" < TIME_SHIFT(TIME_CEIL(CURRENT_TIMESTAMP, 'P1D'), 'P1D', -1)) AND "lol" IN ('hello', 'goodbye')`,
+          ),
+        ),
+      ).toEqual([
+        {
+          alignDuration: 'P1D',
+          alignType: 'ceil',
+          anchor: 'timestamp',
+          column: '__time',
+          negated: false,
+          rangeDuration: 'PT1H',
+          shiftDuration: 'P1D',
+          shiftStep: -1,
+          type: 'timeRelative',
+          startBound: '[',
+          endBound: ')',
+        },
+        {
+          column: 'lol',
+          negated: false,
+          type: 'values',
+          values: ['hello', 'goodbye'],
+        },
+      ]);
     });
   });
 
@@ -246,37 +232,49 @@ describe('filter-pattern', () => {
         values: ['v1', 'v2'],
       });
     });
+
+    it.each([
+      `"__time" >= TIMESTAMP '2022-06-30 22:56:15.923' AND TIMESTAMP '2021-06-30 22:56:14.123' >= "__time"`,
+      `TIMESTAMP '2021-06-30 22:56:14.123' >= "__time" AND "__time" >= TIMESTAMP '2022-06-30 22:56:15.923'`,
+    ])('falls back to custom for invalid expression: %s', expression => {
+      const pattern = fitFilterPattern(SqlExpression.parse(expression));
+      expect(pattern.type).toEqual('custom');
+    });
   });
 
-  describe('fitFilterPatterns', () => {
-    it('works in a general case', () => {
-      expect(
-        fitFilterPatterns(
-          SqlExpression.parse(
-            `(TIME_SHIFT(TIME_SHIFT(TIME_CEIL(CURRENT_TIMESTAMP, 'P1D'), 'P1D', -1), 'PT1H', -1) <= "__time" AND "__time" < TIME_SHIFT(TIME_CEIL(CURRENT_TIMESTAMP, 'P1D'), 'P1D', -1)) AND "lol" IN ('hello', 'goodbye')`,
-          ),
-        ),
-      ).toEqual([
-        {
-          alignDuration: 'P1D',
-          alignType: 'ceil',
-          anchor: 'timestamp',
-          column: '__time',
-          negated: false,
-          rangeDuration: 'PT1H',
-          shiftDuration: 'P1D',
-          shiftStep: -1,
-          type: 'timeRelative',
-          startBound: '[',
-          endBound: ')',
-        },
-        {
-          column: 'lol',
-          negated: false,
-          type: 'values',
-          values: ['hello', 'goodbye'],
-        },
-      ]);
+  describe('fixed point expressions', () => {
+    it.each([
+      `"lol" = 'hello'`,
+      `"lol" <> 'hello'`,
+      `"lol" IN ('hello', 'goodbye')`,
+      `"lol" NOT IN ('hello', 'goodbye')`,
+      `ICONTAINS_STRING(CAST("lol" AS VARCHAR), 'hello')`,
+      `NOT ICONTAINS_STRING(CAST("lol" AS VARCHAR), 'hello')`,
+      `REGEXP_LIKE(CAST("lol" AS VARCHAR), 'hello')`,
+      `NOT REGEXP_LIKE(CAST("lol" AS VARCHAR), 'hello')`,
+      `TIME_IN_INTERVAL("lol", '2022-06-30T22:56:14.123Z/2022-06-30T22:56:15.923Z')`,
+      `NOT TIME_IN_INTERVAL("lol", '2022-06-30T22:56:14.123Z/2022-06-30T22:56:15.923Z')`,
+      `(TIME_SHIFT(CURRENT_TIMESTAMP, 'PT1H', -1) <= "__time" AND "__time" < CURRENT_TIMESTAMP)`,
+      `(TIME_SHIFT(CURRENT_TIMESTAMP, 'PT1H', -1, 'Europe/Paris') <= "__time" AND "__time" < CURRENT_TIMESTAMP)`,
+      `NOT (TIME_SHIFT(CURRENT_TIMESTAMP, 'PT1H', -1) <= "__time" AND "__time" < CURRENT_TIMESTAMP)`,
+      `(TIME_SHIFT(TIME_CEIL(CURRENT_TIMESTAMP, 'P1D'), 'PT1H', -1) <= "__time" AND "__time" < TIME_CEIL(CURRENT_TIMESTAMP, 'P1D'))`,
+      `(TIME_SHIFT(TIME_SHIFT(TIME_CEIL(CURRENT_TIMESTAMP, 'P1D'), 'P1D', -1), 'PT1H', -1) <= "__time" AND "__time" < TIME_SHIFT(TIME_CEIL(CURRENT_TIMESTAMP, 'P1D'), 'P1D', -1))`,
+      `(TIME_SHIFT(TIME_SHIFT(TIME_CEIL(MAX_DATA_TIME(), 'P1D'), 'P1D', -1), 'PT1H', -1) <= "__time" AND "__time" < TIME_SHIFT(TIME_CEIL(MAX_DATA_TIME(), 'P1D'), 'P1D', -1))`,
+      `(TIME_SHIFT(TIME_SHIFT(TIME_CEIL(MAX_DATA_TIME(), 'P1D', NULL, 'Europe/Paris'), 'P1D', -1, 'Europe/Paris'), 'PT1H', -1, 'Europe/Paris') <= "__time" AND "__time" < TIME_SHIFT(TIME_CEIL(MAX_DATA_TIME(), 'P1D', NULL, 'Europe/Paris'), 'P1D', -1, 'Europe/Paris'))`,
+      `(TIME_SHIFT(TIME_SHIFT(TIME_CEIL(TIMESTAMP '2024-01-12 18:30:00', 'P1D'), 'P1D', -1), 'PT1H', -1) <= "__time" AND "__time" < TIME_SHIFT(TIME_CEIL(TIMESTAMP '2024-01-12 18:30:00', 'P1D'), 'P1D', -1))`,
+      `(TIME_SHIFT(TIMESTAMP '2024-01-12 18:31:00', 'P1D', -1, 'Etc/UTC') <= "__time" AND "__time" < TIMESTAMP '2024-01-12 18:31:00')`,
+      `MV_CONTAINS("hello", ARRAY['v1', 'v2'])`,
+      `("hi" > 0 AND "hi" < 100)`,
+      `"hi" > 0`,
+      `"hi" >= 0`,
+      `"hi" < 0`,
+      `"hi" <= 0`,
+      `NOT ("hi" > 0 AND "hi" < 100)`,
+      `TIMESTAMP '2022-06-30 22:56:14.123' <= "__time" AND "__time" <= TIMESTAMP '2022-06-30 22:56:15.923'`,
+      `TIMESTAMP '2022-06-30 22:56:14.123' < "__time" AND "__time" <= TIMESTAMP '2022-06-30 22:56:15.923'`,
+      `(TIME_FLOOR(MAX_DATA_TIME(), 'P3M', NULL, 'Etc/UTC') <= "DIM:__time" AND "DIM:__time" < TIME_SHIFT(TIME_FLOOR(MAX_DATA_TIME(), 'P3M', NULL, 'Etc/UTC'), 'P1D', 1, 'Etc/UTC'))`,
+    ])('correctly handles expression: %s', expression => {
+      backAndForthNotCustom(expression);
     });
   });
 });
