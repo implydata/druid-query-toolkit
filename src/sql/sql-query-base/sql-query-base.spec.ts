@@ -134,6 +134,9 @@ describe('SqlQueryBase', () => {
       const values = parseValues(`EXPLAIN PLAN FOR VALUES (1)`);
 
       expect(values.changeExplain(true)).toBe(values);
+
+      const notExplain = parseValues(`VALUES (1)`);
+      expect(notExplain.changeExplain(false)).toBe(notExplain);
     });
 
     it('removes the EXPLAIN and its spacing', () => {

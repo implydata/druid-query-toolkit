@@ -1529,20 +1529,24 @@ WindowSpec =
     postLeftParen: postLeftParen
   };
   var keywords = value.keywords = {};
+  var lastSpaceName;
 
   if (windowName) {
     value.windowName = windowName[0];
     spacing.postWindowName = windowName[1];
+    lastSpaceName = 'postWindowName';
   }
 
   if (partitionByClause) {
     value.partitionByClause = partitionByClause[0];
     spacing.postPartitionBy = partitionByClause[1];
+    lastSpaceName = 'postPartitionBy';
   }
 
   if (orderByClause) {
     value.orderByClause = orderByClause[0];
     spacing.postOrderBy = orderByClause[1];
+    lastSpaceName = 'postOrderBy';
   }
 
   if (frame) {
@@ -1569,7 +1573,11 @@ WindowSpec =
       value.frameBound1 = b;
     }
 
-    spacing.postFrame = frame[3];
+    spacing.preRightParen = frame[3];
+  } else if (lastSpaceName) {
+    // The space after the last part is the space before the closing paren
+    spacing.preRightParen = spacing[lastSpaceName];
+    delete spacing[lastSpaceName];
   }
 
   return new S.SqlWindowSpec(value);

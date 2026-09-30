@@ -2041,6 +2041,29 @@ describe('SqlMulti', () => {
       const multi = SqlExpression.parse(`a   AND\n  b`);
 
       expect(multi.clearOwnSeparators().toString()).toEqual(`a AND b`);
+      expect(multi.clearOwnSeparators().args.separators).toEqual([]);
+    });
+
+    it('keeps the casing of the operator', () => {
+      expect(SqlExpression.parse(`a   and\n  b AND c`).clearOwnSeparators().toString()).toEqual(
+        `a and b AND c`,
+      );
+      expect(SqlExpression.parse(`a Or b OR c or d OR e`).clearOwnSeparators().toString()).toEqual(
+        `a\n  Or b\n  OR c\n  or d\n  OR e`,
+      );
+    });
+  });
+
+  describe('#resetOwnKeywords', () => {
+    it('resets the casing of the operator and keeps the spacing', () => {
+      expect(SqlExpression.parse(`a   and\n  b AND c`).resetOwnKeywords().toString()).toEqual(
+        `a   AND\n  b AND c`,
+      );
+    });
+
+    it('returns the same instance when nothing changes', () => {
+      const multi = SqlExpression.parse(`a AND b`);
+      expect(multi.resetOwnKeywords()).toBe(multi);
     });
   });
 

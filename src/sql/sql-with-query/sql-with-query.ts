@@ -116,6 +116,12 @@ export class SqlWithQuery extends SqlQueryBase {
     // nowhere to put it, so leave such a query as it is.
     if (!(innerFlatQuery instanceof SqlQuery)) return this;
 
+    // The outer ORDER BY would take the place of the inner one, which decides which rows an
+    // inner LIMIT or OFFSET keeps, so such a query can not be flattened.
+    if (this.orderByClause && (innerFlatQuery.limitClause || innerFlatQuery.offsetClause)) {
+      return this;
+    }
+
     let flatQuery = innerFlatQuery
       .changeParens([])
       .changeSpaces({ initial: this.spacing['initial'], final: this.spacing['final'] });

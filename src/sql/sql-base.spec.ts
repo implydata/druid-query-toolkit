@@ -617,6 +617,10 @@ describe('SqlBase', () => {
       expect(
         parseSql('case  when a then 1\n  end').prettify({ keywordCasing: 'preserve' }).toString(),
       ).toEqual('case when a then 1 end');
+      expect(parseSql('a  and b Or c').prettify({ keywordCasing: 'preserve' }).toString()).toEqual(
+        '(a and b) Or c',
+      );
+      expect(parseSql('a  and b Or c').prettify().toString()).toEqual('(a AND b) OR c');
     });
 
     it('can skip the clarifying parens', () => {

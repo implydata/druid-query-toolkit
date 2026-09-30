@@ -13,7 +13,7 @@
  */
 
 import { RefName } from '../helpers';
-import type { SqlBaseValue, SqlTypeDesignator, Substitutor } from '../sql-base';
+import type { SpaceName, SqlBaseValue, SqlTypeDesignator, Substitutor } from '../sql-base';
 import { SqlBase } from '../sql-base';
 import type { SqlOrderByClause } from '../sql-clause';
 import type { SqlPartitionByClause } from '../sql-clause/sql-partition-by-clause/sql-partition-by-clause';
@@ -68,48 +68,55 @@ export class SqlWindowSpec extends SqlBase {
   }
 
   protected _toRawString(): string {
-    const rawParts: string[] = ['(', this.getSpace('postLeftParen')];
+    // Each part is followed by its own space when another part comes after it, while the space
+    // after the last part lives in preRightParen, so parts can be added or removed freely.
+    const parts: [string, SpaceName | undefined][] = [];
 
     if (this.windowName) {
-      rawParts.push(this.windowName.toString(), this.getSpace('postWindowName'));
+      parts.push([this.windowName.toString(), 'postWindowName']);
     }
 
     if (this.partitionByClause) {
-      rawParts.push(this.partitionByClause.toString(), this.getSpace('postPartitionBy'));
+      parts.push([this.partitionByClause.toString(), 'postPartitionBy']);
     }
 
     if (this.orderByClause) {
-      rawParts.push(this.orderByClause.toString(), this.getSpace('postOrderBy'));
+      parts.push([this.orderByClause.toString(), 'postOrderBy']);
     }
 
     if (this.frameType && this.frameBound1) {
-      rawParts.push(
+      const frameParts: string[] = [
         this.frameType === 'rows'
           ? this.getKeyword('rows', SqlWindowSpec.DEFAULT_ROWS_KEYWORD)
           : this.getKeyword('range', SqlWindowSpec.DEFAULT_RANGE_KEYWORD),
         this.getSpace('postFrameType'),
-      );
+      ];
 
       if (this.frameBound2) {
-        rawParts.push(
+        frameParts.push(
           this.getKeyword('between', SqlWindowSpec.DEFAULT_BETWEEN_KEYWORD),
           this.getSpace('postBetween'),
-        );
-      }
-
-      rawParts.push(this.frameBound1.toString());
-
-      if (this.frameBound2) {
-        rawParts.push(
+          this.frameBound1.toString(),
           this.getSpace('preAnd'),
           this.getKeyword('and', SqlWindowSpec.DEFAULT_AND_KEYWORD),
           this.getSpace('postAnd'),
           this.frameBound2.toString(),
         );
+      } else {
+        frameParts.push(this.frameBound1.toString());
       }
 
-      rawParts.push(this.getSpace('postFrame'));
+      parts.push([frameParts.join(''), undefined]);
     }
+
+    const rawParts: string[] = ['(', this.getSpace('postLeftParen', '')];
+
+    parts.forEach(([part, postSpace], i) => {
+      rawParts.push(part);
+      if (i < parts.length - 1 && postSpace) rawParts.push(this.getSpace(postSpace));
+    });
+
+    if (parts.length) rawParts.push(this.getSpace('preRightParen', ''));
 
     rawParts.push(')');
 
