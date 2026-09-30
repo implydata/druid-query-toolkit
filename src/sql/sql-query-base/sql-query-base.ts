@@ -417,6 +417,15 @@ export abstract class SqlQueryBase extends SqlExpression {
 
   /* ~~~~~ ORDER BY ~~~~~ */
 
+  /**
+   * The ORDER BY clause that applies to the result of this query. Subclasses that express
+   * ordering differently (like the pipe syntax) override this, so the methods below should
+   * read the clause through it rather than through the `orderByClause` field.
+   */
+  public getOrderByClause(): SqlOrderByClause | undefined {
+    return this.orderByClause;
+  }
+
   public changeOrderByClause(orderByClause: SqlOrderByClause | undefined): this {
     if (this.orderByClause === orderByClause) return this;
     const value = this.valueOf();
@@ -435,9 +444,10 @@ export abstract class SqlQueryBase extends SqlExpression {
     if (!orderByExpressions || isEmptyArray(orderByExpressions)) {
       return this.changeOrderByClause(undefined);
     } else {
+      const orderByClause = this.getOrderByClause();
       return this.changeOrderByClause(
-        this.orderByClause
-          ? this.orderByClause.changeExpressions(orderByExpressions)
+        orderByClause
+          ? orderByClause.changeExpressions(orderByExpressions)
           : SqlOrderByClause.create(orderByExpressions),
       );
     }
@@ -449,29 +459,38 @@ export abstract class SqlQueryBase extends SqlExpression {
   }
 
   public hasOrderBy(): boolean {
-    return Boolean(this.orderByClause);
+    return Boolean(this.getOrderByClause());
   }
 
   public getOrderByExpressions(): readonly SqlOrderByExpression[] {
-    const { orderByClause } = this;
+    const orderByClause = this.getOrderByClause();
     if (!orderByClause) return [];
     return orderByClause.expressions.values;
   }
 
   public getOrderByForExpression(ex: SqlExpression): SqlOrderByExpression | undefined {
-    if (!this.orderByClause) return;
-    return this.orderByClause.toArray().find(orderByExpression => {
+    const orderByClause = this.getOrderByClause();
+    if (!orderByClause) return;
+    return orderByClause.toArray().find(orderByExpression => {
       return orderByExpression.expression.equals(ex);
     });
   }
 
   public addOrderBy(orderBy: SqlOrderByExpression): this {
+    const orderByClause = this.getOrderByClause();
     return this.changeOrderByClause(
-      this.orderByClause ? this.orderByClause.addFirst(orderBy) : SqlOrderByClause.create(orderBy),
+      orderByClause ? orderByClause.addFirst(orderBy) : SqlOrderByClause.create(orderBy),
     );
   }
 
   /* ~~~~~ LIMIT ~~~~~ */
+
+  /**
+   * The LIMIT clause that applies to the result of this query, see `getOrderByClause`.
+   */
+  public getLimitClause(): SqlLimitClause | undefined {
+    return this.limitClause;
+  }
 
   public changeLimitClause(limitClause: SqlLimitClause | undefined): this {
     if (this.limitClause === limitClause) return this;
@@ -486,7 +505,7 @@ export abstract class SqlQueryBase extends SqlExpression {
   }
 
   public getLimitValue(): number | undefined {
-    return this.limitClause?.getLimitValue();
+    return this.getLimitClause()?.getLimitValue();
   }
 
   public changeLimitValue(limitValue: SqlLiteral | number | undefined): this {
@@ -497,21 +516,21 @@ export abstract class SqlQueryBase extends SqlExpression {
     if (typeof limitValue === 'number' && !isFinite(limitValue)) {
       return this.changeLimitClause(undefined);
     }
+    const limitClause = this.getLimitClause();
     return this.changeLimitClause(
-      this.limitClause
-        ? this.limitClause.changeLimit(limitValue)
-        : SqlLimitClause.create(limitValue),
+      limitClause ? limitClause.changeLimit(limitValue) : SqlLimitClause.create(limitValue),
     );
   }
 
   public hasLimit(): boolean {
-    return Boolean(this.limitClause);
+    return Boolean(this.getLimitClause());
   }
 
   public combineWithLimitClause(otherLimitClause: SqlLimitClause): this {
-    if (this.limitClause) {
+    const limitClause = this.getLimitClause();
+    if (limitClause) {
       return this.changeLimitValue(
-        Math.min(this.limitClause.getLimitValue(), otherLimitClause.getLimitValue()),
+        Math.min(limitClause.getLimitValue(), otherLimitClause.getLimitValue()),
       );
     } else {
       return this.changeLimitClause(otherLimitClause);
@@ -519,6 +538,13 @@ export abstract class SqlQueryBase extends SqlExpression {
   }
 
   /* ~~~~~ OFFSET ~~~~~ */
+
+  /**
+   * The OFFSET clause that applies to the result of this query, see `getOrderByClause`.
+   */
+  public getOffsetClause(): SqlOffsetClause | undefined {
+    return this.offsetClause;
+  }
 
   public changeOffsetClause(offsetClause: SqlOffsetClause | undefined): this {
     if (this.offsetClause === offsetClause) return this;
@@ -533,26 +559,26 @@ export abstract class SqlQueryBase extends SqlExpression {
   }
 
   public getOffsetValue(): number | undefined {
-    return this.offsetClause?.getOffsetValue();
+    return this.getOffsetClause()?.getOffsetValue();
   }
 
   public changeOffsetValue(offsetValue: SqlLiteral | number | undefined): this {
     if (typeof offsetValue === 'undefined') return this.changeOffsetClause(undefined);
+    const offsetClause = this.getOffsetClause();
     return this.changeOffsetClause(
-      this.offsetClause
-        ? this.offsetClause.changeOffset(offsetValue)
-        : SqlOffsetClause.create(offsetValue),
+      offsetClause ? offsetClause.changeOffset(offsetValue) : SqlOffsetClause.create(offsetValue),
     );
   }
 
   public hasOffset(): boolean {
-    return Boolean(this.offsetClause);
+    return Boolean(this.getOffsetClause());
   }
 
   public combineWithOffsetClause(otherOffsetClause: SqlOffsetClause): this {
-    if (this.offsetClause) {
+    const offsetClause = this.getOffsetClause();
+    if (offsetClause) {
       return this.changeOffsetValue(
-        this.offsetClause.getOffsetValue() + otherOffsetClause.getOffsetValue(),
+        offsetClause.getOffsetValue() + otherOffsetClause.getOffsetValue(),
       );
     } else {
       return this.changeOffsetClause(otherOffsetClause);

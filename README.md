@@ -75,6 +75,35 @@ ORDER BY 5 DESC
  */
 ```
 
+#### Pipe syntax
+
+Pipe syntax queries (`FROM t |> WHERE ... |> AGGREGATE ...`) parse into a `SqlPipesQuery`, which holds the root query (often a `SqlFromQuery`, a bare `FROM <table>`) and a list of pipe operators: `SqlSelectPipeOperator`, `SqlWherePipeOperator`, `SqlAggregatePipeOperator`, `SqlOrderByPipeOperator`, `SqlLimitPipeOperator`, `SqlExtendPipeOperator`, `SqlSetPipeOperator` and `SqlDropPipeOperator`.
+The ORDER BY and LIMIT methods that every query has work on the trailing `|> ORDER BY` and `|> LIMIT` operators.
+
+```javascript
+import { SqlColumn, SqlExpression, SqlWherePipeOperator } from 'druid-query-toolkit';
+
+const sql = SqlExpression.parse(`
+FROM wikipedia
+|> WHERE channel = '#en.wikipedia'
+|> AGGREGATE COUNT(*) AS edits GROUP BY cityName
+`);
+
+sql
+  .appendPipeOperator(SqlWherePipeOperator.create(SqlColumn.optionalQuotes('edits').greaterThan(10)))
+  .changeLimitValue(100)
+  .toString()
+/* →
+`
+FROM wikipedia
+|> WHERE channel = '#en.wikipedia'
+|> AGGREGATE COUNT(*) AS edits GROUP BY cityName
+|> WHERE edits > 10
+|> LIMIT 100
+`
+ */
+```
+
 For more examples, check out the unit tests.
 
 #### ToDo

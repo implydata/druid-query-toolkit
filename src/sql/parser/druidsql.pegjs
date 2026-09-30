@@ -191,7 +191,9 @@ SqlQueryStatement =
   insertClause:(InsertClause _)?
   replaceClause:(ReplaceClause _)?
   body:QueryBody
-  suffix:QuerySuffix
+  orderSuffix:QueryOrderSuffix
+  pipes:(_ SqlPipeOperator)*
+  ingestSuffix:QueryIngestSuffix
   union:(_ UnionClause)?
 {
   var value = {};
@@ -218,13 +220,33 @@ SqlQueryStatement =
     spacing.postReplaceClause = replaceClause[1];
   }
 
-  // The body decides which class we build
-  Object.assign(value, body.value);
-  Object.assign(keywords, body.keywords);
-  Object.assign(spacing, body.spacing);
+  var ClassFn;
+  if (pipes.length) {
+    // The body and its ORDER BY / LIMIT / OFFSET form the root query of the pipeline, the
+    // rest of the statement wraps the whole pipeline
+    value.query = new body.ClassFn(Object.assign({}, body.value, orderSuffix.value, {
+      keywords: body.keywords,
+      spacing: Object.assign({}, body.spacing, orderSuffix.spacing)
+    }));
+    value.pipeOperators = new S.SeparatedArray(
+      pipes.map(function(x) { return x[1] }),
+      pipes.slice(1).map(function(x) { return x[0] })
+    );
+    spacing.prePipes = pipes[0][0];
+    ClassFn = S.SqlPipesQuery;
+  } else {
+    // The body decides which class we build
+    Object.assign(value, body.value);
+    Object.assign(keywords, body.keywords);
+    Object.assign(spacing, body.spacing);
 
-  Object.assign(value, suffix.value);
-  Object.assign(spacing, suffix.spacing);
+    Object.assign(value, orderSuffix.value);
+    Object.assign(spacing, orderSuffix.spacing);
+    ClassFn = body.ClassFn;
+  }
+
+  Object.assign(value, ingestSuffix.value);
+  Object.assign(spacing, ingestSuffix.spacing);
 
   if (union) {
     spacing.preUnion = union[0];
@@ -233,7 +255,7 @@ SqlQueryStatement =
     value.unionQuery = union[1].unionQuery;
   }
 
-  return new body.ClassFn(value);
+  return new ClassFn(value);
 }
 
 // Each alternative is discriminated by its leading token, so the order only
@@ -243,6 +265,7 @@ QueryBody =
 / WithQueryBody
 / ValuesBody
 / TableBody
+/ FromBody
 
 SelectBody = withClause:(WithClause _)? heart:QueryHeart
 {
@@ -309,13 +332,27 @@ TableBody =
   };
 }
 
-// Always succeeds; this is the single place the query suffix clauses are parsed.
-QuerySuffix =
+FromBody =
+  fromKeyword:FromToken
+  postFrom:_
+  table:SqlTable
+{
+  return {
+    ClassFn: S.SqlFromQuery,
+    value: { table: table },
+    keywords: { from: fromKeyword },
+    spacing: { postFrom: postFrom }
+  };
+}
+
+// The query suffix clauses come in two parts so that pipe operators can go between them:
+// ORDER BY / LIMIT / OFFSET belong to the query before any pipes, while PARTITIONED BY and
+// CLUSTERED BY come after all of them. Both always succeed, and this is the single place the
+// query suffix clauses are parsed.
+QueryOrderSuffix =
   orderByClause:(_ OrderByClause)?
   limitClause:(_ LimitClause)?
   offsetClause:(_ OffsetClause)?
-  partitionedByClause:(_ PartitionedByClause)?
-  clusteredByClause:(_ ClusteredByClause)?
 {
   var value = {};
   var spacing = {};
@@ -334,6 +371,16 @@ QuerySuffix =
     spacing.preOffsetClause = offsetClause[0];
     value.offsetClause = offsetClause[1];
   }
+
+  return { value: value, spacing: spacing };
+}
+
+QueryIngestSuffix =
+  partitionedByClause:(_ PartitionedByClause)?
+  clusteredByClause:(_ ClusteredByClause)?
+{
+  var value = {};
+  var spacing = {};
 
   if (partitionedByClause) {
     spacing.prePartitionedByClause = partitionedByClause[0];
@@ -814,6 +861,131 @@ UnionClause = unionKeyword:UnionAllToken postUnion:_ unionQuery:SqlQueryStatemen
     postUnion: postUnion,
     unionQuery: unionQuery
   };
+}
+
+// ------------------------------
+
+SqlPipeOperator = "|>" postPipe:_ pipeOperator:PipeOperatorBody
+{
+  return pipeOperator.changeSpace('postPipe', postPipe);
+}
+
+PipeOperatorBody =
+  SelectPipeOperator
+/ WherePipeOperator
+/ AggregatePipeOperator
+/ OrderByPipeOperator
+/ LimitPipeOperator
+/ ExtendPipeOperator
+/ SetPipeOperator
+/ DropPipeOperator
+
+SelectPipeOperator =
+  select:SelectToken
+  postSelect:_
+  head:SqlStarOrAliasExpression
+  tail:(CommaSeparator SqlStarOrAliasExpression)*
+{
+  return new S.SqlSelectPipeOperator({
+    selectExpressions: makeSeparatedArray(head, tail),
+    keywords: { select: select },
+    spacing: { postSelect: postSelect }
+  });
+}
+
+WherePipeOperator = whereClause:SqlWhereClause
+{
+  return new S.SqlWherePipeOperator({ whereClause: whereClause });
+}
+
+// `AGGREGATE GROUP BY x` has no aggregates, so the GROUP BY is tried first
+AggregatePipeOperator =
+  aggregate:AggregateToken
+  postAggregate:_
+  body:(GroupByClause / (SqlAlias (CommaSeparator SqlAlias)* (_ GroupByClause)?))
+{
+  var value = {
+    keywords: { aggregate: aggregate },
+    spacing: { postAggregate: postAggregate }
+  };
+
+  if (Array.isArray(body)) {
+    value.expressions = makeSeparatedArray(body[0], body[1]);
+    if (body[2]) {
+      value.spacing.preGroupByClause = body[2][0];
+      value.groupByClause = body[2][1];
+    }
+  } else {
+    value.groupByClause = body;
+  }
+
+  return new S.SqlAggregatePipeOperator(value);
+}
+
+OrderByPipeOperator = orderByClause:OrderByClause
+{
+  return new S.SqlOrderByPipeOperator({ orderByClause: orderByClause });
+}
+
+LimitPipeOperator = limitClause:LimitClause offsetClause:(_ OffsetClause)?
+{
+  var value = { limitClause: limitClause };
+  if (offsetClause) {
+    value.spacing = { preOffsetClause: offsetClause[0] };
+    value.offsetClause = offsetClause[1];
+  }
+  return new S.SqlLimitPipeOperator(value);
+}
+
+ExtendPipeOperator =
+  extend:ExtendToken
+  postExtend:_
+  head:SqlAlias
+  tail:(CommaSeparator SqlAlias)*
+{
+  return new S.SqlExtendPipeOperator({
+    expressions: makeSeparatedArray(head, tail),
+    keywords: { extend: extend },
+    spacing: { postExtend: postExtend }
+  });
+}
+
+SetPipeOperator =
+  set:SetToken
+  postSet:_
+  head:SqlColumnAssignment
+  tail:(CommaSeparator SqlColumnAssignment)*
+{
+  return new S.SqlSetPipeOperator({
+    assignments: makeSeparatedArray(head, tail),
+    keywords: { set: set },
+    spacing: { postSet: postSet }
+  });
+}
+
+SqlColumnAssignment = column:SqlColumn preEquals:_ "=" postEquals:_ expression:Expression
+{
+  return new S.SqlColumnAssignment({
+    column: column,
+    expression: expression,
+    spacing: {
+      preEquals: preEquals,
+      postEquals: postEquals
+    }
+  });
+}
+
+DropPipeOperator =
+  drop:DropToken
+  postDrop:_
+  head:SqlColumn
+  tail:(CommaSeparator SqlColumn)*
+{
+  return new S.SqlDropPipeOperator({
+    columns: makeSeparatedArray(head, tail),
+    keywords: { drop: drop },
+    spacing: { postDrop: postDrop }
+  });
 }
 
 // ------------------------------
@@ -1990,6 +2162,7 @@ CloseParen ")" = ")"
 
 /* Tokens */
 
+AggregateToken = $("AGGREGATE"i !IdentifierPart)
 AllToken = $("ALL"i !IdentifierPart)
 AndToken = $("AND"i !IdentifierPart)
 AnyToken = $("ANY"i !IdentifierPart)
@@ -2009,6 +2182,7 @@ CubeToken = $("CUBE"i !IdentifierPart)
 DateToken = $("DATE"i !IdentifierPart)
 DescToken = $("DESC"i !IdentifierPart)
 DistinctToken = $("DISTINCT"i !IdentifierPart)
+DropToken = $("DROP"i !IdentifierPart)
 ElseToken = $("ELSE"i !IdentifierPart)
 EndToken = $("END"i !IdentifierPart)
 EscapeToken = $("ESCAPE"i !IdentifierPart)
