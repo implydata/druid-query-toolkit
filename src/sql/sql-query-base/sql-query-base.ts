@@ -328,7 +328,7 @@ export abstract class SqlQueryBase extends SqlExpression {
   /* ~~~~~ EXPLAIN ~~~~~ */
 
   public changeExplain(explain: boolean): this {
-    if (this.explain === explain) return this;
+    if (Boolean(this.explain) === explain) return this;
     const value = this.valueOf();
     if (explain) {
       value.explain = true;

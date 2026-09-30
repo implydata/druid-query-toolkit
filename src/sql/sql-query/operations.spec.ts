@@ -675,7 +675,7 @@ describe('SqlQuery (operations)', () => {
           Case A When B Then C WheN D Then E End As m
         From tbl
         Where
-          __time Between Timestamp '2020-01-01' And Timestamp '2020-01-02' AND goo is not Null AND NoT True
+          __time Between Timestamp '2020-01-01' And Timestamp '2020-01-02' And goo is not Null aNd NoT True
         Group By 1
         Order By 2 Desc, 3 asC
         LimIT 12

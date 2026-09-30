@@ -2418,6 +2418,27 @@ describe('SqlComparison', () => {
       expect(x.like('hello%').getSpecialLikeType()).toEqual('prefix');
       expect(x.like('%hello').getSpecialLikeType()).toEqual('postfix');
       expect(x.like('%hello%').getSpecialLikeType()).toEqual('includes');
+      expect(x.like('%').getSpecialLikeType()).toEqual('includes');
+      expect(x.like('%%hello%%').getSpecialLikeType()).toEqual('includes');
+    });
+
+    it('does not report a pattern with a wildcard in the middle', () => {
+      expect(x.like('he%llo').getSpecialLikeType()).toBeUndefined();
+      expect(x.like('hel_o%').getSpecialLikeType()).toBeUndefined();
+    });
+
+    it('treats escaped wildcards as plain characters', () => {
+      expect(x.like('a!%', '!').getSpecialLikeType()).toEqual('exact');
+      expect(x.like('!%a%', '!').getSpecialLikeType()).toEqual('prefix');
+      expect(x.like('%a!_b', '!').getSpecialLikeType()).toEqual('postfix');
+      expect(x.like('%a!!%', '!').getSpecialLikeType()).toEqual('includes');
+      expect(SqlExpression.parse(`x LIKE 'a!%' ESCAPE '!'`).getSpecialLikeType()).toEqual('exact');
+    });
+
+    it('does not report a pattern with an unusable escape', () => {
+      expect(x.like('a!', '!').getSpecialLikeType()).toBeUndefined();
+      expect(x.like('a%', '!!').getSpecialLikeType()).toBeUndefined();
+      expect(x.like('a%', SqlColumn.create('e')).getSpecialLikeType()).toBeUndefined();
     });
   });
 

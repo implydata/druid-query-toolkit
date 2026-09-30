@@ -83,13 +83,14 @@ export class SqlMulti extends SqlExpression {
   }
 
   protected _toRawString(): string {
+    return this.args.toString(this.getDefaultSeparator(SqlBase.capitalize(this.op)));
+  }
+
+  private getDefaultSeparator(sep: string): Separator {
     const { op, args } = this;
-    const sep = SqlBase.capitalize(op);
-    return args.toString(
-      args.length() > 3 && (op === 'AND' || op === 'OR')
-        ? Separator.newlineFirst(sep)
-        : Separator.symmetricSpace(sep),
-    );
+    return args.length() > 3 && (op === 'AND' || op === 'OR')
+      ? Separator.newlineFirst(sep)
+      : Separator.symmetricSpace(sep);
   }
 
   public numArgs(): number {
@@ -126,10 +127,37 @@ export class SqlMulti extends SqlExpression {
     return ret;
   }
 
+  public resetOwnKeywords(): this {
+    const ret = super.resetOwnKeywords();
+    const { args } = ret;
+    const sep = SqlBase.capitalize(ret.op);
+    if (args.separators.every(s => !(s instanceof Separator) || s.separator === sep)) return ret;
+    return ret.changeArgs(
+      new SeparatedArray(
+        args.values,
+        args.separators.map(s =>
+          s instanceof Separator
+            ? new Separator({ left: s.left, separator: sep, right: s.right })
+            : s,
+        ),
+      ),
+    );
+  }
+
   public clearOwnSeparators(): this {
-    const value = this.valueOf();
-    value.args = this.args.clearSeparators();
-    return SqlBase.fromValue(value);
+    // The separators also hold the casing of the operator (AND / and), so keep any casing that
+    // differs from the default and reset only the spacing around it
+    const sep = SqlBase.capitalize(this.op);
+    const separators = this.args.separators.map(s =>
+      s instanceof Separator && s.separator !== sep
+        ? this.getDefaultSeparator(s.separator)
+        : undefined,
+    );
+    return this.changeArgs(
+      separators.some(Boolean)
+        ? new SeparatedArray(this.args.values, separators)
+        : this.args.clearSeparators(),
+    );
   }
 
   public flatten(flatteningOp?: SqlMultiOp): SqlExpression {

@@ -143,13 +143,13 @@ describe('SqlWindowSpec', () => {
           "spacing": Object {
             "postAnd": "  ",
             "postBetween": " ",
-            "postFrame": " ",
             "postFrameType": "  ",
             "postLeftParen": " ",
             "postOrderBy": "  ",
             "postPartitionBy": "  ",
             "postWindowName": "  ",
             "preAnd": "  ",
+            "preRightParen": " ",
           },
           "type": "windowSpec",
           "windowName": RefName {
@@ -205,6 +205,19 @@ describe('SqlWindowSpec', () => {
       expect(String(windowSpec)).toEqual(`(PARTITION BY a ORDER BY b)`);
     });
 
+    it('adds a partition by clause after a window name that was the last part', () => {
+      const windowSpec = parseWindowSpec(`(w)`).changePartitionByClause(
+        SqlPartitionByClause.create([SqlColumn.optionalQuotes('a')]),
+      );
+      expect(String(windowSpec)).toEqual(`(w PARTITION BY a)`);
+    });
+
+    it('removes the partition by clause when it is the only part', () => {
+      expect(
+        String(parseWindowSpec(`(PARTITION BY a)`).changePartitionByClause(undefined)),
+      ).toEqual(`()`);
+    });
+
     it('removes the partition by clause along with its spacing', () => {
       const windowSpec = parseWindowSpec(`(PARTITION BY a   ORDER BY b)`);
       const changed = windowSpec.changePartitionByClause(undefined);
@@ -226,6 +239,24 @@ describe('SqlWindowSpec', () => {
         SqlOrderByClause.create(SqlOrderByExpression.create(SqlColumn.optionalQuotes('b'), 'DESC')),
       );
       expect(String(windowSpec)).toEqual(`(ORDER BY b DESC ROWS 1 PRECEDING)`);
+    });
+
+    it('adds an order by clause after a partition by clause that was the last part', () => {
+      const orderBy = SqlOrderByClause.create(
+        SqlOrderByExpression.create(SqlColumn.optionalQuotes('b'), 'DESC'),
+      );
+      expect(String(parseWindowSpec(`(PARTITION BY a)`).changeOrderByClause(orderBy))).toEqual(
+        `(PARTITION BY a ORDER BY b DESC)`,
+      );
+      expect(String(parseWindowSpec(`( PARTITION BY a )`).changeOrderByClause(orderBy))).toEqual(
+        `( PARTITION BY a ORDER BY b DESC )`,
+      );
+    });
+
+    it('removes the last part without leaving a stray space', () => {
+      expect(
+        String(parseWindowSpec(`(PARTITION BY a ORDER BY b)`).changeOrderByClause(undefined)),
+      ).toEqual(`(PARTITION BY a)`);
     });
 
     it('removes the order by clause along with its spacing', () => {
@@ -282,7 +313,7 @@ describe('SqlWindowSpec', () => {
 
   describe('built from parts', () => {
     it('prints default keywords and spacing', () => {
-      expect(String(new SqlWindowSpec({}))).toEqual(`( )`);
+      expect(String(new SqlWindowSpec({}))).toEqual(`()`);
       expect(
         String(
           new SqlWindowSpec({
@@ -291,7 +322,7 @@ describe('SqlWindowSpec', () => {
             frameBound2: SqlFrameBound.CURRENT_ROW,
           }),
         ),
-      ).toEqual(`( ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW )`);
+      ).toEqual(`(ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)`);
       expect(
         String(
           new SqlWindowSpec({
@@ -299,11 +330,23 @@ describe('SqlWindowSpec', () => {
             frameBound1: SqlFrameBound.following(3),
           }),
         ),
-      ).toEqual(`( RANGE 3 FOLLOWING )`);
+      ).toEqual(`(RANGE 3 FOLLOWING)`);
+    });
+
+    it('prints spacing between parts that are added one by one', () => {
+      expect(
+        String(
+          new SqlWindowSpec({})
+            .changePartitionByClause(SqlPartitionByClause.create([SqlColumn.optionalQuotes('a')]))
+            .changeOrderByClause(
+              SqlOrderByClause.create(SqlOrderByExpression.create(SqlColumn.optionalQuotes('b'))),
+            ),
+        ),
+      ).toEqual(`(PARTITION BY a ORDER BY b)`);
     });
 
     it('ignores a frame type without a bound', () => {
-      expect(String(new SqlWindowSpec({ frameType: 'rows' }))).toEqual(`( )`);
+      expect(String(new SqlWindowSpec({ frameType: 'rows' }))).toEqual(`()`);
     });
   });
 });

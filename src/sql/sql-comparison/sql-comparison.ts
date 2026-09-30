@@ -353,15 +353,47 @@ export class SqlComparison extends SqlExpression {
   }
 
   public getSpecialLikeType(): SpecialLikeType | undefined {
+    const { rhs } = this;
     const likeMatchPattern = this.getLikeMatchPattern();
     if (typeof likeMatchPattern !== 'string') return;
-    if (likeMatchPattern.endsWith('%')) {
-      if (likeMatchPattern.startsWith('%')) {
+
+    let escape: string | undefined;
+    if (rhs instanceof SqlLikePart) {
+      if (!(rhs.escape instanceof SqlLiteral)) return;
+      escape = rhs.escape.getStringValue();
+      if (typeof escape !== 'string' || escape.length !== 1) return;
+    }
+
+    // Mark each character of the pattern as an unescaped wildcard ('%' or '_') or a plain character
+    const wildcards: (string | undefined)[] = [];
+    for (let i = 0; i < likeMatchPattern.length; i++) {
+      const char = likeMatchPattern[i]!;
+      if (char === escape) {
+        i++;
+        if (i === likeMatchPattern.length) return; // A dangling escape is not a valid pattern
+        wildcards.push(undefined);
+      } else {
+        wildcards.push(char === '%' || char === '_' ? char : undefined);
+      }
+    }
+
+    let start = 0;
+    while (wildcards[start] === '%') start++;
+    if (start === wildcards.length) return start ? 'includes' : 'exact'; // Only % (or empty)
+
+    let end = wildcards.length;
+    while (wildcards[end - 1] === '%') end--;
+
+    // Any other wildcard makes the pattern more than a simple match
+    if (wildcards.slice(start, end).some(Boolean)) return;
+
+    if (end < wildcards.length) {
+      if (start > 0) {
         return 'includes'; // %blah%
       } else {
         return 'prefix'; // blah%
       }
-    } else if (likeMatchPattern.startsWith('%')) {
+    } else if (start > 0) {
       return 'postfix'; // %blah
     } else {
       return 'exact'; // blah

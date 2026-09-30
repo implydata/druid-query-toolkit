@@ -228,7 +228,7 @@ export class QueryResult {
         // topN like
         if (Array.isArray(firstRowResult)) {
           const firstSubRow = data.find(r => r.result[0]);
-          if (!firstSubRow) return QueryResult.BLANK;
+          if (!firstSubRow) return QueryResult.BLANK.changeResultContext(resultContext);
           const header = Object.keys(firstSubRow.result[0]);
           return new QueryResult({
             header: Column.fromColumnNames(

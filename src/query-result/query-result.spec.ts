@@ -1413,6 +1413,16 @@ describe('QueryResult', () => {
       ).toBe(QueryResult.BLANK);
     });
 
+    it('keeps the context for topN with no sub rows', () => {
+      const result = QueryResult.fromRawResult({
+        results: [{ timestamp: '2019-08-04T15:00:00.000Z', result: [] }],
+        context: { foo: 'bar' },
+      });
+      expect(result.header).toEqual([]);
+      expect(result.rows).toEqual([]);
+      expect(result.resultContext).toEqual({ foo: 'bar' });
+    });
+
     it('returns a header only result for a scan with no events', () => {
       const result = QueryResult.fromRawResult([
         { segmentId: 's', columns: ['a', 'b'], events: [] },

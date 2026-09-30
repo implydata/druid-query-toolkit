@@ -360,7 +360,7 @@ describe('SqlWithQuery', () => {
       const query = parseWithQuery(sane`
         INSERT INTO dst
         WITH a AS (SELECT * FROM wikipedia)
-        (SELECT * FROM a OFFSET 5)
+        (SELECT * FROM a ORDER BY page)
         ORDER BY __time
         LIMIT 3
         OFFSET 2
@@ -371,12 +371,22 @@ describe('SqlWithQuery', () => {
       expect(String(query.flattenWith())).toMatchInlineSnapshot(`
         "INSERT INTO dst
         WITH a AS (SELECT * FROM wikipedia)
-        SELECT * FROM a
-        ORDER BY __time
-        LIMIT 3 OFFSET 7
+        SELECT * FROM a ORDER BY __time
+        LIMIT 3
+        OFFSET 2
         PARTITIONED BY ALL
         CLUSTERED BY page"
       `);
+    });
+
+    it('leaves the query alone when the outer ORDER BY would change which rows the inner LIMIT or OFFSET keeps', () => {
+      for (const sql of [
+        `WITH a AS (SELECT * FROM t) (SELECT * FROM a ORDER BY x LIMIT 3) ORDER BY y`,
+        `WITH a AS (SELECT * FROM t) (SELECT * FROM a OFFSET 5) ORDER BY y LIMIT 3`,
+      ]) {
+        const query = parseWithQuery(sql);
+        expect(query.flattenWith()).toBe(query);
+      }
     });
 
     it('shrinks an inner limit by the outer offset', () => {
