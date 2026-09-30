@@ -1,5 +1,11 @@
 # druid-query-toolkit
 
+## 1.3.1
+
+### Patch Changes
+
+- 26b0510: Fix `SqlQuery.removeOrderByForSelectIndex` and `removeOrderByForOutputColumn`, which kept only the matching ORDER BY expressions instead of removing them
+
 ## 1.3.0
 
 ### Minor Changes
