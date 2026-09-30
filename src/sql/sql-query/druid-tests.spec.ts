@@ -15,7 +15,7 @@
 import { backAndForth } from '../../test-utils';
 import { sane } from '../../utils';
 
-describe('Druid test queries', () => {
+describe('SqlQuery (druid tests)', () => {
   const queries = [
     sane`
       SELECT TIME_FORMAT("date", 'yyyy-MM'), SUM(x)
@@ -1642,7 +1642,9 @@ describe('Druid test queries', () => {
     `,
   ];
 
-  it.each(queries)('correctly parses: %#', sql => {
-    backAndForth(sql);
+  describe('parses', () => {
+    it.each(queries)('correctly parses: %#', sql => {
+      backAndForth(sql);
+    });
   });
 });

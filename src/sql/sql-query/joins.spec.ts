@@ -16,9 +16,9 @@ import { N, SqlColumn, SqlExpression, SqlJoinPart, SqlQuery } from '../..';
 import { backAndForth } from '../../test-utils';
 import { sane } from '../../utils';
 
-describe('joins', () => {
-  describe('parse join with lookup', () => {
-    it('parses a basic math expression', () => {
+describe('SqlQuery (joins)', () => {
+  describe('parses', () => {
+    it('parses a left join', () => {
       const sql = sane`
         SELECT countryName from wikipedia
         Left JOIN lookup.country ON lookup.country.v = wikipedia.countryName
@@ -72,8 +72,8 @@ describe('joins', () => {
     });
   });
 
-  describe('addJoin', () => {
-    it('Add left join explicitly', () => {
+  describe('#addJoin', () => {
+    it('adds a left join', () => {
       expect(
         SqlQuery.parse(`SELECT countryName from wikipedia`)
           .addJoin(
@@ -90,7 +90,7 @@ describe('joins', () => {
       `);
     });
 
-    it('Add natural left join explicitly', () => {
+    it('adds a natural left join', () => {
       expect(
         SqlQuery.parse(`SELECT countryName from wikipedia`)
           .addJoin(SqlJoinPart.natural('LEFT', N('lookup').table('country')))
@@ -100,8 +100,10 @@ describe('joins', () => {
         NATURAL LEFT JOIN \\"lookup\\".\\"country\\""
       `);
     });
+  });
 
-    it('Add left join', () => {
+  describe('#addLeftJoin', () => {
+    it('adds a left join', () => {
       expect(
         SqlQuery.parse(`SELECT countryName from wikipedia`)
           .addLeftJoin(
@@ -114,8 +116,10 @@ describe('joins', () => {
         LEFT JOIN \\"lookup\\".\\"country\\" ON lookup.country.v = wikipedia.countryName"
       `);
     });
+  });
 
-    it('Add inner join', () => {
+  describe('#addInnerJoin', () => {
+    it('adds an inner join', () => {
       expect(
         SqlQuery.parse(`SELECT countryName from wikipedia`)
           .addInnerJoin(
@@ -130,8 +134,8 @@ describe('joins', () => {
     });
   });
 
-  describe('Remove join', () => {
-    it('Remove Join', () => {
+  describe('#removeAllJoins', () => {
+    it('removes the join', () => {
       expect(
         SqlQuery.parse(
           sane`

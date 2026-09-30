@@ -25,508 +25,6 @@ describe('QueryResult', () => {
     ],
   });
 
-  describe('#inflateDates', () => {
-    it('does not inflate nulls', () => {
-      expect(
-        new QueryResult({
-          header: Column.fromColumnNames(['A', 'B', 'C']),
-          rows: [
-            ['A', '2016-06-27T00:00:00.000Z', 876],
-            ['J', null, 870],
-            ['K', '2016-06-27T02:00:00.000Z', 960],
-          ],
-        }).inflateDatesByGuessing(),
-      ).toMatchInlineSnapshot(`
-        QueryResult {
-          "header": Array [
-            Column {
-              "name": "A",
-              "nativeType": undefined,
-              "sqlType": undefined,
-            },
-            Column {
-              "name": "B",
-              "nativeType": undefined,
-              "sqlType": undefined,
-            },
-            Column {
-              "name": "C",
-              "nativeType": undefined,
-              "sqlType": undefined,
-            },
-          ],
-          "query": undefined,
-          "queryDuration": undefined,
-          "queryId": undefined,
-          "resultContext": undefined,
-          "rows": Array [
-            Array [
-              "A",
-              2016-06-27T00:00:00.000Z,
-              876,
-            ],
-            Array [
-              "J",
-              null,
-              870,
-            ],
-            Array [
-              "K",
-              2016-06-27T02:00:00.000Z,
-              960,
-            ],
-          ],
-          "sqlQuery": undefined,
-          "sqlQueryId": undefined,
-        }
-      `);
-    });
-
-    it('works', () => {
-      expect(testQueryResult.inflateDatesByGuessing()).toMatchInlineSnapshot(`
-        QueryResult {
-          "header": Array [
-            Column {
-              "name": "A",
-              "nativeType": undefined,
-              "sqlType": undefined,
-            },
-            Column {
-              "name": "B",
-              "nativeType": undefined,
-              "sqlType": undefined,
-            },
-            Column {
-              "name": "C",
-              "nativeType": undefined,
-              "sqlType": undefined,
-            },
-          ],
-          "query": undefined,
-          "queryDuration": undefined,
-          "queryId": undefined,
-          "resultContext": undefined,
-          "rows": Array [
-            Array [
-              "A",
-              2016-06-27T00:00:00.000Z,
-              876,
-            ],
-            Array [
-              "J",
-              2016-06-27T01:00:00.000Z,
-              870,
-            ],
-            Array [
-              "K",
-              2016-06-27T02:00:00.000Z,
-              960,
-            ],
-          ],
-          "sqlQuery": undefined,
-          "sqlQueryId": undefined,
-        }
-      `);
-    });
-  });
-
-  describe('#inflateDatesFromSqlTypes', () => {
-    it('inflates columns with TIMESTAMP sqlType', () => {
-      expect(
-        new QueryResult({
-          header: Column.fromColumnNamesAndTypeArrays(
-            ['name', 'timestamp', 'count'],
-            [],
-            ['VARCHAR', 'TIMESTAMP', 'BIGINT'],
-          ),
-          rows: [
-            ['Alice', '2016-06-27T00:00:00.000Z', 876],
-            ['Bob', '2016-06-27T01:00:00.000Z', 870],
-            ['Charlie', '2016-06-27T02:00:00.000Z', 960],
-          ],
-        }).inflateDatesFromSqlTypes(),
-      ).toMatchInlineSnapshot(`
-        QueryResult {
-          "header": Array [
-            Column {
-              "name": "name",
-              "nativeType": undefined,
-              "sqlType": "VARCHAR",
-            },
-            Column {
-              "name": "timestamp",
-              "nativeType": undefined,
-              "sqlType": "TIMESTAMP",
-            },
-            Column {
-              "name": "count",
-              "nativeType": undefined,
-              "sqlType": "BIGINT",
-            },
-          ],
-          "query": undefined,
-          "queryDuration": undefined,
-          "queryId": undefined,
-          "resultContext": undefined,
-          "rows": Array [
-            Array [
-              "Alice",
-              2016-06-27T00:00:00.000Z,
-              876,
-            ],
-            Array [
-              "Bob",
-              2016-06-27T01:00:00.000Z,
-              870,
-            ],
-            Array [
-              "Charlie",
-              2016-06-27T02:00:00.000Z,
-              960,
-            ],
-          ],
-          "sqlQuery": undefined,
-          "sqlQueryId": undefined,
-        }
-      `);
-    });
-
-    it('does not inflate nulls in TIMESTAMP columns', () => {
-      expect(
-        new QueryResult({
-          header: Column.fromColumnNamesAndTypeArrays(
-            ['name', 'timestamp', 'count'],
-            [],
-            ['VARCHAR', 'TIMESTAMP', 'BIGINT'],
-          ),
-          rows: [
-            ['Alice', '2016-06-27T00:00:00.000Z', 876],
-            ['Bob', null, 870],
-            ['Charlie', '2016-06-27T02:00:00.000Z', 960],
-          ],
-        }).inflateDatesFromSqlTypes(),
-      ).toMatchInlineSnapshot(`
-        QueryResult {
-          "header": Array [
-            Column {
-              "name": "name",
-              "nativeType": undefined,
-              "sqlType": "VARCHAR",
-            },
-            Column {
-              "name": "timestamp",
-              "nativeType": undefined,
-              "sqlType": "TIMESTAMP",
-            },
-            Column {
-              "name": "count",
-              "nativeType": undefined,
-              "sqlType": "BIGINT",
-            },
-          ],
-          "query": undefined,
-          "queryDuration": undefined,
-          "queryId": undefined,
-          "resultContext": undefined,
-          "rows": Array [
-            Array [
-              "Alice",
-              2016-06-27T00:00:00.000Z,
-              876,
-            ],
-            Array [
-              "Bob",
-              null,
-              870,
-            ],
-            Array [
-              "Charlie",
-              2016-06-27T02:00:00.000Z,
-              960,
-            ],
-          ],
-          "sqlQuery": undefined,
-          "sqlQueryId": undefined,
-        }
-      `);
-    });
-
-    it('handles multiple TIMESTAMP columns', () => {
-      expect(
-        new QueryResult({
-          header: Column.fromColumnNamesAndTypeArrays(
-            ['created', 'name', 'updated'],
-            [],
-            ['TIMESTAMP', 'VARCHAR', 'TIMESTAMP'],
-          ),
-          rows: [
-            ['2016-06-27T00:00:00.000Z', 'Alice', '2016-06-28T00:00:00.000Z'],
-            ['2016-06-27T01:00:00.000Z', 'Bob', '2016-06-28T01:00:00.000Z'],
-          ],
-        }).inflateDatesFromSqlTypes(),
-      ).toMatchInlineSnapshot(`
-        QueryResult {
-          "header": Array [
-            Column {
-              "name": "created",
-              "nativeType": undefined,
-              "sqlType": "TIMESTAMP",
-            },
-            Column {
-              "name": "name",
-              "nativeType": undefined,
-              "sqlType": "VARCHAR",
-            },
-            Column {
-              "name": "updated",
-              "nativeType": undefined,
-              "sqlType": "TIMESTAMP",
-            },
-          ],
-          "query": undefined,
-          "queryDuration": undefined,
-          "queryId": undefined,
-          "resultContext": undefined,
-          "rows": Array [
-            Array [
-              2016-06-27T00:00:00.000Z,
-              "Alice",
-              2016-06-28T00:00:00.000Z,
-            ],
-            Array [
-              2016-06-27T01:00:00.000Z,
-              "Bob",
-              2016-06-28T01:00:00.000Z,
-            ],
-          ],
-          "sqlQuery": undefined,
-          "sqlQueryId": undefined,
-        }
-      `);
-    });
-
-    it('does not inflate columns without TIMESTAMP sqlType', () => {
-      expect(
-        new QueryResult({
-          header: Column.fromColumnNamesAndTypeArrays(
-            ['name', 'date_string', 'count'],
-            [],
-            ['VARCHAR', 'VARCHAR', 'BIGINT'],
-          ),
-          rows: [
-            ['Alice', '2016-06-27T00:00:00.000Z', 876],
-            ['Bob', '2016-06-27T01:00:00.000Z', 870],
-          ],
-        }).inflateDatesFromSqlTypes(),
-      ).toMatchInlineSnapshot(`
-        QueryResult {
-          "header": Array [
-            Column {
-              "name": "name",
-              "nativeType": undefined,
-              "sqlType": "VARCHAR",
-            },
-            Column {
-              "name": "date_string",
-              "nativeType": undefined,
-              "sqlType": "VARCHAR",
-            },
-            Column {
-              "name": "count",
-              "nativeType": undefined,
-              "sqlType": "BIGINT",
-            },
-          ],
-          "query": undefined,
-          "queryDuration": undefined,
-          "queryId": undefined,
-          "resultContext": undefined,
-          "rows": Array [
-            Array [
-              "Alice",
-              "2016-06-27T00:00:00.000Z",
-              876,
-            ],
-            Array [
-              "Bob",
-              "2016-06-27T01:00:00.000Z",
-              870,
-            ],
-          ],
-          "sqlQuery": undefined,
-          "sqlQueryId": undefined,
-        }
-      `);
-    });
-
-    it('returns same instance when no TIMESTAMP columns present', () => {
-      const result = new QueryResult({
-        header: Column.fromColumnNamesAndTypeArrays(['name', 'count'], [], ['VARCHAR', 'BIGINT']),
-        rows: [
-          ['Alice', 876],
-          ['Bob', 870],
-        ],
-      });
-
-      const inflated = result.inflateDatesFromSqlTypes();
-      expect(inflated).toBe(result);
-    });
-
-    it('inflates TIMESTAMP columns with millisecond numbers', () => {
-      expect(
-        new QueryResult({
-          header: Column.fromColumnNamesAndTypeArrays(
-            ['__time', 'name', 'count'],
-            [],
-            ['TIMESTAMP', 'VARCHAR', 'BIGINT'],
-          ),
-          rows: [
-            [1467072000000, 'Alice', 876],
-            [1467075600000, 'Bob', 870],
-            [1467079200000n, 'Charlie', 960], // test with bigint literal
-          ],
-        }).inflateDatesFromSqlTypes(),
-      ).toMatchInlineSnapshot(`
-        QueryResult {
-          "header": Array [
-            Column {
-              "name": "__time",
-              "nativeType": undefined,
-              "sqlType": "TIMESTAMP",
-            },
-            Column {
-              "name": "name",
-              "nativeType": undefined,
-              "sqlType": "VARCHAR",
-            },
-            Column {
-              "name": "count",
-              "nativeType": undefined,
-              "sqlType": "BIGINT",
-            },
-          ],
-          "query": undefined,
-          "queryDuration": undefined,
-          "queryId": undefined,
-          "resultContext": undefined,
-          "rows": Array [
-            Array [
-              2016-06-28T00:00:00.000Z,
-              "Alice",
-              876,
-            ],
-            Array [
-              2016-06-28T01:00:00.000Z,
-              "Bob",
-              870,
-            ],
-            Array [
-              2016-06-28T02:00:00.000Z,
-              "Charlie",
-              960,
-            ],
-          ],
-          "sqlQuery": undefined,
-          "sqlQueryId": undefined,
-        }
-      `);
-    });
-
-    it('handles mixed string and millisecond TIMESTAMP values', () => {
-      expect(
-        new QueryResult({
-          header: Column.fromColumnNamesAndTypeArrays(
-            ['timestamp', 'name'],
-            [],
-            ['TIMESTAMP', 'VARCHAR'],
-          ),
-          rows: [
-            ['2016-06-27T00:00:00.000Z', 'Alice'],
-            [1467075600000, 'Bob'],
-            ['2016-06-27T02:00:00.000Z', 'Charlie'],
-          ],
-        }).inflateDatesFromSqlTypes(),
-      ).toMatchInlineSnapshot(`
-        QueryResult {
-          "header": Array [
-            Column {
-              "name": "timestamp",
-              "nativeType": undefined,
-              "sqlType": "TIMESTAMP",
-            },
-            Column {
-              "name": "name",
-              "nativeType": undefined,
-              "sqlType": "VARCHAR",
-            },
-          ],
-          "query": undefined,
-          "queryDuration": undefined,
-          "queryId": undefined,
-          "resultContext": undefined,
-          "rows": Array [
-            Array [
-              2016-06-27T00:00:00.000Z,
-              "Alice",
-            ],
-            Array [
-              2016-06-28T01:00:00.000Z,
-              "Bob",
-            ],
-            Array [
-              2016-06-27T02:00:00.000Z,
-              "Charlie",
-            ],
-          ],
-          "sqlQuery": undefined,
-          "sqlQueryId": undefined,
-        }
-      `);
-    });
-  });
-
-  describe('#toObjectArray', () => {
-    it('works', () => {
-      expect(testQueryResult.toObjectArray()).toEqual([
-        {
-          A: 'A',
-          B: '2016-06-27T00:00:00.000Z',
-          C: 876,
-        },
-        {
-          A: 'J',
-          B: '2016-06-27T01:00:00.000Z',
-          C: 870,
-        },
-        {
-          A: 'K',
-          B: '2016-06-27T02:00:00.000Z',
-          C: 960,
-        },
-      ]);
-    });
-  });
-
-  describe('#getColumnByIndex', () => {
-    it('works for invalid index', () => {
-      expect(testQueryResult.getColumnByIndex(3)).toBeUndefined();
-    });
-
-    it('works for valid index', () => {
-      expect(testQueryResult.getColumnByIndex(2)).toEqual([876, 870, 960]);
-    });
-  });
-
-  describe('#getColumnByName', () => {
-    it('works for invalid name', () => {
-      expect(testQueryResult.getColumnByName('foo')).toBeUndefined();
-    });
-
-    it('works for valid name', () => {
-      expect(testQueryResult.getColumnByName('C')).toEqual([876, 870, 960]);
-    });
-  });
-
   describe('.fromRawResult', () => {
     it('works for timeseries (no timestamp)', () => {
       const result = [
@@ -1369,81 +867,6 @@ describe('QueryResult', () => {
       `);
     });
 
-    it('works for search', () => {
-      const result = [
-        {
-          timestamp: '2012-01-01T00:00:00.000Z',
-          result: [
-            {
-              dimension: 'dim1',
-              value: 'Ke$ha',
-              count: 3,
-            },
-            {
-              dimension: 'dim2',
-              value: 'Ke$haForPresident',
-              count: 1,
-            },
-          ],
-        },
-        {
-          timestamp: '2012-01-02T00:00:00.000Z',
-          result: [
-            {
-              dimension: 'dim1',
-              value: 'SomethingThatContainsKe',
-              count: 1,
-            },
-          ],
-        },
-      ];
-
-      expect(QueryResult.fromRawResult(result)).toMatchInlineSnapshot(`
-        QueryResult {
-          "header": Array [
-            Column {
-              "name": "dimension",
-              "nativeType": undefined,
-              "sqlType": undefined,
-            },
-            Column {
-              "name": "value",
-              "nativeType": undefined,
-              "sqlType": undefined,
-            },
-            Column {
-              "name": "count",
-              "nativeType": undefined,
-              "sqlType": undefined,
-            },
-          ],
-          "query": undefined,
-          "queryDuration": undefined,
-          "queryId": undefined,
-          "resultContext": undefined,
-          "rows": Array [
-            Array [
-              "dim1",
-              "Ke$ha",
-              3,
-            ],
-            Array [
-              "dim2",
-              "Ke$haForPresident",
-              1,
-            ],
-            Array [
-              "dim1",
-              "SomethingThatContainsKe",
-              1,
-            ],
-          ],
-          "sqlQuery": undefined,
-          "sqlQueryId": undefined,
-        }
-      `);
-    });
-
     it('works for timeBoundary', () => {
       const result = [
         {
@@ -1729,7 +1152,7 @@ describe('QueryResult', () => {
       `);
     });
 
-    it('works with empty string result', () => {
+    it('works with a newline only string result', () => {
       const result = '\n\n\n';
 
       expect(QueryResult.fromRawResult(result)).toMatchInlineSnapshot(`
@@ -1791,52 +1214,7 @@ describe('QueryResult', () => {
       `);
     });
 
-    it('works with non-empty string result', () => {
-      const result = `{"channel":"#sv.wikipedia","added":31}
-{"channel":"#ja.wikipedia","added":125}
-{"channel":"#en.wikipedia","added":2}
-
-`;
-
-      expect(QueryResult.fromRawResult(result)).toMatchInlineSnapshot(`
-        QueryResult {
-          "header": Array [
-            Column {
-              "name": "channel",
-              "nativeType": undefined,
-              "sqlType": undefined,
-            },
-            Column {
-              "name": "added",
-              "nativeType": undefined,
-              "sqlType": undefined,
-            },
-          ],
-          "query": undefined,
-          "queryDuration": undefined,
-          "queryId": undefined,
-          "resultContext": undefined,
-          "rows": Array [
-            Array [
-              "#sv.wikipedia",
-              31,
-            ],
-            Array [
-              "#ja.wikipedia",
-              125,
-            ],
-            Array [
-              "#en.wikipedia",
-              2,
-            ],
-          ],
-          "sqlQuery": undefined,
-          "sqlQueryId": undefined,
-        }
-      `);
-    });
-
-    it('works with empty string result', () => {
+    it('throws on an empty string result', () => {
       expect(() => QueryResult.fromRawResult('')).toThrow(
         `Query results were empty. This may indicate a timeout caused by an intermediate network device (such as a load balancer). Try re-running your query, using a lower limit.`,
       );
@@ -1862,6 +1240,508 @@ describe('QueryResult', () => {
       expect(() => QueryResult.fromRawResult(result)).toThrow(
         `Unparsable row on line 3 in query result: '{"channel":"#en.wikipedia",'.`,
       );
+    });
+  });
+
+  describe('#toObjectArray', () => {
+    it('works', () => {
+      expect(testQueryResult.toObjectArray()).toEqual([
+        {
+          A: 'A',
+          B: '2016-06-27T00:00:00.000Z',
+          C: 876,
+        },
+        {
+          A: 'J',
+          B: '2016-06-27T01:00:00.000Z',
+          C: 870,
+        },
+        {
+          A: 'K',
+          B: '2016-06-27T02:00:00.000Z',
+          C: 960,
+        },
+      ]);
+    });
+  });
+
+  describe('#getColumnByIndex', () => {
+    it('works for invalid index', () => {
+      expect(testQueryResult.getColumnByIndex(3)).toBeUndefined();
+    });
+
+    it('works for valid index', () => {
+      expect(testQueryResult.getColumnByIndex(2)).toEqual([876, 870, 960]);
+    });
+  });
+
+  describe('#getColumnByName', () => {
+    it('works for invalid name', () => {
+      expect(testQueryResult.getColumnByName('foo')).toBeUndefined();
+    });
+
+    it('works for valid name', () => {
+      expect(testQueryResult.getColumnByName('C')).toEqual([876, 870, 960]);
+    });
+  });
+
+  describe('#inflateDatesByGuessing', () => {
+    it('does not inflate nulls', () => {
+      expect(
+        new QueryResult({
+          header: Column.fromColumnNames(['A', 'B', 'C']),
+          rows: [
+            ['A', '2016-06-27T00:00:00.000Z', 876],
+            ['J', null, 870],
+            ['K', '2016-06-27T02:00:00.000Z', 960],
+          ],
+        }).inflateDatesByGuessing(),
+      ).toMatchInlineSnapshot(`
+        QueryResult {
+          "header": Array [
+            Column {
+              "name": "A",
+              "nativeType": undefined,
+              "sqlType": undefined,
+            },
+            Column {
+              "name": "B",
+              "nativeType": undefined,
+              "sqlType": undefined,
+            },
+            Column {
+              "name": "C",
+              "nativeType": undefined,
+              "sqlType": undefined,
+            },
+          ],
+          "query": undefined,
+          "queryDuration": undefined,
+          "queryId": undefined,
+          "resultContext": undefined,
+          "rows": Array [
+            Array [
+              "A",
+              2016-06-27T00:00:00.000Z,
+              876,
+            ],
+            Array [
+              "J",
+              null,
+              870,
+            ],
+            Array [
+              "K",
+              2016-06-27T02:00:00.000Z,
+              960,
+            ],
+          ],
+          "sqlQuery": undefined,
+          "sqlQueryId": undefined,
+        }
+      `);
+    });
+
+    it('works', () => {
+      expect(testQueryResult.inflateDatesByGuessing()).toMatchInlineSnapshot(`
+        QueryResult {
+          "header": Array [
+            Column {
+              "name": "A",
+              "nativeType": undefined,
+              "sqlType": undefined,
+            },
+            Column {
+              "name": "B",
+              "nativeType": undefined,
+              "sqlType": undefined,
+            },
+            Column {
+              "name": "C",
+              "nativeType": undefined,
+              "sqlType": undefined,
+            },
+          ],
+          "query": undefined,
+          "queryDuration": undefined,
+          "queryId": undefined,
+          "resultContext": undefined,
+          "rows": Array [
+            Array [
+              "A",
+              2016-06-27T00:00:00.000Z,
+              876,
+            ],
+            Array [
+              "J",
+              2016-06-27T01:00:00.000Z,
+              870,
+            ],
+            Array [
+              "K",
+              2016-06-27T02:00:00.000Z,
+              960,
+            ],
+          ],
+          "sqlQuery": undefined,
+          "sqlQueryId": undefined,
+        }
+      `);
+    });
+  });
+
+  describe('#inflateDatesFromSqlTypes', () => {
+    it('inflates columns with TIMESTAMP sqlType', () => {
+      expect(
+        new QueryResult({
+          header: Column.fromColumnNamesAndTypeArrays(
+            ['name', 'timestamp', 'count'],
+            [],
+            ['VARCHAR', 'TIMESTAMP', 'BIGINT'],
+          ),
+          rows: [
+            ['Alice', '2016-06-27T00:00:00.000Z', 876],
+            ['Bob', '2016-06-27T01:00:00.000Z', 870],
+            ['Charlie', '2016-06-27T02:00:00.000Z', 960],
+          ],
+        }).inflateDatesFromSqlTypes(),
+      ).toMatchInlineSnapshot(`
+        QueryResult {
+          "header": Array [
+            Column {
+              "name": "name",
+              "nativeType": undefined,
+              "sqlType": "VARCHAR",
+            },
+            Column {
+              "name": "timestamp",
+              "nativeType": undefined,
+              "sqlType": "TIMESTAMP",
+            },
+            Column {
+              "name": "count",
+              "nativeType": undefined,
+              "sqlType": "BIGINT",
+            },
+          ],
+          "query": undefined,
+          "queryDuration": undefined,
+          "queryId": undefined,
+          "resultContext": undefined,
+          "rows": Array [
+            Array [
+              "Alice",
+              2016-06-27T00:00:00.000Z,
+              876,
+            ],
+            Array [
+              "Bob",
+              2016-06-27T01:00:00.000Z,
+              870,
+            ],
+            Array [
+              "Charlie",
+              2016-06-27T02:00:00.000Z,
+              960,
+            ],
+          ],
+          "sqlQuery": undefined,
+          "sqlQueryId": undefined,
+        }
+      `);
+    });
+
+    it('does not inflate nulls in TIMESTAMP columns', () => {
+      expect(
+        new QueryResult({
+          header: Column.fromColumnNamesAndTypeArrays(
+            ['name', 'timestamp', 'count'],
+            [],
+            ['VARCHAR', 'TIMESTAMP', 'BIGINT'],
+          ),
+          rows: [
+            ['Alice', '2016-06-27T00:00:00.000Z', 876],
+            ['Bob', null, 870],
+            ['Charlie', '2016-06-27T02:00:00.000Z', 960],
+          ],
+        }).inflateDatesFromSqlTypes(),
+      ).toMatchInlineSnapshot(`
+        QueryResult {
+          "header": Array [
+            Column {
+              "name": "name",
+              "nativeType": undefined,
+              "sqlType": "VARCHAR",
+            },
+            Column {
+              "name": "timestamp",
+              "nativeType": undefined,
+              "sqlType": "TIMESTAMP",
+            },
+            Column {
+              "name": "count",
+              "nativeType": undefined,
+              "sqlType": "BIGINT",
+            },
+          ],
+          "query": undefined,
+          "queryDuration": undefined,
+          "queryId": undefined,
+          "resultContext": undefined,
+          "rows": Array [
+            Array [
+              "Alice",
+              2016-06-27T00:00:00.000Z,
+              876,
+            ],
+            Array [
+              "Bob",
+              null,
+              870,
+            ],
+            Array [
+              "Charlie",
+              2016-06-27T02:00:00.000Z,
+              960,
+            ],
+          ],
+          "sqlQuery": undefined,
+          "sqlQueryId": undefined,
+        }
+      `);
+    });
+
+    it('handles multiple TIMESTAMP columns', () => {
+      expect(
+        new QueryResult({
+          header: Column.fromColumnNamesAndTypeArrays(
+            ['created', 'name', 'updated'],
+            [],
+            ['TIMESTAMP', 'VARCHAR', 'TIMESTAMP'],
+          ),
+          rows: [
+            ['2016-06-27T00:00:00.000Z', 'Alice', '2016-06-28T00:00:00.000Z'],
+            ['2016-06-27T01:00:00.000Z', 'Bob', '2016-06-28T01:00:00.000Z'],
+          ],
+        }).inflateDatesFromSqlTypes(),
+      ).toMatchInlineSnapshot(`
+        QueryResult {
+          "header": Array [
+            Column {
+              "name": "created",
+              "nativeType": undefined,
+              "sqlType": "TIMESTAMP",
+            },
+            Column {
+              "name": "name",
+              "nativeType": undefined,
+              "sqlType": "VARCHAR",
+            },
+            Column {
+              "name": "updated",
+              "nativeType": undefined,
+              "sqlType": "TIMESTAMP",
+            },
+          ],
+          "query": undefined,
+          "queryDuration": undefined,
+          "queryId": undefined,
+          "resultContext": undefined,
+          "rows": Array [
+            Array [
+              2016-06-27T00:00:00.000Z,
+              "Alice",
+              2016-06-28T00:00:00.000Z,
+            ],
+            Array [
+              2016-06-27T01:00:00.000Z,
+              "Bob",
+              2016-06-28T01:00:00.000Z,
+            ],
+          ],
+          "sqlQuery": undefined,
+          "sqlQueryId": undefined,
+        }
+      `);
+    });
+
+    it('does not inflate columns without TIMESTAMP sqlType', () => {
+      expect(
+        new QueryResult({
+          header: Column.fromColumnNamesAndTypeArrays(
+            ['name', 'date_string', 'count'],
+            [],
+            ['VARCHAR', 'VARCHAR', 'BIGINT'],
+          ),
+          rows: [
+            ['Alice', '2016-06-27T00:00:00.000Z', 876],
+            ['Bob', '2016-06-27T01:00:00.000Z', 870],
+          ],
+        }).inflateDatesFromSqlTypes(),
+      ).toMatchInlineSnapshot(`
+        QueryResult {
+          "header": Array [
+            Column {
+              "name": "name",
+              "nativeType": undefined,
+              "sqlType": "VARCHAR",
+            },
+            Column {
+              "name": "date_string",
+              "nativeType": undefined,
+              "sqlType": "VARCHAR",
+            },
+            Column {
+              "name": "count",
+              "nativeType": undefined,
+              "sqlType": "BIGINT",
+            },
+          ],
+          "query": undefined,
+          "queryDuration": undefined,
+          "queryId": undefined,
+          "resultContext": undefined,
+          "rows": Array [
+            Array [
+              "Alice",
+              "2016-06-27T00:00:00.000Z",
+              876,
+            ],
+            Array [
+              "Bob",
+              "2016-06-27T01:00:00.000Z",
+              870,
+            ],
+          ],
+          "sqlQuery": undefined,
+          "sqlQueryId": undefined,
+        }
+      `);
+    });
+
+    it('returns same instance when no TIMESTAMP columns present', () => {
+      const result = new QueryResult({
+        header: Column.fromColumnNamesAndTypeArrays(['name', 'count'], [], ['VARCHAR', 'BIGINT']),
+        rows: [
+          ['Alice', 876],
+          ['Bob', 870],
+        ],
+      });
+
+      const inflated = result.inflateDatesFromSqlTypes();
+      expect(inflated).toBe(result);
+    });
+
+    it('inflates TIMESTAMP columns with millisecond numbers', () => {
+      expect(
+        new QueryResult({
+          header: Column.fromColumnNamesAndTypeArrays(
+            ['__time', 'name', 'count'],
+            [],
+            ['TIMESTAMP', 'VARCHAR', 'BIGINT'],
+          ),
+          rows: [
+            [1467072000000, 'Alice', 876],
+            [1467075600000, 'Bob', 870],
+            [1467079200000n, 'Charlie', 960], // test with bigint literal
+          ],
+        }).inflateDatesFromSqlTypes(),
+      ).toMatchInlineSnapshot(`
+        QueryResult {
+          "header": Array [
+            Column {
+              "name": "__time",
+              "nativeType": undefined,
+              "sqlType": "TIMESTAMP",
+            },
+            Column {
+              "name": "name",
+              "nativeType": undefined,
+              "sqlType": "VARCHAR",
+            },
+            Column {
+              "name": "count",
+              "nativeType": undefined,
+              "sqlType": "BIGINT",
+            },
+          ],
+          "query": undefined,
+          "queryDuration": undefined,
+          "queryId": undefined,
+          "resultContext": undefined,
+          "rows": Array [
+            Array [
+              2016-06-28T00:00:00.000Z,
+              "Alice",
+              876,
+            ],
+            Array [
+              2016-06-28T01:00:00.000Z,
+              "Bob",
+              870,
+            ],
+            Array [
+              2016-06-28T02:00:00.000Z,
+              "Charlie",
+              960,
+            ],
+          ],
+          "sqlQuery": undefined,
+          "sqlQueryId": undefined,
+        }
+      `);
+    });
+
+    it('handles mixed string and millisecond TIMESTAMP values', () => {
+      expect(
+        new QueryResult({
+          header: Column.fromColumnNamesAndTypeArrays(
+            ['timestamp', 'name'],
+            [],
+            ['TIMESTAMP', 'VARCHAR'],
+          ),
+          rows: [
+            ['2016-06-27T00:00:00.000Z', 'Alice'],
+            [1467075600000, 'Bob'],
+            ['2016-06-27T02:00:00.000Z', 'Charlie'],
+          ],
+        }).inflateDatesFromSqlTypes(),
+      ).toMatchInlineSnapshot(`
+        QueryResult {
+          "header": Array [
+            Column {
+              "name": "timestamp",
+              "nativeType": undefined,
+              "sqlType": "TIMESTAMP",
+            },
+            Column {
+              "name": "name",
+              "nativeType": undefined,
+              "sqlType": "VARCHAR",
+            },
+          ],
+          "query": undefined,
+          "queryDuration": undefined,
+          "queryId": undefined,
+          "resultContext": undefined,
+          "rows": Array [
+            Array [
+              2016-06-27T00:00:00.000Z,
+              "Alice",
+            ],
+            Array [
+              2016-06-28T01:00:00.000Z,
+              "Bob",
+            ],
+            Array [
+              2016-06-27T02:00:00.000Z,
+              "Charlie",
+            ],
+          ],
+          "sqlQuery": undefined,
+          "sqlQueryId": undefined,
+        }
+      `);
     });
   });
 });

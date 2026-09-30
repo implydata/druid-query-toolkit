@@ -18,6 +18,12 @@ import { parse as parseSql } from './parser';
 import type { SqlBase } from './sql-base';
 
 describe('SqlBase', () => {
+  describe('#toJSON', () => {
+    it('serializes to the SQL string', () => {
+      expect(JSON.stringify({ x: parseSql(`COUNT(*)`) })).toEqual('{"x":"COUNT(*)"}');
+    });
+  });
+
   describe('#addParens', () => {
     it('works with single lines', () => {
       expect(parseSql(`COUNT(*)`).addParens().toString()).toEqual(`(COUNT(*))`);
@@ -44,6 +50,16 @@ describe('SqlBase', () => {
     });
   });
 
+  describe('#changeSpace', () => {
+    it('works', () => {
+      let sql = parseSql(`COUNT(*)`);
+      expect(sql.getSpace('postArguments')).toEqual('');
+      sql = sql.changeSpace('postArguments', '   ');
+      expect(sql.getSpace('postArguments')).toEqual('   ');
+      expect(sql.toString()).toEqual(`COUNT(*   )`);
+    });
+  });
+
   describe('#containsFunction', () => {
     const sql: SqlBase = parseSql(`SUM(A) + COUNT(*) + 1`);
 
@@ -51,12 +67,6 @@ describe('SqlBase', () => {
       expect(sql.containsFunction('SUM')).toBe(true);
       expect(sql.containsFunction('Count')).toBe(true);
       expect(sql.containsFunction('Blah')).toBe(false);
-    });
-  });
-
-  describe('#prettyTrim', () => {
-    it('.toJSON', () => {
-      expect(JSON.stringify({ x: parseSql(`COUNT(*)`) })).toEqual('{"x":"COUNT(*)"}');
     });
   });
 
@@ -73,16 +83,6 @@ describe('SqlBase', () => {
 
     it('works with COUNT(*)', () => {
       expect(parseSql(`COUNT(*)`).prettyTrim(10).toString()).toEqual(`COUNT(*)`);
-    });
-  });
-
-  describe('#changeSpace', () => {
-    it('works', () => {
-      let sql = parseSql(`COUNT(*)`);
-      expect(sql.getSpace('postArguments')).toEqual('');
-      sql = sql.changeSpace('postArguments', '   ');
-      expect(sql.getSpace('postArguments')).toEqual('   ');
-      expect(sql.toString()).toEqual(`COUNT(*   )`);
     });
   });
 });

@@ -16,339 +16,343 @@ import { SqlExpression, SqlLiteral } from '../..';
 import { backAndForth } from '../../test-utils';
 
 describe('SqlLiteral', () => {
-  it.each([
-    `NULL`,
-    `TRUE`,
-    `FALSE`,
-    `'lol'`,
-    `U&'hello'`,
-    `U&'hell''o'`,
-    `U&'hell\\\\o'`,
-    `_latin1'hello'`,
-    `_UTF8'hello'`,
-    `_UTF8'hell''o'`,
-    `_l-1'hello'`,
-    `_8l-1'hello'`,
-    `'don''t do it'`,
-    `17.0`,
-    `123.34`,
-    `1606832560494517248`,
-  ])('does back and forth with %s', sql => {
-    backAndForth(sql, SqlLiteral);
-  });
+  describe('parses', () => {
+    it.each([
+      `NULL`,
+      `TRUE`,
+      `FALSE`,
+      `'lol'`,
+      `U&'hello'`,
+      `U&'hell''o'`,
+      `U&'hell\\\\o'`,
+      `_latin1'hello'`,
+      `_UTF8'hello'`,
+      `_UTF8'hell''o'`,
+      `_l-1'hello'`,
+      `_8l-1'hello'`,
+      `'don''t do it'`,
+      `17.0`,
+      `123.34`,
+      `1606832560494517248`,
+    ])('does back and forth with %s', sql => {
+      backAndForth(sql, SqlLiteral);
+    });
 
-  it.each([`__l-1'hello'`, `_-l-1'hello'`])('invalid literal %s should not parse', sql => {
-    expect(() => SqlExpression.parse(sql)).toThrow();
-  });
+    it('works with null', () => {
+      const sql = `NULL`;
 
-  it('Works with Null', () => {
-    const sql = `NULL`;
+      backAndForth(sql);
 
-    backAndForth(sql);
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        SqlLiteral {
+          "keywords": Object {},
+          "parens": undefined,
+          "spacing": Object {},
+          "stringValue": "NULL",
+          "type": "literal",
+          "value": null,
+        }
+      `);
+    });
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlLiteral {
-        "keywords": Object {},
-        "parens": undefined,
-        "spacing": Object {},
-        "stringValue": "NULL",
-        "type": "literal",
-        "value": null,
-      }
-    `);
-  });
+    it('works with true', () => {
+      const sql = `True`;
 
-  it('Works with True', () => {
-    const sql = `True`;
+      backAndForth(sql);
 
-    backAndForth(sql);
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        SqlLiteral {
+          "keywords": Object {},
+          "parens": undefined,
+          "spacing": Object {},
+          "stringValue": "True",
+          "type": "literal",
+          "value": true,
+        }
+      `);
+    });
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlLiteral {
-        "keywords": Object {},
-        "parens": undefined,
-        "spacing": Object {},
-        "stringValue": "True",
-        "type": "literal",
-        "value": true,
-      }
-    `);
-  });
+    it('works with false', () => {
+      const sql = `FalsE`;
 
-  it('Works with False', () => {
-    const sql = `FalsE`;
+      backAndForth(sql);
 
-    backAndForth(sql);
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        SqlLiteral {
+          "keywords": Object {},
+          "parens": undefined,
+          "spacing": Object {},
+          "stringValue": "FalsE",
+          "type": "literal",
+          "value": false,
+        }
+      `);
+    });
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlLiteral {
-        "keywords": Object {},
-        "parens": undefined,
-        "spacing": Object {},
-        "stringValue": "FalsE",
-        "type": "literal",
-        "value": false,
-      }
-    `);
-  });
+    it('string literal', () => {
+      const sql = `'don''t go there'`;
 
-  it('string literal', () => {
-    const sql = `'don''t go there'`;
+      backAndForth(sql);
 
-    backAndForth(sql);
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        SqlLiteral {
+          "keywords": Object {},
+          "parens": undefined,
+          "spacing": Object {},
+          "stringValue": "'don''t go there'",
+          "type": "literal",
+          "value": "don't go there",
+        }
+      `);
+    });
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlLiteral {
-        "keywords": Object {},
-        "parens": undefined,
-        "spacing": Object {},
-        "stringValue": "'don''t go there'",
-        "type": "literal",
-        "value": "don't go there",
-      }
-    `);
-  });
+    it.each([
+      '0',
+      '0.0',
+      '0.01',
+      '.1',
+      '1',
+      '01',
+      '1.234',
+      '+1',
+      '-1',
+      '5e2',
+      '+5e+2',
+      '-5E2',
+      '-5E02',
+      '-5e-2',
+    ])('number literal %s parses to correct value', num => {
+      backAndForth(num);
+      expect((SqlExpression.parse(num) as SqlLiteral).value).toEqual(parseFloat(num));
+    });
 
-  it.each([
-    '0',
-    '0.0',
-    '0.01',
-    '.1',
-    '1',
-    '01',
-    '1.234',
-    '+1',
-    '-1',
-    '5e2',
-    '+5e+2',
-    '-5E2',
-    '-5E02',
-    '-5e-2',
-  ])('number literal %s parses to correct value', num => {
-    backAndForth(num);
-    expect((SqlExpression.parse(num) as SqlLiteral).value).toEqual(parseFloat(num));
-  });
+    it('number literals', () => {
+      const sql = `1`;
 
-  it('number literals', () => {
-    const sql = `1`;
+      backAndForth(sql);
 
-    backAndForth(sql);
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        SqlLiteral {
+          "keywords": Object {},
+          "parens": undefined,
+          "spacing": Object {},
+          "stringValue": "1",
+          "type": "literal",
+          "value": 1,
+        }
+      `);
+    });
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlLiteral {
-        "keywords": Object {},
-        "parens": undefined,
-        "spacing": Object {},
-        "stringValue": "1",
-        "type": "literal",
-        "value": 1,
-      }
-    `);
-  });
+    it('number literal with brackets', () => {
+      const sql = `(1)`;
 
-  it('number literal with brackets', () => {
-    const sql = `(1)`;
+      backAndForth(sql);
 
-    backAndForth(sql);
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        SqlLiteral {
+          "keywords": Object {},
+          "parens": Array [
+            Object {
+              "leftSpacing": "",
+              "rightSpacing": "",
+            },
+          ],
+          "spacing": Object {},
+          "stringValue": "1",
+          "type": "literal",
+          "value": 1,
+        }
+      `);
+    });
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlLiteral {
-        "keywords": Object {},
-        "parens": Array [
-          Object {
-            "leftSpacing": "",
-            "rightSpacing": "",
+    it('string literal with brackets', () => {
+      const sql = `('word')`;
+
+      backAndForth(sql);
+
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        SqlLiteral {
+          "keywords": Object {},
+          "parens": Array [
+            Object {
+              "leftSpacing": "",
+              "rightSpacing": "",
+            },
+          ],
+          "spacing": Object {},
+          "stringValue": "'word'",
+          "type": "literal",
+          "value": "word",
+        }
+      `);
+    });
+
+    it('empty string literal', () => {
+      const sql = `''`;
+
+      backAndForth(sql);
+
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        SqlLiteral {
+          "keywords": Object {},
+          "parens": undefined,
+          "spacing": Object {},
+          "stringValue": "''",
+          "type": "literal",
+          "value": "",
+        }
+      `);
+    });
+
+    it('decimal literal', () => {
+      const sql = `1.01`;
+
+      backAndForth(sql);
+
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        SqlLiteral {
+          "keywords": Object {},
+          "parens": undefined,
+          "spacing": Object {},
+          "stringValue": "1.01",
+          "type": "literal",
+          "value": 1.01,
+        }
+      `);
+    });
+
+    it('works with number', () => {
+      const sql = `12345`;
+
+      backAndForth(sql);
+
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        SqlLiteral {
+          "keywords": Object {},
+          "parens": undefined,
+          "spacing": Object {},
+          "stringValue": "12345",
+          "type": "literal",
+          "value": 12345,
+        }
+      `);
+    });
+
+    it('works with bigint', () => {
+      const sql = `1606832560494517248`;
+
+      backAndForth(sql);
+
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        SqlLiteral {
+          "keywords": Object {},
+          "parens": undefined,
+          "spacing": Object {},
+          "stringValue": "1606832560494517248",
+          "type": "literal",
+          "value": 1606832560494517248n,
+        }
+      `);
+    });
+
+    it('works with string', () => {
+      const sql = `'hello'`;
+
+      backAndForth(sql);
+
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        SqlLiteral {
+          "keywords": Object {},
+          "parens": undefined,
+          "spacing": Object {},
+          "stringValue": "'hello'",
+          "type": "literal",
+          "value": "hello",
+        }
+      `);
+    });
+
+    it('works with unicode string 1', () => {
+      const sql = `U&'f''o\\00F6\\\\'`;
+
+      backAndForth(sql);
+
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        SqlLiteral {
+          "keywords": Object {},
+          "parens": undefined,
+          "spacing": Object {},
+          "stringValue": "U&'f''o\\\\00F6\\\\\\\\'",
+          "type": "literal",
+          "value": "f'oö\\\\",
+        }
+      `);
+    });
+
+    it('works with unicode string 2', () => {
+      const sql = `u&'fo\\00F6\\00F6'`;
+
+      backAndForth(sql);
+
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        SqlLiteral {
+          "keywords": Object {},
+          "parens": undefined,
+          "spacing": Object {},
+          "stringValue": "u&'fo\\\\00F6\\\\00F6'",
+          "type": "literal",
+          "value": "foöö",
+        }
+      `);
+    });
+
+    it('works with timestamp', () => {
+      const sql = `TIMESTAMP '2020-02-25 00:00:00'`;
+
+      backAndForth(sql);
+
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        SqlLiteral {
+          "keywords": Object {
+            "timestamp": "TIMESTAMP",
           },
-        ],
-        "spacing": Object {},
-        "stringValue": "1",
-        "type": "literal",
-        "value": 1,
-      }
-    `);
-  });
-
-  it('string literal with brackets', () => {
-    const sql = `('word')`;
-
-    backAndForth(sql);
-
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlLiteral {
-        "keywords": Object {},
-        "parens": Array [
-          Object {
-            "leftSpacing": "",
-            "rightSpacing": "",
+          "parens": undefined,
+          "spacing": Object {
+            "postTimestamp": " ",
           },
-        ],
-        "spacing": Object {},
-        "stringValue": "'word'",
-        "type": "literal",
-        "value": "word",
-      }
-    `);
+          "stringValue": "'2020-02-25 00:00:00'",
+          "type": "literal",
+          "value": 2020-02-25T00:00:00.000Z,
+        }
+      `);
+    });
+
+    it('works with date', () => {
+      const sql = `DATE '2020-02-25'`;
+
+      backAndForth(sql);
+
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        SqlLiteral {
+          "keywords": Object {
+            "timestamp": "DATE",
+          },
+          "parens": undefined,
+          "spacing": Object {
+            "postTimestamp": " ",
+          },
+          "stringValue": "'2020-02-25'",
+          "type": "literal",
+          "value": 2020-02-25T00:00:00.000Z,
+        }
+      `);
+    });
   });
 
-  it('empty string literal', () => {
-    const sql = `''`;
-
-    backAndForth(sql);
-
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlLiteral {
-        "keywords": Object {},
-        "parens": undefined,
-        "spacing": Object {},
-        "stringValue": "''",
-        "type": "literal",
-        "value": "",
-      }
-    `);
-  });
-
-  it('Decimal literal', () => {
-    const sql = `1.01`;
-
-    backAndForth(sql);
-
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlLiteral {
-        "keywords": Object {},
-        "parens": undefined,
-        "spacing": Object {},
-        "stringValue": "1.01",
-        "type": "literal",
-        "value": 1.01,
-      }
-    `);
-  });
-
-  it('works with number', () => {
-    const sql = `12345`;
-
-    backAndForth(sql);
-
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlLiteral {
-        "keywords": Object {},
-        "parens": undefined,
-        "spacing": Object {},
-        "stringValue": "12345",
-        "type": "literal",
-        "value": 12345,
-      }
-    `);
-  });
-
-  it('works with bigint', () => {
-    const sql = `1606832560494517248`;
-
-    backAndForth(sql);
-
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlLiteral {
-        "keywords": Object {},
-        "parens": undefined,
-        "spacing": Object {},
-        "stringValue": "1606832560494517248",
-        "type": "literal",
-        "value": 1606832560494517248n,
-      }
-    `);
-  });
-
-  it('works with string', () => {
-    const sql = `'hello'`;
-
-    backAndForth(sql);
-
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlLiteral {
-        "keywords": Object {},
-        "parens": undefined,
-        "spacing": Object {},
-        "stringValue": "'hello'",
-        "type": "literal",
-        "value": "hello",
-      }
-    `);
-  });
-
-  it('works with unicode string 1', () => {
-    const sql = `U&'f''o\\00F6\\\\'`;
-
-    backAndForth(sql);
-
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlLiteral {
-        "keywords": Object {},
-        "parens": undefined,
-        "spacing": Object {},
-        "stringValue": "U&'f''o\\\\00F6\\\\\\\\'",
-        "type": "literal",
-        "value": "f'oö\\\\",
-      }
-    `);
-  });
-
-  it('works with unicode string 2', () => {
-    const sql = `u&'fo\\00F6\\00F6'`;
-
-    backAndForth(sql);
-
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlLiteral {
-        "keywords": Object {},
-        "parens": undefined,
-        "spacing": Object {},
-        "stringValue": "u&'fo\\\\00F6\\\\00F6'",
-        "type": "literal",
-        "value": "foöö",
-      }
-    `);
-  });
-
-  it('works with timestamp', () => {
-    const sql = `TIMESTAMP '2020-02-25 00:00:00'`;
-
-    backAndForth(sql);
-
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlLiteral {
-        "keywords": Object {
-          "timestamp": "TIMESTAMP",
-        },
-        "parens": undefined,
-        "spacing": Object {
-          "postTimestamp": " ",
-        },
-        "stringValue": "'2020-02-25 00:00:00'",
-        "type": "literal",
-        "value": 2020-02-25T00:00:00.000Z,
-      }
-    `);
-  });
-
-  it('works with date', () => {
-    const sql = `DATE '2020-02-25'`;
-
-    backAndForth(sql);
-
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlLiteral {
-        "keywords": Object {
-          "timestamp": "DATE",
-        },
-        "parens": undefined,
-        "spacing": Object {
-          "postTimestamp": " ",
-        },
-        "stringValue": "'2020-02-25'",
-        "type": "literal",
-        "value": 2020-02-25T00:00:00.000Z,
-      }
-    `);
+  describe('does not parse', () => {
+    it.each([`__l-1'hello'`, `_-l-1'hello'`])('invalid literal %s should not parse', sql => {
+      expect(() => SqlExpression.parse(sql)).toThrow();
+    });
   });
 
   describe('.create', () => {
@@ -385,28 +389,36 @@ describe('SqlLiteral', () => {
     });
   });
 
-  it('.double', () => {
-    expect(String(SqlLiteral.double(0))).toEqual('0.0');
-    expect(String(SqlLiteral.double(17))).toEqual('17.0');
-    expect(String(SqlLiteral.double(17.23))).toEqual('17.23');
+  describe('.double', () => {
+    it('works', () => {
+      expect(String(SqlLiteral.double(0))).toEqual('0.0');
+      expect(String(SqlLiteral.double(17))).toEqual('17.0');
+      expect(String(SqlLiteral.double(17.23))).toEqual('17.23');
+    });
   });
 
-  it('.direct', () => {
-    expect(String(SqlLiteral.direct('VARCHAR'))).toEqual('VARCHAR');
-    expect(String(SqlLiteral.direct('day'))).toEqual('day');
+  describe('.maybe', () => {
+    it('works', () => {
+      expect(String(SqlLiteral.maybe(null))).toEqual('NULL');
+      expect(String(SqlLiteral.maybe(() => 1))).toEqual('undefined');
+    });
   });
 
-  it('#isInteger', () => {
-    expect(SqlLiteral.double(0).isInteger()).toEqual(false);
-    expect(SqlLiteral.create(0).isInteger()).toEqual(true);
-    expect(SqlLiteral.double(17).isInteger()).toEqual(false);
-    expect(SqlLiteral.create(17).isInteger()).toEqual(true);
-    expect(SqlLiteral.double(17.23).isInteger()).toEqual(false);
-    expect(SqlLiteral.create(17.23).isInteger()).toEqual(false);
+  describe('.direct', () => {
+    it('works', () => {
+      expect(String(SqlLiteral.direct('VARCHAR'))).toEqual('VARCHAR');
+      expect(String(SqlLiteral.direct('day'))).toEqual('day');
+    });
   });
 
-  it('works with maybe', () => {
-    expect(String(SqlLiteral.maybe(null))).toEqual('NULL');
-    expect(String(SqlLiteral.maybe(() => 1))).toEqual('undefined');
+  describe('#isInteger', () => {
+    it('works', () => {
+      expect(SqlLiteral.double(0).isInteger()).toEqual(false);
+      expect(SqlLiteral.create(0).isInteger()).toEqual(true);
+      expect(SqlLiteral.double(17).isInteger()).toEqual(false);
+      expect(SqlLiteral.create(17).isInteger()).toEqual(true);
+      expect(SqlLiteral.double(17.23).isInteger()).toEqual(false);
+      expect(SqlLiteral.create(17.23).isInteger()).toEqual(false);
+    });
   });
 });

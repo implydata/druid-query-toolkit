@@ -16,343 +16,435 @@ import { RefName, sane, SqlBase, SqlColumn, SqlExpression, SqlLiteral } from '..
 import { backAndForth, backAndForthPrettify, mapString } from '../test-utils';
 
 describe('SqlExpression', () => {
-  it.each([
-    '1',
-    '1 + 1',
-    `CONCAT('a', 'b')`,
-    `(Select 1)`,
-    `(TIMESTAMP '2019-08-27 18:00:00'<=(t."__time") AND (t."__time")<TIMESTAMP '2019-08-28 00:00:00')`,
-    `COALESCE(CASE WHEN (TIMESTAMP '2019-08-27 18:00:00'<=(t."__time") AND (t."__time")<TIMESTAMP '2019-08-28 00:00:00') THEN (t."__time") END, TIME_SHIFT((t."__time"), 'PT6H', 1, 'Etc/UTC'))`,
-    `TIME_FLOOR(COALESCE(CASE WHEN (TIMESTAMP '2019-08-27 18:00:00'<=(t."__time") AND (t."__time")<TIMESTAMP '2019-08-28 00:00:00') THEN (t."__time") END, TIME_SHIFT((t."__time"), 'PT6H', 1, 'Etc/UTC')), 'PT5M', NULL, 'Etc/UTC')`,
-    't AS x (a, b, "c")',
-    `VALUES   (1, 1 + 1),(2, 1 + 1)`,
-    `VALUES('Toy' || 'ota', 2, 2+2, CURRENT_TIMESTAMP), ROW('Honda', (SELECT COUNT(*) FROM wikipedia), GREATEST(5, 1), CURRENT_TIMESTAMP - INTERVAL '1' DAY)`,
-    `SELECT * FROM (VALUES   (1, 1 + 1),(2, 1 + 1)) t (a, "b")`,
-    `SELECT * FROM UNNEST(ARRAY['1','2','3'])`,
-    `SELECT * FROM "tbl", UNNEST(DATE_EXPAND(TIMESTAMP_TO_MILLIS(__time), TIMESTAMP_TO_MILLIS(__time), 'PT1S')) as unnested (dt)`,
-    `JSON_OBJECT()`,
-    `JSON_OBJECT(KEY 'x' VALUE 'y')`,
-    `JSON_OBJECT(KEY 'x' VALUE 'y', KEY "z" || '~' VALUE "w" || '~')`,
-    `JSON_OBJECT('x': 'y')`,
-    `JSON_OBJECT('x': 'y', "z" || '~': "w" || '~')`,
-    `JSON_OBJECT(KEY 'x' VALUE 'y', 'z': 'w')`,
-  ])('does back and forth with %s', sql => {
-    backAndForth(sql, SqlExpression);
-  });
+  const x = SqlColumn.optionalQuotes('x');
+  const y = SqlColumn.optionalQuotes('y');
 
-  it.each(['1', '1 + 1', `CONCAT('a', 'b')`, `x IN ('Hello World')`])(
-    'does back and forth prettify with %s',
-    sql => {
-      backAndForthPrettify(sql, SqlExpression);
-    },
-  );
-
-  it.each([`$lol`, `#main.sum($count)`])('plywood expression %s should not parse', sql => {
-    expect(() => SqlBase.parseSql(sql)).toThrow();
-  });
-
-  describe('factories (static)', () => {
-    describe('.and', () => {
-      it('throws if invalid arg is fed in', () => {
-        expect(() => SqlExpression.and(SqlExpression.parse('c < 10'), 'TRUE' as any)).toThrow(
-          'must be a SqlExpression',
-        );
-      });
-
-      it('works in empty case', () => {
-        expect(String(SqlExpression.and())).toEqual('TRUE');
-      });
-
-      it('works in single clause case', () => {
-        expect(String(SqlExpression.and(SqlExpression.parse('c < 10')))).toEqual('c < 10');
-      });
-
-      it('works in general case', () => {
-        expect(
-          String(
-            SqlExpression.and(
-              SqlExpression.parse('a OR b'),
-              SqlExpression.parse('(c OR d)'),
-              SqlExpression.parse('x AND y'),
-              SqlExpression.parse('(z AND w)'),
-              SqlExpression.parse('n < 10'),
-              undefined,
-              SqlExpression.parse('TRUE'),
-              SqlExpression.parse('NOT k = 1'),
-            ),
-          ),
-        ).toEqual(sane`
-          (a OR b)
-            AND (c OR d)
-            AND x
-            AND y
-            AND (z AND w)
-            AND n < 10
-            AND NOT k = 1
-       `);
-      });
+  describe('parses', () => {
+    it.each([
+      '1',
+      '1 + 1',
+      `CONCAT('a', 'b')`,
+      `(Select 1)`,
+      `(TIMESTAMP '2019-08-27 18:00:00'<=(t."__time") AND (t."__time")<TIMESTAMP '2019-08-28 00:00:00')`,
+      `COALESCE(CASE WHEN (TIMESTAMP '2019-08-27 18:00:00'<=(t."__time") AND (t."__time")<TIMESTAMP '2019-08-28 00:00:00') THEN (t."__time") END, TIME_SHIFT((t."__time"), 'PT6H', 1, 'Etc/UTC'))`,
+      `TIME_FLOOR(COALESCE(CASE WHEN (TIMESTAMP '2019-08-27 18:00:00'<=(t."__time") AND (t."__time")<TIMESTAMP '2019-08-28 00:00:00') THEN (t."__time") END, TIME_SHIFT((t."__time"), 'PT6H', 1, 'Etc/UTC')), 'PT5M', NULL, 'Etc/UTC')`,
+      't AS x (a, b, "c")',
+      `VALUES   (1, 1 + 1),(2, 1 + 1)`,
+      `VALUES('Toy' || 'ota', 2, 2+2, CURRENT_TIMESTAMP), ROW('Honda', (SELECT COUNT(*) FROM wikipedia), GREATEST(5, 1), CURRENT_TIMESTAMP - INTERVAL '1' DAY)`,
+      `SELECT * FROM (VALUES   (1, 1 + 1),(2, 1 + 1)) t (a, "b")`,
+      `SELECT * FROM UNNEST(ARRAY['1','2','3'])`,
+      `SELECT * FROM "tbl", UNNEST(DATE_EXPAND(TIMESTAMP_TO_MILLIS(__time), TIMESTAMP_TO_MILLIS(__time), 'PT1S')) as unnested (dt)`,
+      `JSON_OBJECT()`,
+      `JSON_OBJECT(KEY 'x' VALUE 'y')`,
+      `JSON_OBJECT(KEY 'x' VALUE 'y', KEY "z" || '~' VALUE "w" || '~')`,
+      `JSON_OBJECT('x': 'y')`,
+      `JSON_OBJECT('x': 'y', "z" || '~': "w" || '~')`,
+      `JSON_OBJECT(KEY 'x' VALUE 'y', 'z': 'w')`,
+    ])('does back and forth with %s', sql => {
+      backAndForth(sql, SqlExpression);
     });
 
-    describe('.or', () => {
-      it('throws if invalid arg is fed in', () => {
-        expect(() => SqlExpression.or(SqlExpression.parse('c < 10'), 'TRUE' as any)).toThrow(
-          'must be a SqlExpression',
-        );
+    it.each(['1', '1 + 1', `CONCAT('a', 'b')`, `x IN ('Hello World')`])(
+      'does back and forth prettify with %s',
+      sql => {
+        backAndForthPrettify(sql, SqlExpression);
+      },
+    );
+
+    describe('extreme', () => {
+      it('works for a huge flat parse', () => {
+        const sql = new Array(1000)
+          .fill('')
+          .map((_, i) => `c_id = "c${i}"`)
+          .join(' or ');
+
+        backAndForth(sql);
       });
 
-      it('works in empty case', () => {
-        expect(String(SqlExpression.or())).toEqual('FALSE');
+      it('works for lots of things in parens (left paren)', () => {
+        const sql = new Array(100).fill('').reduce((a, _, i) => `(${a} or c_id = "c${i}")`, 'X');
+
+        backAndForth(sql);
       });
 
-      it('works in single clause case', () => {
-        expect(String(SqlExpression.or(SqlExpression.parse('c < 10')))).toEqual('c < 10');
-      });
+      it('works for lots of things in parens (right paren)', () => {
+        const sql = new Array(100).fill('').reduce((a, _, i) => `(c_id = "c${i}" or ${a})`, 'X');
 
-      it('works in general case', () => {
-        expect(
-          String(
-            SqlExpression.or(
-              SqlExpression.parse('a OR b'),
-              SqlExpression.parse('(c OR d)'),
-              SqlExpression.parse('x AND y'),
-              SqlExpression.parse('(z AND w)'),
-              SqlExpression.parse('n < 10'),
-              undefined,
-              SqlExpression.parse('FALSE'),
-              SqlExpression.parse('NOT k = 1'),
-            ),
-          ),
-        ).toEqual(sane`
-          a
-            OR b
-            OR (c OR d)
-            OR (x AND y)
-            OR (z AND w)
-            OR n < 10
-            OR NOT k = 1
-        `);
-      });
-    });
-
-    describe('.add', () => {
-      it('throws if invalid arg is fed in', () => {
-        expect(() => SqlExpression.add(SqlLiteral.ONE, 0 as any)).toThrow(
-          'must be a SqlExpression',
-        );
-      });
-
-      it('works in empty case', () => {
-        expect(String(SqlExpression.add())).toEqual('0.0');
-      });
-
-      it('works in single clause case', () => {
-        expect(String(SqlExpression.add(SqlExpression.parse('F(x)')))).toEqual('F(x)');
-      });
-
-      it('works in general case', () => {
-        expect(
-          String(
-            SqlExpression.add(
-              SqlExpression.parse('F(a)'),
-              SqlExpression.parse('b + c'),
-              SqlExpression.parse('d - e'),
-              SqlExpression.parse('(f + g)'),
-              undefined,
-              SqlExpression.parse('0'),
-              SqlExpression.parse('10'),
-            ),
-          ),
-        ).toEqual('F(a) + b + c + (d - e) + (f + g) + 0 + 10');
-      });
-    });
-
-    describe('.subtract', () => {
-      it('throws if invalid arg is fed in', () => {
-        expect(() => SqlExpression.subtract(SqlLiteral.ONE, 0 as any)).toThrow(
-          'must be a SqlExpression',
-        );
-      });
-
-      it('throws error in empty case', () => {
-        expect(() => SqlExpression.subtract()).toThrow(
-          'first argument to subtract must be defined',
-        );
-      });
-
-      it('works in single clause case', () => {
-        expect(String(SqlExpression.subtract(SqlExpression.parse('F(x)')))).toEqual('F(x)');
-      });
-
-      it('works in general case', () => {
-        expect(
-          String(
-            SqlExpression.subtract(
-              SqlExpression.parse('F(a)'),
-              SqlExpression.parse('b + c'),
-              SqlExpression.parse('d - e'),
-              SqlExpression.parse('(f + g)'),
-              undefined,
-              SqlExpression.parse('0'),
-              SqlExpression.parse('10'),
-            ),
-          ),
-        ).toEqual('F(a) - b - c - (d - e) - (f + g) - 0 - 10');
-      });
-    });
-
-    describe('.fromTimeExpressionAndInterval', () => {
-      const time = SqlColumn.optionalQuotes('__time');
-
-      it('works for a single interval', () => {
-        expect(
-          String(
-            SqlExpression.fromTimeExpressionAndInterval(
-              time,
-              '2022-04-30T00:00:00.000Z/2022-05-01T00:00:00.000Z',
-            ),
-          ),
-        ).toEqual("TIMESTAMP '2022-04-30' <= __time AND __time < TIMESTAMP '2022-05-01'");
-      });
-
-      it('works for multiple intervals', () => {
-        expect(
-          String(
-            SqlExpression.fromTimeExpressionAndInterval(time, [
-              '2022-04-30T00:00:00.000Z/2022-04-30T01:00:00.000Z',
-              '2022-04-30T02:00:00.000Z/2022-04-30T03:00:00.000Z',
-            ]),
-          ),
-        ).toEqual(
-          "(TIMESTAMP '2022-04-30' <= __time AND __time < TIMESTAMP '2022-04-30 01:00:00') OR (TIMESTAMP '2022-04-30 02:00:00' <= __time AND __time < TIMESTAMP '2022-04-30 03:00:00')",
-        );
+        backAndForth(sql);
       });
     });
   });
 
-  describe('factories (methods)', () => {
-    const x = SqlColumn.optionalQuotes('x');
-    const y = SqlColumn.optionalQuotes('y');
+  describe('does not parse', () => {
+    it.each([`$lol`, `#main.sum($count)`])('rejects the plywood expression %s', sql => {
+      expect(() => SqlBase.parseSql(sql)).toThrow();
+    });
+  });
 
-    describe('#as', () => {
-      const x = SqlColumn.optionalQuotes('X').as('test');
-      const z = SqlColumn.optionalQuotes('Z').as(RefName.create('test', true));
-
-      it('should work with normal string', () => {
-        expect(String(x.as('hello'))).toEqual('X AS "hello"');
-      });
-
-      it('should preserve quotes', () => {
-        expect(String(z.as('hello'))).toEqual('Z AS "hello"');
-      });
-
-      it('should work with quotes if needed', () => {
-        expect(String(x.as('select'))).toEqual('X AS "select"');
-      });
-
-      it('should work with quotes if forced', () => {
-        expect(String(x.as('hello', true))).toEqual('X AS "hello"');
-      });
+  describe('.and', () => {
+    it('throws if invalid arg is fed in', () => {
+      expect(() => SqlExpression.and(SqlExpression.parse('c < 10'), 'TRUE' as any)).toThrow(
+        'must be a SqlExpression',
+      );
     });
 
-    describe('#setAlias', () => {
-      const x = SqlColumn.optionalQuotes('X').setAlias('test');
-      const z = SqlColumn.optionalQuotes('Z').setAlias(RefName.create('test', true));
-
-      it('should work with normal string', () => {
-        expect(String(x.setAlias('hello'))).toEqual('X AS "hello"');
-      });
-
-      it('should work with undefined', () => {
-        expect(String(x.setAlias(undefined))).toEqual('X');
-      });
-
-      it('should preserve quotes', () => {
-        expect(String(z.setAlias('hello'))).toEqual('Z AS "hello"');
-      });
-
-      it('should work with quotes if needed', () => {
-        expect(String(x.setAlias('select'))).toEqual('X AS "select"');
-      });
-
-      it('should work with quotes if forced', () => {
-        expect(String(x.setAlias('hello', true))).toEqual('X AS "hello"');
-      });
+    it('works in empty case', () => {
+      expect(String(SqlExpression.and())).toEqual('TRUE');
     });
 
-    it('#toOrderByExpression', () => {
+    it('works in single clause case', () => {
+      expect(String(SqlExpression.and(SqlExpression.parse('c < 10')))).toEqual('c < 10');
+    });
+
+    it('works in general case', () => {
+      expect(
+        String(
+          SqlExpression.and(
+            SqlExpression.parse('a OR b'),
+            SqlExpression.parse('(c OR d)'),
+            SqlExpression.parse('x AND y'),
+            SqlExpression.parse('(z AND w)'),
+            SqlExpression.parse('n < 10'),
+            undefined,
+            SqlExpression.parse('TRUE'),
+            SqlExpression.parse('NOT k = 1'),
+          ),
+        ),
+      ).toEqual(sane`
+        (a OR b)
+          AND (c OR d)
+          AND x
+          AND y
+          AND (z AND w)
+          AND n < 10
+          AND NOT k = 1
+     `);
+    });
+  });
+
+  describe('.or', () => {
+    it('throws if invalid arg is fed in', () => {
+      expect(() => SqlExpression.or(SqlExpression.parse('c < 10'), 'TRUE' as any)).toThrow(
+        'must be a SqlExpression',
+      );
+    });
+
+    it('works in empty case', () => {
+      expect(String(SqlExpression.or())).toEqual('FALSE');
+    });
+
+    it('works in single clause case', () => {
+      expect(String(SqlExpression.or(SqlExpression.parse('c < 10')))).toEqual('c < 10');
+    });
+
+    it('works in general case', () => {
+      expect(
+        String(
+          SqlExpression.or(
+            SqlExpression.parse('a OR b'),
+            SqlExpression.parse('(c OR d)'),
+            SqlExpression.parse('x AND y'),
+            SqlExpression.parse('(z AND w)'),
+            SqlExpression.parse('n < 10'),
+            undefined,
+            SqlExpression.parse('FALSE'),
+            SqlExpression.parse('NOT k = 1'),
+          ),
+        ),
+      ).toEqual(sane`
+        a
+          OR b
+          OR (c OR d)
+          OR (x AND y)
+          OR (z AND w)
+          OR n < 10
+          OR NOT k = 1
+      `);
+    });
+  });
+
+  describe('.add', () => {
+    it('throws if invalid arg is fed in', () => {
+      expect(() => SqlExpression.add(SqlLiteral.ONE, 0 as any)).toThrow('must be a SqlExpression');
+    });
+
+    it('works in empty case', () => {
+      expect(String(SqlExpression.add())).toEqual('0.0');
+    });
+
+    it('works in single clause case', () => {
+      expect(String(SqlExpression.add(SqlExpression.parse('F(x)')))).toEqual('F(x)');
+    });
+
+    it('works in general case', () => {
+      expect(
+        String(
+          SqlExpression.add(
+            SqlExpression.parse('F(a)'),
+            SqlExpression.parse('b + c'),
+            SqlExpression.parse('d - e'),
+            SqlExpression.parse('(f + g)'),
+            undefined,
+            SqlExpression.parse('0'),
+            SqlExpression.parse('10'),
+          ),
+        ),
+      ).toEqual('F(a) + b + c + (d - e) + (f + g) + 0 + 10');
+    });
+  });
+
+  describe('.subtract', () => {
+    it('throws if invalid arg is fed in', () => {
+      expect(() => SqlExpression.subtract(SqlLiteral.ONE, 0 as any)).toThrow(
+        'must be a SqlExpression',
+      );
+    });
+
+    it('throws error in empty case', () => {
+      expect(() => SqlExpression.subtract()).toThrow('first argument to subtract must be defined');
+    });
+
+    it('works in single clause case', () => {
+      expect(String(SqlExpression.subtract(SqlExpression.parse('F(x)')))).toEqual('F(x)');
+    });
+
+    it('works in general case', () => {
+      expect(
+        String(
+          SqlExpression.subtract(
+            SqlExpression.parse('F(a)'),
+            SqlExpression.parse('b + c'),
+            SqlExpression.parse('d - e'),
+            SqlExpression.parse('(f + g)'),
+            undefined,
+            SqlExpression.parse('0'),
+            SqlExpression.parse('10'),
+          ),
+        ),
+      ).toEqual('F(a) - b - c - (d - e) - (f + g) - 0 - 10');
+    });
+  });
+
+  describe('.fromTimeExpressionAndInterval', () => {
+    const time = SqlColumn.optionalQuotes('__time');
+
+    it('works for a single interval', () => {
+      expect(
+        String(
+          SqlExpression.fromTimeExpressionAndInterval(
+            time,
+            '2022-04-30T00:00:00.000Z/2022-05-01T00:00:00.000Z',
+          ),
+        ),
+      ).toEqual("TIMESTAMP '2022-04-30' <= __time AND __time < TIMESTAMP '2022-05-01'");
+    });
+
+    it('works for multiple intervals', () => {
+      expect(
+        String(
+          SqlExpression.fromTimeExpressionAndInterval(time, [
+            '2022-04-30T00:00:00.000Z/2022-04-30T01:00:00.000Z',
+            '2022-04-30T02:00:00.000Z/2022-04-30T03:00:00.000Z',
+          ]),
+        ),
+      ).toEqual(
+        "(TIMESTAMP '2022-04-30' <= __time AND __time < TIMESTAMP '2022-04-30 01:00:00') OR (TIMESTAMP '2022-04-30 02:00:00' <= __time AND __time < TIMESTAMP '2022-04-30 03:00:00')",
+      );
+    });
+  });
+
+  describe('#as', () => {
+    const x = SqlColumn.optionalQuotes('X').as('test');
+    const z = SqlColumn.optionalQuotes('Z').as(RefName.create('test', true));
+
+    it('works with normal string', () => {
+      expect(String(x.as('hello'))).toEqual('X AS "hello"');
+    });
+
+    it('preserves quotes', () => {
+      expect(String(z.as('hello'))).toEqual('Z AS "hello"');
+    });
+
+    it('works with quotes if needed', () => {
+      expect(String(x.as('select'))).toEqual('X AS "select"');
+    });
+
+    it('works with quotes if forced', () => {
+      expect(String(x.as('hello', true))).toEqual('X AS "hello"');
+    });
+  });
+
+  describe('#setAlias', () => {
+    const x = SqlColumn.optionalQuotes('X').setAlias('test');
+    const z = SqlColumn.optionalQuotes('Z').setAlias(RefName.create('test', true));
+
+    it('works with normal string', () => {
+      expect(String(x.setAlias('hello'))).toEqual('X AS "hello"');
+    });
+
+    it('works with undefined', () => {
+      expect(String(x.setAlias(undefined))).toEqual('X');
+    });
+
+    it('preserves quotes', () => {
+      expect(String(z.setAlias('hello'))).toEqual('Z AS "hello"');
+    });
+
+    it('works with quotes if needed', () => {
+      expect(String(x.setAlias('select'))).toEqual('X AS "select"');
+    });
+
+    it('works with quotes if forced', () => {
+      expect(String(x.setAlias('hello', true))).toEqual('X AS "hello"');
+    });
+  });
+
+  describe('#toOrderByExpression', () => {
+    it('works', () => {
       expect(String(x.toOrderByExpression('DESC'))).toEqual('x DESC');
     });
+  });
 
-    it('#not', () => {
+  describe('#not', () => {
+    it('works', () => {
       expect(String(x.not())).toEqual('NOT x');
       expect(String(SqlExpression.parse(`a < b`).not())).toEqual('NOT (a < b)');
       expect(String(SqlExpression.parse(`a OR b`).not())).toEqual('NOT (a OR b)');
       expect(String(SqlExpression.parse(`a AND b`).not())).toEqual('NOT (a AND b)');
     });
+  });
 
-    it('#equal', () => {
+  describe('#equal', () => {
+    it('works', () => {
       expect(String(x.equal(y))).toEqual('x = y');
     });
+  });
 
-    it('#unequal', () => {
+  describe('#unequal', () => {
+    it('works', () => {
       expect(String(x.unequal(y))).toEqual('x <> y');
     });
+  });
 
-    it('#isNotDistinctFrom', () => {
-      expect(String(x.isNotDistinctFrom(y))).toEqual('x IS NOT DISTINCT FROM y');
-    });
-
-    it('#isDistinctFrom', () => {
-      expect(String(x.isDistinctFrom(y))).toEqual('x IS DISTINCT FROM y');
-    });
-
-    it('#lessThan', () => {
+  describe('#lessThan', () => {
+    it('works', () => {
       expect(String(x.lessThan(y))).toEqual('x < y');
     });
+  });
 
-    it('#greaterThan', () => {
+  describe('#greaterThan', () => {
+    it('works', () => {
       expect(String(x.greaterThan(y))).toEqual('x > y');
     });
+  });
 
-    it('#lessThanOrEqual', () => {
+  describe('#lessThanOrEqual', () => {
+    it('works', () => {
       expect(String(x.lessThanOrEqual(y))).toEqual('x <= y');
     });
+  });
 
-    it('#greaterThanOrEqual', () => {
+  describe('#greaterThanOrEqual', () => {
+    it('works', () => {
       expect(String(x.greaterThanOrEqual(y))).toEqual('x >= y');
     });
+  });
 
-    it('#isNull', () => {
+  describe('#isNull', () => {
+    it('works', () => {
       expect(String(x.isNull())).toEqual('x IS NULL');
     });
+  });
 
-    it('#isNotNull', () => {
+  describe('#isNotNull', () => {
+    it('works', () => {
       expect(String(x.isNotNull())).toEqual('x IS NOT NULL');
     });
+  });
 
-    it('#like', () => {
+  describe('#isNotDistinctFrom', () => {
+    it('works', () => {
+      expect(String(x.isNotDistinctFrom(y))).toEqual('x IS NOT DISTINCT FROM y');
+    });
+  });
+
+  describe('#isDistinctFrom', () => {
+    it('works', () => {
+      expect(String(x.isDistinctFrom(y))).toEqual('x IS DISTINCT FROM y');
+    });
+  });
+
+  describe('#like', () => {
+    it('works', () => {
       expect(String(x.like(y))).toEqual('x LIKE y');
       expect(String(x.like(y, '$'))).toEqual("x LIKE y ESCAPE '$'");
     });
+  });
 
-    it('#between', () => {
+  describe('#between', () => {
+    it('works', () => {
       expect(String(x.between(1, 5))).toEqual('x BETWEEN 1 AND 5');
     });
+  });
 
-    it('#notBetween', () => {
+  describe('#notBetween', () => {
+    it('works', () => {
       expect(String(x.notBetween(1, 5))).toEqual('x NOT BETWEEN 1 AND 5');
     });
+  });
 
-    it('#betweenSymmetric', () => {
+  describe('#betweenSymmetric', () => {
+    it('works', () => {
       expect(String(x.betweenSymmetric(5, 1))).toEqual('x BETWEEN SYMMETRIC 5 AND 1');
     });
+  });
 
-    it('#notBetweenSymmetric', () => {
+  describe('#notBetweenSymmetric', () => {
+    it('works', () => {
       expect(String(x.notBetweenSymmetric(5, 1))).toEqual('x NOT BETWEEN SYMMETRIC 5 AND 1');
     });
+  });
 
-    it('#and', () => {
+  describe('#and', () => {
+    it('works', () => {
       expect(String(x.and(y))).toEqual('x AND y');
+    });
+  });
+
+  describe('#flatten', () => {
+    it('returns the expression as-is for non-multi expressions', () => {
+      const expr = SqlExpression.parse('a = 1');
+      expect(expr.flatten()).toBe(expr);
+    });
+
+    it('flattens nested AND expressions', () => {
+      const expr = SqlExpression.parse('a AND (b AND c)');
+      const flattened = expr.flatten();
+      expect(String(flattened)).toEqual('a AND b AND c');
+    });
+
+    it('flattens nested OR expressions', () => {
+      const expr = SqlExpression.parse('a OR (b OR c)');
+      const flattened = expr.flatten();
+      expect(String(flattened)).toEqual('a OR b OR c');
+    });
+
+    it('does not flatten when flatteningOp does not match', () => {
+      const expr = SqlExpression.parse('a AND b');
+      const flattened = expr.flatten('OR');
+      expect(flattened).toBe(expr);
+    });
+
+    it('flattens deeply nested expressions', () => {
+      const expr = SqlExpression.parse('a AND (b AND (c AND d))');
+      const flattened = expr.flatten();
+      expect(String(flattened)).toEqual('a AND b AND c AND d');
+    });
+
+    it('flattens mixed nested expressions', () => {
+      const expr = SqlExpression.parse('(a OR b) AND ((c OR d) AND e)');
+      const flattened = expr.flatten();
+      expect(String(flattened)).toEqual('(a OR b) AND (c OR d) AND e');
     });
   });
 
@@ -431,63 +523,61 @@ describe('SqlExpression', () => {
     });
   });
 
-  describe('extreme', () => {
-    it('should work for a huge flat parse', () => {
-      const sql = new Array(1000)
-        .fill('')
-        .map((_, i) => `c_id = "c${i}"`)
-        .join(' or ');
+  describe('#removeColumnFromAnd', () => {
+    it('removes from single expression not AND', () => {
+      const sql = `A > 1`;
 
-      backAndForth(sql);
+      expect(String(SqlExpression.parse(sql).removeColumnFromAnd('A'))).toEqual('undefined');
+      expect(String(SqlExpression.parse(sql).removeColumnFromAnd('B'))).toEqual('A > 1');
     });
 
-    it('should work for lots of things in parens (left paren)', () => {
-      const sql = new Array(100).fill('').reduce((a, _, i) => `(${a} or c_id = "c${i}")`, 'X');
+    it('removes from simple AND', () => {
+      const sql = `A AND B`;
 
-      backAndForth(sql);
+      expect(String(SqlExpression.parse(sql).removeColumnFromAnd('A'))).toEqual('B');
     });
 
-    it('should work for lots of things in parens (right paren)', () => {
-      const sql = new Array(100).fill('').reduce((a, _, i) => `(c_id = "c${i}" or ${a})`, 'X');
+    it('removes from single expression type multiple', () => {
+      const sql = `A AND B AND C`;
 
-      backAndForth(sql);
-    });
-  });
-
-  describe('#flatten', () => {
-    it('returns the expression as-is for non-multi expressions', () => {
-      const expr = SqlExpression.parse('a = 1');
-      expect(expr.flatten()).toBe(expr);
+      expect(String(SqlExpression.parse(sql).removeColumnFromAnd('A'))).toEqual('B AND C');
     });
 
-    it('flattens nested AND expressions', () => {
-      const expr = SqlExpression.parse('a AND (b AND c)');
-      const flattened = expr.flatten();
-      expect(String(flattened)).toEqual('a AND b AND c');
+    it('removes from more complex AND', () => {
+      const sql = `A AND B > 1 AND C`;
+
+      expect(String(SqlExpression.parse(sql).removeColumnFromAnd('C'))).toEqual('A AND B > 1');
     });
 
-    it('flattens nested OR expressions', () => {
-      const expr = SqlExpression.parse('a OR (b OR c)');
-      const flattened = expr.flatten();
-      expect(String(flattened)).toEqual('a OR b OR c');
+    it('handles nested AND comparison expression', () => {
+      const sql = `(A > 1 AND D) AND B AND C`;
+
+      expect(String(SqlExpression.parse(sql).removeColumnFromAnd('A'))).toEqual('D AND B AND C');
     });
 
-    it('does not flatten when flatteningOp does not match', () => {
-      const expr = SqlExpression.parse('a AND b');
-      const flattened = expr.flatten('OR');
-      expect(flattened).toBe(expr);
+    it('removes nested comparison expression', () => {
+      const sql = `(A > 1 OR D) AND B AND C`;
+
+      expect(String(SqlExpression.parse(sql).removeColumnFromAnd('A'))).toEqual('B AND C');
     });
 
-    it('flattens deeply nested expressions', () => {
-      const expr = SqlExpression.parse('a AND (b AND (c AND d))');
-      const flattened = expr.flatten();
-      expect(String(flattened)).toEqual('a AND b AND c AND d');
-    });
+    it.each([
+      'A',
+      'B',
+      'A AND B',
+      'A AND B AND C',
+      '(A AND B) AND C',
+      'A AND (B AND C)',
+      'A AND ((B AND C) AND D)',
+      '(A OR a) AND (((B OR b) AND (C OR c)) AND (D OR d))',
+    ])('invariants hold on: %s', sql => {
+      const ex = SqlExpression.parse(sql);
 
-    it('flattens mixed nested expressions', () => {
-      const expr = SqlExpression.parse('(a OR b) AND ((c OR d) AND e)');
-      const flattened = expr.flatten();
-      expect(String(flattened)).toEqual('(a OR b) AND (c OR d) AND e');
+      expect(String(ex.removeColumnFromAnd('X'))).toEqual(sql);
+
+      expect(String(ex.flatten('AND').removeColumnFromAnd('A'))).toEqual(
+        String(ex.removeColumnFromAnd('A')?.flatten('AND')),
+      );
     });
   });
 
@@ -509,7 +599,7 @@ describe('SqlExpression', () => {
     });
   });
 
-  describe('addFilterToAggregations', () => {
+  describe('#addFilterToAggregations', () => {
     const knownAggregates = ['COUNT', 'SUM', 'MIN'];
     const filter = SqlExpression.parse(`country = 'USA'`);
 
@@ -580,64 +670,6 @@ describe('SqlExpression', () => {
           .toString(),
       ).toEqual(
         `APPROX_COUNT_DISTINCT_DS_HLL(COALESCE(t."email", t."user", 'api:' || t."id")) FILTER (WHERE 2 <> 1 AND country = 'USA')`,
-      );
-    });
-  });
-
-  describe('#removeColumnFromAnd', () => {
-    it('remove from single expression not AND', () => {
-      const sql = `A > 1`;
-
-      expect(String(SqlExpression.parse(sql).removeColumnFromAnd('A'))).toEqual('undefined');
-      expect(String(SqlExpression.parse(sql).removeColumnFromAnd('B'))).toEqual('A > 1');
-    });
-
-    it('remove from simple AND', () => {
-      const sql = `A AND B`;
-
-      expect(String(SqlExpression.parse(sql).removeColumnFromAnd('A'))).toEqual('B');
-    });
-
-    it('remove from single expression type multiple', () => {
-      const sql = `A AND B AND C`;
-
-      expect(String(SqlExpression.parse(sql).removeColumnFromAnd('A'))).toEqual('B AND C');
-    });
-
-    it('remove from more complex AND', () => {
-      const sql = `A AND B > 1 AND C`;
-
-      expect(String(SqlExpression.parse(sql).removeColumnFromAnd('C'))).toEqual('A AND B > 1');
-    });
-
-    it('handles nested AND comparison expression', () => {
-      const sql = `(A > 1 AND D) AND B AND C`;
-
-      expect(String(SqlExpression.parse(sql).removeColumnFromAnd('A'))).toEqual('D AND B AND C');
-    });
-
-    it('remove nested comparison expression', () => {
-      const sql = `(A > 1 OR D) AND B AND C`;
-
-      expect(String(SqlExpression.parse(sql).removeColumnFromAnd('A'))).toEqual('B AND C');
-    });
-
-    it.each([
-      'A',
-      'B',
-      'A AND B',
-      'A AND B AND C',
-      '(A AND B) AND C',
-      'A AND (B AND C)',
-      'A AND ((B AND C) AND D)',
-      '(A OR a) AND (((B OR b) AND (C OR c)) AND (D OR d))',
-    ])('invariants hold on: %s', sql => {
-      const ex = SqlExpression.parse(sql);
-
-      expect(String(ex.removeColumnFromAnd('X'))).toEqual(sql);
-
-      expect(String(ex.flatten('AND').removeColumnFromAnd('A'))).toEqual(
-        String(ex.removeColumnFromAnd('A')?.flatten('AND')),
       );
     });
   });

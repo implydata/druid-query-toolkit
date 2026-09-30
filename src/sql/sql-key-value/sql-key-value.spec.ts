@@ -16,44 +16,56 @@ import { SqlExpression, SqlKeyValue, SqlLiteral } from '../..';
 import { backAndForth } from '../../test-utils';
 
 describe('SqlKeyValue', () => {
-  it('creates a key-value pair with longhand syntax', () => {
-    const keyValue = SqlKeyValue.create(SqlLiteral.create('x'), SqlLiteral.create('y'));
-
-    expect(keyValue.toString()).toEqual("KEY 'x' VALUE 'y'");
+  describe('parses', () => {
+    it('works inside JSON_OBJECT', () => {
+      backAndForth("JSON_OBJECT(KEY 'x' VALUE 'y')", SqlExpression);
+      backAndForth("JSON_OBJECT(KEY 'x' VALUE 'y', KEY 'z' VALUE 'w')", SqlExpression);
+      backAndForth("JSON_OBJECT('x': 'y')", SqlExpression);
+      backAndForth("JSON_OBJECT('x': 'y', 'z': 'w')", SqlExpression);
+      backAndForth("JSON_OBJECT(KEY 'x' VALUE 'y', 'z': 'w')", SqlExpression);
+    });
   });
 
-  it('creates a key-value pair with shorthand syntax', () => {
-    const keyValue = SqlKeyValue.short(SqlLiteral.create('x'), SqlLiteral.create('y'));
+  describe('.create', () => {
+    it('creates a key-value pair with longhand syntax', () => {
+      const keyValue = SqlKeyValue.create(SqlLiteral.create('x'), SqlLiteral.create('y'));
 
-    expect(keyValue.toString()).toEqual("'x':'y'");
+      expect(keyValue.toString()).toEqual("KEY 'x' VALUE 'y'");
+    });
   });
 
-  it('allows changing the key', () => {
-    const keyValue = SqlKeyValue.create(SqlLiteral.create('x'), SqlLiteral.create('y'));
+  describe('.short', () => {
+    it('creates a key-value pair with shorthand syntax', () => {
+      const keyValue = SqlKeyValue.short(SqlLiteral.create('x'), SqlLiteral.create('y'));
 
-    const changed = keyValue.changeKey(SqlLiteral.create('z'));
-    expect(changed.toString()).toEqual("KEY 'z' VALUE 'y'");
+      expect(keyValue.toString()).toEqual("'x':'y'");
+    });
   });
 
-  it('allows changing the value', () => {
-    const keyValue = SqlKeyValue.create(SqlLiteral.create('x'), SqlLiteral.create('y'));
+  describe('#changeKey', () => {
+    it('changes the key', () => {
+      const keyValue = SqlKeyValue.create(SqlLiteral.create('x'), SqlLiteral.create('y'));
 
-    const changed = keyValue.changeValue(SqlLiteral.create('w'));
-    expect(changed.toString()).toEqual("KEY 'x' VALUE 'w'");
+      const changed = keyValue.changeKey(SqlLiteral.create('z'));
+      expect(changed.toString()).toEqual("KEY 'z' VALUE 'y'");
+    });
   });
 
-  it('allows changing the shorthand flag', () => {
-    const keyValue = SqlKeyValue.create(SqlLiteral.create('x'), SqlLiteral.create('y'));
+  describe('#changeValue', () => {
+    it('changes the value', () => {
+      const keyValue = SqlKeyValue.create(SqlLiteral.create('x'), SqlLiteral.create('y'));
 
-    const changed = keyValue.changeShort(true);
-    expect(changed.toString()).toEqual("'x':'y'");
+      const changed = keyValue.changeValue(SqlLiteral.create('w'));
+      expect(changed.toString()).toEqual("KEY 'x' VALUE 'w'");
+    });
   });
 
-  it('should test JSON_OBJECT function with key-value pairs', () => {
-    backAndForth("JSON_OBJECT(KEY 'x' VALUE 'y')", SqlExpression);
-    backAndForth("JSON_OBJECT(KEY 'x' VALUE 'y', KEY 'z' VALUE 'w')", SqlExpression);
-    backAndForth("JSON_OBJECT('x': 'y')", SqlExpression);
-    backAndForth("JSON_OBJECT('x': 'y', 'z': 'w')", SqlExpression);
-    backAndForth("JSON_OBJECT(KEY 'x' VALUE 'y', 'z': 'w')", SqlExpression);
+  describe('#changeShort', () => {
+    it('changes the shorthand flag', () => {
+      const keyValue = SqlKeyValue.create(SqlLiteral.create('x'), SqlLiteral.create('y'));
+
+      const changed = keyValue.changeShort(true);
+      expect(changed.toString()).toEqual("'x':'y'");
+    });
   });
 });

@@ -16,7 +16,7 @@ import { backAndForth } from '../../test-utils';
 import { SqlExpression } from '../sql-expression';
 
 describe('SqlStar', () => {
-  describe('star expressions', () => {
+  describe('parses', () => {
     it.each([
       'SELECT *',
       `SELECT hello. *`,
@@ -28,77 +28,77 @@ describe('SqlStar', () => {
     ])('correctly parses: %s', sql => {
       backAndForth(sql);
     });
-  });
 
-  it('without quotes + namespace', () => {
-    const sql = `SELECT hello . "world" . *`;
+    it('without quotes + namespace', () => {
+      const sql = `SELECT hello . "world" . *`;
 
-    backAndForth(sql);
+      backAndForth(sql);
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlQuery {
-        "clusteredByClause": undefined,
-        "contextStatements": undefined,
-        "decorator": undefined,
-        "explain": undefined,
-        "fromClause": undefined,
-        "groupByClause": undefined,
-        "havingClause": undefined,
-        "insertClause": undefined,
-        "keywords": Object {
-          "select": "SELECT",
-        },
-        "limitClause": undefined,
-        "offsetClause": undefined,
-        "orderByClause": undefined,
-        "parens": undefined,
-        "partitionedByClause": undefined,
-        "replaceClause": undefined,
-        "selectExpressions": SeparatedArray {
-          "separators": Array [],
-          "values": Array [
-            SqlStar {
-              "keywords": Object {},
-              "parens": undefined,
-              "spacing": Object {
-                "postDot": " ",
-                "postTable": " ",
-              },
-              "table": SqlTable {
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        SqlQuery {
+          "clusteredByClause": undefined,
+          "contextStatements": undefined,
+          "decorator": undefined,
+          "explain": undefined,
+          "fromClause": undefined,
+          "groupByClause": undefined,
+          "havingClause": undefined,
+          "insertClause": undefined,
+          "keywords": Object {
+            "select": "SELECT",
+          },
+          "limitClause": undefined,
+          "offsetClause": undefined,
+          "orderByClause": undefined,
+          "parens": undefined,
+          "partitionedByClause": undefined,
+          "replaceClause": undefined,
+          "selectExpressions": SeparatedArray {
+            "separators": Array [],
+            "values": Array [
+              SqlStar {
                 "keywords": Object {},
-                "namespace": SqlNamespace {
-                  "keywords": Object {},
-                  "parens": undefined,
-                  "refName": RefName {
-                    "name": "hello",
-                    "quotes": false,
-                  },
-                  "spacing": Object {},
-                  "type": "namespace",
-                },
                 "parens": undefined,
-                "refName": RefName {
-                  "name": "world",
-                  "quotes": true,
-                },
                 "spacing": Object {
                   "postDot": " ",
-                  "postNamespace": " ",
+                  "postTable": " ",
                 },
-                "type": "table",
+                "table": SqlTable {
+                  "keywords": Object {},
+                  "namespace": SqlNamespace {
+                    "keywords": Object {},
+                    "parens": undefined,
+                    "refName": RefName {
+                      "name": "hello",
+                      "quotes": false,
+                    },
+                    "spacing": Object {},
+                    "type": "namespace",
+                  },
+                  "parens": undefined,
+                  "refName": RefName {
+                    "name": "world",
+                    "quotes": true,
+                  },
+                  "spacing": Object {
+                    "postDot": " ",
+                    "postNamespace": " ",
+                  },
+                  "type": "table",
+                },
+                "type": "star",
               },
-              "type": "star",
-            },
-          ],
-        },
-        "spacing": Object {
-          "postSelect": " ",
-        },
-        "type": "query",
-        "unionQuery": undefined,
-        "whereClause": undefined,
-        "withClause": undefined,
-      }
-    `);
+            ],
+          },
+          "spacing": Object {
+            "postSelect": " ",
+          },
+          "type": "query",
+          "unionQuery": undefined,
+          "whereClause": undefined,
+          "withClause": undefined,
+        }
+      `);
+    });
   });
 });

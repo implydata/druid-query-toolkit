@@ -15,20 +15,24 @@
 import { RefName } from '../../..';
 
 describe('RefName', () => {
-  describe('static methods for detecting reserved words', () => {
+  describe('.isReservedKeyword', () => {
     it('identifies reserved keywords', () => {
       expect(RefName.isReservedKeyword('SELECT')).toBe(true);
       expect(RefName.isReservedKeyword('select')).toBe(true); // Case insensitive
       expect(RefName.isReservedKeyword('FROM')).toBe(true);
       expect(RefName.isReservedKeyword('normalword')).toBe(false);
     });
+  });
 
+  describe('.isReservedAlias', () => {
     it('identifies reserved aliases', () => {
       expect(RefName.isReservedAlias('SELECT')).toBe(true); // Keywords are also reserved aliases
       expect(RefName.isReservedAlias('VALUE')).toBe(true); // Reserved alias
       expect(RefName.isReservedAlias('normalword')).toBe(false);
     });
+  });
 
+  describe('.isReservedFunctionName', () => {
     it('identifies reserved function names', () => {
       // Depends on which functions are allowed, checking pattern rather than specific values
       const someForbiddenKeyword = RefName.RESERVED_KEYWORDS.find(
@@ -45,7 +49,7 @@ describe('RefName', () => {
     });
   });
 
-  describe('static methods for detecting need for quotes', () => {
+  describe('.needsQuotes', () => {
     it('determines when names need quotes', () => {
       expect(RefName.needsQuotes('SELECT')).toBe(true); // Reserved keyword needs quotes
       expect(RefName.needsQuotes('normal_column')).toBe(false); // Valid identifier
@@ -53,12 +57,16 @@ describe('RefName', () => {
       expect(RefName.needsQuotes('column-name')).toBe(true); // Invalid identifier (has hyphen)
       expect(RefName.needsQuotes('column name')).toBe(true); // Invalid identifier (has space)
     });
+  });
 
+  describe('.needsQuotesAlias', () => {
     it('determines when aliases need quotes', () => {
       expect(RefName.needsQuotesAlias('VALUE')).toBe(true); // Reserved alias needs quotes
       expect(RefName.needsQuotesAlias('normal_alias')).toBe(false); // Valid identifier
     });
+  });
 
+  describe('.needsQuotesFunctionName', () => {
     it('determines when function names need quotes', () => {
       // Testing with allowed function names vs reserved keywords
       expect(RefName.needsQuotesFunctionName('COUNT')).toBe(false); // Allowed function

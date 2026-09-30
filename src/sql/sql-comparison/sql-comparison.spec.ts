@@ -16,114 +16,89 @@ import { backAndForth } from '../../test-utils';
 import { SqlColumn, SqlComparison, SqlExpression, SqlValues } from '..';
 
 describe('SqlComparison', () => {
-  it('keeps a VALUES query as the rhs of an IN', () => {
-    const comparison = SqlExpression.parse(
-      `(1, 2) IN (VALUES (1, 1 + 1),(2, 1 + 1))`,
-    ) as SqlComparison;
+  describe('parses', () => {
+    it('keeps a VALUES query as the rhs of an IN', () => {
+      const comparison = SqlExpression.parse(
+        `(1, 2) IN (VALUES (1, 1 + 1),(2, 1 + 1))`,
+      ) as SqlComparison;
 
-    expect(comparison.rhs).toBeInstanceOf(SqlValues);
-  });
-
-  it.each([
-    'x = y',
-    'x != y',
-    'x <> y',
-    '(1, ROW(2)) = Row (1, 1 + 1)',
-
-    'x < y',
-    'x > y',
-    'x <= y',
-    'x >= y',
-    ' x >= y  ',
-
-    `X = ANY (SELECT page FROM wikipedia GROUP BY 1 ORDER BY COUNT(*) DESC LIMIT 5)`,
-    `X <> any (SELECT page FROM wikipedia GROUP BY 1 ORDER BY COUNT(*) DESC LIMIT 5)`,
-    `X < ALL (SELECT page FROM wikipedia GROUP BY 1 ORDER BY COUNT(*) DESC LIMIT 5)`,
-    `X > all (SELECT page FROM wikipedia GROUP BY 1 ORDER BY COUNT(*) DESC LIMIT 5)`,
-    `X <= SOME (SELECT page FROM wikipedia GROUP BY 1 ORDER BY COUNT(*) DESC LIMIT 5)`,
-    `X >= some (SELECT page FROM wikipedia GROUP BY 1 ORDER BY COUNT(*) DESC LIMIT 5)`,
-
-    `X IN ('moon', 'beam')`,
-    `X IN ('mo' || 'on', 'be' || 'am')`,
-    `X NOT IN ('moon', 'beam')`,
-    `X IN (SELECT page FROM wikipedia GROUP BY 1 ORDER BY COUNT(*) DESC LIMIT 5)`,
-    `X IN ((SELECT page FROM wikipedia GROUP BY 1 ORDER BY COUNT(*) DESC LIMIT 5))`,
-    `(browser, country) IN (ROW ('Chr' || 'ome', 'United States'), ('Firefox', 'Israel'))`,
-    `(1, 2) IN (VALUES   (1, 1 + 1),(2, 1 + 1))`,
-
-    `x IS  NOT DISTINCT FROM y`,
-    `x IS DISTINCT  FROM y`,
-
-    '2 between 1 and 3',
-    '2 between 3 and 2',
-    '2 between symmetric 3 and 2',
-    '3 between 1 and 3',
-    '4 between 1 and 3',
-    '1 between 4 and -3',
-    '1 between -1 and -3',
-    '1 between -1 and 3',
-    '1 between 1 and 1',
-    '1.5 between 1 and 3',
-    '1.2 between 1.1 and 1.3',
-    '1.5 between 2 and 3',
-    '1.5 between 1.6 and 1.7',
-    '1.2e1 between 1.1 and 1.3',
-    '1.2e0 between 1.1 and 1.3',
-    '1.5e0 between 2 and 3',
-    '1.5e0 between 2e0 and 3e0',
-    '1.5e1 between 1.6e1 and 1.7e1',
-    "x'' between x'' and x''",
-    'cast(null as integer) between -1 and 2',
-    '1 between -1 and cast(null as integer)',
-    '1 between cast(null as integer) and cast(null as integer)',
-    '1 between cast(null as integer) and 1',
-    "x'0A00015A' between x'0A000130' and x'0A0001B0'",
-    "x'0A00015A' between x'0A0001A0' and x'0A0001B0'",
-    '2 not between 1 and 3',
-    '3 not between 1 and 3',
-    '4 not between 1 and 3',
-    '1.2e0 not between 1.1 and 1.3',
-    '1.2e1 not between 1.1 and 1.3',
-    '1.5e0 not between 2 and 3',
-    '1.5e0 not between 2e0 and 3e0',
-    "x'0A00015A' not between x'0A000130' and x'0A0001B0'",
-    "x'0A00015A' not between x'0A0001A0' and x'0A0001B0'",
-  ])('does back and forth with %s', sql => {
-    backAndForth(sql, SqlComparison);
-  });
-
-  describe('factories', () => {
-    it('works with IN', () => {
-      expect(SqlComparison.in(SqlColumn.create('x'), [1]).toString()).toEqual('"x" IN (1)');
-      expect(SqlComparison.in(SqlColumn.create('x'), [1, 2, 3]).toString()).toEqual(
-        '"x" IN (1, 2, 3)',
-      );
-      expect(SqlComparison.notIn(SqlColumn.create('x'), [1, 2, 3]).toString()).toEqual(
-        '"x" NOT IN (1, 2, 3)',
-      );
+      expect(comparison.rhs).toBeInstanceOf(SqlValues);
     });
-  });
 
-  describe('negate', () => {
-    it('works', () => {
-      expect(String(SqlExpression.parse('X = 1').negate())).toEqual('X <> 1');
-      expect(String(SqlExpression.parse('X is NULL').negate())).toEqual('X IS NOT NULL');
-      expect(String(SqlExpression.parse('X is not NULL').negate())).toEqual('X IS NULL');
-      expect(String(SqlExpression.parse(`X in ('a', 'b')`).negate())).toEqual(
-        `X NOT IN ('a', 'b')`,
-      );
-      expect(String(SqlExpression.parse(`X not in ('a', 'b')`).negate())).toEqual(
-        `X IN ('a', 'b')`,
-      );
+    it.each([
+      'x = y',
+      'x != y',
+      'x <> y',
+      '(1, ROW(2)) = Row (1, 1 + 1)',
+
+      'x < y',
+      'x > y',
+      'x <= y',
+      'x >= y',
+      ' x >= y  ',
+
+      `X = ANY (SELECT page FROM wikipedia GROUP BY 1 ORDER BY COUNT(*) DESC LIMIT 5)`,
+      `X <> any (SELECT page FROM wikipedia GROUP BY 1 ORDER BY COUNT(*) DESC LIMIT 5)`,
+      `X < ALL (SELECT page FROM wikipedia GROUP BY 1 ORDER BY COUNT(*) DESC LIMIT 5)`,
+      `X > all (SELECT page FROM wikipedia GROUP BY 1 ORDER BY COUNT(*) DESC LIMIT 5)`,
+      `X <= SOME (SELECT page FROM wikipedia GROUP BY 1 ORDER BY COUNT(*) DESC LIMIT 5)`,
+      `X >= some (SELECT page FROM wikipedia GROUP BY 1 ORDER BY COUNT(*) DESC LIMIT 5)`,
+
+      `X IN ('moon', 'beam')`,
+      `X IN ('mo' || 'on', 'be' || 'am')`,
+      `X NOT IN ('moon', 'beam')`,
+      `X IN (SELECT page FROM wikipedia GROUP BY 1 ORDER BY COUNT(*) DESC LIMIT 5)`,
+      `X IN ((SELECT page FROM wikipedia GROUP BY 1 ORDER BY COUNT(*) DESC LIMIT 5))`,
+      `(browser, country) IN (ROW ('Chr' || 'ome', 'United States'), ('Firefox', 'Israel'))`,
+      `(1, 2) IN (VALUES   (1, 1 + 1),(2, 1 + 1))`,
+
+      `x IS  NOT DISTINCT FROM y`,
+      `x IS DISTINCT  FROM y`,
+
+      '2 between 1 and 3',
+      '2 between 3 and 2',
+      '2 between symmetric 3 and 2',
+      '3 between 1 and 3',
+      '4 between 1 and 3',
+      '1 between 4 and -3',
+      '1 between -1 and -3',
+      '1 between -1 and 3',
+      '1 between 1 and 1',
+      '1.5 between 1 and 3',
+      '1.2 between 1.1 and 1.3',
+      '1.5 between 2 and 3',
+      '1.5 between 1.6 and 1.7',
+      '1.2e1 between 1.1 and 1.3',
+      '1.2e0 between 1.1 and 1.3',
+      '1.5e0 between 2 and 3',
+      '1.5e0 between 2e0 and 3e0',
+      '1.5e1 between 1.6e1 and 1.7e1',
+      "x'' between x'' and x''",
+      'cast(null as integer) between -1 and 2',
+      '1 between -1 and cast(null as integer)',
+      '1 between cast(null as integer) and cast(null as integer)',
+      '1 between cast(null as integer) and 1',
+      "x'0A00015A' between x'0A000130' and x'0A0001B0'",
+      "x'0A00015A' between x'0A0001A0' and x'0A0001B0'",
+      '2 not between 1 and 3',
+      '3 not between 1 and 3',
+      '4 not between 1 and 3',
+      '1.2e0 not between 1.1 and 1.3',
+      '1.2e1 not between 1.1 and 1.3',
+      '1.5e0 not between 2 and 3',
+      '1.5e0 not between 2e0 and 3e0',
+      "x'0A00015A' not between x'0A000130' and x'0A0001B0'",
+      "x'0A00015A' not between x'0A0001A0' and x'0A0001B0'",
+    ])('does back and forth with %s', sql => {
+      backAndForth(sql, SqlComparison);
     });
-  });
 
-  it('Simple compare 1', () => {
-    const sql = `A > B`;
+    it('simple compare', () => {
+      const sql = `A > B`;
 
-    backAndForth(sql);
+      backAndForth(sql);
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "decorator": undefined,
         "keywords": Object {
@@ -160,14 +135,14 @@ describe('SqlComparison', () => {
         "type": "comparison",
       }
     `);
-  });
+    });
 
-  it('Simple compare 2', () => {
-    const sql = `"language"  =   'xxx'`;
+    it('simple compare with spacing and quotes', () => {
+      const sql = `"language"  =   'xxx'`;
 
-    backAndForth(sql);
+      backAndForth(sql);
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "decorator": undefined,
         "keywords": Object {
@@ -201,14 +176,14 @@ describe('SqlComparison', () => {
         "type": "comparison",
       }
     `);
-  });
+    });
 
-  it('works with = ANY', () => {
-    const sql = `X = ANY (SELECT page FROM wikipedia GROUP BY 1 ORDER BY COUNT(*) DESC LIMIT 5)`;
+    it('works with = ANY', () => {
+      const sql = `X = ANY (SELECT page FROM wikipedia GROUP BY 1 ORDER BY COUNT(*) DESC LIMIT 5)`;
 
-    backAndForth(sql);
+      backAndForth(sql);
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "decorator": "ANY",
         "keywords": Object {
@@ -411,14 +386,14 @@ describe('SqlComparison', () => {
         "type": "comparison",
       }
     `);
-  });
+    });
 
-  it('works with IS', () => {
-    const sql = `X  IS   NULL`;
+    it('works with IS', () => {
+      const sql = `X  IS   NULL`;
 
-    backAndForth(sql);
+      backAndForth(sql);
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "decorator": undefined,
         "keywords": Object {
@@ -452,14 +427,14 @@ describe('SqlComparison', () => {
         "type": "comparison",
       }
     `);
-  });
+    });
 
-  it('works with IS NOT', () => {
-    const sql = `X  IS   NOT    NULL`;
+    it('works with IS NOT', () => {
+      const sql = `X  IS   NOT    NULL`;
 
-    backAndForth(sql);
+      backAndForth(sql);
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "decorator": undefined,
         "keywords": Object {
@@ -493,14 +468,14 @@ describe('SqlComparison', () => {
         "type": "comparison",
       }
     `);
-  });
+    });
 
-  it('works with IN (value)', () => {
-    const sql = `X IN (1)`;
+    it('works with IN (value)', () => {
+      const sql = `X IN (1)`;
 
-    backAndForth(sql);
+      backAndForth(sql);
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "decorator": undefined,
         "keywords": Object {
@@ -550,14 +525,14 @@ describe('SqlComparison', () => {
         "type": "comparison",
       }
     `);
-  });
+    });
 
-  it('works with IN (values)', () => {
-    const sql = `X IN (1, 2, 4 - 1)`;
+    it('works with IN (values)', () => {
+      const sql = `X IN (1, 2, 4 - 1)`;
 
-    backAndForth(sql);
+      backAndForth(sql);
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "decorator": undefined,
         "keywords": Object {
@@ -660,14 +635,14 @@ describe('SqlComparison', () => {
         "type": "comparison",
       }
     `);
-  });
+    });
 
-  it('works with NOT IN (values)', () => {
-    const sql = `X NOT IN (1, 2, 4 - 1)`;
+    it('works with NOT IN (values)', () => {
+      const sql = `X NOT IN (1, 2, 4 - 1)`;
 
-    backAndForth(sql);
+      backAndForth(sql);
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "decorator": undefined,
         "keywords": Object {
@@ -770,14 +745,14 @@ describe('SqlComparison', () => {
         "type": "comparison",
       }
     `);
-  });
+    });
 
-  it('works with IN (subquery)', () => {
-    const sql = `X IN ( (SELECT val FROM tbl LIMIT 1  ))`;
+    it('works with IN (subquery)', () => {
+      const sql = `X IN ( (SELECT val FROM tbl LIMIT 1  ))`;
 
-    backAndForth(sql);
+      backAndForth(sql);
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "decorator": undefined,
         "keywords": Object {
@@ -899,14 +874,14 @@ describe('SqlComparison', () => {
         "type": "comparison",
       }
     `);
-  });
+    });
 
-  it('works with NOT IN (subquery)', () => {
-    const sql = `X NOT IN (SELECT val FROM tbl LIMIT 1)`;
+    it('works with NOT IN (subquery)', () => {
+      const sql = `X NOT IN (SELECT val FROM tbl LIMIT 1)`;
 
-    backAndForth(sql);
+      backAndForth(sql);
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "decorator": undefined,
         "keywords": Object {
@@ -1024,14 +999,14 @@ describe('SqlComparison', () => {
         "type": "comparison",
       }
     `);
-  });
+    });
 
-  it('works with IN nested record', () => {
-    const sql = `(browser, country) IN (('Chr' || 'ome', 'United States'), ('Firefox', 'Israel'))`;
+    it('works with IN nested record', () => {
+      const sql = `(browser, country) IN (('Chr' || 'ome', 'United States'), ('Firefox', 'Israel'))`;
 
-    backAndForth(sql);
+      backAndForth(sql);
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "decorator": undefined,
         "keywords": Object {
@@ -1214,14 +1189,14 @@ describe('SqlComparison', () => {
         "type": "comparison",
       }
     `);
-  });
+    });
 
-  it('works with BETWEEN', () => {
-    const sql = `X BETWEEN Y AND Z`;
+    it('works with BETWEEN', () => {
+      const sql = `X BETWEEN Y AND Z`;
 
-    backAndForth(sql);
+      backAndForth(sql);
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "decorator": undefined,
         "keywords": Object {
@@ -1281,14 +1256,14 @@ describe('SqlComparison', () => {
         "type": "comparison",
       }
     `);
-  });
+    });
 
-  it('works with NOT BETWEEN', () => {
-    const sql = `X NOT BETWEEN SYMMETRIC Y AND Z`;
+    it('works with NOT BETWEEN', () => {
+      const sql = `X NOT BETWEEN SYMMETRIC Y AND Z`;
 
-    backAndForth(sql);
+      backAndForth(sql);
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "decorator": undefined,
         "keywords": Object {
@@ -1350,14 +1325,14 @@ describe('SqlComparison', () => {
         "type": "comparison",
       }
     `);
-  });
+    });
 
-  it('works with LIKE', () => {
-    const sql = `X LIKE '%A%'`;
+    it('works with LIKE', () => {
+      const sql = `X LIKE '%A%'`;
 
-    backAndForth(sql);
+      backAndForth(sql);
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "decorator": undefined,
         "keywords": Object {
@@ -1391,14 +1366,14 @@ describe('SqlComparison', () => {
         "type": "comparison",
       }
     `);
-  });
+    });
 
-  it('works with NOT LIKE', () => {
-    const sql = `X NOT LIKE '%A%'`;
+    it('works with NOT LIKE', () => {
+      const sql = `X NOT LIKE '%A%'`;
 
-    backAndForth(sql);
+      backAndForth(sql);
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "decorator": undefined,
         "keywords": Object {
@@ -1432,14 +1407,14 @@ describe('SqlComparison', () => {
         "type": "comparison",
       }
     `);
-  });
+    });
 
-  it('works with LIKE with complex match and ESCAPE', () => {
-    const sql = `X || Y NOT LIKE '%Je' || '%' ESCAPE '\\' || ''`;
+    it('works with LIKE with complex match and ESCAPE', () => {
+      const sql = `X || Y NOT LIKE '%Je' || '%' ESCAPE '\\' || ''`;
 
-    backAndForth(sql);
+      backAndForth(sql);
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "decorator": undefined,
         "keywords": Object {
@@ -1573,14 +1548,14 @@ describe('SqlComparison', () => {
         "type": "comparison",
       }
     `);
-  });
+    });
 
-  it('works with LIKE with escape', () => {
-    const sql = `X LIKE '%A%' ESCAPE '$'`;
+    it('works with LIKE with escape', () => {
+      const sql = `X LIKE '%A%' ESCAPE '$'`;
 
-    backAndForth(sql);
+      backAndForth(sql);
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "decorator": undefined,
         "keywords": Object {
@@ -1633,14 +1608,14 @@ describe('SqlComparison', () => {
         "type": "comparison",
       }
     `);
-  });
+    });
 
-  it('works with NOT LIKE with escape', () => {
-    const sql = `X NOT LIKE '%A%' ESCAPE '$'`;
+    it('works with NOT LIKE with escape', () => {
+      const sql = `X NOT LIKE '%A%' ESCAPE '$'`;
 
-    backAndForth(sql);
+      backAndForth(sql);
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlComparison {
         "decorator": undefined,
         "keywords": Object {
@@ -1693,15 +1668,15 @@ describe('SqlComparison', () => {
         "type": "comparison",
       }
     `);
-  });
+    });
 
-  describe('Extra tests', () => {
-    it('single expression with unquoted string', () => {
-      const sql = `A > B`;
+    describe('extra cases', () => {
+      it('single expression with unquoted string', () => {
+        const sql = `A > B`;
 
-      backAndForth(sql);
+        backAndForth(sql);
 
-      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
         SqlComparison {
           "decorator": undefined,
           "keywords": Object {
@@ -1738,14 +1713,14 @@ describe('SqlComparison', () => {
           "type": "comparison",
         }
       `);
-    });
+      });
 
-    it('single expression with single quoted string', () => {
-      const sql = `'A' > 'B'`;
+      it('single expression with single quoted string', () => {
+        const sql = `'A' > 'B'`;
 
-      backAndForth(sql);
+        backAndForth(sql);
 
-      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
         SqlComparison {
           "decorator": undefined,
           "keywords": Object {
@@ -1776,14 +1751,14 @@ describe('SqlComparison', () => {
           "type": "comparison",
         }
       `);
-    });
+      });
 
-    it('single expression with double quoted string', () => {
-      const sql = `"A" > "B"`;
+      it('single expression with double quoted string', () => {
+        const sql = `"A" > "B"`;
 
-      backAndForth(sql);
+        backAndForth(sql);
 
-      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
         SqlComparison {
           "decorator": undefined,
           "keywords": Object {
@@ -1820,14 +1795,14 @@ describe('SqlComparison', () => {
           "type": "comparison",
         }
       `);
-    });
+      });
 
-    it('single expression with numbers', () => {
-      const sql = `1 > 2`;
+      it('single expression with numbers', () => {
+        const sql = `1 > 2`;
 
-      backAndForth(sql);
+        backAndForth(sql);
 
-      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
         SqlComparison {
           "decorator": undefined,
           "keywords": Object {
@@ -1858,14 +1833,14 @@ describe('SqlComparison', () => {
           "type": "comparison",
         }
       `);
-    });
+      });
 
-    it('brackets', () => {
-      const sql = `(1 > 2)`;
+      it('brackets', () => {
+        const sql = `(1 > 2)`;
 
-      backAndForth(sql);
+        backAndForth(sql);
 
-      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
         SqlComparison {
           "decorator": undefined,
           "keywords": Object {
@@ -1901,14 +1876,14 @@ describe('SqlComparison', () => {
           "type": "comparison",
         }
       `);
-    });
+      });
 
-    it('Between expression', () => {
-      const sql = `X BETWEEN Y AND Z`;
+      it('between expression', () => {
+        const sql = `X BETWEEN Y AND Z`;
 
-      backAndForth(sql);
+        backAndForth(sql);
 
-      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
         SqlComparison {
           "decorator": undefined,
           "keywords": Object {
@@ -1968,14 +1943,14 @@ describe('SqlComparison', () => {
           "type": "comparison",
         }
       `);
-    });
+      });
 
-    it('Mixed Between expression', () => {
-      const sql = `A OR B AND X BETWEEN Y AND Z`;
+      it('mixed between expression', () => {
+        const sql = `A OR B AND X BETWEEN Y AND Z`;
 
-      backAndForth(sql);
+        backAndForth(sql);
 
-      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
         SqlMulti {
           "args": SeparatedArray {
             "separators": Array [
@@ -2093,14 +2068,14 @@ describe('SqlComparison', () => {
           "type": "multi",
         }
       `);
-    });
+      });
 
-    it('Complex Between expression', () => {
-      const sql = `X BETWEEN 1+2 AND 3+4`;
+      it('complex between expression', () => {
+        const sql = `X BETWEEN 1+2 AND 3+4`;
 
-      backAndForth(sql);
+        backAndForth(sql);
 
-      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
         SqlComparison {
           "decorator": undefined,
           "keywords": Object {
@@ -2206,6 +2181,33 @@ describe('SqlComparison', () => {
           "type": "comparison",
         }
       `);
+      });
+    });
+  });
+
+  describe('.in / .notIn', () => {
+    it('works with IN', () => {
+      expect(SqlComparison.in(SqlColumn.create('x'), [1]).toString()).toEqual('"x" IN (1)');
+      expect(SqlComparison.in(SqlColumn.create('x'), [1, 2, 3]).toString()).toEqual(
+        '"x" IN (1, 2, 3)',
+      );
+      expect(SqlComparison.notIn(SqlColumn.create('x'), [1, 2, 3]).toString()).toEqual(
+        '"x" NOT IN (1, 2, 3)',
+      );
+    });
+  });
+
+  describe('#negate', () => {
+    it('works', () => {
+      expect(String(SqlExpression.parse('X = 1').negate())).toEqual('X <> 1');
+      expect(String(SqlExpression.parse('X is NULL').negate())).toEqual('X IS NOT NULL');
+      expect(String(SqlExpression.parse('X is not NULL').negate())).toEqual('X IS NULL');
+      expect(String(SqlExpression.parse(`X in ('a', 'b')`).negate())).toEqual(
+        `X NOT IN ('a', 'b')`,
+      );
+      expect(String(SqlExpression.parse(`X not in ('a', 'b')`).negate())).toEqual(
+        `X IN ('a', 'b')`,
+      );
     });
   });
 

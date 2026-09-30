@@ -18,7 +18,7 @@ import { SqlBase } from '../sql-base';
 
 import { SqlQuery } from './sql-query';
 
-describe('Uber query', () => {
+describe('SqlQuery (uber query)', () => {
   const sql = sane`
     SET sqlTimeZone = 'America/Los_Angeles';
     WITH temp_t1 AS (SELECT * FROM blah), temp_t2 AS (SELECT * FROM blah2)
@@ -77,69 +77,83 @@ describe('Uber query', () => {
     throw e;
   }
 
-  it('works back and forth', () => {
-    backAndForth(sql);
+  describe('parses', () => {
+    it('works back and forth', () => {
+      backAndForth(sql);
+    });
   });
 
-  it('walk it all', () => {
-    expect(query.walkPostorder(t => SqlBase.fromValue(t.valueOf())).toString()).toEqual(sql);
+  describe('#changeLimitValue', () => {
+    it('throws for invalid limit values', () => {
+      expect(() => query.changeLimitValue(1)).not.toThrow();
+      expect(() => query.changeLimitValue(0)).not.toThrow();
+      expect(() => query.changeLimitValue(-1)).toThrow('-1 is not a valid limit value');
+      expect(() => query.changeLimitValue(-Infinity)).toThrow(
+        '-Infinity is not a valid limit value',
+      );
+    });
   });
 
-  it('resetOwnKeywords', () => {
-    expect(query.walkPostorder(t => t.resetOwnKeywords()).toString()).toEqual(sql);
+  describe('#resetOwnKeywords', () => {
+    it('leaves the query unchanged when applied to every node', () => {
+      expect(query.walkPostorder(t => t.resetOwnKeywords()).toString()).toEqual(sql);
+    });
   });
 
-  it('.getUsedColumns', () => {
-    expect(query.getUsedColumnNames()).toEqual([
-      'Col1',
-      'blah',
-      'col',
-      'col1',
-      'col10',
-      'col11',
-      'col2',
-      'col3',
-      'col4',
-      'col5',
-      'col6',
-      'col7',
-      'col8',
-      'col9',
-      'colA',
-      'colB',
-      'constructor',
-      'time',
-    ]);
+  describe('#walkPostorder', () => {
+    it('rebuilds the query from the values of every node', () => {
+      expect(query.walkPostorder(t => SqlBase.fromValue(t.valueOf())).toString()).toEqual(sql);
+    });
   });
 
-  it('has things', () => {
-    expect(query.hasStarInSelect()).toEqual(false);
-    expect(query.hasFrom()).toEqual(true);
-    expect(query.hasJoin()).toEqual(true);
-    expect(query.hasWhere()).toEqual(true);
-    expect(query.hasGroupBy()).toEqual(true);
-    expect(query.hasHaving()).toEqual(true);
-    expect(query.hasOrderBy()).toEqual(true);
-    expect(query.hasLimit()).toEqual(true);
-    expect(query.hasOffset()).toEqual(true);
+  describe('#getUsedColumnNames', () => {
+    it('lists every used column', () => {
+      expect(query.getUsedColumnNames()).toEqual([
+        'Col1',
+        'blah',
+        'col',
+        'col1',
+        'col10',
+        'col11',
+        'col2',
+        'col3',
+        'col4',
+        'col5',
+        'col6',
+        'col7',
+        'col8',
+        'col9',
+        'colA',
+        'colB',
+        'constructor',
+        'time',
+      ]);
+    });
   });
 
-  it('remove one thing', () => {
-    expect(query.changeFromExpressions(undefined).hasFrom()).toEqual(false);
-    // expect(query. ? .hasJoin()).toEqual(false);
-    expect(query.changeWhereExpression(undefined).hasWhere()).toEqual(false);
-    expect(query.changeGroupByExpressions(undefined).hasGroupBy()).toEqual(false);
-    expect(query.changeHavingExpression(undefined).hasHaving()).toEqual(false);
-    expect(query.changeOrderByExpressions(undefined).hasOrderBy()).toEqual(false);
-    expect(query.changeLimitValue(undefined).hasLimit()).toEqual(false);
-    expect(query.changeLimitValue(Infinity).hasLimit()).toEqual(false);
-    expect(query.changeOffsetValue(undefined).hasOffset()).toEqual(false);
-  });
+  describe('clauses', () => {
+    it('has every clause', () => {
+      expect(query.hasStarInSelect()).toEqual(false);
+      expect(query.hasFrom()).toEqual(true);
+      expect(query.hasJoin()).toEqual(true);
+      expect(query.hasWhere()).toEqual(true);
+      expect(query.hasGroupBy()).toEqual(true);
+      expect(query.hasHaving()).toEqual(true);
+      expect(query.hasOrderBy()).toEqual(true);
+      expect(query.hasLimit()).toEqual(true);
+      expect(query.hasOffset()).toEqual(true);
+    });
 
-  it('throws for invalid limit values', () => {
-    expect(() => query.changeLimitValue(1)).not.toThrow();
-    expect(() => query.changeLimitValue(0)).not.toThrow();
-    expect(() => query.changeLimitValue(-1)).toThrow('-1 is not a valid limit value');
-    expect(() => query.changeLimitValue(-Infinity)).toThrow('-Infinity is not a valid limit value');
+    it('removes each clause', () => {
+      expect(query.changeFromExpressions(undefined).hasFrom()).toEqual(false);
+      // expect(query. ? .hasJoin()).toEqual(false);
+      expect(query.changeWhereExpression(undefined).hasWhere()).toEqual(false);
+      expect(query.changeGroupByExpressions(undefined).hasGroupBy()).toEqual(false);
+      expect(query.changeHavingExpression(undefined).hasHaving()).toEqual(false);
+      expect(query.changeOrderByExpressions(undefined).hasOrderBy()).toEqual(false);
+      expect(query.changeLimitValue(undefined).hasLimit()).toEqual(false);
+      expect(query.changeLimitValue(Infinity).hasLimit()).toEqual(false);
+      expect(query.changeOffsetValue(undefined).hasOffset()).toEqual(false);
+    });
   });
 });

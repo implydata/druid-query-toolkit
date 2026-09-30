@@ -892,8 +892,9 @@ export class SqlQuery extends SqlQueryBase {
   public removeOrderByForSelectIndex(selectIndex: number): this {
     if (!this.orderByClause || !this.isValidSelectIndex(selectIndex)) return this;
     return this.changeOrderByExpressions(
-      this.orderByClause.expressions.filter(orderByExpression =>
-        this.expressionRefersToSelectIndex(orderByExpression.expression, selectIndex, true),
+      this.orderByClause.expressions.filter(
+        orderByExpression =>
+          !this.expressionRefersToSelectIndex(orderByExpression.expression, selectIndex, true),
       ),
     );
   }

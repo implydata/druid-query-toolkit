@@ -15,27 +15,31 @@
 import { SqlColumn, SqlOrderByExpression } from '../..';
 
 describe('SqlOrderByExpression', () => {
-  it('#getEffectiveDirection', () => {
-    expect(SqlOrderByExpression.create(SqlColumn.create('x')).getEffectiveDirection()).toEqual(
-      'ASC',
-    );
+  describe('#getEffectiveDirection', () => {
+    it('returns the effective direction', () => {
+      expect(SqlOrderByExpression.create(SqlColumn.create('x')).getEffectiveDirection()).toEqual(
+        'ASC',
+      );
 
-    expect(
-      SqlOrderByExpression.create(SqlColumn.create('x'), 'ASC').getEffectiveDirection(),
-    ).toEqual('ASC');
+      expect(
+        SqlOrderByExpression.create(SqlColumn.create('x'), 'ASC').getEffectiveDirection(),
+      ).toEqual('ASC');
 
-    expect(
-      SqlOrderByExpression.create(SqlColumn.create('x'), 'DESC').getEffectiveDirection(),
-    ).toEqual('DESC');
+      expect(
+        SqlOrderByExpression.create(SqlColumn.create('x'), 'DESC').getEffectiveDirection(),
+      ).toEqual('DESC');
+    });
   });
 
-  it('#reverseDirection', () => {
-    const x = SqlColumn.optionalQuotes('x');
+  describe('#reverseDirection', () => {
+    it('flips the direction', () => {
+      const x = SqlColumn.optionalQuotes('x');
 
-    expect(String(SqlOrderByExpression.create(x, 'DESC').reverseDirection())).toEqual('x ASC');
+      expect(String(SqlOrderByExpression.create(x, 'DESC').reverseDirection())).toEqual('x ASC');
 
-    expect(String(SqlOrderByExpression.create(x, 'ASC').reverseDirection())).toEqual('x DESC');
+      expect(String(SqlOrderByExpression.create(x, 'ASC').reverseDirection())).toEqual('x DESC');
 
-    expect(String(SqlOrderByExpression.create(x).reverseDirection())).toEqual('x DESC');
+      expect(String(SqlOrderByExpression.create(x).reverseDirection())).toEqual('x DESC');
+    });
   });
 });

@@ -16,12 +16,13 @@ import { SqlExpression, SqlPlaceholder } from '../..';
 import { backAndForth } from '../../test-utils';
 
 describe('SqlPlaceholder', () => {
-  it('works', () => {
-    const sql = '?';
+  describe('parses', () => {
+    it('works', () => {
+      const sql = '?';
 
-    backAndForth(sql);
+      backAndForth(sql);
 
-    expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
       SqlPlaceholder {
         "customPlaceholder": undefined,
         "keywords": Object {},
@@ -30,9 +31,12 @@ describe('SqlPlaceholder', () => {
         "type": "placeholder",
       }
     `);
+    });
   });
 
-  it('custom placeholder', () => {
-    expect(String(SqlPlaceholder.PLACEHOLDER.changeCustomPlaceholder('[lol]'))).toEqual('[lol]');
+  describe('#changeCustomPlaceholder', () => {
+    it('sets a custom placeholder', () => {
+      expect(String(SqlPlaceholder.PLACEHOLDER.changeCustomPlaceholder('[lol]'))).toEqual('[lol]');
+    });
   });
 });

@@ -15,323 +15,238 @@
 import { backAndForth } from '../../test-utils';
 import { sane } from '../../utils';
 
-describe('Druid Query Tests', () => {
-  it('parses the default data sources query', () => {
-    const sql = sane`
-      SELECT
-        datasource,
-        COUNT(*) AS num_segments,
-        SUM(is_available) AS num_available_segments,
-        SUM("size") AS size,
-        SUM("num_rows") AS num_rows
-      FROM sys.segments
-      GROUP BY 1
-    `;
+describe('SqlQuery (default queries)', () => {
+  describe('parses', () => {
+    it('parses the default data sources query', () => {
+      const sql = sane`
+        SELECT
+          datasource,
+          COUNT(*) AS num_segments,
+          SUM(is_available) AS num_available_segments,
+          SUM("size") AS size,
+          SUM("num_rows") AS num_rows
+        FROM sys.segments
+        GROUP BY 1
+      `;
 
-    backAndForth(sql);
-  });
+      backAndForth(sql);
+    });
 
-  it('parses segments query', () => {
-    const sql = sane`
-      SELECT "segment_id", "datasource", "start", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed"
-      FROM sys.segments
-      ORDER BY "start" DESC
-      LIMIT 50
-    `;
+    it('parses the segments query', () => {
+      const sql = sane`
+        SELECT "segment_id", "datasource", "start", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed"
+        FROM sys.segments
+        ORDER BY "start" DESC
+        LIMIT 50
+      `;
 
-    backAndForth(sql);
-  });
+      backAndForth(sql);
+    });
 
-  it('parses task query', () => {
-    const sql = sane`
-      SELECT
-        "task_id", "type", "datasource", "created_time", "location", "duration", "error_msg",
-        CASE WHEN "status" = 'RUNNING' THEN "runner_status" ELSE "status" END AS "status",
-        (
-          CASE WHEN "status" = 'RUNNING' THEN
-           (CASE "runner_status" WHEN 'RUNNING' THEN 4 WHEN 'PENDING' THEN 3 ELSE 2 END)
-          ELSE 1
-          END
-        ) AS "rank"
-      FROM sys.tasks
-      ORDER BY "rank" DESC, "created_time" DESC
-    `;
+    it('parses the tasks query', () => {
+      const sql = sane`
+        SELECT
+          "task_id", "type", "datasource", "created_time", "location", "duration", "error_msg",
+          CASE WHEN "status" = 'RUNNING' THEN "runner_status" ELSE "status" END AS "status",
+          (
+            CASE WHEN "status" = 'RUNNING' THEN
+             (CASE "runner_status" WHEN 'RUNNING' THEN 4 WHEN 'PENDING' THEN 3 ELSE 2 END)
+            ELSE 1
+            END
+          ) AS "rank"
+        FROM sys.tasks
+        ORDER BY "rank" DESC, "created_time" DESC
+      `;
 
-    backAndForth(sql);
-  });
+      backAndForth(sql);
+    });
 
-  it('parses servers query', () => {
-    const sql = sane`
-      SELECT
-        "server", "server_type", "tier", "host", "plaintext_port", "tls_port", "curr_size", "max_size",
-        (
-          CASE "server_type"
-          WHEN 'coordinator' THEN 7
-          WHEN 'overlord' THEN 6
-          WHEN 'router' THEN 5
-          WHEN 'broker' THEN 4
-          WHEN 'historical' THEN 3
-          WHEN 'middle_manager' THEN 2
-          WHEN 'peon' THEN 1
-          ELSE 0
-          END
-        ) AS "rank"
-      FROM sys.servers
-      ORDER BY "rank" DESC, "server" DESC
-    `;
+    it('parses the servers query', () => {
+      const sql = sane`
+        SELECT
+          "server", "server_type", "tier", "host", "plaintext_port", "tls_port", "curr_size", "max_size",
+          (
+            CASE "server_type"
+            WHEN 'coordinator' THEN 7
+            WHEN 'overlord' THEN 6
+            WHEN 'router' THEN 5
+            WHEN 'broker' THEN 4
+            WHEN 'historical' THEN 3
+            WHEN 'middle_manager' THEN 2
+            WHEN 'peon' THEN 1
+            ELSE 0
+            END
+          ) AS "rank"
+        FROM sys.servers
+        ORDER BY "rank" DESC, "server" DESC
+      `;
 
-    backAndForth(sql);
-  });
+      backAndForth(sql);
+    });
 
-  it('parses the default data sources query to string', () => {
-    const sql = sane`
-      SELECT
-        datasource,
-        COUNT(*) FILTER (WHERE (is_published = 1 AND is_overshadowed = 0) OR is_realtime = 1) AS num_segments,
-        COUNT(*) FILTER (WHERE is_available = 1 AND ((is_published = 1 AND is_overshadowed = 0) OR is_realtime = 1)) AS num_available_segments,
-        COUNT(*) FILTER (WHERE is_published = 1 AND is_overshadowed = 0 AND is_available = 0) AS num_segments_to_load,
-        COUNT(*) FILTER (WHERE is_available = 1 AND NOT ((is_published = 1 AND is_overshadowed = 0) OR is_realtime = 1)) AS num_segments_to_drop,
-        SUM("size") FILTER (WHERE (is_published = 1 AND is_overshadowed = 0) OR is_realtime = 1) AS size,
-        SUM("size" * "num_replicas") FILTER (WHERE (is_published = 1 AND is_overshadowed = 0) OR is_realtime = 1) AS replicated_size,
-        SUM("num_rows") FILTER (WHERE (is_published = 1 AND is_overshadowed = 0) OR is_realtime = 1) AS num_rows
-      FROM sys.segments
-      GROUP BY 1
-    `;
+    it('parses the default data sources query with filtered aggregates', () => {
+      const sql = sane`
+        SELECT
+          datasource,
+          COUNT(*) FILTER (WHERE (is_published = 1 AND is_overshadowed = 0) OR is_realtime = 1) AS num_segments,
+          COUNT(*) FILTER (WHERE is_available = 1 AND ((is_published = 1 AND is_overshadowed = 0) OR is_realtime = 1)) AS num_available_segments,
+          COUNT(*) FILTER (WHERE is_published = 1 AND is_overshadowed = 0 AND is_available = 0) AS num_segments_to_load,
+          COUNT(*) FILTER (WHERE is_available = 1 AND NOT ((is_published = 1 AND is_overshadowed = 0) OR is_realtime = 1)) AS num_segments_to_drop,
+          SUM("size") FILTER (WHERE (is_published = 1 AND is_overshadowed = 0) OR is_realtime = 1) AS size,
+          SUM("size" * "num_replicas") FILTER (WHERE (is_published = 1 AND is_overshadowed = 0) OR is_realtime = 1) AS replicated_size,
+          SUM("num_rows") FILTER (WHERE (is_published = 1 AND is_overshadowed = 0) OR is_realtime = 1) AS num_rows
+        FROM sys.segments
+        GROUP BY 1
+      `;
 
-    backAndForth(sql);
-  });
+      backAndForth(sql);
+    });
 
-  it('parses segments query', () => {
-    const sql = sane`
-      SELECT "segment_id", "datasource", "start", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed"
-      FROM sys.segments
-      ORDER BY "start" DESC
-      LIMIT 50
-    `;
+    it('parses the servers query with columns in brackets', () => {
+      const sql = sane`
+        SELECT
+          ("server"), "server_type", "tier", "host", "plaintext_port", "tls_port", "curr_size", "max_size",
+          (
+            CASE "server_type"
+            WHEN 'coordinator' THEN 7
+            WHEN 'overlord' THEN 6
+            WHEN 'router' THEN 5
+            WHEN 'broker' THEN 4
+            WHEN 'historical' THEN 3
+            WHEN 'middle_manager' THEN 2
+            WHEN 'peon' THEN 1
+            ELSE 0
+            END
+          ) AS "rank"
+        FROM sys.servers
+        ORDER BY "rank" DESC, "server" DESC
+      `;
 
-    backAndForth(sql);
-  });
+      backAndForth(sql);
+    });
 
-  it('parses task query to string', () => {
-    const sql = sane`
-      SELECT
-        "task_id", "type", "datasource", "created_time", "location", "duration", "error_msg",
-        CASE WHEN "status" = 'RUNNING' THEN "runner_status" ELSE "status" END AS "status",
-        (
-          CASE WHEN "status" = 'RUNNING' THEN
-           (CASE "runner_status" WHEN 'RUNNING' THEN 4 WHEN 'PENDING' THEN 3 ELSE 2 END)
-          ELSE 1
-          END
-        ) AS "rank"
-      FROM sys.tasks
-      ORDER BY "rank" DESC, "created_time" DESC
-    `;
+    it('parses the segments query with an interval concat', () => {
+      const sql = sane`
+        SELECT
+          ("start" || '/' || "end") AS "interval",
+          "segment_id", "datasource", "start", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed"
+        FROM sys.segments
+        WHERE
+         ("start" || '/' || "end") IN (SELECT "start" || '/' || "end" FROM sys.segments GROUP BY 1 LIMIT 25)
+        ORDER BY "start" DESC
+        LIMIT 25000
+      `;
 
-    backAndForth(sql);
-  });
+      backAndForth(sql);
+    });
 
-  it('parses servers query to string', () => {
-    const sql = sane`
-      SELECT
-        "server", "server_type", "tier", "host", "plaintext_port", "tls_port", "curr_size", "max_size",
-        (
-          CASE "server_type"
-          WHEN 'coordinator' THEN 7
-          WHEN 'overlord' THEN 6
-          WHEN 'router' THEN 5
-          WHEN 'broker' THEN 4
-          WHEN 'historical' THEN 3
-          WHEN 'middle_manager' THEN 2
-          WHEN 'peon' THEN 1
-          ELSE 0
-          END
-        ) AS "rank"
-      FROM sys.servers
-      ORDER BY "rank" DESC, "server" DESC
-    `;
+    it('parses a concat in the select list', () => {
+      const sql = sane`
+        SELECT "start" || ' / ' || "end" FROM sys.segments GROUP BY 1,2
+      `;
 
-    backAndForth(sql);
-  });
+      backAndForth(sql);
+    });
 
-  it('parses servers query with columns in brackets to string', () => {
-    const sql = sane`
-      SELECT
-        ("server"), "server_type", "tier", "host", "plaintext_port", "tls_port", "curr_size", "max_size",
-        (
-          CASE "server_type"
-          WHEN 'coordinator' THEN 7
-          WHEN 'overlord' THEN 6
-          WHEN 'router' THEN 5
-          WHEN 'broker' THEN 4
-          WHEN 'historical' THEN 3
-          WHEN 'middle_manager' THEN 2
-          WHEN 'peon' THEN 1
-          ELSE 0
-          END
-        ) AS "rank"
-      FROM sys.servers
-      ORDER BY "rank" DESC, "server" DESC
-    `;
+    it('parses extra spaces after SELECT', () => {
+      const sql = sane`
+        SELECT  "comments",
+          COUNT(*) AS "Count", SUM("comments") AS "sum_comments"
+        FROM "github"
+        WHERE "__time" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY AND "commits" > 100
+        GROUP BY 1, 2
+        ORDER BY "Time" ASC
+      `;
 
-    backAndForth(sql);
-  });
+      backAndForth(sql);
+    });
 
-  it('parses segments query with concat', () => {
-    const sql = sane`
-      SELECT
-        ("start" || '/' || "end") AS "interval",
-        "segment_id", "datasource", "start", "end", "size", "version", "partition_num", "num_replicas", "num_rows", "is_published", "is_available", "is_realtime", "is_overshadowed"
-      FROM sys.segments
-      WHERE
-       ("start" || '/' || "end") IN (SELECT "start" || '/' || "end" FROM sys.segments GROUP BY 1 LIMIT 25)
-      ORDER BY "start" DESC
-      LIMIT 25000
-    `;
+    it('parses a WITH clause with a column list', () => {
+      const sql = sane`
+        WITH temporaryTable (averageValue) as
+        (SELECT avg(Attr1)
+        FROM Tbl)
+        SELECT Attr1
+        FROM Tbl
+        WHERE Tbl.Attr1 > temporaryTable.averageValue
+      `;
 
-    backAndForth(sql);
-  });
+      backAndForth(sql);
+    });
 
-  it('parses segments query with concat', () => {
-    const sql = sane`
-      SELECT "start" || ' / ' || "end" FROM sys.segments GROUP BY 1,2
-    `;
+    it('parses multiple WITH clauses', () => {
+      const sql = sane`
+        WITH totalSalary(Airline, total) as
+        (SELECT Airline, sum(Salary)
+        FROM Pilot
+        GROUP BY Airline),
+        airlineAverage(avgSalary) as
+        (SELECT avg(total)
+        FROM totalSalary )
+        SELECT Airline
+        FROM totalSalary
+        WHERE totalSalary.total > airlineAverage.avgSalary
+      `;
 
-    backAndForth(sql);
-  });
+      backAndForth(sql);
+    });
 
-  it('parses the default data sources query to string with spaces', () => {
-    const sql = sane`
-      SELECT
-        datasource,
-        COUNT(*) FILTER (WHERE (is_published = 1 AND is_overshadowed = 0) OR is_realtime = 1) AS num_segments,
-        COUNT(*) FILTER (WHERE is_available = 1 AND ((is_published = 1 AND is_overshadowed = 0) OR is_realtime = 1)) AS num_available_segments,
-        COUNT(*) FILTER (WHERE is_published = 1 AND is_overshadowed = 0 AND is_available = 0) AS num_segments_to_load,
-        COUNT(*) FILTER (WHERE is_available = 1 AND NOT ((is_published = 1 AND is_overshadowed = 0) OR is_realtime = 1)) AS num_segments_to_drop,
-        SUM("size") FILTER (WHERE (is_published = 1 AND is_overshadowed = 0) OR is_realtime = 1) AS size,
-        SUM("size" * "num_replicas") FILTER (WHERE (is_published = 1 AND is_overshadowed = 0) OR is_realtime = 1) AS replicated_size,
-        SUM("num_rows") FILTER (WHERE (is_published = 1 AND is_overshadowed = 0) OR is_realtime = 1) AS num_rows
-      FROM sys.segments
-      GROUP BY 1
-    `;
+    it('parses TRIM with BOTH', () => {
+      const sql = sane`
+        SELECT
+          "language",
+          TRIM(BOTH 'A' FROM "language") AS "Count"
+        FROM "github"
+        WHERE "__time" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY AND "language" != 'TypeScript'
+        GROUP BY 1
+        HAVING "Count" != 37392
+        ORDER BY "Count" DESC
+      `;
 
-    backAndForth(sql);
-  });
+      backAndForth(sql);
+    });
 
-  it('parses the default data sources query to string with spaces', () => {
-    const sql = sane`
-      SELECT  "comments",
-        COUNT(*) AS "Count", SUM("comments") AS "sum_comments"
-      FROM "github"
-      WHERE "__time" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY AND "commits" > 100
-      GROUP BY 1, 2
-      ORDER BY "Time" ASC
-    `;
+    it('parses TRIM with LEADING', () => {
+      const sql = sane`
+        SELECT
+          "language",
+          TRIM(LEADING 'A' FROM "language") AS "Count", COUNT(DISTINCT "language") AS "dist_language", COUNT(*) FILTER (WHERE "language"= 'xxx') AS "language_filtered_count"
+        FROM "github"
+        WHERE "__time" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY AND "language" != 'TypeScript'
+        GROUP BY 1
+        HAVING "Count" != 37392
+        ORDER BY "Count" DESC
+      `;
 
-    backAndForth(sql);
-  });
+      backAndForth(sql);
+    });
 
-  it('test WITH clause 1', () => {
-    const sql = sane`
-      WITH temporaryTable (averageValue) as
-      (SELECT avg(Attr1)
-      FROM Tbl)
-      SELECT Attr1
-      FROM Tbl
-      WHERE Tbl.Attr1 > temporaryTable.averageValue
-    `;
+    it('parses TRIM with TRAILING', () => {
+      const sql = sane`
+        SELECT
+          "language",
+          TRIM(TRAILING 'A' FROM "language") AS "Count", COUNT(DISTINCT "language") AS "dist_language", COUNT(*) FILTER (WHERE "language"= 'xxx') AS "language_filtered_count"
+        FROM "github"
+        WHERE "__time" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY AND "language" != 'TypeScript'
+        GROUP BY 1
+        HAVING "Count" != 37392
+        ORDER BY "Count" DESC
+      `;
 
-    backAndForth(sql);
-  });
+      backAndForth(sql);
+    });
 
-  it('test WITH clause 2', () => {
-    const sql = sane`
-      WITH totalSalary(Airline, total) as
-      (SELECT Airline, sum(Salary)
-      FROM Pilot
-      GROUP BY Airline),
-      airlineAverage(avgSalary) as
-      (SELECT avg(total)
-      FROM totalSalary )
-      SELECT Airline
-      FROM totalSalary
-      WHERE totalSalary.total > airlineAverage.avgSalary
-    `;
+    it('parses IS NOT NULL in a WHERE clause', () => {
+      const sql = sane`
+        SELECT
+          SUM("count") AS "TotalEdits",
+          SUM("added") AS "TotalAdded"
+        FROM "wikipedia"
+        WHERE REGEXP_EXTRACT("cityName", 'San') IS NOT NULL AND REGEXP_EXTRACT("cityName", 'San') <> ''
+        GROUP BY ''
+      `;
 
-    backAndForth(sql);
-  });
-
-  it('test WITH clause 3', () => {
-    const sql = sane`
-      WITH totalSalary(Airline, total) as
-      (SELECT Airline, sum(Salary)
-      FROM Pilot
-      GROUP BY Airline),
-      airlineAverage(avgSalary) as
-      (SELECT avg(total)
-      FROM totalSalary )
-      SELECT Airline
-      FROM totalSalary
-      WHERE totalSalary.total > airlineAverage.avgSalary
-    `;
-
-    backAndForth(sql);
-  });
-
-  it('Test TRIM with BOTH', () => {
-    const sql = sane`
-      SELECT
-        "language",
-        TRIM(BOTH 'A' FROM "language") AS "Count"
-      FROM "github"
-      WHERE "__time" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY AND "language" != 'TypeScript'
-      GROUP BY 1
-      HAVING "Count" != 37392
-      ORDER BY "Count" DESC
-    `;
-
-    backAndForth(sql);
-  });
-
-  it('Test TRIM with LEADING', () => {
-    const sql = sane`
-      SELECT
-        "language",
-        TRIM(LEADING 'A' FROM "language") AS "Count", COUNT(DISTINCT "language") AS "dist_language", COUNT(*) FILTER (WHERE "language"= 'xxx') AS "language_filtered_count"
-      FROM "github"
-      WHERE "__time" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY AND "language" != 'TypeScript'
-      GROUP BY 1
-      HAVING "Count" != 37392
-      ORDER BY "Count" DESC
-    `;
-
-    backAndForth(sql);
-  });
-
-  it('Test TRIM with TRAILING', () => {
-    const sql = sane`
-      SELECT
-        "language",
-        TRIM(TRAILING 'A' FROM "language") AS "Count", COUNT(DISTINCT "language") AS "dist_language", COUNT(*) FILTER (WHERE "language"= 'xxx') AS "language_filtered_count"
-      FROM "github"
-      WHERE "__time" >= CURRENT_TIMESTAMP - INTERVAL '1' DAY AND "language" != 'TypeScript'
-      GROUP BY 1
-      HAVING "Count" != 37392
-      ORDER BY "Count" DESC
-    `;
-
-    backAndForth(sql);
-  });
-
-  it('IS NOT NULL Where Clause', () => {
-    const sql = sane`
-      SELECT
-        SUM("count") AS "TotalEdits",
-        SUM("added") AS "TotalAdded"
-      FROM "wikipedia"
-      WHERE REGEXP_EXTRACT("cityName", 'San') IS NOT NULL AND REGEXP_EXTRACT("cityName", 'San') <> ''
-      GROUP BY ''
-    `;
-
-    backAndForth(sql);
+      backAndForth(sql);
+    });
   });
 });
