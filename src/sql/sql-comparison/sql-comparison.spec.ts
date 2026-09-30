@@ -13,7 +13,7 @@
  */
 
 import { backAndForth } from '../../test-utils';
-import { SqlColumn, SqlComparison, SqlExpression, SqlValues } from '..';
+import { SqlColumn, SqlComparison, SqlExpression, SqlLikePart, SqlValues } from '..';
 
 describe('SqlComparison', () => {
   describe('parses', () => {
@@ -2185,15 +2185,171 @@ describe('SqlComparison', () => {
     });
   });
 
-  describe('.in / .notIn', () => {
-    it('works with IN', () => {
+  describe('.equal', () => {
+    it('creates an = comparison', () => {
+      expect(SqlComparison.equal(SqlColumn.create('x'), 1).toString()).toEqual('"x" = 1');
+    });
+  });
+
+  describe('.unequal', () => {
+    it('creates a <> comparison', () => {
+      expect(SqlComparison.unequal(SqlColumn.create('x'), 'a').toString()).toEqual(`"x" <> 'a'`);
+    });
+  });
+
+  describe('.lessThan', () => {
+    it('creates a < comparison', () => {
+      expect(SqlComparison.lessThan(SqlColumn.create('x'), 1).toString()).toEqual('"x" < 1');
+    });
+  });
+
+  describe('.greaterThan', () => {
+    it('creates a > comparison', () => {
+      expect(SqlComparison.greaterThan(SqlColumn.create('x'), 1).toString()).toEqual('"x" > 1');
+    });
+  });
+
+  describe('.lessThanOrEqual', () => {
+    it('creates a <= comparison', () => {
+      expect(SqlComparison.lessThanOrEqual(SqlColumn.create('x'), 1).toString()).toEqual(
+        '"x" <= 1',
+      );
+    });
+  });
+
+  describe('.greaterThanOrEqual', () => {
+    it('creates a >= comparison', () => {
+      expect(SqlComparison.greaterThanOrEqual(SqlColumn.create('x'), 1).toString()).toEqual(
+        '"x" >= 1',
+      );
+    });
+  });
+
+  describe('.isNull', () => {
+    it('creates an IS NULL comparison', () => {
+      expect(SqlComparison.isNull(SqlColumn.create('x')).toString()).toEqual('"x" IS NULL');
+    });
+  });
+
+  describe('.isNotNull', () => {
+    it('creates an IS NOT NULL comparison', () => {
+      expect(SqlComparison.isNotNull(SqlColumn.create('x')).toString()).toEqual('"x" IS NOT NULL');
+    });
+  });
+
+  describe('.isNotDistinctFrom', () => {
+    it('creates an IS NOT DISTINCT FROM comparison', () => {
+      expect(SqlComparison.isNotDistinctFrom(SqlColumn.create('x'), 1).toString()).toEqual(
+        '"x" IS NOT DISTINCT FROM 1',
+      );
+    });
+  });
+
+  describe('.isDistinctFrom', () => {
+    it('creates an IS DISTINCT FROM comparison', () => {
+      expect(SqlComparison.isDistinctFrom(SqlColumn.create('x'), 1).toString()).toEqual(
+        '"x" IS DISTINCT FROM 1',
+      );
+    });
+  });
+
+  describe('.in', () => {
+    it('creates an IN comparison', () => {
       expect(SqlComparison.in(SqlColumn.create('x'), [1]).toString()).toEqual('"x" IN (1)');
       expect(SqlComparison.in(SqlColumn.create('x'), [1, 2, 3]).toString()).toEqual(
         '"x" IN (1, 2, 3)',
       );
+    });
+  });
+
+  describe('.notIn', () => {
+    it('creates a NOT IN comparison', () => {
       expect(SqlComparison.notIn(SqlColumn.create('x'), [1, 2, 3]).toString()).toEqual(
         '"x" NOT IN (1, 2, 3)',
       );
+    });
+  });
+
+  describe('.like', () => {
+    it('creates a LIKE comparison', () => {
+      expect(SqlComparison.like('x', 'a%').toString()).toEqual(`'x' LIKE 'a%'`);
+      expect(SqlComparison.like(SqlColumn.create('x'), 'a%').toString()).toEqual(`"x" LIKE 'a%'`);
+    });
+
+    it('adds an ESCAPE when given one', () => {
+      const comparison = SqlComparison.like(SqlColumn.create('x'), 'a!%%', '!');
+
+      expect(comparison.rhs).toBeInstanceOf(SqlLikePart);
+      expect(comparison.toString()).toEqual(`"x" LIKE 'a!%%' ESCAPE '!'`);
+    });
+  });
+
+  describe('.notLike', () => {
+    it('creates a NOT LIKE comparison', () => {
+      expect(SqlComparison.notLike(SqlColumn.create('x'), 'a%').toString()).toEqual(
+        `"x" NOT LIKE 'a%'`,
+      );
+      expect(SqlComparison.notLike(SqlColumn.create('x'), 'a!%%', '!').toString()).toEqual(
+        `"x" NOT LIKE 'a!%%' ESCAPE '!'`,
+      );
+    });
+  });
+
+  describe('.between', () => {
+    it('creates a BETWEEN comparison', () => {
+      expect(SqlComparison.between(SqlColumn.create('x'), 1, 5).toString()).toEqual(
+        '"x" BETWEEN 1 AND 5',
+      );
+    });
+  });
+
+  describe('.notBetween', () => {
+    it('creates a NOT BETWEEN comparison', () => {
+      expect(SqlComparison.notBetween(SqlColumn.create('x'), 1, 5).toString()).toEqual(
+        '"x" NOT BETWEEN 1 AND 5',
+      );
+    });
+  });
+
+  describe('.betweenSymmetric', () => {
+    it('creates a BETWEEN SYMMETRIC comparison', () => {
+      expect(SqlComparison.betweenSymmetric(SqlColumn.create('x'), 5, 1).toString()).toEqual(
+        '"x" BETWEEN SYMMETRIC 5 AND 1',
+      );
+    });
+  });
+
+  describe('.notBetweenSymmetric', () => {
+    it('creates a NOT BETWEEN SYMMETRIC comparison', () => {
+      expect(SqlComparison.notBetweenSymmetric(SqlColumn.create('x'), 5, 1).toString()).toEqual(
+        '"x" NOT BETWEEN SYMMETRIC 5 AND 1',
+      );
+    });
+  });
+
+  describe('.reverseOperator', () => {
+    it('returns the opposite operator', () => {
+      expect(SqlComparison.reverseOperator('<')).toEqual('>=');
+      expect(SqlComparison.reverseOperator('>=')).toEqual('<');
+      expect(SqlComparison.reverseOperator('IS DISTINCT FROM')).toEqual('IS NOT DISTINCT FROM');
+      expect(SqlComparison.reverseOperator('NOT LIKE')).toEqual('LIKE');
+      expect(SqlComparison.reverseOperator('BETWEEN')).toEqual('NOT BETWEEN');
+    });
+  });
+
+  describe('#changeLhs', () => {
+    it('replaces the left hand side', () => {
+      const comparison = SqlExpression.parse('x  >  1') as SqlComparison;
+
+      expect(comparison.changeLhs(SqlColumn.create('y')).toString()).toEqual('"y"  >  1');
+    });
+  });
+
+  describe('#changeRhs', () => {
+    it('replaces the right hand side', () => {
+      const comparison = SqlExpression.parse('x  >  1') as SqlComparison;
+
+      expect(comparison.changeRhs(SqlColumn.create('y')).toString()).toEqual('x  >  "y"');
     });
   });
 
@@ -2209,6 +2365,24 @@ describe('SqlComparison', () => {
         `X IN ('a', 'b')`,
       );
     });
+
+    it('flips the ALL / ANY decorator', () => {
+      expect(String(SqlExpression.parse(`X = ANY (SELECT 1)`).negate())).toEqual(
+        `X <> ALL (SELECT 1)`,
+      );
+      expect(String(SqlExpression.parse(`X < ALL (SELECT 1)`).negate())).toEqual(
+        `X >= ANY (SELECT 1)`,
+      );
+    });
+  });
+
+  describe('#hasNot', () => {
+    it('is true for the negated operators', () => {
+      expect((SqlExpression.parse('x NOT IN (1)') as SqlComparison).hasNot()).toEqual(true);
+      expect((SqlExpression.parse('x IS NOT NULL') as SqlComparison).hasNot()).toEqual(true);
+      expect((SqlExpression.parse('x IN (1)') as SqlComparison).hasNot()).toEqual(false);
+      expect((SqlExpression.parse('x <> 1') as SqlComparison).hasNot()).toEqual(false);
+    });
   });
 
   describe('#getLikeMatchPattern', () => {
@@ -2217,6 +2391,21 @@ describe('SqlComparison', () => {
     it('works', () => {
       expect(x.lessThan(4).getLikeMatchPattern()).toBeUndefined();
       expect(x.like('hello').getLikeMatchPattern()).toEqual('hello');
+    });
+
+    it('reads the pattern from a LIKE with ESCAPE', () => {
+      expect(
+        (SqlExpression.parse(`x LIKE 'a!%%' ESCAPE '!'`) as SqlComparison).getLikeMatchPattern(),
+      ).toEqual('a!%%');
+    });
+
+    it('returns undefined when the pattern is not a literal', () => {
+      expect(
+        (SqlExpression.parse(`x LIKE y`) as SqlComparison).getLikeMatchPattern(),
+      ).toBeUndefined();
+      expect(
+        (SqlExpression.parse(`x LIKE y ESCAPE '!'`) as SqlComparison).getLikeMatchPattern(),
+      ).toBeUndefined();
     });
   });
 
@@ -2229,6 +2418,39 @@ describe('SqlComparison', () => {
       expect(x.like('hello%').getSpecialLikeType()).toEqual('prefix');
       expect(x.like('%hello').getSpecialLikeType()).toEqual('postfix');
       expect(x.like('%hello%').getSpecialLikeType()).toEqual('includes');
+    });
+  });
+
+  describe('#walk', () => {
+    it('substitutes on both sides', () => {
+      expect(
+        SqlExpression.parse(`x BETWEEN a AND b`)
+          .walk(ex => (ex instanceof SqlColumn ? SqlColumn.optionalQuotes(ex.getName() + '1') : ex))
+          .toString(),
+      ).toEqual(`x1 BETWEEN a1 AND b1`);
+    });
+
+    it('keeps the same instance when nothing changes', () => {
+      const comparison = SqlExpression.parse(`x = 1`);
+
+      expect(comparison.walk(ex => ex)).toBe(comparison);
+    });
+
+    it('stops when the callback returns nothing for either side', () => {
+      const comparison = SqlExpression.parse(`x = y`);
+
+      const seen: string[] = [];
+      comparison.walk(ex => {
+        seen.push(ex.toString());
+        return ex instanceof SqlColumn && ex.getName() === 'x' ? undefined : ex;
+      });
+      expect(seen).toEqual(['x = y', 'x']);
+
+      expect(
+        comparison.walkPostorder(ex =>
+          ex instanceof SqlColumn && ex.getName() === 'y' ? undefined : ex,
+        ),
+      ).toBe(comparison);
     });
   });
 });

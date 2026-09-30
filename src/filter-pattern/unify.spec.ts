@@ -14,7 +14,10 @@
 
 import { SqlExpression } from '../sql';
 
+import type { FilterPattern, FilterPatternType } from './unify';
 import {
+  changeFilterPatternType,
+  FILTER_PATTERN_TYPES,
   filterPatternsToExpression,
   filterPatternToExpression,
   fitFilterPattern,
@@ -37,6 +40,30 @@ function backAndForthNotCustom(expression: string): void {
 
 describe('unify', () => {
   describe('fitFilterPatterns', () => {
+    it('returns a single pattern when the whole expression fits', () => {
+      expect(fitFilterPatterns(SqlExpression.parse(`"hi" > 0 AND "hi" < 100`))).toEqual([
+        {
+          type: 'numberRange',
+          negated: false,
+          column: 'hi',
+          start: 0,
+          end: 100,
+          startBound: '(',
+          endBound: ')',
+        },
+      ]);
+    });
+
+    it('keeps the parts that do not fit as custom', () => {
+      const patterns = fitFilterPatterns(
+        SqlExpression.parse(`"lol" = 'hello' AND "a" + "b" > "c"`),
+      );
+      expect(patterns.map(p => p.type)).toEqual(['values', 'custom']);
+      expect(String(filterPatternsToExpression(patterns))).toEqual(
+        `"lol" = 'hello' AND "a" + "b" > "c"`,
+      );
+    });
+
     it('works in a general case', () => {
       expect(
         fitFilterPatterns(
@@ -69,6 +96,14 @@ describe('unify', () => {
   });
 
   describe('fitFilterPattern', () => {
+    it('falls back to custom', () => {
+      expect(fitFilterPattern(SqlExpression.parse(`"a" + "b" > "c"`))).toEqual({
+        type: 'custom',
+        negated: false,
+        expression: SqlExpression.parse(`"a" + "b" > "c"`),
+      });
+    });
+
     it('works for (single)', () => {
       expect(fitFilterPattern(SqlExpression.parse(`"lol" = 'hello'`))).toEqual({
         column: 'lol',
@@ -239,6 +274,145 @@ describe('unify', () => {
     ])('falls back to custom for invalid expression: %s', expression => {
       const pattern = fitFilterPattern(SqlExpression.parse(expression));
       expect(pattern.type).toEqual('custom');
+    });
+  });
+
+  describe('filterPatternsToExpression', () => {
+    it('ANDs the patterns together', () => {
+      expect(
+        String(
+          filterPatternsToExpression([
+            { type: 'values', negated: false, column: 'a', values: ['x'] },
+            { type: 'contains', negated: true, column: 'b', contains: 'y' },
+          ]),
+        ),
+      ).toEqual(`"a" = 'x' AND NOT ICONTAINS_STRING(CAST("b" AS VARCHAR), 'y')`);
+    });
+
+    it('returns TRUE for no patterns', () => {
+      expect(String(filterPatternsToExpression([]))).toEqual('TRUE');
+    });
+  });
+
+  describe('filterPatternToExpression', () => {
+    it('uses the definition for the pattern type', () => {
+      expect(
+        String(
+          filterPatternToExpression({
+            type: 'mvContains',
+            negated: false,
+            column: 'tags',
+            values: ['a'],
+          }),
+        ),
+      ).toEqual(`MV_CONTAINS("tags", ARRAY['a'])`);
+    });
+  });
+
+  describe('changeFilterPatternType', () => {
+    const valuesPattern: FilterPattern = {
+      type: 'values',
+      negated: true,
+      column: 'city',
+      values: ['Paris'],
+    };
+
+    function changeAll(pattern: FilterPattern): Record<FilterPatternType, FilterPattern> {
+      const ret = {} as Record<FilterPatternType, FilterPattern>;
+      for (const type of FILTER_PATTERN_TYPES) {
+        ret[type] = changeFilterPatternType(pattern, type);
+      }
+      return ret;
+    }
+
+    it('carries over the column, the negation and the thing', () => {
+      const changed = changeAll(valuesPattern);
+      expect(changed.values).toEqual(valuesPattern);
+      expect(changed.contains).toEqual({
+        type: 'contains',
+        negated: true,
+        column: 'city',
+        contains: 'Paris',
+      });
+      expect(changed.regexp).toEqual({
+        type: 'regexp',
+        negated: true,
+        column: 'city',
+        regexp: 'Paris',
+      });
+      expect(changed.timeInterval).toEqual({
+        type: 'timeInterval',
+        negated: true,
+        column: 'city',
+        start: new Date('2020-01-01Z'),
+        end: new Date('2022-01-01Z'),
+        startBound: '[',
+        endBound: ')',
+      });
+      expect(changed.timeRelative).toEqual({
+        type: 'timeRelative',
+        negated: true,
+        column: 'city',
+        anchor: 'timestamp',
+        rangeDuration: 'P1D',
+        startBound: '[',
+        endBound: ')',
+      });
+      expect(changed.numberRange).toEqual({
+        type: 'numberRange',
+        negated: true,
+        column: 'city',
+        start: 0,
+        end: 100,
+        startBound: '(',
+        endBound: ')',
+      });
+      expect(changed.mvContains).toEqual({
+        type: 'mvContains',
+        negated: true,
+        column: 'city',
+        values: ['Paris'],
+      });
+    });
+
+    it('turns the pattern into its expression when changing to custom', () => {
+      expect(changeFilterPatternType(valuesPattern, 'custom')).toEqual({
+        type: 'custom',
+        negated: false,
+        expression: filterPatternToExpression(valuesPattern),
+      });
+      expect(String((changeFilterPatternType(valuesPattern, 'custom') as any).expression)).toEqual(
+        `"city" <> 'Paris'`,
+      );
+    });
+
+    it('uses the first column of a custom expression', () => {
+      const changed = changeFilterPatternType(
+        { type: 'custom', negated: false, expression: SqlExpression.parse(`"x" + "y" > 3`) },
+        'contains',
+      );
+      expect(changed).toEqual({ type: 'contains', negated: false, column: 'x', contains: '' });
+    });
+
+    it('uses placeholders when there is no column or thing', () => {
+      const changed = changeAll({ type: 'custom', negated: false });
+      expect(changed.values).toEqual({ type: 'values', negated: false, column: '?', values: [] });
+      expect(changed.contains).toEqual({
+        type: 'contains',
+        negated: false,
+        column: '?',
+        contains: '',
+      });
+      expect(changed.regexp).toEqual({ type: 'regexp', negated: false, column: '?', regexp: '' });
+      expect((changed.timeInterval as any).column).toEqual('?');
+      expect((changed.timeRelative as any).column).toEqual('?');
+      expect((changed.numberRange as any).column).toEqual('?');
+      expect(changed.mvContains).toEqual({
+        type: 'mvContains',
+        negated: false,
+        column: '?',
+        values: [],
+      });
     });
   });
 

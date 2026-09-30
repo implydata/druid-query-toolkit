@@ -15,6 +15,16 @@
 import { Column, Introspect, QueryResult, SqlQuery, T } from '..';
 
 describe('Introspect', () => {
+  describe('.getTableIntrospectionQuery', () => {
+    it('queries the druid tables in INFORMATION_SCHEMA', () => {
+      const query = Introspect.getTableIntrospectionQuery();
+      expect(query).toEqual(
+        `SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'druid' AND TABLE_TYPE = 'TABLE'`,
+      );
+      expect(SqlQuery.parse(query).getFirstTableName()).toEqual('TABLES');
+    });
+  });
+
   describe('.decodeTableIntrospectionResult', () => {
     it('works', () => {
       const queryResult = new QueryResult({
@@ -39,6 +49,14 @@ describe('Introspect', () => {
       });
 
       expect(Introspect.decodeTableIntrospectionResult(emptyQueryResult)).toEqual([]);
+    });
+  });
+
+  describe('.getQueryColumnIntrospectionQuery', () => {
+    it('wraps a table in a zero row select', () => {
+      expect(String(Introspect.getQueryColumnIntrospectionQuery(T('lol')))).toEqual(
+        'SELECT *\nFROM "lol"\nLIMIT 0',
+      );
     });
   });
 

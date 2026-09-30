@@ -147,6 +147,12 @@ describe('SqlTableQuery', () => {
       expect(SqlTableQuery.optionalQuotes('kttm').toString()).toEqual(`TABLE kttm`);
       expect(SqlTableQuery.optionalQuotes('has space').toString()).toEqual(`TABLE "has space"`);
     });
+
+    it('returns a given table query as is', () => {
+      const tableQuery = SqlTableQuery.create('kttm');
+
+      expect(SqlTableQuery.optionalQuotes(tableQuery)).toBe(tableQuery);
+    });
   });
 
   describe('#walk', () => {
@@ -160,6 +166,19 @@ describe('SqlTableQuery', () => {
           .walk(ex => (ex instanceof SqlTable ? SqlTable.optionalQuotes('wikipedia') : ex))
           .toString(),
       ).toEqual(`TABLE wikipedia`);
+    });
+
+    it('stops when the substitutor returns undefined', () => {
+      const tableQuery = SqlExpression.parse(`TABLE druid.kttm`);
+      const visited: string[] = [];
+
+      expect(
+        tableQuery.walk(ex => {
+          visited.push(String(ex));
+          return ex instanceof SqlTable ? undefined : ex;
+        }),
+      ).toBe(tableQuery);
+      expect(visited).toEqual([`TABLE druid.kttm`, `druid.kttm`]);
     });
   });
 

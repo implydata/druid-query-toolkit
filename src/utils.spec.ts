@@ -15,6 +15,7 @@
 import {
   cleanFunctionArguments,
   cleanObject,
+  compact,
   dedupe,
   filterMap,
   isDate,
@@ -209,6 +210,12 @@ describe('utils', () => {
       expect(isInteger(NaN)).toBe(false);
       expect(isInteger(Infinity)).toBe(false);
       expect(isInteger(-Infinity)).toBe(false);
+    });
+  });
+
+  describe('compact', () => {
+    it('removes falsy values', () => {
+      expect(compact([1, undefined, 0 as any, 2, null, false, '' as const, 3])).toEqual([1, 2, 3]);
     });
   });
 

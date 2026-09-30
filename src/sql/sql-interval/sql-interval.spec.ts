@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { SqlExpression } from '../..';
+import { SqlExpression, SqlInterval } from '../..';
 import { backAndForth } from '../../test-utils';
 
 describe('SqlInterval', () => {
@@ -102,6 +102,28 @@ describe('SqlInterval', () => {
         "unit": "YEAR_MONTH",
       }
     `);
+    });
+  });
+
+  describe('.create', () => {
+    it('creates an interval from a unit and a number', () => {
+      const interval = SqlInterval.create('DAY', 2);
+
+      expect(interval.toString()).toEqual(`INTERVAL '2' DAY`);
+      expect(interval.unit).toEqual('DAY');
+      expect(interval.intervalValue?.value).toEqual('2');
+    });
+  });
+
+  describe('#valueOf', () => {
+    it('carries the interval value and unit into changed copies', () => {
+      const interval = SqlExpression.parse(`interval  '3'  HOUR`) as SqlInterval;
+      const reset = interval.resetOwnSpacing().resetOwnKeywords();
+
+      expect(reset).toBeInstanceOf(SqlInterval);
+      expect(reset.unit).toEqual('HOUR');
+      expect(reset.intervalValue).toBe(interval.intervalValue);
+      expect(reset.toString()).toEqual(`INTERVAL '3' HOUR`);
     });
   });
 });

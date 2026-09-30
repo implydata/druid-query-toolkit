@@ -59,12 +59,10 @@ export class SqlColumnDeclaration extends SqlBase {
   ): SqlColumnDeclaration | undefined {
     let ret = this;
 
-    if (this.columnType) {
-      const columnType = this.columnType._walkHelper(nextStack, fn, postorder);
-      if (!columnType) return;
-      if (columnType !== this.columnType) {
-        ret = ret.changeColumnType(columnType as SqlType);
-      }
+    const columnType = this.columnType._walkHelper(nextStack, fn, postorder);
+    if (!columnType) return;
+    if (columnType !== this.columnType) {
+      ret = ret.changeColumnType(columnType as SqlType);
     }
 
     return ret;

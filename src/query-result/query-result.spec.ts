@@ -12,6 +12,8 @@
  * limitations under the License.
  */
 
+import { SqlQuery } from '../sql';
+
 import { Column } from './column';
 import { QueryResult } from './query-result';
 
@@ -23,6 +25,133 @@ describe('QueryResult', () => {
       ['J', '2016-06-27T01:00:00.000Z', 870],
       ['K', '2016-06-27T02:00:00.000Z', 960],
     ],
+  });
+
+  describe('.shouldIncludeTimestamp', () => {
+    it('includes the timestamp for a non all granularity', () => {
+      expect(
+        QueryResult.shouldIncludeTimestamp({ queryType: 'timeseries', granularity: 'hour' }),
+      ).toEqual(true);
+      expect(
+        QueryResult.shouldIncludeTimestamp({
+          queryType: 'timeseries',
+          granularity: { type: 'period', period: 'P1D' },
+        }),
+      ).toEqual(true);
+    });
+
+    it('does not include the timestamp for all granularity', () => {
+      expect(
+        QueryResult.shouldIncludeTimestamp({ queryType: 'timeseries', granularity: 'ALL' }),
+      ).toEqual(false);
+      expect(
+        QueryResult.shouldIncludeTimestamp({
+          queryType: 'timeseries',
+          granularity: { type: 'all' },
+        }),
+      ).toEqual(false);
+    });
+
+    it('treats an unrecognized granularity as not all', () => {
+      expect(
+        QueryResult.shouldIncludeTimestamp({ queryType: 'timeseries', granularity: 5 }),
+      ).toEqual(true);
+      expect(
+        QueryResult.shouldIncludeTimestamp({ queryType: 'timeseries', granularity: {} }),
+      ).toEqual(true);
+    });
+
+    it('does not include the timestamp when there is no granularity', () => {
+      expect(QueryResult.shouldIncludeTimestamp({ queryType: 'scan' })).toEqual(false);
+      expect(QueryResult.shouldIncludeTimestamp({ query: 'SELECT 1' })).toEqual(false);
+    });
+  });
+
+  describe('.hasHeader', () => {
+    it('is true for a SQL query with header: true', () => {
+      expect(QueryResult.hasHeader({ query: 'SELECT 1', header: true })).toEqual(true);
+    });
+
+    it('is false otherwise', () => {
+      expect(QueryResult.hasHeader({ query: 'SELECT 1' })).toEqual(false);
+      expect(QueryResult.hasHeader({ queryType: 'scan', header: true })).toEqual(false);
+    });
+  });
+
+  describe('.hasTypeHeader', () => {
+    const included = { 'x-druid-sql-header-included': 'yes' };
+
+    it('needs the header, typesHeader and the response header', () => {
+      expect(
+        QueryResult.hasTypeHeader({ query: 'SELECT 1', header: true, typesHeader: true }, included),
+      ).toEqual(true);
+      expect(
+        QueryResult.hasTypeHeader({ query: 'SELECT 1', header: true, typesHeader: true }, {}),
+      ).toEqual(false);
+      expect(QueryResult.hasTypeHeader({ query: 'SELECT 1', header: true }, included)).toEqual(
+        false,
+      );
+      expect(QueryResult.hasTypeHeader({ query: 'SELECT 1', typesHeader: true }, included)).toEqual(
+        false,
+      );
+    });
+  });
+
+  describe('.hasSqlTypeHeader', () => {
+    const included = { 'x-druid-sql-header-included': 'yes' };
+
+    it('needs the header, sqlTypesHeader and the response header', () => {
+      expect(
+        QueryResult.hasSqlTypeHeader(
+          { query: 'SELECT 1', header: true, sqlTypesHeader: true },
+          included,
+        ),
+      ).toEqual(true);
+      expect(
+        QueryResult.hasSqlTypeHeader({ query: 'SELECT 1', header: true, sqlTypesHeader: true }, {}),
+      ).toEqual(false);
+      expect(QueryResult.hasSqlTypeHeader({ query: 'SELECT 1', header: true }, included)).toEqual(
+        false,
+      );
+    });
+  });
+
+  describe('.fromQueryAndRawResult', () => {
+    it('decodes the headers requested by a SQL query', () => {
+      const result = QueryResult.fromQueryAndRawResult(
+        { query: 'SELECT 1', header: true, typesHeader: true, sqlTypesHeader: true },
+        [
+          ['__time', 'n'],
+          ['LONG', 'LONG'],
+          ['TIMESTAMP', 'BIGINT'],
+          ['2020-01-01T00:00:00.000Z', 1],
+        ],
+        { 'x-druid-sql-header-included': 'yes' },
+      );
+      expect(result.header).toEqual([
+        new Column({ name: '__time', nativeType: 'LONG', sqlType: 'TIMESTAMP' }),
+        new Column({ name: 'n', nativeType: 'LONG', sqlType: 'BIGINT' }),
+      ]);
+      expect(result.rows).toEqual([['2020-01-01T00:00:00.000Z', 1]]);
+    });
+
+    it('ignores the type rows when the response header is missing', () => {
+      const result = QueryResult.fromQueryAndRawResult(
+        { query: 'SELECT 1', header: true, typesHeader: true, sqlTypesHeader: true },
+        [['n'], [1]],
+      );
+      expect(result.header).toEqual([new Column({ name: 'n' })]);
+      expect(result.rows).toEqual([[1]]);
+    });
+
+    it('includes the timestamp for a native query with a granularity', () => {
+      const result = QueryResult.fromQueryAndRawResult(
+        { queryType: 'timeseries', granularity: 'hour' },
+        [{ timestamp: '2019-08-04T15:00:00.000Z', result: { count: 5 } }],
+      );
+      expect(result.getHeaderNames()).toEqual(['timestamp', 'count']);
+      expect(result.rows).toEqual([['2019-08-04T15:00:00.000Z', 5]]);
+    });
   });
 
   describe('.fromRawResult', () => {
@@ -1241,6 +1370,211 @@ describe('QueryResult', () => {
         `Unparsable row on line 3 in query result: '{"channel":"#en.wikipedia",'.`,
       );
     });
+
+    it('names the columns by index when there is no header', () => {
+      const result = QueryResult.fromRawResult([
+        ['a', 1],
+        ['b', 2],
+      ]);
+      expect(result.getHeaderNames()).toEqual(['0', '1']);
+      expect(result.rows).toEqual([
+        ['a', 1],
+        ['b', 2],
+      ]);
+    });
+
+    it('unwraps results with a context', () => {
+      const result = QueryResult.fromRawResult(
+        { results: [['x'], [1]], context: { foo: 'bar' } },
+        false,
+        true,
+      );
+      expect(result.getHeaderNames()).toEqual(['x']);
+      expect(result.rows).toEqual([[1]]);
+      expect(result.resultContext).toEqual({ foo: 'bar' });
+    });
+
+    it('unwraps results without a context', () => {
+      const result = QueryResult.fromRawResult({ results: [['x'], [1]] }, false, true);
+      expect(result.rows).toEqual([[1]]);
+      expect(result.resultContext).toBeUndefined();
+    });
+
+    it('returns a blank result with the context for empty results', () => {
+      const result = QueryResult.fromRawResult({ results: [], context: { foo: 'bar' } });
+      expect(result.header).toEqual([]);
+      expect(result.rows).toEqual([]);
+      expect(result.resultContext).toEqual({ foo: 'bar' });
+    });
+
+    it('returns a blank result for topN with no sub rows', () => {
+      expect(
+        QueryResult.fromRawResult([{ timestamp: '2019-08-04T15:00:00.000Z', result: [] }]),
+      ).toBe(QueryResult.BLANK);
+    });
+
+    it('returns a header only result for a scan with no events', () => {
+      const result = QueryResult.fromRawResult([
+        { segmentId: 's', columns: ['a', 'b'], events: [] },
+      ]);
+      expect(result.getHeaderNames()).toEqual(['a', 'b']);
+      expect(result.rows).toEqual([]);
+    });
+
+    it('throws on scan events that are not arrays or objects', () => {
+      expect(() =>
+        QueryResult.fromRawResult([{ segmentId: 's', columns: ['a'], events: ['x'] }]),
+      ).toThrow('Unexpected scan like results.');
+    });
+
+    it('throws on an array of non objects', () => {
+      expect(() => QueryResult.fromRawResult([1, 2])).toThrow(
+        'Unexpected query result, array of non objects or arrays.',
+      );
+    });
+
+    it('throws on a non array result', () => {
+      expect(() => QueryResult.fromRawResult({ hello: 'world' })).toThrow(
+        'Unrecognizable query return shape, not an array.',
+      );
+      expect(() => QueryResult.fromRawResult(5)).toThrow(
+        'Unrecognizable query return shape, not an array.',
+      );
+    });
+  });
+
+  describe('.fromObjectArray', () => {
+    it('uses the keys of the first object as the header', () => {
+      const result = QueryResult.fromObjectArray([
+        { a: 1, b: 'x' },
+        { a: 2, b: 'y' },
+      ]);
+      expect(result.header).toEqual([new Column({ name: 'a' }), new Column({ name: 'b' })]);
+      expect(result.rows).toEqual([
+        [1, 'x'],
+        [2, 'y'],
+      ]);
+    });
+
+    it('skips the header row', () => {
+      const result = QueryResult.fromObjectArray(
+        [
+          { a: 'a', b: 'b' },
+          { a: 1, b: 'x' },
+        ],
+        true,
+      );
+      expect(result.header).toEqual([new Column({ name: 'a' }), new Column({ name: 'b' })]);
+      expect(result.rows).toEqual([[1, 'x']]);
+    });
+
+    it('reads the types from the header row', () => {
+      const result = QueryResult.fromObjectArray(
+        [
+          { a: { type: 'LONG', sqlType: 'BIGINT' }, b: { type: 'STRING', sqlType: 'VARCHAR' } },
+          { a: 1, b: 'x' },
+        ],
+        true,
+        true,
+      );
+      expect(result.header).toEqual([
+        new Column({ name: 'a', nativeType: 'LONG', sqlType: 'BIGINT' }),
+        new Column({ name: 'b', nativeType: 'STRING', sqlType: 'VARCHAR' }),
+      ]);
+      expect(result.rows).toEqual([[1, 'x']]);
+    });
+
+    it('returns a blank result for an empty array', () => {
+      expect(QueryResult.fromObjectArray([])).toBe(QueryResult.BLANK);
+    });
+  });
+
+  describe('#valueOf', () => {
+    it('returns all the fields', () => {
+      const result = testQueryResult
+        .attachQuery({ query: 'SELECT 1' })
+        .attachQueryId('q', 'sq')
+        .changeQueryDuration(12)
+        .changeResultContext({ foo: 1 });
+      expect(result.valueOf()).toEqual({
+        header: testQueryResult.header,
+        rows: testQueryResult.rows,
+        query: { query: 'SELECT 1' },
+        sqlQuery: undefined,
+        queryId: 'q',
+        sqlQueryId: 'sq',
+        resultContext: { foo: 1 },
+        queryDuration: 12,
+      });
+    });
+  });
+
+  describe('#changeQueryDuration', () => {
+    it('sets the duration on a new result', () => {
+      const result = testQueryResult.changeQueryDuration(42);
+      expect(result.queryDuration).toEqual(42);
+      expect(result).not.toBe(testQueryResult);
+      expect(testQueryResult.queryDuration).toBeUndefined();
+    });
+  });
+
+  describe('#attachQuery', () => {
+    it('attaches the payload and the parsed query', () => {
+      const sqlQuery = SqlQuery.parse('SELECT * FROM tbl');
+      const result = testQueryResult.attachQuery({ query: 'SELECT * FROM tbl' }, sqlQuery);
+      expect(result.query).toEqual({ query: 'SELECT * FROM tbl' });
+      expect(result.sqlQuery).toBe(sqlQuery);
+      expect(result.rows).toBe(testQueryResult.rows);
+    });
+  });
+
+  describe('#attachQueryId', () => {
+    it('attaches the query ids', () => {
+      const result = testQueryResult.attachQueryId('q1', 'sq1');
+      expect(result.queryId).toEqual('q1');
+      expect(result.sqlQueryId).toEqual('sq1');
+    });
+
+    it('works with only a native query id', () => {
+      const result = testQueryResult.attachQueryId('q1');
+      expect(result.queryId).toEqual('q1');
+      expect(result.sqlQueryId).toBeUndefined();
+    });
+  });
+
+  describe('#changeResultContext', () => {
+    it('sets the result context', () => {
+      const context = { foo: 'bar' };
+      const result = testQueryResult.changeResultContext(context);
+      expect(result.resultContext).toBe(context);
+      expect(result).not.toBe(testQueryResult);
+    });
+
+    it('returns the same instance when the context is unchanged', () => {
+      expect(testQueryResult.changeResultContext(undefined)).toBe(testQueryResult);
+      const withContext = testQueryResult.changeResultContext({ a: 1 });
+      expect(withContext.changeResultContext(withContext.resultContext)).toBe(withContext);
+    });
+  });
+
+  describe('#getHeaderNames', () => {
+    it('returns the column names', () => {
+      expect(testQueryResult.getHeaderNames()).toEqual(['A', 'B', 'C']);
+    });
+  });
+
+  describe('#isEmpty', () => {
+    it('tells if there are no rows', () => {
+      expect(testQueryResult.isEmpty()).toEqual(false);
+      expect(QueryResult.BLANK.isEmpty()).toEqual(true);
+    });
+  });
+
+  describe('#getNumResults', () => {
+    it('counts the rows', () => {
+      expect(testQueryResult.getNumResults()).toEqual(3);
+      expect(QueryResult.BLANK.getNumResults()).toEqual(0);
+    });
   });
 
   describe('#toObjectArray', () => {
@@ -1282,6 +1616,24 @@ describe('QueryResult', () => {
 
     it('works for valid name', () => {
       expect(testQueryResult.getColumnByName('C')).toEqual([876, 870, 960]);
+    });
+  });
+
+  describe('#getSqlOuterLimit', () => {
+    it('reads sqlOuterLimit from the query context', () => {
+      expect(
+        testQueryResult
+          .attachQuery({ query: 'SELECT 1', context: { sqlOuterLimit: 100 } })
+          .getSqlOuterLimit(),
+      ).toEqual(100);
+    });
+
+    it('returns undefined when there is no query or context', () => {
+      expect(testQueryResult.getSqlOuterLimit()).toBeUndefined();
+      expect(testQueryResult.attachQuery({ query: 'SELECT 1' }).getSqlOuterLimit()).toBeUndefined();
+      expect(
+        testQueryResult.attachQuery({ query: 'SELECT 1', context: {} }).getSqlOuterLimit(),
+      ).toBeUndefined();
     });
   });
 

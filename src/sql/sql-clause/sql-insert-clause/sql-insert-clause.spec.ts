@@ -13,9 +13,7 @@
  */
 
 import { backAndForth } from '../../../test-utils';
-import { SqlFunction } from '../../sql-function/sql-function';
-import { SqlQuery } from '../../sql-query/sql-query';
-import { SqlTable } from '../../sql-table/sql-table';
+import { SqlExpression, SqlFunction, SqlInsertClause, SqlQuery, SqlTable } from '../..';
 
 describe('SqlInsertClause', () => {
   describe('parses', () => {
@@ -72,13 +70,75 @@ describe('SqlInsertClause', () => {
     });
   });
 
+  describe('.create', () => {
+    it('creates a clause from a table name', () => {
+      expect(SqlInsertClause.create('t').toString()).toEqual(`INSERT INTO "t"`);
+    });
+
+    it('creates a clause from a table expression', () => {
+      expect(SqlInsertClause.create(SqlTable.create('t', 'ns')).toString()).toEqual(
+        `INSERT INTO "ns"."t"`,
+      );
+    });
+
+    it('returns the same instance when given an insert clause', () => {
+      const clause = SqlInsertClause.create('t');
+
+      expect(SqlInsertClause.create(clause)).toBe(clause);
+    });
+  });
+
   describe('#changeTable', () => {
+    it('accepts an expression', () => {
+      const query = SqlQuery.parse(`insert into t (a) SELECT 1`);
+
+      expect(query.insertClause!.changeTable(SqlTable.create('u', 'ns')).toString()).toEqual(
+        `insert into "ns"."u" (a)`,
+      );
+    });
+
     it('keeps the format when the clause is changed', () => {
       const query = SqlQuery.parse(`INSERT INTO EXTERN(S3(bucket => 'b')) AS CSV SELECT 1`);
       const changed = query.insertClause!.changeTable('t');
 
       expect(changed.format).toEqual('CSV');
       expect(String(changed)).toEqual(`INSERT INTO "t" AS CSV`);
+    });
+  });
+
+  describe('#_walkInner', () => {
+    const clause = SqlInsertClause.create('t');
+
+    it('returns the same instance when nothing changes', () => {
+      expect(clause.walk(ex => ex)).toBe(clause);
+    });
+
+    it('substitutes the table', () => {
+      expect(
+        clause.walk(ex => (ex instanceof SqlTable ? SqlTable.create('u') : ex)).toString(),
+      ).toEqual(`INSERT INTO "u"`);
+    });
+
+    it('substitutes inside an export target', () => {
+      const exportClause = SqlQuery.parse(
+        `INSERT INTO EXTERN(local(path => 'a')) AS CSV SELECT 1`,
+      ).insertClause!;
+
+      expect(
+        exportClause
+          .walk(ex =>
+            ex instanceof SqlFunction && ex.getEffectiveFunctionName() === 'LOCAL'
+              ? SqlExpression.parse(`local(path => 'b')`)
+              : ex,
+          )
+          .toString(),
+      ).toEqual(`INSERT INTO EXTERN(local(path => 'b')) AS CSV`);
+    });
+
+    it('stops when the table walk returns undefined', () => {
+      expect(
+        clause._walkHelper([], ex => (ex instanceof SqlTable ? undefined : ex), false),
+      ).toBeUndefined();
     });
   });
 });

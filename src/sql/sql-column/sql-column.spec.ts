@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { SqlColumn, SqlExpression, SqlQuery } from '../..';
+import { RefName, SqlColumn, SqlExpression, SqlQuery, SqlTable } from '../..';
 import { backAndForth } from '../../test-utils';
 
 describe('SqlColumn', () => {
@@ -441,11 +441,133 @@ describe('SqlColumn', () => {
     it('works with column starting with a number', () => {
       expect(String(SqlColumn.create('3d'))).toEqual(`"3d"`);
     });
+
+    it('adds a quoted table', () => {
+      expect(String(SqlColumn.create('x', 'tbl'))).toEqual(`"tbl"."x"`);
+      expect(String(SqlColumn.create('x', SqlTable.create('tbl', 'ns')))).toEqual(`"ns"."tbl"."x"`);
+    });
+
+    it('returns an existing column as is when no table is given', () => {
+      const column = SqlColumn.create('x');
+      expect(SqlColumn.create(column)).toBe(column);
+    });
+
+    it('sets the table on an existing column', () => {
+      const column = SqlExpression.parse('a.x') as SqlColumn;
+      expect(String(SqlColumn.create(column, 'b'))).toEqual(`"b".x`);
+    });
   });
 
   describe('.optionalQuotes', () => {
     it('does not quote a reserved alias', () => {
       expect(String(SqlColumn.optionalQuotes('user'))).toEqual(`user`);
+    });
+
+    it('quotes only what needs quoting', () => {
+      expect(String(SqlColumn.optionalQuotes('x', 'tbl'))).toEqual(`tbl.x`);
+      expect(String(SqlColumn.optionalQuotes('my col', 'my tbl'))).toEqual(`"my tbl"."my col"`);
+    });
+
+    it('returns an existing column as is when no table is given', () => {
+      const column = SqlColumn.create('x');
+      expect(SqlColumn.optionalQuotes(column)).toBe(column);
+    });
+
+    it('sets the table on an existing column', () => {
+      const column = SqlExpression.parse('a.x') as SqlColumn;
+      expect(String(SqlColumn.optionalQuotes(column, 'b'))).toEqual(`"b".x`);
+    });
+  });
+
+  describe('#changeRefName', () => {
+    it('replaces the name and keeps the table', () => {
+      const column = SqlExpression.parse('t . x') as SqlColumn;
+      expect(String(column.changeRefName(RefName.create('y', false)))).toEqual(`t . y`);
+    });
+  });
+
+  describe('#getName', () => {
+    it('returns the unquoted name', () => {
+      expect((SqlExpression.parse('t."a""b"') as SqlColumn).getName()).toEqual('a"b');
+    });
+  });
+
+  describe('#changeName', () => {
+    it('keeps the existing quoting', () => {
+      expect(String((SqlExpression.parse('t.x') as SqlColumn).changeName('y'))).toEqual(`t.y`);
+      expect(String((SqlExpression.parse('"x"') as SqlColumn).changeName('y'))).toEqual(`"y"`);
+    });
+
+    it('adds quotes when the new name needs them', () => {
+      expect(String((SqlExpression.parse('x') as SqlColumn).changeName('my col'))).toEqual(
+        `"my col"`,
+      );
+    });
+  });
+
+  describe('#changeTable', () => {
+    it('sets a table', () => {
+      const column = SqlColumn.create('x');
+      expect(String(column.changeTable(SqlTable.create('t')))).toEqual(`"t"."x"`);
+    });
+
+    it('replaces the table and keeps the spacing', () => {
+      const column = SqlExpression.parse('a . x') as SqlColumn;
+      expect(String(column.changeTable(SqlTable.optionalQuotes('b')))).toEqual(`b . x`);
+    });
+
+    it('removes the table along with its spacing', () => {
+      const column = SqlExpression.parse('a . x') as SqlColumn;
+      const changed = column.changeTable(undefined);
+      expect(String(changed)).toEqual(`x`);
+      expect(changed.table).toBeUndefined();
+      expect(changed.spacing).toEqual({});
+    });
+  });
+
+  describe('#getTableName', () => {
+    it('returns the table name when there is one', () => {
+      expect((SqlExpression.parse('ns.t.x') as SqlColumn).getTableName()).toEqual('t');
+      expect((SqlExpression.parse('x') as SqlColumn).getTableName()).toBeUndefined();
+    });
+  });
+
+  describe('#changeTableName', () => {
+    it('renames an existing table and keeps its namespace and quoting', () => {
+      const column = SqlExpression.parse('ns.t.x') as SqlColumn;
+      expect(String(column.changeTableName('u'))).toEqual(`ns.u.x`);
+    });
+
+    it('creates a table when there is none', () => {
+      expect(String(SqlColumn.create('x').changeTableName('t'))).toEqual(`"t"."x"`);
+    });
+
+    it('removes the table when given undefined', () => {
+      const column = SqlExpression.parse('t.x') as SqlColumn;
+      expect(String(column.changeTableName(undefined))).toEqual(`x`);
+    });
+  });
+
+  describe('#getNamespaceName', () => {
+    it('returns the namespace of the table when there is one', () => {
+      expect((SqlExpression.parse('ns.t.x') as SqlColumn).getNamespaceName()).toEqual('ns');
+      expect((SqlExpression.parse('t.x') as SqlColumn).getNamespaceName()).toBeUndefined();
+      expect((SqlExpression.parse('x') as SqlColumn).getNamespaceName()).toBeUndefined();
+    });
+  });
+
+  describe('#prettyTrim', () => {
+    it('trims the column name', () => {
+      expect(String(SqlColumn.create('abcdefghij').prettyTrim(6))).toEqual(`"abc..."`);
+    });
+
+    it('trims the table and namespace names too', () => {
+      const column = SqlColumn.create('abcdefghij', SqlTable.create('klmnopqrst', 'uvwxyzabcd'));
+      expect(String(column.prettyTrim(6))).toEqual(`"uvw..."."klm..."."abc..."`);
+    });
+
+    it('leaves short names alone', () => {
+      expect(String((SqlExpression.parse('t.x') as SqlColumn).prettyTrim(6))).toEqual(`t.x`);
     });
   });
 
@@ -480,6 +602,24 @@ describe('SqlColumn', () => {
           "type": "table",
         }
       `);
+    });
+
+    it('converts a plain column', () => {
+      const table = (SqlExpression.parse('x') as SqlColumn).convertToTable();
+      expect(table).toBeInstanceOf(SqlTable);
+      expect(String(table)).toEqual('x');
+      expect(table.namespace).toBeUndefined();
+    });
+
+    it('fails when there are three parts', () => {
+      const column = SqlExpression.parse('a.b.c') as SqlColumn;
+      expect(() => column.convertToTable()).toThrow('can not convert');
+    });
+  });
+
+  describe('#getOutputName', () => {
+    it('returns the column name', () => {
+      expect((SqlExpression.parse('t."Hello"') as SqlColumn).getOutputName()).toEqual('Hello');
     });
   });
 });

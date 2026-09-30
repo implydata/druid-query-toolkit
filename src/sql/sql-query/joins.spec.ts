@@ -72,7 +72,42 @@ describe('SqlQuery (joins)', () => {
     });
   });
 
+  describe('#hasJoin', () => {
+    it('tells if the FROM clause has a join', () => {
+      expect(
+        SqlQuery.parse(
+          `SELECT * FROM wikipedia LEFT JOIN lookup.country ON v = countryName`,
+        ).hasJoin(),
+      ).toEqual(true);
+      expect(SqlQuery.parse(`SELECT * FROM wikipedia`).hasJoin()).toEqual(false);
+    });
+
+    it('is false when there is no FROM clause', () => {
+      expect(SqlQuery.parse(`SELECT 1`).hasJoin()).toEqual(false);
+    });
+  });
+
+  describe('#getJoins', () => {
+    it('returns the join parts', () => {
+      expect(
+        SqlQuery.parse(`SELECT * FROM wikipedia LEFT JOIN a ON a.k = x INNER JOIN b ON b.k = x`)
+          .getJoins()
+          .map(String),
+      ).toEqual(['LEFT JOIN a ON a.k = x', 'INNER JOIN b ON b.k = x']);
+    });
+
+    it('returns nothing when there is no FROM clause', () => {
+      expect(SqlQuery.parse(`SELECT 1`).getJoins()).toEqual([]);
+    });
+  });
+
   describe('#addJoin', () => {
+    it('does nothing when there is no FROM clause', () => {
+      const query = SqlQuery.parse(`SELECT 1`);
+
+      expect(query.addJoin(SqlJoinPart.cross(N('lookup').table('country')))).toBe(query);
+    });
+
     it('adds a left join', () => {
       expect(
         SqlQuery.parse(`SELECT countryName from wikipedia`)
@@ -118,6 +153,22 @@ describe('SqlQuery (joins)', () => {
     });
   });
 
+  describe('#addRightJoin', () => {
+    it('adds a right join', () => {
+      expect(
+        SqlQuery.parse(`SELECT countryName from wikipedia`)
+          .addRightJoin(
+            N('lookup').table('country'),
+            SqlExpression.parse('lookup.country.v = wikipedia.countryName'),
+          )
+          .toString(),
+      ).toMatchInlineSnapshot(`
+        "SELECT countryName from wikipedia
+        RIGHT JOIN \\"lookup\\".\\"country\\" ON lookup.country.v = wikipedia.countryName"
+      `);
+    });
+  });
+
   describe('#addInnerJoin', () => {
     it('adds an inner join', () => {
       expect(
@@ -134,7 +185,42 @@ describe('SqlQuery (joins)', () => {
     });
   });
 
+  describe('#addFullJoin', () => {
+    it('adds a full join', () => {
+      expect(
+        SqlQuery.parse(`SELECT countryName from wikipedia`)
+          .addFullJoin(
+            N('lookup').table('country'),
+            SqlExpression.parse('lookup.country.v = wikipedia.countryName'),
+          )
+          .toString(),
+      ).toMatchInlineSnapshot(`
+        "SELECT countryName from wikipedia
+        FULL JOIN \\"lookup\\".\\"country\\" ON lookup.country.v = wikipedia.countryName"
+      `);
+    });
+  });
+
+  describe('#addCrossJoin', () => {
+    it('adds a cross join', () => {
+      expect(
+        SqlQuery.parse(`SELECT countryName from wikipedia`)
+          .addCrossJoin(N('lookup').table('country'))
+          .toString(),
+      ).toMatchInlineSnapshot(`
+        "SELECT countryName from wikipedia
+        CROSS JOIN \\"lookup\\".\\"country\\""
+      `);
+    });
+  });
+
   describe('#removeAllJoins', () => {
+    it('does nothing when there is no FROM clause', () => {
+      const query = SqlQuery.parse(`SELECT 1`);
+
+      expect(query.removeAllJoins()).toBe(query);
+    });
+
     it('removes the join', () => {
       expect(
         SqlQuery.parse(

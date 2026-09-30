@@ -12,11 +12,27 @@
  * limitations under the License.
  */
 
+import type { SqlBase } from '../..';
+import {
+  SqlLiteral,
+  SqlQuery,
+  SqlRecord,
+  SqlTable,
+  SqlValues,
+  SqlWithClause,
+  SqlWithPart,
+} from '../..';
 import { backAndForth } from '../../test-utils';
 import { sane } from '../../utils';
 import { SqlExpression } from '../sql-expression';
 
-import type { SqlWithQuery } from './sql-with-query';
+import { SqlWithQuery } from './sql-with-query';
+
+function parseWithQuery(sql: string): SqlWithQuery {
+  const parsed = SqlExpression.parse(sql);
+  if (!(parsed instanceof SqlWithQuery)) throw new Error(`not a WITH query: ${sql}`);
+  return parsed;
+}
 
 describe('SqlWithQuery', () => {
   describe('parses', () => {
@@ -243,6 +259,71 @@ describe('SqlWithQuery', () => {
     });
   });
 
+  describe('#changeWithClause', () => {
+    const query = parseWithQuery(`WITH a AS (SELECT 1) (SELECT * FROM a)`);
+
+    it('returns the same instance when nothing changes', () => {
+      expect(query.changeWithClause(query.withClause)).toBe(query);
+    });
+
+    it('changes the WITH clause', () => {
+      expect(
+        String(
+          query.changeWithClause(
+            SqlWithClause.create([SqlWithPart.simple('b', SqlQuery.parse(`(SELECT 2)`))]),
+          ),
+        ),
+      ).toEqual(`WITH "b" AS (SELECT 2) (SELECT * FROM a)`);
+    });
+  });
+
+  describe('#changeQuery', () => {
+    const query = parseWithQuery(`WITH a AS (SELECT 1) (SELECT * FROM a)`);
+
+    it('returns the same instance when nothing changes', () => {
+      expect(query.changeQuery(query.query)).toBe(query);
+    });
+
+    it('changes the inner query', () => {
+      expect(
+        String(query.changeQuery(SqlValues.create([SqlRecord.create([SqlLiteral.ONE])]))),
+      ).toEqual(`WITH a AS (SELECT 1) (VALUES ROW(1))`);
+    });
+  });
+
+  describe('#getWithParts', () => {
+    it('returns the WITH parts', () => {
+      expect(
+        parseWithQuery(`WITH a AS (SELECT 1), b AS (SELECT 2) (SELECT * FROM b)`)
+          .getWithParts()
+          .map(String),
+      ).toEqual(['a AS (SELECT 1)', 'b AS (SELECT 2)']);
+    });
+  });
+
+  describe('#changeWithParts', () => {
+    it('replaces the WITH parts', () => {
+      const query = parseWithQuery(`WITH a AS (SELECT 1), b AS (SELECT 2) (SELECT * FROM b)`);
+
+      expect(String(query.changeWithParts(query.getWithParts().slice(1)))).toEqual(
+        `WITH b AS (SELECT 2) (SELECT * FROM b)`,
+      );
+    });
+  });
+
+  describe('#prependWith', () => {
+    it('adds a WITH part at the front', () => {
+      expect(
+        String(
+          parseWithQuery(`WITH a AS (SELECT 1) (SELECT * FROM a)`).prependWith(
+            'z',
+            SqlQuery.parse(`SELECT 0`),
+          ),
+        ),
+      ).toEqual(`WITH "z" AS (SELECT 0),\na AS (SELECT 1) (SELECT * FROM a)`);
+    });
+  });
+
   describe('#flattenWith', () => {
     it('flattens nested WITH clauses into one', () => {
       const sql = sane`
@@ -273,6 +354,77 @@ describe('SqlWithQuery', () => {
         PARTITIONED BY ALL
         -- Trailing comment
       `);
+    });
+
+    it('carries the INSERT clause and the suffix clauses over', () => {
+      const query = parseWithQuery(sane`
+        INSERT INTO dst
+        WITH a AS (SELECT * FROM wikipedia)
+        (SELECT * FROM a OFFSET 5)
+        ORDER BY __time
+        LIMIT 3
+        OFFSET 2
+        PARTITIONED BY ALL
+        CLUSTERED BY page
+      `);
+
+      expect(String(query.flattenWith())).toMatchInlineSnapshot(`
+        "INSERT INTO dst
+        WITH a AS (SELECT * FROM wikipedia)
+        SELECT * FROM a
+        ORDER BY __time
+        LIMIT 3 OFFSET 7
+        PARTITIONED BY ALL
+        CLUSTERED BY page"
+      `);
+    });
+
+    it('shrinks an inner limit by the outer offset', () => {
+      const flatten = (sql: string) => String(parseWithQuery(sql).flattenWith());
+
+      expect(
+        flatten(`WITH a AS (SELECT * FROM t) (SELECT * FROM a LIMIT 3) LIMIT 10 OFFSET 2`),
+      ).toEqual(`WITH a AS (SELECT * FROM t)\nSELECT * FROM a LIMIT 1\nOFFSET 2`);
+
+      expect(
+        flatten(`WITH a AS (SELECT * FROM t) (SELECT * FROM a LIMIT 10 OFFSET 1) LIMIT 3 OFFSET 2`),
+      ).toEqual(`WITH a AS (SELECT * FROM t)\nSELECT * FROM a LIMIT 3 OFFSET 3`);
+
+      expect(flatten(`WITH a AS (SELECT * FROM t) (SELECT * FROM a LIMIT 3) OFFSET 5`)).toEqual(
+        `WITH a AS (SELECT * FROM t)\nSELECT * FROM a LIMIT 0\nOFFSET 5`,
+      );
+    });
+
+    it('leaves the query alone when the inner query can not take a WITH clause', () => {
+      const query = parseWithQuery(`WITH a AS (SELECT 1) (VALUES (1))`);
+
+      expect(query.flattenWith()).toBe(query);
+    });
+  });
+
+  describe('#walk', () => {
+    const query = parseWithQuery(`WITH a AS (SELECT * FROM t) (SELECT * FROM t)`);
+
+    it('substitutes inside the WITH clause and the query', () => {
+      expect(String(query.walk(ex => (ex instanceof SqlTable ? ex.changeName('u') : ex)))).toEqual(
+        `WITH a AS (SELECT * FROM u) (SELECT * FROM u)`,
+      );
+    });
+
+    it.each<[string, (q: SqlWithQuery) => SqlBase]>([
+      ['the WITH clause', q => q.withClause],
+      ['the query', q => q.query],
+    ])('stops at %s when the substitutor returns undefined', (_name, getTarget) => {
+      const target = getTarget(query);
+      const visited: SqlBase[] = [];
+
+      expect(
+        query.walk(ex => {
+          visited.push(ex);
+          return ex === target ? undefined : ex;
+        }),
+      ).toBe(query);
+      expect(visited[visited.length - 1]).toBe(target);
     });
   });
 

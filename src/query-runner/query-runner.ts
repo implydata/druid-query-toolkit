@@ -97,8 +97,8 @@ export class QueryRunner {
         query,
         resultFormat: resultFormat ?? 'array',
         header: header ?? true,
-        typesHeader: (header && typesHeader) ?? true,
-        sqlTypesHeader: (header && sqlTypesHeader) ?? true,
+        typesHeader: (header ?? true) && (typesHeader ?? true),
+        sqlTypesHeader: (header ?? true) && (sqlTypesHeader ?? true),
       };
       try {
         parsedQuery = SqlQuery.parse(query);
@@ -110,8 +110,8 @@ export class QueryRunner {
         query: String(query),
         resultFormat: resultFormat ?? 'array',
         header: header ?? true,
-        typesHeader: (header && typesHeader) ?? true,
-        sqlTypesHeader: (header && sqlTypesHeader) ?? true,
+        typesHeader: (header ?? true) && (typesHeader ?? true),
+        sqlTypesHeader: (header ?? true) && (sqlTypesHeader ?? true),
       };
     } else {
       queryPayload = query;

@@ -14,9 +14,11 @@
 
 import { SqlQuery } from '..';
 
+import type { InflateDateStrategy, QueryExecutorArgs } from './query-runner';
 import { QueryRunner } from './query-runner';
 
 describe('QueryRunner', () => {
+  const originalNow = QueryRunner.now;
   let n = 100000000;
   QueryRunner.now = () => ++n;
 
@@ -59,7 +61,177 @@ describe('QueryRunner', () => {
     },
   });
 
+  describe('.now', () => {
+    it('returns the current time in ms', () => {
+      const before = Date.now();
+      const now = originalNow();
+      expect(now).toBeGreaterThanOrEqual(before);
+      expect(now).toBeLessThanOrEqual(Date.now());
+    });
+  });
+
+  describe('.isEmptyContext', () => {
+    it('is true for a missing or empty context', () => {
+      expect(QueryRunner.isEmptyContext(undefined)).toEqual(true);
+      expect(QueryRunner.isEmptyContext({})).toEqual(true);
+    });
+
+    it('is false when there are keys', () => {
+      expect(QueryRunner.isEmptyContext({ a: undefined })).toEqual(false);
+    });
+  });
+
   describe('#runQuery', () => {
+    function makeCapturingRunner(options: { inflateDateStrategy?: InflateDateStrategy } = {}) {
+      const calls: QueryExecutorArgs[] = [];
+      const runner = new QueryRunner({
+        ...options,
+        // eslint-disable-next-line @typescript-eslint/require-await
+        executor: async args => {
+          calls.push(args);
+          return {
+            data: [
+              ['__time', 'guessed'],
+              ['LONG', 'STRING'],
+              ['TIMESTAMP', 'VARCHAR'],
+              ['2020-01-01T00:00:00.000Z', '2021-01-01T00:00:00.000Z'],
+            ],
+            headers: { 'x-druid-sql-header-included': 'yes' },
+          };
+        },
+      });
+      return { runner, calls };
+    }
+
+    it('throws without an executor', async () => {
+      await expect(new QueryRunner().runQuery({ query: 'SELECT 1' })).rejects.toThrow(
+        'Query executor must be provided or a default must be defined',
+      );
+    });
+
+    it('falls back to the default executor', async () => {
+      const { runner, calls } = makeCapturingRunner();
+      QueryRunner.defaultQueryExecutor = runner.executor;
+      try {
+        const result = await new QueryRunner().runQuery({ query: 'SELECT 1' });
+        expect(calls).toHaveLength(1);
+        expect(result.getNumResults()).toEqual(1);
+      } finally {
+        QueryRunner.defaultQueryExecutor = undefined;
+      }
+    });
+
+    it('inflates dates from the sql types by default', async () => {
+      const { runner } = makeCapturingRunner();
+      expect(runner.inflateDateStrategy).toEqual('fromSqlTypes');
+      const result = await runner.runQuery({ query: 'SELECT 1' });
+      expect(result.rows).toEqual([
+        [new Date('2020-01-01T00:00:00.000Z'), '2021-01-01T00:00:00.000Z'],
+      ]);
+    });
+
+    it('inflates dates by guessing', async () => {
+      const { runner } = makeCapturingRunner({ inflateDateStrategy: 'guess' });
+      const result = await runner.runQuery({ query: 'SELECT 1' });
+      expect(result.rows).toEqual([
+        [new Date('2020-01-01T00:00:00.000Z'), new Date('2021-01-01T00:00:00.000Z')],
+      ]);
+    });
+
+    it('does not inflate dates with the none strategy', async () => {
+      const { runner } = makeCapturingRunner({ inflateDateStrategy: 'none' });
+      const result = await runner.runQuery({ query: 'SELECT 1' });
+      expect(result.rows).toEqual([['2020-01-01T00:00:00.000Z', '2021-01-01T00:00:00.000Z']]);
+    });
+
+    it('builds a SQL payload from the options', async () => {
+      const { runner, calls } = makeCapturingRunner();
+      await runner.runQuery({
+        query: 'SELECT 1',
+        resultFormat: 'object',
+        header: false,
+      });
+      expect(calls[0]!.payload).toEqual({
+        query: 'SELECT 1',
+        resultFormat: 'object',
+        header: false,
+        typesHeader: false,
+        sqlTypesHeader: false,
+      });
+      expect(calls[0]!.isSql).toEqual(true);
+    });
+
+    it('respects the type header flags when header is not set', async () => {
+      const { runner, calls } = makeCapturingRunner();
+      await runner.runQuery({
+        query: SqlQuery.parse('SELECT 1'),
+        typesHeader: false,
+        sqlTypesHeader: true,
+      });
+      expect(calls[0]!.payload).toEqual({
+        query: 'SELECT 1',
+        resultFormat: 'array',
+        header: true,
+        typesHeader: false,
+        sqlTypesHeader: true,
+      });
+    });
+
+    it('still runs a SQL string that does not parse', async () => {
+      const { runner, calls } = makeCapturingRunner();
+      const result = await runner.runQuery({ query: 'SELEC 1 FROM' });
+      expect(calls[0]!.payload.query).toEqual('SELEC 1 FROM');
+      expect(result.sqlQuery).toBeUndefined();
+    });
+
+    it('still runs a SQL payload that does not parse', async () => {
+      const { runner, calls } = makeCapturingRunner();
+      const result = await runner.runQuery({ query: { query: 'SELEC 1 FROM', header: true } });
+      expect(calls[0]!.isSql).toEqual(true);
+      expect(result.sqlQuery).toBeUndefined();
+    });
+
+    it('merges the contexts with extra over payload over default', async () => {
+      const { runner, calls } = makeCapturingRunner();
+      await runner.runQuery({
+        query: { query: 'SELECT 1', context: { a: 'payload', b: 'payload' } },
+        defaultQueryContext: { a: 'default', b: 'default', c: 'default' },
+        extraQueryContext: { b: 'extra' },
+      });
+      expect(calls[0]!.payload.context).toEqual({ a: 'payload', b: 'extra', c: 'default' });
+    });
+
+    it('does not add parameters to a native query', async () => {
+      const { runner, calls } = makeCapturingRunner({ inflateDateStrategy: 'none' });
+      await runner.runQuery({
+        query: { queryType: 'scan', dataSource: 'x' },
+        queryParameters: [{ type: 'VARCHAR', value: 'v' }],
+      });
+      expect(calls[0]!.isSql).toEqual(false);
+      expect(calls[0]!.payload).toEqual({ queryType: 'scan', dataSource: 'x' });
+    });
+
+    it('throws if the signal was aborted during the query', async () => {
+      const controller = new AbortController();
+      const runner = new QueryRunner({
+        // eslint-disable-next-line @typescript-eslint/require-await
+        executor: async () => {
+          controller.abort(new Error('user cancelled'));
+          return { data: [], headers: {} };
+        },
+      });
+      await expect(
+        runner.runQuery({ query: 'SELECT 1', signal: controller.signal }),
+      ).rejects.toThrow('user cancelled');
+    });
+
+    it('passes the signal to the executor', async () => {
+      const controller = new AbortController();
+      const { runner, calls } = makeCapturingRunner();
+      await runner.runQuery({ query: 'SELECT 1', signal: controller.signal });
+      expect(calls[0]!.signal).toBe(controller.signal);
+    });
+
     it('works with rune query', async () => {
       const queryResult = await queryRunner.runQuery({
         query: {

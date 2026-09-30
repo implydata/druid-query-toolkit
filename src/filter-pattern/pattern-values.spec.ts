@@ -89,6 +89,71 @@ describe('pattern-values', () => {
     },
   ];
 
+  const pattern: ValuesFilterPattern = {
+    type: 'values',
+    negated: false,
+    column: 'cityName',
+    values: ['Paris', 'Marseille'],
+  };
+
+  function fit(sql: string) {
+    return VALUES_PATTERN_DEFINITION.fit(SqlExpression.parse(sql));
+  }
+
+  describe('.fit', () => {
+    it.each([
+      `"cityName" <> 'Paris' OR "cityName" <> 'Marseille'`,
+      `"cityName" = 'Paris' AND "cityName" = 'Marseille'`,
+      `"cityName" = 'Paris' OR "cityName" <> 'Marseille'`,
+      `"cityName" = 'Paris' OR "countryName" = 'France'`,
+      `"cityName" = 'Paris' OR "cityName" > 'Marseille'`,
+      `"cityName" = "countryName"`,
+      `'Paris' = 'Paris'`,
+      `'Paris' IS NULL`,
+      `"cityName" IN ('Paris', "countryName")`,
+      `"cityName" IN (SELECT 'Paris')`,
+      `"cityName" > 'Paris'`,
+      `"cityName" LIKE 'P%'`,
+      `UPPER("cityName")`,
+    ])('does not fit %s', sql => {
+      expect(fit(sql)).toBeUndefined();
+    });
+  });
+
+  describe('.isValid', () => {
+    it('is valid when there are values', () => {
+      expect(VALUES_PATTERN_DEFINITION.isValid(pattern)).toEqual(true);
+    });
+
+    it('is not valid when there are no values', () => {
+      expect(VALUES_PATTERN_DEFINITION.isValid({ ...pattern, values: [] })).toEqual(false);
+    });
+  });
+
+  describe('.toExpression', () => {
+    it('returns FALSE when there are no values', () => {
+      expect(String(VALUES_PATTERN_DEFINITION.toExpression({ ...pattern, values: [] }))).toEqual(
+        'FALSE',
+      );
+    });
+
+    it('makes a negated IN', () => {
+      expect(String(VALUES_PATTERN_DEFINITION.toExpression({ ...pattern, negated: true }))).toEqual(
+        `"cityName" NOT IN ('Paris', 'Marseille')`,
+      );
+    });
+  });
+
+  describe('.getThing', () => {
+    it('returns the first value as a string', () => {
+      expect(VALUES_PATTERN_DEFINITION.getThing({ ...pattern, values: [5, 'Paris'] })).toEqual('5');
+    });
+
+    it('returns nothing when there are no values', () => {
+      expect(VALUES_PATTERN_DEFINITION.getThing({ ...pattern, values: [] })).toBeUndefined();
+    });
+  });
+
   describe('fit <-> toExpression', () => {
     expectations.forEach(({ fixedPoint, pattern, otherForms }) => {
       it(`works with ${fixedPoint}`, () => {

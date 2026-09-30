@@ -12,13 +12,16 @@
  * limitations under the License.
  */
 
+import type { SqlBase } from '../..';
 import {
+  C,
   RefName,
   sql,
   SqlCase,
   SqlColumn,
   SqlColumnList,
   SqlExpression,
+  SqlFromClause,
   SqlFunction,
   SqlLiteral,
   SqlQuery,
@@ -5527,6 +5530,29 @@ describe('SqlQuery', () => {
         FROM lol
       `);
     });
+
+    it('creates a table from a string', () => {
+      expect(String(SqlQuery.from('lol'))).toEqual(`SELECT ...\nFROM "lol"`);
+    });
+
+    it('uses a given FROM clause as is', () => {
+      const fromClause = SqlFromClause.create([SqlTable.create('lol')]);
+
+      expect(SqlQuery.from(fromClause).fromClause).toBe(fromClause);
+    });
+
+    it('lifts the context out of a WITH query', () => {
+      const withQuery = SqlExpression.parse(sane`
+        SET a = 1;
+        WITH w AS (SELECT 1) (SELECT * FROM w)
+      `);
+
+      expect(String(SqlQuery.from(withQuery))).toEqual(sane`
+        SET a = 1;
+        SELECT ...
+        FROM (WITH w AS (SELECT 1) (SELECT * FROM w))
+      `);
+    });
   });
 
   describe('.selectStarFrom', () => {
@@ -5592,11 +5618,48 @@ describe('SqlQuery', () => {
     });
   });
 
+  describe('.create', () => {
+    it('does the same as selectStarFrom', () => {
+      expect(String(SqlQuery.create('lol'))).toEqual(String(SqlQuery.selectStarFrom('lol')));
+    });
+  });
+
   describe('.parse', () => {
     it('throws on a non-query', () => {
       expect(() => SqlQuery.parse('a OR b')).toThrowErrorMatchingInlineSnapshot(
         `"Provided SQL was not a query"`,
       );
+    });
+
+    it('returns a given query as is', () => {
+      const query = SqlQuery.parse(`SELECT 1`);
+
+      expect(SqlQuery.parse(query)).toBe(query);
+    });
+
+    it('throws on an input that is neither a string nor a query', () => {
+      expect(() => SqlQuery.parse(SqlTable.create('lol') as any)).toThrow('unknown input');
+    });
+  });
+
+  describe('.maybeParse', () => {
+    it('returns the parsed query', () => {
+      expect(String(SqlQuery.maybeParse(`SELECT 1`))).toEqual(`SELECT 1`);
+    });
+
+    it('returns nothing when the input is not a query', () => {
+      expect(SqlQuery.maybeParse(`a OR b`)).toBeUndefined();
+      expect(SqlQuery.maybeParse(`SELECT FROM WHERE`)).toBeUndefined();
+    });
+  });
+
+  describe('.getSelectExpressionOutput', () => {
+    it('uses the output name or makes up a phony one', () => {
+      expect(SqlQuery.getSelectExpressionOutput(SqlExpression.parse(`x AS y`), 0)).toEqual('y');
+      expect(SqlQuery.getSelectExpressionOutput(SqlExpression.parse(`t.channel`), 1)).toEqual(
+        'channel',
+      );
+      expect(SqlQuery.getSelectExpressionOutput(SqlExpression.parse(`1 + 2`), 3)).toEqual('EXPR$3');
     });
   });
 
@@ -5606,6 +5669,878 @@ describe('SqlQuery', () => {
       expect(SqlQuery.isPhonyOutputName('EXPR$12')).toEqual(true);
       expect(SqlQuery.isPhonyOutputName('EXPR$01')).toEqual(false);
       expect(SqlQuery.isPhonyOutputName('expr$')).toEqual(false);
+    });
+  });
+
+  describe('#changeWithClause', () => {
+    const query = SqlQuery.parse(`WITH w AS (SELECT 1)  SELECT * FROM w`);
+
+    it('returns the same instance when nothing changes', () => {
+      expect(query.changeWithClause(query.withClause)).toBe(query);
+    });
+
+    it('removes the clause and its spacing', () => {
+      expect(String(query.changeWithClause(undefined))).toEqual(`SELECT * FROM w`);
+    });
+  });
+
+  describe('#changeDecorator', () => {
+    it('works', () => {
+      const sql = SqlQuery.parse(sane`
+        SELECT
+          isAnonymous,
+          cityName,
+          flags,
+          COUNT(*) AS "Count",
+          SUM(added) AS "sum_added"
+        FROM wikipedia
+        GROUP BY 1, 2, 3
+        ORDER BY 4 DESC
+      `);
+      expect(sql.changeDecorator('ALL').toString()).toEqual(sane`
+        SELECT
+          ALL
+          isAnonymous,
+          cityName,
+          flags,
+          COUNT(*) AS "Count",
+          SUM(added) AS "sum_added"
+        FROM wikipedia
+        GROUP BY 1, 2, 3
+        ORDER BY 4 DESC
+      `);
+      expect(sql.changeDecorator('DISTINCT').toString()).toEqual(sane`
+        SELECT
+          DISTINCT
+          isAnonymous,
+          cityName,
+          flags,
+          COUNT(*) AS "Count",
+          SUM(added) AS "sum_added"
+        FROM wikipedia
+        GROUP BY 1, 2, 3
+        ORDER BY 4 DESC
+      `);
+    });
+    it('can remove an existing decorator', () => {
+      const sql = SqlQuery.parse(sane`
+      SELECT
+      ALL
+        isAnonymous,
+        cityName,
+        flags,
+        COUNT(*) AS "Count",
+        SUM(added) AS "sum_added"
+      FROM (
+        SELECT * FROM wikipedia
+      ) t
+      GROUP BY 1, 2, 3
+      ORDER BY 4 DESC
+    `);
+      expect(sql.changeDecorator(undefined).toString()).toEqual(sane`
+      SELECT
+      isAnonymous,
+        cityName,
+        flags,
+        COUNT(*) AS "Count",
+        SUM(added) AS "sum_added"
+      FROM (
+        SELECT * FROM wikipedia
+      ) t
+      GROUP BY 1, 2, 3
+      ORDER BY 4 DESC
+    `);
+    });
+  });
+
+  describe('#changeSelectExpressions', () => {
+    it('returns the same instance when nothing changes', () => {
+      const query = SqlQuery.parse(`SELECT a FROM t`);
+
+      expect(query.changeSelectExpressions(query.selectExpressions)).toBe(query);
+    });
+  });
+
+  describe('#changeFromClause', () => {
+    it('returns the same instance when nothing changes', () => {
+      const query = SqlQuery.parse(`SELECT a FROM t`);
+
+      expect(query.changeFromClause(query.fromClause)).toBe(query);
+    });
+  });
+
+  describe('#changeFromExpressions', () => {
+    it('changes the expressions of an existing clause', () => {
+      expect(
+        String(SqlQuery.parse(`SELECT a FROM t`).changeFromExpressions([SqlTable.create('u')])),
+      ).toEqual(`SELECT a FROM "u"`);
+    });
+
+    it('creates a clause', () => {
+      expect(
+        String(SqlQuery.parse(`SELECT 1`).changeFromExpressions([SqlTable.create('u')])),
+      ).toEqual(`SELECT 1\nFROM "u"`);
+    });
+
+    it('removes the clause when given nothing', () => {
+      expect(String(SqlQuery.parse(`SELECT a FROM t`).changeFromExpressions(undefined))).toEqual(
+        `SELECT a`,
+      );
+    });
+  });
+
+  describe('#changeWhereExpression', () => {
+    it('removes the clause when given TRUE', () => {
+      expect(
+        String(SqlQuery.parse(`SELECT a FROM t WHERE b`).changeWhereExpression(SqlLiteral.TRUE)),
+      ).toEqual(`SELECT a FROM t`);
+    });
+  });
+
+  describe('#changeGroupByClause', () => {
+    it('returns the same instance when nothing changes', () => {
+      const query = SqlQuery.parse(`SELECT a FROM t GROUP BY a`);
+
+      expect(query.changeGroupByClause(query.groupByClause)).toBe(query);
+    });
+  });
+
+  describe('#getGroupByExpressions', () => {
+    it('returns the GROUP BY expressions', () => {
+      expect(
+        SqlQuery.parse(`SELECT a, b FROM t GROUP BY 1, b`).getGroupByExpressions()?.map(String),
+      ).toEqual(['1', 'b']);
+      expect(SqlQuery.parse(`SELECT a FROM t`).getGroupByExpressions()).toBeUndefined();
+    });
+  });
+
+  describe('#changeGroupByExpressions', () => {
+    it('changes the expressions of an existing clause', () => {
+      expect(
+        String(SqlQuery.parse(`SELECT a FROM t GROUP BY a`).changeGroupByExpressions([C('b')])),
+      ).toEqual(`SELECT a FROM t GROUP BY "b"`);
+    });
+
+    it('creates a clause', () => {
+      expect(String(SqlQuery.parse(`SELECT a FROM t`).changeGroupByExpressions([C('a')]))).toEqual(
+        `SELECT a FROM t\nGROUP BY "a"`,
+      );
+    });
+
+    it('removes the clause when given nothing', () => {
+      expect(
+        String(SqlQuery.parse(`SELECT a FROM t GROUP BY a`).changeGroupByExpressions(undefined)),
+      ).toEqual(`SELECT a FROM t`);
+    });
+  });
+
+  describe('#changeHavingClause', () => {
+    it('returns the same instance when nothing changes', () => {
+      const query = SqlQuery.parse(`SELECT a FROM t GROUP BY a HAVING COUNT(*) > 1`);
+
+      expect(query.changeHavingClause(query.havingClause)).toBe(query);
+    });
+  });
+
+  describe('#changeHavingExpression', () => {
+    const query = SqlQuery.parse(`SELECT a FROM t GROUP BY a HAVING COUNT(*) > 1`);
+
+    it('changes the expression of an existing clause', () => {
+      expect(String(query.changeHavingExpression(SqlExpression.parse(`COUNT(*) > 2`)))).toEqual(
+        `SELECT a FROM t GROUP BY a HAVING COUNT(*) > 2`,
+      );
+    });
+
+    it('creates a clause', () => {
+      expect(
+        String(
+          SqlQuery.parse(`SELECT a FROM t GROUP BY a`).changeHavingExpression(
+            SqlExpression.parse(`COUNT(*) > 2`),
+          ),
+        ),
+      ).toEqual(`SELECT a FROM t GROUP BY a\nHAVING COUNT(*) > 2`);
+    });
+
+    it('removes the clause when given nothing or TRUE', () => {
+      expect(String(query.changeHavingExpression(undefined))).toEqual(`SELECT a FROM t GROUP BY a`);
+      expect(String(query.changeHavingExpression(SqlLiteral.TRUE))).toEqual(
+        `SELECT a FROM t GROUP BY a`,
+      );
+    });
+  });
+
+  describe('#inlineMaxDataTime', () => {
+    const query = SqlQuery.parse(
+      `SELECT * FROM t WHERE __time >= MAX_DATA_TIME() - INTERVAL '1' DAY AND x = LOWER('A')`,
+    );
+
+    it('replaces MAX_DATA_TIME() with the given time', () => {
+      expect(String(query.inlineMaxDataTime(Date.UTC(2020, 0, 2, 3, 4, 5)))).toEqual(
+        `SELECT * FROM t WHERE __time >= TIMESTAMP '2020-01-02 03:04:05' - INTERVAL '1' DAY AND x = LOWER('A')`,
+      );
+    });
+
+    it('uses the current time when no time is given', () => {
+      jest.useFakeTimers().setSystemTime(Date.UTC(2021, 5, 6, 7, 8, 9));
+      try {
+        expect(String(query.inlineMaxDataTime(undefined))).toEqual(
+          `SELECT * FROM t WHERE __time >= TIMESTAMP '2021-06-06 07:08:09' - INTERVAL '1' DAY AND x = LOWER('A')`,
+        );
+      } finally {
+        jest.useRealTimers();
+      }
+    });
+  });
+
+  describe('#getWithParts', () => {
+    it('returns nothing when there is no WITH clause', () => {
+      expect(SqlQuery.parse(`SELECT 1`).getWithParts()).toEqual([]);
+    });
+  });
+
+  describe('#changeWithParts', () => {
+    it('changes the parts of an existing clause', () => {
+      const query = SqlQuery.parse(`WITH a AS (SELECT 1), b AS (SELECT 2) SELECT * FROM b`);
+
+      expect(String(query.changeWithParts(query.getWithParts().slice(1)))).toEqual(
+        `WITH b AS (SELECT 2) SELECT * FROM b`,
+      );
+    });
+
+    it('removes the clause when given nothing', () => {
+      const query = SqlQuery.parse(`WITH a AS (SELECT 1) SELECT * FROM a`);
+
+      expect(String(query.changeWithParts([]))).toEqual(`SELECT * FROM a`);
+      expect(String(query.changeWithParts(undefined))).toEqual(`SELECT * FROM a`);
+    });
+  });
+
+  describe('#isValidSelectIndex', () => {
+    it('checks the index against the select expressions', () => {
+      const query = SqlQuery.parse(`SELECT a, b FROM t`);
+
+      expect(query.isValidSelectIndex(0)).toEqual(true);
+      expect(query.isValidSelectIndex(1)).toEqual(true);
+      expect(query.isValidSelectIndex(2)).toEqual(false);
+      expect(query.isValidSelectIndex(-1)).toEqual(false);
+    });
+
+    it('is false when there are no select expressions', () => {
+      expect(SqlQuery.from('t').isValidSelectIndex(0)).toEqual(false);
+    });
+  });
+
+  describe('#getSelectExpressionsArray', () => {
+    it('returns the select expressions', () => {
+      expect(SqlQuery.parse(`SELECT a, b FROM t`).getSelectExpressionsArray().map(String)).toEqual([
+        'a',
+        'b',
+      ]);
+    });
+
+    it('returns nothing when there are no select expressions', () => {
+      expect(SqlQuery.from('t').getSelectExpressionsArray()).toEqual([]);
+    });
+  });
+
+  describe('#hasStarInSelect', () => {
+    it('works when there is no star', () => {
+      const sql = SqlQuery.parse(sane`
+        SELECT
+          isAnonymous,
+          cityName
+        FROM wikipedia
+      `);
+
+      expect(sql.hasStarInSelect()).toBe(false);
+    });
+
+    it('works when there is a star', () => {
+      const sql = SqlQuery.parse(sane`
+        SELECT
+          *,
+          cityName
+        FROM wikipedia
+      `);
+
+      expect(sql.hasStarInSelect()).toBe(true);
+    });
+
+    it('works when there is a star from a table', () => {
+      const sql = SqlQuery.parse(sane`
+        SELECT
+          t.*,
+          cityName
+        FROM wikipedia AS t
+      `);
+
+      expect(sql.hasStarInSelect()).toBe(true);
+    });
+  });
+
+  describe('#getOutputColumns', () => {
+    it('lists the output name of every select expression', () => {
+      expect(
+        SqlQuery.parse(`SELECT channel, COUNT(*), SUM(x) AS s FROM t`).getOutputColumns(),
+      ).toEqual(['channel', 'EXPR$1', 's']);
+    });
+  });
+
+  describe('#getSelectIndexesForColumn', () => {
+    it('finds every select expression that uses the column', () => {
+      const query = SqlQuery.parse(`SELECT channel, UPPER(channel) AS u, page FROM t`);
+
+      expect(query.getSelectIndexesForColumn('channel')).toEqual([0, 1]);
+      expect(query.getSelectIndexesForColumn('page')).toEqual([2]);
+      expect(query.getSelectIndexesForColumn('nope')).toEqual([]);
+    });
+  });
+
+  describe('#getGroupedSelectIndexesForColumn', () => {
+    it('keeps only the grouped select expressions', () => {
+      const query = SqlQuery.parse(
+        `SELECT channel, LATEST(channel) AS l, UPPER(channel) AS u FROM t GROUP BY 1, 3`,
+      );
+
+      expect(query.getGroupedSelectIndexesForColumn('channel')).toEqual([0, 2]);
+    });
+  });
+
+  describe('#isRealOutputColumnAtSelectIndex', () => {
+    it('tells if the select expression has a real output name', () => {
+      const query = SqlQuery.parse(`SELECT channel, COUNT(*), SUM(x) AS s FROM t`);
+
+      expect(query.isRealOutputColumnAtSelectIndex(0)).toEqual(true);
+      expect(query.isRealOutputColumnAtSelectIndex(1)).toEqual(false);
+      expect(query.isRealOutputColumnAtSelectIndex(2)).toEqual(true);
+      expect(query.isRealOutputColumnAtSelectIndex(3)).toEqual(false);
+    });
+  });
+
+  describe('#isGroupedSelectIndex', () => {
+    it('is false without a GROUP BY or for an invalid index', () => {
+      expect(SqlQuery.parse(`SELECT a FROM t`).isGroupedSelectIndex(0)).toEqual(false);
+      expect(SqlQuery.parse(`SELECT a FROM t GROUP BY 1`).isGroupedSelectIndex(0)).toEqual(true);
+      expect(SqlQuery.parse(`SELECT a FROM t GROUP BY 1`).isGroupedSelectIndex(1)).toEqual(false);
+    });
+  });
+
+  describe('#isGroupedOutputColumn', () => {
+    it('tells if the output column is grouped on', () => {
+      const query = SqlQuery.parse(`SELECT a, COUNT(*) AS c FROM t GROUP BY 1`);
+
+      expect(query.isGroupedOutputColumn('a')).toEqual(true);
+      expect(query.isGroupedOutputColumn('c')).toEqual(false);
+      expect(query.isGroupedOutputColumn('nope')).toEqual(false);
+    });
+  });
+
+  describe('#isAggregateSelectIndex', () => {
+    it('is false without a GROUP BY or for an invalid index', () => {
+      expect(SqlQuery.parse(`SELECT COUNT(*) FROM t`).isAggregateSelectIndex(0)).toEqual(false);
+      expect(
+        SqlQuery.parse(`SELECT a, COUNT(*) FROM t GROUP BY 1`).isAggregateSelectIndex(2),
+      ).toEqual(false);
+    });
+  });
+
+  describe('#isAggregateOutputColumn', () => {
+    it('tells if the output column is an aggregate', () => {
+      const query = SqlQuery.parse(`SELECT a, COUNT(*) AS c FROM t GROUP BY 1`);
+
+      expect(query.isAggregateOutputColumn('a')).toEqual(false);
+      expect(query.isAggregateOutputColumn('c')).toEqual(true);
+      expect(query.isAggregateOutputColumn('nope')).toEqual(false);
+    });
+  });
+
+  describe('#addSelect', () => {
+    const sql = SqlQuery.parse(sane`
+      SELECT
+        isAnonymous,
+        cityName,
+        flags,
+        COUNT(*) AS "Count",
+        SUM(added) AS "sum_added"
+      FROM wikipedia
+      GROUP BY 1, 2, 3
+      ORDER BY 4 DESC
+    `);
+
+    it('adds last', () => {
+      const select = SqlExpression.parse(`"new_column" AS "New column"`);
+      expect(sql.addSelect(select).toString()).toEqual(sane`
+        SELECT
+          isAnonymous,
+          cityName,
+          flags,
+          COUNT(*) AS "Count",
+          SUM(added) AS "sum_added",
+          "new_column" AS "New column"
+        FROM wikipedia
+        GROUP BY 1, 2, 3
+        ORDER BY 4 DESC
+      `);
+    });
+
+    it('adds first', () => {
+      const select = SqlExpression.parse(`"new_column" AS "New column"`);
+      expect(sql.addSelect(select, { insertIndex: 0 }).toString()).toEqual(sane`
+        SELECT
+          "new_column" AS "New column",
+          isAnonymous,
+          cityName,
+          flags,
+          COUNT(*) AS "Count",
+          SUM(added) AS "sum_added"
+        FROM wikipedia
+        GROUP BY 2, 3, 4
+        ORDER BY 5 DESC
+      `);
+    });
+
+    it('adds grouped', () => {
+      const select = SqlExpression.parse(`UPPER(city) AS City`);
+      expect(
+        sql.addSelect(select, { insertIndex: 'last-grouping', addToGroupBy: 'end' }).toString(),
+      ).toEqual(sane`
+        SELECT
+          isAnonymous,
+          cityName,
+          flags,
+          UPPER(city) AS City,
+          COUNT(*) AS "Count",
+          SUM(added) AS "sum_added"
+        FROM wikipedia
+        GROUP BY 1, 2, 3, 4
+        ORDER BY 5 DESC
+      `);
+    });
+
+    it('adds grouped with expression', () => {
+      const select = SqlExpression.parse(`UPPER(city) AS City`);
+      expect(
+        sql
+          .addSelect(select, {
+            insertIndex: 'last-grouping',
+            groupByExpression: SqlExpression.parse(`SUBSTR(city, 1, 2)`),
+          })
+          .toString(),
+      ).toEqual(sane`
+        SELECT
+          isAnonymous,
+          cityName,
+          flags,
+          UPPER(city) AS City,
+          COUNT(*) AS "Count",
+          SUM(added) AS "sum_added"
+        FROM wikipedia
+        GROUP BY 1, 2, 3, SUBSTR(city, 1, 2)
+        ORDER BY 5 DESC
+      `);
+    });
+
+    it('adds sorted', () => {
+      const select = SqlExpression.parse(`COUNT(DISTINCT "user") AS unique_users`);
+      expect(
+        sql
+          .addSelect(select, {
+            insertIndex: 'last',
+            addToOrderBy: 'start',
+            direction: 'DESC',
+          })
+          .toString(),
+      ).toEqual(sane`
+        SELECT
+          isAnonymous,
+          cityName,
+          flags,
+          COUNT(*) AS "Count",
+          SUM(added) AS "sum_added",
+          COUNT(DISTINCT "user") AS unique_users
+        FROM wikipedia
+        GROUP BY 1, 2, 3
+        ORDER BY 6 DESC, 4 DESC
+      `);
+    });
+
+    it('adds grouped + sorted', () => {
+      const select = SqlExpression.parse(`UPPER(city) AS City`);
+      expect(
+        sql
+          .addSelect(select, {
+            insertIndex: 'last-grouping',
+            addToGroupBy: 'end',
+            addToOrderBy: 'end',
+          })
+          .toString(),
+      ).toEqual(sane`
+        SELECT
+          isAnonymous,
+          cityName,
+          flags,
+          UPPER(city) AS City,
+          COUNT(*) AS "Count",
+          SUM(added) AS "sum_added"
+        FROM wikipedia
+        GROUP BY 1, 2, 3, 4
+        ORDER BY 5 DESC, 4
+      `);
+    });
+
+    it('works when there is a UNION ALL', () => {
+      const sql = SqlQuery.parse(sane`
+        SELECT
+          isAnonymous,
+          cityName,
+          flags,
+          COUNT(*) AS "Count",
+          SUM(added) AS "sum_added"
+        FROM wikipedia
+        GROUP BY 1, 2, 3
+        UNION ALL
+        SELECT
+          isAnonymous,
+          cityName,
+          flags,
+          COUNT(*) AS "Count",
+          SUM(added) AS "sum_added"
+        FROM wikipedia
+        GROUP BY 1, 2, 3
+      `);
+
+      const select = SqlExpression.parse(`UPPER(city) AS City`);
+      expect(
+        sql
+          .addSelect(select, {
+            insertIndex: 'last-grouping',
+            addToGroupBy: 'end',
+          })
+          .toString(),
+      ).toEqual(sane`
+        SELECT
+          isAnonymous,
+          cityName,
+          flags,
+          UPPER(city) AS City,
+          COUNT(*) AS "Count",
+          SUM(added) AS "sum_added"
+        FROM wikipedia
+        GROUP BY 1, 2, 3, 4
+        UNION ALL
+        SELECT
+          isAnonymous,
+          cityName,
+          flags,
+          COUNT(*) AS "Count",
+          SUM(added) AS "sum_added"
+        FROM wikipedia
+        GROUP BY 1, 2, 3
+      `);
+    });
+
+    it('adds to a query with no select expressions', () => {
+      expect(String(SqlQuery.from('t').addSelect(C('a')))).toEqual(`SELECT "a"\nFROM "t"`);
+    });
+
+    it('creates the GROUP BY and ORDER BY clauses when asked to add to them', () => {
+      expect(
+        String(
+          SqlQuery.parse(
+            sane`
+            SELECT
+              a
+            FROM t
+          `,
+          ).addSelect(C('b'), {
+            addToGroupBy: 'end',
+            addToOrderBy: 'end',
+            direction: 'DESC',
+          }),
+        ),
+      ).toEqual(sane`
+        SELECT
+          a,
+          "b"
+        FROM t
+        GROUP BY 2
+        ORDER BY 2 DESC
+      `);
+    });
+
+    it('throws on an unsupported insert index', () => {
+      expect(() =>
+        SqlQuery.parse(`SELECT a FROM t`).addSelect(C('b'), { insertIndex: 'first' as any }),
+      ).toThrow('unsupported insert index (first)');
+    });
+  });
+
+  describe('#changeSelect', () => {
+    const sql = SqlQuery.parse(sane`
+      SELECT
+        isAnonymous,
+        cityName,
+        flags,
+        COUNT(*) AS "Count",
+        SUM(added) AS "sum_added"
+      FROM wikipedia
+      GROUP BY 1, 2, 3
+      ORDER BY 4 DESC
+    `);
+
+    it('adds last', () => {
+      const select = SqlExpression.parse(`"new_column" AS "New column"`);
+      expect(sql.changeSelect(2, select).toString()).toEqual(sane`
+        SELECT
+          isAnonymous,
+          cityName,
+          "new_column" AS "New column",
+          COUNT(*) AS "Count",
+          SUM(added) AS "sum_added"
+        FROM wikipedia
+        GROUP BY 1, 2, 3
+        ORDER BY 4 DESC
+      `);
+    });
+
+    it('does nothing when there are no select expressions', () => {
+      const query = SqlQuery.from('t');
+
+      expect(query.changeSelect(0, C('a'))).toBe(query);
+    });
+  });
+
+  describe('#removeSelectIndex', () => {
+    const sql = SqlQuery.parse(sane`
+      SELECT
+        isAnonymous,
+        cityName,
+        flags,
+        COUNT(*) AS "Count",
+        SUM(added) AS "sum_added"
+      FROM wikipedia
+      GROUP BY 1, 2, 3
+      ORDER BY 4 DESC
+    `);
+
+    it('works', () => {
+      expect(sql.removeSelectIndex(1).toString()).toEqual(sane`
+        SELECT
+          isAnonymous,
+          flags,
+          COUNT(*) AS "Count",
+          SUM(added) AS "sum_added"
+        FROM wikipedia
+        GROUP BY 1, 2
+        ORDER BY 3 DESC
+      `);
+    });
+
+    it('eliminates order by', () => {
+      expect(sql.removeSelectIndex(3).toString()).toEqual(sane`
+        SELECT
+          isAnonymous,
+          cityName,
+          flags,
+          SUM(added) AS "sum_added"
+        FROM wikipedia
+        GROUP BY 1, 2, 3
+      `);
+    });
+
+    it('does nothing for an index that is out of range', () => {
+      expect(sql.removeSelectIndex(10)).toBe(sql);
+    });
+
+    it('does nothing when there are no select expressions', () => {
+      const query = SqlQuery.from('t');
+
+      expect(query.removeSelectIndex(0)).toBe(query);
+    });
+  });
+
+  describe('#removeSelectIndexes', () => {
+    const sql = SqlQuery.parse(sane`
+      SELECT
+        isAnonymous,
+        cityName,
+        flags,
+        COUNT(*) AS "Count",
+        SUM(added) AS "sum_added"
+      FROM wikipedia
+      GROUP BY 1, 2, 3
+      ORDER BY 4 DESC
+    `);
+
+    it('works', () => {
+      expect(sql.removeSelectIndexes([1, 3]).toString()).toEqual(sane`
+        SELECT
+          isAnonymous,
+          flags,
+          SUM(added) AS "sum_added"
+        FROM wikipedia
+        GROUP BY 1, 2
+      `);
+    });
+
+    it('removes all', () => {
+      expect(sql.removeSelectIndexes([1, 3, 2, 0, 4]).toString()).toEqual(sane`
+        SELECT
+          ...
+        FROM wikipedia
+        GROUP BY ()
+      `);
+    });
+  });
+
+  describe('#hasFrom', () => {
+    it('tells if there is a FROM clause', () => {
+      expect(SqlQuery.parse(`SELECT a FROM t`).hasFrom()).toEqual(true);
+      expect(SqlQuery.parse(`SELECT 1`).hasFrom()).toEqual(false);
+    });
+  });
+
+  describe('#getFromExpressions', () => {
+    it('returns the FROM expressions', () => {
+      expect(SqlQuery.parse(`SELECT a FROM t, u`).getFromExpressions().map(String)).toEqual([
+        't',
+        'u',
+      ]);
+      expect(SqlQuery.parse(`SELECT 1`).getFromExpressions()).toEqual([]);
+    });
+  });
+
+  describe('#getFirstFromExpression', () => {
+    it('returns the first FROM expression', () => {
+      expect(String(SqlQuery.parse(`SELECT a FROM t, u`).getFirstFromExpression())).toEqual('t');
+      expect(SqlQuery.parse(`SELECT 1`).getFirstFromExpression()).toBeUndefined();
+    });
+  });
+
+  describe('#hasWhere', () => {
+    it('tells if there is a WHERE clause', () => {
+      expect(SqlQuery.parse(`SELECT a FROM t WHERE b`).hasWhere()).toEqual(true);
+      expect(SqlQuery.parse(`SELECT a FROM t`).hasWhere()).toEqual(false);
+    });
+  });
+
+  describe('#getWhereExpression', () => {
+    it('returns the WHERE expression', () => {
+      expect(String(SqlQuery.parse(`SELECT a FROM t WHERE b = 1`).getWhereExpression())).toEqual(
+        'b = 1',
+      );
+      expect(SqlQuery.parse(`SELECT a FROM t`).getWhereExpression()).toBeUndefined();
+    });
+  });
+
+  describe('#getEffectiveWhereExpression', () => {
+    it('returns the WHERE expression or TRUE', () => {
+      expect(
+        String(SqlQuery.parse(`SELECT a FROM t WHERE b = 1`).getEffectiveWhereExpression()),
+      ).toEqual('b = 1');
+      expect(SqlQuery.parse(`SELECT a FROM t`).getEffectiveWhereExpression()).toBe(SqlLiteral.TRUE);
+    });
+  });
+
+  describe('#hasGroupBy', () => {
+    it('tells if there is a GROUP BY clause', () => {
+      expect(SqlQuery.parse(`SELECT a FROM t GROUP BY a`).hasGroupBy()).toEqual(true);
+      expect(SqlQuery.parse(`SELECT a FROM t`).hasGroupBy()).toEqual(false);
+    });
+  });
+
+  describe('#hasHaving', () => {
+    it('tells if there is a HAVING clause', () => {
+      expect(SqlQuery.parse(`SELECT a FROM t GROUP BY a HAVING COUNT(*) > 1`).hasHaving()).toEqual(
+        true,
+      );
+      expect(SqlQuery.parse(`SELECT a FROM t GROUP BY a`).hasHaving()).toEqual(false);
+    });
+  });
+
+  describe('#getHavingExpression', () => {
+    it('returns the HAVING expression', () => {
+      expect(
+        String(
+          SqlQuery.parse(`SELECT a FROM t GROUP BY a HAVING COUNT(*) > 1`).getHavingExpression(),
+        ),
+      ).toEqual('COUNT(*) > 1');
+      expect(SqlQuery.parse(`SELECT a FROM t`).getHavingExpression()).toBeUndefined();
+    });
+  });
+
+  describe('#getEffectiveHavingExpression', () => {
+    it('returns the HAVING expression or TRUE', () => {
+      expect(
+        String(
+          SqlQuery.parse(
+            `SELECT a FROM t GROUP BY a HAVING COUNT(*) > 1`,
+          ).getEffectiveHavingExpression(),
+        ),
+      ).toEqual('COUNT(*) > 1');
+      expect(SqlQuery.parse(`SELECT a FROM t`).getEffectiveHavingExpression()).toBe(
+        SqlLiteral.TRUE,
+      );
+    });
+  });
+
+  describe('#addHaving', () => {
+    it('creates the clause or ANDs onto it', () => {
+      const query = SqlQuery.parse(`SELECT a FROM t GROUP BY a`).addHaving(
+        SqlExpression.parse(`COUNT(*) > 1`),
+      );
+
+      expect(String(query)).toEqual(`SELECT a FROM t GROUP BY a\nHAVING COUNT(*) > 1`);
+      expect(String(query.addHaving(SqlExpression.parse(`SUM(x) < 5`)))).toEqual(
+        `SELECT a FROM t GROUP BY a\nHAVING COUNT(*) > 1 AND SUM(x) < 5`,
+      );
+    });
+
+    it('does nothing when given no expressions', () => {
+      const query = SqlQuery.parse(`SELECT a FROM t GROUP BY a`);
+
+      expect(query.addHaving()).toBe(query);
+    });
+  });
+
+  describe('#getOrderByForSelectIndex', () => {
+    const query = SqlQuery.parse(`SELECT a, b AS bb, c FROM t ORDER BY bb DESC, 1`);
+
+    it('finds the ORDER BY expression by alias or by index', () => {
+      expect(String(query.getOrderByForSelectIndex(0))).toEqual('1');
+      expect(String(query.getOrderByForSelectIndex(1))).toEqual('bb DESC');
+      expect(query.getOrderByForSelectIndex(2)).toBeUndefined();
+    });
+
+    it('returns nothing for an invalid index or without an ORDER BY clause', () => {
+      expect(query.getOrderByForSelectIndex(3)).toBeUndefined();
+      expect(SqlQuery.parse(`SELECT a FROM t`).getOrderByForSelectIndex(0)).toBeUndefined();
+    });
+  });
+
+  describe('#getOrderedSelectExpressions', () => {
+    it('lists the select expressions that are ordered on', () => {
+      expect(
+        SqlQuery.parse(`SELECT a, b AS bb, c FROM t ORDER BY bb DESC, 1`)
+          .getOrderedSelectExpressions()
+          .map(String),
+      ).toEqual(['a', 'b AS bb']);
+      expect(SqlQuery.parse(`SELECT a FROM t`).getOrderedSelectExpressions()).toEqual([]);
+    });
+  });
+
+  describe('#removeOrderByForSelectIndex', () => {
+    const query = SqlQuery.parse(`SELECT a, b FROM t ORDER BY b DESC, 1`);
+
+    it('removes the ORDER BY expressions for the select index', () => {
+      expect(String(query.removeOrderByForSelectIndex(1))).toEqual(`SELECT a, b FROM t ORDER BY 1`);
+    });
+
+    it('does nothing for an invalid index or without an ORDER BY clause', () => {
+      expect(query.removeOrderByForSelectIndex(5)).toBe(query);
+
+      const noOrderBy = SqlQuery.parse(`SELECT a FROM t`);
+      expect(noOrderBy.removeOrderByForSelectIndex(0)).toBe(noOrderBy);
     });
   });
 
@@ -5901,6 +6836,30 @@ describe('SqlQuery', () => {
         'SET sqlTimeZone = \'America/Los_Angeles\';\nSELECT\n  datasource d,\n  SUM("size") AS total_size,\n  CASE WHEN SUM("size") = 0 THEN 0 ELSE SUM("size") END AS avg_size,\n  CASE WHEN SUM(num_rows) = 0 THEN 0 ELSE SUM("num_rows") END AS avg_num_rows,\n  COUNT(*) AS num_segments\nFROM sys.segments\nWHERE datasource IN (\'moon\', \'beam\') AND \'druid\' = schema\nGROUP BY datasource\nHAVING total_size > 100\nORDER BY datasource DESC, 2 ASC\nLIMIT 100',
       ]);
     });
+
+    it.each<[string, (q: SqlQuery) => SqlBase]>([
+      ['the WITH clause', q => q.withClause!],
+      ['a select expression', q => q.selectExpressions!.first()],
+      ['the FROM clause', q => q.fromClause!],
+      ['the WHERE clause', q => q.whereClause!],
+      ['the GROUP BY clause', q => q.groupByClause!],
+      ['the HAVING clause', q => q.havingClause!],
+    ])('stops at %s when the substitutor returns undefined', (_name, getTarget) => {
+      const query = SqlQuery.parse(sane`
+        WITH w AS (SELECT 1)
+        SELECT a FROM t WHERE b = 1 GROUP BY a HAVING COUNT(*) > 1
+      `);
+      const target = getTarget(query);
+      const visited: SqlBase[] = [];
+
+      expect(
+        query.walk(ex => {
+          visited.push(ex);
+          return ex === target ? undefined : ex;
+        }),
+      ).toBe(query);
+      expect(visited[visited.length - 1]).toBe(target);
+    });
   });
 
   describe('#hasContext / #getContext', () => {
@@ -6005,398 +6964,6 @@ describe('SqlQuery', () => {
       expect(String(replaceSql)).toEqual(
         `REPLACE INTO ns.tbl OVERWRITE ALL SELECT * FROM wikipedia PARTITIONED BY ALL`,
       );
-    });
-  });
-
-  describe('#changeDecorator', () => {
-    it('works', () => {
-      const sql = SqlQuery.parse(sane`
-        SELECT
-          isAnonymous,
-          cityName,
-          flags,
-          COUNT(*) AS "Count",
-          SUM(added) AS "sum_added"
-        FROM wikipedia
-        GROUP BY 1, 2, 3
-        ORDER BY 4 DESC
-      `);
-      expect(sql.changeDecorator('ALL').toString()).toEqual(sane`
-        SELECT
-          ALL
-          isAnonymous,
-          cityName,
-          flags,
-          COUNT(*) AS "Count",
-          SUM(added) AS "sum_added"
-        FROM wikipedia
-        GROUP BY 1, 2, 3
-        ORDER BY 4 DESC
-      `);
-      expect(sql.changeDecorator('DISTINCT').toString()).toEqual(sane`
-        SELECT
-          DISTINCT
-          isAnonymous,
-          cityName,
-          flags,
-          COUNT(*) AS "Count",
-          SUM(added) AS "sum_added"
-        FROM wikipedia
-        GROUP BY 1, 2, 3
-        ORDER BY 4 DESC
-      `);
-    });
-    it('can remove an existing decorator', () => {
-      const sql = SqlQuery.parse(sane`
-      SELECT
-      ALL
-        isAnonymous,
-        cityName,
-        flags,
-        COUNT(*) AS "Count",
-        SUM(added) AS "sum_added"
-      FROM (
-        SELECT * FROM wikipedia
-      ) t
-      GROUP BY 1, 2, 3
-      ORDER BY 4 DESC
-    `);
-      expect(sql.changeDecorator(undefined).toString()).toEqual(sane`
-      SELECT
-      isAnonymous,
-        cityName,
-        flags,
-        COUNT(*) AS "Count",
-        SUM(added) AS "sum_added"
-      FROM (
-        SELECT * FROM wikipedia
-      ) t
-      GROUP BY 1, 2, 3
-      ORDER BY 4 DESC
-    `);
-    });
-  });
-
-  describe('#hasStarInSelect', () => {
-    it('works when there is no star', () => {
-      const sql = SqlQuery.parse(sane`
-        SELECT
-          isAnonymous,
-          cityName
-        FROM wikipedia
-      `);
-
-      expect(sql.hasStarInSelect()).toBe(false);
-    });
-
-    it('works when there is a star', () => {
-      const sql = SqlQuery.parse(sane`
-        SELECT
-          *,
-          cityName
-        FROM wikipedia
-      `);
-
-      expect(sql.hasStarInSelect()).toBe(true);
-    });
-
-    it('works when there is a star from a table', () => {
-      const sql = SqlQuery.parse(sane`
-        SELECT
-          t.*,
-          cityName
-        FROM wikipedia AS t
-      `);
-
-      expect(sql.hasStarInSelect()).toBe(true);
-    });
-  });
-
-  describe('#addSelect', () => {
-    const sql = SqlQuery.parse(sane`
-      SELECT
-        isAnonymous,
-        cityName,
-        flags,
-        COUNT(*) AS "Count",
-        SUM(added) AS "sum_added"
-      FROM wikipedia
-      GROUP BY 1, 2, 3
-      ORDER BY 4 DESC
-    `);
-
-    it('adds last', () => {
-      const select = SqlExpression.parse(`"new_column" AS "New column"`);
-      expect(sql.addSelect(select).toString()).toEqual(sane`
-        SELECT
-          isAnonymous,
-          cityName,
-          flags,
-          COUNT(*) AS "Count",
-          SUM(added) AS "sum_added",
-          "new_column" AS "New column"
-        FROM wikipedia
-        GROUP BY 1, 2, 3
-        ORDER BY 4 DESC
-      `);
-    });
-
-    it('adds first', () => {
-      const select = SqlExpression.parse(`"new_column" AS "New column"`);
-      expect(sql.addSelect(select, { insertIndex: 0 }).toString()).toEqual(sane`
-        SELECT
-          "new_column" AS "New column",
-          isAnonymous,
-          cityName,
-          flags,
-          COUNT(*) AS "Count",
-          SUM(added) AS "sum_added"
-        FROM wikipedia
-        GROUP BY 2, 3, 4
-        ORDER BY 5 DESC
-      `);
-    });
-
-    it('adds grouped', () => {
-      const select = SqlExpression.parse(`UPPER(city) AS City`);
-      expect(
-        sql.addSelect(select, { insertIndex: 'last-grouping', addToGroupBy: 'end' }).toString(),
-      ).toEqual(sane`
-        SELECT
-          isAnonymous,
-          cityName,
-          flags,
-          UPPER(city) AS City,
-          COUNT(*) AS "Count",
-          SUM(added) AS "sum_added"
-        FROM wikipedia
-        GROUP BY 1, 2, 3, 4
-        ORDER BY 5 DESC
-      `);
-    });
-
-    it('adds grouped with expression', () => {
-      const select = SqlExpression.parse(`UPPER(city) AS City`);
-      expect(
-        sql
-          .addSelect(select, {
-            insertIndex: 'last-grouping',
-            groupByExpression: SqlExpression.parse(`SUBSTR(city, 1, 2)`),
-          })
-          .toString(),
-      ).toEqual(sane`
-        SELECT
-          isAnonymous,
-          cityName,
-          flags,
-          UPPER(city) AS City,
-          COUNT(*) AS "Count",
-          SUM(added) AS "sum_added"
-        FROM wikipedia
-        GROUP BY 1, 2, 3, SUBSTR(city, 1, 2)
-        ORDER BY 5 DESC
-      `);
-    });
-
-    it('adds sorted', () => {
-      const select = SqlExpression.parse(`COUNT(DISTINCT "user") AS unique_users`);
-      expect(
-        sql
-          .addSelect(select, {
-            insertIndex: 'last',
-            addToOrderBy: 'start',
-            direction: 'DESC',
-          })
-          .toString(),
-      ).toEqual(sane`
-        SELECT
-          isAnonymous,
-          cityName,
-          flags,
-          COUNT(*) AS "Count",
-          SUM(added) AS "sum_added",
-          COUNT(DISTINCT "user") AS unique_users
-        FROM wikipedia
-        GROUP BY 1, 2, 3
-        ORDER BY 6 DESC, 4 DESC
-      `);
-    });
-
-    it('adds grouped + sorted', () => {
-      const select = SqlExpression.parse(`UPPER(city) AS City`);
-      expect(
-        sql
-          .addSelect(select, {
-            insertIndex: 'last-grouping',
-            addToGroupBy: 'end',
-            addToOrderBy: 'end',
-          })
-          .toString(),
-      ).toEqual(sane`
-        SELECT
-          isAnonymous,
-          cityName,
-          flags,
-          UPPER(city) AS City,
-          COUNT(*) AS "Count",
-          SUM(added) AS "sum_added"
-        FROM wikipedia
-        GROUP BY 1, 2, 3, 4
-        ORDER BY 5 DESC, 4
-      `);
-    });
-
-    it('works when there is a UNION ALL', () => {
-      const sql = SqlQuery.parse(sane`
-        SELECT
-          isAnonymous,
-          cityName,
-          flags,
-          COUNT(*) AS "Count",
-          SUM(added) AS "sum_added"
-        FROM wikipedia
-        GROUP BY 1, 2, 3
-        UNION ALL
-        SELECT
-          isAnonymous,
-          cityName,
-          flags,
-          COUNT(*) AS "Count",
-          SUM(added) AS "sum_added"
-        FROM wikipedia
-        GROUP BY 1, 2, 3
-      `);
-
-      const select = SqlExpression.parse(`UPPER(city) AS City`);
-      expect(
-        sql
-          .addSelect(select, {
-            insertIndex: 'last-grouping',
-            addToGroupBy: 'end',
-          })
-          .toString(),
-      ).toEqual(sane`
-        SELECT
-          isAnonymous,
-          cityName,
-          flags,
-          UPPER(city) AS City,
-          COUNT(*) AS "Count",
-          SUM(added) AS "sum_added"
-        FROM wikipedia
-        GROUP BY 1, 2, 3, 4
-        UNION ALL
-        SELECT
-          isAnonymous,
-          cityName,
-          flags,
-          COUNT(*) AS "Count",
-          SUM(added) AS "sum_added"
-        FROM wikipedia
-        GROUP BY 1, 2, 3
-      `);
-    });
-  });
-
-  describe('#changeSelect', () => {
-    const sql = SqlQuery.parse(sane`
-      SELECT
-        isAnonymous,
-        cityName,
-        flags,
-        COUNT(*) AS "Count",
-        SUM(added) AS "sum_added"
-      FROM wikipedia
-      GROUP BY 1, 2, 3
-      ORDER BY 4 DESC
-    `);
-
-    it('adds last', () => {
-      const select = SqlExpression.parse(`"new_column" AS "New column"`);
-      expect(sql.changeSelect(2, select).toString()).toEqual(sane`
-        SELECT
-          isAnonymous,
-          cityName,
-          "new_column" AS "New column",
-          COUNT(*) AS "Count",
-          SUM(added) AS "sum_added"
-        FROM wikipedia
-        GROUP BY 1, 2, 3
-        ORDER BY 4 DESC
-      `);
-    });
-  });
-
-  describe('#removeSelectIndex', () => {
-    const sql = SqlQuery.parse(sane`
-      SELECT
-        isAnonymous,
-        cityName,
-        flags,
-        COUNT(*) AS "Count",
-        SUM(added) AS "sum_added"
-      FROM wikipedia
-      GROUP BY 1, 2, 3
-      ORDER BY 4 DESC
-    `);
-
-    it('works', () => {
-      expect(sql.removeSelectIndex(1).toString()).toEqual(sane`
-        SELECT
-          isAnonymous,
-          flags,
-          COUNT(*) AS "Count",
-          SUM(added) AS "sum_added"
-        FROM wikipedia
-        GROUP BY 1, 2
-        ORDER BY 3 DESC
-      `);
-    });
-
-    it('eliminates order by', () => {
-      expect(sql.removeSelectIndex(3).toString()).toEqual(sane`
-        SELECT
-          isAnonymous,
-          cityName,
-          flags,
-          SUM(added) AS "sum_added"
-        FROM wikipedia
-        GROUP BY 1, 2, 3
-      `);
-    });
-  });
-
-  describe('#removeSelectIndexes', () => {
-    const sql = SqlQuery.parse(sane`
-      SELECT
-        isAnonymous,
-        cityName,
-        flags,
-        COUNT(*) AS "Count",
-        SUM(added) AS "sum_added"
-      FROM wikipedia
-      GROUP BY 1, 2, 3
-      ORDER BY 4 DESC
-    `);
-
-    it('works', () => {
-      expect(sql.removeSelectIndexes([1, 3]).toString()).toEqual(sane`
-        SELECT
-          isAnonymous,
-          flags,
-          SUM(added) AS "sum_added"
-        FROM wikipedia
-        GROUP BY 1, 2
-      `);
-    });
-
-    it('removes all', () => {
-      expect(sql.removeSelectIndexes([1, 3, 2, 0, 4]).toString()).toEqual(sane`
-        SELECT
-          ...
-        FROM wikipedia
-        GROUP BY ()
-      `);
     });
   });
 

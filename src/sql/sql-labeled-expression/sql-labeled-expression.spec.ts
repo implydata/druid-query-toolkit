@@ -242,6 +242,22 @@ describe('SqlLabeledExpression', () => {
       expect(result.getUnderlyingExpression()).toBe(original.getUnderlyingExpression());
       expect(result).not.toBe(original);
     });
+
+    it('accepts a RefName label', () => {
+      const original = SqlLabeledExpression.create('x', SqlLiteral.create(1));
+
+      expect(original.changeLabel(RefName.alias('y', true)).toString()).toEqual(`"y" => 1`);
+    });
+
+    it('keeps the existing quoting unless quotes are forced', () => {
+      const original = SqlLabeledExpression.create(
+        RefName.create('x', false),
+        SqlLiteral.create(1),
+      );
+
+      expect(original.changeLabel('y').toString()).toEqual(`y => 1`);
+      expect(original.changeLabel('y', true).toString()).toEqual(`"y" => 1`);
+    });
   });
 
   describe('#changeUnderlyingExpression', () => {
@@ -257,6 +273,31 @@ describe('SqlLabeledExpression', () => {
       expect(result.getLabelName()).toBe(label);
       expect(result.getUnderlyingExpression()).toBe(newExpression);
       expect(result).not.toBe(original);
+    });
+  });
+
+  describe('#walk', () => {
+    it('substitutes inside the expression', () => {
+      const labeled = SqlExpression.parse(`CONCAT(x => a, y => b)`);
+
+      expect(
+        labeled
+          .walk(ex => (ex instanceof SqlColumn ? SqlColumn.optionalQuotes(ex.getName() + '1') : ex))
+          .toString(),
+      ).toEqual(`CONCAT(x => a1, y => b1)`);
+    });
+
+    it('stops when the callback returns nothing for the expression', () => {
+      const labeled = SqlLabeledExpression.create('x', SqlColumn.optionalQuotes('a'));
+
+      const seen: string[] = [];
+      expect(
+        labeled.walkPostorder(ex => {
+          seen.push(ex.toString());
+          return ex instanceof SqlColumn ? undefined : ex;
+        }),
+      ).toBe(labeled);
+      expect(seen).toEqual(['a']);
     });
   });
 });

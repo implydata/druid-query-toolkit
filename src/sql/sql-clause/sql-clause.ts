@@ -29,11 +29,9 @@ export abstract class SqlClause extends SqlBase {
     }
   }
 
-  public _walkInner(
-    _nextStack: SqlBase[],
-    _fn: Substitutor,
-    _postorder: boolean,
-  ): SqlClause | undefined {
-    return this;
-  }
+  public abstract _walkInner(
+    nextStack: SqlBase[],
+    fn: Substitutor,
+    postorder: boolean,
+  ): SqlClause | undefined;
 }

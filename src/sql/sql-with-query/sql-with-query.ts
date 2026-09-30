@@ -132,12 +132,20 @@ export class SqlWithQuery extends SqlQueryBase {
       flatQuery = flatQuery.changeOrderByClause(this.orderByClause);
     }
 
-    if (this.limitClause) {
-      flatQuery = flatQuery.combineWithLimitClause(this.limitClause);
+    // The outer OFFSET skips rows that the inner LIMIT has already let through, so it has to
+    // shrink the inner limit before the outer LIMIT is applied.
+    if (this.offsetClause) {
+      const innerLimitValue = flatQuery.getLimitValue();
+      if (typeof innerLimitValue === 'number') {
+        flatQuery = flatQuery.changeLimitValue(
+          Math.max(innerLimitValue - this.offsetClause.getOffsetValue(), 0),
+        );
+      }
+      flatQuery = flatQuery.combineWithOffsetClause(this.offsetClause);
     }
 
-    if (this.offsetClause) {
-      flatQuery = flatQuery.combineWithOffsetClause(this.offsetClause);
+    if (this.limitClause) {
+      flatQuery = flatQuery.combineWithLimitClause(this.limitClause);
     }
 
     if (this.partitionedByClause) {

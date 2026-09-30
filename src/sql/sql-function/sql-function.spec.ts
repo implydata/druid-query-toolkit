@@ -13,7 +13,19 @@
  */
 
 import { backAndForth } from '../../test-utils';
-import { SqlColumn, SqlExpression, SqlFunction, SqlKeyValue, SqlLiteral, SqlStar } from '..';
+import {
+  SqlColumn,
+  SqlColumnDeclaration,
+  SqlExpression,
+  SqlExtendClause,
+  SqlFunction,
+  SqlKeyValue,
+  SqlLiteral,
+  SqlNamespace,
+  SqlStar,
+  SqlType,
+  SqlWhereClause,
+} from '..';
 import { RefName, SeparatedArray, Separator } from '../helpers';
 
 describe('SqlFunction', () => {
@@ -1230,6 +1242,15 @@ describe('SqlFunction', () => {
     it('works', () => {
       expect(SqlFunction.isValidFunctionName('SUM')).toEqual(true);
       expect(SqlFunction.isValidFunctionName('TABLE')).toEqual(true);
+      expect(SqlFunction.isValidFunctionName('SELECT')).toEqual(false);
+    });
+  });
+
+  describe('.isNakedFunction', () => {
+    it('recognizes functions that are called without parens', () => {
+      expect(SqlFunction.isNakedFunction('current_timestamp')).toEqual(true);
+      expect(SqlFunction.isNakedFunction('PI')).toEqual(true);
+      expect(SqlFunction.isNakedFunction('SUM')).toEqual(false);
     });
   });
 
@@ -1303,6 +1324,30 @@ describe('SqlFunction', () => {
     it('works', () => {
       const x = SqlExpression.parse('x');
       expect(SqlFunction.countDistinct(x).toString()).toEqual('COUNT(DISTINCT x)');
+    });
+  });
+
+  describe('.sum', () => {
+    it('creates a SUM', () => {
+      expect(SqlFunction.sum(SqlColumn.create('x')).toString()).toEqual('SUM("x")');
+    });
+  });
+
+  describe('.min', () => {
+    it('creates a MIN', () => {
+      expect(SqlFunction.min(SqlColumn.create('x')).toString()).toEqual('MIN("x")');
+    });
+  });
+
+  describe('.max', () => {
+    it('creates a MAX', () => {
+      expect(SqlFunction.max(SqlColumn.create('x')).toString()).toEqual('MAX("x")');
+    });
+  });
+
+  describe('.avg', () => {
+    it('creates an AVG', () => {
+      expect(SqlFunction.avg(SqlColumn.create('x')).toString()).toEqual('AVG("x")');
     });
   });
 
@@ -1402,6 +1447,35 @@ describe('SqlFunction', () => {
       );
     });
 
+    it('with a SeparatedArray of key-values', () => {
+      const keyValues = SeparatedArray.fromArray([
+        SqlKeyValue.short(SqlLiteral.create('a'), SqlLiteral.create(1)),
+      ]);
+      expect(SqlFunction.jsonObject(keyValues).toString()).toEqual(`JSON_OBJECT('a':1)`);
+    });
+
+    it('with an object of various value types', () => {
+      expect(
+        SqlFunction.jsonObject({
+          n: null,
+          d: new Date('2020-01-02Z'),
+          e: SqlColumn.create('x'),
+          b: true,
+          big: BigInt(7),
+          skipped: undefined,
+        }).toString(),
+      ).toEqual(`JSON_OBJECT('n':NULL, 'd':TIMESTAMP '2020-01-02', 'e':"x", 'b':TRUE, 'big':7)`);
+    });
+
+    it('throws on values that can not be represented', () => {
+      expect(() => SqlFunction.jsonObject({ f: () => 1 })).toThrow(
+        'Cannot use function (in key f) as a JSON object value',
+      );
+      expect(() => SqlFunction.jsonObject({ s: Symbol('s') })).toThrow(
+        'Cannot use symbol (in key s) as a JSON object value',
+      );
+    });
+
     it('with complex expressions', () => {
       // Create complex expressions using the builder pattern
       const userId = SqlColumn.create('user').concat(SqlColumn.create('id'));
@@ -1420,6 +1494,25 @@ describe('SqlFunction', () => {
       expect(SqlFunction.floor(SqlColumn.create('__time'), 'Hour').toString()).toEqual(
         'FLOOR("__time" TO Hour)',
       );
+    });
+  });
+
+  describe('.timeFloor', () => {
+    it('drops the trailing arguments that are not given', () => {
+      expect(SqlFunction.timeFloor(SqlColumn.create('__time'), 'PT1H').toString()).toEqual(
+        `TIME_FLOOR("__time", 'PT1H')`,
+      );
+      expect(
+        SqlFunction.timeFloor(SqlColumn.create('__time'), 'PT1H', undefined, 'Etc/UTC').toString(),
+      ).toEqual(`TIME_FLOOR("__time", 'PT1H', NULL, 'Etc/UTC')`);
+    });
+  });
+
+  describe('.timeCeil', () => {
+    it('creates a TIME_CEIL', () => {
+      expect(
+        SqlFunction.timeCeil(SqlColumn.create('__time'), 'P1D', '2020-01-01', 'UTC').toString(),
+      ).toEqual(`TIME_CEIL("__time", 'P1D', '2020-01-01', 'UTC')`);
     });
   });
 
@@ -1457,11 +1550,139 @@ describe('SqlFunction', () => {
     });
   });
 
+  describe('.stringFormat', () => {
+    it('puts the format first', () => {
+      expect(SqlFunction.stringFormat('%s-%d', SqlColumn.create('x'), 3).toString()).toEqual(
+        `STRING_FORMAT('%s-%d', "x", 3)`,
+      );
+    });
+  });
+
+  describe('.regexpLike', () => {
+    it('creates a REGEXP_LIKE', () => {
+      expect(SqlFunction.regexpLike(SqlColumn.create('x'), '^a').toString()).toEqual(
+        `REGEXP_LIKE("x", '^a')`,
+      );
+    });
+  });
+
   describe('.arrayOfLiterals', () => {
     it('works', () => {
       expect(SqlFunction.arrayOfLiterals(['a', 'b', 'c']).toString()).toEqual(
         `ARRAY['a', 'b', 'c']`,
       );
+    });
+  });
+
+  describe('#changeNamespace', () => {
+    it('adds a namespace', () => {
+      const fn = SqlExpression.parse(`FOO(1)`) as SqlFunction;
+
+      expect(fn.changeNamespace(SqlNamespace.create('ns')).toString()).toEqual('"ns".FOO(1)');
+    });
+
+    it('removes the namespace and its spacing', () => {
+      const fn = SqlExpression.parse(`ns . FOO(1)`) as SqlFunction;
+
+      const changed = fn.changeNamespace(undefined);
+      expect(changed.namespace).toBeUndefined();
+      expect(changed.toString()).toEqual('FOO(1)');
+    });
+  });
+
+  describe('#getNamespaceName', () => {
+    it('returns the namespace name if there is one', () => {
+      expect((SqlExpression.parse(`ns.FOO(1)`) as SqlFunction).getNamespaceName()).toEqual('ns');
+      expect((SqlExpression.parse(`FOO(1)`) as SqlFunction).getNamespaceName()).toBeUndefined();
+    });
+  });
+
+  describe('#changeNamespaceName', () => {
+    it('renames, adds and removes the namespace', () => {
+      const withNs = SqlExpression.parse(`ns.FOO(1)`) as SqlFunction;
+      const withoutNs = SqlExpression.parse(`FOO(1)`) as SqlFunction;
+
+      expect(withNs.changeNamespaceName('other').toString()).toEqual('other.FOO(1)');
+      expect(withoutNs.changeNamespaceName('other').toString()).toEqual('"other".FOO(1)');
+      expect(withNs.changeNamespaceName(undefined).toString()).toEqual('FOO(1)');
+    });
+  });
+
+  describe('#getEffectiveFunctionName', () => {
+    it('upper cases the name', () => {
+      expect((SqlExpression.parse(`sum(x)`) as SqlFunction).getEffectiveFunctionName()).toEqual(
+        'SUM',
+      );
+    });
+  });
+
+  describe('#getEffectiveDecorator', () => {
+    it('upper cases the decorator', () => {
+      expect(
+        (SqlExpression.parse(`count(distinct x)`) as SqlFunction).getEffectiveDecorator(),
+      ).toEqual('DISTINCT');
+      expect(
+        (SqlExpression.parse(`count(x)`) as SqlFunction).getEffectiveDecorator(),
+      ).toBeUndefined();
+    });
+  });
+
+  describe('#changeArgs', () => {
+    it('replaces the args', () => {
+      const fn = SqlExpression.parse(`FOO(1,  2)`) as SqlFunction;
+
+      expect(fn.changeArgs(SeparatedArray.fromArray([SqlLiteral.create(3)])).toString()).toEqual(
+        'FOO(3)',
+      );
+    });
+  });
+
+  describe('#changeArg', () => {
+    it('replaces one arg', () => {
+      const fn = SqlExpression.parse(`FOO(1,  2)`) as SqlFunction;
+
+      expect(fn.changeArg(1, SqlLiteral.create(3)).toString()).toEqual('FOO(1,  3)');
+    });
+
+    it('does nothing when there are no args', () => {
+      const fn = SqlExpression.parse(`CURRENT_TIMESTAMP`) as SqlFunction;
+
+      expect(fn.changeArg(0, SqlLiteral.create(3))).toBe(fn);
+    });
+  });
+
+  describe('#numArgs', () => {
+    it('counts the args', () => {
+      expect((SqlExpression.parse(`FOO(1, x => 2)`) as SqlFunction).numArgs()).toEqual(2);
+      expect((SqlExpression.parse(`CURRENT_TIMESTAMP`) as SqlFunction).numArgs()).toEqual(0);
+    });
+  });
+
+  describe('#numPositionalArgs', () => {
+    it('counts the args without labels', () => {
+      expect((SqlExpression.parse(`FOO(1, 2, x => 3)`) as SqlFunction).numPositionalArgs()).toEqual(
+        2,
+      );
+      expect((SqlExpression.parse(`CURRENT_TIMESTAMP`) as SqlFunction).numPositionalArgs()).toEqual(
+        0,
+      );
+    });
+  });
+
+  describe('#numLabeledArgs', () => {
+    it('counts the args with labels', () => {
+      expect((SqlExpression.parse(`FOO(1, 2, x => 3)`) as SqlFunction).numLabeledArgs()).toEqual(1);
+      expect((SqlExpression.parse(`CURRENT_TIMESTAMP`) as SqlFunction).numLabeledArgs()).toEqual(0);
+    });
+  });
+
+  describe('#getArgArray', () => {
+    it('returns the args or an empty array', () => {
+      expect((SqlExpression.parse(`FOO(1, a)`) as SqlFunction).getArgArray().map(String)).toEqual([
+        '1',
+        'a',
+      ]);
+      expect((SqlExpression.parse(`CURRENT_TIMESTAMP`) as SqlFunction).getArgArray()).toEqual([]);
     });
   });
 
@@ -1478,6 +1699,75 @@ describe('SqlFunction', () => {
     it('works with label', () => {
       expect(String(fn.getArg('hello'))).toEqual(`"world"`);
       expect(fn.getArg('blah')).toBeUndefined();
+    });
+
+    it('returns undefined when there are no args', () => {
+      expect((SqlExpression.parse(`CURRENT_TIMESTAMP`) as SqlFunction).getArg(0)).toBeUndefined();
+    });
+  });
+
+  describe('#getArgAsString', () => {
+    const fn = SqlExpression.parse(`FOO('a', 1, x, s => 'b')`) as SqlFunction;
+
+    it('returns string literal args', () => {
+      expect(fn.getArgAsString(0)).toEqual('a');
+      expect(fn.getArgAsString('s')).toEqual('b');
+    });
+
+    it('returns undefined for anything else', () => {
+      expect(fn.getArgAsString(1)).toBeUndefined();
+      expect(fn.getArgAsString(2)).toBeUndefined();
+    });
+  });
+
+  describe('#getArgAsNumber', () => {
+    const fn = SqlExpression.parse(`FOO(1, 'a', x)`) as SqlFunction;
+
+    it('returns number literal args', () => {
+      expect(fn.getArgAsNumber(0)).toEqual(1);
+    });
+
+    it('returns undefined for anything else', () => {
+      expect(fn.getArgAsNumber(1)).toBeUndefined();
+      expect(fn.getArgAsNumber(2)).toBeUndefined();
+    });
+  });
+
+  describe('#getArgAsNumberOrBigint', () => {
+    const fn = SqlExpression.parse(`FOO(1, 1606832560494517248, x)`) as SqlFunction;
+
+    it('returns number and bigint literal args', () => {
+      expect(fn.getArgAsNumberOrBigint(0)).toEqual(1);
+      expect(fn.getArgAsNumberOrBigint(1)).toEqual(BigInt('1606832560494517248'));
+    });
+
+    it('returns undefined for anything else', () => {
+      expect(fn.getArgAsNumberOrBigint(2)).toBeUndefined();
+    });
+  });
+
+  describe('#changeWhereClause', () => {
+    it('sets the where clause', () => {
+      const fn = SqlExpression.parse(`SUM(x)`) as SqlFunction;
+
+      expect(
+        fn
+          .changeWhereClause(SqlWhereClause.createForFunction(SqlExpression.parse('y = 1')))
+          .toString(),
+      ).toEqual('SUM(x) FILTER (WHERE y = 1)');
+    });
+
+    it('removes the where clause and its FILTER keyword', () => {
+      const fn = SqlExpression.parse(`SUM(x) filter (WHERE y = 1)`) as SqlFunction;
+
+      const changed = fn.changeWhereClause(undefined);
+      expect(changed.keywords).toEqual({});
+      expect(changed.toString()).toEqual('SUM(x)');
+      expect(
+        changed
+          .changeWhereClause(SqlWhereClause.createForFunction(SqlExpression.parse('z')))
+          .toString(),
+      ).toEqual('SUM(x) FILTER (WHERE z)');
     });
   });
 
@@ -1498,6 +1788,19 @@ describe('SqlFunction', () => {
       expect(String(fn.changeWhereExpression(SqlExpression.parse(`t."country" = 'UK'`)))).toEqual(
         'SUM(t."lol") FILTER (WHERE t."country" = \'UK\')',
       );
+    });
+
+    it('removes the filter when given nothing or TRUE', () => {
+      const fn = SqlExpression.parse(`SUM(x) FILTER (WHERE y = 1)`) as SqlFunction;
+
+      expect(String(fn.changeWhereExpression(undefined))).toEqual('SUM(x)');
+      expect(String(fn.changeWhereExpression(SqlLiteral.TRUE))).toEqual('SUM(x)');
+    });
+
+    it('returns the same instance when the expression is unchanged', () => {
+      const fn = SqlExpression.parse(`SUM(x) FILTER (WHERE y = 1)`) as SqlFunction;
+
+      expect(fn.changeWhereExpression(fn.getWhereExpression())).toBe(fn);
     });
   });
 
@@ -1525,12 +1828,205 @@ describe('SqlFunction', () => {
 
       expect(String(fn.addWhere(SqlExpression.parse(`TRUE`)))).toEqual('SUM(t."lol")');
     });
+
+    it('returns the same instance when given nothing', () => {
+      const fn = SqlExpression.parse(`SUM(x)`) as SqlFunction;
+
+      expect(fn.addWhere()).toBe(fn);
+    });
+  });
+
+  describe('#addWhereExpression', () => {
+    it('adds to the filter', () => {
+      const fn = SqlExpression.parse(`SUM(x) FILTER (WHERE y = 1)`) as SqlFunction;
+
+      expect(String(fn.addWhereExpression(SqlExpression.parse('z = 2')))).toEqual(
+        'SUM(x) FILTER (WHERE y = 1 AND z = 2)',
+      );
+    });
+  });
+
+  describe('#getWhereExpression', () => {
+    it('returns the filter expression if there is one', () => {
+      expect(
+        String(
+          (SqlExpression.parse(`SUM(x) FILTER (WHERE y = 1)`) as SqlFunction).getWhereExpression(),
+        ),
+      ).toEqual('y = 1');
+      expect((SqlExpression.parse(`SUM(x)`) as SqlFunction).getWhereExpression()).toBeUndefined();
+    });
+  });
+
+  describe('#getEffectiveWhereExpression', () => {
+    it('falls back to TRUE', () => {
+      expect(
+        String(
+          (
+            SqlExpression.parse(`SUM(x) FILTER (WHERE y = 1)`) as SqlFunction
+          ).getEffectiveWhereExpression(),
+        ),
+      ).toEqual('y = 1');
+      expect((SqlExpression.parse(`SUM(x)`) as SqlFunction).getEffectiveWhereExpression()).toBe(
+        SqlLiteral.TRUE,
+      );
+    });
+  });
+
+  describe('#changeExtendClause', () => {
+    it('sets the extend clause', () => {
+      const fn = SqlExpression.parse(`TABLE(x)`) as SqlFunction;
+
+      expect(
+        fn
+          .changeExtendClause(SqlExtendClause.create([SqlColumnDeclaration.create('a', 'VARCHAR')]))
+          .toString(),
+      ).toEqual('TABLE(x) EXTEND ("a" VARCHAR)');
+    });
+
+    it('removes the extend clause and its spacing', () => {
+      const fn = SqlExpression.parse(`TABLE(x)   EXTEND (a VARCHAR)`) as SqlFunction;
+
+      expect(fn.changeExtendClause(undefined).toString()).toEqual('TABLE(x)');
+    });
+  });
+
+  describe('#isAggregation', () => {
+    it('is true for known aggregations and filtered functions', () => {
+      expect((SqlExpression.parse(`sum(x)`) as SqlFunction).isAggregation(['SUM'])).toEqual(true);
+      expect((SqlExpression.parse(`FOO(x)`) as SqlFunction).isAggregation(['SUM'])).toEqual(false);
+      expect(
+        (SqlExpression.parse(`FOO(x) FILTER (WHERE y)`) as SqlFunction).isAggregation(['SUM']),
+      ).toEqual(true);
+    });
   });
 
   describe('#clearOwnSeparators', () => {
     it('is smart about clearing separators', () => {
       const sql = `EXTRACT(HOUR FROM "time")`;
       expect(String(SqlExpression.parse(sql).clearOwnSeparators())).toEqual(sql);
+    });
+
+    it('clears comma spacing', () => {
+      expect(String(SqlExpression.parse(`FOO(1 ,2,   3)`).clearOwnSeparators())).toEqual(
+        'FOO(1, 2, 3)',
+      );
+    });
+
+    it('returns the same instance when there are no args', () => {
+      const fn = SqlExpression.parse(`CURRENT_TIMESTAMP`);
+
+      expect(fn.clearOwnSeparators()).toBe(fn);
+    });
+  });
+
+  describe('#resetOwnKeywords', () => {
+    it('upper cases the function name and resets the keywords', () => {
+      expect(
+        SqlExpression.parse(`sum(x) filter (where y = 1)`).resetOwnKeywords().toString(),
+      ).toEqual('SUM(x) FILTER (where y = 1)');
+    });
+
+    it('returns the same instance when there is nothing to reset', () => {
+      const fn = SqlExpression.parse(`SUM(x)`);
+
+      expect(fn.resetOwnKeywords()).toBe(fn);
+    });
+  });
+
+  describe('#isCountStar', () => {
+    it('is true only for COUNT(*)', () => {
+      expect((SqlExpression.parse(`count(*)`) as SqlFunction).isCountStar()).toEqual(true);
+      expect((SqlExpression.parse(`COUNT(x)`) as SqlFunction).isCountStar()).toEqual(false);
+      expect((SqlExpression.parse(`COUNT()`) as SqlFunction).isCountStar()).toEqual(false);
+      expect(SqlFunction.simple('SUM', [SqlStar.PLAIN]).isCountStar()).toEqual(false);
+    });
+  });
+
+  describe('#getCastType', () => {
+    it('returns the type of a CAST', () => {
+      const castType = (SqlExpression.parse(`CAST(x AS BIGINT)`) as SqlFunction).getCastType();
+
+      expect(castType).toBeInstanceOf(SqlType);
+      expect(String(castType)).toEqual('BIGINT');
+    });
+
+    it('returns undefined for other functions', () => {
+      expect((SqlExpression.parse(`FOO(x, y)`) as SqlFunction).getCastType()).toBeUndefined();
+    });
+  });
+
+  describe('#getColumnDeclarations', () => {
+    it('returns the declarations of the extend clause', () => {
+      expect(
+        (SqlExpression.parse(`TABLE(x) EXTEND (a VARCHAR, b BIGINT)`) as SqlFunction)
+          .getColumnDeclarations()
+          ?.map(String),
+      ).toEqual(['a VARCHAR', 'b BIGINT']);
+      expect(
+        (SqlExpression.parse(`TABLE(x)`) as SqlFunction).getColumnDeclarations(),
+      ).toBeUndefined();
+    });
+  });
+
+  describe('#changeColumnDeclarations', () => {
+    it('creates, changes and removes the extend clause', () => {
+      const fn = SqlExpression.parse(`TABLE(x)`) as SqlFunction;
+      const declarations = [SqlColumnDeclaration.create('a', 'VARCHAR')];
+
+      const withExtend = fn.changeColumnDeclarations(declarations);
+      expect(withExtend.toString()).toEqual('TABLE(x) EXTEND ("a" VARCHAR)');
+
+      expect(
+        withExtend
+          .changeColumnDeclarations([SqlColumnDeclaration.create('b', 'BIGINT')])
+          .toString(),
+      ).toEqual('TABLE(x) EXTEND ("b" BIGINT)');
+
+      expect(withExtend.changeColumnDeclarations(undefined).toString()).toEqual('TABLE(x)');
+    });
+  });
+
+  describe('#walk', () => {
+    it('substitutes in the args, the filter and the extend clause', () => {
+      const fn = SqlExpression.parse(`SUM(a) FILTER (WHERE b = 1)`);
+
+      expect(
+        fn
+          .walk(ex => (ex instanceof SqlColumn ? SqlColumn.optionalQuotes(ex.getName() + '1') : ex))
+          .toString(),
+      ).toEqual('SUM(a1) FILTER (WHERE b1 = 1)');
+    });
+
+    it('walks into the extend clause', () => {
+      const fn = SqlExpression.parse(`TABLE(x) EXTEND (a VARCHAR)`);
+
+      expect(
+        fn
+          .walk(ex =>
+            ex instanceof SqlColumnDeclaration ? SqlColumnDeclaration.create('b', 'BIGINT') : ex,
+          )
+          .toString(),
+      ).toEqual('TABLE(x) EXTEND ("b" BIGINT)');
+    });
+
+    it('keeps the same instance when nothing changes', () => {
+      const fn = SqlExpression.parse(`TABLE(x) EXTEND (a VARCHAR)`);
+      const filtered = SqlExpression.parse(`SUM(a) FILTER (WHERE b = 1)`);
+
+      expect(fn.walk(ex => ex)).toBe(fn);
+      expect(filtered.walk(ex => ex)).toBe(filtered);
+    });
+
+    it('stops when the callback returns nothing for a part', () => {
+      const stopOn = (predicate: (ex: SqlExpression) => boolean) => (ex: any) =>
+        predicate(ex) ? undefined : ex;
+
+      const filtered = SqlExpression.parse(`SUM(a) FILTER (WHERE b = 1)`);
+      expect(filtered.walkPostorder(stopOn(ex => String(ex) === 'a'))).toBe(filtered);
+      expect(filtered.walkPostorder(stopOn(ex => ex instanceof SqlWhereClause))).toBe(filtered);
+
+      const extended = SqlExpression.parse(`TABLE(x) EXTEND (a VARCHAR)`);
+      expect(extended.walkPostorder(stopOn(ex => ex instanceof SqlExtendClause))).toBe(extended);
     });
   });
 });

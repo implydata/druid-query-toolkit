@@ -90,6 +90,10 @@ export const TIME_INTERVAL_PATTERN_DEFINITION: FilterPatternDefinition<TimeInter
         const { column: startColumn, value: startLiteral, op: startOp } = decomposedStart;
         const { column: endColumn, value: endLiteral, op: endOp } = decomposedEnd;
 
+        // The start must be a lower bound on the column and the end must be an upper bound
+        if (startOp !== '>' && startOp !== '>=') return;
+        if (endOp !== '<' && endOp !== '<=') return;
+
         if (!(startLiteral instanceof SqlLiteral) || !(endLiteral instanceof SqlLiteral)) return;
 
         const startValue = startLiteral.value;
@@ -155,7 +159,8 @@ export const TIME_INTERVAL_PATTERN_DEFINITION: FilterPatternDefinition<TimeInter
             SqlColumn.create(pattern.column)
               .applyIf(pattern.endBound === ']', c => c.lessThanOrEqual(pattern.end))
               .applyIf(pattern.endBound === ')', c => c.lessThan(pattern.end)),
-          );
+          )
+          .applyIf(pattern.negated, ex => ex.ensureParens().negate());
       }
 
       return F(
