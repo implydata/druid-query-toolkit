@@ -79,6 +79,7 @@ ORDER BY 5 DESC
 
 Pipe syntax queries (`FROM t |> WHERE ... |> AGGREGATE ...`) parse into a `SqlPipesQuery`, which holds the root query (often a `SqlFromQuery`, a bare `FROM <table>`) and a list of pipe operators: `SqlSelectPipeOperator`, `SqlWherePipeOperator`, `SqlAggregatePipeOperator`, `SqlOrderByPipeOperator`, `SqlLimitPipeOperator`, `SqlExtendPipeOperator`, `SqlSetPipeOperator` and `SqlDropPipeOperator`.
 The ORDER BY and LIMIT methods that every query has work on the trailing `|> ORDER BY` and `|> LIMIT` operators.
+`unpipe()` converts a pipe query into an equivalent `SqlQuery` without pipes, folding the operators into one `SELECT` where it can and nesting sub queries where it has to: `From t |> Where x=1` becomes `SELECT * From t Where x=1`.
 
 ```javascript
 import { SqlColumn, SqlExpression, SqlWherePipeOperator } from 'druid-query-toolkit';

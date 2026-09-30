@@ -48,7 +48,7 @@ describe('SqlPipesQuery', () => {
       `SELECT * FROM t |> WHERE x`,
       `SELECT a, COUNT(*) AS c FROM t GROUP BY 1 ORDER BY 2 DESC LIMIT 10 |> WHERE c > 1`,
       `TABLE t |> WHERE x`,
-      `VALUES (1), (2) |> WHERE EXPR/bin/zsh > 1`,
+      `VALUES (1), (2) |> WHERE "EXPR$0" > 1`,
       `(FROM t |> WHERE x)`,
       `EXPLAIN PLAN FOR FROM t |> WHERE x`,
       `INSERT INTO u FROM t |> WHERE x PARTITIONED BY DAY`,
@@ -423,7 +423,280 @@ describe('SqlPipesQuery', () => {
       const removed = query.removePipeOperator(0);
 
       expect(removed).toBeInstanceOf(SqlFromQuery);
-      expect(removed.toString()).toEqual(`INSERT INTO u\nFROM t\nPARTITIONED BY DAY`);
+      expect(removed.toString()).toEqual(`INSERT INTO u FROM t PARTITIONED BY DAY`);
+    });
+  });
+
+  describe('#unpipe', () => {
+    function unpipe(sql: string): string {
+      return parsePipes(sql).unpipe().toString();
+    }
+
+    it('keeps the casing and spacing of the clauses that carry over', () => {
+      expect(unpipe(`From t |> Where x=1`)).toEqual(`SELECT * From t Where x=1`);
+      expect(unpipe(`FROM t\n|> WHERE x = 1\n|> LIMIT 10`)).toEqual(
+        `SELECT * FROM t\nWHERE x = 1\nLIMIT 10`,
+      );
+      expect(
+        unpipe(
+          `from t |> where x |> aggregate count(*) as c group by a |> order by c desc |> limit 5`,
+        ),
+      ).toEqual(`SELECT a, count(*) as c from t where x group by a order by c desc limit 5`);
+    });
+
+    it('returns a SqlQuery', () => {
+      expect(parsePipes(`FROM t |> WHERE x`).unpipe()).toBeInstanceOf(SqlQuery);
+    });
+
+    it('keeps comments in front of the clauses they were in front of', () => {
+      expect(unpipe(`FROM t\n-- only x\n|> WHERE x`)).toEqual(
+        `SELECT * FROM t\n-- only x\nWHERE x`,
+      );
+    });
+
+    it('does not glue clauses together', () => {
+      expect(unpipe(`FROM t|>WHERE x`)).toEqual(`SELECT * FROM t WHERE x`);
+    });
+
+    it('combines WHERE operators', () => {
+      expect(unpipe(`FROM t |> WHERE x = 1 |> WHERE y = 2 OR z = 3`)).toEqual(
+        `SELECT * FROM t WHERE x = 1 AND (y = 2 OR z = 3)`,
+      );
+    });
+
+    it('folds a SELECT into the select list', () => {
+      expect(unpipe(`FROM t |> WHERE x |> select a, b AS c`)).toEqual(
+        `select a, b AS c FROM t WHERE x`,
+      );
+    });
+
+    it('folds an EXTEND into the select list', () => {
+      expect(unpipe(`FROM t |> EXTEND a + 1 AS b, a + 2 AS c`)).toEqual(
+        `SELECT *, a + 1 AS b, a + 2 AS c FROM t`,
+      );
+      expect(unpipe(`FROM t\n|> EXTEND\n  a + 1 AS b,\n  a + 2 AS c`)).toEqual(
+        `SELECT *,\n  a + 1 AS b,\n  a + 2 AS c\nFROM t`,
+      );
+    });
+
+    it('puts the grouping keys before the aggregates', () => {
+      expect(
+        unpipe(`FROM t |> WHERE x |> AGGREGATE COUNT(*) AS c, SUM(v) AS s GROUP BY a, b`),
+      ).toEqual(`SELECT a, b, COUNT(*) AS c, SUM(v) AS s FROM t WHERE x GROUP BY a, b`);
+      expect(unpipe(`FROM t |> AGGREGATE COUNT(*) AS c`)).toEqual(`SELECT COUNT(*) AS c FROM t`);
+      expect(unpipe(`FROM t |> AGGREGATE GROUP BY a`)).toEqual(`SELECT a FROM t GROUP BY a`);
+      expect(unpipe(`FROM t |> AGGREGATE COUNT(*) GROUP BY ROLLUP (a, b)`)).toEqual(
+        `SELECT a, b, COUNT(*) FROM t GROUP BY ROLLUP (a, b)`,
+      );
+      expect(
+        unpipe(`FROM t |> AGGREGATE COUNT(*) GROUP BY GROUPING SETS ((a), (a, b), ())`),
+      ).toEqual(`SELECT a, b, COUNT(*) FROM t GROUP BY GROUPING SETS ((a), (a, b), ())`);
+    });
+
+    it('throws for an AGGREGATE with nothing to output', () => {
+      expect(() => unpipe(`FROM t |> AGGREGATE GROUP BY ()`)).toThrow(
+        'can not unpipe an |> AGGREGATE that has no aggregates or grouping keys',
+      );
+    });
+
+    it('wraps the query when an operator can not be folded into it', () => {
+      // WHERE can not see a column that the SELECT list defines
+      expect(unpipe(`FROM t |> EXTEND a + 1 AS b |> WHERE b > 2`)).toEqual(
+        `SELECT * FROM (SELECT *, a + 1 AS b FROM t) WHERE b > 2`,
+      );
+
+      // WHERE applies after the LIMIT
+      expect(unpipe(`FROM t |> LIMIT 5 |> WHERE x`)).toEqual(
+        `SELECT * FROM (SELECT * FROM t LIMIT 5) WHERE x`,
+      );
+
+      // AGGREGATE over an aggregate
+      expect(
+        unpipe(`FROM t |> AGGREGATE COUNT(*) AS c GROUP BY a |> AGGREGATE MAX(c) AS m`),
+      ).toEqual(`SELECT MAX(c) AS m FROM (SELECT a, COUNT(*) AS c FROM t GROUP BY a)`);
+
+      // LIMIT after a LIMIT
+      expect(unpipe(`FROM t |> LIMIT 5 OFFSET 1 |> LIMIT 2`)).toEqual(
+        `SELECT * FROM (SELECT * FROM t LIMIT 5 OFFSET 1) LIMIT 2`,
+      );
+    });
+
+    it('folds an ORDER BY past a select list only when it names output columns', () => {
+      expect(unpipe(`FROM t |> AGGREGATE COUNT(*) AS c GROUP BY a |> ORDER BY c DESC, a`)).toEqual(
+        `SELECT a, COUNT(*) AS c FROM t GROUP BY a ORDER BY c DESC, a`,
+      );
+      expect(unpipe(`FROM t |> AGGREGATE COUNT(*) AS c GROUP BY a |> ORDER BY c + 1`)).toEqual(
+        `SELECT * FROM (SELECT a, COUNT(*) AS c FROM t GROUP BY a) ORDER BY c + 1`,
+      );
+      expect(unpipe(`FROM t |> ORDER BY a + 1 |> LIMIT 3`)).toEqual(
+        `SELECT * FROM t ORDER BY a + 1 LIMIT 3`,
+      );
+      expect(unpipe(`FROM t |> LIMIT 3 |> ORDER BY a`)).toEqual(
+        `SELECT * FROM (SELECT * FROM t LIMIT 3) ORDER BY a`,
+      );
+    });
+
+    it('spells out the columns for SET and DROP', () => {
+      expect(unpipe(`FROM t |> AGGREGATE COUNT(*) AS c, SUM(v) AS s GROUP BY a |> SET c = c * 2`))
+        .toEqual(sane`
+          SELECT
+            a,
+            c * 2 AS c,
+            s
+          FROM (SELECT a, COUNT(*) AS c, SUM(v) AS s FROM t GROUP BY a)
+        `);
+
+      expect(unpipe(`FROM t |> SELECT a, b, "c d" |> DROP b`)).toEqual(sane`
+        SELECT
+          a,
+          "c d"
+        FROM (SELECT a, b, "c d" FROM t)
+      `);
+
+      expect(unpipe(`FROM t |> SELECT a, b |> WHERE a > 1 |> DROP b`)).toEqual(
+        `SELECT a FROM (SELECT a, b FROM t) WHERE a > 1`,
+      );
+    });
+
+    it('throws for SET and DROP when the input columns are not known', () => {
+      expect(() => unpipe(`FROM t |> DROP a`)).toThrow(
+        'can not unpipe |> DROP because the columns of its input are not known',
+      );
+      expect(() => unpipe(`FROM t |> SET a = 1`)).toThrow(
+        'can not unpipe |> SET because the columns of its input are not known',
+      );
+      expect(() => unpipe(`FROM t |> SELECT a, b + 1 |> DROP a`)).toThrow(
+        'can not unpipe |> DROP because the columns of its input are not known',
+      );
+      expect(() => unpipe(`FROM t |> SELECT a, u.* |> DROP a`)).toThrow(
+        'can not unpipe |> DROP because the columns of its input are not known',
+      );
+      expect(() => unpipe(`SELECT * FROM t JOIN u ON t.a = u.a |> DROP a`)).toThrow(
+        'can not unpipe |> DROP because the columns of its input are not known',
+      );
+    });
+
+    it('throws for SET and DROP of unknown columns', () => {
+      expect(() => unpipe(`FROM t |> SELECT a |> SET b = 1`)).toThrow(
+        `can not SET unknown column 'b'`,
+      );
+      expect(() => unpipe(`FROM t |> SELECT a |> DROP b`)).toThrow(
+        `can not DROP unknown column 'b'`,
+      );
+      expect(() => unpipe(`FROM t |> SELECT a |> DROP a`)).toThrow('can not DROP every column');
+    });
+
+    it('follows a star through sub queries to find the columns', () => {
+      expect(unpipe(`FROM t |> SELECT a, b |> EXTEND a + b AS c |> DROP a`)).toEqual(sane`
+        SELECT
+          b,
+          c
+        FROM (SELECT *, a + b AS c FROM (SELECT a, b FROM t))
+      `);
+    });
+
+    it('works with every kind of root query', () => {
+      expect(unpipe(`TABLE t |> WHERE x`)).toEqual(`SELECT * FROM t WHERE x`);
+      expect(unpipe(`FROM t LIMIT 5 |> WHERE x`)).toEqual(
+        `SELECT * FROM (SELECT * FROM t LIMIT 5) WHERE x`,
+      );
+      expect(unpipe(`SELECT a FROM t |> WHERE a > 1`)).toEqual(
+        `SELECT * FROM (SELECT a FROM t) WHERE a > 1`,
+      );
+      expect(unpipe(`SELECT * FROM t WHERE x |> WHERE y`)).toEqual(`SELECT * FROM t WHERE x AND y`);
+      expect(unpipe(`VALUES (1), (2) |> WHERE "EXPR$0" > 1`)).toEqual(
+        `SELECT * FROM (VALUES (1), (2)) WHERE "EXPR$0" > 1`,
+      );
+    });
+
+    it('keeps the parts that wrap the pipeline', () => {
+      expect(unpipe(`INSERT INTO u FROM t |> WHERE x PARTITIONED BY DAY CLUSTERED BY a`)).toEqual(
+        `INSERT INTO u SELECT * FROM t WHERE x PARTITIONED BY DAY CLUSTERED BY a`,
+      );
+      expect(unpipe(`SET x = 1;\nEXPLAIN PLAN FOR FROM t |> WHERE x`)).toEqual(
+        `SET x = 1;\nEXPLAIN PLAN FOR SELECT * FROM t WHERE x`,
+      );
+      expect(unpipe(`  (FROM t |> WHERE x)  `)).toEqual(`  (SELECT * FROM t WHERE x)  `);
+    });
+
+    it('wraps a query with a LIMIT that is followed by a UNION ALL', () => {
+      expect(unpipe(`FROM t |> WHERE x UNION ALL FROM u`)).toEqual(
+        `SELECT * FROM t WHERE x UNION ALL FROM u`,
+      );
+      expect(unpipe(`FROM t |> LIMIT 1 UNION ALL FROM u`)).toEqual(
+        `SELECT * FROM (SELECT * FROM t LIMIT 1) UNION ALL FROM u`,
+      );
+    });
+
+    it('converts nested pipe queries', () => {
+      expect(
+        unpipe(`FROM t |> WHERE a IN (FROM u |> SELECT a) UNION ALL FROM v |> WHERE y`),
+      ).toEqual(`SELECT * FROM t WHERE a IN (SELECT a FROM u) UNION ALL SELECT * FROM v WHERE y`);
+      expect(
+        new SqlPipesQuery({
+          query: parsePipes(`FROM t |> WHERE x`),
+          pipeOperators: parsePipes(`FROM t |> LIMIT 1`).pipeOperators,
+        })
+          .unpipe()
+          .toString(),
+      ).toEqual(`SELECT * FROM t WHERE x\nLIMIT 1`);
+    });
+
+    it('converts a long query', () => {
+      const query = parsePipes(sane`
+        FROM store
+        |> WHERE channel = '#en'
+        |> EXTEND
+             LOWER(site_name) AS site,
+             TIME_FLOOR(__time, 'P1D') AS day_start
+        -- Visitors per site per day
+        |> AGGREGATE COUNT(DISTINCT client_ip) AS visitors GROUP BY site, day_start
+        |> AGGREGATE
+             SUM(visitors) FILTER (WHERE day_start >= TIMESTAMP '2026-01-01') AS current_visitors,
+             AVG(visitors) FILTER (WHERE day_start < TIMESTAMP '2026-01-01') AS avg_visitors
+           GROUP BY site
+        |> EXTEND avg_visitors * 3 AS threshold
+        |> WHERE current_visitors > threshold
+        |> SET threshold = ROUND(threshold, 1)
+        |> ORDER BY current_visitors DESC
+        |> LIMIT 10
+      `);
+
+      const unpiped = query.unpipe();
+      expect(unpiped.toString()).toMatchInlineSnapshot(`
+        "SELECT
+          site,
+          current_visitors,
+          avg_visitors,
+          ROUND(threshold, 1) AS threshold
+        FROM (
+          SELECT *, avg_visitors * 3 AS threshold
+          FROM (
+            SELECT site,
+                 SUM(visitors) FILTER (WHERE day_start >= TIMESTAMP '2026-01-01') AS current_visitors,
+                 AVG(visitors) FILTER (WHERE day_start < TIMESTAMP '2026-01-01') AS avg_visitors
+            FROM (
+              SELECT site, day_start, COUNT(DISTINCT client_ip) AS visitors
+              FROM (
+                SELECT *,
+                     LOWER(site_name) AS site,
+                     TIME_FLOOR(__time, 'P1D') AS day_start
+                FROM store
+                WHERE channel = '#en'
+              )
+              -- Visitors per site per day
+              GROUP BY site, day_start
+            )
+            GROUP BY site
+          )
+        )
+        WHERE current_visitors > threshold
+        ORDER BY current_visitors DESC
+        LIMIT 10"
+      `);
+      expect(
+        SqlExpression.parse(unpiped.toString()).some(ex => ex instanceof SqlPipesQuery),
+      ).toEqual(false);
     });
   });
 
