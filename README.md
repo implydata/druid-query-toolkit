@@ -8,6 +8,16 @@ There are a number of use cases for this toolkit and one of the chief use cases 
 Search for uses within [web-console/src](https://github.com/apache/druid/tree/master/web-console/src) for some examples.
 Specifically the [query view](https://github.com/apache/druid/tree/master/web-console/src/views/workbench-view) uses these tools a lot.
 
+## Documentation
+
+The [docs](docs/README.md) cover the whole API with examples:
+
+- [Getting started](docs/getting-started.md) and [why the text is preserved](docs/text-preservation.md)
+- [Parsing](docs/parsing.md), [building SQL](docs/building.md), [expressions](docs/expressions.md) and [walking the tree](docs/traversal.md)
+- [Queries](docs/queries.md), [SELECT queries](docs/select-queries.md) and [pipe syntax](docs/pipe-syntax.md)
+- Use cases: [editing queries from UI actions](docs/use-case-ui-edits.md), [validating user input](docs/use-case-validation.md) and [rewriting queries](docs/use-case-rewriting.md)
+- [API reference](docs/api.md)
+
 ## Parts
 
 At a high level there are 4 parts to this toolkit:
