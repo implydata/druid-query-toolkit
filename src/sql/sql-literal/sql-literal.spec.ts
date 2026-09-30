@@ -409,6 +409,139 @@ describe('SqlLiteral', () => {
       expect(String(SqlLiteral.direct('VARCHAR'))).toEqual('VARCHAR');
       expect(String(SqlLiteral.direct('day'))).toEqual('day');
     });
+
+    it('returns an existing literal as is', () => {
+      const literal = SqlLiteral.create('x');
+
+      expect(SqlLiteral.direct(literal)).toBe(literal);
+    });
+  });
+
+  describe('.index', () => {
+    it('turns a zero based index into a one based literal', () => {
+      expect(String(SqlLiteral.index(0))).toEqual('1');
+      expect(String(SqlLiteral.index(4))).toEqual('5');
+    });
+  });
+
+  describe('.escapeLiteralString', () => {
+    it('quotes and escapes a string', () => {
+      expect(SqlLiteral.escapeLiteralString(`it's`)).toEqual(`'it''s'`);
+      expect(SqlLiteral.escapeLiteralString(`a\u0001b`)).toEqual(`U&'a\\0001b'`);
+    });
+  });
+
+  describe('.dateToTimestampValue', () => {
+    it('drops the zero parts of the time', () => {
+      expect(SqlLiteral.dateToTimestampValue(new Date('2020-01-02T00:00:00Z'))).toEqual(
+        '2020-01-02',
+      );
+      expect(SqlLiteral.dateToTimestampValue(new Date('2020-01-02T03:04:00Z'))).toEqual(
+        '2020-01-02 03:04:00',
+      );
+      expect(SqlLiteral.dateToTimestampValue(new Date('2020-01-02T00:00:00.123Z'))).toEqual(
+        '2020-01-02 00:00:00.123',
+      );
+    });
+  });
+
+  describe('.isTrue', () => {
+    it('is true only for the TRUE literal', () => {
+      expect(SqlLiteral.isTrue(SqlExpression.parse('true'))).toEqual(true);
+      expect(SqlLiteral.isTrue(SqlLiteral.FALSE)).toEqual(false);
+      expect(SqlLiteral.isTrue(SqlLiteral.create('true'))).toEqual(false);
+      expect(SqlLiteral.isTrue(SqlExpression.parse('x'))).toEqual(false);
+    });
+  });
+
+  describe('._equalsLiteral', () => {
+    it('checks for a literal with the given number value', () => {
+      expect(SqlLiteral._equalsLiteral(SqlLiteral.create(3), 3)).toEqual(true);
+      expect(SqlLiteral._equalsLiteral(SqlLiteral.create(3), 4)).toEqual(false);
+      expect(SqlLiteral._equalsLiteral(SqlLiteral.create('3'), 3)).toEqual(false);
+      expect(SqlLiteral._equalsLiteral(SqlExpression.parse('x'), 3)).toEqual(false);
+    });
+  });
+
+  describe('#getEffectiveStringValue', () => {
+    it('uses the parsed string value when there is one', () => {
+      expect((SqlExpression.parse('1.50') as SqlLiteral).getEffectiveStringValue()).toEqual('1.50');
+    });
+
+    it('renders the value when there is no string value', () => {
+      expect(SqlLiteral.NULL.getEffectiveStringValue()).toEqual('NULL');
+      expect(SqlLiteral.TRUE.getEffectiveStringValue()).toEqual('TRUE');
+      expect(SqlLiteral.FALSE.getEffectiveStringValue()).toEqual('FALSE');
+      expect(SqlLiteral.create(`a'b`).getEffectiveStringValue()).toEqual(`'a''b'`);
+      expect(SqlLiteral.create(new Date('2020-01-02Z')).getEffectiveStringValue()).toEqual(
+        `'2020-01-02'`,
+      );
+      expect(SqlLiteral.create(BigInt(12)).getEffectiveStringValue()).toEqual('12');
+    });
+  });
+
+  describe('#resetOwnKeywords', () => {
+    it('normalizes the casing of NULL and booleans', () => {
+      expect(SqlExpression.parse('null').resetOwnKeywords().toString()).toEqual('NULL');
+      expect(SqlExpression.parse('True').resetOwnKeywords().toString()).toEqual('TRUE');
+      expect(SqlExpression.parse('false').resetOwnKeywords().toString()).toEqual('FALSE');
+    });
+
+    it('resets the TIMESTAMP keyword but keeps other string values', () => {
+      expect(SqlExpression.parse(`timestamp '2020-01-02'`).resetOwnKeywords().toString()).toEqual(
+        `TIMESTAMP '2020-01-02'`,
+      );
+      expect(SqlExpression.parse('1.50').resetOwnKeywords().toString()).toEqual('1.50');
+    });
+  });
+
+  describe('#isIndex', () => {
+    it('is true for numbers only', () => {
+      expect(SqlLiteral.create(2).isIndex()).toEqual(true);
+      expect(SqlLiteral.create('2').isIndex()).toEqual(false);
+    });
+  });
+
+  describe('#getIndexValue', () => {
+    it('returns the zero based index', () => {
+      expect(SqlLiteral.create(3).getIndexValue()).toEqual(2);
+      expect(SqlLiteral.create(3.7).getIndexValue()).toEqual(2);
+      expect(SqlLiteral.create('3').getIndexValue()).toEqual(-1);
+    });
+  });
+
+  describe('#incrementIndex', () => {
+    it('increments a numeric literal', () => {
+      expect(String(SqlLiteral.create(3).incrementIndex())).toEqual('4');
+      expect(String(SqlLiteral.create(3).incrementIndex(-2))).toEqual('1');
+      expect(String((SqlExpression.parse('03') as SqlLiteral).incrementIndex())).toEqual('4');
+    });
+
+    it('leaves non numeric literals alone', () => {
+      const literal = SqlLiteral.create('3');
+
+      expect(literal.incrementIndex()).toBe(literal);
+    });
+  });
+
+  describe('#prettyTrim', () => {
+    it('trims long strings', () => {
+      expect(String(SqlLiteral.create('hello world').prettyTrim(8))).toEqual(`'hello...'`);
+      expect(String(SqlLiteral.create('hi').prettyTrim(8))).toEqual(`'hi'`);
+    });
+
+    it('leaves non string literals alone', () => {
+      const literal = SqlLiteral.create(1234567890);
+
+      expect(literal.prettyTrim(3)).toBe(literal);
+    });
+  });
+
+  describe('#decomposeViaAnd', () => {
+    it('drops TRUE and keeps everything else', () => {
+      expect(SqlLiteral.TRUE.decomposeViaAnd()).toEqual([]);
+      expect(SqlLiteral.FALSE.decomposeViaAnd()).toEqual([SqlLiteral.FALSE]);
+    });
   });
 
   describe('#isInteger', () => {
@@ -419,6 +552,51 @@ describe('SqlLiteral', () => {
       expect(SqlLiteral.create(17).isInteger()).toEqual(true);
       expect(SqlLiteral.double(17.23).isInteger()).toEqual(false);
       expect(SqlLiteral.create(17.23).isInteger()).toEqual(false);
+      expect((SqlExpression.parse('17.0') as SqlLiteral).isInteger()).toEqual(false);
+      expect((SqlExpression.parse('17') as SqlLiteral).isInteger()).toEqual(true);
+    });
+
+    it('is true for bigints and false for non numbers', () => {
+      expect(SqlLiteral.create(BigInt(5)).isInteger()).toEqual(true);
+      expect(SqlLiteral.create('5').isInteger()).toEqual(false);
+    });
+  });
+
+  describe('#isDate', () => {
+    it('is true for dates only', () => {
+      expect(SqlLiteral.create(new Date('2020-01-01Z')).isDate()).toEqual(true);
+      expect(SqlLiteral.create('2020-01-01').isDate()).toEqual(false);
+    });
+  });
+
+  describe('#getNumberValue', () => {
+    it('returns numbers only', () => {
+      expect(SqlLiteral.create(5).getNumberValue()).toEqual(5);
+      expect(SqlLiteral.create(BigInt(5)).getNumberValue()).toBeUndefined();
+    });
+  });
+
+  describe('#getNumberOrBigintValue', () => {
+    it('returns numbers and bigints', () => {
+      expect(SqlLiteral.create(5).getNumberOrBigintValue()).toEqual(5);
+      expect(SqlLiteral.create(BigInt(5)).getNumberOrBigintValue()).toEqual(BigInt(5));
+      expect(SqlLiteral.create('5').getNumberOrBigintValue()).toBeUndefined();
+    });
+  });
+
+  describe('#getStringValue', () => {
+    it('returns strings only', () => {
+      expect(SqlLiteral.create('5').getStringValue()).toEqual('5');
+      expect(SqlLiteral.create(5).getStringValue()).toBeUndefined();
+    });
+  });
+
+  describe('#getDateValue', () => {
+    it('returns dates only', () => {
+      const date = new Date('2020-01-01Z');
+
+      expect(SqlLiteral.create(date).getDateValue()).toBe(date);
+      expect(SqlLiteral.create('2020-01-01').getDateValue()).toBeUndefined();
     });
   });
 });

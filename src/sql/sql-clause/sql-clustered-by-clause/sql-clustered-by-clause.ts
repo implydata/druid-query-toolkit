@@ -68,11 +68,8 @@ export class SqlClusteredByClause extends SqlClause {
     expression: SqlExpression,
     where: 'start' | 'end' = 'end',
   ): SqlClusteredByClause {
-    const { expressions } = this;
     return this.changeExpressions(
-      expressions
-        ? expressions.insert(where === 'start' ? 0 : Infinity, expression)
-        : SeparatedArray.fromSingleValue(expression),
+      this.expressions.insert(where === 'start' ? 0 : Infinity, expression),
     );
   }
 
@@ -93,7 +90,6 @@ export class SqlClusteredByClause extends SqlClause {
   }
 
   public clearOwnSeparators(): this {
-    if (!this.expressions) return this;
     const value = this.valueOf();
     value.expressions = this.expressions.clearSeparators();
     return SqlBase.fromValue(value);
@@ -104,7 +100,6 @@ export class SqlClusteredByClause extends SqlClause {
   }
 
   public shiftIndexes(aboveIndex: number): SqlClusteredByClause {
-    if (!this.expressions) return this;
     return this.changeExpressions(
       this.expressions.map(expression => {
         if (expression instanceof SqlLiteral && expression.isIndex()) {

@@ -12,9 +12,18 @@
  * limitations under the License.
  */
 
-import { SqlLimitClause, SqlLiteral } from '../../..';
+import { SqlLimitClause, SqlLiteral, SqlQuery } from '../../..';
+import { backAndForth } from '../../../test-utils';
 
 describe('SqlLimitClause', () => {
+  describe('parses', () => {
+    it('round trips', () => {
+      backAndForth('SELECT * FROM t LIMIT 10', SqlQuery);
+      backAndForth('SELECT * FROM t limit   5', SqlQuery);
+      backAndForth('SELECT * FROM t LIMIT /* c */ 5 OFFSET 2', SqlQuery);
+    });
+  });
+
   describe('.create', () => {
     it('creates a limit clause from a number', () => {
       const limitClause = SqlLimitClause.create(100);
@@ -48,6 +57,24 @@ describe('SqlLimitClause', () => {
       const newLimitClause = limitClause.changeLimit(literal);
 
       expect(newLimitClause.toString()).toEqual('LIMIT 300');
+    });
+  });
+
+  describe('#_walkInner', () => {
+    const limitClause = SqlQuery.parse('SELECT * FROM t LIMIT 10').limitClause!;
+
+    it('substitutes the limit literal', () => {
+      expect(
+        limitClause.walk(ex => (ex instanceof SqlLiteral ? SqlLiteral.create(20) : ex)).toString(),
+      ).toEqual('LIMIT 20');
+    });
+
+    it('returns the same instance when nothing changes', () => {
+      expect(limitClause.walk(ex => ex)).toBe(limitClause);
+    });
+
+    it('stops when the walker returns undefined', () => {
+      expect(limitClause.walk(ex => (ex instanceof SqlLiteral ? undefined : ex))).toBe(limitClause);
     });
   });
 

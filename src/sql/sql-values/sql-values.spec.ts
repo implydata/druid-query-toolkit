@@ -94,6 +94,28 @@ describe('SqlValues', () => {
         )
       `);
     });
+
+    it('returns a given VALUES as is', () => {
+      const values = SqlExpression.parse(`VALUES (1)`) as SqlValues;
+
+      expect(SqlValues.create(values)).toBe(values);
+    });
+  });
+
+  describe('#changeRecords', () => {
+    it('replaces the records', () => {
+      const values = SqlExpression.parse(`VALUES (1, 2), (3, 4)`) as SqlValues;
+
+      expect(String(values.changeRecords(values.records.values.slice(1)))).toEqual(`VALUES (3, 4)`);
+    });
+  });
+
+  describe('#clearOwnSeparators', () => {
+    it('resets the separators between records', () => {
+      expect(
+        String((SqlExpression.parse(`VALUES (1)  ,  (2)`) as SqlValues).clearOwnSeparators()),
+      ).toEqual(`VALUES (1),\n(2)`);
+    });
   });
 
   describe('#changeLimitValue', () => {
@@ -143,6 +165,32 @@ describe('SqlValues', () => {
         (3, 4),
         (5, 6)
       `);
+    });
+  });
+
+  describe('#walk', () => {
+    const values = SqlExpression.parse(`VALUES (1, 2), (3, 4)`) as SqlValues;
+
+    it('substitutes inside the records', () => {
+      expect(
+        String(
+          values.walk(ex =>
+            ex instanceof SqlLiteral && ex.value === 3 ? SqlLiteral.create(30) : ex,
+          ),
+        ),
+      ).toEqual(`VALUES (1, 2), (30, 4)`);
+    });
+
+    it('stops when the substitutor returns undefined', () => {
+      const visited: string[] = [];
+
+      expect(
+        values.walk(ex => {
+          visited.push(String(ex));
+          return ex instanceof SqlRecord ? undefined : ex;
+        }),
+      ).toBe(values);
+      expect(visited).toEqual([`VALUES (1, 2), (3, 4)`, `(1, 2)`]);
     });
   });
 

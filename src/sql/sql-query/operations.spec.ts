@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { SqlColumn, SqlExpression, SqlQuery } from '../..';
+import { SqlColumn, SqlExpression, SqlLiteral, SqlQuery } from '../..';
 import { sane } from '../../utils';
 
 function stringifyExpressions(v: any) {
@@ -116,6 +116,10 @@ describe('SqlQuery (operations)', () => {
       `;
 
       expect(SqlQuery.parse(sql).getAggregateOutputColumns()).toEqual(['aggregated']);
+    });
+
+    it('returns nothing without a GROUP BY', () => {
+      expect(SqlQuery.parse(`SELECT COUNT(*) FROM t`).getAggregateOutputColumns()).toEqual([]);
     });
   });
 
@@ -256,6 +260,12 @@ describe('SqlQuery (operations)', () => {
         FROM sys."github" WHERE (col > 1 OR col < 5) AND colTwo > 5 AND colTwo > 2
       `);
     });
+
+    it('does nothing when given no expressions', () => {
+      const query = SqlQuery.parse(`SELECT * FROM t WHERE a = 1`);
+
+      expect(query.addWhere()).toBe(query);
+    });
   });
 
   describe('#removeColumnFromWhere', () => {
@@ -315,6 +325,12 @@ describe('SqlQuery (operations)', () => {
       `;
 
       expect(SqlQuery.parse(sql).removeColumnFromWhere('col2').toString()).toEqual(sql);
+    });
+
+    it('does nothing when there is no WHERE clause', () => {
+      const query = SqlQuery.parse(`SELECT * FROM t`);
+
+      expect(query.removeColumnFromWhere('a')).toBe(query);
     });
   });
 
@@ -379,6 +395,12 @@ describe('SqlQuery (operations)', () => {
         SELECT col0, col1, col2
         FROM github
       `);
+    });
+
+    it('does nothing when there is no HAVING clause', () => {
+      const query = SqlQuery.parse(`SELECT a FROM t GROUP BY a`);
+
+      expect(query.removeFromHaving('a')).toBe(query);
     });
   });
 
@@ -820,6 +842,11 @@ describe('SqlQuery (operations)', () => {
           2,
         );
       });
+
+      it('returns -1 for an index literal that is out of range', () => {
+        expect(query.getSelectIndexForExpression(SqlLiteral.index(6), false)).toEqual(-1);
+        expect(query.getSelectIndexForExpression(SqlLiteral.index(5), false)).toEqual(5);
+      });
     });
 
     describe('#getGroupedSelectExpressions', () => {
@@ -830,6 +857,12 @@ describe('SqlQuery (operations)', () => {
           'namespace AS s_namespace',
           'TRANSFORM(countryName) AS "trans"',
         ]);
+      });
+
+      it('returns nothing without a GROUP BY', () => {
+        expect(SqlQuery.parse(`SELECT a, COUNT(*) FROM t`).getGroupedSelectExpressions()).toEqual(
+          [],
+        );
       });
     });
 
@@ -864,6 +897,12 @@ describe('SqlQuery (operations)', () => {
           },
         ]);
       });
+
+      it('returns nothing without a GROUP BY', () => {
+        expect(SqlQuery.parse(`SELECT a, COUNT(*) FROM t`).getGroupingExpressionInfos()).toEqual(
+          [],
+        );
+      });
     });
 
     describe('#getGroupingExpressions', () => {
@@ -887,6 +926,10 @@ describe('SqlQuery (operations)', () => {
           'trans',
         ]);
       });
+
+      it('returns nothing without a GROUP BY', () => {
+        expect(SqlQuery.parse(`SELECT a, COUNT(*) FROM t`).getGroupedOutputColumns()).toEqual([]);
+      });
     });
 
     describe('#getAggregateSelectExpressions', () => {
@@ -895,6 +938,12 @@ describe('SqlQuery (operations)', () => {
           'COUNT(*)',
           'SUM(added) AS "Added"',
         ]);
+      });
+
+      it('returns nothing without a GROUP BY', () => {
+        expect(SqlQuery.parse(`SELECT a, COUNT(*) FROM t`).getAggregateSelectExpressions()).toEqual(
+          [],
+        );
       });
     });
 
@@ -916,6 +965,10 @@ describe('SqlQuery (operations)', () => {
     describe('#getOrderedOutputColumns', () => {
       it('works', () => {
         expect(query.getOrderedOutputColumns()).toEqual(['channel', 's_namespace', 'EXPR$4']);
+      });
+
+      it('returns nothing without an ORDER BY', () => {
+        expect(SqlQuery.parse(`SELECT a FROM t`).getOrderedOutputColumns()).toEqual([]);
       });
     });
   });

@@ -13,7 +13,8 @@
  */
 
 import { backAndForth } from '../../test-utils';
-import { RefName, SqlAlias, SqlColumn, SqlQuery } from '..';
+import type { SqlBase } from '..';
+import { RefName, SqlAlias, SqlColumn, SqlExpression, SqlQuery, SqlTable } from '..';
 
 describe('SqlAlias', () => {
   describe('parses', () => {
@@ -169,6 +170,16 @@ describe('SqlAlias', () => {
         }
       `);
     });
+
+    it('works with a column list', () => {
+      const sql = `t AS x (a, "b")`;
+
+      backAndForth(sql, SqlAlias);
+
+      const alias = SqlExpression.parse(sql) as SqlAlias;
+      expect(alias.getAliasName()).toEqual('x');
+      expect(String(alias.columns)).toEqual('(a, "b")');
+    });
   });
 
   describe('.create', () => {
@@ -217,6 +228,15 @@ describe('SqlAlias', () => {
     });
   });
 
+  describe('#changeExpression', () => {
+    it('replaces the expression and keeps the alias and spacing', () => {
+      const alias = SqlExpression.parse(`x  AS  "y"`) as SqlAlias;
+      expect(alias.changeExpression(SqlExpression.parse('a + 1')).toString()).toEqual(
+        'a + 1  AS  "y"',
+      );
+    });
+  });
+
   describe('#changeAlias', () => {
     const x = SqlAlias.create(SqlColumn.optionalQuotes('X'), 'test');
     const z = SqlAlias.create(SqlColumn.optionalQuotes('Z'), RefName.create('test', true));
@@ -235,6 +255,86 @@ describe('SqlAlias', () => {
 
     it('works with quotes if forced', () => {
       expect(String(x.changeAlias('hello', true))).toEqual('X AS "hello"');
+    });
+
+    it('uses a RefName as given', () => {
+      expect(String(x.changeAlias(RefName.create('hello', false)))).toEqual('X AS hello');
+    });
+  });
+
+  describe('#_walkInner', () => {
+    const alias = SqlExpression.parse(`a + b AS "c"`) as SqlAlias;
+
+    it('returns the same instance when nothing changes', () => {
+      expect(alias.walk(ex => ex)).toBe(alias);
+    });
+
+    it('substitutes inside the expression but not the alias', () => {
+      expect(
+        alias
+          .walk(ex => (ex instanceof SqlColumn ? ex.changeName(ex.getName().toUpperCase()) : ex))
+          .toString(),
+      ).toEqual('A + B AS "c"');
+    });
+
+    it('abandons all changes when the expression aborts the walk', () => {
+      expect(
+        alias.walk((ex: SqlBase) => {
+          if (!(ex instanceof SqlColumn)) return ex;
+          if (ex.getName() === 'b') return;
+          return ex.changeName('z');
+        }),
+      ).toBe(alias);
+    });
+  });
+
+  describe('#ifUnnamedAliasAs', () => {
+    it('keeps the existing alias', () => {
+      const alias = SqlAlias.create(SqlColumn.create('x'), 'y');
+      expect(alias.ifUnnamedAliasAs('z')).toBe(alias);
+    });
+  });
+
+  describe('#convertToTable', () => {
+    it('turns an aliased column into an aliased table', () => {
+      const alias = SqlExpression.parse(`sys.segments AS s`) as SqlAlias;
+      const converted = alias.convertToTable() as SqlAlias;
+      expect(converted.expression).toBeInstanceOf(SqlTable);
+      expect(converted.toString()).toEqual('sys.segments AS s');
+    });
+
+    it('leaves a non column expression alone', () => {
+      const alias = SqlAlias.create(SqlExpression.parse('1 + 1'), 'two');
+      expect(alias.convertToTable()).toBe(alias);
+    });
+  });
+
+  describe('#getAliasName', () => {
+    it('returns the alias name', () => {
+      expect((SqlExpression.parse(`x AS "My Name"`) as SqlAlias).getAliasName()).toEqual('My Name');
+    });
+  });
+
+  describe('#getOutputName', () => {
+    it('returns the alias name', () => {
+      expect(SqlExpression.parse(`x AS y`).getOutputName()).toEqual('y');
+    });
+  });
+
+  describe('#getUnderlyingExpression', () => {
+    it('returns the aliased expression', () => {
+      const x = SqlColumn.create('x');
+      expect(SqlAlias.create(x, 'y').getUnderlyingExpression()).toBe(x);
+    });
+  });
+
+  describe('#changeUnderlyingExpression', () => {
+    it('replaces the aliased expression', () => {
+      expect(
+        SqlAlias.create(SqlColumn.create('x'), 'y')
+          .changeUnderlyingExpression(SqlExpression.parse('COUNT(*)'))
+          .toString(),
+      ).toEqual('COUNT(*) AS "y"');
     });
   });
 });

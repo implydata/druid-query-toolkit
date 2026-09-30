@@ -12,8 +12,13 @@
  * limitations under the License.
  */
 
+import { SqlQuery, SqlStar, SqlTable } from '../..';
 import { backAndForth } from '../../test-utils';
 import { SqlExpression } from '../sql-expression';
+
+function parseStar(sql: string): SqlStar {
+  return SqlQuery.parse(`SELECT ${sql}`).getSelectExpressionForIndex(0) as SqlStar;
+}
 
 describe('SqlStar', () => {
   describe('parses', () => {
@@ -99,6 +104,70 @@ describe('SqlStar', () => {
           "withClause": undefined,
         }
       `);
+    });
+  });
+
+  describe('.PLAIN', () => {
+    it('is a star without a table', () => {
+      expect(String(SqlStar.PLAIN)).toEqual('*');
+      expect(SqlStar.PLAIN.table).toBeUndefined();
+    });
+  });
+
+  describe('.create', () => {
+    it('makes a star with or without a table', () => {
+      expect(String(SqlStar.create())).toEqual('*');
+      expect(String(SqlStar.create(SqlTable.create('t')))).toEqual('"t".*');
+    });
+  });
+
+  describe('#changeTable', () => {
+    it('sets a table', () => {
+      expect(String(SqlStar.PLAIN.changeTable(SqlTable.optionalQuotes('t')))).toEqual('t.*');
+    });
+
+    it('replaces the table and keeps the spacing', () => {
+      expect(String(parseStar('a . *').changeTable(SqlTable.optionalQuotes('b')))).toEqual('b . *');
+    });
+
+    it('removes the table along with its spacing', () => {
+      const changed = parseStar('a . *').changeTable(undefined);
+      expect(String(changed)).toEqual('*');
+      expect(changed.table).toBeUndefined();
+      expect(changed.spacing).toEqual({});
+    });
+  });
+
+  describe('#getTableName', () => {
+    it('returns the table name when there is one', () => {
+      expect(parseStar('ns.t.*').getTableName()).toEqual('t');
+      expect(parseStar('*').getTableName()).toBeUndefined();
+    });
+  });
+
+  describe('#changeTableName', () => {
+    it('renames an existing table and keeps its namespace and quoting', () => {
+      expect(String(parseStar('ns.t.*').changeTableName('u'))).toEqual('ns.u.*');
+    });
+
+    it('creates a table when there is none', () => {
+      expect(String(parseStar('*').changeTableName('t'))).toEqual('"t".*');
+    });
+
+    it('removes the table when given undefined', () => {
+      expect(String(parseStar('t.*').changeTableName(undefined))).toEqual('*');
+    });
+  });
+
+  describe('#prettyTrim', () => {
+    it('trims the table and namespace names', () => {
+      expect(String(parseStar('abcdefghij.klmnopqrst.*').prettyTrim(6))).toEqual(
+        '"abc..."."klm...".*',
+      );
+    });
+
+    it('returns a star without a table as is', () => {
+      expect(SqlStar.PLAIN.prettyTrim(6)).toBe(SqlStar.PLAIN);
     });
   });
 });

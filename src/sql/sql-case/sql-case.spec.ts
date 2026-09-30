@@ -13,7 +13,8 @@
  */
 
 import { backAndForth } from '../../test-utils';
-import { SqlCase, SqlExpression } from '..';
+import type { SqlBase } from '..';
+import { SeparatedArray, SqlCase, SqlColumn, SqlExpression, SqlWhenThenPart } from '..';
 
 describe('SqlCase', () => {
   describe('parses', () => {
@@ -913,6 +914,97 @@ describe('SqlCase', () => {
       expect(SqlCase.ifThenElse(condition, thenExpr).toString()).toEqual(
         'CASE WHEN x > 5 THEN "result is true" END',
       );
+    });
+  });
+
+  describe('#changeCaseExpression', () => {
+    it('replaces the case expression', () => {
+      expect(
+        SqlExpression.parse(`CASE x WHEN 1 THEN 'a' END`)
+          .apply(ex => (ex as SqlCase).changeCaseExpression(SqlColumn.create('y')))
+          .toString(),
+      ).toEqual(`CASE "y" WHEN 1 THEN 'a' END`);
+    });
+
+    it('adds a case expression to a caseless CASE', () => {
+      expect(
+        SqlCase.ifThenElse(SqlExpression.parse('1'), 'a')
+          .changeCaseExpression(SqlColumn.create('y'))
+          .toString(),
+      ).toEqual(`CASE "y" WHEN 1 THEN 'a' END`);
+    });
+  });
+
+  describe('#changeWhenThenParts', () => {
+    it('replaces the when/then parts', () => {
+      const c = SqlExpression.parse(`CASE WHEN a THEN 1 ELSE 0 END`) as SqlCase;
+      expect(
+        c
+          .changeWhenThenParts(
+            SeparatedArray.fromArray([
+              SqlWhenThenPart.create(SqlExpression.parse('b'), 2),
+              SqlWhenThenPart.create(SqlExpression.parse('c'), 3),
+            ]),
+          )
+          .toString(),
+      ).toEqual('CASE WHEN b THEN 2 WHEN c THEN 3 ELSE 0 END');
+    });
+  });
+
+  describe('#changeElseExpression', () => {
+    it('replaces the else expression', () => {
+      const c = SqlExpression.parse(`CASE WHEN a THEN 1 else  0 END`) as SqlCase;
+      expect(c.changeElseExpression(SqlExpression.parse('-1')).toString()).toEqual(
+        'CASE WHEN a THEN 1 else  -1 END',
+      );
+    });
+
+    it('adds an else expression', () => {
+      expect(
+        SqlCase.ifThenElse(SqlExpression.parse('a'), 1)
+          .changeElseExpression(SqlExpression.parse('0'))
+          .toString(),
+      ).toEqual('CASE WHEN a THEN 1 ELSE 0 END');
+    });
+  });
+
+  describe('#_walkInner', () => {
+    const c = SqlExpression.parse(`CASE x WHEN a THEN b ELSE y END`) as SqlCase;
+
+    function upperUnless(stopAt?: string) {
+      return (ex: SqlBase): SqlBase | undefined => {
+        if (!(ex instanceof SqlColumn)) return ex;
+        if (ex.getName() === stopAt) return;
+        return ex.changeName(ex.getName().toUpperCase());
+      };
+    }
+
+    it('returns the same instance when nothing changes', () => {
+      expect(c.walk(ex => ex)).toBe(c);
+    });
+
+    it('substitutes in the case, when/then and else expressions', () => {
+      expect(c.walk(upperUnless()).toString()).toEqual('CASE X WHEN A THEN B ELSE Y END');
+    });
+
+    it('visits the parts in order', () => {
+      const seen: string[] = [];
+      c.walk(ex => {
+        if (ex instanceof SqlColumn) seen.push(ex.getName());
+        return ex;
+      });
+      expect(seen).toEqual(['x', 'a', 'b', 'y']);
+    });
+
+    it.each(['x', 'a', 'y'])('abandons all changes when %s aborts the walk', stopAt => {
+      expect(c.walk(upperUnless(stopAt))).toBe(c);
+    });
+  });
+
+  describe('#clearOwnSeparators', () => {
+    it('resets the spacing between when/then parts', () => {
+      const c = SqlExpression.parse(`CASE WHEN a THEN 1\n  WHEN b THEN 2 END`) as SqlCase;
+      expect(c.clearOwnSeparators().toString()).toEqual('CASE WHEN a THEN 1 WHEN b THEN 2 END');
     });
   });
 });

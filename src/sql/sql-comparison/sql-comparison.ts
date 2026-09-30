@@ -307,7 +307,7 @@ export class SqlComparison extends SqlExpression {
 
     const value = this.valueOf();
     value.op = SqlComparison.reverseOperator(op);
-    value.keywords = this.getKeywordsWithout('op');
+    value.keywords = this.getKeywordsWithout('op', 'decorator');
     if (decorator) {
       value.decorator = decorator === 'ALL' ? 'ANY' : 'ALL';
     }

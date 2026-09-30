@@ -67,5 +67,62 @@ describe('SqlKeyValue', () => {
       const changed = keyValue.changeShort(true);
       expect(changed.toString()).toEqual("'x':'y'");
     });
+
+    it('returns the same instance when the flag does not change', () => {
+      const keyValue = SqlKeyValue.create(SqlLiteral.create('x'), SqlLiteral.create('y'));
+
+      expect(keyValue.changeShort(false)).toBe(keyValue);
+      expect(keyValue.changeShort(true).changeShort(true).toString()).toEqual("'x':'y'");
+    });
+
+    it('switches back to longhand and resets the spacing', () => {
+      const keyValue = SqlKeyValue.short(
+        SqlLiteral.create('x'),
+        SqlLiteral.create('y'),
+      ).changeSpaces({ postKeyExpression: ' ', preValueExpression: '  ' });
+      expect(keyValue.toString()).toEqual("'x' :  'y'");
+
+      const changed = keyValue.changeShort(false);
+      expect(changed.short).toBeUndefined();
+      expect(changed.toString()).toEqual("KEY 'x' VALUE 'y'");
+    });
+  });
+
+  describe('#walk', () => {
+    it('substitutes the key and the value', () => {
+      const keyValue = SqlKeyValue.create(SqlLiteral.create('x'), SqlLiteral.create('y'));
+
+      expect(
+        keyValue
+          .walk(ex =>
+            ex instanceof SqlLiteral ? SqlLiteral.create(String(ex.value).toUpperCase()) : ex,
+          )
+          .toString(),
+      ).toEqual("KEY 'X' VALUE 'Y'");
+    });
+
+    it('keeps the same instance when nothing changes', () => {
+      const keyValue = SqlKeyValue.create(SqlLiteral.create('x'), SqlLiteral.create('y'));
+
+      expect(keyValue.walk(ex => ex)).toBe(keyValue);
+    });
+
+    it('stops the walk when the callback returns nothing for the key or the value', () => {
+      const keyValue = SqlKeyValue.create(SqlLiteral.create('x'), SqlLiteral.create('y'));
+
+      const seen: string[] = [];
+      keyValue.walk(ex => {
+        seen.push(ex.toString());
+        return ex instanceof SqlLiteral && ex.value === 'x' ? undefined : ex;
+      });
+      expect(seen).toEqual(["KEY 'x' VALUE 'y'", "'x'"]);
+
+      seen.length = 0;
+      keyValue.walk(ex => {
+        seen.push(ex.toString());
+        return ex instanceof SqlLiteral && ex.value === 'y' ? undefined : ex;
+      });
+      expect(seen).toEqual(["KEY 'x' VALUE 'y'", "'x'", "'y'"]);
+    });
   });
 });

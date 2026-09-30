@@ -12,9 +12,16 @@
  * limitations under the License.
  */
 
-import { SqlExpression } from '../sql';
+import { SqlExpression, SqlLiteral, SqlRecord } from '../sql';
 
-import { extractOuterNot, unwrapCastAsVarchar } from './common';
+import {
+  castAsVarchar,
+  extractOuterNot,
+  oneOf,
+  sqlRecordGetLiteralValues,
+  unwrapCastAsVarchar,
+  xor,
+} from './common';
 
 describe('common', () => {
   describe('extractOuterNot', () => {
@@ -29,6 +36,40 @@ describe('common', () => {
       expect(negate).toEqual(true);
       expect(String(ex)).toEqual('x > 5');
     });
+
+    it('cancels out a double not', () => {
+      const [negate, ex] = extractOuterNot(SqlExpression.parse('NOT (NOT (x > 5))'));
+      expect(negate).toEqual(false);
+      expect(String(ex)).toEqual('x > 5');
+    });
+  });
+
+  describe('sqlRecordGetLiteralValues', () => {
+    it('returns the values when every element is a literal', () => {
+      expect(
+        sqlRecordGetLiteralValues(SqlRecord.create([1, 'a', null].map(v => SqlLiteral.create(v)))),
+      ).toEqual([1, 'a', null]);
+    });
+
+    it('returns undefined when an element is not a literal', () => {
+      expect(
+        sqlRecordGetLiteralValues(
+          SqlRecord.create([SqlLiteral.create(1), SqlExpression.parse('"col"')]),
+        ),
+      ).toBeUndefined();
+    });
+
+    it('returns an empty array for an empty record', () => {
+      expect(sqlRecordGetLiteralValues(SqlRecord.create([]))).toEqual([]);
+    });
+  });
+
+  describe('castAsVarchar', () => {
+    it('wraps the expression in a cast', () => {
+      expect(String(castAsVarchar(SqlExpression.parse('"channel"')))).toEqual(
+        'CAST("channel" AS VARCHAR)',
+      );
+    });
   });
 
   describe('unwrapCastAsVarchar', () => {
@@ -42,6 +83,35 @@ describe('common', () => {
       expect(String(unwrapCastAsVarchar(SqlExpression.parse('t."channel"')))).toEqual(
         't."channel"',
       );
+    });
+
+    it('does not unwrap a cast to another type', () => {
+      expect(String(unwrapCastAsVarchar(SqlExpression.parse('CAST("channel" AS BIGINT)')))).toEqual(
+        'CAST("channel" AS BIGINT)',
+      );
+    });
+
+    it('does not unwrap other functions', () => {
+      expect(String(unwrapCastAsVarchar(SqlExpression.parse('UPPER("channel")')))).toEqual(
+        'UPPER("channel")',
+      );
+    });
+  });
+
+  describe('oneOf', () => {
+    it('tells if the thing is one of the options', () => {
+      expect(oneOf('b', 'a', 'b', 'c')).toEqual(true);
+      expect(oneOf('d', 'a', 'b', 'c')).toEqual(false);
+      expect(oneOf('d')).toEqual(false);
+    });
+  });
+
+  describe('xor', () => {
+    it('is true when exactly one side is truthy', () => {
+      expect(xor(false, false)).toEqual(false);
+      expect(xor(true, false)).toEqual(true);
+      expect(xor(0, 'x')).toEqual(true);
+      expect(xor(1, 'x')).toEqual(false);
     });
   });
 });

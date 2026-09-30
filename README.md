@@ -84,6 +84,16 @@ Not every valid DruidSQL construct can currently be parsed, the following snippe
 - `(a, b) IN (subquery)`
 - `EXPLAIN PLAN FOR TABLE t`, `INSERT INTO dst TABLE t PARTITIONED BY ALL`, `TABLE a UNION ALL TABLE b`, and `WITH x AS (...) TABLE x` (a bare `TABLE t` and `SELECT * FROM (TABLE t)` do parse, as `SqlTableQuery`)
 
+Known issues:
+
+- `SqlWindowSpec.changeOrderByClause` and `changePartitionByClause` can print invalid SQL: adding an ORDER BY to a parsed `OVER (PARTITION BY a)` gives `(PARTITION BY aORDER BY b DESC )`, because the space before `)` is parsed as empty. Removing the last clause leaves a stray space (`(PARTITION BY a )`), and a window spec built without parsing prints `( )`.
+- `SqlWithQuery.flattenWith` puts the outer ORDER BY in place of the inner one, which changes which rows the inner query keeps when it has its own LIMIT or OFFSET.
+- `prettify({ keywordCasing: 'preserve' })` does not preserve the casing of `AND` / `OR`, since `SqlMulti` keeps the operator in its separators and `prettify` clears them.
+- Removing the last expression from a `SqlGroupByClause` leaves `GROUP BY ()` (a grand total that always returns one row) rather than removing the clause.
+- `SqlComparison.getSpecialLikeType` ignores `ESCAPE`, so `'a!%' ESCAPE '!'` is reported as a prefix match.
+- A topN result with no rows returns `QueryResult.BLANK` without its `resultContext`, unlike the other empty result paths.
+- `SqlQueryBase.changeExplain(false)` on a query that is not an EXPLAIN returns a new, equivalent instance instead of `this`.
+
 ## License
 
 [Apache 2.0](LICENSE)

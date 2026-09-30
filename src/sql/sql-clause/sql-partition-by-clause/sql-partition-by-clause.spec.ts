@@ -12,9 +12,35 @@
  * limitations under the License.
  */
 
-import { SeparatedArray, SqlColumn, SqlLiteral, SqlPartitionByClause } from '../../..';
+import {
+  SeparatedArray,
+  SqlColumn,
+  SqlExpression,
+  SqlFunction,
+  SqlLiteral,
+  SqlPartitionByClause,
+} from '../../..';
+import { backAndForth } from '../../../test-utils';
 
 describe('SqlPartitionByClause', () => {
+  describe('parses', () => {
+    it.each([
+      `SUM(x) OVER (PARTITION BY a)`,
+      `SUM(x) OVER (partition  by a ,b ORDER BY c)`,
+      `SUM(x) OVER (PARTITION /* hi */ BY LOWER(a), 1)`,
+    ])('does back and forth with %s', sql => {
+      backAndForth(sql, SqlFunction);
+    });
+
+    it('parses the expressions', () => {
+      const fn = SqlExpression.parse(`SUM(x) OVER (PARTITION BY a, b)`) as SqlFunction;
+      const partitionByClause = fn.windowSpec!.partitionByClause!;
+
+      expect(partitionByClause).toBeInstanceOf(SqlPartitionByClause);
+      expect(partitionByClause.expressions.values.map(String)).toEqual(['a', 'b']);
+    });
+  });
+
   describe('.create', () => {
     it('creates a PARTITION BY clause from a single expression', () => {
       const column = SqlColumn.create('x');
@@ -103,6 +129,30 @@ describe('SqlPartitionByClause', () => {
       const updatedClause = partitionByClause.changeExpressions([newColumn1, newColumn2]);
 
       expect(updatedClause.toString()).toEqual(`PARTITION BY "y", "z"`);
+    });
+  });
+
+  describe('#_walkInner', () => {
+    const clause = SqlPartitionByClause.create([SqlColumn.create('a'), SqlColumn.create('b')]);
+
+    it('returns the same instance when nothing changes', () => {
+      expect(clause.walk(ex => ex)).toBe(clause);
+    });
+
+    it('substitutes inner expressions', () => {
+      expect(
+        clause
+          .walk(ex =>
+            ex instanceof SqlColumn && ex.getName() === 'a' ? SqlColumn.create('z') : ex,
+          )
+          .toString(),
+      ).toEqual(`PARTITION BY "z", "b"`);
+    });
+
+    it('stops when an inner expression walk returns undefined', () => {
+      expect(
+        clause._walkHelper([], ex => (ex instanceof SqlColumn ? undefined : ex), false),
+      ).toBeUndefined();
     });
   });
 });

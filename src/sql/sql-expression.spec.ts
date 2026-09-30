@@ -12,7 +12,16 @@
  * limitations under the License.
  */
 
-import { RefName, sane, SqlBase, SqlColumn, SqlExpression, SqlLiteral } from '..';
+import {
+  RefName,
+  sane,
+  SqlBase,
+  SqlColumn,
+  SqlExpression,
+  SqlLiteral,
+  SqlMulti,
+  SqlWhenThenPart,
+} from '..';
 import { backAndForth, backAndForthPrettify, mapString } from '../test-utils';
 
 describe('SqlExpression', () => {
@@ -78,6 +87,56 @@ describe('SqlExpression', () => {
   describe('does not parse', () => {
     it.each([`$lol`, `#main.sum($count)`])('rejects the plywood expression %s', sql => {
       expect(() => SqlBase.parseSql(sql)).toThrow();
+    });
+  });
+
+  describe('.parse', () => {
+    it('parses a string into an expression', () => {
+      expect(SqlExpression.parse('a + 1')).toBeInstanceOf(SqlMulti);
+    });
+
+    it('returns an expression as is', () => {
+      expect(SqlExpression.parse(x)).toBe(x);
+    });
+
+    it('throws on unknown input', () => {
+      expect(() => SqlExpression.parse(5 as any)).toThrow('unknown input');
+    });
+
+    it('throws on invalid SQL', () => {
+      expect(() => SqlExpression.parse('a +')).toThrow();
+    });
+  });
+
+  describe('.maybeParse', () => {
+    it('parses valid SQL', () => {
+      expect(String(SqlExpression.maybeParse('a + 1'))).toEqual('a + 1');
+    });
+
+    it('returns undefined for invalid SQL', () => {
+      expect(SqlExpression.maybeParse('a +')).toBeUndefined();
+    });
+  });
+
+  describe('.wrap', () => {
+    it('returns an expression as is', () => {
+      expect(SqlExpression.wrap(x)).toBe(x);
+    });
+
+    it('wraps a literal value', () => {
+      const wrapped = SqlExpression.wrap('hello');
+      expect(wrapped).toBeInstanceOf(SqlLiteral);
+      expect(String(wrapped)).toEqual(`'hello'`);
+    });
+  });
+
+  describe('.verify', () => {
+    it('returns an expression as is', () => {
+      expect(SqlExpression.verify(x)).toBe(x);
+    });
+
+    it('throws on a non expression', () => {
+      expect(() => SqlExpression.verify('x' as any)).toThrow('must be a SqlExpression');
     });
   });
 
@@ -163,6 +222,29 @@ describe('SqlExpression', () => {
     });
   });
 
+  describe('.concat', () => {
+    it('throws if invalid arg is fed in', () => {
+      expect(() => SqlExpression.concat(x, 'a' as any)).toThrow('must be a SqlExpression');
+    });
+
+    it('works in empty case', () => {
+      expect(String(SqlExpression.concat())).toEqual(`''`);
+    });
+
+    it('works in general case', () => {
+      expect(
+        String(
+          SqlExpression.concat(
+            SqlExpression.parse(`'a' || b`),
+            undefined,
+            SqlExpression.parse(`c + d`),
+            SqlLiteral.create('e'),
+          ),
+        ),
+      ).toEqual(`'a' || b || (c + d) || 'e'`);
+    });
+  });
+
   describe('.add', () => {
     it('throws if invalid arg is fed in', () => {
       expect(() => SqlExpression.add(SqlLiteral.ONE, 0 as any)).toThrow('must be a SqlExpression');
@@ -225,6 +307,56 @@ describe('SqlExpression', () => {
     });
   });
 
+  describe('.multiply', () => {
+    it('throws if invalid arg is fed in', () => {
+      expect(() => SqlExpression.multiply(SqlLiteral.ONE, 2 as any)).toThrow(
+        'must be a SqlExpression',
+      );
+    });
+
+    it('works in empty case', () => {
+      expect(String(SqlExpression.multiply())).toEqual('1.0');
+    });
+
+    it('works in general case', () => {
+      expect(
+        String(
+          SqlExpression.multiply(
+            SqlExpression.parse('a * b'),
+            undefined,
+            SqlExpression.parse('c + d'),
+            SqlExpression.parse('e / f'),
+          ),
+        ),
+      ).toEqual('a * b * (c + d) * (e / f)');
+    });
+  });
+
+  describe('.divide', () => {
+    it('throws if invalid arg is fed in', () => {
+      expect(() => SqlExpression.divide(SqlLiteral.ONE, 2 as any)).toThrow(
+        'must be a SqlExpression',
+      );
+    });
+
+    it('throws error in empty case', () => {
+      expect(() => SqlExpression.divide()).toThrow('first argument to divide must be defined');
+    });
+
+    it('works in general case', () => {
+      expect(
+        String(
+          SqlExpression.divide(
+            SqlExpression.parse('a'),
+            SqlExpression.parse('b * c'),
+            undefined,
+            SqlExpression.parse('d + e'),
+          ),
+        ),
+      ).toEqual('a / b / c / (d + e)');
+    });
+  });
+
   describe('.fromTimeExpressionAndInterval', () => {
     const time = SqlColumn.optionalQuotes('__time');
 
@@ -249,6 +381,42 @@ describe('SqlExpression', () => {
         ),
       ).toEqual(
         "(TIMESTAMP '2022-04-30' <= __time AND __time < TIMESTAMP '2022-04-30 01:00:00') OR (TIMESTAMP '2022-04-30 02:00:00' <= __time AND __time < TIMESTAMP '2022-04-30 03:00:00')",
+      );
+    });
+
+    it('throws when the interval does not have two parts', () => {
+      expect(() => SqlExpression.fromTimeExpressionAndInterval(time, '2022-04-30')).toThrow(
+        'can not convert interval: 2022-04-30',
+      );
+    });
+
+    it('throws when the start can not be parsed', () => {
+      expect(() => SqlExpression.fromTimeExpressionAndInterval(time, 'lol/2022-04-30')).toThrow(
+        'can not parse the start of interval: lol/2022-04-30',
+      );
+    });
+
+    it('throws when the end can not be parsed', () => {
+      expect(() => SqlExpression.fromTimeExpressionAndInterval(time, '2022-04-30/lol')).toThrow(
+        'can not parse the end of interval: 2022-04-30/lol',
+      );
+    });
+  });
+
+  describe('.arrayOfLiterals', () => {
+    it('makes an ARRAY of literals', () => {
+      expect(String(SqlExpression.arrayOfLiterals(['a', 1, true]))).toEqual(`ARRAY['a', 1, TRUE]`);
+    });
+  });
+
+  describe('#_walkHelper', () => {
+    it('allows replacing an expression with another expression', () => {
+      expect(String(x.walk(() => y))).toEqual('y');
+    });
+
+    it('throws when the walker returns a non expression', () => {
+      expect(() => x.walk(() => SqlWhenThenPart.create(x, y))).toThrow(
+        'expression walker must return a SQL expression',
       );
     });
   });
@@ -299,6 +467,40 @@ describe('SqlExpression', () => {
     });
   });
 
+  describe('#ifUnnamedAliasAs', () => {
+    it('adds an alias to an unaliased expression', () => {
+      expect(String(SqlExpression.parse('COUNT(*)').ifUnnamedAliasAs('cnt'))).toEqual(
+        'COUNT(*) AS "cnt"',
+      );
+    });
+  });
+
+  describe('#getUnderlyingExpression', () => {
+    it('returns the expression itself', () => {
+      const ex = SqlExpression.parse('a + 1');
+      expect(ex.getUnderlyingExpression()).toBe(ex);
+    });
+  });
+
+  describe('#changeUnderlyingExpression', () => {
+    it('returns the new expression', () => {
+      expect(SqlExpression.parse('a + 1').changeUnderlyingExpression(y)).toBe(y);
+    });
+  });
+
+  describe('#getOutputName', () => {
+    it('is undefined for an unnamed expression', () => {
+      expect(SqlExpression.parse('a + 1').getOutputName()).toBeUndefined();
+    });
+  });
+
+  describe('#convertToTable', () => {
+    it('returns the expression itself', () => {
+      const ex = SqlExpression.parse('F(a)');
+      expect(ex.convertToTable()).toBe(ex);
+    });
+  });
+
   describe('#toOrderByExpression', () => {
     it('works', () => {
       expect(String(x.toOrderByExpression('DESC'))).toEqual('x DESC');
@@ -311,6 +513,12 @@ describe('SqlExpression', () => {
       expect(String(SqlExpression.parse(`a < b`).not())).toEqual('NOT (a < b)');
       expect(String(SqlExpression.parse(`a OR b`).not())).toEqual('NOT (a OR b)');
       expect(String(SqlExpression.parse(`a AND b`).not())).toEqual('NOT (a AND b)');
+    });
+  });
+
+  describe('#negate', () => {
+    it('wraps in NOT', () => {
+      expect(String(SqlExpression.parse('F(a)').negate())).toEqual('NOT F(a)');
     });
   });
 
@@ -374,6 +582,18 @@ describe('SqlExpression', () => {
     });
   });
 
+  describe('#in', () => {
+    it('works', () => {
+      expect(String(x.in([1, 'a', y]))).toEqual(`x IN (1, 'a', y)`);
+    });
+  });
+
+  describe('#notIn', () => {
+    it('works', () => {
+      expect(String(x.notIn([1, 2]))).toEqual('x NOT IN (1, 2)');
+    });
+  });
+
   describe('#like', () => {
     it('works', () => {
       expect(String(x.like(y))).toEqual('x LIKE y');
@@ -408,6 +628,42 @@ describe('SqlExpression', () => {
   describe('#and', () => {
     it('works', () => {
       expect(String(x.and(y))).toEqual('x AND y');
+    });
+  });
+
+  describe('#or', () => {
+    it('works', () => {
+      expect(String(x.or(y))).toEqual('x OR y');
+    });
+  });
+
+  describe('#concat', () => {
+    it('works', () => {
+      expect(String(x.concat(y))).toEqual('x || y');
+    });
+  });
+
+  describe('#add', () => {
+    it('works', () => {
+      expect(String(x.add(y))).toEqual('x + y');
+    });
+  });
+
+  describe('#subtract', () => {
+    it('works', () => {
+      expect(String(x.subtract(y))).toEqual('x - y');
+    });
+  });
+
+  describe('#multiply', () => {
+    it('works', () => {
+      expect(String(x.multiply(y))).toEqual('x * y');
+    });
+  });
+
+  describe('#divide', () => {
+    it('works', () => {
+      expect(String(x.divide(y))).toEqual('x / y');
     });
   });
 
@@ -494,6 +750,20 @@ describe('SqlExpression', () => {
 
     it('works with query', () => {
       expect(mapString(SqlExpression.parse('SELECT 13').decomposeViaAnd())).toEqual(['SELECT 13']);
+    });
+  });
+
+  describe('#decomposeViaOr', () => {
+    it('works without OR', () => {
+      expect(mapString(SqlExpression.parse('a = 1').decomposeViaOr())).toEqual(['a = 1']);
+    });
+
+    it('works with OR', () => {
+      expect(mapString(SqlExpression.parse('a OR b = 1 OR c').decomposeViaOr())).toEqual([
+        'a',
+        'b = 1',
+        'c',
+      ]);
     });
   });
 
@@ -599,6 +869,12 @@ describe('SqlExpression', () => {
     });
   });
 
+  describe('#cast', () => {
+    it('works', () => {
+      expect(String(x.cast('BIGINT'))).toEqual('CAST(x AS BIGINT)');
+    });
+  });
+
   describe('#addFilterToAggregations', () => {
     const knownAggregates = ['COUNT', 'SUM', 'MIN'];
     const filter = SqlExpression.parse(`country = 'USA'`);
@@ -670,6 +946,50 @@ describe('SqlExpression', () => {
           .toString(),
       ).toEqual(
         `APPROX_COUNT_DISTINCT_DS_HLL(COALESCE(t."email", t."user", 'api:' || t."id")) FILTER (WHERE 2 <> 1 AND country = 'USA')`,
+      );
+    });
+  });
+
+  describe('#changeClauseInWhere', () => {
+    it('returns the clause when the current filter is TRUE', () => {
+      expect(String(SqlLiteral.TRUE.changeClauseInWhere(`a = 1`))).toEqual('a = 1');
+    });
+
+    it('replaces the clause on the same column', () => {
+      expect(
+        String(SqlExpression.parse(`a = 1 AND b = 2`).changeClauseInWhere(`a IN (3, 4)`)),
+      ).toEqual('b = 2 AND a IN (3, 4)');
+    });
+
+    it('keeps clauses using several columns', () => {
+      expect(String(SqlExpression.parse(`a = b AND c = 2`).changeClauseInWhere(`a = 5`))).toEqual(
+        'a = b AND c = 2 AND a = 5',
+      );
+    });
+
+    it('just adds a clause that uses several columns', () => {
+      expect(String(SqlExpression.parse(`a = 1`).changeClauseInWhere(`a = b`))).toEqual(
+        'a = 1 AND a = b',
+      );
+    });
+  });
+
+  describe('#toggleClauseInWhere', () => {
+    it('returns the clause when the current filter is TRUE', () => {
+      expect(String(SqlLiteral.TRUE.toggleClauseInWhere(SqlExpression.parse('a = 1')))).toEqual(
+        'a = 1',
+      );
+    });
+
+    it('adds the clause when it is not there', () => {
+      expect(String(SqlExpression.parse(`a = 1`).toggleClauseInWhere(`b = 2`))).toEqual(
+        'a = 1 AND b = 2',
+      );
+    });
+
+    it('removes the clause when it is there', () => {
+      expect(String(SqlExpression.parse(`a = 1 AND b = 2`).toggleClauseInWhere(`b = 2`))).toEqual(
+        'a = 1',
       );
     });
   });
