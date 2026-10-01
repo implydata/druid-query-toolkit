@@ -1,5 +1,20 @@
 # druid-query-toolkit
 
+## 1.3.2
+
+### Patch Changes
+
+- e2be7a7: Keep the `resultContext` for a topN result with no rows
+- a77034e: Fix several filter pattern bugs: number range and time interval patterns now keep `negated` in every form, number range no longer fits an OR as a range and reads strict bounds correctly when the literal comes first, and time interval no longer fits an upper bound as the start
+- e2be7a7: Preserve the casing of `AND` / `OR` in `prettify({ keywordCasing: 'preserve' })`
+- e2be7a7: Make `SqlComparison.getSpecialLikeType` respect `ESCAPE` and not report patterns with a wildcard in the middle
+- a77034e: Fix `QueryRunner` sending `typesHeader: true` / `sqlTypesHeader: true` when they were set to `false` and `header` was unset
+- e2be7a7: Make `SqlWithQuery.flattenWith` leave the query alone when the outer ORDER BY would change which rows an inner LIMIT or OFFSET keeps
+- a77034e: Fix `SqlComparison.negate` on a parsed `= ANY (...)` / `= ALL (...)` comparison, which kept the original ALL/ANY keyword instead of flipping it
+- e2be7a7: Fix `SqlWindowSpec` spacing when adding or removing clauses, and print `()` for a window spec built without parsing
+- e2be7a7: Make `SqlQueryBase.changeExplain(false)` return the same instance for a query that is not an EXPLAIN
+- a77034e: Fix `SqlWithQuery.flattenWith` ignoring that an outer OFFSET reduces an inner LIMIT
+
 ## 1.3.1
 
 ### Patch Changes
