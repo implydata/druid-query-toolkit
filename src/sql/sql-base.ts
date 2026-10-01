@@ -57,6 +57,8 @@ export type SqlTypeDesignator =
   | 'query'
   | 'withQuery'
   | 'tableQuery'
+  | 'fromQuery'
+  | 'pipesQuery'
   | 'values'
   | 'withClause'
   | 'whereClause'
@@ -94,7 +96,16 @@ export type SqlTypeDesignator =
   | 'setStatement'
   | 'unary'
   | 'windowSpec'
-  | 'frameBound';
+  | 'frameBound'
+  | 'columnAssignment'
+  | 'selectPipeOperator'
+  | 'wherePipeOperator'
+  | 'aggregatePipeOperator'
+  | 'orderByPipeOperator'
+  | 'limitPipeOperator'
+  | 'extendPipeOperator'
+  | 'setPipeOperator'
+  | 'dropPipeOperator';
 
 /**
  * The type designators of everything that extends SqlQueryBase. Lets code that sits above
@@ -105,9 +116,12 @@ export const QUERY_TYPE_DESIGNATORS: readonly SqlTypeDesignator[] = [
   'withQuery',
   'values',
   'tableQuery',
+  'fromQuery',
+  'pipesQuery',
 ];
 
 export type KeywordName =
+  | 'aggregate'
   | 'all'
   | 'and'
   | 'as'
@@ -117,6 +131,7 @@ export type KeywordName =
   | 'currentRow'
   | 'decorator'
   | 'direction'
+  | 'drop'
   | 'else'
   | 'end'
   | 'escape'
@@ -168,6 +183,7 @@ export type KeywordName =
 export type SpaceName =
   | 'final'
   | 'initial'
+  | 'postAggregate'
   | 'postAnd'
   | 'postArguments'
   | 'postArrow'
@@ -182,6 +198,7 @@ export type SpaceName =
   | 'postColumns'
   | 'postDecorator'
   | 'postDot'
+  | 'postDrop'
   | 'postElse'
   | 'postKeyExpression'
   | 'postEquals'
@@ -214,6 +231,7 @@ export type SpaceName =
   | 'postOverwrite'
   | 'postPartitionBy'
   | 'postPartitionedBy'
+  | 'postPipe'
   | 'postReplace'
   | 'postReplaceClause'
   | 'postRow'
@@ -243,6 +261,7 @@ export type SpaceName =
   | 'preDirection'
   | 'preElse'
   | 'preEnd'
+  | 'preEquals'
   | 'preEscape'
   | 'preExtend'
   | 'preFilter'
@@ -260,6 +279,7 @@ export type SpaceName =
   | 'preOver'
   | 'preOverwrite'
   | 'prePartitionedByClause'
+  | 'prePipes'
   | 'preRightParen'
   | 'preUnion'
   | 'preUsing'

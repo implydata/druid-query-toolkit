@@ -34,6 +34,24 @@ export function backAndForthPrettify(sql: string, expectedConstructor?: any): vo
   expect(parsed.prettify().toString()).toEqual(sql);
 }
 
+/**
+ * Like backAndForth but for a single pipe operator: parses it after a \`FROM\` and checks that
+ * the operator is of the expected class and prints back identically.
+ */
+export function backAndForthPipeOperator(operatorSql: string, expectedConstructor?: any): void {
+  const sql = `FROM t\n${operatorSql}`;
+  const parsed = parseSql(sql);
+  const pipeOperators = parsed.pipeOperators?.values;
+  const pipeOperator = pipeOperators?.[pipeOperators.length - 1];
+
+  if (!pipeOperator || (expectedConstructor && !(pipeOperator instanceof expectedConstructor))) {
+    throw new Error(`${operatorSql} did not parse to the right class`);
+  }
+
+  expect(pipeOperator.toString()).toEqual(operatorSql);
+  expect(parsed.toString()).toEqual(sql);
+}
+
 export function mapString(xs: any[]): string[] {
   return xs.map(String);
 }

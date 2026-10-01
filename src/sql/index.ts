@@ -44,6 +44,7 @@ export * from './sql-window-spec/sql-frame-bound';
 export * from './sql-set-statement/sql-set-statement';
 
 export * from './sql-clause';
+export * from './sql-pipe-operator';
 
 export * from './sql-query-base/sql-query-base';
 
@@ -51,5 +52,7 @@ export * from './sql-record/sql-record';
 export * from './sql-values/sql-values';
 export * from './sql-function/sql-function';
 export * from './sql-table-query/sql-table-query';
+export * from './sql-from-query/sql-from-query';
 export * from './sql-query/sql-query';
 export * from './sql-with-query/sql-with-query';
+export * from './sql-pipes-query/sql-pipes-query';
