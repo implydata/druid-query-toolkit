@@ -23,5 +23,5 @@ jobs:
       - name: Test
         run: npm test
       - name: Check for changes requiring a changeset
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && github.head_ref != 'changeset-release/master'
         run: npx changeset status --since=origin/master
