@@ -6083,6 +6083,27 @@ describe('SqlQuery', () => {
       `);
     });
 
+    it('keeps a trailing comment with the expression it follows', () => {
+      expect(
+        SqlQuery.parse(
+          sane`
+          SELECT
+            a,
+            b -- the b
+          FROM t
+        `,
+        )
+          .addSelect(SqlExpression.parse('c'))
+          .toString(),
+      ).toEqual(sane`
+        SELECT
+          a,
+          b, -- the b
+          c
+        FROM t
+      `);
+    });
+
     it('adds first', () => {
       const select = SqlExpression.parse(`"new_column" AS "New column"`);
       expect(sql.addSelect(select, { insertIndex: 0 }).toString()).toEqual(sane`

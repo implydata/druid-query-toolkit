@@ -363,6 +363,10 @@ describe('SqlQueryBase', () => {
       expect(parseValues(`VALUES (1) LIMIT 3`).getLimitValue()).toEqual(3);
       expect(parseValues(`VALUES (1)`).getLimitValue()).toBeUndefined();
     });
+
+    it('reads the limit of a union from the last query', () => {
+      expect(parseValues(`VALUES (1) UNION ALL VALUES (2) LIMIT 5`).getLimitValue()).toEqual(5);
+    });
   });
 
   describe('#changeLimitValue', () => {
@@ -375,6 +379,18 @@ describe('SqlQueryBase', () => {
     it('accepts a literal', () => {
       expect(String(parseValues(`VALUES (1)`).changeLimitValue(SqlLiteral.create(7)))).toEqual(
         `VALUES (1)\nLIMIT 7`,
+      );
+    });
+
+    it('puts the limit of a union after the last query', () => {
+      expect(String(parseValues(`VALUES (1) UNION ALL VALUES (2)`).changeLimitValue(5))).toEqual(
+        `VALUES (1) UNION ALL VALUES (2)\nLIMIT 5`,
+      );
+    });
+
+    it('keeps a trailing comment before the new clause', () => {
+      expect(String(parseValues(`VALUES (1) /* one row */`).changeLimitValue(10))).toEqual(
+        `VALUES (1) /* one row */\nLIMIT 10`,
       );
     });
   });

@@ -194,6 +194,27 @@ describe('SqlQuery (operations)', () => {
       `);
     });
 
+    it('keeps the separators of a multi line filter', () => {
+      expect(
+        SqlQuery.parse(
+          sane`
+            SELECT *
+            FROM t
+            WHERE a = 1
+              AND b = 2
+          `,
+        )
+          .addWhere(SqlExpression.parse(`c = 3`))
+          .toString(),
+      ).toEqual(sane`
+        SELECT *
+        FROM t
+        WHERE a = 1
+          AND b = 2
+          AND c = 3
+      `);
+    });
+
     it('noop on TRUE', () => {
       expect(
         SqlQuery.parse(

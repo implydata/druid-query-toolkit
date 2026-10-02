@@ -626,6 +626,16 @@ describe('SqlBase', () => {
     it('can skip the clarifying parens', () => {
       expect(ex.prettify({ clarifyingParens: 'disable' }).toString()).toEqual('a AND b OR c');
     });
+
+    it('keeps a lower case naked function a function', () => {
+      expect(parseSql('current_timestamp').prettify().toString()).toEqual('CURRENT_TIMESTAMP');
+    });
+
+    it('upper cases the unit of an interval', () => {
+      expect(parseSql(`x - interval '1' day`).prettify().toString()).toEqual(
+        `x - INTERVAL '1' DAY`,
+      );
+    });
   });
 
   describe('#prettyTrim', () => {
