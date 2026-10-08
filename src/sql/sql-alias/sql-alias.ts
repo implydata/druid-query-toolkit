@@ -114,7 +114,7 @@ export class SqlAlias extends SqlExpression {
     const expression = this.expression._walkHelper(nextStack, fn, postorder);
     if (!expression) return;
     if (expression !== this.expression) {
-      ret = ret.changeExpression(expression as any);
+      ret = ret.changeExpression(expression);
     }
 
     return ret;

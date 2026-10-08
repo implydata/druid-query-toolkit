@@ -127,7 +127,7 @@ export class SeparatedArray<T> {
     callbackfn: (value: T, index: number) => U | undefined,
   ): SeparatedArray<U> | undefined {
     // Technically the intermediate array here will not be valid because it might have an `undefined` in it which is not walkable
-    return this.map(callbackfn as any).filter(Boolean) as SeparatedArray<U> | undefined;
+    return this.map(callbackfn).filter(Boolean) as SeparatedArray<U> | undefined;
   }
 
   public remove(index: number): SeparatedArray<T> | undefined {

@@ -8,6 +8,16 @@ There are a number of use cases for this toolkit and one of the chief use cases 
 Search for uses within [web-console/src](https://github.com/apache/druid/tree/master/web-console/src) for some examples.
 Specifically the [query view](https://github.com/apache/druid/tree/master/web-console/src/views/workbench-view) uses these tools a lot.
 
+## Documentation
+
+The [docs](docs/README.md) cover the whole API with examples:
+
+- [Getting started](docs/getting-started.md) and [why the text is preserved](docs/text-preservation.md)
+- [Parsing](docs/parsing.md), [building SQL](docs/building.md), [expressions](docs/expressions.md) and [walking the tree](docs/traversal.md)
+- [Queries](docs/queries.md), [SELECT queries](docs/select-queries.md) and [pipe syntax](docs/pipe-syntax.md)
+- Use cases: [editing queries from UI actions](docs/use-case-ui-edits.md), [validating user input](docs/use-case-validation.md) and [rewriting queries](docs/use-case-rewriting.md)
+- [API reference](docs/api.md)
+
 ## Parts
 
 At a high level there are 4 parts to this toolkit:
@@ -71,6 +81,36 @@ SELECT
 FROM wikipedia
 GROUP BY 1, 2, 3, 4
 ORDER BY 5 DESC
+`
+ */
+```
+
+#### Pipe syntax
+
+Pipe syntax queries (`FROM t |> WHERE ... |> AGGREGATE ...`) parse into a `SqlPipesQuery`, which holds the root query (often a `SqlFromQuery`, a bare `FROM <table>`) and a list of pipe operators: `SqlSelectPipeOperator`, `SqlWherePipeOperator`, `SqlAggregatePipeOperator`, `SqlOrderByPipeOperator`, `SqlLimitPipeOperator`, `SqlExtendPipeOperator`, `SqlSetPipeOperator` and `SqlDropPipeOperator`.
+The ORDER BY and LIMIT methods that every query has work on the trailing `|> ORDER BY` and `|> LIMIT` operators.
+`unpipe()` converts a pipe query into an equivalent `SqlQuery` without pipes, folding the operators into one `SELECT` where it can and nesting sub queries where it has to: `From t |> Where x=1` becomes `SELECT * From t Where x=1`.
+
+```javascript
+import { SqlColumn, SqlExpression, SqlWherePipeOperator } from 'druid-query-toolkit';
+
+const sql = SqlExpression.parse(`
+FROM wikipedia
+|> WHERE channel = '#en.wikipedia'
+|> AGGREGATE COUNT(*) AS edits GROUP BY cityName
+`);
+
+sql
+  .appendPipeOperator(SqlWherePipeOperator.create(SqlColumn.optionalQuotes('edits').greaterThan(10)))
+  .changeLimitValue(100)
+  .toString()
+/* →
+`
+FROM wikipedia
+|> WHERE channel = '#en.wikipedia'
+|> AGGREGATE COUNT(*) AS edits GROUP BY cityName
+|> WHERE edits > 10
+|> LIMIT 100
 `
  */
 ```

@@ -24,6 +24,7 @@ import {
   SqlPlaceholder,
   SqlUnary,
 } from '.';
+import { NEWLINE } from './helpers';
 import { parse as parseSql } from './parser';
 import type { Substitutor } from './sql-base';
 import { SqlBase } from './sql-base';
@@ -66,31 +67,46 @@ export abstract class SqlExpression extends SqlBase {
   }
 
   static and(...args: (SqlExpression | undefined)[]): SqlExpression {
-    return SqlMulti.createIfNeeded(
+    return SqlExpression.combine(
       'AND',
-      args.flatMap(a => {
-        if (a == null) return [];
-        if (a instanceof SqlLiteral && a.value === true) {
-          return []; // Skip no-op TRUE this is a special case
-        }
-        if (a instanceof SqlMulti) return a.flattenIfNeeded('AND');
-        return SqlExpression.verify(a);
-      }),
+      // Skip no-op TRUE this is a special case
+      args.filter(
+        (a): a is SqlExpression => a != null && !(a instanceof SqlLiteral && a.value === true),
+      ),
     );
   }
 
   static or(...args: (SqlExpression | undefined)[]): SqlExpression {
-    return SqlMulti.createIfNeeded(
+    return SqlExpression.combine(
       'OR',
-      args.flatMap(a => {
-        if (a == null) return [];
-        if (a instanceof SqlLiteral && a.value === false) {
-          return []; // Skip no-op FALSE this is a special case
-        }
-        if (a instanceof SqlMulti) return a.flattenIfNeeded('OR');
-        return SqlExpression.verify(a);
-      }),
+      // Skip no-op FALSE this is a special case
+      args.filter(
+        (a): a is SqlExpression => a != null && !(a instanceof SqlLiteral && a.value === false),
+      ),
     );
+  }
+
+  /**
+   * Joins the expressions with `op`, flattening the ones that are already joined by it. A
+   * leading one that is spread over several lines is extended rather than rebuilt, so it keeps
+   * its separators and the new expressions follow its layout.
+   */
+  private static combine(op: SqlMultiOp, args: SqlExpression[]): SqlExpression {
+    const flatArgs = args.flatMap(a =>
+      a instanceof SqlMulti ? a.flattenIfNeeded(op) : SqlExpression.verify(a),
+    );
+    const first = args[0];
+    if (
+      first instanceof SqlMulti &&
+      first.op === op &&
+      !first.hasParens() &&
+      first.args.separators.some(separator => String(separator ?? '').includes(NEWLINE))
+    ) {
+      return flatArgs
+        .slice(first.numArgs())
+        .reduce<SqlMulti>((multi, arg) => multi.changeArgs(multi.args.append(arg)), first);
+    }
+    return SqlMulti.createIfNeeded(op, flatArgs);
   }
 
   static concat(...args: (SqlExpression | undefined)[]): SqlExpression {

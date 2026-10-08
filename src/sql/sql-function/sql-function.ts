@@ -557,7 +557,10 @@ export class SqlFunction extends SqlExpression {
       return this;
     }
     const value = this.valueOf();
-    value.functionName = value.functionName.changeNameAsFunctionName(upperCaseName);
+    // An unquoted name parsed fine, so its upper cased form is valid too (naked functions like CURRENT_TIMESTAMP are reserved words)
+    value.functionName = this.functionName.quotes
+      ? this.functionName.changeNameAsFunctionName(upperCaseName)
+      : new RefName({ name: upperCaseName, quotes: false });
     value.keywords = {};
     return SqlBase.fromValue(value);
   }

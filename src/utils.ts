@@ -22,7 +22,7 @@ export function cleanObject(obj: Record<string, any>): Record<string, string> {
 }
 
 export function filterMap<T, Q>(xs: readonly T[], f: (x: T, i: number) => Q | undefined): Q[] {
-  return xs.map(f).filter((x: Q | undefined) => typeof x !== 'undefined') as Q[];
+  return xs.map(f).filter((x: Q | undefined) => typeof x !== 'undefined');
 }
 
 export function objectMap<T, Q>(
