@@ -91,5 +91,16 @@
     "ts-pegjs": "^4.2.2",
     "tsup": "^8.5.1",
     "typescript": "~6.0.3"
+  },
+  "overrides": {
+    "@istanbuljs/load-nyc-config": {
+      "js-yaml": "^4.3.2"
+    }
+  },
+  "allowScripts": {
+    "@parcel/watcher": false,
+    "esbuild": false,
+    "fsevents": false,
+    "unrs-resolver": false
   }
 }

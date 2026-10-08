@@ -485,7 +485,7 @@ export abstract class SqlBase {
   }
 
   public getSpace(name: SpaceName, defaultSpace = SPACE) {
-    const s = this.spacing[name] as string | undefined;
+    const s = this.spacing[name];
     return typeof s === 'string' ? s : defaultSpace;
   }
 

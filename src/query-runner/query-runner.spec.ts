@@ -40,7 +40,7 @@ describe('QueryRunner', () => {
           headers: {
             'x-druid-sql-query-id': firstParameterValue || 'sql-query-id-yyy',
             'x-druid-sql-header-included': 'yes',
-          } as any,
+          },
         };
       } else {
         return {
@@ -55,7 +55,7 @@ describe('QueryRunner', () => {
           ],
           headers: {
             'x-druid-query-id': 'query-id-xxx',
-          } as any,
+          },
         };
       }
     },
