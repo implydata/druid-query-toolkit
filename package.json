@@ -3,10 +3,12 @@
   "version": "1.4.0",
   "description": "A collection of utilities for working with Druid queries",
   "main": "dist/index.js",
+  "unpkg": "dist/index.global.js",
+  "jsdelivr": "dist/index.global.js",
   "types": "types/index.d.ts",
   "scripts": {
     "clean": "rm -rf dist types *.tsbuildinfo src/sql/parser/index.ts",
-    "build": "npm run clean && node script/compile-peg.js && tsc --emitDeclarationOnly -p ./tsconfig.dist.json && tsup src/index.ts --global-name druid",
+    "build": "npm run clean && node script/compile-peg.js && tsc --emitDeclarationOnly -p ./tsconfig.dist.json && tsup",
     "prepublishOnly": "npm run build",
     "pretest": "npm run build",
     "test": "npm run eslint && npm run prettify-check && jest",
@@ -47,19 +49,6 @@
     }
   },
   "prettier": "@awesome-code-style/prettier-config",
-  "tsup": {
-    "entry": {
-      "query": "src/index.ts"
-    },
-    "format": [
-      "esm",
-      "cjs",
-      "iife"
-    ],
-    "splitting": false,
-    "sourcemap": true,
-    "clean": true
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/implydata/druid-query-toolkit.git"
