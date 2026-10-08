@@ -1,5 +1,11 @@
 # druid-query-toolkit
 
+## 1.4.0
+
+### Minor Changes
+
+- 79810da: Support pipe SQL syntax: `FROM <table>` queries (`SqlFromQuery`) and pipe queries (`SqlPipesQuery`) with the `SELECT`, `WHERE`, `AGGREGATE`, `ORDER BY`, `LIMIT`, `EXTEND`, `SET` and `DROP` pipe operators, and `SqlPipesQuery#unpipe` to convert a pipe query into a query without pipes
+
 ## 1.3.2
 
 ### Patch Changes
