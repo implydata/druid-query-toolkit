@@ -1,5 +1,11 @@
 # druid-query-toolkit
 
+## 1.4.1
+
+### Patch Changes
+
+- 4c04eff: Make the browser bundle UMD and point `unpkg`/`jsdelivr` at it, so `require('druid-query-toolkit')` works on ObservableHQ
+
 ## 1.4.0
 
 ### Minor Changes
