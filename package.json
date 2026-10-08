@@ -1,6 +1,6 @@
 {
   "name": "druid-query-toolkit",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "A collection of utilities for working with Druid queries",
   "main": "dist/index.js",
   "unpkg": "dist/index.global.js",
