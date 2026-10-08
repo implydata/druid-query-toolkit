@@ -50,6 +50,15 @@ export class SqlInterval extends SqlExpression {
     return value;
   }
 
+  public resetOwnKeywords(): this {
+    const upperCaseUnit = this.unit?.toUpperCase();
+    if (Object.keys(this.keywords).length === 0 && upperCaseUnit === this.unit) return this;
+    const value = this.valueOf();
+    value.unit = upperCaseUnit;
+    value.keywords = {};
+    return SqlBase.fromValue(value);
+  }
+
   protected _toRawString(): string {
     return [
       this.getKeyword('interval', SqlInterval.DEFAULT_INTERVAL_KEYWORD),

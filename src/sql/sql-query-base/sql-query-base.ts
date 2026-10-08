@@ -187,6 +187,14 @@ export abstract class SqlQueryBase extends SqlExpression {
     return rawParts.join('');
   }
 
+  /**
+   * Whether a comment trails this (top level) query. Such a comment is parsed into the final
+   * space, which renders after everything, so a clause added at the end would land after it.
+   */
+  private hasFinalComment(): boolean {
+    return !this.parens && this.getSpace('final', '').trim() !== '';
+  }
+
   /* ~~~~~ Walking ~~~~~ */
 
   public _walkInner(
@@ -489,14 +497,47 @@ export abstract class SqlQueryBase extends SqlExpression {
    * The LIMIT clause that applies to the result of this query, see `getOrderByClause`.
    */
   public getLimitClause(): SqlLimitClause | undefined {
+    // The parser puts the LIMIT of a union on its last query
+    if (!this.limitClause && this.unionQuery) return this.unionQuery.getLimitClause();
     return this.limitClause;
   }
 
   public changeLimitClause(limitClause: SqlLimitClause | undefined): this {
     if (this.limitClause === limitClause) return this;
+    const { unionQuery } = this;
+    if (!this.limitClause && unionQuery) {
+      if (limitClause && !unionQuery.getLimitClause() && this.hasFinalComment()) {
+        // Hand the trailing comment to the last query so it can keep it in front of the new LIMIT
+        const value = this.valueOf();
+        value.unionQuery = unionQuery.changeSpace(
+          'final',
+          this.getSpace('final', '') + unionQuery.getSpace('final', ''),
+        );
+        value.spacing = this.getSpacingWithout('final');
+        return SqlBase.fromValue(value).changeLimitClause(limitClause);
+      }
+      return this.changeUnionQuery(unionQuery.changeLimitClause(limitClause));
+    }
+
     const value = this.valueOf();
     if (limitClause) {
       value.limitClause = limitClause;
+      if (
+        !this.limitClause &&
+        !this.offsetClause &&
+        !this.partitionedByClause &&
+        !this.clusteredByClause &&
+        this.hasFinalComment()
+      ) {
+        // The new LIMIT is the last clause, keep the trailing comment with the text it followed
+        const final = this.getSpace('final', '');
+        const comment = final.trimEnd();
+        value.spacing = {
+          ...this.getSpacingWithout('final'),
+          preLimitClause: comment + NEWLINE,
+          ...(comment === final ? {} : { final: final.slice(comment.length) }),
+        };
+      }
     } else {
       delete value.limitClause;
       value.spacing = this.getSpacingWithout('preLimitClause');

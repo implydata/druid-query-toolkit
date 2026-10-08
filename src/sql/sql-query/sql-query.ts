@@ -23,7 +23,7 @@ import {
   SPACE,
 } from '../helpers';
 import { parse as parseSql } from '../parser';
-import type { SqlTypeDesignator, Substitutor } from '../sql-base';
+import type { SpaceName, SqlTypeDesignator, Substitutor } from '../sql-base';
 import { SqlBase } from '../sql-base';
 import type { SqlOrderByDirection } from '../sql-clause';
 import {
@@ -646,8 +646,36 @@ export class SqlQuery extends SqlQueryBase {
     } = options;
     const idx = this.decodeInsertIndex(insertIndex);
 
-    const selectExpressions =
+    let self = this;
+    let selectExpressions =
       this.selectExpressions?.insert(idx, ex) || SeparatedArray.fromSingleValue(ex);
+
+    // A comment trailing the last expression is parsed into the space that follows the list, keep it with that expression
+    const trailingSpaceName = this.getPostSelectExpressionsSpaceName();
+    if (this.selectExpressions && idx === this.selectExpressions.length() && trailingSpaceName) {
+      const trailingSpace = this.getSpace(trailingSpaceName, '');
+      const comment = trailingSpace.trimEnd();
+      if (comment.trim()) {
+        const rest = trailingSpace.slice(comment.length);
+        const { values, separators } = this.selectExpressions;
+        const lastSeparator = separators[idx - 2];
+        const left = lastSeparator instanceof Separator ? lastSeparator.left : '';
+        const lastRight = lastSeparator instanceof Separator ? lastSeparator.right : undefined;
+        const right = lastRight?.includes(NEWLINE)
+          ? lastRight
+          : rest.includes(NEWLINE)
+            ? NEWLINE_INDENT
+            : SPACE;
+        selectExpressions = new SeparatedArray(
+          [...values, ex],
+          [
+            ...Array.from({ length: idx - 1 }, (_, i) => separators[i]),
+            new Separator({ left, separator: ',', right: comment + right }),
+          ],
+        );
+        self = self.changeSpace(trailingSpaceName, rest || SPACE);
+      }
+    }
 
     let groupByClause = this.groupByClause?.shiftIndexes(idx);
     if (addToGroupBy || groupByExpression) {
@@ -665,9 +693,27 @@ export class SqlQuery extends SqlQueryBase {
         : SqlOrderByClause.create([newOrderBy]);
     }
 
-    return this.changeSelectExpressions(selectExpressions)
+    return self
+      .changeSelectExpressions(selectExpressions)
       .changeGroupByClause(groupByClause)
       .changeOrderByClause(orderByClause);
+  }
+
+  /**
+   * The space that follows the select expressions, or undefined when nothing follows them.
+   */
+  private getPostSelectExpressionsSpaceName(): SpaceName | undefined {
+    if (this.fromClause) return 'preFromClause';
+    if (this.whereClause) return 'preWhereClause';
+    if (this.groupByClause) return 'preGroupByClause';
+    if (this.havingClause) return 'preHavingClause';
+    if (this.orderByClause) return 'preOrderByClause';
+    if (this.limitClause) return 'preLimitClause';
+    if (this.offsetClause) return 'preOffsetClause';
+    if (this.partitionedByClause) return 'prePartitionedByClause';
+    if (this.clusteredByClause) return 'preClusteredByClause';
+    if (this.unionQuery) return 'preUnion';
+    return;
   }
 
   public changeSelect(selectIndex: number, ex: SqlExpression): this {
