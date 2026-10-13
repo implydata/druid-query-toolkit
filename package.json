@@ -11,7 +11,7 @@
     "build": "npm run clean && node script/compile-peg.js && tsc --emitDeclarationOnly -p ./tsconfig.dist.json && tsup",
     "prepublishOnly": "npm run build",
     "pretest": "npm run build",
-    "test": "npm run eslint && npm run prettify-check && jest",
+    "test": "npm run eslint && npm run prettify-check && npm run snapshot-indent-check && jest",
     "coverage": "jest --coverage",
     "eslint": "TIMING=1 npx eslint --max-warnings 0 'src/**/*.ts?(x)'",
     "eslint-fix": "npm run eslint -- --fix",
@@ -19,6 +19,8 @@
     "eslint-fix-changed-only": "npm run eslint-changed-only -- --fix",
     "prettify": "prettier --write '{src,script}/**/*.{ts,js}'",
     "prettify-check": "prettier --check '{src,script}/**/*.{ts,js}'",
+    "snapshot-indent-check": "node script/check-inline-snapshots.js",
+    "snapshot-indent-fix": "node script/check-inline-snapshots.js --fix",
     "prepare": "husky"
   },
   "files": [

@@ -11,9 +11,10 @@ A TypeScript library for parsing, modeling and transforming Druid SQL (plus runn
 Node is pinned in `.node-version`, managed by mise (`mise exec -- <cmd>` if it is not activated in the shell).
 
 - `npm run build`: compiles the PEG grammar, emits types to `types/`, and bundles to `dist/` with tsup
-- `npm test`: builds (via `pretest`), then runs eslint, the prettier check and jest. This is the full gate.
+- `npm test`: builds (via `pretest`), then runs eslint, the prettier check, the inline snapshot indentation check and jest. This is the full gate.
 - `npx jest src/sql/sql-table/sql-table.spec.ts` or `npx jest -t "pattern"`: run a subset. It needs the generated parser to exist, so run `npm run build` (or `node script/compile-peg.js`) first after any grammar change.
 - `npm run eslint-fix` / `npm run prettify`: autofix lint and formatting
+- `npm run snapshot-indent-fix`: re-indent inline snapshots the way jest writes them. `npm test` fails on any that are not, because one off would make the next `jest -u` re-indent the whole file.
 
 ## Architecture
 
