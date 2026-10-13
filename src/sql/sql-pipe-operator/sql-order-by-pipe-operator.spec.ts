@@ -28,12 +28,14 @@ function parseOperator(sql: string): SqlOrderByPipeOperator {
 
 describe('SqlOrderByPipeOperator', () => {
   describe('parses', () => {
-    it.each([`|> ORDER BY a`, `|> ORDER BY a DESC, b ASC`, `|> order  by a desc`])(
-      'does back and forth with %s',
-      sql => {
-        backAndForthPipeOperator(sql, SqlOrderByPipeOperator);
-      },
-    );
+    it.each([
+      `|> ORDER BY a`,
+      `|> ORDER BY a DESC, b ASC`,
+      `|> order  by a desc`,
+      `|> ORDER BY a DESC NULLS LAST, b nulls  first`,
+    ])('does back and forth with %s', sql => {
+      backAndForthPipeOperator(sql, SqlOrderByPipeOperator);
+    });
   });
 
   describe('does not parse', () => {

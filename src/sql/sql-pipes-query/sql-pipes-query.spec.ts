@@ -536,6 +536,15 @@ describe('SqlPipesQuery', () => {
       );
     });
 
+    it('keeps NULLS FIRST and NULLS LAST', () => {
+      expect(
+        unpipe(`FROM t |> AGGREGATE COUNT(*) AS c GROUP BY a |> ORDER BY c DESC NULLS LAST, a`),
+      ).toEqual(`SELECT a, COUNT(*) AS c FROM t GROUP BY a ORDER BY c DESC NULLS LAST, a`);
+      expect(unpipe(`FROM t |> LIMIT 3 |> ORDER BY a nulls  first`)).toEqual(
+        `SELECT * FROM (SELECT * FROM t LIMIT 3) ORDER BY a nulls  first`,
+      );
+    });
+
     it('spells out the columns for SET and DROP', () => {
       expect(unpipe(`FROM t |> AGGREGATE COUNT(*) AS c, SUM(v) AS s GROUP BY a |> SET c = c * 2`))
         .toEqual(sane`
