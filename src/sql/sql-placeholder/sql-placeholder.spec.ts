@@ -23,14 +23,14 @@ describe('SqlPlaceholder', () => {
       backAndForth(sql);
 
       expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlPlaceholder {
-        "customPlaceholder": undefined,
-        "keywords": Object {},
-        "parens": undefined,
-        "spacing": Object {},
-        "type": "placeholder",
-      }
-    `);
+        SqlPlaceholder {
+          "customPlaceholder": undefined,
+          "keywords": Object {},
+          "parens": undefined,
+          "spacing": Object {},
+          "type": "placeholder",
+        }
+      `);
     });
   });
 
