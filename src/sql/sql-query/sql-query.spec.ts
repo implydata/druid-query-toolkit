@@ -239,6 +239,7 @@ describe('SqlQuery', () => {
                           "keywords": Object {
                             "direction": "DESC",
                           },
+                          "nulls": undefined,
                           "parens": undefined,
                           "spacing": Object {
                             "preDirection": " ",
@@ -2067,6 +2068,7 @@ describe('SqlQuery', () => {
                       "value": 1,
                     },
                     "keywords": Object {},
+                    "nulls": undefined,
                     "parens": undefined,
                     "spacing": Object {},
                     "type": "orderByExpression",
@@ -2178,6 +2180,7 @@ describe('SqlQuery', () => {
                       "type": "column",
                     },
                     "keywords": Object {},
+                    "nulls": undefined,
                     "parens": undefined,
                     "spacing": Object {},
                     "type": "orderByExpression",
@@ -2288,6 +2291,7 @@ describe('SqlQuery', () => {
                     "keywords": Object {
                       "direction": "Asc",
                     },
+                    "nulls": undefined,
                     "parens": undefined,
                     "spacing": Object {
                       "preDirection": " ",
@@ -2454,6 +2458,7 @@ describe('SqlQuery', () => {
                     "keywords": Object {
                       "direction": "DESC",
                     },
+                    "nulls": undefined,
                     "parens": undefined,
                     "spacing": Object {
                       "preDirection": " ",
@@ -2775,6 +2780,7 @@ describe('SqlQuery', () => {
                     "keywords": Object {
                       "direction": "DESC",
                     },
+                    "nulls": undefined,
                     "parens": undefined,
                     "spacing": Object {
                       "preDirection": " ",
@@ -3026,6 +3032,7 @@ describe('SqlQuery', () => {
                     "keywords": Object {
                       "direction": "DESC",
                     },
+                    "nulls": undefined,
                     "parens": undefined,
                     "spacing": Object {
                       "preDirection": " ",
@@ -3161,6 +3168,7 @@ describe('SqlQuery', () => {
                     "keywords": Object {
                       "direction": "ASC",
                     },
+                    "nulls": undefined,
                     "parens": undefined,
                     "spacing": Object {
                       "preDirection": " ",
@@ -3181,6 +3189,7 @@ describe('SqlQuery', () => {
                       "type": "column",
                     },
                     "keywords": Object {},
+                    "nulls": undefined,
                     "parens": undefined,
                     "spacing": Object {},
                     "type": "orderByExpression",
@@ -3297,6 +3306,7 @@ describe('SqlQuery', () => {
                     "keywords": Object {
                       "direction": "ASC",
                     },
+                    "nulls": undefined,
                     "parens": undefined,
                     "spacing": Object {
                       "preDirection": " ",
@@ -3319,6 +3329,7 @@ describe('SqlQuery', () => {
                     "keywords": Object {
                       "direction": "DESC",
                     },
+                    "nulls": undefined,
                     "parens": undefined,
                     "spacing": Object {
                       "preDirection": " ",
@@ -4754,6 +4765,7 @@ describe('SqlQuery', () => {
                     "keywords": Object {
                       "direction": "DESC",
                     },
+                    "nulls": undefined,
                     "parens": undefined,
                     "spacing": Object {
                       "preDirection": "",
@@ -5018,6 +5030,7 @@ describe('SqlQuery', () => {
                     "keywords": Object {
                       "direction": "DESC",
                     },
+                    "nulls": undefined,
                     "parens": undefined,
                     "spacing": Object {
                       "preDirection": " ",

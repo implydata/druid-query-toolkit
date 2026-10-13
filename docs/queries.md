@@ -155,7 +155,7 @@ query.addOrderBy(C('page').toOrderByExpression()); // add as the first (most sig
 query.changeOrderByExpression(undefined); // remove ORDER BY
 ```
 
-Each item is a `SqlOrderByExpression` with an `expression` and an optional `direction`. `getEffectiveDirection()` returns the direction with the default (`'ASC'`) filled in, and `reverseDirection()` flips it. Sorting by a result column header, as in the web console, looks like this:
+Each item is a `SqlOrderByExpression` with an `expression`, an optional `direction` and an optional `nulls` (`'FIRST'` or `'LAST'`, from `NULLS FIRST` / `NULLS LAST`). `getEffectiveDirection()` returns the direction with the default (`'ASC'`) filled in, `changeNulls()` sets or removes the nulls placement, and `reverseDirection()` flips the direction (and the nulls placement, if there is one). Sorting by a result column header, as in the web console, looks like this:
 
 ```js
 const current = query.getOrderByForOutputColumn(header); // SqlQuery only, see the SELECT page

@@ -778,7 +778,10 @@ OrderByClause = orderBy:OrderByToken postOrderBy:_ head:SqlOrderByExpression tai
   });
 }
 
-SqlOrderByExpression = expression:Expression direction:(_ (AscToken / DescToken))?
+SqlOrderByExpression =
+  expression:Expression
+  direction:(_ (AscToken / DescToken))?
+  nulls:(_ (NullsFirstToken / NullsLastToken))?
 {
   var value = {
     expression: expression,
@@ -790,6 +793,12 @@ SqlOrderByExpression = expression:Expression direction:(_ (AscToken / DescToken)
     spacing.preDirection = direction[0];
     value.direction = direction[1].toUpperCase();
     keywords.direction = direction[1];
+  }
+
+  if (nulls) {
+    spacing.preNulls = nulls[0];
+    value.nulls = /first$/i.test(nulls[1]) ? 'FIRST' : 'LAST';
+    keywords.nulls = nulls[1];
   }
 
   return new S.SqlOrderByExpression(value);
@@ -2213,6 +2222,8 @@ LimitToken = $("LIMIT"i !IdentifierPart)
 NaturalToken = $("NATURAL"i !IdentifierPart)
 NotToken = $("NOT"i !IdentifierPart)
 NullToken = $("NULL"i !IdentifierPart) { return { value: null, stringValue: text() }; }
+NullsFirstToken = $("NULLS"i __ "FIRST"i !IdentifierPart)
+NullsLastToken = $("NULLS"i __ "LAST"i !IdentifierPart)
 OffsetToken = $("OFFSET"i !IdentifierPart)
 OnToken = $("ON"i !IdentifierPart)
 OrToken = $("OR"i !IdentifierPart)

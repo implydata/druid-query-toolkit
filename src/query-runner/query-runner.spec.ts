@@ -447,6 +447,7 @@ describe('QueryRunner', () => {
                     "keywords": Object {
                       "direction": "DESC",
                     },
+                    "nulls": undefined,
                     "parens": undefined,
                     "spacing": Object {
                       "preDirection": " ",
@@ -688,6 +689,7 @@ describe('QueryRunner', () => {
                     "keywords": Object {
                       "direction": "DESC",
                     },
+                    "nulls": undefined,
                     "parens": undefined,
                     "spacing": Object {
                       "preDirection": " ",
@@ -933,6 +935,7 @@ describe('QueryRunner', () => {
                     "keywords": Object {
                       "direction": "DESC",
                     },
+                    "nulls": undefined,
                     "parens": undefined,
                     "spacing": Object {
                       "preDirection": " ",
