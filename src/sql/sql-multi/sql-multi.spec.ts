@@ -22,309 +22,309 @@ describe('SqlMulti', () => {
         const sql = `A OR B`;
 
         expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlMulti {
-        "args": SeparatedArray {
-          "separators": Array [
-            Separator {
-              "left": " ",
-              "right": " ",
-              "separator": "OR",
+          SqlMulti {
+            "args": SeparatedArray {
+              "separators": Array [
+                Separator {
+                  "left": " ",
+                  "right": " ",
+                  "separator": "OR",
+                },
+              ],
+              "values": Array [
+                SqlColumn {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "refName": RefName {
+                    "name": "A",
+                    "quotes": false,
+                  },
+                  "spacing": Object {},
+                  "table": undefined,
+                  "type": "column",
+                },
+                SqlColumn {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "refName": RefName {
+                    "name": "B",
+                    "quotes": false,
+                  },
+                  "spacing": Object {},
+                  "table": undefined,
+                  "type": "column",
+                },
+              ],
             },
-          ],
-          "values": Array [
-            SqlColumn {
-              "keywords": Object {},
-              "parens": undefined,
-              "refName": RefName {
-                "name": "A",
-                "quotes": false,
-              },
-              "spacing": Object {},
-              "table": undefined,
-              "type": "column",
-            },
-            SqlColumn {
-              "keywords": Object {},
-              "parens": undefined,
-              "refName": RefName {
-                "name": "B",
-                "quotes": false,
-              },
-              "spacing": Object {},
-              "table": undefined,
-              "type": "column",
-            },
-          ],
-        },
-        "keywords": Object {},
-        "op": "OR",
-        "parens": undefined,
-        "spacing": Object {},
-        "type": "multi",
-      }
-    `);
+            "keywords": Object {},
+            "op": "OR",
+            "parens": undefined,
+            "spacing": Object {},
+            "type": "multi",
+          }
+        `);
       });
 
       it('single expression with single quoted string', () => {
         const sql = `'A' OR 'B'`;
 
         expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlMulti {
-        "args": SeparatedArray {
-          "separators": Array [
-            Separator {
-              "left": " ",
-              "right": " ",
-              "separator": "OR",
+          SqlMulti {
+            "args": SeparatedArray {
+              "separators": Array [
+                Separator {
+                  "left": " ",
+                  "right": " ",
+                  "separator": "OR",
+                },
+              ],
+              "values": Array [
+                SqlLiteral {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "spacing": Object {},
+                  "stringValue": "'A'",
+                  "type": "literal",
+                  "value": "A",
+                },
+                SqlLiteral {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "spacing": Object {},
+                  "stringValue": "'B'",
+                  "type": "literal",
+                  "value": "B",
+                },
+              ],
             },
-          ],
-          "values": Array [
-            SqlLiteral {
-              "keywords": Object {},
-              "parens": undefined,
-              "spacing": Object {},
-              "stringValue": "'A'",
-              "type": "literal",
-              "value": "A",
-            },
-            SqlLiteral {
-              "keywords": Object {},
-              "parens": undefined,
-              "spacing": Object {},
-              "stringValue": "'B'",
-              "type": "literal",
-              "value": "B",
-            },
-          ],
-        },
-        "keywords": Object {},
-        "op": "OR",
-        "parens": undefined,
-        "spacing": Object {},
-        "type": "multi",
-      }
-    `);
+            "keywords": Object {},
+            "op": "OR",
+            "parens": undefined,
+            "spacing": Object {},
+            "type": "multi",
+          }
+        `);
       });
 
       it('single expression with double quoted string', () => {
         const sql = `"A" OR "B"`;
 
         expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlMulti {
-        "args": SeparatedArray {
-          "separators": Array [
-            Separator {
-              "left": " ",
-              "right": " ",
-              "separator": "OR",
+          SqlMulti {
+            "args": SeparatedArray {
+              "separators": Array [
+                Separator {
+                  "left": " ",
+                  "right": " ",
+                  "separator": "OR",
+                },
+              ],
+              "values": Array [
+                SqlColumn {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "refName": RefName {
+                    "name": "A",
+                    "quotes": true,
+                  },
+                  "spacing": Object {},
+                  "table": undefined,
+                  "type": "column",
+                },
+                SqlColumn {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "refName": RefName {
+                    "name": "B",
+                    "quotes": true,
+                  },
+                  "spacing": Object {},
+                  "table": undefined,
+                  "type": "column",
+                },
+              ],
             },
-          ],
-          "values": Array [
-            SqlColumn {
-              "keywords": Object {},
-              "parens": undefined,
-              "refName": RefName {
-                "name": "A",
-                "quotes": true,
-              },
-              "spacing": Object {},
-              "table": undefined,
-              "type": "column",
-            },
-            SqlColumn {
-              "keywords": Object {},
-              "parens": undefined,
-              "refName": RefName {
-                "name": "B",
-                "quotes": true,
-              },
-              "spacing": Object {},
-              "table": undefined,
-              "type": "column",
-            },
-          ],
-        },
-        "keywords": Object {},
-        "op": "OR",
-        "parens": undefined,
-        "spacing": Object {},
-        "type": "multi",
-      }
-    `);
+            "keywords": Object {},
+            "op": "OR",
+            "parens": undefined,
+            "spacing": Object {},
+            "type": "multi",
+          }
+        `);
       });
 
       it('single expression with numbers', () => {
         const sql = `1 OR 2`;
 
         expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlMulti {
-        "args": SeparatedArray {
-          "separators": Array [
-            Separator {
-              "left": " ",
-              "right": " ",
-              "separator": "OR",
+          SqlMulti {
+            "args": SeparatedArray {
+              "separators": Array [
+                Separator {
+                  "left": " ",
+                  "right": " ",
+                  "separator": "OR",
+                },
+              ],
+              "values": Array [
+                SqlLiteral {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "spacing": Object {},
+                  "stringValue": "1",
+                  "type": "literal",
+                  "value": 1,
+                },
+                SqlLiteral {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "spacing": Object {},
+                  "stringValue": "2",
+                  "type": "literal",
+                  "value": 2,
+                },
+              ],
             },
-          ],
-          "values": Array [
-            SqlLiteral {
-              "keywords": Object {},
-              "parens": undefined,
-              "spacing": Object {},
-              "stringValue": "1",
-              "type": "literal",
-              "value": 1,
-            },
-            SqlLiteral {
-              "keywords": Object {},
-              "parens": undefined,
-              "spacing": Object {},
-              "stringValue": "2",
-              "type": "literal",
-              "value": 2,
-            },
-          ],
-        },
-        "keywords": Object {},
-        "op": "OR",
-        "parens": undefined,
-        "spacing": Object {},
-        "type": "multi",
-      }
-    `);
+            "keywords": Object {},
+            "op": "OR",
+            "parens": undefined,
+            "spacing": Object {},
+            "type": "multi",
+          }
+        `);
       });
 
       it('brackets', () => {
         const sql = `(1 OR 2)`;
 
         expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlMulti {
-        "args": SeparatedArray {
-          "separators": Array [
-            Separator {
-              "left": " ",
-              "right": " ",
-              "separator": "OR",
+          SqlMulti {
+            "args": SeparatedArray {
+              "separators": Array [
+                Separator {
+                  "left": " ",
+                  "right": " ",
+                  "separator": "OR",
+                },
+              ],
+              "values": Array [
+                SqlLiteral {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "spacing": Object {},
+                  "stringValue": "1",
+                  "type": "literal",
+                  "value": 1,
+                },
+                SqlLiteral {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "spacing": Object {},
+                  "stringValue": "2",
+                  "type": "literal",
+                  "value": 2,
+                },
+              ],
             },
-          ],
-          "values": Array [
-            SqlLiteral {
-              "keywords": Object {},
-              "parens": undefined,
-              "spacing": Object {},
-              "stringValue": "1",
-              "type": "literal",
-              "value": 1,
-            },
-            SqlLiteral {
-              "keywords": Object {},
-              "parens": undefined,
-              "spacing": Object {},
-              "stringValue": "2",
-              "type": "literal",
-              "value": 2,
-            },
-          ],
-        },
-        "keywords": Object {},
-        "op": "OR",
-        "parens": Array [
-          Object {
-            "leftSpacing": "",
-            "rightSpacing": "",
-          },
-        ],
-        "spacing": Object {},
-        "type": "multi",
-      }
-    `);
+            "keywords": Object {},
+            "op": "OR",
+            "parens": Array [
+              Object {
+                "leftSpacing": "",
+                "rightSpacing": "",
+              },
+            ],
+            "spacing": Object {},
+            "type": "multi",
+          }
+        `);
       });
 
       it('strange spacing', () => {
         const sql = `1   OR 2`;
 
         expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlMulti {
-        "args": SeparatedArray {
-          "separators": Array [
-            Separator {
-              "left": "   ",
-              "right": " ",
-              "separator": "OR",
+          SqlMulti {
+            "args": SeparatedArray {
+              "separators": Array [
+                Separator {
+                  "left": "   ",
+                  "right": " ",
+                  "separator": "OR",
+                },
+              ],
+              "values": Array [
+                SqlLiteral {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "spacing": Object {},
+                  "stringValue": "1",
+                  "type": "literal",
+                  "value": 1,
+                },
+                SqlLiteral {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "spacing": Object {},
+                  "stringValue": "2",
+                  "type": "literal",
+                  "value": 2,
+                },
+              ],
             },
-          ],
-          "values": Array [
-            SqlLiteral {
-              "keywords": Object {},
-              "parens": undefined,
-              "spacing": Object {},
-              "stringValue": "1",
-              "type": "literal",
-              "value": 1,
-            },
-            SqlLiteral {
-              "keywords": Object {},
-              "parens": undefined,
-              "spacing": Object {},
-              "stringValue": "2",
-              "type": "literal",
-              "value": 2,
-            },
-          ],
-        },
-        "keywords": Object {},
-        "op": "OR",
-        "parens": undefined,
-        "spacing": Object {},
-        "type": "multi",
-      }
-    `);
+            "keywords": Object {},
+            "op": "OR",
+            "parens": undefined,
+            "spacing": Object {},
+            "type": "multi",
+          }
+        `);
       });
 
       it('strange spacing and brackets', () => {
         const sql = `( 1   OR 2 )`;
 
         expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlMulti {
-        "args": SeparatedArray {
-          "separators": Array [
-            Separator {
-              "left": "   ",
-              "right": " ",
-              "separator": "OR",
+          SqlMulti {
+            "args": SeparatedArray {
+              "separators": Array [
+                Separator {
+                  "left": "   ",
+                  "right": " ",
+                  "separator": "OR",
+                },
+              ],
+              "values": Array [
+                SqlLiteral {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "spacing": Object {},
+                  "stringValue": "1",
+                  "type": "literal",
+                  "value": 1,
+                },
+                SqlLiteral {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "spacing": Object {},
+                  "stringValue": "2",
+                  "type": "literal",
+                  "value": 2,
+                },
+              ],
             },
-          ],
-          "values": Array [
-            SqlLiteral {
-              "keywords": Object {},
-              "parens": undefined,
-              "spacing": Object {},
-              "stringValue": "1",
-              "type": "literal",
-              "value": 1,
-            },
-            SqlLiteral {
-              "keywords": Object {},
-              "parens": undefined,
-              "spacing": Object {},
-              "stringValue": "2",
-              "type": "literal",
-              "value": 2,
-            },
-          ],
-        },
-        "keywords": Object {},
-        "op": "OR",
-        "parens": Array [
-          Object {
-            "leftSpacing": " ",
-            "rightSpacing": " ",
-          },
-        ],
-        "spacing": Object {},
-        "type": "multi",
-      }
-    `);
+            "keywords": Object {},
+            "op": "OR",
+            "parens": Array [
+              Object {
+                "leftSpacing": " ",
+                "rightSpacing": " ",
+              },
+            ],
+            "spacing": Object {},
+            "type": "multi",
+          }
+        `);
       });
     });
 
@@ -335,47 +335,47 @@ describe('SqlMulti', () => {
         backAndForth(sql);
 
         expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlMulti {
-        "args": SeparatedArray {
-          "separators": Array [
-            Separator {
-              "left": " ",
-              "right": " ",
-              "separator": "AND",
+          SqlMulti {
+            "args": SeparatedArray {
+              "separators": Array [
+                Separator {
+                  "left": " ",
+                  "right": " ",
+                  "separator": "AND",
+                },
+              ],
+              "values": Array [
+                SqlColumn {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "refName": RefName {
+                    "name": "A",
+                    "quotes": false,
+                  },
+                  "spacing": Object {},
+                  "table": undefined,
+                  "type": "column",
+                },
+                SqlColumn {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "refName": RefName {
+                    "name": "B",
+                    "quotes": false,
+                  },
+                  "spacing": Object {},
+                  "table": undefined,
+                  "type": "column",
+                },
+              ],
             },
-          ],
-          "values": Array [
-            SqlColumn {
-              "keywords": Object {},
-              "parens": undefined,
-              "refName": RefName {
-                "name": "A",
-                "quotes": false,
-              },
-              "spacing": Object {},
-              "table": undefined,
-              "type": "column",
-            },
-            SqlColumn {
-              "keywords": Object {},
-              "parens": undefined,
-              "refName": RefName {
-                "name": "B",
-                "quotes": false,
-              },
-              "spacing": Object {},
-              "table": undefined,
-              "type": "column",
-            },
-          ],
-        },
-        "keywords": Object {},
-        "op": "AND",
-        "parens": undefined,
-        "spacing": Object {},
-        "type": "multi",
-      }
-    `);
+            "keywords": Object {},
+            "op": "AND",
+            "parens": undefined,
+            "spacing": Object {},
+            "type": "multi",
+          }
+        `);
       });
 
       it('single expression with single quoted string', () => {
@@ -384,41 +384,41 @@ describe('SqlMulti', () => {
         backAndForth(sql);
 
         expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlMulti {
-        "args": SeparatedArray {
-          "separators": Array [
-            Separator {
-              "left": " ",
-              "right": " ",
-              "separator": "AND",
+          SqlMulti {
+            "args": SeparatedArray {
+              "separators": Array [
+                Separator {
+                  "left": " ",
+                  "right": " ",
+                  "separator": "AND",
+                },
+              ],
+              "values": Array [
+                SqlLiteral {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "spacing": Object {},
+                  "stringValue": "'A'",
+                  "type": "literal",
+                  "value": "A",
+                },
+                SqlLiteral {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "spacing": Object {},
+                  "stringValue": "'B'",
+                  "type": "literal",
+                  "value": "B",
+                },
+              ],
             },
-          ],
-          "values": Array [
-            SqlLiteral {
-              "keywords": Object {},
-              "parens": undefined,
-              "spacing": Object {},
-              "stringValue": "'A'",
-              "type": "literal",
-              "value": "A",
-            },
-            SqlLiteral {
-              "keywords": Object {},
-              "parens": undefined,
-              "spacing": Object {},
-              "stringValue": "'B'",
-              "type": "literal",
-              "value": "B",
-            },
-          ],
-        },
-        "keywords": Object {},
-        "op": "AND",
-        "parens": undefined,
-        "spacing": Object {},
-        "type": "multi",
-      }
-    `);
+            "keywords": Object {},
+            "op": "AND",
+            "parens": undefined,
+            "spacing": Object {},
+            "type": "multi",
+          }
+        `);
       });
 
       it('single expression with double quoted string', () => {
@@ -427,47 +427,47 @@ describe('SqlMulti', () => {
         backAndForth(sql);
 
         expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlMulti {
-        "args": SeparatedArray {
-          "separators": Array [
-            Separator {
-              "left": " ",
-              "right": " ",
-              "separator": "AND",
+          SqlMulti {
+            "args": SeparatedArray {
+              "separators": Array [
+                Separator {
+                  "left": " ",
+                  "right": " ",
+                  "separator": "AND",
+                },
+              ],
+              "values": Array [
+                SqlColumn {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "refName": RefName {
+                    "name": "A",
+                    "quotes": true,
+                  },
+                  "spacing": Object {},
+                  "table": undefined,
+                  "type": "column",
+                },
+                SqlColumn {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "refName": RefName {
+                    "name": "B",
+                    "quotes": true,
+                  },
+                  "spacing": Object {},
+                  "table": undefined,
+                  "type": "column",
+                },
+              ],
             },
-          ],
-          "values": Array [
-            SqlColumn {
-              "keywords": Object {},
-              "parens": undefined,
-              "refName": RefName {
-                "name": "A",
-                "quotes": true,
-              },
-              "spacing": Object {},
-              "table": undefined,
-              "type": "column",
-            },
-            SqlColumn {
-              "keywords": Object {},
-              "parens": undefined,
-              "refName": RefName {
-                "name": "B",
-                "quotes": true,
-              },
-              "spacing": Object {},
-              "table": undefined,
-              "type": "column",
-            },
-          ],
-        },
-        "keywords": Object {},
-        "op": "AND",
-        "parens": undefined,
-        "spacing": Object {},
-        "type": "multi",
-      }
-    `);
+            "keywords": Object {},
+            "op": "AND",
+            "parens": undefined,
+            "spacing": Object {},
+            "type": "multi",
+          }
+        `);
       });
 
       it('single expression with numbers', () => {
@@ -476,41 +476,41 @@ describe('SqlMulti', () => {
         backAndForth(sql);
 
         expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlMulti {
-        "args": SeparatedArray {
-          "separators": Array [
-            Separator {
-              "left": " ",
-              "right": " ",
-              "separator": "AND",
+          SqlMulti {
+            "args": SeparatedArray {
+              "separators": Array [
+                Separator {
+                  "left": " ",
+                  "right": " ",
+                  "separator": "AND",
+                },
+              ],
+              "values": Array [
+                SqlLiteral {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "spacing": Object {},
+                  "stringValue": "1",
+                  "type": "literal",
+                  "value": 1,
+                },
+                SqlLiteral {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "spacing": Object {},
+                  "stringValue": "2",
+                  "type": "literal",
+                  "value": 2,
+                },
+              ],
             },
-          ],
-          "values": Array [
-            SqlLiteral {
-              "keywords": Object {},
-              "parens": undefined,
-              "spacing": Object {},
-              "stringValue": "1",
-              "type": "literal",
-              "value": 1,
-            },
-            SqlLiteral {
-              "keywords": Object {},
-              "parens": undefined,
-              "spacing": Object {},
-              "stringValue": "2",
-              "type": "literal",
-              "value": 2,
-            },
-          ],
-        },
-        "keywords": Object {},
-        "op": "AND",
-        "parens": undefined,
-        "spacing": Object {},
-        "type": "multi",
-      }
-    `);
+            "keywords": Object {},
+            "op": "AND",
+            "parens": undefined,
+            "spacing": Object {},
+            "type": "multi",
+          }
+        `);
       });
 
       it('brackets', () => {
@@ -519,46 +519,46 @@ describe('SqlMulti', () => {
         backAndForth(sql);
 
         expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlMulti {
-        "args": SeparatedArray {
-          "separators": Array [
-            Separator {
-              "left": " ",
-              "right": " ",
-              "separator": "AND",
+          SqlMulti {
+            "args": SeparatedArray {
+              "separators": Array [
+                Separator {
+                  "left": " ",
+                  "right": " ",
+                  "separator": "AND",
+                },
+              ],
+              "values": Array [
+                SqlLiteral {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "spacing": Object {},
+                  "stringValue": "1",
+                  "type": "literal",
+                  "value": 1,
+                },
+                SqlLiteral {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "spacing": Object {},
+                  "stringValue": "2",
+                  "type": "literal",
+                  "value": 2,
+                },
+              ],
             },
-          ],
-          "values": Array [
-            SqlLiteral {
-              "keywords": Object {},
-              "parens": undefined,
-              "spacing": Object {},
-              "stringValue": "1",
-              "type": "literal",
-              "value": 1,
-            },
-            SqlLiteral {
-              "keywords": Object {},
-              "parens": undefined,
-              "spacing": Object {},
-              "stringValue": "2",
-              "type": "literal",
-              "value": 2,
-            },
-          ],
-        },
-        "keywords": Object {},
-        "op": "AND",
-        "parens": Array [
-          Object {
-            "leftSpacing": "",
-            "rightSpacing": "",
-          },
-        ],
-        "spacing": Object {},
-        "type": "multi",
-      }
-    `);
+            "keywords": Object {},
+            "op": "AND",
+            "parens": Array [
+              Object {
+                "leftSpacing": "",
+                "rightSpacing": "",
+              },
+            ],
+            "spacing": Object {},
+            "type": "multi",
+          }
+        `);
       });
     });
 
@@ -569,41 +569,41 @@ describe('SqlMulti', () => {
         backAndForth(sql);
 
         expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlMulti {
-        "args": SeparatedArray {
-          "separators": Array [
-            Separator {
-              "left": " ",
-              "right": " ",
-              "separator": "+",
+          SqlMulti {
+            "args": SeparatedArray {
+              "separators": Array [
+                Separator {
+                  "left": " ",
+                  "right": " ",
+                  "separator": "+",
+                },
+              ],
+              "values": Array [
+                SqlLiteral {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "spacing": Object {},
+                  "stringValue": "1",
+                  "type": "literal",
+                  "value": 1,
+                },
+                SqlLiteral {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "spacing": Object {},
+                  "stringValue": "2",
+                  "type": "literal",
+                  "value": 2,
+                },
+              ],
             },
-          ],
-          "values": Array [
-            SqlLiteral {
-              "keywords": Object {},
-              "parens": undefined,
-              "spacing": Object {},
-              "stringValue": "1",
-              "type": "literal",
-              "value": 1,
-            },
-            SqlLiteral {
-              "keywords": Object {},
-              "parens": undefined,
-              "spacing": Object {},
-              "stringValue": "2",
-              "type": "literal",
-              "value": 2,
-            },
-          ],
-        },
-        "keywords": Object {},
-        "op": "+",
-        "parens": undefined,
-        "spacing": Object {},
-        "type": "multi",
-      }
-    `);
+            "keywords": Object {},
+            "op": "+",
+            "parens": undefined,
+            "spacing": Object {},
+            "type": "multi",
+          }
+        `);
       });
 
       it('subtraction', () => {
@@ -612,41 +612,41 @@ describe('SqlMulti', () => {
         backAndForth(sql);
 
         expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlMulti {
-        "args": SeparatedArray {
-          "separators": Array [
-            Separator {
-              "left": " ",
-              "right": " ",
-              "separator": "-",
+          SqlMulti {
+            "args": SeparatedArray {
+              "separators": Array [
+                Separator {
+                  "left": " ",
+                  "right": " ",
+                  "separator": "-",
+                },
+              ],
+              "values": Array [
+                SqlLiteral {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "spacing": Object {},
+                  "stringValue": "1",
+                  "type": "literal",
+                  "value": 1,
+                },
+                SqlLiteral {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "spacing": Object {},
+                  "stringValue": "2",
+                  "type": "literal",
+                  "value": 2,
+                },
+              ],
             },
-          ],
-          "values": Array [
-            SqlLiteral {
-              "keywords": Object {},
-              "parens": undefined,
-              "spacing": Object {},
-              "stringValue": "1",
-              "type": "literal",
-              "value": 1,
-            },
-            SqlLiteral {
-              "keywords": Object {},
-              "parens": undefined,
-              "spacing": Object {},
-              "stringValue": "2",
-              "type": "literal",
-              "value": 2,
-            },
-          ],
-        },
-        "keywords": Object {},
-        "op": "-",
-        "parens": undefined,
-        "spacing": Object {},
-        "type": "multi",
-      }
-    `);
+            "keywords": Object {},
+            "op": "-",
+            "parens": undefined,
+            "spacing": Object {},
+            "type": "multi",
+          }
+        `);
       });
 
       it('multiplication', () => {
@@ -655,41 +655,41 @@ describe('SqlMulti', () => {
         backAndForth(sql);
 
         expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlMulti {
-        "args": SeparatedArray {
-          "separators": Array [
-            Separator {
-              "left": " ",
-              "right": " ",
-              "separator": "*",
+          SqlMulti {
+            "args": SeparatedArray {
+              "separators": Array [
+                Separator {
+                  "left": " ",
+                  "right": " ",
+                  "separator": "*",
+                },
+              ],
+              "values": Array [
+                SqlLiteral {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "spacing": Object {},
+                  "stringValue": "1",
+                  "type": "literal",
+                  "value": 1,
+                },
+                SqlLiteral {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "spacing": Object {},
+                  "stringValue": "2",
+                  "type": "literal",
+                  "value": 2,
+                },
+              ],
             },
-          ],
-          "values": Array [
-            SqlLiteral {
-              "keywords": Object {},
-              "parens": undefined,
-              "spacing": Object {},
-              "stringValue": "1",
-              "type": "literal",
-              "value": 1,
-            },
-            SqlLiteral {
-              "keywords": Object {},
-              "parens": undefined,
-              "spacing": Object {},
-              "stringValue": "2",
-              "type": "literal",
-              "value": 2,
-            },
-          ],
-        },
-        "keywords": Object {},
-        "op": "*",
-        "parens": undefined,
-        "spacing": Object {},
-        "type": "multi",
-      }
-    `);
+            "keywords": Object {},
+            "op": "*",
+            "parens": undefined,
+            "spacing": Object {},
+            "type": "multi",
+          }
+        `);
       });
 
       it('division', () => {
@@ -698,41 +698,41 @@ describe('SqlMulti', () => {
         backAndForth(sql);
 
         expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlMulti {
-        "args": SeparatedArray {
-          "separators": Array [
-            Separator {
-              "left": " ",
-              "right": " ",
-              "separator": "/",
+          SqlMulti {
+            "args": SeparatedArray {
+              "separators": Array [
+                Separator {
+                  "left": " ",
+                  "right": " ",
+                  "separator": "/",
+                },
+              ],
+              "values": Array [
+                SqlLiteral {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "spacing": Object {},
+                  "stringValue": "1",
+                  "type": "literal",
+                  "value": 1,
+                },
+                SqlLiteral {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "spacing": Object {},
+                  "stringValue": "2",
+                  "type": "literal",
+                  "value": 2,
+                },
+              ],
             },
-          ],
-          "values": Array [
-            SqlLiteral {
-              "keywords": Object {},
-              "parens": undefined,
-              "spacing": Object {},
-              "stringValue": "1",
-              "type": "literal",
-              "value": 1,
-            },
-            SqlLiteral {
-              "keywords": Object {},
-              "parens": undefined,
-              "spacing": Object {},
-              "stringValue": "2",
-              "type": "literal",
-              "value": 2,
-            },
-          ],
-        },
-        "keywords": Object {},
-        "op": "/",
-        "parens": undefined,
-        "spacing": Object {},
-        "type": "multi",
-      }
-    `);
+            "keywords": Object {},
+            "op": "/",
+            "parens": undefined,
+            "spacing": Object {},
+            "type": "multi",
+          }
+        `);
       });
 
       it('single expression with unquoted string', () => {
@@ -741,47 +741,47 @@ describe('SqlMulti', () => {
         backAndForth(sql);
 
         expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlMulti {
-        "args": SeparatedArray {
-          "separators": Array [
-            Separator {
-              "left": " ",
-              "right": " ",
-              "separator": "+",
+          SqlMulti {
+            "args": SeparatedArray {
+              "separators": Array [
+                Separator {
+                  "left": " ",
+                  "right": " ",
+                  "separator": "+",
+                },
+              ],
+              "values": Array [
+                SqlColumn {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "refName": RefName {
+                    "name": "A",
+                    "quotes": false,
+                  },
+                  "spacing": Object {},
+                  "table": undefined,
+                  "type": "column",
+                },
+                SqlColumn {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "refName": RefName {
+                    "name": "B",
+                    "quotes": false,
+                  },
+                  "spacing": Object {},
+                  "table": undefined,
+                  "type": "column",
+                },
+              ],
             },
-          ],
-          "values": Array [
-            SqlColumn {
-              "keywords": Object {},
-              "parens": undefined,
-              "refName": RefName {
-                "name": "A",
-                "quotes": false,
-              },
-              "spacing": Object {},
-              "table": undefined,
-              "type": "column",
-            },
-            SqlColumn {
-              "keywords": Object {},
-              "parens": undefined,
-              "refName": RefName {
-                "name": "B",
-                "quotes": false,
-              },
-              "spacing": Object {},
-              "table": undefined,
-              "type": "column",
-            },
-          ],
-        },
-        "keywords": Object {},
-        "op": "+",
-        "parens": undefined,
-        "spacing": Object {},
-        "type": "multi",
-      }
-    `);
+            "keywords": Object {},
+            "op": "+",
+            "parens": undefined,
+            "spacing": Object {},
+            "type": "multi",
+          }
+        `);
       });
 
       it('single expression with single quoted string', () => {
@@ -790,41 +790,41 @@ describe('SqlMulti', () => {
         backAndForth(sql);
 
         expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlMulti {
-        "args": SeparatedArray {
-          "separators": Array [
-            Separator {
-              "left": " ",
-              "right": " ",
-              "separator": "+",
+          SqlMulti {
+            "args": SeparatedArray {
+              "separators": Array [
+                Separator {
+                  "left": " ",
+                  "right": " ",
+                  "separator": "+",
+                },
+              ],
+              "values": Array [
+                SqlLiteral {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "spacing": Object {},
+                  "stringValue": "'A'",
+                  "type": "literal",
+                  "value": "A",
+                },
+                SqlLiteral {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "spacing": Object {},
+                  "stringValue": "'B'",
+                  "type": "literal",
+                  "value": "B",
+                },
+              ],
             },
-          ],
-          "values": Array [
-            SqlLiteral {
-              "keywords": Object {},
-              "parens": undefined,
-              "spacing": Object {},
-              "stringValue": "'A'",
-              "type": "literal",
-              "value": "A",
-            },
-            SqlLiteral {
-              "keywords": Object {},
-              "parens": undefined,
-              "spacing": Object {},
-              "stringValue": "'B'",
-              "type": "literal",
-              "value": "B",
-            },
-          ],
-        },
-        "keywords": Object {},
-        "op": "+",
-        "parens": undefined,
-        "spacing": Object {},
-        "type": "multi",
-      }
-    `);
+            "keywords": Object {},
+            "op": "+",
+            "parens": undefined,
+            "spacing": Object {},
+            "type": "multi",
+          }
+        `);
       });
 
       it('single expression with double quoted string', () => {
@@ -833,47 +833,47 @@ describe('SqlMulti', () => {
         backAndForth(sql);
 
         expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlMulti {
-        "args": SeparatedArray {
-          "separators": Array [
-            Separator {
-              "left": " ",
-              "right": " ",
-              "separator": "+",
+          SqlMulti {
+            "args": SeparatedArray {
+              "separators": Array [
+                Separator {
+                  "left": " ",
+                  "right": " ",
+                  "separator": "+",
+                },
+              ],
+              "values": Array [
+                SqlColumn {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "refName": RefName {
+                    "name": "A",
+                    "quotes": true,
+                  },
+                  "spacing": Object {},
+                  "table": undefined,
+                  "type": "column",
+                },
+                SqlColumn {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "refName": RefName {
+                    "name": "B",
+                    "quotes": true,
+                  },
+                  "spacing": Object {},
+                  "table": undefined,
+                  "type": "column",
+                },
+              ],
             },
-          ],
-          "values": Array [
-            SqlColumn {
-              "keywords": Object {},
-              "parens": undefined,
-              "refName": RefName {
-                "name": "A",
-                "quotes": true,
-              },
-              "spacing": Object {},
-              "table": undefined,
-              "type": "column",
-            },
-            SqlColumn {
-              "keywords": Object {},
-              "parens": undefined,
-              "refName": RefName {
-                "name": "B",
-                "quotes": true,
-              },
-              "spacing": Object {},
-              "table": undefined,
-              "type": "column",
-            },
-          ],
-        },
-        "keywords": Object {},
-        "op": "+",
-        "parens": undefined,
-        "spacing": Object {},
-        "type": "multi",
-      }
-    `);
+            "keywords": Object {},
+            "op": "+",
+            "parens": undefined,
+            "spacing": Object {},
+            "type": "multi",
+          }
+        `);
       });
 
       it('single expression with numbers', () => {
@@ -882,41 +882,41 @@ describe('SqlMulti', () => {
         backAndForth(sql);
 
         expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlMulti {
-        "args": SeparatedArray {
-          "separators": Array [
-            Separator {
-              "left": " ",
-              "right": " ",
-              "separator": "+",
+          SqlMulti {
+            "args": SeparatedArray {
+              "separators": Array [
+                Separator {
+                  "left": " ",
+                  "right": " ",
+                  "separator": "+",
+                },
+              ],
+              "values": Array [
+                SqlLiteral {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "spacing": Object {},
+                  "stringValue": "1",
+                  "type": "literal",
+                  "value": 1,
+                },
+                SqlLiteral {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "spacing": Object {},
+                  "stringValue": "2",
+                  "type": "literal",
+                  "value": 2,
+                },
+              ],
             },
-          ],
-          "values": Array [
-            SqlLiteral {
-              "keywords": Object {},
-              "parens": undefined,
-              "spacing": Object {},
-              "stringValue": "1",
-              "type": "literal",
-              "value": 1,
-            },
-            SqlLiteral {
-              "keywords": Object {},
-              "parens": undefined,
-              "spacing": Object {},
-              "stringValue": "2",
-              "type": "literal",
-              "value": 2,
-            },
-          ],
-        },
-        "keywords": Object {},
-        "op": "+",
-        "parens": undefined,
-        "spacing": Object {},
-        "type": "multi",
-      }
-    `);
+            "keywords": Object {},
+            "op": "+",
+            "parens": undefined,
+            "spacing": Object {},
+            "type": "multi",
+          }
+        `);
       });
 
       it('brackets', () => {
@@ -925,46 +925,46 @@ describe('SqlMulti', () => {
         backAndForth(sql);
 
         expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlMulti {
-        "args": SeparatedArray {
-          "separators": Array [
-            Separator {
-              "left": " ",
-              "right": " ",
-              "separator": "+",
+          SqlMulti {
+            "args": SeparatedArray {
+              "separators": Array [
+                Separator {
+                  "left": " ",
+                  "right": " ",
+                  "separator": "+",
+                },
+              ],
+              "values": Array [
+                SqlLiteral {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "spacing": Object {},
+                  "stringValue": "1",
+                  "type": "literal",
+                  "value": 1,
+                },
+                SqlLiteral {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "spacing": Object {},
+                  "stringValue": "2",
+                  "type": "literal",
+                  "value": 2,
+                },
+              ],
             },
-          ],
-          "values": Array [
-            SqlLiteral {
-              "keywords": Object {},
-              "parens": undefined,
-              "spacing": Object {},
-              "stringValue": "1",
-              "type": "literal",
-              "value": 1,
-            },
-            SqlLiteral {
-              "keywords": Object {},
-              "parens": undefined,
-              "spacing": Object {},
-              "stringValue": "2",
-              "type": "literal",
-              "value": 2,
-            },
-          ],
-        },
-        "keywords": Object {},
-        "op": "+",
-        "parens": Array [
-          Object {
-            "leftSpacing": "",
-            "rightSpacing": "",
-          },
-        ],
-        "spacing": Object {},
-        "type": "multi",
-      }
-    `);
+            "keywords": Object {},
+            "op": "+",
+            "parens": Array [
+              Object {
+                "leftSpacing": "",
+                "rightSpacing": "",
+              },
+            ],
+            "spacing": Object {},
+            "type": "multi",
+          }
+        `);
       });
 
       it('decimal', () => {
@@ -973,115 +973,115 @@ describe('SqlMulti', () => {
         backAndForth(sql);
 
         expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlMulti {
-        "args": SeparatedArray {
-          "separators": Array [
-            Separator {
-              "left": " ",
-              "right": " ",
-              "separator": "*",
-            },
-          ],
-          "values": Array [
-            SqlFunction {
-              "args": SeparatedArray {
-                "separators": Array [],
-                "values": Array [
-                  SqlStar {
-                    "keywords": Object {},
-                    "parens": undefined,
-                    "spacing": Object {},
-                    "table": undefined,
-                    "type": "star",
+          SqlMulti {
+            "args": SeparatedArray {
+              "separators": Array [
+                Separator {
+                  "left": " ",
+                  "right": " ",
+                  "separator": "*",
+                },
+              ],
+              "values": Array [
+                SqlFunction {
+                  "args": SeparatedArray {
+                    "separators": Array [],
+                    "values": Array [
+                      SqlStar {
+                        "keywords": Object {},
+                        "parens": undefined,
+                        "spacing": Object {},
+                        "table": undefined,
+                        "type": "star",
+                      },
+                    ],
                   },
-                ],
-              },
-              "decorator": undefined,
-              "extendClause": undefined,
-              "functionName": RefName {
-                "name": "COUNT",
-                "quotes": false,
-              },
-              "keywords": Object {},
-              "namespace": undefined,
-              "parens": undefined,
-              "spacing": Object {
-                "postArguments": "",
-                "postLeftParen": "",
-                "preLeftParen": "",
-              },
-              "specialParen": undefined,
-              "type": "function",
-              "whereClause": undefined,
-              "windowSpec": undefined,
-            },
-            SqlMulti {
-              "args": SeparatedArray {
-                "separators": Array [
-                  Separator {
-                    "left": " ",
-                    "right": " ",
-                    "separator": "/",
+                  "decorator": undefined,
+                  "extendClause": undefined,
+                  "functionName": RefName {
+                    "name": "COUNT",
+                    "quotes": false,
                   },
-                ],
-                "values": Array [
-                  SqlLiteral {
-                    "keywords": Object {},
-                    "parens": undefined,
-                    "spacing": Object {},
-                    "stringValue": "1.0",
-                    "type": "literal",
-                    "value": 1,
+                  "keywords": Object {},
+                  "namespace": undefined,
+                  "parens": undefined,
+                  "spacing": Object {
+                    "postArguments": "",
+                    "postLeftParen": "",
+                    "preLeftParen": "",
                   },
-                  SqlFunction {
-                    "args": SeparatedArray {
-                      "separators": Array [],
-                      "values": Array [
-                        SqlStar {
-                          "keywords": Object {},
-                          "parens": undefined,
-                          "spacing": Object {},
-                          "table": undefined,
-                          "type": "star",
+                  "specialParen": undefined,
+                  "type": "function",
+                  "whereClause": undefined,
+                  "windowSpec": undefined,
+                },
+                SqlMulti {
+                  "args": SeparatedArray {
+                    "separators": Array [
+                      Separator {
+                        "left": " ",
+                        "right": " ",
+                        "separator": "/",
+                      },
+                    ],
+                    "values": Array [
+                      SqlLiteral {
+                        "keywords": Object {},
+                        "parens": undefined,
+                        "spacing": Object {},
+                        "stringValue": "1.0",
+                        "type": "literal",
+                        "value": 1,
+                      },
+                      SqlFunction {
+                        "args": SeparatedArray {
+                          "separators": Array [],
+                          "values": Array [
+                            SqlStar {
+                              "keywords": Object {},
+                              "parens": undefined,
+                              "spacing": Object {},
+                              "table": undefined,
+                              "type": "star",
+                            },
+                          ],
                         },
-                      ],
-                    },
-                    "decorator": undefined,
-                    "extendClause": undefined,
-                    "functionName": RefName {
-                      "name": "COUNT",
-                      "quotes": false,
-                    },
-                    "keywords": Object {},
-                    "namespace": undefined,
-                    "parens": undefined,
-                    "spacing": Object {
-                      "postArguments": "",
-                      "postLeftParen": "",
-                      "preLeftParen": "",
-                    },
-                    "specialParen": undefined,
-                    "type": "function",
-                    "whereClause": undefined,
-                    "windowSpec": undefined,
+                        "decorator": undefined,
+                        "extendClause": undefined,
+                        "functionName": RefName {
+                          "name": "COUNT",
+                          "quotes": false,
+                        },
+                        "keywords": Object {},
+                        "namespace": undefined,
+                        "parens": undefined,
+                        "spacing": Object {
+                          "postArguments": "",
+                          "postLeftParen": "",
+                          "preLeftParen": "",
+                        },
+                        "specialParen": undefined,
+                        "type": "function",
+                        "whereClause": undefined,
+                        "windowSpec": undefined,
+                      },
+                    ],
                   },
-                ],
-              },
-              "keywords": Object {},
-              "op": "/",
-              "parens": undefined,
-              "spacing": Object {},
-              "type": "multi",
+                  "keywords": Object {},
+                  "op": "/",
+                  "parens": undefined,
+                  "spacing": Object {},
+                  "type": "multi",
+                },
+              ],
             },
-          ],
-        },
-        "keywords": Object {},
-        "op": "*",
-        "parens": undefined,
-        "spacing": Object {},
-        "type": "multi",
-      }
-    `);
+            "keywords": Object {},
+            "op": "*",
+            "parens": undefined,
+            "spacing": Object {},
+            "type": "multi",
+          }
+        `);
       });
     });
 
@@ -1092,129 +1092,129 @@ describe('SqlMulti', () => {
         backAndForth(sql);
 
         expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlMulti {
-        "args": SeparatedArray {
-          "separators": Array [
-            Separator {
-              "left": " ",
-              "right": " ",
-              "separator": "OR",
-            },
-          ],
-          "values": Array [
-            SqlColumn {
-              "keywords": Object {},
-              "parens": undefined,
-              "refName": RefName {
-                "name": "A",
-                "quotes": false,
-              },
-              "spacing": Object {},
-              "table": undefined,
-              "type": "column",
-            },
-            SqlMulti {
-              "args": SeparatedArray {
-                "separators": Array [
-                  Separator {
-                    "left": " ",
-                    "right": " ",
-                    "separator": "AND",
+          SqlMulti {
+            "args": SeparatedArray {
+              "separators": Array [
+                Separator {
+                  "left": " ",
+                  "right": " ",
+                  "separator": "OR",
+                },
+              ],
+              "values": Array [
+                SqlColumn {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "refName": RefName {
+                    "name": "A",
+                    "quotes": false,
                   },
-                ],
-                "values": Array [
-                  SqlColumn {
-                    "keywords": Object {},
-                    "parens": undefined,
-                    "refName": RefName {
-                      "name": "B",
-                      "quotes": false,
-                    },
-                    "spacing": Object {},
-                    "table": undefined,
-                    "type": "column",
-                  },
-                  SqlComparison {
-                    "decorator": undefined,
-                    "keywords": Object {
-                      "op": ">",
-                    },
-                    "lhs": SqlColumn {
-                      "keywords": Object {},
-                      "parens": undefined,
-                      "refName": RefName {
-                        "name": "C",
-                        "quotes": false,
+                  "spacing": Object {},
+                  "table": undefined,
+                  "type": "column",
+                },
+                SqlMulti {
+                  "args": SeparatedArray {
+                    "separators": Array [
+                      Separator {
+                        "left": " ",
+                        "right": " ",
+                        "separator": "AND",
                       },
-                      "spacing": Object {},
-                      "table": undefined,
-                      "type": "column",
-                    },
-                    "op": ">",
-                    "parens": undefined,
-                    "rhs": SqlMulti {
-                      "args": SeparatedArray {
-                        "separators": Array [
-                          Separator {
-                            "left": " ",
-                            "right": " ",
-                            "separator": "+",
-                          },
-                        ],
-                        "values": Array [
-                          SqlColumn {
-                            "keywords": Object {},
-                            "parens": undefined,
-                            "refName": RefName {
-                              "name": "D",
-                              "quotes": false,
-                            },
-                            "spacing": Object {},
-                            "table": undefined,
-                            "type": "column",
-                          },
-                          SqlColumn {
-                            "keywords": Object {},
-                            "parens": undefined,
-                            "refName": RefName {
-                              "name": "E",
-                              "quotes": false,
-                            },
-                            "spacing": Object {},
-                            "table": undefined,
-                            "type": "column",
-                          },
-                        ],
+                    ],
+                    "values": Array [
+                      SqlColumn {
+                        "keywords": Object {},
+                        "parens": undefined,
+                        "refName": RefName {
+                          "name": "B",
+                          "quotes": false,
+                        },
+                        "spacing": Object {},
+                        "table": undefined,
+                        "type": "column",
                       },
-                      "keywords": Object {},
-                      "op": "+",
-                      "parens": undefined,
-                      "spacing": Object {},
-                      "type": "multi",
-                    },
-                    "spacing": Object {
-                      "postOp": " ",
-                      "preOp": " ",
-                    },
-                    "type": "comparison",
+                      SqlComparison {
+                        "decorator": undefined,
+                        "keywords": Object {
+                          "op": ">",
+                        },
+                        "lhs": SqlColumn {
+                          "keywords": Object {},
+                          "parens": undefined,
+                          "refName": RefName {
+                            "name": "C",
+                            "quotes": false,
+                          },
+                          "spacing": Object {},
+                          "table": undefined,
+                          "type": "column",
+                        },
+                        "op": ">",
+                        "parens": undefined,
+                        "rhs": SqlMulti {
+                          "args": SeparatedArray {
+                            "separators": Array [
+                              Separator {
+                                "left": " ",
+                                "right": " ",
+                                "separator": "+",
+                              },
+                            ],
+                            "values": Array [
+                              SqlColumn {
+                                "keywords": Object {},
+                                "parens": undefined,
+                                "refName": RefName {
+                                  "name": "D",
+                                  "quotes": false,
+                                },
+                                "spacing": Object {},
+                                "table": undefined,
+                                "type": "column",
+                              },
+                              SqlColumn {
+                                "keywords": Object {},
+                                "parens": undefined,
+                                "refName": RefName {
+                                  "name": "E",
+                                  "quotes": false,
+                                },
+                                "spacing": Object {},
+                                "table": undefined,
+                                "type": "column",
+                              },
+                            ],
+                          },
+                          "keywords": Object {},
+                          "op": "+",
+                          "parens": undefined,
+                          "spacing": Object {},
+                          "type": "multi",
+                        },
+                        "spacing": Object {
+                          "postOp": " ",
+                          "preOp": " ",
+                        },
+                        "type": "comparison",
+                      },
+                    ],
                   },
-                ],
-              },
-              "keywords": Object {},
-              "op": "AND",
-              "parens": undefined,
-              "spacing": Object {},
-              "type": "multi",
+                  "keywords": Object {},
+                  "op": "AND",
+                  "parens": undefined,
+                  "spacing": Object {},
+                  "type": "multi",
+                },
+              ],
             },
-          ],
-        },
-        "keywords": Object {},
-        "op": "OR",
-        "parens": undefined,
-        "spacing": Object {},
-        "type": "multi",
-      }
-    `);
+            "keywords": Object {},
+            "op": "OR",
+            "parens": undefined,
+            "spacing": Object {},
+            "type": "multi",
+          }
+        `);
       });
 
       it('every expression out of order', () => {
@@ -1223,129 +1223,129 @@ describe('SqlMulti', () => {
         backAndForth(sql);
 
         expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlMulti {
-        "args": SeparatedArray {
-          "separators": Array [
-            Separator {
-              "left": " ",
-              "right": " ",
-              "separator": "OR",
-            },
-          ],
-          "values": Array [
-            SqlMulti {
-              "args": SeparatedArray {
-                "separators": Array [
-                  Separator {
-                    "left": " ",
-                    "right": " ",
-                    "separator": "AND",
-                  },
-                ],
-                "values": Array [
-                  SqlComparison {
-                    "decorator": undefined,
-                    "keywords": Object {
-                      "op": ">",
-                    },
-                    "lhs": SqlMulti {
-                      "args": SeparatedArray {
-                        "separators": Array [
-                          Separator {
-                            "left": " ",
-                            "right": " ",
-                            "separator": "+",
-                          },
-                        ],
-                        "values": Array [
-                          SqlColumn {
-                            "keywords": Object {},
-                            "parens": undefined,
-                            "refName": RefName {
-                              "name": "A",
-                              "quotes": false,
-                            },
-                            "spacing": Object {},
-                            "table": undefined,
-                            "type": "column",
-                          },
-                          SqlColumn {
-                            "keywords": Object {},
-                            "parens": undefined,
-                            "refName": RefName {
-                              "name": "B",
-                              "quotes": false,
-                            },
-                            "spacing": Object {},
-                            "table": undefined,
-                            "type": "column",
-                          },
-                        ],
+          SqlMulti {
+            "args": SeparatedArray {
+              "separators": Array [
+                Separator {
+                  "left": " ",
+                  "right": " ",
+                  "separator": "OR",
+                },
+              ],
+              "values": Array [
+                SqlMulti {
+                  "args": SeparatedArray {
+                    "separators": Array [
+                      Separator {
+                        "left": " ",
+                        "right": " ",
+                        "separator": "AND",
                       },
-                      "keywords": Object {},
-                      "op": "+",
-                      "parens": undefined,
-                      "spacing": Object {},
-                      "type": "multi",
-                    },
-                    "op": ">",
-                    "parens": undefined,
-                    "rhs": SqlColumn {
-                      "keywords": Object {},
-                      "parens": undefined,
-                      "refName": RefName {
-                        "name": "C",
-                        "quotes": false,
+                    ],
+                    "values": Array [
+                      SqlComparison {
+                        "decorator": undefined,
+                        "keywords": Object {
+                          "op": ">",
+                        },
+                        "lhs": SqlMulti {
+                          "args": SeparatedArray {
+                            "separators": Array [
+                              Separator {
+                                "left": " ",
+                                "right": " ",
+                                "separator": "+",
+                              },
+                            ],
+                            "values": Array [
+                              SqlColumn {
+                                "keywords": Object {},
+                                "parens": undefined,
+                                "refName": RefName {
+                                  "name": "A",
+                                  "quotes": false,
+                                },
+                                "spacing": Object {},
+                                "table": undefined,
+                                "type": "column",
+                              },
+                              SqlColumn {
+                                "keywords": Object {},
+                                "parens": undefined,
+                                "refName": RefName {
+                                  "name": "B",
+                                  "quotes": false,
+                                },
+                                "spacing": Object {},
+                                "table": undefined,
+                                "type": "column",
+                              },
+                            ],
+                          },
+                          "keywords": Object {},
+                          "op": "+",
+                          "parens": undefined,
+                          "spacing": Object {},
+                          "type": "multi",
+                        },
+                        "op": ">",
+                        "parens": undefined,
+                        "rhs": SqlColumn {
+                          "keywords": Object {},
+                          "parens": undefined,
+                          "refName": RefName {
+                            "name": "C",
+                            "quotes": false,
+                          },
+                          "spacing": Object {},
+                          "table": undefined,
+                          "type": "column",
+                        },
+                        "spacing": Object {
+                          "postOp": " ",
+                          "preOp": " ",
+                        },
+                        "type": "comparison",
                       },
-                      "spacing": Object {},
-                      "table": undefined,
-                      "type": "column",
-                    },
-                    "spacing": Object {
-                      "postOp": " ",
-                      "preOp": " ",
-                    },
-                    "type": "comparison",
+                      SqlColumn {
+                        "keywords": Object {},
+                        "parens": undefined,
+                        "refName": RefName {
+                          "name": "D",
+                          "quotes": false,
+                        },
+                        "spacing": Object {},
+                        "table": undefined,
+                        "type": "column",
+                      },
+                    ],
                   },
-                  SqlColumn {
-                    "keywords": Object {},
-                    "parens": undefined,
-                    "refName": RefName {
-                      "name": "D",
-                      "quotes": false,
-                    },
-                    "spacing": Object {},
-                    "table": undefined,
-                    "type": "column",
+                  "keywords": Object {},
+                  "op": "AND",
+                  "parens": undefined,
+                  "spacing": Object {},
+                  "type": "multi",
+                },
+                SqlColumn {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "refName": RefName {
+                    "name": "E",
+                    "quotes": false,
                   },
-                ],
-              },
-              "keywords": Object {},
-              "op": "AND",
-              "parens": undefined,
-              "spacing": Object {},
-              "type": "multi",
+                  "spacing": Object {},
+                  "table": undefined,
+                  "type": "column",
+                },
+              ],
             },
-            SqlColumn {
-              "keywords": Object {},
-              "parens": undefined,
-              "refName": RefName {
-                "name": "E",
-                "quotes": false,
-              },
-              "spacing": Object {},
-              "table": undefined,
-              "type": "column",
-            },
-          ],
-        },
-        "keywords": Object {},
-        "op": "OR",
-        "parens": undefined,
-        "spacing": Object {},
-        "type": "multi",
-      }
-    `);
+            "keywords": Object {},
+            "op": "OR",
+            "parens": undefined,
+            "spacing": Object {},
+            "type": "multi",
+          }
+        `);
       });
 
       it('every expression in another order', () => {
@@ -1354,129 +1354,129 @@ describe('SqlMulti', () => {
         backAndForth(sql);
 
         expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlMulti {
-        "args": SeparatedArray {
-          "separators": Array [
-            Separator {
-              "left": " ",
-              "right": " ",
-              "separator": "OR",
-            },
-          ],
-          "values": Array [
-            SqlMulti {
-              "args": SeparatedArray {
-                "separators": Array [
-                  Separator {
-                    "left": " ",
-                    "right": " ",
-                    "separator": "AND",
-                  },
-                ],
-                "values": Array [
-                  SqlColumn {
-                    "keywords": Object {},
-                    "parens": undefined,
-                    "refName": RefName {
-                      "name": "A",
-                      "quotes": false,
-                    },
-                    "spacing": Object {},
-                    "table": undefined,
-                    "type": "column",
-                  },
-                  SqlComparison {
-                    "decorator": undefined,
-                    "keywords": Object {
-                      "op": ">",
-                    },
-                    "lhs": SqlColumn {
-                      "keywords": Object {},
-                      "parens": undefined,
-                      "refName": RefName {
-                        "name": "B",
-                        "quotes": false,
+          SqlMulti {
+            "args": SeparatedArray {
+              "separators": Array [
+                Separator {
+                  "left": " ",
+                  "right": " ",
+                  "separator": "OR",
+                },
+              ],
+              "values": Array [
+                SqlMulti {
+                  "args": SeparatedArray {
+                    "separators": Array [
+                      Separator {
+                        "left": " ",
+                        "right": " ",
+                        "separator": "AND",
                       },
-                      "spacing": Object {},
-                      "table": undefined,
-                      "type": "column",
-                    },
-                    "op": ">",
-                    "parens": undefined,
-                    "rhs": SqlMulti {
-                      "args": SeparatedArray {
-                        "separators": Array [
-                          Separator {
-                            "left": " ",
-                            "right": " ",
-                            "separator": "+",
-                          },
-                        ],
-                        "values": Array [
-                          SqlColumn {
-                            "keywords": Object {},
-                            "parens": undefined,
-                            "refName": RefName {
-                              "name": "C",
-                              "quotes": false,
-                            },
-                            "spacing": Object {},
-                            "table": undefined,
-                            "type": "column",
-                          },
-                          SqlColumn {
-                            "keywords": Object {},
-                            "parens": undefined,
-                            "refName": RefName {
-                              "name": "D",
-                              "quotes": false,
-                            },
-                            "spacing": Object {},
-                            "table": undefined,
-                            "type": "column",
-                          },
-                        ],
+                    ],
+                    "values": Array [
+                      SqlColumn {
+                        "keywords": Object {},
+                        "parens": undefined,
+                        "refName": RefName {
+                          "name": "A",
+                          "quotes": false,
+                        },
+                        "spacing": Object {},
+                        "table": undefined,
+                        "type": "column",
                       },
-                      "keywords": Object {},
-                      "op": "+",
-                      "parens": undefined,
-                      "spacing": Object {},
-                      "type": "multi",
-                    },
-                    "spacing": Object {
-                      "postOp": " ",
-                      "preOp": " ",
-                    },
-                    "type": "comparison",
+                      SqlComparison {
+                        "decorator": undefined,
+                        "keywords": Object {
+                          "op": ">",
+                        },
+                        "lhs": SqlColumn {
+                          "keywords": Object {},
+                          "parens": undefined,
+                          "refName": RefName {
+                            "name": "B",
+                            "quotes": false,
+                          },
+                          "spacing": Object {},
+                          "table": undefined,
+                          "type": "column",
+                        },
+                        "op": ">",
+                        "parens": undefined,
+                        "rhs": SqlMulti {
+                          "args": SeparatedArray {
+                            "separators": Array [
+                              Separator {
+                                "left": " ",
+                                "right": " ",
+                                "separator": "+",
+                              },
+                            ],
+                            "values": Array [
+                              SqlColumn {
+                                "keywords": Object {},
+                                "parens": undefined,
+                                "refName": RefName {
+                                  "name": "C",
+                                  "quotes": false,
+                                },
+                                "spacing": Object {},
+                                "table": undefined,
+                                "type": "column",
+                              },
+                              SqlColumn {
+                                "keywords": Object {},
+                                "parens": undefined,
+                                "refName": RefName {
+                                  "name": "D",
+                                  "quotes": false,
+                                },
+                                "spacing": Object {},
+                                "table": undefined,
+                                "type": "column",
+                              },
+                            ],
+                          },
+                          "keywords": Object {},
+                          "op": "+",
+                          "parens": undefined,
+                          "spacing": Object {},
+                          "type": "multi",
+                        },
+                        "spacing": Object {
+                          "postOp": " ",
+                          "preOp": " ",
+                        },
+                        "type": "comparison",
+                      },
+                    ],
                   },
-                ],
-              },
-              "keywords": Object {},
-              "op": "AND",
-              "parens": undefined,
-              "spacing": Object {},
-              "type": "multi",
+                  "keywords": Object {},
+                  "op": "AND",
+                  "parens": undefined,
+                  "spacing": Object {},
+                  "type": "multi",
+                },
+                SqlColumn {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "refName": RefName {
+                    "name": "E",
+                    "quotes": false,
+                  },
+                  "spacing": Object {},
+                  "table": undefined,
+                  "type": "column",
+                },
+              ],
             },
-            SqlColumn {
-              "keywords": Object {},
-              "parens": undefined,
-              "refName": RefName {
-                "name": "E",
-                "quotes": false,
-              },
-              "spacing": Object {},
-              "table": undefined,
-              "type": "column",
-            },
-          ],
-        },
-        "keywords": Object {},
-        "op": "OR",
-        "parens": undefined,
-        "spacing": Object {},
-        "type": "multi",
-      }
-    `);
+            "keywords": Object {},
+            "op": "OR",
+            "parens": undefined,
+            "spacing": Object {},
+            "type": "multi",
+          }
+        `);
       });
     });
 
@@ -1487,63 +1487,63 @@ describe('SqlMulti', () => {
         backAndForth(sql);
 
         expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlMulti {
-        "args": SeparatedArray {
-          "separators": Array [
-            Separator {
-              "left": " ",
-              "right": " ",
-              "separator": "OR",
+          SqlMulti {
+            "args": SeparatedArray {
+              "separators": Array [
+                Separator {
+                  "left": " ",
+                  "right": " ",
+                  "separator": "OR",
+                },
+                Separator {
+                  "left": " ",
+                  "right": " ",
+                  "separator": "OR",
+                },
+              ],
+              "values": Array [
+                SqlColumn {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "refName": RefName {
+                    "name": "A",
+                    "quotes": false,
+                  },
+                  "spacing": Object {},
+                  "table": undefined,
+                  "type": "column",
+                },
+                SqlColumn {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "refName": RefName {
+                    "name": "B",
+                    "quotes": false,
+                  },
+                  "spacing": Object {},
+                  "table": undefined,
+                  "type": "column",
+                },
+                SqlColumn {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "refName": RefName {
+                    "name": "C",
+                    "quotes": false,
+                  },
+                  "spacing": Object {},
+                  "table": undefined,
+                  "type": "column",
+                },
+              ],
             },
-            Separator {
-              "left": " ",
-              "right": " ",
-              "separator": "OR",
-            },
-          ],
-          "values": Array [
-            SqlColumn {
-              "keywords": Object {},
-              "parens": undefined,
-              "refName": RefName {
-                "name": "A",
-                "quotes": false,
-              },
-              "spacing": Object {},
-              "table": undefined,
-              "type": "column",
-            },
-            SqlColumn {
-              "keywords": Object {},
-              "parens": undefined,
-              "refName": RefName {
-                "name": "B",
-                "quotes": false,
-              },
-              "spacing": Object {},
-              "table": undefined,
-              "type": "column",
-            },
-            SqlColumn {
-              "keywords": Object {},
-              "parens": undefined,
-              "refName": RefName {
-                "name": "C",
-                "quotes": false,
-              },
-              "spacing": Object {},
-              "table": undefined,
-              "type": "column",
-            },
-          ],
-        },
-        "keywords": Object {},
-        "op": "OR",
-        "parens": undefined,
-        "spacing": Object {},
-        "type": "multi",
-      }
-    `);
+            "keywords": Object {},
+            "op": "OR",
+            "parens": undefined,
+            "spacing": Object {},
+            "type": "multi",
+          }
+        `);
       });
 
       it('multiple ANDs and ORs', () => {
@@ -1552,121 +1552,121 @@ describe('SqlMulti', () => {
         backAndForth(sql);
 
         expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlMulti {
-        "args": SeparatedArray {
-          "separators": Array [
-            Separator {
-              "left": " ",
-              "right": " ",
-              "separator": "OR",
+          SqlMulti {
+            "args": SeparatedArray {
+              "separators": Array [
+                Separator {
+                  "left": " ",
+                  "right": " ",
+                  "separator": "OR",
+                },
+                Separator {
+                  "left": " ",
+                  "right": " ",
+                  "separator": "OR",
+                },
+              ],
+              "values": Array [
+                SqlMulti {
+                  "args": SeparatedArray {
+                    "separators": Array [
+                      Separator {
+                        "left": " ",
+                        "right": " ",
+                        "separator": "AND",
+                      },
+                    ],
+                    "values": Array [
+                      SqlColumn {
+                        "keywords": Object {},
+                        "parens": undefined,
+                        "refName": RefName {
+                          "name": "A",
+                          "quotes": false,
+                        },
+                        "spacing": Object {},
+                        "table": undefined,
+                        "type": "column",
+                      },
+                      SqlColumn {
+                        "keywords": Object {},
+                        "parens": undefined,
+                        "refName": RefName {
+                          "name": "B",
+                          "quotes": false,
+                        },
+                        "spacing": Object {},
+                        "table": undefined,
+                        "type": "column",
+                      },
+                    ],
+                  },
+                  "keywords": Object {},
+                  "op": "AND",
+                  "parens": undefined,
+                  "spacing": Object {},
+                  "type": "multi",
+                },
+                SqlMulti {
+                  "args": SeparatedArray {
+                    "separators": Array [
+                      Separator {
+                        "left": " ",
+                        "right": " ",
+                        "separator": "AND",
+                      },
+                    ],
+                    "values": Array [
+                      SqlColumn {
+                        "keywords": Object {},
+                        "parens": undefined,
+                        "refName": RefName {
+                          "name": "C",
+                          "quotes": false,
+                        },
+                        "spacing": Object {},
+                        "table": undefined,
+                        "type": "column",
+                      },
+                      SqlColumn {
+                        "keywords": Object {},
+                        "parens": undefined,
+                        "refName": RefName {
+                          "name": "D",
+                          "quotes": false,
+                        },
+                        "spacing": Object {},
+                        "table": undefined,
+                        "type": "column",
+                      },
+                    ],
+                  },
+                  "keywords": Object {},
+                  "op": "AND",
+                  "parens": undefined,
+                  "spacing": Object {},
+                  "type": "multi",
+                },
+                SqlColumn {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "refName": RefName {
+                    "name": "E",
+                    "quotes": false,
+                  },
+                  "spacing": Object {},
+                  "table": undefined,
+                  "type": "column",
+                },
+              ],
             },
-            Separator {
-              "left": " ",
-              "right": " ",
-              "separator": "OR",
-            },
-          ],
-          "values": Array [
-            SqlMulti {
-              "args": SeparatedArray {
-                "separators": Array [
-                  Separator {
-                    "left": " ",
-                    "right": " ",
-                    "separator": "AND",
-                  },
-                ],
-                "values": Array [
-                  SqlColumn {
-                    "keywords": Object {},
-                    "parens": undefined,
-                    "refName": RefName {
-                      "name": "A",
-                      "quotes": false,
-                    },
-                    "spacing": Object {},
-                    "table": undefined,
-                    "type": "column",
-                  },
-                  SqlColumn {
-                    "keywords": Object {},
-                    "parens": undefined,
-                    "refName": RefName {
-                      "name": "B",
-                      "quotes": false,
-                    },
-                    "spacing": Object {},
-                    "table": undefined,
-                    "type": "column",
-                  },
-                ],
-              },
-              "keywords": Object {},
-              "op": "AND",
-              "parens": undefined,
-              "spacing": Object {},
-              "type": "multi",
-            },
-            SqlMulti {
-              "args": SeparatedArray {
-                "separators": Array [
-                  Separator {
-                    "left": " ",
-                    "right": " ",
-                    "separator": "AND",
-                  },
-                ],
-                "values": Array [
-                  SqlColumn {
-                    "keywords": Object {},
-                    "parens": undefined,
-                    "refName": RefName {
-                      "name": "C",
-                      "quotes": false,
-                    },
-                    "spacing": Object {},
-                    "table": undefined,
-                    "type": "column",
-                  },
-                  SqlColumn {
-                    "keywords": Object {},
-                    "parens": undefined,
-                    "refName": RefName {
-                      "name": "D",
-                      "quotes": false,
-                    },
-                    "spacing": Object {},
-                    "table": undefined,
-                    "type": "column",
-                  },
-                ],
-              },
-              "keywords": Object {},
-              "op": "AND",
-              "parens": undefined,
-              "spacing": Object {},
-              "type": "multi",
-            },
-            SqlColumn {
-              "keywords": Object {},
-              "parens": undefined,
-              "refName": RefName {
-                "name": "E",
-                "quotes": false,
-              },
-              "spacing": Object {},
-              "table": undefined,
-              "type": "column",
-            },
-          ],
-        },
-        "keywords": Object {},
-        "op": "OR",
-        "parens": undefined,
-        "spacing": Object {},
-        "type": "multi",
-      }
-    `);
+            "keywords": Object {},
+            "op": "OR",
+            "parens": undefined,
+            "spacing": Object {},
+            "type": "multi",
+          }
+        `);
       });
     });
 
@@ -1675,81 +1675,81 @@ describe('SqlMulti', () => {
         const sql = `(A AND b) OR c`;
 
         expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlMulti {
-        "args": SeparatedArray {
-          "separators": Array [
-            Separator {
-              "left": " ",
-              "right": " ",
-              "separator": "OR",
-            },
-          ],
-          "values": Array [
-            SqlMulti {
-              "args": SeparatedArray {
-                "separators": Array [
-                  Separator {
-                    "left": " ",
-                    "right": " ",
-                    "separator": "AND",
-                  },
-                ],
-                "values": Array [
-                  SqlColumn {
-                    "keywords": Object {},
-                    "parens": undefined,
-                    "refName": RefName {
-                      "name": "A",
-                      "quotes": false,
-                    },
-                    "spacing": Object {},
-                    "table": undefined,
-                    "type": "column",
-                  },
-                  SqlColumn {
-                    "keywords": Object {},
-                    "parens": undefined,
-                    "refName": RefName {
-                      "name": "b",
-                      "quotes": false,
-                    },
-                    "spacing": Object {},
-                    "table": undefined,
-                    "type": "column",
-                  },
-                ],
-              },
-              "keywords": Object {},
-              "op": "AND",
-              "parens": Array [
-                Object {
-                  "leftSpacing": "",
-                  "rightSpacing": "",
+          SqlMulti {
+            "args": SeparatedArray {
+              "separators": Array [
+                Separator {
+                  "left": " ",
+                  "right": " ",
+                  "separator": "OR",
                 },
               ],
-              "spacing": Object {},
-              "type": "multi",
+              "values": Array [
+                SqlMulti {
+                  "args": SeparatedArray {
+                    "separators": Array [
+                      Separator {
+                        "left": " ",
+                        "right": " ",
+                        "separator": "AND",
+                      },
+                    ],
+                    "values": Array [
+                      SqlColumn {
+                        "keywords": Object {},
+                        "parens": undefined,
+                        "refName": RefName {
+                          "name": "A",
+                          "quotes": false,
+                        },
+                        "spacing": Object {},
+                        "table": undefined,
+                        "type": "column",
+                      },
+                      SqlColumn {
+                        "keywords": Object {},
+                        "parens": undefined,
+                        "refName": RefName {
+                          "name": "b",
+                          "quotes": false,
+                        },
+                        "spacing": Object {},
+                        "table": undefined,
+                        "type": "column",
+                      },
+                    ],
+                  },
+                  "keywords": Object {},
+                  "op": "AND",
+                  "parens": Array [
+                    Object {
+                      "leftSpacing": "",
+                      "rightSpacing": "",
+                    },
+                  ],
+                  "spacing": Object {},
+                  "type": "multi",
+                },
+                SqlColumn {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "refName": RefName {
+                    "name": "c",
+                    "quotes": false,
+                  },
+                  "spacing": Object {},
+                  "table": undefined,
+                  "type": "column",
+                },
+              ],
             },
-            SqlColumn {
-              "keywords": Object {},
-              "parens": undefined,
-              "refName": RefName {
-                "name": "c",
-                "quotes": false,
-              },
-              "spacing": Object {},
-              "table": undefined,
-              "type": "column",
-            },
-          ],
-        },
-        "keywords": Object {},
-        "op": "OR",
-        "parens": undefined,
-        "spacing": Object {},
-        "type": "multi",
-      }
-    `);
+            "keywords": Object {},
+            "op": "OR",
+            "parens": undefined,
+            "spacing": Object {},
+            "type": "multi",
+          }
+        `);
 
         backAndForth(sql);
       });
@@ -1758,107 +1758,17 @@ describe('SqlMulti', () => {
         const sql = `((A + b) OR c)`;
 
         expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlMulti {
-        "args": SeparatedArray {
-          "separators": Array [
-            Separator {
-              "left": " ",
-              "right": " ",
-              "separator": "OR",
-            },
-          ],
-          "values": Array [
-            SqlMulti {
-              "args": SeparatedArray {
-                "separators": Array [
-                  Separator {
-                    "left": " ",
-                    "right": " ",
-                    "separator": "+",
-                  },
-                ],
-                "values": Array [
-                  SqlColumn {
-                    "keywords": Object {},
-                    "parens": undefined,
-                    "refName": RefName {
-                      "name": "A",
-                      "quotes": false,
-                    },
-                    "spacing": Object {},
-                    "table": undefined,
-                    "type": "column",
-                  },
-                  SqlColumn {
-                    "keywords": Object {},
-                    "parens": undefined,
-                    "refName": RefName {
-                      "name": "b",
-                      "quotes": false,
-                    },
-                    "spacing": Object {},
-                    "table": undefined,
-                    "type": "column",
-                  },
-                ],
-              },
-              "keywords": Object {},
-              "op": "+",
-              "parens": Array [
-                Object {
-                  "leftSpacing": "",
-                  "rightSpacing": "",
+          SqlMulti {
+            "args": SeparatedArray {
+              "separators": Array [
+                Separator {
+                  "left": " ",
+                  "right": " ",
+                  "separator": "OR",
                 },
               ],
-              "spacing": Object {},
-              "type": "multi",
-            },
-            SqlColumn {
-              "keywords": Object {},
-              "parens": undefined,
-              "refName": RefName {
-                "name": "c",
-                "quotes": false,
-              },
-              "spacing": Object {},
-              "table": undefined,
-              "type": "column",
-            },
-          ],
-        },
-        "keywords": Object {},
-        "op": "OR",
-        "parens": Array [
-          Object {
-            "leftSpacing": "",
-            "rightSpacing": "",
-          },
-        ],
-        "spacing": Object {},
-        "type": "multi",
-      }
-    `);
-
-        backAndForth(sql);
-      });
-
-      it('changing order of operations with NOT', () => {
-        const sql = `NOT NOT (A + b) OR c`;
-
-        expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlMulti {
-        "args": SeparatedArray {
-          "separators": Array [
-            Separator {
-              "left": " ",
-              "right": " ",
-              "separator": "OR",
-            },
-          ],
-          "values": Array [
-            SqlUnary {
-              "argument": SqlUnary {
-                "argument": SqlMulti {
+              "values": Array [
+                SqlMulti {
                   "args": SeparatedArray {
                     "separators": Array [
                       Separator {
@@ -1903,46 +1813,136 @@ describe('SqlMulti', () => {
                   "spacing": Object {},
                   "type": "multi",
                 },
-                "keywords": Object {
+                SqlColumn {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "refName": RefName {
+                    "name": "c",
+                    "quotes": false,
+                  },
+                  "spacing": Object {},
+                  "table": undefined,
+                  "type": "column",
+                },
+              ],
+            },
+            "keywords": Object {},
+            "op": "OR",
+            "parens": Array [
+              Object {
+                "leftSpacing": "",
+                "rightSpacing": "",
+              },
+            ],
+            "spacing": Object {},
+            "type": "multi",
+          }
+        `);
+
+        backAndForth(sql);
+      });
+
+      it('changing order of operations with NOT', () => {
+        const sql = `NOT NOT (A + b) OR c`;
+
+        expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+          SqlMulti {
+            "args": SeparatedArray {
+              "separators": Array [
+                Separator {
+                  "left": " ",
+                  "right": " ",
+                  "separator": "OR",
+                },
+              ],
+              "values": Array [
+                SqlUnary {
+                  "argument": SqlUnary {
+                    "argument": SqlMulti {
+                      "args": SeparatedArray {
+                        "separators": Array [
+                          Separator {
+                            "left": " ",
+                            "right": " ",
+                            "separator": "+",
+                          },
+                        ],
+                        "values": Array [
+                          SqlColumn {
+                            "keywords": Object {},
+                            "parens": undefined,
+                            "refName": RefName {
+                              "name": "A",
+                              "quotes": false,
+                            },
+                            "spacing": Object {},
+                            "table": undefined,
+                            "type": "column",
+                          },
+                          SqlColumn {
+                            "keywords": Object {},
+                            "parens": undefined,
+                            "refName": RefName {
+                              "name": "b",
+                              "quotes": false,
+                            },
+                            "spacing": Object {},
+                            "table": undefined,
+                            "type": "column",
+                          },
+                        ],
+                      },
+                      "keywords": Object {},
+                      "op": "+",
+                      "parens": Array [
+                        Object {
+                          "leftSpacing": "",
+                          "rightSpacing": "",
+                        },
+                      ],
+                      "spacing": Object {},
+                      "type": "multi",
+                    },
+                    "keywords": Object {
+                      "op": "NOT",
+                    },
+                    "op": "NOT",
+                    "parens": undefined,
+                    "spacing": Object {
+                      "postOp": " ",
+                    },
+                    "type": "unary",
+                  },
+                  "keywords": Object {
+                    "op": "NOT",
+                  },
                   "op": "NOT",
+                  "parens": undefined,
+                  "spacing": Object {
+                    "postOp": " ",
+                  },
+                  "type": "unary",
                 },
-                "op": "NOT",
-                "parens": undefined,
-                "spacing": Object {
-                  "postOp": " ",
+                SqlColumn {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "refName": RefName {
+                    "name": "c",
+                    "quotes": false,
+                  },
+                  "spacing": Object {},
+                  "table": undefined,
+                  "type": "column",
                 },
-                "type": "unary",
-              },
-              "keywords": Object {
-                "op": "NOT",
-              },
-              "op": "NOT",
-              "parens": undefined,
-              "spacing": Object {
-                "postOp": " ",
-              },
-              "type": "unary",
+              ],
             },
-            SqlColumn {
-              "keywords": Object {},
-              "parens": undefined,
-              "refName": RefName {
-                "name": "c",
-                "quotes": false,
-              },
-              "spacing": Object {},
-              "table": undefined,
-              "type": "column",
-            },
-          ],
-        },
-        "keywords": Object {},
-        "op": "OR",
-        "parens": undefined,
-        "spacing": Object {},
-        "type": "multi",
-      }
-    `);
+            "keywords": Object {},
+            "op": "OR",
+            "parens": undefined,
+            "spacing": Object {},
+            "type": "multi",
+          }
+        `);
 
         backAndForth(sql);
       });
@@ -2221,170 +2221,170 @@ describe('SqlMulti', () => {
       const sql = `A > 1 AND D OR B OR C`;
 
       expect(SqlExpression.parse(sql).getColumns()).toMatchInlineSnapshot(`
-      Array [
-        SqlColumn {
-          "keywords": Object {},
-          "parens": undefined,
-          "refName": RefName {
-            "name": "A",
-            "quotes": false,
+        Array [
+          SqlColumn {
+            "keywords": Object {},
+            "parens": undefined,
+            "refName": RefName {
+              "name": "A",
+              "quotes": false,
+            },
+            "spacing": Object {},
+            "table": undefined,
+            "type": "column",
           },
-          "spacing": Object {},
-          "table": undefined,
-          "type": "column",
-        },
-        SqlColumn {
-          "keywords": Object {},
-          "parens": undefined,
-          "refName": RefName {
-            "name": "D",
-            "quotes": false,
+          SqlColumn {
+            "keywords": Object {},
+            "parens": undefined,
+            "refName": RefName {
+              "name": "D",
+              "quotes": false,
+            },
+            "spacing": Object {},
+            "table": undefined,
+            "type": "column",
           },
-          "spacing": Object {},
-          "table": undefined,
-          "type": "column",
-        },
-        SqlColumn {
-          "keywords": Object {},
-          "parens": undefined,
-          "refName": RefName {
-            "name": "B",
-            "quotes": false,
+          SqlColumn {
+            "keywords": Object {},
+            "parens": undefined,
+            "refName": RefName {
+              "name": "B",
+              "quotes": false,
+            },
+            "spacing": Object {},
+            "table": undefined,
+            "type": "column",
           },
-          "spacing": Object {},
-          "table": undefined,
-          "type": "column",
-        },
-        SqlColumn {
-          "keywords": Object {},
-          "parens": undefined,
-          "refName": RefName {
-            "name": "C",
-            "quotes": false,
+          SqlColumn {
+            "keywords": Object {},
+            "parens": undefined,
+            "refName": RefName {
+              "name": "C",
+              "quotes": false,
+            },
+            "spacing": Object {},
+            "table": undefined,
+            "type": "column",
           },
-          "spacing": Object {},
-          "table": undefined,
-          "type": "column",
-        },
-      ]
-    `);
+        ]
+      `);
     });
 
     it('includes unary expressions', () => {
       const sql = `A > 1 AND D OR B OR Not C`;
 
       expect(SqlExpression.parse(sql).getColumns()).toMatchInlineSnapshot(`
-      Array [
-        SqlColumn {
-          "keywords": Object {},
-          "parens": undefined,
-          "refName": RefName {
-            "name": "A",
-            "quotes": false,
+        Array [
+          SqlColumn {
+            "keywords": Object {},
+            "parens": undefined,
+            "refName": RefName {
+              "name": "A",
+              "quotes": false,
+            },
+            "spacing": Object {},
+            "table": undefined,
+            "type": "column",
           },
-          "spacing": Object {},
-          "table": undefined,
-          "type": "column",
-        },
-        SqlColumn {
-          "keywords": Object {},
-          "parens": undefined,
-          "refName": RefName {
-            "name": "D",
-            "quotes": false,
+          SqlColumn {
+            "keywords": Object {},
+            "parens": undefined,
+            "refName": RefName {
+              "name": "D",
+              "quotes": false,
+            },
+            "spacing": Object {},
+            "table": undefined,
+            "type": "column",
           },
-          "spacing": Object {},
-          "table": undefined,
-          "type": "column",
-        },
-        SqlColumn {
-          "keywords": Object {},
-          "parens": undefined,
-          "refName": RefName {
-            "name": "B",
-            "quotes": false,
+          SqlColumn {
+            "keywords": Object {},
+            "parens": undefined,
+            "refName": RefName {
+              "name": "B",
+              "quotes": false,
+            },
+            "spacing": Object {},
+            "table": undefined,
+            "type": "column",
           },
-          "spacing": Object {},
-          "table": undefined,
-          "type": "column",
-        },
-        SqlColumn {
-          "keywords": Object {},
-          "parens": undefined,
-          "refName": RefName {
-            "name": "C",
-            "quotes": false,
+          SqlColumn {
+            "keywords": Object {},
+            "parens": undefined,
+            "refName": RefName {
+              "name": "C",
+              "quotes": false,
+            },
+            "spacing": Object {},
+            "table": undefined,
+            "type": "column",
           },
-          "spacing": Object {},
-          "table": undefined,
-          "type": "column",
-        },
-      ]
-    `);
+        ]
+      `);
     });
 
     it('includes unary expressions and nested Multi Expressions', () => {
       const sql = `A > 1 AND D OR B OR Not (C Or E)`;
 
       expect(SqlExpression.parse(sql).getColumns()).toMatchInlineSnapshot(`
-      Array [
-        SqlColumn {
-          "keywords": Object {},
-          "parens": undefined,
-          "refName": RefName {
-            "name": "A",
-            "quotes": false,
+        Array [
+          SqlColumn {
+            "keywords": Object {},
+            "parens": undefined,
+            "refName": RefName {
+              "name": "A",
+              "quotes": false,
+            },
+            "spacing": Object {},
+            "table": undefined,
+            "type": "column",
           },
-          "spacing": Object {},
-          "table": undefined,
-          "type": "column",
-        },
-        SqlColumn {
-          "keywords": Object {},
-          "parens": undefined,
-          "refName": RefName {
-            "name": "D",
-            "quotes": false,
+          SqlColumn {
+            "keywords": Object {},
+            "parens": undefined,
+            "refName": RefName {
+              "name": "D",
+              "quotes": false,
+            },
+            "spacing": Object {},
+            "table": undefined,
+            "type": "column",
           },
-          "spacing": Object {},
-          "table": undefined,
-          "type": "column",
-        },
-        SqlColumn {
-          "keywords": Object {},
-          "parens": undefined,
-          "refName": RefName {
-            "name": "B",
-            "quotes": false,
+          SqlColumn {
+            "keywords": Object {},
+            "parens": undefined,
+            "refName": RefName {
+              "name": "B",
+              "quotes": false,
+            },
+            "spacing": Object {},
+            "table": undefined,
+            "type": "column",
           },
-          "spacing": Object {},
-          "table": undefined,
-          "type": "column",
-        },
-        SqlColumn {
-          "keywords": Object {},
-          "parens": undefined,
-          "refName": RefName {
-            "name": "C",
-            "quotes": false,
+          SqlColumn {
+            "keywords": Object {},
+            "parens": undefined,
+            "refName": RefName {
+              "name": "C",
+              "quotes": false,
+            },
+            "spacing": Object {},
+            "table": undefined,
+            "type": "column",
           },
-          "spacing": Object {},
-          "table": undefined,
-          "type": "column",
-        },
-        SqlColumn {
-          "keywords": Object {},
-          "parens": undefined,
-          "refName": RefName {
-            "name": "E",
-            "quotes": false,
+          SqlColumn {
+            "keywords": Object {},
+            "parens": undefined,
+            "refName": RefName {
+              "name": "E",
+              "quotes": false,
+            },
+            "spacing": Object {},
+            "table": undefined,
+            "type": "column",
           },
-          "spacing": Object {},
-          "table": undefined,
-          "type": "column",
-        },
-      ]
-    `);
+        ]
+      `);
     });
 
     it('concat function', () => {
@@ -2393,63 +2393,63 @@ describe('SqlMulti', () => {
       backAndForth(sql);
 
       expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlMulti {
-        "args": SeparatedArray {
-          "separators": Array [
-            Separator {
-              "left": " ",
-              "right": " ",
-              "separator": "||",
-            },
-            Separator {
-              "left": " ",
-              "right": " ",
-              "separator": "||",
-            },
-          ],
-          "values": Array [
-            SqlColumn {
-              "keywords": Object {},
-              "parens": undefined,
-              "refName": RefName {
-                "name": "A",
-                "quotes": false,
+        SqlMulti {
+          "args": SeparatedArray {
+            "separators": Array [
+              Separator {
+                "left": " ",
+                "right": " ",
+                "separator": "||",
               },
-              "spacing": Object {},
-              "table": undefined,
-              "type": "column",
-            },
-            SqlColumn {
-              "keywords": Object {},
-              "parens": undefined,
-              "refName": RefName {
-                "name": "B",
-                "quotes": false,
+              Separator {
+                "left": " ",
+                "right": " ",
+                "separator": "||",
               },
-              "spacing": Object {},
-              "table": undefined,
-              "type": "column",
-            },
-            SqlColumn {
-              "keywords": Object {},
-              "parens": undefined,
-              "refName": RefName {
-                "name": "C",
-                "quotes": false,
+            ],
+            "values": Array [
+              SqlColumn {
+                "keywords": Object {},
+                "parens": undefined,
+                "refName": RefName {
+                  "name": "A",
+                  "quotes": false,
+                },
+                "spacing": Object {},
+                "table": undefined,
+                "type": "column",
               },
-              "spacing": Object {},
-              "table": undefined,
-              "type": "column",
-            },
-          ],
-        },
-        "keywords": Object {},
-        "op": "||",
-        "parens": undefined,
-        "spacing": Object {},
-        "type": "multi",
-      }
-    `);
+              SqlColumn {
+                "keywords": Object {},
+                "parens": undefined,
+                "refName": RefName {
+                  "name": "B",
+                  "quotes": false,
+                },
+                "spacing": Object {},
+                "table": undefined,
+                "type": "column",
+              },
+              SqlColumn {
+                "keywords": Object {},
+                "parens": undefined,
+                "refName": RefName {
+                  "name": "C",
+                  "quotes": false,
+                },
+                "spacing": Object {},
+                "table": undefined,
+                "type": "column",
+              },
+            ],
+          },
+          "keywords": Object {},
+          "op": "||",
+          "parens": undefined,
+          "spacing": Object {},
+          "type": "multi",
+        }
+      `);
     });
 
     it('IS function', () => {
@@ -2458,39 +2458,39 @@ describe('SqlMulti', () => {
       backAndForth(sql);
 
       expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlComparison {
-        "decorator": undefined,
-        "keywords": Object {
-          "op": "IS",
-        },
-        "lhs": SqlColumn {
-          "keywords": Object {},
-          "parens": undefined,
-          "refName": RefName {
-            "name": "X",
-            "quotes": false,
+        SqlComparison {
+          "decorator": undefined,
+          "keywords": Object {
+            "op": "IS",
           },
-          "spacing": Object {},
-          "table": undefined,
-          "type": "column",
-        },
-        "op": "IS",
-        "parens": undefined,
-        "rhs": SqlLiteral {
-          "keywords": Object {},
+          "lhs": SqlColumn {
+            "keywords": Object {},
+            "parens": undefined,
+            "refName": RefName {
+              "name": "X",
+              "quotes": false,
+            },
+            "spacing": Object {},
+            "table": undefined,
+            "type": "column",
+          },
+          "op": "IS",
           "parens": undefined,
-          "spacing": Object {},
-          "stringValue": "NULL",
-          "type": "literal",
-          "value": null,
-        },
-        "spacing": Object {
-          "postOp": " ",
-          "preOp": " ",
-        },
-        "type": "comparison",
-      }
-    `);
+          "rhs": SqlLiteral {
+            "keywords": Object {},
+            "parens": undefined,
+            "spacing": Object {},
+            "stringValue": "NULL",
+            "type": "literal",
+            "value": null,
+          },
+          "spacing": Object {
+            "postOp": " ",
+            "preOp": " ",
+          },
+          "type": "comparison",
+        }
+      `);
     });
 
     it('IS NOT NULL', () => {
@@ -2499,39 +2499,39 @@ describe('SqlMulti', () => {
       backAndForth(sql);
 
       expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlComparison {
-        "decorator": undefined,
-        "keywords": Object {
-          "op": "IS NOT",
-        },
-        "lhs": SqlColumn {
-          "keywords": Object {},
-          "parens": undefined,
-          "refName": RefName {
-            "name": "X",
-            "quotes": false,
+        SqlComparison {
+          "decorator": undefined,
+          "keywords": Object {
+            "op": "IS NOT",
           },
-          "spacing": Object {},
-          "table": undefined,
-          "type": "column",
-        },
-        "op": "IS NOT",
-        "parens": undefined,
-        "rhs": SqlLiteral {
-          "keywords": Object {},
+          "lhs": SqlColumn {
+            "keywords": Object {},
+            "parens": undefined,
+            "refName": RefName {
+              "name": "X",
+              "quotes": false,
+            },
+            "spacing": Object {},
+            "table": undefined,
+            "type": "column",
+          },
+          "op": "IS NOT",
           "parens": undefined,
-          "spacing": Object {},
-          "stringValue": "NULL",
-          "type": "literal",
-          "value": null,
-        },
-        "spacing": Object {
-          "postOp": " ",
-          "preOp": " ",
-        },
-        "type": "comparison",
-      }
-    `);
+          "rhs": SqlLiteral {
+            "keywords": Object {},
+            "parens": undefined,
+            "spacing": Object {},
+            "stringValue": "NULL",
+            "type": "literal",
+            "value": null,
+          },
+          "spacing": Object {
+            "postOp": " ",
+            "preOp": " ",
+          },
+          "type": "comparison",
+        }
+      `);
     });
 
     it('IS NOT TRUE', () => {
@@ -2540,39 +2540,39 @@ describe('SqlMulti', () => {
       backAndForth(sql);
 
       expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlComparison {
-        "decorator": undefined,
-        "keywords": Object {
-          "op": "IS NOT",
-        },
-        "lhs": SqlColumn {
-          "keywords": Object {},
-          "parens": undefined,
-          "refName": RefName {
-            "name": "X",
-            "quotes": false,
+        SqlComparison {
+          "decorator": undefined,
+          "keywords": Object {
+            "op": "IS NOT",
           },
-          "spacing": Object {},
-          "table": undefined,
-          "type": "column",
-        },
-        "op": "IS NOT",
-        "parens": undefined,
-        "rhs": SqlLiteral {
-          "keywords": Object {},
+          "lhs": SqlColumn {
+            "keywords": Object {},
+            "parens": undefined,
+            "refName": RefName {
+              "name": "X",
+              "quotes": false,
+            },
+            "spacing": Object {},
+            "table": undefined,
+            "type": "column",
+          },
+          "op": "IS NOT",
           "parens": undefined,
-          "spacing": Object {},
-          "stringValue": "TRUE",
-          "type": "literal",
-          "value": true,
-        },
-        "spacing": Object {
-          "postOp": " ",
-          "preOp": " ",
-        },
-        "type": "comparison",
-      }
-    `);
+          "rhs": SqlLiteral {
+            "keywords": Object {},
+            "parens": undefined,
+            "spacing": Object {},
+            "stringValue": "TRUE",
+            "type": "literal",
+            "value": true,
+          },
+          "spacing": Object {
+            "postOp": " ",
+            "preOp": " ",
+          },
+          "type": "comparison",
+        }
+      `);
     });
 
     it('nested IS NOT function', () => {
@@ -2581,89 +2581,89 @@ describe('SqlMulti', () => {
       backAndForth(sql);
 
       expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
-      SqlMulti {
-        "args": SeparatedArray {
-          "separators": Array [
-            Separator {
-              "left": " ",
-              "right": " ",
-              "separator": "AND",
-            },
-          ],
-          "values": Array [
-            SqlComparison {
-              "decorator": undefined,
-              "keywords": Object {
+        SqlMulti {
+          "args": SeparatedArray {
+            "separators": Array [
+              Separator {
+                "left": " ",
+                "right": " ",
+                "separator": "AND",
+              },
+            ],
+            "values": Array [
+              SqlComparison {
+                "decorator": undefined,
+                "keywords": Object {
+                  "op": "IS NOT",
+                },
+                "lhs": SqlColumn {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "refName": RefName {
+                    "name": "X",
+                    "quotes": false,
+                  },
+                  "spacing": Object {},
+                  "table": undefined,
+                  "type": "column",
+                },
                 "op": "IS NOT",
-              },
-              "lhs": SqlColumn {
-                "keywords": Object {},
                 "parens": undefined,
-                "refName": RefName {
-                  "name": "X",
-                  "quotes": false,
+                "rhs": SqlLiteral {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "spacing": Object {},
+                  "stringValue": "NULL",
+                  "type": "literal",
+                  "value": null,
                 },
-                "spacing": Object {},
-                "table": undefined,
-                "type": "column",
+                "spacing": Object {
+                  "postOp": " ",
+                  "preOp": " ",
+                },
+                "type": "comparison",
               },
-              "op": "IS NOT",
-              "parens": undefined,
-              "rhs": SqlLiteral {
-                "keywords": Object {},
-                "parens": undefined,
-                "spacing": Object {},
-                "stringValue": "NULL",
-                "type": "literal",
-                "value": null,
-              },
-              "spacing": Object {
-                "postOp": " ",
-                "preOp": " ",
-              },
-              "type": "comparison",
-            },
-            SqlComparison {
-              "decorator": undefined,
-              "keywords": Object {
+              SqlComparison {
+                "decorator": undefined,
+                "keywords": Object {
+                  "op": "<>",
+                },
+                "lhs": SqlColumn {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "refName": RefName {
+                    "name": "X",
+                    "quotes": false,
+                  },
+                  "spacing": Object {},
+                  "table": undefined,
+                  "type": "column",
+                },
                 "op": "<>",
-              },
-              "lhs": SqlColumn {
-                "keywords": Object {},
                 "parens": undefined,
-                "refName": RefName {
-                  "name": "X",
-                  "quotes": false,
+                "rhs": SqlLiteral {
+                  "keywords": Object {},
+                  "parens": undefined,
+                  "spacing": Object {},
+                  "stringValue": "''",
+                  "type": "literal",
+                  "value": "",
                 },
-                "spacing": Object {},
-                "table": undefined,
-                "type": "column",
+                "spacing": Object {
+                  "postOp": " ",
+                  "preOp": " ",
+                },
+                "type": "comparison",
               },
-              "op": "<>",
-              "parens": undefined,
-              "rhs": SqlLiteral {
-                "keywords": Object {},
-                "parens": undefined,
-                "spacing": Object {},
-                "stringValue": "''",
-                "type": "literal",
-                "value": "",
-              },
-              "spacing": Object {
-                "postOp": " ",
-                "preOp": " ",
-              },
-              "type": "comparison",
-            },
-          ],
-        },
-        "keywords": Object {},
-        "op": "AND",
-        "parens": undefined,
-        "spacing": Object {},
-        "type": "multi",
-      }
-    `);
+            ],
+          },
+          "keywords": Object {},
+          "op": "AND",
+          "parens": undefined,
+          "spacing": Object {},
+          "type": "multi",
+        }
+      `);
     });
   });
 

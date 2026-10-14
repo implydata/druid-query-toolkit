@@ -98,6 +98,7 @@ describe('SqlWindowSpec', () => {
                     "type": "column",
                   },
                   "keywords": Object {},
+                  "nulls": undefined,
                   "parens": undefined,
                   "spacing": Object {},
                   "type": "orderByExpression",

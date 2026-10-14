@@ -31,6 +31,35 @@ describe('SqlOrderByExpression', () => {
       expect(orderBy('x desc').direction).toEqual('DESC');
       expect(orderBy('x').direction).toBeUndefined();
     });
+
+    it('round trips with NULLS FIRST and NULLS LAST', () => {
+      backAndForth('SELECT * FROM t ORDER BY x NULLS FIRST', SqlQuery);
+      backAndForth('SELECT * FROM t ORDER BY x DESC NULLS LAST, y', SqlQuery);
+      backAndForth('SELECT * FROM t ORDER BY x  asc  nulls  /* c */  last', SqlQuery);
+      backAndForth(
+        'SELECT x, ROW_NUMBER() OVER (PARTITION BY y ORDER BY z DESC NULLS FIRST) FROM t',
+        SqlQuery,
+      );
+    });
+
+    it('normalizes the nulls placement', () => {
+      expect(orderBy('x nulls first').nulls).toEqual('FIRST');
+      expect(orderBy('x DESC Nulls Last').nulls).toEqual('LAST');
+      expect(orderBy('x DESC').nulls).toBeUndefined();
+    });
+
+    it('still parses a column named nulls', () => {
+      backAndForth('SELECT * FROM t ORDER BY nulls DESC NULLS LAST', SqlQuery);
+      expect(orderBy('nulls').nulls).toBeUndefined();
+    });
+  });
+
+  describe('does not parse', () => {
+    it('fails on an incomplete or misplaced NULLS', () => {
+      expect(() => SqlQuery.parse('SELECT * FROM t ORDER BY x NULLS')).toThrow();
+      expect(() => SqlQuery.parse('SELECT * FROM t ORDER BY x NULLS FIRST DESC')).toThrow();
+      expect(() => SqlQuery.parse('SELECT * FROM t ORDER BY x NULLSFIRST')).toThrow();
+    });
   });
 
   describe('.create', () => {
@@ -39,6 +68,22 @@ describe('SqlOrderByExpression', () => {
       expect(String(SqlOrderByExpression.create(SqlColumn.create('x'), 'DESC'))).toEqual(
         '"x" DESC',
       );
+    });
+
+    it('creates an expression with a nulls placement', () => {
+      expect(String(SqlOrderByExpression.create(SqlColumn.create('x'), 'DESC', 'LAST'))).toEqual(
+        '"x" DESC NULLS LAST',
+      );
+
+      expect(
+        String(SqlOrderByExpression.create(SqlColumn.create('x'), undefined, 'FIRST')),
+      ).toEqual('"x" NULLS FIRST');
+    });
+
+    it('throws on an invalid nulls placement', () => {
+      expect(() =>
+        SqlOrderByExpression.create(SqlColumn.create('x'), 'ASC', 'MIDDLE' as any),
+      ).toThrow('invalid nulls MIDDLE');
     });
 
     it('throws on an invalid direction', () => {
@@ -64,6 +109,12 @@ describe('SqlOrderByExpression', () => {
         'y + 1  desc',
       );
     });
+
+    it('keeps the nulls placement', () => {
+      expect(
+        String(orderBy('x desc  nulls last').changeExpression(SqlExpression.parse('y'))),
+      ).toEqual('y desc  nulls last');
+    });
   });
 
   describe('#changeDirection', () => {
@@ -76,6 +127,33 @@ describe('SqlOrderByExpression', () => {
 
       expect(String(ex)).toEqual('x');
       expect(ex.direction).toBeUndefined();
+    });
+
+    it('keeps the nulls placement', () => {
+      expect(String(orderBy('x  desc  nulls last').changeDirection('ASC'))).toEqual(
+        'x  ASC  nulls last',
+      );
+
+      expect(String(orderBy('x desc nulls last').changeDirection(undefined))).toEqual(
+        'x nulls last',
+      );
+    });
+  });
+
+  describe('#changeNulls', () => {
+    it('adds a nulls placement', () => {
+      expect(String(orderBy('x desc').changeNulls('FIRST'))).toEqual('x desc NULLS FIRST');
+    });
+
+    it('changes the nulls placement and resets the keyword', () => {
+      expect(String(orderBy('x  nulls  first').changeNulls('LAST'))).toEqual('x  NULLS LAST');
+    });
+
+    it('removes the nulls placement and the space before it', () => {
+      const ex = orderBy('x DESC  NULLS FIRST').changeNulls(undefined);
+
+      expect(String(ex)).toEqual('x DESC');
+      expect(ex.nulls).toBeUndefined();
     });
   });
 
@@ -104,6 +182,11 @@ describe('SqlOrderByExpression', () => {
       expect(String(SqlOrderByExpression.create(x, 'ASC').reverseDirection())).toEqual('x DESC');
 
       expect(String(SqlOrderByExpression.create(x).reverseDirection())).toEqual('x DESC');
+    });
+
+    it('flips the nulls placement when there is one', () => {
+      expect(String(orderBy('x DESC NULLS LAST').reverseDirection())).toEqual('x ASC NULLS FIRST');
+      expect(String(orderBy('x NULLS FIRST').reverseDirection())).toEqual('x DESC NULLS LAST');
     });
   });
 

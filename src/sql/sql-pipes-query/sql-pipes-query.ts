@@ -22,6 +22,7 @@ import {
   Separator,
   SPACE,
 } from '../helpers';
+import { SqlAlias } from '../sql-alias/sql-alias';
 import type { KeywordName, SpaceName, SqlTypeDesignator, Substitutor } from '../sql-base';
 import { SqlBase } from '../sql-base';
 import type {
@@ -524,6 +525,17 @@ function getGroupKeys(groupByClause: SqlGroupByClause | undefined): SqlExpressio
 }
 
 /**
+ * Standard SQL has no aliases in GROUP BY, the aliased keys are in the select list instead.
+ */
+function removeGroupByAliases(groupByClause: SqlGroupByClause): SqlGroupByClause {
+  const { expressions } = groupByClause;
+  if (!expressions?.values.some(ex => ex instanceof SqlAlias)) return groupByClause;
+  return groupByClause.changeExpressions(
+    expressions.map(ex => (ex instanceof SqlAlias ? ex.expression : ex)),
+  );
+}
+
+/**
  * The names of the output columns of a query, when they can be told from the query alone.
  */
 function getOutputNames(query: SqlQuery): string[] | undefined {
@@ -621,7 +633,9 @@ function applyPipeOperator(query: SqlQuery, pipeOperator: SqlPipeOperator, gap: 
       pick(starQuery.spacing, ['postSelect']),
     );
     if (!groupByClause) return aggregateQuery;
-    return aggregateQuery.changeGroupByClause(groupByClause).changeSpace('preGroupByClause', gap);
+    return aggregateQuery
+      .changeGroupByClause(removeGroupByAliases(groupByClause))
+      .changeSpace('preGroupByClause', gap);
   }
 
   if (pipeOperator instanceof SqlOrderByPipeOperator) {

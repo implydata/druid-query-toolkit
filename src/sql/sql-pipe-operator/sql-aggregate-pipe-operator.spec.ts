@@ -15,6 +15,7 @@
 import type { SqlPipesQuery } from '../..';
 import {
   SqlAggregatePipeOperator,
+  SqlAlias,
   SqlColumn,
   SqlExpression,
   SqlFunction,
@@ -36,6 +37,9 @@ describe('SqlAggregatePipeOperator', () => {
       `|> aggregate  SUM(a) AS s ,  MAX(b) AS m\n  group by  c`,
       `|> AGGREGATE\n  SUM(x) FILTER (WHERE d >= TIMESTAMP '2026-01-01') AS cur,\n  COUNT(*) AS n\nGROUP BY site`,
       `|> AGGREGATE COUNT(*) GROUP BY ()`,
+      `|> AGGREGATE COUNT(*) AS n GROUP BY item AS i`,
+      `|> AGGREGATE COUNT(*) AS n GROUP BY item i, b`,
+      `|> AGGREGATE GROUP BY UPPER(item)  as  "Item"`,
     ])('does back and forth with %s', sql => {
       backAndForthPipeOperator(sql, SqlAggregatePipeOperator);
     });
@@ -137,10 +141,31 @@ describe('SqlAggregatePipeOperator', () => {
         }
       `);
     });
+
+    it('keeps the aliases of the grouping keys', () => {
+      const expressions = parseOperator(`|> AGGREGATE COUNT(*) GROUP BY UPPER(a) AS u, b`)
+        .groupByClause!.expressions!.values;
+
+      expect(expressions[0]).toBeInstanceOf(SqlAlias);
+      expect((expressions[0] as SqlAlias).getAliasName()).toEqual('u');
+      expect(expressions[1]).toBeInstanceOf(SqlColumn);
+    });
+
+    it('parses a group by without aliases like a standard one', () => {
+      const groupByClause = parseOperator(`|> AGGREGATE COUNT(*) GROUP BY (a, b)`).groupByClause!;
+
+      expect(groupByClause.innerParens).toEqual(true);
+      expect(groupByClause.expressions!.values.map(String)).toEqual(['a', 'b']);
+    });
   });
 
   describe('does not parse', () => {
-    it.each([`FROM t |> AGGREGATE`, `FROM t |> AGGREGATE GROUP BY`])('rejects %s', sql => {
+    it.each([
+      `FROM t |> AGGREGATE`,
+      `FROM t |> AGGREGATE GROUP BY`,
+      `FROM t |> AGGREGATE COUNT(*) GROUP BY a AS x (c)`,
+      `FROM t |> AGGREGATE COUNT(*) GROUP BY (a + 1) AS x, ()`,
+    ])('rejects %s', sql => {
       expect(() => SqlExpression.parse(sql)).toThrow('Expected');
     });
   });
@@ -153,6 +178,15 @@ describe('SqlAggregatePipeOperator', () => {
           [SqlColumn.create('a')],
         ).toString(),
       ).toEqual(`|> AGGREGATE COUNT(*) AS "c" GROUP BY "a"`);
+    });
+
+    it('works with aliased grouping keys', () => {
+      expect(
+        SqlAggregatePipeOperator.create(
+          [SqlFunction.count().as('c')],
+          [SqlColumn.create('a').as('k')],
+        ).toString(),
+      ).toEqual(`|> AGGREGATE COUNT(*) AS "c" GROUP BY "a" AS "k"`);
     });
 
     it('works with only a group by clause', () => {

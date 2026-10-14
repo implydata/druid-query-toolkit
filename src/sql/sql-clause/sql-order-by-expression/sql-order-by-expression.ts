@@ -19,18 +19,26 @@ import { SqlLiteral } from '../../sql-literal/sql-literal';
 
 export type SqlOrderByDirection = 'ASC' | 'DESC';
 
+export type SqlOrderByNulls = 'FIRST' | 'LAST';
+
 export interface SqlOrderByExpressionValue extends SqlBaseValue {
   expression: SqlExpression;
   direction?: SqlOrderByDirection;
+  nulls?: SqlOrderByNulls;
 }
 
 export class SqlOrderByExpression extends SqlBase {
   static type: SqlTypeDesignator = 'orderByExpression';
 
-  static create(expression: SqlExpression, direction?: SqlOrderByDirection) {
+  static create(
+    expression: SqlExpression,
+    direction?: SqlOrderByDirection,
+    nulls?: SqlOrderByNulls,
+  ) {
     return new SqlOrderByExpression({
       expression: SqlExpression.verify(expression),
       direction,
+      nulls,
     });
   }
 
@@ -43,6 +51,7 @@ export class SqlOrderByExpression extends SqlBase {
 
   public readonly expression: SqlExpression;
   public readonly direction?: SqlOrderByDirection;
+  public readonly nulls?: SqlOrderByNulls;
 
   constructor(options: SqlOrderByExpressionValue) {
     super(options, SqlOrderByExpression.type);
@@ -55,12 +64,21 @@ export class SqlOrderByExpression extends SqlBase {
         throw new Error(`invalid direction ${direction}`);
       }
     }
+
+    const nulls = options.nulls;
+    this.nulls = nulls;
+    if (nulls) {
+      if (nulls !== 'FIRST' && nulls !== 'LAST') {
+        throw new Error(`invalid nulls ${nulls}`);
+      }
+    }
   }
 
   public valueOf(): SqlOrderByExpressionValue {
     const value = super.valueOf() as SqlOrderByExpressionValue;
     value.expression = this.expression;
     value.direction = this.direction;
+    value.nulls = this.nulls;
     return value;
   }
 
@@ -69,6 +87,10 @@ export class SqlOrderByExpression extends SqlBase {
 
     if (this.direction) {
       rawParts.push(this.getSpace('preDirection'), this.getKeyword('direction', this.direction));
+    }
+
+    if (this.nulls) {
+      rawParts.push(this.getSpace('preNulls'), this.getKeyword('nulls', `NULLS ${this.nulls}`));
     }
 
     return rawParts.join('');
@@ -92,14 +114,33 @@ export class SqlOrderByExpression extends SqlBase {
     return SqlBase.fromValue(value);
   }
 
+  public changeNulls(nulls: SqlOrderByNulls | undefined): this {
+    const value = this.valueOf();
+    if (nulls) {
+      value.nulls = nulls;
+    } else {
+      delete value.nulls;
+      value.spacing = this.getSpacingWithout('preNulls');
+    }
+    value.keywords = this.getKeywordsWithout('nulls');
+    return SqlBase.fromValue(value);
+  }
+
   public getEffectiveDirection(): SqlOrderByDirection {
     const { direction } = this;
     if (!direction) return 'ASC';
     return direction;
   }
 
+  /**
+   * Flips the direction, and the NULLS placement if there is one, so the rows come out in the
+   * exact opposite order
+   */
   public reverseDirection(): this {
-    return this.changeDirection(this.getEffectiveDirection() === 'ASC' ? 'DESC' : 'ASC');
+    const ret = this.changeDirection(this.getEffectiveDirection() === 'ASC' ? 'DESC' : 'ASC');
+    const { nulls } = this;
+    if (!nulls) return ret;
+    return ret.changeNulls(nulls === 'FIRST' ? 'LAST' : 'FIRST');
   }
 
   public _walkInner(

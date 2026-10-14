@@ -47,6 +47,8 @@ Each operator is its own class, all extending `SqlPipeOperator`:
 
 Operators have accessors for their parts, such as `SqlWherePipeOperator#getExpression()` and `#changeExpression(ex)`, `SqlAggregatePipeOperator#getGroupByExpressions()` and `SqlLimitPipeOperator#getLimitValue()`.
 
+Unlike in standard SQL, the `GROUP BY` items of an `|> AGGREGATE` can have aliases (`|> AGGREGATE COUNT(*) AS n GROUP BY UPPER(item) AS i`), which become the names of the grouping columns in the output. They are `SqlAlias` expressions in the `groupByClause`; create them with `.as(...)`, for example `SqlAggregatePipeOperator.create([F.count().as('n')], [F('UPPER', C('item')).as('i')])`. `unpipe()` puts the aliased keys in the select list and groups by the bare expressions.
+
 ## Building
 
 `SqlPipesQuery.create(query, operators)` builds a pipe query. Given a pipe query as the starting point, it appends the operators to it instead of nesting:

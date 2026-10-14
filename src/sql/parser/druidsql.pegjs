@@ -78,7 +78,7 @@ SqlAlias = expression:Expression alias:((_ AsToken)? _ RefNameAlias)? columns:(_
   return new S.SqlAlias(value);
 }
 
-GeneralFunctionArgument = SqlLabeledExpression / SqlAlias
+GeneralFunctionArgument = SqlStar / SqlLabeledExpression / SqlAlias
 
 SqlLabeledExpression = label:RefNameAlias preArrow:_ "=>" postArrow:_ expression:Expression
 {
@@ -778,7 +778,10 @@ OrderByClause = orderBy:OrderByToken postOrderBy:_ head:SqlOrderByExpression tai
   });
 }
 
-SqlOrderByExpression = expression:Expression direction:(_ (AscToken / DescToken))?
+SqlOrderByExpression =
+  expression:Expression
+  direction:(_ (AscToken / DescToken))?
+  nulls:(_ (NullsFirstToken / NullsLastToken))?
 {
   var value = {
     expression: expression,
@@ -790,6 +793,12 @@ SqlOrderByExpression = expression:Expression direction:(_ (AscToken / DescToken)
     spacing.preDirection = direction[0];
     value.direction = direction[1].toUpperCase();
     keywords.direction = direction[1];
+  }
+
+  if (nulls) {
+    spacing.preNulls = nulls[0];
+    value.nulls = /first$/i.test(nulls[1]) ? 'FIRST' : 'LAST';
+    keywords.nulls = nulls[1];
   }
 
   return new S.SqlOrderByExpression(value);
@@ -902,7 +911,7 @@ WherePipeOperator = whereClause:SqlWhereClause
 AggregatePipeOperator =
   aggregate:AggregateToken
   postAggregate:_
-  body:(GroupByClause / (SqlAlias (CommaSeparator SqlAlias)* (_ GroupByClause)?))
+  body:(PipeGroupByClause / (SqlAlias (CommaSeparator SqlAlias)* (_ PipeGroupByClause)?))
 {
   var value = {
     keywords: { aggregate: aggregate },
@@ -920,6 +929,32 @@ AggregatePipeOperator =
   }
 
   return new S.SqlAggregatePipeOperator(value);
+}
+
+// Unlike in standard SQL the GROUP BY items of an AGGREGATE can have aliases. That form is only
+// taken when some item has one, so everything else parses exactly like a standard GROUP BY.
+PipeGroupByClause = AliasedGroupByClause / GroupByClause
+
+AliasedGroupByClause =
+  groupBy:GroupByToken
+  postGroupBy:_
+  head:SqlAlias
+  tail:(CommaSeparator SqlAlias)*
+  &{
+    var expressions = [head].concat(tail.map(function(t) { return t[1]; }));
+    return expressions.some(function(ex) { return ex instanceof S.SqlAlias; }) &&
+      !expressions.some(function(ex) { return ex instanceof S.SqlAlias && ex.columns; });
+  }
+{
+  return new S.SqlGroupByClause({
+    expressions: makeSeparatedArray(head, tail),
+    spacing: {
+      postGroupBy: postGroupBy
+    },
+    keywords: {
+      groupBy: groupBy
+    }
+  });
 }
 
 OrderByPipeOperator = orderByClause:OrderByClause
@@ -1322,7 +1357,6 @@ TimeUnitExtra =
 Function =
   CastFunction
 / GenericFunction
-/ CountStarFunction
 / ExtractFunction
 / TrimFunction
 / FloorCeilFunction
@@ -1403,46 +1437,6 @@ NakedFunction = functionName:UnquotedRefNameFree &{ return S.SqlFunction.isNaked
     functionName: new S.RefName({ name: functionName, quotes: false }),
     specialParen: 'none'
   });
-}
-
-CountStarFunction =
-  functionName:(CountToken / ('"' CountToken '"'))
-  preLeftParen:_
-  OpenParen
-  postLeftParen:_
-  "*"
-  postArguments:_
-  CloseParen
-  filter:(_ FunctionFilter)?
-  window:(_ OverToken _ WindowSpec)?
-{
-  var value = {
-    functionName: makeFunctionName(functionName)
-  };
-  var spacing = value.spacing = {
-    preLeftParen: preLeftParen,
-    postLeftParen: postLeftParen,
-  };
-  var keywords = value.keywords = {};
-
-  value.args = S.SeparatedArray.fromSingleValue(S.SqlStar.PLAIN);
-  spacing.postArguments = postArguments;
-
-  if (filter) {
-    spacing.preFilter = filter[0];
-    keywords.filter = filter[1].filterKeyword;
-    spacing.postFilter = filter[1].postFilter;
-    value.whereClause = filter[1].whereClause;
-  }
-
-  if (window) {
-    spacing.preOver = window[0];
-    keywords.over = window[1];
-    spacing.postOver = window[2];
-    value.windowSpec = window[3];
-  }
-
-  return new S.SqlFunction(value);
 }
 
 CastFunction =
@@ -2175,7 +2169,6 @@ CaseToken = $("CASE"i !IdentifierPart)
 CastToken = $("CAST"i !IdentifierPart)
 CeilToken = $("CEIL"i !IdentifierPart)
 ClusteredByToken = $("CLUSTERED"i __ "BY"i !IdentifierPart)
-CountToken = $("COUNT"i !IdentifierPart)
 CsvToken = $("CSV"i !IdentifierPart)
 CurrentRowToken = $("CURRENT"i __ "ROW"i !IdentifierPart)
 CubeToken = $("CUBE"i !IdentifierPart)
@@ -2213,6 +2206,8 @@ LimitToken = $("LIMIT"i !IdentifierPart)
 NaturalToken = $("NATURAL"i !IdentifierPart)
 NotToken = $("NOT"i !IdentifierPart)
 NullToken = $("NULL"i !IdentifierPart) { return { value: null, stringValue: text() }; }
+NullsFirstToken = $("NULLS"i __ "FIRST"i !IdentifierPart)
+NullsLastToken = $("NULLS"i __ "LAST"i !IdentifierPart)
 OffsetToken = $("OFFSET"i !IdentifierPart)
 OnToken = $("ON"i !IdentifierPart)
 OrToken = $("OR"i !IdentifierPart)
