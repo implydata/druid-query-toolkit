@@ -35,6 +35,10 @@ describe('SqlFunction', () => {
       `"COUNT"(*)`,
       `COUNT(DISTINCT blah)`,
       `COUNT(ALL blah)`,
+      `COUNT( * )`,
+      `COUNT(*) FILTER (WHERE x > 1)`,
+      `FOOBAR(*, "x", *)`,
+      `FOOBAR(t.*, s.t.*)`,
       "position('b' in 'abc')",
       "position('' in 'abc')",
       "position('b' in 'abcabc' FROM 3)",
@@ -85,6 +89,15 @@ describe('SqlFunction', () => {
       `UNNEST(t)`,
     ])('correctly parses: %s', sql => {
       backAndForth(sql, SqlFunction);
+    });
+
+    it('parses a star as an argument to any function', () => {
+      const fn = SqlExpression.parse(`FOOBAR(*, "x", *)`) as SqlFunction;
+      expect(fn.getArgArray().map(arg => arg.constructor.name)).toEqual([
+        'SqlStar',
+        'SqlColumn',
+        'SqlStar',
+      ]);
     });
 
     it('function without args', () => {
