@@ -71,6 +71,13 @@ describe('SqlGroupByClause', () => {
     });
   });
 
+  describe('does not parse', () => {
+    it('rejects an alias, which only a pipe AGGREGATE allows', () => {
+      expect(() => SqlExpression.parse(`SELECT a AS x FROM t GROUP BY a AS x`)).toThrow('Expected');
+      expect(() => SqlExpression.parse(`SELECT a AS x FROM t GROUP BY a x`)).toThrow('Expected');
+    });
+  });
+
   describe('.create', () => {
     it('creates a clause from an array', () => {
       expect(

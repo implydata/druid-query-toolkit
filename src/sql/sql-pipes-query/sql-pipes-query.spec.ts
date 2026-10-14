@@ -493,6 +493,18 @@ describe('SqlPipesQuery', () => {
       ).toEqual(`SELECT a, b, COUNT(*) FROM t GROUP BY GROUPING SETS ((a), (a, b), ())`);
     });
 
+    it('moves the aliases of the grouping keys into the select list', () => {
+      expect(unpipe(`FROM t |> AGGREGATE COUNT(*) AS n GROUP BY UPPER(item) AS i, b`)).toEqual(
+        `SELECT UPPER(item) AS i, b, COUNT(*) AS n FROM t GROUP BY UPPER(item), b`,
+      );
+      expect(unpipe(`FROM t |> AGGREGATE GROUP BY item i`)).toEqual(
+        `SELECT item i FROM t GROUP BY item`,
+      );
+      expect(
+        unpipe(`FROM t |> AGGREGATE COUNT(*) AS n GROUP BY item AS i |> ORDER BY i |> LIMIT 5`),
+      ).toEqual(`SELECT item AS i, COUNT(*) AS n FROM t GROUP BY item ORDER BY i LIMIT 5`);
+    });
+
     it('throws for an AGGREGATE with nothing to output', () => {
       expect(() => unpipe(`FROM t |> AGGREGATE GROUP BY ()`)).toThrow(
         'can not unpipe an |> AGGREGATE that has no aggregates or grouping keys',

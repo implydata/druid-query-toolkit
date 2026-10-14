@@ -911,7 +911,7 @@ WherePipeOperator = whereClause:SqlWhereClause
 AggregatePipeOperator =
   aggregate:AggregateToken
   postAggregate:_
-  body:(GroupByClause / (SqlAlias (CommaSeparator SqlAlias)* (_ GroupByClause)?))
+  body:(PipeGroupByClause / (SqlAlias (CommaSeparator SqlAlias)* (_ PipeGroupByClause)?))
 {
   var value = {
     keywords: { aggregate: aggregate },
@@ -929,6 +929,32 @@ AggregatePipeOperator =
   }
 
   return new S.SqlAggregatePipeOperator(value);
+}
+
+// Unlike in standard SQL the GROUP BY items of an AGGREGATE can have aliases. That form is only
+// taken when some item has one, so everything else parses exactly like a standard GROUP BY.
+PipeGroupByClause = AliasedGroupByClause / GroupByClause
+
+AliasedGroupByClause =
+  groupBy:GroupByToken
+  postGroupBy:_
+  head:SqlAlias
+  tail:(CommaSeparator SqlAlias)*
+  &{
+    var expressions = [head].concat(tail.map(function(t) { return t[1]; }));
+    return expressions.some(function(ex) { return ex instanceof S.SqlAlias; }) &&
+      !expressions.some(function(ex) { return ex instanceof S.SqlAlias && ex.columns; });
+  }
+{
+  return new S.SqlGroupByClause({
+    expressions: makeSeparatedArray(head, tail),
+    spacing: {
+      postGroupBy: postGroupBy
+    },
+    keywords: {
+      groupBy: groupBy
+    }
+  });
 }
 
 OrderByPipeOperator = orderByClause:OrderByClause
