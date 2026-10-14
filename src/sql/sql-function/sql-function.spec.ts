@@ -35,6 +35,10 @@ describe('SqlFunction', () => {
       `"COUNT"(*)`,
       `COUNT(DISTINCT blah)`,
       `COUNT(ALL blah)`,
+      `LOG_SEARCH(*, 'error')`,
+      `log_search( *  ,  'error' )`,
+      `"LOG_SEARCH"(*, 'error')`,
+      `LOG_SEARCH(message, 'error')`,
       "position('b' in 'abc')",
       "position('' in 'abc')",
       "position('b' in 'abcabc' FROM 3)",
@@ -85,6 +89,14 @@ describe('SqlFunction', () => {
       `UNNEST(t)`,
     ])('correctly parses: %s', sql => {
       backAndForth(sql, SqlFunction);
+    });
+
+    it('parses a star as the first argument of LOG_SEARCH', () => {
+      const fn = SqlExpression.parse(`LOG_SEARCH(*, 'error')`) as SqlFunction;
+
+      expect(fn).toBeInstanceOf(SqlFunction);
+      expect(fn.getArg(0)).toBe(SqlStar.PLAIN);
+      expect(String(fn.getArg(1))).toEqual(`'error'`);
     });
 
     it('function without args', () => {

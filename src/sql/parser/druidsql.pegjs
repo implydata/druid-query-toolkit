@@ -1323,6 +1323,7 @@ Function =
   CastFunction
 / GenericFunction
 / CountStarFunction
+/ LogSearchStarFunction
 / ExtractFunction
 / TrimFunction
 / FloorCeilFunction
@@ -1443,6 +1444,27 @@ CountStarFunction =
   }
 
   return new S.SqlFunction(value);
+}
+
+LogSearchStarFunction =
+  functionName:(LogSearchToken / ('"' LogSearchToken '"'))
+  preLeftParen:_
+  OpenParen
+  postLeftParen:_
+  "*"
+  tail:(CommaSeparator GeneralFunctionArgument)*
+  postArguments:_
+  CloseParen
+{
+  return new S.SqlFunction({
+    functionName: makeFunctionName(functionName),
+    args: makeSeparatedArray(S.SqlStar.PLAIN, tail),
+    spacing: {
+      preLeftParen: preLeftParen,
+      postLeftParen: postLeftParen,
+      postArguments: postArguments,
+    }
+  });
 }
 
 CastFunction =
@@ -2210,6 +2232,7 @@ ValueToken = $("VALUE"i !IdentifierPart)
 LeadingToken = $("LEADING"i !IdentifierPart)
 LikeToken = $("LIKE"i !IdentifierPart)
 LimitToken = $("LIMIT"i !IdentifierPart)
+LogSearchToken = $("LOG_SEARCH"i !IdentifierPart)
 NaturalToken = $("NATURAL"i !IdentifierPart)
 NotToken = $("NOT"i !IdentifierPart)
 NullToken = $("NULL"i !IdentifierPart) { return { value: null, stringValue: text() }; }
