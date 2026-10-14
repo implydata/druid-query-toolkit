@@ -1,5 +1,13 @@
 # druid-query-toolkit
 
+## 1.5.0
+
+### Minor Changes
+
+- 6e17528: Support `NULLS FIRST` / `NULLS LAST` in `ORDER BY` (`SqlOrderByExpression#nulls`, `changeNulls`)
+- 6e17528: Allow aliases on the `GROUP BY` items of a `|> AGGREGATE` pipe operator (`GROUP BY UPPER(item) AS i`)
+- 6e17528: Parse `*` (and `t.*`) as an argument to any function, not just `COUNT`
+
 ## 1.4.1
 
 ### Patch Changes
