@@ -297,6 +297,13 @@ _Returns_: `SqlExpression`
 
 `CAST(expression AS type)`.
 
+### expression.access(...path)
+
+`path`: `(string | number)[]`\
+_Returns_: `SqlColonAccess`
+
+Colon access, `expression:a.b[0]`. The expression gets parens unless it is a term. On a `SqlColonAccess` it extends the path (`v:a` becomes `v:a.b`).
+
 ### expression.as(alias, forceQuotes?)
 
 `alias`: `string | RefName`\

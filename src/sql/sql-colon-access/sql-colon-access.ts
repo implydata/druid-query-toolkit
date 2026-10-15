@@ -16,7 +16,9 @@ import { RefName } from '../helpers';
 import type { SqlBaseValue, SqlTypeDesignator, Substitutor } from '../sql-base';
 import { SqlBase } from '../sql-base';
 import { SqlExpression } from '../sql-expression';
+import { SqlFunction } from '../sql-function/sql-function';
 import { SqlLiteral } from '../sql-literal/sql-literal';
+import type { SqlType } from '../sql-type/sql-type';
 
 const SIMPLE_JSON_PATH_NAME = /^[a-z_]\w*$/i;
 
@@ -99,7 +101,8 @@ export interface SqlColonAccessValue extends SqlBaseValue {
 }
 
 /**
- * Colon access, reading a nested field out of a value: `v:a.b['c d'][0]`
+ * Colon access, reading a nested field out of a value: `v:a.b['c d'][0]`. It is sugar for
+ * JSON_VALUE with the matching JSON path (see toJsonValue).
  */
 export class SqlColonAccess extends SqlExpression {
   static type: SqlTypeDesignator = 'colonAccess';
@@ -195,6 +198,22 @@ export class SqlColonAccess extends SqlExpression {
         })
         .join('')
     );
+  }
+
+  /**
+   * The JSON_VALUE call that this colon access is sugar for: `v:a.b` is `JSON_VALUE(v, '$.a.b')`.
+   * Any parens around the base are dropped. Throws when the path has a name containing a quote
+   * (see getJsonPath).
+   */
+  public toJsonValue(returningType?: SqlType | string): SqlExpression {
+    return SqlFunction.jsonValue(this.base.changeParens([]), this.getJsonPath(), returningType);
+  }
+
+  /**
+   * Extends the path, since a colon access can not be followed by another colon
+   */
+  public access(...path: SqlColonAccessPathElement[]): SqlColonAccess {
+    return this.changeSegments(this.segments.concat(SqlColonAccess.pathToSegments(path)));
   }
 
   public _walkInner(

@@ -296,6 +296,45 @@ describe('SqlColonAccess', () => {
     });
   });
 
+  describe('#toJsonValue', () => {
+    it('makes the JSON_VALUE call', () => {
+      expect(String((SqlExpression.parse('v:a.b') as SqlColonAccess).toJsonValue())).toEqual(
+        "JSON_VALUE(v, '$.a.b')",
+      );
+    });
+
+    it('adds the returning type', () => {
+      expect(
+        String((SqlExpression.parse('v:a[0]') as SqlColonAccess).toJsonValue('BIGINT')),
+      ).toEqual("JSON_VALUE(v, '$.a[0]' RETURNING BIGINT)");
+    });
+
+    it('drops the parens around the base', () => {
+      expect(String((SqlExpression.parse('(x + y):a') as SqlColonAccess).toJsonValue())).toEqual(
+        "JSON_VALUE(x + y, '$.a')",
+      );
+    });
+
+    it('throws on a name containing a quote', () => {
+      expect(() => (SqlExpression.parse("v:['it''s']") as SqlColonAccess).toJsonValue()).toThrow(
+        "can not make a JSON path for a name containing a quote: it's",
+      );
+    });
+  });
+
+  describe('#access', () => {
+    it('extends the path instead of adding a second colon', () => {
+      const access = SqlExpression.parse('v : a [ 0 ]') as SqlColonAccess;
+      expect(String(access.access('b', 1))).toEqual('v : a [ 0 ].b[1]');
+      expect(String(SqlColumn.create('v').access('a').access('b'))).toEqual('"v":a.b');
+    });
+
+    it('rejects an empty path', () => {
+      const access = SqlExpression.parse('v:a') as SqlColonAccess;
+      expect(() => access.access()).toThrow('colon access path must have at least one element');
+    });
+  });
+
   describe('#walk', () => {
     it('walks into the base but not the segments', () => {
       const access = SqlExpression.parse('v:a.b');
