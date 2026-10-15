@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { SqlExpression, SqlKeyValue, SqlLiteral } from '../..';
+import { SqlColonAccess, SqlColumn, SqlExpression, SqlKeyValue, SqlLiteral } from '../..';
 import { backAndForth } from '../../test-utils';
 
 describe('SqlKeyValue', () => {
@@ -40,6 +40,33 @@ describe('SqlKeyValue', () => {
 
       expect(keyValue.toString()).toEqual("'x':'y'");
     });
+
+    it('adds parens to a key that would not parse back', () => {
+      const access = SqlColonAccess.create(SqlColumn.optionalQuotes('v'), ['a']);
+
+      expect(SqlKeyValue.short(access, 1).toString()).toEqual('(v:a):1');
+      expect(SqlKeyValue.short(SqlExpression.parse('a + b'), 1).toString()).toEqual('(a + b):1');
+      expect(SqlKeyValue.short(SqlExpression.parse("'a' || v:b"), 1).toString()).toEqual(
+        "('a' || v:b):1",
+      );
+      expect(SqlKeyValue.short(SqlExpression.parse("'a' || b"), 1).toString()).toEqual(
+        "'a' || b:1",
+      );
+    });
+  });
+
+  describe('.ensureShortKey', () => {
+    it('keeps a key that parses back as a short key', () => {
+      const key = SqlExpression.parse("'a' || F(b) || (v:c)");
+      expect(SqlKeyValue.ensureShortKey(key)).toBe(key);
+    });
+
+    it('adds parens to any other key', () => {
+      expect(SqlKeyValue.ensureShortKey(SqlExpression.parse('v:a')).toString()).toEqual('(v:a)');
+      expect(SqlKeyValue.ensureShortKey(SqlExpression.parse('a = b')).toString()).toEqual(
+        '(a = b)',
+      );
+    });
   });
 
   describe('#changeKey', () => {
@@ -48,6 +75,15 @@ describe('SqlKeyValue', () => {
 
       const changed = keyValue.changeKey(SqlLiteral.create('z'));
       expect(changed.toString()).toEqual("KEY 'z' VALUE 'y'");
+    });
+
+    it('adds parens to a short key that would not parse back', () => {
+      const keyValue = SqlKeyValue.short(SqlLiteral.create('x'), SqlLiteral.create('y'));
+
+      expect(keyValue.changeKey(SqlExpression.parse('v:a')).toString()).toEqual("(v:a):'y'");
+      expect(keyValue.changeShort(false).changeKey(SqlExpression.parse('v:a')).toString()).toEqual(
+        "KEY v:a VALUE 'y'",
+      );
     });
   });
 
@@ -73,6 +109,12 @@ describe('SqlKeyValue', () => {
 
       expect(keyValue.changeShort(false)).toBe(keyValue);
       expect(keyValue.changeShort(true).changeShort(true).toString()).toEqual("'x':'y'");
+    });
+
+    it('adds parens to a key that would not parse back in short form', () => {
+      const keyValue = SqlKeyValue.create(SqlExpression.parse('v:a'), SqlLiteral.create('y'));
+
+      expect(keyValue.changeShort(true).toString()).toEqual("(v:a):'y'");
     });
 
     it('switches back to longhand and resets the spacing', () => {

@@ -875,6 +875,21 @@ describe('SqlExpression', () => {
     });
   });
 
+  describe('#access', () => {
+    it('makes a colon access', () => {
+      expect(String(SqlColumn.create('fields').access('foo'))).toEqual('"fields":foo');
+      expect(String(x.access('a', 'b c', 0))).toEqual("x:a['b c'][0]");
+    });
+
+    it('adds parens to a base that is not a term', () => {
+      expect(String(x.add(y).access('a'))).toEqual('(x + y):a');
+    });
+
+    it('rejects an empty path', () => {
+      expect(() => x.access()).toThrow('colon access path must have at least one element');
+    });
+  });
+
   describe('#addFilterToAggregations', () => {
     const knownAggregates = ['COUNT', 'SUM', 'MIN'];
     const filter = SqlExpression.parse(`country = 'USA'`);

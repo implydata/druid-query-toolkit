@@ -12,9 +12,17 @@
  * limitations under the License.
  */
 
-import type { LiteralValue, RefName, SqlMultiOp, SqlOrderByDirection, SqlType } from '.';
+import type {
+  LiteralValue,
+  RefName,
+  SqlColonAccessPathElement,
+  SqlMultiOp,
+  SqlOrderByDirection,
+  SqlType,
+} from '.';
 import {
   SqlAlias,
+  SqlColonAccess,
   SqlColumn,
   SqlComparison,
   SqlFunction,
@@ -415,6 +423,15 @@ export abstract class SqlExpression extends SqlBase {
 
   public cast(asType: SqlType | string): SqlExpression {
     return SqlFunction.cast(this, asType);
+  }
+
+  // SqlColonAccess
+
+  /**
+   * Colon access into this expression: `C('v').access('a', 0)` is `"v":a[0]`
+   */
+  public access(...path: SqlColonAccessPathElement[]): SqlColonAccess {
+    return SqlColonAccess.create(this, path);
   }
 
   // Logic

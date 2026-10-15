@@ -297,6 +297,13 @@ _Returns_: `SqlExpression`
 
 `CAST(expression AS type)`.
 
+### expression.access(...path)
+
+`path`: `(string | number)[]`\
+_Returns_: `SqlColonAccess`
+
+Colon access, `expression:a.b[0]`. The expression gets parens unless it is a term. On a `SqlColonAccess` it extends the path (`v:a` becomes `v:a.b`).
+
 ### expression.as(alias, forceQuotes?)
 
 `alias`: `string | RefName`\
@@ -662,7 +669,7 @@ All of these extend [`SqlQueryBase`](#sqlquerybase).
 
 ## Expression classes
 
-The classes an expression parses into, and their own methods, are listed in [Expressions](expressions.md#reading-specific-kinds-of-expression). They are `SqlColumn`, `SqlTable`, `SqlNamespace`, `SqlStar`, `SqlLiteral`, `SqlPlaceholder`, `SqlInterval`, `SqlType`, `SqlFunction`, `SqlComparison`, `SqlMulti`, `SqlUnary`, `SqlAlias`, `SqlCase`, `SqlRecord`, `SqlLabeledExpression` and `SqlKeyValue`, plus the query classes above.
+The classes an expression parses into, and their own methods, are listed in [Expressions](expressions.md#reading-specific-kinds-of-expression). They are `SqlColumn`, `SqlTable`, `SqlNamespace`, `SqlStar`, `SqlLiteral`, `SqlPlaceholder`, `SqlInterval`, `SqlType`, `SqlFunction`, `SqlComparison`, `SqlMulti`, `SqlUnary`, `SqlAlias`, `SqlCase`, `SqlRecord`, `SqlLabeledExpression`, `SqlKeyValue` and `SqlColonAccess`, plus the query classes above.
 
 ## Types
 
