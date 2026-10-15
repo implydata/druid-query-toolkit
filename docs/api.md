@@ -662,7 +662,7 @@ All of these extend [`SqlQueryBase`](#sqlquerybase).
 
 ## Expression classes
 
-The classes an expression parses into, and their own methods, are listed in [Expressions](expressions.md#reading-specific-kinds-of-expression). They are `SqlColumn`, `SqlTable`, `SqlNamespace`, `SqlStar`, `SqlLiteral`, `SqlPlaceholder`, `SqlInterval`, `SqlType`, `SqlFunction`, `SqlComparison`, `SqlMulti`, `SqlUnary`, `SqlAlias`, `SqlCase`, `SqlRecord`, `SqlLabeledExpression` and `SqlKeyValue`, plus the query classes above.
+The classes an expression parses into, and their own methods, are listed in [Expressions](expressions.md#reading-specific-kinds-of-expression). They are `SqlColumn`, `SqlTable`, `SqlNamespace`, `SqlStar`, `SqlLiteral`, `SqlPlaceholder`, `SqlInterval`, `SqlType`, `SqlFunction`, `SqlComparison`, `SqlMulti`, `SqlUnary`, `SqlAlias`, `SqlCase`, `SqlRecord`, `SqlLabeledExpression`, `SqlKeyValue` and `SqlColonAccess`, plus the query classes above.
 
 ## Types
 

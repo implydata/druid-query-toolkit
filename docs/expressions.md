@@ -148,6 +148,21 @@ C('x').cast('BIGINT'); //=> CAST("x" AS BIGINT)
 C('x').cast(SqlType.VARCHAR); //=> CAST("x" AS VARCHAR)
 ```
 
+## Colon access
+
+Colon access reads a nested field out of a value, as in Snowflake and Databricks: `v:a.b`, `v:['field name']`, `v:[0]`, or any mix such as `v:a['b c'][0].d`. Calcite added this syntax in [CALCITE-7448](https://issues.apache.org/jira/browse/CALCITE-7448), but Druid does not support it yet. DQT parses and builds it as `SqlColonAccess`, and does not promise what it evaluates to in Druid. `getJsonPath()` gives the matching JSON path, so you can write the `JSON_VALUE` call yourself if that is what you mean.
+
+```js
+const ex = SqlExpression.parse(`"payload":user.name`);
+ex.base; //=> "payload"
+ex.getPath(); //=> ['user', 'name']
+ex.getJsonPath(); //=> '$.user.name'
+
+SqlColonAccess.create(C('payload'), ['user', 'first name', 0]); //=> "payload":user['first name'][0]
+```
+
+Only one colon is allowed: write `v:a.b`, not `v:a:b`. Colon access binds tighter than any operator, so `-v:a` is `-(v:a)`. In the short form of `JSON_OBJECT` the first colon always separates the key from the value, so `JSON_OBJECT(k:v:z)` has the key `k` and the value `v:z`. A short key must be a term or a `||` of terms, and a colon access in it needs parens: `JSON_OBJECT((v:a): 1)`. `SqlKeyValue` adds these parens for you when it prints the short form.
+
 ## Aliases and output names
 
 A select expression like `LOWER(page) AS "page"` is a `SqlAlias` wrapping `LOWER(page)`. Several methods help you edit the expression without losing its name:
@@ -237,6 +252,7 @@ Narrow with `instanceof` and then use the class's own accessors:
 | `SqlUnary` (`NOT`, `-`) | `op`, `argument`, `changeArgument(ex)` |
 | `SqlAlias` | `getAliasName()`, `changeAlias(name)`, `expression`, `changeExpression(ex)` |
 | `SqlCase` | `caseExpression`, `whenThenParts`, `elseExpression` |
+| `SqlColonAccess` (`v:a.b`) | `base`, `changeBase(ex)`, `getPath()`, `changePath(path)`, `getJsonPath()` |
 
 ```js
 const ex = SqlExpression.parse(`APPROX_QUANTILE_DS("added", 0.98)`);

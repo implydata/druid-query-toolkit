@@ -111,7 +111,8 @@ LongKeyValueForm = keyToken:KeyToken postKey:_ key:Expression postKeyExpression:
   });
 }
 
-ShortKeyValueForm = key:Expression postKeyExpression:_ ":" preValueExpression:_ value:Expression
+// The key can not contain an unparenthesized colon access, so the first colon always separates the key from the value
+ShortKeyValueForm = key:ShortKey postKeyExpression:_ ":" preValueExpression:_ value:Expression
 {
   return new S.SqlKeyValue({
     key: key,
@@ -122,6 +123,11 @@ ShortKeyValueForm = key:Expression postKeyExpression:_ ":" preValueExpression:_ 
       preValueExpression: preValueExpression
     }
   });
+}
+
+ShortKey = head:BaseType tail:(_ '||' _ BaseType)*
+{
+  return maybeMakeMulti('||', head, tail);
 }
 
 SqlExtendClause =
@@ -1035,6 +1041,8 @@ Expressions are defined below in acceding priority order
   Additive (+, -)
   Multiplicative (*), Division (/)
   Unary identity (+), negation (-)
+  Concat (||)
+  Colon access (v:a.b)
 */
 
 Expression = OrExpression
@@ -1230,9 +1238,61 @@ UnaryExpression = op:[+-] postOp:_ !Number argument:ConcatExpression
 }
   / ConcatExpression
 
-ConcatExpression = head:BaseType tail:(_ '||' _ BaseType)*
+ConcatExpression = head:ColonAccessExpression tail:(_ '||' _ ColonAccessExpression)*
 {
   return maybeMakeMulti('||', head, tail);
+}
+
+ColonAccessExpression = base:BaseType colon:(_ ":" _ ColonAccessFirstSegment ColonAccessSegment*)?
+{
+  if (!colon) return base;
+  return new S.SqlColonAccess({
+    base: base,
+    segments: [colon[3]].concat(colon[4]),
+    spacing: {
+      preColon: colon[0],
+      postColon: colon[2]
+    }
+  });
+}
+
+ColonAccessFirstSegment = ColonAccessBracketSegment / ColonAccessNameSegment
+
+ColonAccessSegment =
+  preDot:_ "." postDot:_ segment:ColonAccessNameSegment
+{
+  return Object.assign({ preDot: preDot, postDot: postDot }, segment);
+}
+/ preBracket:_ segment:ColonAccessBracketSegment
+{
+  return Object.assign({ preBracket: preBracket }, segment);
+}
+
+ColonAccessNameSegment = name:RefName
+{
+  return { name: name };
+}
+
+ColonAccessBracketSegment = "[" postLeftBracket:_ value:ColonAccessBracketValue preRightBracket:_ "]"
+{
+  return {
+    value: value,
+    postLeftBracket: postLeftBracket,
+    preRightBracket: preRightBracket
+  };
+}
+
+ColonAccessBracketValue =
+  lit:(SingleQuotedString / UnicodeString)
+{
+  return new S.SqlLiteral(lit);
+}
+/ digits:Digits
+{
+  return new S.SqlLiteral({
+    value: +digits,
+    stringValue: digits
+  });
 }
 
 BaseType =
@@ -1356,6 +1416,7 @@ TimeUnitExtra =
 
 Function =
   CastFunction
+/ JsonObjectFunction // Before GenericFunction, which would read JSON_OBJECT(k: v) as a call with a colon access argument
 / GenericFunction
 / ExtractFunction
 / TrimFunction
@@ -1363,7 +1424,6 @@ Function =
 / TimestampAddDiffFunction
 / PositionFunction
 / JsonValueReturningFunction
-/ JsonObjectFunction
 / ArrayFunction
 / NakedFunction
 

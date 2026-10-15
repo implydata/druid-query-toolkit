@@ -43,3 +43,17 @@ Node is pinned in `.node-version`, managed by mise (`mise exec -- <cmd>` if it i
 - Lint and formatting come from the shared `@awesome-code-style` configs. `npm test` fails on any eslint warning.
 - User-facing changes need a changeset: a file in `.changeset/` with `'druid-query-toolkit': patch|minor|major` and a one-line summary. Releases go through the changesets GitHub action.
 - The published package has no runtime dependencies. Keep it that way.
+
+## Agent skills
+
+### Issue tracker
+
+Issues and specs live as local markdown files under `.scratch/<feature>/`. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+The five default roles (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`), recorded as a `Status:` line in each issue file. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context: one `CONTEXT.md` and `docs/adr/` at the repo root, both created on demand. See `docs/agents/domain.md`.

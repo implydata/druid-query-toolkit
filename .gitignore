@@ -15,6 +15,12 @@
 /src/sql/parser/.DS_Store
 .claude/
 /resources/
+/.scratch/
 
 # TypeScript cache
 *.tsbuildinfo
+
+# Trying out https://github.com/mattpocock/skills
+/docs/adr/
+/docs/agents/
+CONTEXT.md

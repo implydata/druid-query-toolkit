@@ -14,8 +14,10 @@
 
 import type { SqlBaseValue, SqlTypeDesignator, Substitutor } from '../sql-base';
 import { SqlBase } from '../sql-base';
+import { SqlColonAccess } from '../sql-colon-access/sql-colon-access';
 import { SqlExpression } from '../sql-expression';
 import type { LiteralValue } from '../sql-literal/sql-literal';
+import { SqlMulti } from '../sql-multi/sql-multi';
 
 export interface SqlKeyValueValue extends SqlBaseValue {
   key: SqlExpression;
@@ -44,10 +46,23 @@ export class SqlKeyValue extends SqlExpression {
     value: SqlExpression | LiteralValue,
   ): SqlKeyValue {
     return new SqlKeyValue({
-      key: SqlExpression.wrap(key),
+      key: SqlKeyValue.ensureShortKey(SqlExpression.wrap(key)),
       value: SqlExpression.wrap(value),
       short: true,
     });
+  }
+
+  /**
+   * Adds parens to a key that would not parse back as a short form key, such as a colon access
+   * (the first colon always separates the key from the value)
+   */
+  static ensureShortKey(key: SqlExpression): SqlExpression {
+    if (key instanceof SqlMulti && key.op === '||' && !key.hasParens()) {
+      return key.args.values.every(arg => SqlColonAccess.ensureTerm(arg) === arg)
+        ? key
+        : key.ensureParens();
+    }
+    return SqlColonAccess.ensureTerm(key);
   }
 
   public readonly key: SqlExpression;
@@ -93,7 +108,7 @@ export class SqlKeyValue extends SqlExpression {
 
   public changeKey(key: SqlExpression): this {
     const value = this.valueOf();
-    value.key = key;
+    value.key = this.short ? SqlKeyValue.ensureShortKey(key) : key;
     return SqlBase.fromValue(value);
   }
 
@@ -108,6 +123,7 @@ export class SqlKeyValue extends SqlExpression {
     const value = this.valueOf();
     value.spacing = {}; // Reset all spacing
     if (short) {
+      value.key = SqlKeyValue.ensureShortKey(value.key);
       value.short = true;
     } else {
       delete value.short;
