@@ -150,7 +150,7 @@ C('x').cast(SqlType.VARCHAR); //=> CAST("x" AS VARCHAR)
 
 ## Colon access
 
-Colon access reads a nested field out of a value, as in Snowflake and Databricks: `v:a.b`, `v:['field name']`, `v:[0]`, or any mix such as `v:a['b c'][0].d`. Calcite added this syntax in [CALCITE-7448](https://issues.apache.org/jira/browse/CALCITE-7448), but Druid does not support it yet. In Druid it is sugar for `JSON_VALUE` with the matching JSON path: `v:a.b` means `JSON_VALUE(v, '$.a.b')`. DQT parses and builds it as `SqlColonAccess`. `getJsonPath()` gives the matching JSON path, and `toJsonValue(returningType?)` gives the `JSON_VALUE` call it stands for.
+Colon access reads a nested field out of a value, as in Snowflake and Databricks: `v:a.b`, `v:['field name']`, `v:[0]`, or any mix such as `v:a['b c'][0].d`. Calcite added this syntax in [CALCITE-7448](https://issues.apache.org/jira/browse/CALCITE-7448), and Druid supports it as sugar for `JSON_VALUE` with the matching JSON path: `v:a.b` means `JSON_VALUE(v, '$.a.b')`. DQT parses and builds it as `SqlColonAccess`. `getJsonPath()` gives the matching JSON path, and `toJsonValue(returningType?)` gives the `JSON_VALUE` call it stands for.
 
 ```js
 const ex = SqlExpression.parse(`"payload":user.name`);
