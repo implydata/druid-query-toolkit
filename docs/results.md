@@ -44,7 +44,7 @@ For SQL it asks for the `array` result format with all three header rows (names,
 - `resultFormat`, `header`, `typesHeader`, `sqlTypesHeader`: override the defaults for a SQL string or `SqlQuery`.
 - `new QueryRunner({ inflateDateStrategy })`: `'fromSqlTypes'` (the default) converts `TIMESTAMP` columns, `'guess'` converts anything that looks like an ISO date, `'none'` leaves strings alone.
 
-If the query string parses as a `SqlQuery`, it is attached to the result as `result.sqlQuery`. The web console relies on that: result table menus look at `result.sqlQuery` to decide which [query actions](use-case-ui-edits.md) to offer.
+If the query string parses as a query (a `SELECT`, a pipe query, `TABLE t`, ...), it is attached to the result as `result.sqlQuery`, a [`SqlQueryBase`](queries.md#output-columns-filters-and-grouping). The web console relies on that: result table menus ask `result.sqlQuery` about its output columns to decide which [query actions](use-case-ui-edits.md) to offer. To change the query, narrow it with `instanceof SqlQuery` first.
 
 ## QueryResult
 
@@ -61,7 +61,7 @@ result.isEmpty(); //=> false
 result.toObjectArray(); //=> [{ channel: '#en', cnt: 10, __time: Date }, ...]
 result.getColumnByName('cnt'); //=> [10, 5]
 result.getColumnByIndex(0); //=> ['#en', '#fr']
-result.sqlQuery; //=> the SqlQuery that ran, if it parsed
+result.sqlQuery; //=> the query that ran, if it parsed
 result.queryDuration; //=> ms
 result.sqlQueryId; // from the response headers
 ```

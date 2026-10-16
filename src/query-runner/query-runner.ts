@@ -14,7 +14,7 @@
 
 import type { QueryParameter, QueryPayload } from '../query-payload/query-payload';
 import { QueryResult } from '../query-result';
-import { SqlQuery } from '../sql';
+import { SqlQueryBase } from '../sql';
 
 export interface DataAndHeaders {
   data: unknown;
@@ -30,7 +30,7 @@ export interface QueryExecutorArgs {
 export type QueryExecutor = (args: QueryExecutorArgs) => Promise<DataAndHeaders>;
 
 export interface RunQueryOptions {
-  query: string | SqlQuery | QueryPayload;
+  query: string | SqlQueryBase | QueryPayload;
   defaultQueryContext?: Record<string, any>;
   extraQueryContext?: Record<string, any>;
   queryParameters?: QueryParameter[];
@@ -90,7 +90,7 @@ export class QueryRunner {
 
     let isSql: boolean;
     let queryPayload: QueryPayload;
-    let parsedQuery: SqlQuery | undefined;
+    let parsedQuery: SqlQueryBase | undefined;
     if (typeof query === 'string') {
       isSql = true;
       queryPayload = {
@@ -100,10 +100,8 @@ export class QueryRunner {
         typesHeader: (header ?? true) && (typesHeader ?? true),
         sqlTypesHeader: (header ?? true) && (sqlTypesHeader ?? true),
       };
-      try {
-        parsedQuery = SqlQuery.parse(query);
-      } catch {}
-    } else if (query instanceof SqlQuery) {
+      parsedQuery = SqlQueryBase.maybeParse(query);
+    } else if (query instanceof SqlQueryBase) {
       isSql = true;
       parsedQuery = query;
       queryPayload = {
@@ -117,9 +115,7 @@ export class QueryRunner {
       queryPayload = query;
       isSql = !('queryType' in queryPayload) && typeof queryPayload.query === 'string';
       if (isSql) {
-        try {
-          parsedQuery = SqlQuery.parse(queryPayload.query);
-        } catch {}
+        parsedQuery = SqlQueryBase.maybeParse(queryPayload.query);
       }
     }
 

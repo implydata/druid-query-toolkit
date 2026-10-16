@@ -324,6 +324,46 @@ describe('SqlWithQuery', () => {
     });
   });
 
+  describe('#getSelectExpressionsArray', () => {
+    it('answers from the query it wraps', () => {
+      const query = SqlExpression.parse(sane`
+        WITH x AS (SELECT * FROM t)
+        (SELECT a, b FROM x)
+      `) as SqlWithQuery;
+      expect(query.getSelectExpressionsArray().map(String)).toEqual(['a', 'b']);
+    });
+  });
+
+  describe('#getWhereExpression', () => {
+    it('answers from the query it wraps', () => {
+      const query = SqlExpression.parse(sane`
+        WITH x AS (SELECT * FROM t)
+        (SELECT a FROM x WHERE b = 1)
+      `) as SqlWithQuery;
+      expect(String(query.getWhereExpression())).toEqual('b = 1');
+    });
+  });
+
+  describe('#getGroupByExpressions', () => {
+    it('answers from the query it wraps', () => {
+      const query = SqlExpression.parse(sane`
+        WITH x AS (SELECT * FROM t)
+        (SELECT a, COUNT(*) FROM x GROUP BY 1)
+      `) as SqlWithQuery;
+      expect(query.getGroupByExpressions()?.map(String)).toEqual(['1']);
+    });
+  });
+
+  describe('#getHavingExpression', () => {
+    it('answers from the query it wraps', () => {
+      const query = SqlExpression.parse(sane`
+        WITH x AS (SELECT * FROM t)
+        (SELECT a, COUNT(*) FROM x GROUP BY 1 HAVING COUNT(*) > 1)
+      `) as SqlWithQuery;
+      expect(String(query.getHavingExpression())).toEqual('COUNT(*) > 1');
+    });
+  });
+
   describe('#flattenWith', () => {
     it('flattens nested WITH clauses into one', () => {
       const sql = sane`

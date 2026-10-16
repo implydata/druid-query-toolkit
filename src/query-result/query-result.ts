@@ -13,7 +13,7 @@
  */
 
 import type { QueryPayload } from '../query-payload/query-payload';
-import type { SqlQuery } from '../sql';
+import type { SqlQueryBase } from '../sql';
 import { filterMap } from '../utils';
 
 import { Column } from './column';
@@ -45,7 +45,7 @@ export interface QueryResultValue {
   header: readonly Column[];
   rows: readonly any[][];
   query?: QueryPayload;
-  sqlQuery?: SqlQuery;
+  sqlQuery?: SqlQueryBase;
   queryId?: string;
   sqlQueryId?: string;
   resultContext?: Record<string, any>;
@@ -372,7 +372,7 @@ export class QueryResult {
   public readonly rows: readonly any[][];
 
   public readonly query?: QueryPayload;
-  public readonly sqlQuery?: SqlQuery;
+  public readonly sqlQuery?: SqlQueryBase;
 
   public readonly queryId?: string;
   public readonly sqlQueryId?: string;
@@ -409,7 +409,7 @@ export class QueryResult {
     return new QueryResult(value);
   }
 
-  public attachQuery(queryPayload: QueryPayload, sqlQuery?: SqlQuery): QueryResult {
+  public attachQuery(queryPayload: QueryPayload, sqlQuery?: SqlQueryBase): QueryResult {
     const value = this.valueOf();
     value.query = queryPayload;
     value.sqlQuery = sqlQuery;

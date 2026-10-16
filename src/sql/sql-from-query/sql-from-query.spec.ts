@@ -175,6 +175,14 @@ describe('SqlFromQuery', () => {
     });
   });
 
+  describe('#getSelectExpressionsArray', () => {
+    it('reads every column, like SELECT *', () => {
+      expect(
+        (SqlExpression.parse('FROM t') as SqlFromQuery).getSelectExpressionsArray().map(String),
+      ).toEqual(['*']);
+    });
+  });
+
   describe('#walk', () => {
     it('walks the underlying table', () => {
       const fromQuery = SqlExpression.parse(`FROM druid.kttm`);

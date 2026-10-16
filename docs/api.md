@@ -390,6 +390,54 @@ The base class of every query. Extends [`SqlExpression`](#sqlexpression).
 
 [More info.](queries.md)
 
+### SqlQueryBase.parse(input), SqlQueryBase.maybeParse(input)
+
+`input`: `string | SqlQueryBase`\
+_Returns_: `SqlQueryBase` / `SqlQueryBase | undefined`
+
+Parses any kind of query. `parse` throws `Provided SQL was not a query` for an expression that is not one.
+
+### SqlQueryBase.isPhonyOutputName(name)
+
+_Returns_: `boolean`
+
+Whether a name is one of Druid's made up `EXPR$n` names.
+
+### Output columns
+
+Every kind of query answers these. `TABLE t` and `FROM t` answer like `SELECT *`, and a query whose output columns can not be told from its text (`VALUES`, a pipe query) answers with none. [More info.](queries.md#output-columns-filters-and-grouping)
+
+| Method | Returns |
+| --- | --- |
+| `query.getSelectExpressionsArray()` | `readonly SqlExpression[]` |
+| `query.getSelectExpressionForIndex(index)` | `SqlExpression \| undefined` |
+| `query.isValidSelectIndex(index)` | `boolean` |
+| `query.getOutputColumns()` | `string[]` |
+| `query.getSelectIndexForOutputColumn(name)` | `number` (`-1` if none) |
+| `query.getSelectIndexForExpression(ex, allowAliasReferences)` | `number` |
+| `query.getSelectIndexesForColumn(column)` | `number[]` |
+| `query.isRealOutputColumnAtSelectIndex(index)` | `boolean` |
+| `query.hasStarInSelect()` | `boolean` |
+| `query.getOrderByForSelectIndex(index)`, `query.getOrderByForOutputColumn(name)` | `SqlOrderByExpression \| undefined` |
+| `query.getOrderedSelectExpressions()`, `query.getOrderedOutputColumns()` | `SqlExpression[]`, `string[]` |
+
+### Filters and grouping
+
+| Method | Returns |
+| --- | --- |
+| `query.hasWhere()`, `query.hasHaving()` | `boolean` |
+| `query.getWhereExpression()`, `query.getHavingExpression()` | `SqlExpression \| undefined` |
+| `query.getEffectiveWhereExpression()`, `query.getEffectiveHavingExpression()` | `SqlExpression` (`TRUE` if none) |
+| `query.hasGroupBy()` | `boolean` |
+| `query.getGroupByExpressions()` | `readonly SqlExpression[] \| undefined`, as written |
+| `query.getGroupingExpressions()` | `SqlExpression[]`, with references resolved |
+| `query.getGroupingExpressionInfos()` | `ExpressionInfo[]` |
+| `query.isGroupedSelectIndex(index)`, `query.isGroupedOutputColumn(name)` | `boolean` |
+| `query.getGroupedSelectExpressions()`, `query.getGroupedOutputColumns()` | `SqlExpression[]`, `string[]` |
+| `query.getGroupedSelectIndexesForColumn(column)` | `number[]` |
+| `query.isAggregateSelectIndex(index)`, `query.isAggregateOutputColumn(name)` | `boolean` |
+| `query.getAggregateSelectExpressions()`, `query.getAggregateOutputColumns()` | `SqlExpression[]`, `string[]` |
+
 ### query.getContext(), query.hasContext()
 
 _Returns_: `Record<string, any>` / `boolean`
@@ -522,25 +570,12 @@ _Returns_: `SqlQuery`
 
 A query reading from a table or sub-query, with no select list (`from`) or `SELECT *` (`selectStarFrom`). `SET` statements of a sub-query move to the outer query.
 
-### SqlQuery.isPhonyOutputName(name)
-
-_Returns_: `boolean`
-
-Whether a name is one of Druid's made up `EXPR$n` names.
+The questions about its output columns, filters and grouping are on [`SqlQueryBase`](#output-columns). The methods below change the query.
 
 ### Select list
 
 | Method | Returns |
 | --- | --- |
-| `query.getSelectExpressionsArray()` | `readonly SqlExpression[]` |
-| `query.getSelectExpressionForIndex(index)` | `SqlExpression \| undefined` |
-| `query.isValidSelectIndex(index)` | `boolean` |
-| `query.getOutputColumns()` | `string[]` |
-| `query.getSelectIndexForOutputColumn(name)` | `number` (`-1` if none) |
-| `query.getSelectIndexForExpression(ex, allowAliasReferences)` | `number` |
-| `query.getSelectIndexesForColumn(column)` | `number[]` |
-| `query.isRealOutputColumnAtSelectIndex(index)` | `boolean` |
-| `query.hasStarInSelect()` | `boolean` |
 | `query.addSelect(ex, options?)` | `this`, see [`AddSelectOptions`](#addselectoptions) |
 | `query.changeSelect(index, ex)` | `this` |
 | `query.changeSelectExpressions(expressions)` | `this` |
@@ -569,9 +604,6 @@ Whether a name is one of Druid's made up `EXPR$n` names.
 
 | Method | Returns |
 | --- | --- |
-| `query.hasWhere()`, `query.hasHaving()` | `boolean` |
-| `query.getWhereExpression()`, `query.getHavingExpression()` | `SqlExpression \| undefined` |
-| `query.getEffectiveWhereExpression()`, `query.getEffectiveHavingExpression()` | `SqlExpression` (`TRUE` if none) |
 | `query.addWhere(...ex)`, `query.addHaving(...ex)` | `this`, AND-ed on |
 | `query.removeColumnFromWhere(column)`, `query.removeFromHaving(column)` | `this` |
 | `query.changeWhereExpression(ex)`, `query.changeHavingExpression(ex)` | `this`, `undefined` or `TRUE` removes |
@@ -583,15 +615,6 @@ Whether a name is one of Druid's made up `EXPR$n` names.
 
 | Method | Returns |
 | --- | --- |
-| `query.hasGroupBy()` | `boolean` |
-| `query.getGroupByExpressions()` | `readonly SqlExpression[] \| undefined`, as written |
-| `query.getGroupingExpressions()` | `SqlExpression[]`, with references resolved |
-| `query.getGroupingExpressionInfos()` | `ExpressionInfo[]` |
-| `query.isGroupedSelectIndex(index)`, `query.isGroupedOutputColumn(name)` | `boolean` |
-| `query.getGroupedSelectExpressions()`, `query.getGroupedOutputColumns()` | `SqlExpression[]`, `string[]` |
-| `query.getGroupedSelectIndexesForColumn(column)` | `number[]` |
-| `query.isAggregateSelectIndex(index)`, `query.isAggregateOutputColumn(name)` | `boolean` |
-| `query.getAggregateSelectExpressions()`, `query.getAggregateOutputColumns()` | `SqlExpression[]`, `string[]` |
 | `query.addGroupBy(ex)` | `this` |
 | `query.changeGroupByExpressions(expressions)`, `query.changeGroupByClause(clause)` | `this`, `[]` gives `GROUP BY ()`, `undefined` removes |
 
@@ -601,8 +624,6 @@ Whether a name is one of Druid's made up `EXPR$n` names.
 
 | Method | Returns |
 | --- | --- |
-| `query.getOrderByForSelectIndex(index)`, `query.getOrderByForOutputColumn(name)` | `SqlOrderByExpression \| undefined` |
-| `query.getOrderedSelectExpressions()`, `query.getOrderedOutputColumns()` | `SqlExpression[]`, `string[]` |
 | `query.removeOrderByForSelectIndex(index)`, `query.removeOrderByForOutputColumn(name)` | `this` |
 
 [More info.](select-queries.md#order-by)

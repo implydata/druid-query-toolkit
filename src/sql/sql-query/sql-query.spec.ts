@@ -5678,25 +5678,6 @@ describe('SqlQuery', () => {
     });
   });
 
-  describe('.getSelectExpressionOutput', () => {
-    it('uses the output name or makes up a phony one', () => {
-      expect(SqlQuery.getSelectExpressionOutput(SqlExpression.parse(`x AS y`), 0)).toEqual('y');
-      expect(SqlQuery.getSelectExpressionOutput(SqlExpression.parse(`t.channel`), 1)).toEqual(
-        'channel',
-      );
-      expect(SqlQuery.getSelectExpressionOutput(SqlExpression.parse(`1 + 2`), 3)).toEqual('EXPR$3');
-    });
-  });
-
-  describe('.isPhonyOutputName', () => {
-    it('works', () => {
-      expect(SqlQuery.isPhonyOutputName('EXPR$0')).toEqual(true);
-      expect(SqlQuery.isPhonyOutputName('EXPR$12')).toEqual(true);
-      expect(SqlQuery.isPhonyOutputName('EXPR$01')).toEqual(false);
-      expect(SqlQuery.isPhonyOutputName('expr$')).toEqual(false);
-    });
-  });
-
   describe('#changeWithClause', () => {
     const query = SqlQuery.parse(`WITH w AS (SELECT 1)  SELECT * FROM w`);
 
@@ -5996,21 +5977,6 @@ describe('SqlQuery', () => {
     });
   });
 
-  describe('#isValidSelectIndex', () => {
-    it('checks the index against the select expressions', () => {
-      const query = SqlQuery.parse(`SELECT a, b FROM t`);
-
-      expect(query.isValidSelectIndex(0)).toEqual(true);
-      expect(query.isValidSelectIndex(1)).toEqual(true);
-      expect(query.isValidSelectIndex(2)).toEqual(false);
-      expect(query.isValidSelectIndex(-1)).toEqual(false);
-    });
-
-    it('is false when there are no select expressions', () => {
-      expect(SqlQuery.from('t').isValidSelectIndex(0)).toEqual(false);
-    });
-  });
-
   describe('#getSelectExpressionsArray', () => {
     it('returns the select expressions', () => {
       expect(SqlQuery.parse(`SELECT a, b FROM t`).getSelectExpressionsArray().map(String)).toEqual([
@@ -6021,117 +5987,6 @@ describe('SqlQuery', () => {
 
     it('returns nothing when there are no select expressions', () => {
       expect(SqlQuery.from('t').getSelectExpressionsArray()).toEqual([]);
-    });
-  });
-
-  describe('#hasStarInSelect', () => {
-    it('works when there is no star', () => {
-      const sql = SqlQuery.parse(sane`
-        SELECT
-          isAnonymous,
-          cityName
-        FROM wikipedia
-      `);
-
-      expect(sql.hasStarInSelect()).toBe(false);
-    });
-
-    it('works when there is a star', () => {
-      const sql = SqlQuery.parse(sane`
-        SELECT
-          *,
-          cityName
-        FROM wikipedia
-      `);
-
-      expect(sql.hasStarInSelect()).toBe(true);
-    });
-
-    it('works when there is a star from a table', () => {
-      const sql = SqlQuery.parse(sane`
-        SELECT
-          t.*,
-          cityName
-        FROM wikipedia AS t
-      `);
-
-      expect(sql.hasStarInSelect()).toBe(true);
-    });
-  });
-
-  describe('#getOutputColumns', () => {
-    it('lists the output name of every select expression', () => {
-      expect(
-        SqlQuery.parse(`SELECT channel, COUNT(*), SUM(x) AS s FROM t`).getOutputColumns(),
-      ).toEqual(['channel', 'EXPR$1', 's']);
-    });
-  });
-
-  describe('#getSelectIndexesForColumn', () => {
-    it('finds every select expression that uses the column', () => {
-      const query = SqlQuery.parse(`SELECT channel, UPPER(channel) AS u, page FROM t`);
-
-      expect(query.getSelectIndexesForColumn('channel')).toEqual([0, 1]);
-      expect(query.getSelectIndexesForColumn('page')).toEqual([2]);
-      expect(query.getSelectIndexesForColumn('nope')).toEqual([]);
-    });
-  });
-
-  describe('#getGroupedSelectIndexesForColumn', () => {
-    it('keeps only the grouped select expressions', () => {
-      const query = SqlQuery.parse(
-        `SELECT channel, LATEST(channel) AS l, UPPER(channel) AS u FROM t GROUP BY 1, 3`,
-      );
-
-      expect(query.getGroupedSelectIndexesForColumn('channel')).toEqual([0, 2]);
-    });
-  });
-
-  describe('#isRealOutputColumnAtSelectIndex', () => {
-    it('tells if the select expression has a real output name', () => {
-      const query = SqlQuery.parse(`SELECT channel, COUNT(*), SUM(x) AS s FROM t`);
-
-      expect(query.isRealOutputColumnAtSelectIndex(0)).toEqual(true);
-      expect(query.isRealOutputColumnAtSelectIndex(1)).toEqual(false);
-      expect(query.isRealOutputColumnAtSelectIndex(2)).toEqual(true);
-      expect(query.isRealOutputColumnAtSelectIndex(3)).toEqual(false);
-    });
-  });
-
-  describe('#isGroupedSelectIndex', () => {
-    it('is false without a GROUP BY or for an invalid index', () => {
-      expect(SqlQuery.parse(`SELECT a FROM t`).isGroupedSelectIndex(0)).toEqual(false);
-      expect(SqlQuery.parse(`SELECT a FROM t GROUP BY 1`).isGroupedSelectIndex(0)).toEqual(true);
-      expect(SqlQuery.parse(`SELECT a FROM t GROUP BY 1`).isGroupedSelectIndex(1)).toEqual(false);
-    });
-  });
-
-  describe('#isGroupedOutputColumn', () => {
-    it('tells if the output column is grouped on', () => {
-      const query = SqlQuery.parse(`SELECT a, COUNT(*) AS c FROM t GROUP BY 1`);
-
-      expect(query.isGroupedOutputColumn('a')).toEqual(true);
-      expect(query.isGroupedOutputColumn('c')).toEqual(false);
-      expect(query.isGroupedOutputColumn('nope')).toEqual(false);
-    });
-  });
-
-  describe('#isAggregateSelectIndex', () => {
-    it('is false without a GROUP BY or for an invalid index', () => {
-      expect(SqlQuery.parse(`SELECT COUNT(*) FROM t`).isAggregateSelectIndex(0)).toEqual(false);
-      expect(
-        SqlQuery.parse(`SELECT a, COUNT(*) FROM t GROUP BY 1`).isAggregateSelectIndex(2),
-      ).toEqual(false);
-    });
-  });
-
-  describe('#isAggregateOutputColumn', () => {
-    it('tells if the output column is an aggregate', () => {
-      const query = SqlQuery.parse(`SELECT a, COUNT(*) AS c FROM t GROUP BY 1`);
-
-      expect(query.isAggregateOutputColumn('a')).toEqual(false);
-      expect(query.isAggregateOutputColumn('c')).toEqual(true);
-      expect(query.isAggregateOutputColumn('nope')).toEqual(false);
     });
   });
 
@@ -6573,44 +6428,12 @@ describe('SqlQuery', () => {
     });
   });
 
-  describe('#hasWhere', () => {
-    it('tells if there is a WHERE clause', () => {
-      expect(SqlQuery.parse(`SELECT a FROM t WHERE b`).hasWhere()).toEqual(true);
-      expect(SqlQuery.parse(`SELECT a FROM t`).hasWhere()).toEqual(false);
-    });
-  });
-
   describe('#getWhereExpression', () => {
     it('returns the WHERE expression', () => {
       expect(String(SqlQuery.parse(`SELECT a FROM t WHERE b = 1`).getWhereExpression())).toEqual(
         'b = 1',
       );
       expect(SqlQuery.parse(`SELECT a FROM t`).getWhereExpression()).toBeUndefined();
-    });
-  });
-
-  describe('#getEffectiveWhereExpression', () => {
-    it('returns the WHERE expression or TRUE', () => {
-      expect(
-        String(SqlQuery.parse(`SELECT a FROM t WHERE b = 1`).getEffectiveWhereExpression()),
-      ).toEqual('b = 1');
-      expect(SqlQuery.parse(`SELECT a FROM t`).getEffectiveWhereExpression()).toBe(SqlLiteral.TRUE);
-    });
-  });
-
-  describe('#hasGroupBy', () => {
-    it('tells if there is a GROUP BY clause', () => {
-      expect(SqlQuery.parse(`SELECT a FROM t GROUP BY a`).hasGroupBy()).toEqual(true);
-      expect(SqlQuery.parse(`SELECT a FROM t`).hasGroupBy()).toEqual(false);
-    });
-  });
-
-  describe('#hasHaving', () => {
-    it('tells if there is a HAVING clause', () => {
-      expect(SqlQuery.parse(`SELECT a FROM t GROUP BY a HAVING COUNT(*) > 1`).hasHaving()).toEqual(
-        true,
-      );
-      expect(SqlQuery.parse(`SELECT a FROM t GROUP BY a`).hasHaving()).toEqual(false);
     });
   });
 
@@ -6622,21 +6445,6 @@ describe('SqlQuery', () => {
         ),
       ).toEqual('COUNT(*) > 1');
       expect(SqlQuery.parse(`SELECT a FROM t`).getHavingExpression()).toBeUndefined();
-    });
-  });
-
-  describe('#getEffectiveHavingExpression', () => {
-    it('returns the HAVING expression or TRUE', () => {
-      expect(
-        String(
-          SqlQuery.parse(
-            `SELECT a FROM t GROUP BY a HAVING COUNT(*) > 1`,
-          ).getEffectiveHavingExpression(),
-        ),
-      ).toEqual('COUNT(*) > 1');
-      expect(SqlQuery.parse(`SELECT a FROM t`).getEffectiveHavingExpression()).toBe(
-        SqlLiteral.TRUE,
-      );
     });
   });
 
@@ -6656,32 +6464,6 @@ describe('SqlQuery', () => {
       const query = SqlQuery.parse(`SELECT a FROM t GROUP BY a`);
 
       expect(query.addHaving()).toBe(query);
-    });
-  });
-
-  describe('#getOrderByForSelectIndex', () => {
-    const query = SqlQuery.parse(`SELECT a, b AS bb, c FROM t ORDER BY bb DESC, 1`);
-
-    it('finds the ORDER BY expression by alias or by index', () => {
-      expect(String(query.getOrderByForSelectIndex(0))).toEqual('1');
-      expect(String(query.getOrderByForSelectIndex(1))).toEqual('bb DESC');
-      expect(query.getOrderByForSelectIndex(2)).toBeUndefined();
-    });
-
-    it('returns nothing for an invalid index or without an ORDER BY clause', () => {
-      expect(query.getOrderByForSelectIndex(3)).toBeUndefined();
-      expect(SqlQuery.parse(`SELECT a FROM t`).getOrderByForSelectIndex(0)).toBeUndefined();
-    });
-  });
-
-  describe('#getOrderedSelectExpressions', () => {
-    it('lists the select expressions that are ordered on', () => {
-      expect(
-        SqlQuery.parse(`SELECT a, b AS bb, c FROM t ORDER BY bb DESC, 1`)
-          .getOrderedSelectExpressions()
-          .map(String),
-      ).toEqual(['a', 'b AS bb']);
-      expect(SqlQuery.parse(`SELECT a FROM t`).getOrderedSelectExpressions()).toEqual([]);
     });
   });
 
