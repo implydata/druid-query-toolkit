@@ -21,6 +21,7 @@ import {
   SeparatedArray,
   Separator,
   SPACE,
+  stripComments,
 } from '../helpers';
 import { parse as parseSql } from '../parser';
 import type { SpaceName, SqlTypeDesignator, Substitutor } from '../sql-base';
@@ -267,7 +268,9 @@ export class SqlQuery extends SqlQueryBase {
     if (this.selectExpressions === selectExpressions) return this;
     const value = this.valueOf();
     if (selectExpressions) {
-      value.selectExpressions = SeparatedArray.fromArray(selectExpressions);
+      value.selectExpressions = Array.isArray(selectExpressions)
+        ? this.withSelectSeparators(selectExpressions)
+        : selectExpressions;
     } else {
       delete value.selectExpressions;
     }
@@ -650,17 +653,23 @@ export class SqlQuery extends SqlQueryBase {
     let selectExpressions =
       this.selectExpressions?.insert(idx, ex) || SeparatedArray.fromSingleValue(ex);
 
-    // A comment trailing the last expression is parsed into the space that follows the list, keep it with that expression
+    // A comment on the same line as the last expression is parsed into the space that follows the list,
+    // keep it with that expression. Comments on their own lines stay at the end of the list.
     const trailingSpaceName = this.getPostSelectExpressionsSpaceName();
     if (this.selectExpressions && idx === this.selectExpressions.length() && trailingSpaceName) {
       const trailingSpace = this.getSpace(trailingSpaceName, '');
-      const comment = trailingSpace.trimEnd();
+      const newlineIndex = trailingSpace.indexOf(NEWLINE);
+      const comment = (
+        newlineIndex === -1 ? trailingSpace : trailingSpace.slice(0, newlineIndex)
+      ).trimEnd();
       if (comment.trim()) {
         const rest = trailingSpace.slice(comment.length);
         const { values, separators } = this.selectExpressions;
         const lastSeparator = separators[idx - 2];
-        const left = lastSeparator instanceof Separator ? lastSeparator.left : '';
-        const lastRight = lastSeparator instanceof Separator ? lastSeparator.right : undefined;
+        const left =
+          lastSeparator instanceof Separator ? stripComments(lastSeparator.left || '') : '';
+        const lastRight =
+          lastSeparator instanceof Separator ? stripComments(lastSeparator.right || '') : undefined;
         const right = lastRight?.includes(NEWLINE)
           ? lastRight
           : rest.includes(NEWLINE)
@@ -702,6 +711,25 @@ export class SqlQuery extends SqlQueryBase {
   /**
    * The space that follows the select expressions, or undefined when nothing follows them.
    */
+  // A plain array has no separators, so reuse the current ones by position and lay out any extra items
+  // like the last one, so that the list keeps the indentation of a nested query
+  private withSelectSeparators(selectExpressions: SqlExpression[]): SeparatedArray<SqlExpression> {
+    const separators = this.selectExpressions?.separators || [];
+    const last = separators[separators.length - 1];
+    const postSelect = this.getSpace('postSelect', '');
+    const extra =
+      last instanceof Separator
+        ? last.withoutComments()
+        : (last ??
+          (postSelect.includes(NEWLINE)
+            ? new Separator({ separator: ',', right: stripComments(postSelect) })
+            : undefined));
+    return new SeparatedArray(
+      selectExpressions,
+      selectExpressions.slice(1).map((_, i) => separators[i] ?? extra),
+    );
+  }
+
   private getPostSelectExpressionsSpaceName(): SpaceName | undefined {
     if (this.fromClause) return 'preFromClause';
     if (this.whereClause) return 'preWhereClause';

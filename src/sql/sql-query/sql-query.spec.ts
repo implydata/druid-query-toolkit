@@ -5516,6 +5516,18 @@ describe('SqlQuery', () => {
       expect(() => SqlQuery.parse(sql)).toThrow();
     });
 
+    it('fails after the semicolon when another statement follows', () => {
+      // The web console splits a text into statements at this location
+      let error: any;
+      try {
+        SqlQuery.parse('SELECT 1;\nSELECT 2');
+      } catch (e) {
+        error = e;
+      }
+      expect(error.location.start).toEqual({ offset: 10, line: 2, column: 1 });
+      expect(error.message).toEqual('Expected end of input or possible semicolon but "S" found.');
+    });
+
     it('errors if there are INSERT and REPLACE clauses', () => {
       expect(() => {
         SqlQuery.parse(sane`
@@ -5771,6 +5783,62 @@ describe('SqlQuery', () => {
       const query = SqlQuery.parse(`SELECT a FROM t`);
 
       expect(query.changeSelectExpressions(query.selectExpressions)).toBe(query);
+    });
+
+    it('keeps the layout of the current expressions when given an array', () => {
+      const query = SqlQuery.parse(sane`
+        SELECT * FROM (
+          SELECT
+            t."time" AS "Time",
+            t."host" AS "Host"
+          FROM "metrics" AS "t"
+        )
+      `);
+
+      expect(
+        query
+          .walk(ex =>
+            ex instanceof SqlQuery && ex !== query
+              ? ex.changeSelectExpressions([...ex.getSelectExpressionsArray(), C('count')])
+              : ex,
+          )
+          .toString(),
+      ).toEqual(sane`
+        SELECT * FROM (
+          SELECT
+            t."time" AS "Time",
+            t."host" AS "Host",
+            "count"
+          FROM "metrics" AS "t"
+        )
+      `);
+    });
+
+    it('lays out added expressions like the first one when there is only one', () => {
+      const query = SqlQuery.parse(sane`
+        SELECT * FROM (
+          SELECT
+            t."time" AS "Time"
+          FROM "metrics" AS "t"
+        )
+      `);
+
+      expect(
+        query
+          .walk(ex =>
+            ex instanceof SqlQuery && ex !== query
+              ? ex.changeSelectExpressions([...ex.getSelectExpressionsArray(), C('count')])
+              : ex,
+          )
+          .toString(),
+      ).toEqual(sane`
+        SELECT * FROM (
+          SELECT
+            t."time" AS "Time",
+            "count"
+          FROM "metrics" AS "t"
+        )
+      `);
     });
   });
 
@@ -6113,6 +6181,60 @@ describe('SqlQuery', () => {
           a,
           b, -- the b
           c
+        FROM t
+      `);
+    });
+
+    it('keeps a comment on its own line at the end of the list', () => {
+      const query = SqlQuery.parse(sane`
+        SELECT
+          t."time" AS "Time",
+          t."host" AS "Host"
+          --:MEASURE SUM(x) AS "Queries"
+        FROM "metrics" AS "t"
+      `);
+
+      expect(query.addSelect(C('count')).addSelect(C('metric')).toString()).toEqual(sane`
+        SELECT
+          t."time" AS "Time",
+          t."host" AS "Host",
+          "count",
+          "metric"
+          --:MEASURE SUM(x) AS "Queries"
+        FROM "metrics" AS "t"
+      `);
+    });
+
+    it('does not repeat a trailing comment when adding several expressions', () => {
+      const query = SqlQuery.parse(sane`
+        SELECT
+          a, -- the a
+          b -- the b
+          -- the end
+        FROM t
+      `);
+
+      expect(query.addSelect(C('c')).addSelect(C('d')).toString()).toEqual(sane`
+        SELECT
+          a, -- the a
+          b, -- the b
+          "c",
+          "d"
+          -- the end
+        FROM t
+      `);
+      expect(
+        query
+          .addSelect(C('d'), { insertIndex: 2 })
+          .addSelect(C('c'), { insertIndex: 2 })
+          .toString(),
+      ).toEqual(sane`
+        SELECT
+          a, -- the a
+          b, -- the b
+          "c",
+          "d"
+          -- the end
         FROM t
       `);
     });

@@ -140,10 +140,15 @@ export class SeparatedArray<T> {
     index = clampIndex(normalizeIndex(index, values.length), 0, values.length);
 
     const sn = separators.length;
+    // The new separator copies the layout of its neighbor but not its comments, which stay where they were
     const separator = separators[clampIndex(index - 1, 0, sn - 1)];
     return new SeparatedArray<T>(
       insert(values, index, value),
-      insert(separators, Math.min(index, sn), separator),
+      insert(
+        separators,
+        Math.min(index, sn),
+        separator instanceof Separator ? separator.withoutComments() : separator,
+      ),
     );
   }
 

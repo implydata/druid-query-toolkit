@@ -25,6 +25,15 @@ export function indentLines(str: string): string {
     .join(NEWLINE);
 }
 
+// The whitespace of a space with its comments taken out, ending in the same line break and indentation
+export function stripComments(space: string): string {
+  if (!space.includes('--') && !space.includes('/*')) return space;
+  const stripped = space.replace(/--[^\n]*|\/\*[\s\S]*?\*\//g, '');
+  if (!stripped.includes(NEWLINE)) return stripped ? SPACE : '';
+  const lastLine = space.slice(space.lastIndexOf(NEWLINE) + 1);
+  return NEWLINE + /^[ \t]*/.exec(lastLine)![0];
+}
+
 export function trimString(str: string, maxLength: number): string {
   if (str.length < maxLength) return str;
   return str.substr(0, Math.max(maxLength - 3, 1)) + '...';

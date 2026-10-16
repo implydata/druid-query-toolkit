@@ -85,6 +85,22 @@ describe('Separator', () => {
     });
   });
 
+  describe('#withoutComments', () => {
+    it('takes the comments out of both sides', () => {
+      const separator = new Separator({
+        left: ' /* l */ ',
+        separator: ',',
+        right: ' -- the b\n  ',
+      });
+      expect(separator.withoutComments().toString()).toBe(' ,\n  ');
+    });
+
+    it('returns the same separator when there are no comments', () => {
+      const separator = Separator.indentSpace(',');
+      expect(separator.withoutComments()).toBe(separator);
+    });
+  });
+
   describe('#toString', () => {
     it('joins left, separator, and right values', () => {
       const separator = new Separator({ left: 'left', separator: 'SEP', right: 'right' });

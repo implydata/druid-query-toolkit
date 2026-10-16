@@ -12,9 +12,28 @@
  * limitations under the License.
  */
 
-import { clampIndex, insert, normalizeIndex, trimString } from './general';
+import { clampIndex, insert, normalizeIndex, stripComments, trimString } from './general';
 
 describe('general', () => {
+  describe('stripComments', () => {
+    it('leaves a space without comments as it is', () => {
+      expect(stripComments('')).toEqual('');
+      expect(stripComments(' ')).toEqual(' ');
+      expect(stripComments('\n    ')).toEqual('\n    ');
+    });
+
+    it('keeps the line break and indentation the space ends with', () => {
+      expect(stripComments(' -- the b\n  ')).toEqual('\n  ');
+      expect(stripComments('\n  --:MEASURE SUM(x)\n    ')).toEqual('\n    ');
+      expect(stripComments('\n  /* c */ ')).toEqual('\n  ');
+    });
+
+    it('collapses a space on one line to a single space', () => {
+      expect(stripComments(' /* c */ ')).toEqual(' ');
+      expect(stripComments('/* c */')).toEqual('');
+    });
+  });
+
   describe('trimString', () => {
     it('works in basic case', () => {
       expect(trimString(`abcd`, 10)).toEqual(`abcd`);

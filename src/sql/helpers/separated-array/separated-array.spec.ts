@@ -50,6 +50,16 @@ describe('SeparatedArray', () => {
       expect(String(a.insert(3, 7))).toEqual('1, 2 ; 3 ; 7');
       expect(String(a.insert(4, 7))).toEqual('1, 2 ; 3 ; 7');
     });
+
+    it('does not copy the comments of the separator it copies', () => {
+      const commented = new SeparatedArray(
+        [1, 2],
+        [new Separator({ separator: ',', right: ' -- the 1\n  ' })],
+      );
+      expect(String(commented.insert(0, 7))).toEqual('7,\n  1, -- the 1\n  2');
+      expect(String(commented.insert(1, 7))).toEqual('1, -- the 1\n  7,\n  2');
+      expect(String(commented.insert(2, 7).insert(3, 8))).toEqual('1, -- the 1\n  2,\n  7,\n  8');
+    });
   });
 
   describe('#prepend', () => {

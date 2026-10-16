@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { NEWLINE, NEWLINE_INDENT, SPACE } from '../general/general';
+import { NEWLINE, NEWLINE_INDENT, SPACE, stripComments } from '../general/general';
 
 export interface SeparatorValue {
   left?: string;
@@ -48,6 +48,13 @@ export class Separator {
     this.left = options.left || '';
     this.right = options.right || '';
     this.separator = options.separator;
+  }
+
+  public withoutComments(): Separator {
+    const left = stripComments(this.left || '');
+    const right = stripComments(this.right || '');
+    if (left === this.left && right === this.right) return this;
+    return new Separator({ left, separator: this.separator, right });
   }
 
   public toString(): string {
