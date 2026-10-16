@@ -75,7 +75,7 @@ When you need a whole query in the default style (for example to show generated 
 
 ## Things to know
 
-- **Comments live in the gaps.** A comment belongs to the whitespace between two tokens. It stays in that gap when things around it change. If you insert a new item at the end of a list, it goes before the gap that follows the list, so a trailing `-- comment` after the last select item ends up after the new item.
+- **Comments live in the gaps.** A comment belongs to the whitespace between two tokens. It stays in that gap when things around it change, and is never copied into a new gap. If you insert a new item at the end of a list, it goes before the gap that follows the list, so a `-- comment` on its own line after the last select item ends up after the new item. A comment on the same line as the last select item is the exception: `addSelect` keeps it with that item, so `b -- the b` becomes `b, -- the b` followed by the new item.
 - **Equality is textual.** `a.equals(b)` compares printed text, so `x=1` and `x = 1` are not equal. Use `logicalEquals` to compare ignoring whitespace and keyword casing, see [Formatting](formatting.md).
 - **Identity is often preserved.** Many methods return the same object when they have nothing to do: a `walk` that replaces nothing, `removeColumnFromWhere` on a column that is not filtered, `addWhere()` with no arguments, `changeOrderByClause(undefined)` on a query without `ORDER BY`. This is handy for skipping work, but it is not guaranteed for every method (`changeLimitValue(5)` on a query that already has `LIMIT 5` builds a new object), so compare with `equals` when it matters.
 

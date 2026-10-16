@@ -25,8 +25,10 @@ Start = initial:_ thing:(TopLevelStatement / SqlAlias) final:_sc
 // have its turn. The lookahead makes this alternative succeed only when the query explains
 // everything up to the end of the input, so the bodies that are also expressions fall
 // through when something trails them: `VALUES (1) AS t` and `TABLE foo AS t` are aliased
-// expressions, while a bare `VALUES (1)` is still a statement.
-TopLevelStatement = query:SqlQueryWithPossibleContext &(_sc !.)
+// expressions, while a bare `VALUES (1)` is still a statement. A `;` after the query also
+// commits, since no expression can go past it: `SELECT 1; SELECT 2` then fails after the `;`,
+// which is where callers that split statements on the error location expect it.
+TopLevelStatement = query:SqlQueryWithPossibleContext &(_sc !. / _ ";")
 {
   return query;
 }

@@ -22,6 +22,7 @@ export default defineConfig([
     format: ['esm', 'cjs'],
     splitting: false,
     sourcemap: true,
+    keepNames: true,
   },
   {
     // The browser build is UMD: AMD loaders (such as `require` on ObservableHQ, which is d3-require)
@@ -30,6 +31,7 @@ export default defineConfig([
     format: ['iife'],
     globalName: 'druid',
     sourcemap: true,
+    keepNames: true,
     banner: {
       js: `(function (root, factory) {
   if (typeof define === 'function' && define.amd) define([], factory);
