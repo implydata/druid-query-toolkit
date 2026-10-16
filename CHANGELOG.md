@@ -1,5 +1,14 @@
 # druid-query-toolkit
 
+## 1.6.1
+
+### Patch Changes
+
+- e64f705: `addSelect` (and any insert into a list) no longer repeats a comment for every added item: a comment on the same line as the last select expression stays with it, and a comment on its own line stays at the end of the list, as in 1.2
+- e64f705: `changeSelectExpressions` given a plain array keeps the query's separators, so the list keeps its indentation inside a nested query
+- e64f705: Classes keep their names in the bundle, so `Column.name` is `'Column'` rather than `'_Column'` (also `SqlQuery`, `QueryResult` and the rest)
+- e64f705: A query followed by `;` and more text fails after the `;` again (`Expected end of input or possible semicolon`), as in 1.2, instead of at the `;` with a long list of expected tokens
+
 ## 1.6.0
 
 ### Minor Changes
