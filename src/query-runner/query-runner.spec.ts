@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { SqlQuery } from '..';
+import { SqlPipesQuery, SqlQuery, SqlTableQuery } from '..';
 
 import type { InflateDateStrategy, QueryExecutorArgs } from './query-runner';
 import { QueryRunner } from './query-runner';
@@ -181,6 +181,21 @@ describe('QueryRunner', () => {
       const { runner, calls } = makeCapturingRunner();
       const result = await runner.runQuery({ query: 'SELEC 1 FROM' });
       expect(calls[0]!.payload.query).toEqual('SELEC 1 FROM');
+      expect(result.sqlQuery).toBeUndefined();
+    });
+
+    it('attaches any kind of query, not only SELECT', async () => {
+      const { runner } = makeCapturingRunner();
+      const result = await runner.runQuery({ query: 'FROM t |> WHERE a = 1' });
+      expect(result.sqlQuery).toBeInstanceOf(SqlPipesQuery);
+
+      const payloadResult = await runner.runQuery({ query: { query: 'TABLE t' } });
+      expect(payloadResult.sqlQuery).toBeInstanceOf(SqlTableQuery);
+    });
+
+    it('does not attach an expression that is not a query', async () => {
+      const { runner } = makeCapturingRunner();
+      const result = await runner.runQuery({ query: '1 + 1' });
       expect(result.sqlQuery).toBeUndefined();
     });
 

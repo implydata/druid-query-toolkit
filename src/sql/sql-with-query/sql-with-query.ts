@@ -17,6 +17,7 @@ import { NEWLINE } from '../helpers';
 import type { SqlTypeDesignator, Substitutor } from '../sql-base';
 import { SqlBase } from '../sql-base';
 import { SqlWithClause, SqlWithPart } from '../sql-clause';
+import type { SqlExpression } from '../sql-expression';
 import { SqlQuery } from '../sql-query/sql-query';
 import type { SqlQueryBaseValue } from '../sql-query-base/sql-query-base';
 import { SqlQueryBase } from '../sql-query-base/sql-query-base';
@@ -107,6 +108,24 @@ export class SqlWithQuery extends SqlQueryBase {
     return this.changeWithParts(
       [SqlWithPart.simple(name, query.ensureParens())].concat(this.getWithParts()),
     );
+  }
+
+  /* ~~~~~ Questions answered by the inner query ~~~~~ */
+
+  public getSelectExpressionsArray(): readonly SqlExpression[] {
+    return this.query.getSelectExpressionsArray();
+  }
+
+  public getWhereExpression(): SqlExpression | undefined {
+    return this.query.getWhereExpression();
+  }
+
+  public getGroupByExpressions(): readonly SqlExpression[] | undefined {
+    return this.query.getGroupByExpressions();
+  }
+
+  public getHavingExpression(): SqlExpression | undefined {
+    return this.query.getHavingExpression();
   }
 
   public flattenWith(): SqlQueryBase {

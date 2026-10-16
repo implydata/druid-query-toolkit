@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { filterMap, isEmptyArray } from '../../utils';
+import { isEmptyArray } from '../../utils';
 import {
   clampIndex,
   NEWLINE,
@@ -38,7 +38,6 @@ import {
   SqlWithClause,
   SqlWithPart,
 } from '../sql-clause';
-import { SqlColumn } from '../sql-column/sql-column';
 import { SqlExpression } from '../sql-expression';
 import { SqlFunction } from '../sql-function/sql-function';
 import { SqlLiteral } from '../sql-literal/sql-literal';
@@ -52,13 +51,6 @@ import { SqlWithQuery } from '../sql-with-query/sql-with-query';
 export type SqlQueryDecorator = 'ALL' | 'DISTINCT';
 
 export type InsertIndex = number | 'last-grouping' | 'last';
-
-export interface ExpressionInfo {
-  expression: SqlExpression;
-  selectIndex: number;
-  outputColumn?: string;
-  orderByExpression?: SqlOrderByExpression;
-}
 
 export interface AddSelectOptions {
   insertIndex?: InsertIndex;
@@ -144,14 +136,6 @@ export class SqlQuery extends SqlQueryBase {
     } catch {
       return;
     }
-  }
-
-  static getSelectExpressionOutput(selectExpression: SqlExpression, i: number) {
-    return selectExpression.getOutputName() || `EXPR$${i}`;
-  }
-
-  static isPhonyOutputName(name: string) {
-    return /^EXPR\$(?:\d|[1-9]\d*)$/.test(name);
   }
 
   public readonly contextStatements?: SeparatedArray<SqlSetStatement>;
@@ -483,143 +467,8 @@ export class SqlQuery extends SqlQueryBase {
 
   /* ~~~~~ SELECT ~~~~~ */
 
-  public isValidSelectIndex(selectIndex: number): boolean {
-    const { selectExpressions } = this;
-    if (!selectExpressions) return false;
-    return 0 <= selectIndex && selectIndex < selectExpressions.length();
-  }
-
   public getSelectExpressionsArray(): readonly SqlExpression[] {
     return this.selectExpressions?.values || [];
-  }
-
-  public getSelectExpressionForIndex(selectIndex: number): SqlExpression | undefined {
-    return this.selectExpressions?.get(selectIndex);
-  }
-
-  public hasStarInSelect(): boolean {
-    return this.getSelectExpressionsArray().some(v => v instanceof SqlStar);
-  }
-
-  public getOutputColumns(): string[] {
-    return this.getSelectExpressionsArray().map(SqlQuery.getSelectExpressionOutput);
-  }
-
-  public getSelectIndexesForColumn(column: string): number[] {
-    return filterMap(this.getSelectExpressionsArray(), (selectExpression, i) => {
-      return selectExpression.containsColumnName(column) ? i : undefined;
-    });
-  }
-
-  public getGroupedSelectIndexesForColumn(column: string): number[] {
-    return this.getSelectIndexesForColumn(column).filter(selectIndex =>
-      this.isGroupedSelectIndex(selectIndex),
-    );
-  }
-
-  public getSelectIndexForOutputColumn(outputColumn: string): number {
-    return this.getSelectExpressionsArray().findIndex((selectExpression, i) => {
-      return SqlQuery.getSelectExpressionOutput(selectExpression, i) === outputColumn;
-    });
-  }
-
-  private expressionRefersToSelectIndex(
-    ex: SqlExpression,
-    selectIndex: number,
-    allowAliasReferences: boolean,
-  ): boolean {
-    const selectExpression = this.getSelectExpressionForIndex(selectIndex);
-    if (!selectExpression) return false;
-
-    if (ex instanceof SqlLiteral && ex.isIndex()) {
-      return selectIndex === ex.getIndexValue();
-    }
-
-    if (allowAliasReferences && ex instanceof SqlColumn) {
-      return selectExpression.getOutputName() === ex.getName();
-    }
-
-    return selectExpression.getUnderlyingExpression().contains(ex);
-  }
-
-  public getSelectIndexForExpression(ex: SqlExpression, allowAliasReferences: boolean): number {
-    const selectExpressionsArray = this.getSelectExpressionsArray();
-
-    if (ex instanceof SqlLiteral && ex.isIndex()) {
-      const idx = ex.getIndexValue();
-      return this.isValidSelectIndex(idx) ? idx : -1;
-    }
-
-    if (allowAliasReferences && ex instanceof SqlColumn) {
-      const refIdx = selectExpressionsArray.findIndex((selectExpression, i) => {
-        return SqlQuery.getSelectExpressionOutput(selectExpression, i) === ex.getName();
-      });
-      if (refIdx !== -1) {
-        return refIdx;
-      }
-    }
-
-    return selectExpressionsArray.findIndex(selectExpression => {
-      return ex.equals(selectExpression.getUnderlyingExpression());
-    });
-  }
-
-  public isRealOutputColumnAtSelectIndex(selectIndex: number): boolean {
-    const selectExpression = this.getSelectExpressionForIndex(selectIndex);
-    if (!selectExpression) return false;
-    return Boolean(selectExpression.getOutputName());
-  }
-
-  public isGroupedSelectIndex(selectIndex: number): boolean {
-    const { groupByClause } = this;
-    if (!groupByClause || !this.isValidSelectIndex(selectIndex)) return false;
-    return groupByClause
-      .toArray()
-      .some(ex => this.expressionRefersToSelectIndex(ex, selectIndex, false));
-  }
-
-  public isGroupedOutputColumn(outputColumn: string): boolean {
-    return this.isGroupedSelectIndex(this.getSelectIndexForOutputColumn(outputColumn));
-  }
-
-  public getGroupedSelectExpressions(): SqlExpression[] {
-    if (!this.hasGroupBy()) return [];
-    return this.getSelectExpressionsArray().filter((_selectExpression, i) => {
-      return this.isGroupedSelectIndex(i);
-    });
-  }
-
-  getGroupedOutputColumns(): string[] {
-    if (!this.hasGroupBy()) return [];
-    return filterMap(this.getSelectExpressionsArray(), (selectExpression, i) => {
-      if (!this.isGroupedSelectIndex(i)) return;
-      return SqlQuery.getSelectExpressionOutput(selectExpression, i);
-    });
-  }
-
-  isAggregateSelectIndex(selectIndex: number): boolean {
-    const { groupByClause } = this;
-    if (!groupByClause || !this.isValidSelectIndex(selectIndex)) return false;
-    return !this.isGroupedSelectIndex(selectIndex);
-  }
-
-  isAggregateOutputColumn(outputColumn: string): boolean {
-    return this.isAggregateSelectIndex(this.getSelectIndexForOutputColumn(outputColumn));
-  }
-
-  getAggregateSelectExpressions(): SqlExpression[] {
-    if (!this.groupByClause) return [];
-    return this.getSelectExpressionsArray().filter((_selectExpression, i) => {
-      return this.isAggregateSelectIndex(i);
-    });
-  }
-
-  getAggregateOutputColumns(): string[] {
-    if (!this.groupByClause) return [];
-    return filterMap(this.getSelectExpressionsArray(), (selectExpression, i) => {
-      if (!this.isAggregateSelectIndex(i)) return;
-      return SqlQuery.getSelectExpressionOutput(selectExpression, i);
-    });
   }
 
   private decodeInsertIndex(insertIndex: InsertIndex = 'last'): number {
@@ -842,17 +691,8 @@ export class SqlQuery extends SqlQueryBase {
 
   /* ~~~~~ WHERE ~~~~~ */
 
-  public hasWhere(): boolean {
-    return Boolean(this.whereClause);
-  }
-
   public getWhereExpression(): SqlExpression | undefined {
     if (!this.whereClause) return;
-    return this.whereClause.expression;
-  }
-
-  public getEffectiveWhereExpression(): SqlExpression {
-    if (!this.whereClause) return SqlLiteral.TRUE;
     return this.whereClause.expression;
   }
 
@@ -869,38 +709,6 @@ export class SqlQuery extends SqlQueryBase {
 
   /* ~~~~~ GROUP BY ~~~~~ */
 
-  public hasGroupBy(): boolean {
-    return Boolean(this.groupByClause);
-  }
-
-  public getGroupingExpressionInfos(): ExpressionInfo[] {
-    const { groupByClause } = this;
-    if (!groupByClause) return [];
-
-    return groupByClause.toArray().map(ex => {
-      const selectIndex = this.getSelectIndexForExpression(ex, true);
-      if (selectIndex === -1) {
-        return {
-          expression: ex,
-          selectIndex,
-          orderByExpression: this.getOrderByForExpression(ex),
-        };
-      } else {
-        const selectExpression = this.getSelectExpressionForIndex(selectIndex)!;
-        return {
-          expression: selectExpression.getUnderlyingExpression(),
-          selectIndex,
-          outputColumn: SqlQuery.getSelectExpressionOutput(selectExpression, selectIndex),
-          orderByExpression: this.getOrderByForSelectIndex(selectIndex),
-        };
-      }
-    });
-  }
-
-  public getGroupingExpressions(): SqlExpression[] {
-    return this.getGroupingExpressionInfos().map(info => info.expression);
-  }
-
   public addGroupBy(ex: SqlExpression) {
     return this.changeGroupByClause(
       this.groupByClause ? this.groupByClause.addExpression(ex) : SqlGroupByClause.create([ex]),
@@ -909,17 +717,8 @@ export class SqlQuery extends SqlQueryBase {
 
   /* ~~~~~ HAVING ~~~~~ */
 
-  public hasHaving(): boolean {
-    return Boolean(this.havingClause);
-  }
-
   public getHavingExpression(): SqlExpression | undefined {
     if (!this.havingClause) return;
-    return this.havingClause.expression;
-  }
-
-  public getEffectiveHavingExpression(): SqlExpression {
-    if (!this.havingClause) return SqlLiteral.TRUE;
     return this.havingClause.expression;
   }
 
@@ -934,34 +733,6 @@ export class SqlQuery extends SqlQueryBase {
   }
 
   /* ~~~~~ ORDER BY ~~~~~ */
-
-  public getOrderByForSelectIndex(selectIndex: number): SqlOrderByExpression | undefined {
-    if (!this.orderByClause || !this.isValidSelectIndex(selectIndex)) return;
-    return this.orderByClause
-      .toArray()
-      .find(orderByExpression =>
-        this.expressionRefersToSelectIndex(orderByExpression.expression, selectIndex, true),
-      );
-  }
-
-  public getOrderByForOutputColumn(outputColumn: string): SqlOrderByExpression | undefined {
-    return this.getOrderByForSelectIndex(this.getSelectIndexForOutputColumn(outputColumn));
-  }
-
-  public getOrderedSelectExpressions() {
-    if (!this.orderByClause) return [];
-    return this.getSelectExpressionsArray().filter((_selectExpression, i) => {
-      return this.getOrderByForSelectIndex(i);
-    });
-  }
-
-  public getOrderedOutputColumns() {
-    if (!this.orderByClause) return [];
-    return filterMap(this.getSelectExpressionsArray(), (selectExpression, i) => {
-      if (!this.getOrderByForSelectIndex(i)) return;
-      return SqlQuery.getSelectExpressionOutput(selectExpression, i);
-    });
-  }
 
   public removeOrderByForSelectIndex(selectIndex: number): this {
     if (!this.orderByClause || !this.isValidSelectIndex(selectIndex)) return this;

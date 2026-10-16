@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { SqlQuery } from '../sql';
+import { SqlQuery, SqlQueryBase } from '../sql';
 
 import { Column } from './column';
 import { QueryResult } from './query-result';
@@ -1535,6 +1535,11 @@ describe('QueryResult', () => {
       expect(result.query).toEqual({ query: 'SELECT * FROM tbl' });
       expect(result.sqlQuery).toBe(sqlQuery);
       expect(result.rows).toBe(testQueryResult.rows);
+    });
+
+    it('attaches any kind of query', () => {
+      const sqlQuery = SqlQueryBase.parse('TABLE tbl');
+      expect(testQueryResult.attachQuery({ query: 'TABLE tbl' }, sqlQuery).sqlQuery).toBe(sqlQuery);
     });
   });
 

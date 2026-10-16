@@ -15,9 +15,11 @@
 import { SPACE } from '../helpers';
 import type { SqlTypeDesignator, Substitutor } from '../sql-base';
 import { SqlBase } from '../sql-base';
+import type { SqlExpression } from '../sql-expression';
 import type { SqlNamespace } from '../sql-namespace/sql-namespace';
 import type { SqlQueryBaseValue } from '../sql-query-base/sql-query-base';
 import { SqlQueryBase } from '../sql-query-base/sql-query-base';
+import { SqlStar } from '../sql-star/sql-star';
 import { SqlTable } from '../sql-table/sql-table';
 
 export interface SqlTableQueryValue extends SqlQueryBaseValue {
@@ -84,6 +86,11 @@ export class SqlTableQuery extends SqlQueryBase {
 
   public changeNamespace(namespace: SqlNamespace | undefined): this {
     return this.changeTable(this.table.changeNamespace(namespace));
+  }
+
+  // Reads every column of the table, like SELECT *
+  public getSelectExpressionsArray(): readonly SqlExpression[] {
+    return [SqlStar.PLAIN];
   }
 
   protected _walkInnerBody(

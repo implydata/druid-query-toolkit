@@ -60,6 +60,31 @@ showLatestFirst('FROM wikipedia |> WHERE isRobot = FALSE');
 
 For pipe queries, `ORDER BY`, `LIMIT` and `OFFSET` are expressed as trailing pipe operators instead of clauses, and the methods below take care of that.
 
+## Output columns, filters and grouping
+
+Every query returns a table, and `SqlQueryBase` answers the questions about it: which **output columns** it has (by index or by name) and which expression makes each one, what it filters on and what it groups by. These are the members a results table needs, so code that shows a result can take any query:
+
+```js
+const query = SqlQueryBase.parse(sql);
+
+query.getOutputColumns(); //=> ['channel', 'Count']
+query.getSelectExpressionForIndex(1); //=> COUNT(*) AS "Count"
+query.isAggregateOutputColumn('Count'); //=> true
+query.getEffectiveWhereExpression(); //=> isRobot = FALSE  (TRUE if there is no filter)
+query.getOrderByForOutputColumn('Count'); //=> 2 DESC
+```
+
+How each kind of query answers:
+
+| Query | Output columns | Filters and grouping |
+| --- | --- | --- |
+| `SqlQuery` | its select list | its `WHERE`, `GROUP BY` and `HAVING` |
+| `SqlWithQuery` | from the query it wraps | from the query it wraps |
+| `SqlTableQuery`, `SqlFromQuery` | a single `*`, like `SELECT *` | none |
+| `SqlValues`, `SqlPipesQuery` | none, they can not be told from the text yet | none |
+
+Changing a query (adding a filter, a column, a grouping) is specific to its kind, so those methods are on the [`SqlQuery`](select-queries.md) class. Narrow with `instanceof SqlQuery` before you change one.
+
 ## Context (SET statements)
 
 Druid SQL can set query context parameters with `SET` statements at the top of the query. The query models them as a plain object:
@@ -158,14 +183,14 @@ query.changeOrderByExpression(undefined); // remove ORDER BY
 Each item is a `SqlOrderByExpression` with an `expression`, an optional `direction` and an optional `nulls` (`'FIRST'` or `'LAST'`, from `NULLS FIRST` / `NULLS LAST`). `getEffectiveDirection()` returns the direction with the default (`'ASC'`) filled in, `changeNulls()` sets or removes the nulls placement, and `reverseDirection()` flips the direction (and the nulls placement, if there is one). Sorting by a result column header, as in the web console, looks like this:
 
 ```js
-const current = query.getOrderByForOutputColumn(header); // SqlQuery only, see the SELECT page
+const current = query.getOrderByForOutputColumn(header);
 const next = current
   ? current.reverseDirection()
   : SqlLiteral.index(headerIndex).toOrderByExpression('DESC'); // ORDER BY <n> DESC
 query.changeOrderByExpressions([next]);
 ```
 
-`SqlQuery` has more column oriented ORDER BY helpers, see [SELECT queries](select-queries.md#order-by).
+The other column oriented ORDER BY questions (`getOrderByForSelectIndex`, `getOrderedOutputColumns`, ...) are on every query too, see [above](#output-columns-filters-and-grouping). Removing the sort of a column is on `SqlQuery`, see [SELECT queries](select-queries.md#order-by).
 
 ## LIMIT and OFFSET
 

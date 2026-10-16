@@ -155,6 +155,14 @@ describe('SqlTableQuery', () => {
     });
   });
 
+  describe('#getSelectExpressionsArray', () => {
+    it('reads every column, like SELECT *', () => {
+      expect(
+        (SqlExpression.parse('TABLE t') as SqlTableQuery).getSelectExpressionsArray().map(String),
+      ).toEqual(['*']);
+    });
+  });
+
   describe('#walk', () => {
     it('walks the underlying table', () => {
       const tableQuery = SqlExpression.parse(`TABLE druid.kttm`);
