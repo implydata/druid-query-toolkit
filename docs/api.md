@@ -659,6 +659,10 @@ _Returns_: `SqlPipesQuery`
 
 The starting query.
 
+### pipesQuery.withClause, pipesQuery.changeWithClause(withClause), pipesQuery.getWithParts()
+
+The `WITH` in front of the starting query, which the operators can use the tables of. [More info.](pipe-syntax.md#parsing)
+
 ### pipesQuery.getPipeOperators(), pipesQuery.getLastPipeOperator()
 
 _Returns_: `readonly SqlPipeOperator[]` / `SqlPipeOperator`
@@ -677,16 +681,17 @@ Removing the last operator returns the starting query.
 
 _Returns_: `SqlQuery`
 
-An equivalent query without pipes. Throws if a `|> SET` or `|> DROP` has input with unknown columns. [More info.](pipe-syntax.md#unpipe)
+An equivalent query without pipes. Throws if a `|> SET`, `|> DROP` or `|> RENAME` has input with unknown columns. [More info.](pipe-syntax.md#unpipe)
 
 ## Other query classes
 
 All of these extend [`SqlQueryBase`](#sqlquerybase).
 
-- `SqlFromQuery`: `FROM t`. `SqlFromQuery.create(table)`, `optionalQuotes(table)`, `getTableName()`, `changeTableName(name)`, `changeTable(table)`, `getNamespaceName()`, `changeNamespace(namespace)`.
-- `SqlTableQuery`: `TABLE t`. The same methods as `SqlFromQuery`.
+- `SqlFromQuery`: `FROM ...`, a whole FROM clause on its own (`FROM t AS a JOIN u AS b ON ...`). `SqlFromQuery.create(from)` (a table name, an expression or a `SqlFromClause`), `optionalQuotes(table)`, `fromClause`, `changeFromClause(fromClause)`, `getFromExpressions()`, `getFirstFromExpression()`, `changeFromExpressions(expressions)`, `hasJoin()`, `getJoins()`, `addJoin(join)`, `removeAllJoins()`.
+- `SqlTableQuery`: `TABLE t`. `SqlTableQuery.create(table)`, `optionalQuotes(table)`, `getTableName()`, `changeTableName(name)`, `changeTable(table)`, `getNamespaceName()`, `changeNamespace(namespace)`.
 - `SqlValues`: `VALUES (...), (...)`. `SqlValues.create(records)`, `changeRecords(records)`.
-- `SqlWithQuery`: a `WITH` clause around a body that is not a plain `SELECT`. `withClause`, `query`, `getWithParts()`, `changeWithParts(parts)`, `prependWith(name, query)`, `changeQuery(query)`.
+- `SqlWithQuery`: a `WITH` clause around a body that is not a plain `SELECT`: a query in parentheses, or a bare `FROM`, `TABLE` or `VALUES`. `withClause`, `query`, `getWithParts()`, `changeWithParts(parts)`, `prependWith(name, query)`, `changeQuery(query)`.
+- `SqlParensQuery`: a query in parentheses with more of the statement outside of them, like `(FROM t) UNION ALL (FROM u)` or `(SELECT ...) ORDER BY x`. `SqlParensQuery.create(query)`, `query`, `changeQuery(query)`. A statement that is only a query in parentheses parses to that query.
 
 ## Expression classes
 

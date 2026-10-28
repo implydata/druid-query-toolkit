@@ -20,6 +20,7 @@ import {
   SqlExpression,
   SqlFunction,
   SqlGroupByClause,
+  SqlOrderByExpression,
 } from '../..';
 import { backAndForthPipeOperator } from '../../test-utils';
 
@@ -40,6 +41,12 @@ describe('SqlAggregatePipeOperator', () => {
       `|> AGGREGATE COUNT(*) AS n GROUP BY item AS i`,
       `|> AGGREGATE COUNT(*) AS n GROUP BY item i, b`,
       `|> AGGREGATE GROUP BY UPPER(item)  as  "Item"`,
+      `|> AGGREGATE COUNT(*) AS c DESC GROUP BY a ASC NULLS LAST, b`,
+      `|> AGGREGATE COUNT(*) DESC`,
+      `|> AGGREGATE COUNT(*) c  asc ,  SUM(x) GROUP BY a b  desc  nulls first`,
+      `|> AGGREGATE GROUP BY a DESC`,
+      `|> AGGREGATE COUNT(*) AS "desc"`,
+      `|> AGGREGATE COUNT(*) AS desc DESC`,
     ])('does back and forth with %s', sql => {
       backAndForthPipeOperator(sql, SqlAggregatePipeOperator);
     });
@@ -151,6 +158,29 @@ describe('SqlAggregatePipeOperator', () => {
       expect(expressions[1]).toBeInstanceOf(SqlColumn);
     });
 
+    it('reads ASC and DESC as an order suffix, not as an alias', () => {
+      const operator = parseOperator(`|> AGGREGATE COUNT(*) DESC GROUP BY a AS x ASC NULLS LAST`);
+      const aggregate = operator.expressions!.first() as SqlOrderByExpression;
+      const key = operator.getGroupByExpressions()[0] as SqlOrderByExpression;
+
+      expect(aggregate).toBeInstanceOf(SqlOrderByExpression);
+      expect(aggregate.direction).toEqual('DESC');
+      expect(aggregate.expression).toBeInstanceOf(SqlFunction);
+
+      expect(key).toBeInstanceOf(SqlOrderByExpression);
+      expect(key.direction).toEqual('ASC');
+      expect(key.nulls).toEqual('LAST');
+      expect(key.expression).toBeInstanceOf(SqlAlias);
+      expect(key.getOutputName()).toEqual('x');
+    });
+
+    it('takes DESC after an AS as an alias', () => {
+      const aggregate = parseOperator(`|> AGGREGATE COUNT(*) AS desc`).expressions!.first();
+
+      expect(aggregate).toBeInstanceOf(SqlAlias);
+      expect(aggregate.getOutputName()).toEqual('desc');
+    });
+
     it('parses a group by without aliases like a standard one', () => {
       const groupByClause = parseOperator(`|> AGGREGATE COUNT(*) GROUP BY (a, b)`).groupByClause!;
 
@@ -165,6 +195,8 @@ describe('SqlAggregatePipeOperator', () => {
       `FROM t |> AGGREGATE GROUP BY`,
       `FROM t |> AGGREGATE COUNT(*) GROUP BY a AS x (c)`,
       `FROM t |> AGGREGATE COUNT(*) GROUP BY (a + 1) AS x, ()`,
+      `FROM t |> AGGREGATE COUNT(*) NULLS FIRST`,
+      `FROM t |> AGGREGATE COUNT(*) DESC DESC`,
     ])('rejects %s', sql => {
       expect(() => SqlExpression.parse(sql)).toThrow('Expected');
     });
@@ -187,6 +219,15 @@ describe('SqlAggregatePipeOperator', () => {
           [SqlColumn.create('a').as('k')],
         ).toString(),
       ).toEqual(`|> AGGREGATE COUNT(*) AS "c" GROUP BY "a" AS "k"`);
+    });
+
+    it('works with order suffixes', () => {
+      expect(
+        SqlAggregatePipeOperator.create(
+          [SqlFunction.count().as('c').toOrderByExpression('DESC')],
+          [SqlColumn.create('a').toOrderByExpression('ASC')],
+        ).toString(),
+      ).toEqual(`|> AGGREGATE COUNT(*) AS "c" DESC GROUP BY "a" ASC`);
     });
 
     it('works with only a group by clause', () => {
@@ -244,6 +285,14 @@ describe('SqlAggregatePipeOperator', () => {
         parseOperator(`|> AGGREGATE COUNT(*) GROUP BY a, b`).getGroupByExpressions().map(String),
       ).toEqual(['a', 'b']);
       expect(parseOperator(`|> AGGREGATE COUNT(*)`).getGroupByExpressions()).toEqual([]);
+    });
+
+    it('keeps the order suffixes', () => {
+      expect(
+        parseOperator(`|> AGGREGATE COUNT(*) GROUP BY a DESC, b`)
+          .getGroupByExpressions()
+          .map(String),
+      ).toEqual(['a DESC', 'b']);
     });
   });
 

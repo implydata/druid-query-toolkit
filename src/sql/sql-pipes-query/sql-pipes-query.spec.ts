@@ -27,6 +27,7 @@ import {
   SqlQuery,
   SqlTable,
   SqlWherePipeOperator,
+  SqlWithQuery,
 } from '../..';
 import { backAndForth } from '../../test-utils';
 import { sane } from '../../utils';
@@ -53,14 +54,121 @@ describe('SqlPipesQuery', () => {
       `EXPLAIN PLAN FOR FROM t |> WHERE x`,
       `INSERT INTO u FROM t |> WHERE x PARTITIONED BY DAY`,
       `REPLACE INTO u OVERWRITE ALL FROM t |> AGGREGATE COUNT(*) GROUP BY a PARTITIONED BY ALL CLUSTERED BY a`,
-      `FROM t |> WHERE x UNION ALL FROM u`,
       sane`
         SET x = 1;
         FROM t
         |> WHERE x
       `,
+      `FROM t AS a |> WHERE a.x`,
+      `FROM t a, u b |> WHERE a.x = b.x`,
+      `FROM t AS a JOIN u AS b ON a.x = b.x |> AGGREGATE COUNT(*) AS c`,
+      `FROM (SELECT a FROM t) AS s |> WHERE s.a > 1`,
+      `WITH s AS (SELECT a FROM t) FROM s |> WHERE a > 1`,
+      `WITH s AS (FROM t) FROM s |> AGGREGATE COUNT(*) AS c`,
+      `WITH s AS (SELECT a FROM t) TABLE s |> LIMIT 1`,
+      `WITH s AS (SELECT a FROM t) SELECT a FROM s |> WHERE a > 1`,
+      `(FROM t) |> WHERE x`,
+      `(SELECT a FROM t) |> WHERE a > 1`,
+      `(FROM t |> SELECT a) |> LIMIT 1`,
+      `FROM t |> SELECT DISTINCT a |> UNION ALL (FROM u |> SELECT a), (SELECT b FROM v)`,
+      `FROM t |> AS a |> JOIN u AS b ON a.x = b.x |> RENAME x AS y |> DISTINCT`,
+      `FROM t |> AGGREGATE COUNT(*) AS c DESC GROUP BY a ASC NULLS LAST, b`,
+      `SELECT a FROM t UNION ALL SELECT a FROM u |> AGGREGATE COUNT(*) AS c`,
+      `WITH s AS (FROM t) SELECT a, b FROM s |> WHERE a IN (FROM s |> SELECT a)`,
+      sane`
+        FROM t
+        |> WHERE a = 'x'
+        |> AGGREGATE COUNT(*) AS c, SUM(b) AS s GROUP BY d
+        |> ORDER BY c DESC, d
+        |> LIMIT 5
+      `,
+      sane`
+        FROM t
+        |> SELECT a, b, c
+        |> EXTEND b - c AS e
+        |> DROP c
+        |> RENAME a AS k
+        |> SET b = b * 2
+        |> AGGREGATE SUM(b) AS b, SUM(e) AS e GROUP BY k
+      `,
+      sane`
+        SELECT a, COUNT(*) AS c FROM t GROUP BY a
+        |> WHERE c > 10
+        |> ORDER BY c DESC
+      `,
+      sane`
+        FROM t
+        |> SELECT a
+        |> DISTINCT
+        |> AGGREGATE COUNT(*) c
+      `,
+      sane`
+        FROM t
+        |> AS l
+        |> LEFT JOIN u AS r ON l.k = r.k
+        |> AGGREGATE COUNT(*) AS c, SUM(r.v) AS s
+      `,
+      sane`
+        FROM t
+        |> SELECT a
+        |> UNION ALL (
+             FROM u
+             |> SELECT a
+           )
+      `,
+      `FROM t |> AGGREGATE COUNT(*) AS c GROUP BY a DESC /* sorts */ |> LIMIT 2`,
+      `FROM t |> ORDER BY __time |> SELECT a |> LIMIT 2`,
+      `FROM t |> AS m |> WHERE MY_FN(m.*, 'x') |> AGGREGATE COUNT(*) AS c`,
+      sane`
+        INSERT INTO dst
+        WITH s AS (FROM t)
+        FROM s
+        |> SELECT __time, a
+        PARTITIONED BY ALL TIME
+      `,
+      sane`
+        REPLACE INTO dst OVERWRITE ALL
+        FROM TABLE(EXTERN('{}', '{}')) EXTEND (a VARCHAR, b BIGINT)
+        |> AGGREGATE SUM(b) AS b GROUP BY a
+        PARTITIONED BY DAY
+      `,
     ])('does back and forth with %s', sql => {
       backAndForth(sql, SqlPipesQuery);
+    });
+
+    it('applies the pipe operators after a UNION ALL to the whole union', () => {
+      const query = parsePipes(
+        `SELECT a FROM t UNION ALL FROM u UNION ALL SELECT a FROM v ORDER BY a LIMIT 3 |> WHERE a`,
+      );
+
+      expect(query.query).toBeInstanceOf(SqlQuery);
+      expect(query.query.toString()).toEqual(
+        `SELECT a FROM t UNION ALL FROM u UNION ALL SELECT a FROM v ORDER BY a LIMIT 3`,
+      );
+      expect(query.getPipeOperators().map(String)).toEqual([`|> WHERE a`]);
+    });
+
+    it('keeps the pipe operators in parentheses on their query', () => {
+      const query = SqlExpression.parse(`SELECT a FROM t UNION ALL (FROM u |> WHERE a)`);
+
+      expect(query).toBeInstanceOf(SqlQuery);
+      expect((query as SqlQuery).unionQuery).toBeInstanceOf(SqlPipesQuery);
+    });
+
+    it('puts a WITH in front of the root query around the whole pipeline', () => {
+      for (const root of [`FROM s`, `SELECT a FROM s UNION ALL FROM s`]) {
+        const query = parsePipes(`WITH s AS (SELECT a FROM t) ${root} |> WHERE a > 1`);
+
+        expect(String(query.withClause)).toEqual(`WITH s AS (SELECT a FROM t)`);
+        expect(query.query.toString()).toEqual(root);
+      }
+    });
+
+    it('leaves a WITH in parentheses on the root query', () => {
+      const query = parsePipes(`(WITH s AS (FROM t) FROM s) |> WHERE a > 1`);
+
+      expect(query.withClause).toBeUndefined();
+      expect(query.query).toBeInstanceOf(SqlWithQuery);
     });
 
     describe('as a sub query', () => {
@@ -80,16 +188,17 @@ describe('SqlPipesQuery', () => {
       expect(query.limitClause).toBeUndefined();
     });
 
-    it('puts the ingest and union clauses on the pipes query', () => {
-      const query = parsePipes(
-        `INSERT INTO u FROM t |> WHERE x PARTITIONED BY DAY CLUSTERED BY a UNION ALL FROM v`,
-      );
+    it('puts the ingest clauses on the pipes query', () => {
+      for (const root of [`FROM t`, `FROM t UNION ALL FROM v`]) {
+        const query = parsePipes(
+          `INSERT INTO u ${root} |> WHERE x PARTITIONED BY DAY CLUSTERED BY a`,
+        );
 
-      expect(query.query.toString()).toEqual(`FROM t`);
-      expect(String(query.insertClause)).toEqual(`INSERT INTO u`);
-      expect(String(query.partitionedByClause)).toEqual(`PARTITIONED BY DAY`);
-      expect(String(query.clusteredByClause)).toEqual(`CLUSTERED BY a`);
-      expect(String(query.unionQuery)).toEqual(`FROM v`);
+        expect(query.query.toString()).toEqual(root);
+        expect(String(query.insertClause)).toEqual(`INSERT INTO u`);
+        expect(String(query.partitionedByClause)).toEqual(`PARTITIONED BY DAY`);
+        expect(String(query.clusteredByClause)).toEqual(`CLUSTERED BY a`);
+      }
     });
 
     it('works with a spike detection query', () => {
@@ -262,30 +371,42 @@ describe('SqlPipesQuery', () => {
             "clusteredByClause": undefined,
             "contextStatements": undefined,
             "explain": undefined,
-            "insertClause": undefined,
-            "keywords": Object {
-              "from": "FROM",
+            "fromClause": SqlFromClause {
+              "expressions": SeparatedArray {
+                "separators": Array [],
+                "values": Array [
+                  SqlTable {
+                    "keywords": Object {},
+                    "namespace": undefined,
+                    "parens": undefined,
+                    "refName": RefName {
+                      "name": "t",
+                      "quotes": false,
+                    },
+                    "spacing": Object {},
+                    "type": "table",
+                  },
+                ],
+              },
+              "joinParts": undefined,
+              "keywords": Object {
+                "from": "FROM",
+              },
+              "parens": undefined,
+              "spacing": Object {
+                "postFrom": " ",
+              },
+              "type": "fromClause",
             },
+            "insertClause": undefined,
+            "keywords": Object {},
             "limitClause": undefined,
             "offsetClause": undefined,
             "orderByClause": undefined,
             "parens": undefined,
             "partitionedByClause": undefined,
             "replaceClause": undefined,
-            "spacing": Object {
-              "postFrom": " ",
-            },
-            "table": SqlTable {
-              "keywords": Object {},
-              "namespace": undefined,
-              "parens": undefined,
-              "refName": RefName {
-                "name": "t",
-                "quotes": false,
-              },
-              "spacing": Object {},
-              "type": "table",
-            },
+            "spacing": Object {},
             "type": "fromQuery",
             "unionQuery": undefined,
           },
@@ -296,6 +417,7 @@ describe('SqlPipesQuery', () => {
           },
           "type": "pipesQuery",
           "unionQuery": undefined,
+          "withClause": undefined,
         }
       `);
     });
@@ -311,6 +433,10 @@ describe('SqlPipesQuery', () => {
       `FROM t |> AGGREGATE`,
       `FROM t |> LIMIT`,
       `|> WHERE x`,
+      `FROM t |> GROUP BY x`,
+      `FROM t |> WHERE x |> UNION ALL FROM u`,
+      `FROM t |> WHERE x UNION ALL FROM u`,
+      `FROM t |> LIMIT 1 UNION ALL SELECT a FROM u`,
     ])('rejects %s', sql => {
       expect(() => SqlExpression.parse(sql)).toThrow('Expected');
     });
@@ -333,6 +459,16 @@ describe('SqlPipesQuery', () => {
         ]).toString(),
       ).toEqual(`FROM t |> WHERE x\n|> LIMIT 5`);
     });
+
+    it('puts the WITH of the root query around the pipeline, as parsing does', () => {
+      const query = SqlPipesQuery.create(SqlQuery.parse(`WITH s AS (FROM t) SELECT a FROM s`), [
+        SqlWherePipeOperator.create(SqlColumn.create('x')),
+      ]);
+
+      expect(String(query.withClause)).toEqual(`WITH s AS (FROM t)`);
+      expect(query.query.toString()).toEqual(`SELECT a FROM s`);
+      expect(query.toString()).toEqual(`WITH s AS (FROM t) SELECT a FROM s\n|> WHERE "x"`);
+    });
   });
 
   describe('#constructor', () => {
@@ -345,6 +481,34 @@ describe('SqlPipesQuery', () => {
             limitClause: SqlLimitClause.create(1),
           }),
       ).toThrow('a pipes query can not have ORDER BY, LIMIT or OFFSET clauses');
+    });
+
+    it('throws when given a union', () => {
+      expect(() =>
+        parsePipes(`FROM t |> WHERE x`).changeUnionQuery(SqlFromQuery.create('u')),
+      ).toThrow('a pipes query can not have a UNION ALL after it, use |> UNION ALL instead');
+    });
+  });
+
+  describe('#changeWithClause', () => {
+    it('sets and removes the WITH', () => {
+      const query = parsePipes(`WITH s AS (FROM t)\nFROM s |> WHERE x`);
+
+      expect(query.changeWithClause(undefined).toString()).toEqual(`FROM s |> WHERE x`);
+      expect(parsePipes(`FROM s |> WHERE x`).changeWithClause(query.withClause).toString()).toEqual(
+        `WITH s AS (FROM t)\nFROM s |> WHERE x`,
+      );
+    });
+  });
+
+  describe('#getWithParts', () => {
+    it('gets the parts of the WITH', () => {
+      expect(
+        parsePipes(`WITH s AS (FROM t), r AS (FROM u) FROM s |> WHERE x`)
+          .getWithParts()
+          .map(String),
+      ).toEqual([`s AS (FROM t)`, `r AS (FROM u)`]);
+      expect(parsePipes(`FROM s |> WHERE x`).getWithParts()).toEqual([]);
     });
   });
 
@@ -424,6 +588,20 @@ describe('SqlPipesQuery', () => {
 
       expect(removed).toBeInstanceOf(SqlFromQuery);
       expect(removed.toString()).toEqual(`INSERT INTO u FROM t PARTITIONED BY DAY`);
+    });
+
+    it('gives the WITH back to the root query when the last operator goes', () => {
+      const select = parsePipes(`WITH s AS (FROM t) SELECT a FROM s |> WHERE x`).removePipeOperator(
+        0,
+      );
+      expect(select).toBeInstanceOf(SqlQuery);
+      expect(select.toString()).toEqual(`WITH s AS (FROM t) SELECT a FROM s`);
+
+      const from = parsePipes(
+        `INSERT INTO u WITH s AS (FROM t) FROM s |> WHERE x`,
+      ).removePipeOperator(0);
+      expect(from).toBeInstanceOf(SqlWithQuery);
+      expect(from.toString()).toEqual(`INSERT INTO u WITH s AS (FROM t) FROM s`);
     });
   });
 
@@ -640,18 +818,143 @@ describe('SqlPipesQuery', () => {
       expect(unpipe(`  (FROM t |> WHERE x)  `)).toEqual(`  (SELECT * FROM t WHERE x)  `);
     });
 
-    it('wraps a query with a LIMIT that is followed by a UNION ALL', () => {
-      expect(unpipe(`FROM t |> WHERE x UNION ALL FROM u`)).toEqual(
-        `SELECT * FROM t WHERE x UNION ALL FROM u`,
+    it('applies the operators after a UNION ALL to the whole union', () => {
+      expect(
+        unpipe(`SELECT a FROM t UNION ALL SELECT a FROM u |> AGGREGATE COUNT(*) AS c`),
+      ).toEqual(`SELECT COUNT(*) AS c FROM (SELECT a FROM t UNION ALL SELECT a FROM u)`);
+      expect(unpipe(`SELECT a FROM t UNION ALL SELECT a FROM u LIMIT 5 |> WHERE a`)).toEqual(
+        `SELECT * FROM (SELECT a FROM t UNION ALL SELECT a FROM u LIMIT 5) WHERE a`,
       );
-      expect(unpipe(`FROM t |> LIMIT 1 UNION ALL FROM u`)).toEqual(
-        `SELECT * FROM (SELECT * FROM t LIMIT 1) UNION ALL FROM u`,
+    });
+
+    it('keeps the tables of a WITH in reach of every operator', () => {
+      expect(
+        unpipe(`WITH s AS (FROM t) SELECT a, b FROM s |> WHERE a IN (FROM s |> SELECT a)`),
+      ).toEqual(
+        `WITH s AS (SELECT * FROM t) SELECT * FROM (SELECT a, b FROM s) WHERE a IN (SELECT a FROM s)`,
+      );
+      expect(
+        unpipe(
+          `WITH s AS (FROM t) FROM s |> AGGREGATE COUNT(*) AS c GROUP BY a |> WHERE a IN (FROM s)`,
+        ),
+      ).toEqual(
+        `WITH s AS (SELECT * FROM t) SELECT * FROM (SELECT a, COUNT(*) AS c FROM s GROUP BY a) WHERE a IN (SELECT * FROM s)`,
+      );
+      expect(unpipe(`WITH r AS (FROM u) (WITH s AS (FROM t) SELECT * FROM s) |> WHERE x`)).toEqual(
+        `WITH r AS (SELECT * FROM u), s AS (SELECT * FROM t) SELECT * FROM s WHERE x`,
+      );
+    });
+
+    it('converts SELECT DISTINCT and DISTINCT', () => {
+      expect(unpipe(`FROM t |> SELECT DISTINCT a`)).toEqual(`SELECT DISTINCT a FROM t`);
+      expect(unpipe(`FROM t |> SELECT a |> distinct`)).toEqual(`SELECT distinct a FROM t`);
+      expect(unpipe(`FROM t |> WHERE x |> DISTINCT`)).toEqual(`SELECT DISTINCT * FROM t WHERE x`);
+      expect(unpipe(`FROM t |> SELECT a |> LIMIT 5 |> DISTINCT`)).toEqual(
+        `SELECT DISTINCT * FROM (SELECT a FROM t LIMIT 5)`,
+      );
+      expect(unpipe(`FROM t |> DISTINCT |> WHERE x`)).toEqual(
+        `SELECT * FROM (SELECT DISTINCT * FROM t) WHERE x`,
+      );
+    });
+
+    it('converts AS', () => {
+      expect(unpipe(`FROM t |> AS a |> WHERE a.x`)).toEqual(`SELECT * FROM t AS a WHERE a.x`);
+      expect(unpipe(`FROM t AS b |> AS a`)).toEqual(`SELECT * FROM t AS a`);
+      expect(unpipe(`FROM t |> WHERE x |> AS a |> WHERE a.y`)).toEqual(
+        `SELECT * FROM (SELECT * FROM t WHERE x) AS a WHERE a.y`,
+      );
+    });
+
+    it('converts JOIN', () => {
+      expect(unpipe(`FROM t |> AS a |> JOIN u AS b ON a.x = b.x`)).toEqual(
+        `SELECT * FROM t AS a JOIN u AS b ON a.x = b.x`,
+      );
+      expect(unpipe(`FROM t JOIN u USING (x) |> LEFT JOIN v USING (y)`)).toEqual(
+        `SELECT * FROM t JOIN u USING (x)\nLEFT JOIN v USING (y)`,
+      );
+    });
+
+    it('keeps the name of the input when a JOIN has to go after a sub query', () => {
+      expect(unpipe(`FROM t |> WHERE x |> JOIN u ON t.k = u.k`)).toEqual(
+        `SELECT * FROM (SELECT * FROM t WHERE x) AS t JOIN u ON t.k = u.k`,
+      );
+      expect(unpipe(`FROM t AS a |> WHERE x |> JOIN u ON a.k = u.k`)).toEqual(
+        `SELECT * FROM (SELECT * FROM t AS a WHERE x) AS a JOIN u ON a.k = u.k`,
+      );
+      expect(unpipe(`FROM t |> SELECT k |> JOIN u USING (k)`)).toEqual(
+        `SELECT * FROM (SELECT k FROM t) JOIN u USING (k)`,
+      );
+    });
+
+    it('converts RENAME when the input columns are known', () => {
+      expect(unpipe(`FROM t |> SELECT a, b, c |> RENAME a AS x, c y`)).toEqual(sane`
+        SELECT
+          a AS x,
+          b,
+          c y
+        FROM (SELECT a, b, c FROM t)
+      `);
+      expect(() => unpipe(`FROM t |> RENAME a AS x`)).toThrow(
+        'can not unpipe |> RENAME because the columns of its input are not known',
+      );
+      expect(() => unpipe(`FROM t |> SELECT a |> RENAME b AS x`)).toThrow(
+        `can not RENAME unknown column 'b'`,
+      );
+    });
+
+    it('converts UNION ALL', () => {
+      expect(
+        unpipe(`FROM t |> SELECT a |> UNION ALL (FROM u |> SELECT a), (SELECT b FROM v)`),
+      ).toEqual(`SELECT a FROM t UNION ALL SELECT a FROM u UNION ALL SELECT b FROM v`);
+      expect(
+        unpipe(`FROM t |> SELECT a |> UNION ALL (SELECT a FROM u LIMIT 1) |> WHERE a`),
+      ).toEqual(
+        `SELECT * FROM (SELECT a FROM t UNION ALL SELECT * FROM (SELECT a FROM u LIMIT 1)) WHERE a`,
+      );
+      expect(unpipe(`FROM t |> LIMIT 1 |> UNION ALL (FROM u)`)).toEqual(
+        `SELECT * FROM (SELECT * FROM t LIMIT 1) UNION ALL SELECT * FROM u`,
+      );
+    });
+
+    it('converts a UNION without ALL to a DISTINCT over a UNION ALL', () => {
+      expect(unpipe(`FROM t |> SELECT a |> UNION (FROM u |> SELECT a)`)).toEqual(
+        `SELECT DISTINCT * FROM (SELECT a FROM t UNION ALL SELECT a FROM u)`,
+      );
+      expect(unpipe(`FROM t |> SELECT a |> UNION DISTINCT (FROM u |> SELECT a)`)).toEqual(
+        `SELECT DISTINCT * FROM (SELECT a FROM t UNION ALL SELECT a FROM u)`,
+      );
+    });
+
+    it('turns the order suffixes of an AGGREGATE into an ORDER BY', () => {
+      expect(unpipe(`FROM t |> AGGREGATE COUNT(*) AS c DESC GROUP BY a`)).toEqual(
+        `SELECT a, COUNT(*) AS c FROM t GROUP BY a\nORDER BY c DESC`,
+      );
+      expect(
+        unpipe(`FROM t |> AGGREGATE COUNT(*) DESC, SUM(x) AS s GROUP BY a AS k ASC NULLS LAST, b`),
+      ).toEqual(
+        `SELECT a AS k, b, COUNT(*), SUM(x) AS s FROM t GROUP BY a, b\nORDER BY k ASC NULLS LAST, COUNT(*) DESC`,
+      );
+      expect(unpipe(`FROM t |> AGGREGATE COUNT(*) AS c GROUP BY a DESC |> LIMIT 3`)).toEqual(
+        `SELECT a, COUNT(*) AS c FROM t GROUP BY a\nORDER BY a DESC LIMIT 3`,
+      );
+    });
+
+    it('converts every kind of FROM query', () => {
+      expect(unpipe(`FROM t AS a, u |> WHERE a.x = u.x`)).toEqual(
+        `SELECT * FROM t AS a, u WHERE a.x = u.x`,
+      );
+      expect(unpipe(`(FROM t) |> WHERE x`)).toEqual(`SELECT * FROM t WHERE x`);
+      expect(unpipe(`WITH s AS (FROM t) FROM s |> WHERE x`)).toEqual(
+        `WITH s AS (SELECT * FROM t) SELECT * FROM s WHERE x`,
+      );
+      expect(unpipe(`(FROM t) LIMIT 5 |> WHERE x`)).toEqual(
+        `SELECT * FROM ((SELECT * FROM t) LIMIT 5) WHERE x`,
       );
     });
 
     it('converts nested pipe queries', () => {
       expect(
-        unpipe(`FROM t |> WHERE a IN (FROM u |> SELECT a) UNION ALL FROM v |> WHERE y`),
+        unpipe(`FROM t |> WHERE a IN (FROM u |> SELECT a) |> UNION ALL (FROM v |> WHERE y)`),
       ).toEqual(`SELECT * FROM t WHERE a IN (SELECT a FROM u) UNION ALL SELECT * FROM v WHERE y`);
       expect(
         new SqlPipesQuery({

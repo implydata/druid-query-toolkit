@@ -29,8 +29,20 @@ describe('SqlSelectPipeOperator', () => {
       `|> select  a ,b`,
       `|>SELECT a + 1 AS x`,
       `|> SELECT\n  a,\n  b`,
+      `|> SELECT DISTINCT a`,
+      `|> select distinct  a, b`,
+      `|> SELECT ALL *`,
+      `|> SELECT DISTINCT\n  a,\n  b`,
     ])('does back and forth with %s', sql => {
       backAndForthPipeOperator(sql, SqlSelectPipeOperator);
+    });
+
+    it('parses the decorator', () => {
+      const operator = parseOperator(`|> select distinct a`);
+
+      expect(operator.decorator).toEqual('DISTINCT');
+      expect(operator.keywords['decorator']).toEqual('distinct');
+      expect(operator.selectExpressions.values.map(String)).toEqual(['a']);
     });
   });
 
@@ -45,6 +57,38 @@ describe('SqlSelectPipeOperator', () => {
       expect(
         SqlSelectPipeOperator.create([SqlStar.PLAIN, SqlColumn.create('a').as('b')]).toString(),
       ).toEqual(`|> SELECT\n  *,\n  "a" AS "b"`);
+    });
+
+    it('works with a decorator', () => {
+      expect(SqlSelectPipeOperator.create([SqlColumn.create('a')], 'DISTINCT').toString()).toEqual(
+        `|> SELECT DISTINCT "a"`,
+      );
+    });
+  });
+
+  describe('#changeDecorator', () => {
+    it('adds a decorator', () => {
+      expect(parseOperator(`|> SELECT a`).changeDecorator('DISTINCT').toString()).toEqual(
+        `|> SELECT DISTINCT a`,
+      );
+    });
+
+    it('removes a decorator with its keyword', () => {
+      expect(parseOperator(`|> select distinct  a`).changeDecorator(undefined).toString()).toEqual(
+        `|> select a`,
+      );
+    });
+
+    it('replaces a decorator', () => {
+      expect(parseOperator(`|> SELECT distinct a`).changeDecorator('ALL').toString()).toEqual(
+        `|> SELECT ALL a`,
+      );
+    });
+
+    it('returns the same operator for the same decorator', () => {
+      const operator = parseOperator(`|> SELECT DISTINCT a`);
+
+      expect(operator.changeDecorator('DISTINCT')).toBe(operator);
     });
   });
 

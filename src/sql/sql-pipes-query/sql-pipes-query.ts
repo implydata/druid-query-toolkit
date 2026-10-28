@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import type { SeparatorOrString } from '../helpers';
+import type { RefName, SeparatorOrString } from '../helpers';
 import {
   clampIndex,
   insert,
@@ -27,31 +27,41 @@ import type { KeywordName, SpaceName, SqlTypeDesignator, Substitutor } from '../
 import { SqlBase } from '../sql-base';
 import type {
   SqlGroupByClause,
+  SqlJoinPart,
   SqlLimitClause,
   SqlOffsetClause,
-  SqlOrderByClause,
+  SqlWithClause,
+  SqlWithPart,
 } from '../sql-clause';
-import { SqlFromClause } from '../sql-clause';
+import { SqlFromClause, SqlOrderByClause, SqlOrderByExpression } from '../sql-clause';
 import { SqlColumn } from '../sql-column/sql-column';
 import type { SqlExpression } from '../sql-expression';
 import { SqlFromQuery } from '../sql-from-query/sql-from-query';
 import type { SqlPipeOperator } from '../sql-pipe-operator';
 import {
   SqlAggregatePipeOperator,
+  SqlAsPipeOperator,
+  SqlDistinctPipeOperator,
   SqlDropPipeOperator,
   SqlExtendPipeOperator,
+  SqlJoinPipeOperator,
   SqlLimitPipeOperator,
   SqlOrderByPipeOperator,
+  SqlRenamePipeOperator,
   SqlSelectPipeOperator,
   SqlSetPipeOperator,
+  SqlUnionPipeOperator,
   SqlWherePipeOperator,
 } from '../sql-pipe-operator';
+import type { SqlQueryDecorator } from '../sql-query/sql-query';
 import { SqlQuery } from '../sql-query/sql-query';
 import type { SqlQueryBaseValue } from '../sql-query-base/sql-query-base';
 import { SqlQueryBase } from '../sql-query-base/sql-query-base';
 import { SqlRecord } from '../sql-record/sql-record';
 import { SqlStar } from '../sql-star/sql-star';
+import { SqlTable } from '../sql-table/sql-table';
 import { SqlTableQuery } from '../sql-table-query/sql-table-query';
+import { SqlWithQuery } from '../sql-with-query/sql-with-query';
 
 // The spacing and keywords of the parts that wrap the whole pipeline, see moveWrapperTo
 const WRAPPER_SPACE_NAMES: SpaceName[] = [
@@ -61,12 +71,11 @@ const WRAPPER_SPACE_NAMES: SpaceName[] = [
   'postExplainPlanFor',
   'postInsertClause',
   'postReplaceClause',
+  'postWithClause',
   'prePartitionedByClause',
   'preClusteredByClause',
-  'preUnion',
-  'postUnion',
 ];
-const WRAPPER_KEYWORD_NAMES: KeywordName[] = ['explainPlanFor', 'union'];
+const WRAPPER_KEYWORD_NAMES: KeywordName[] = ['explainPlanFor'];
 
 function pick<T extends string>(
   record: Readonly<Record<string, string>>,
@@ -81,19 +90,23 @@ function pick<T extends string>(
 }
 
 export interface SqlPipesQueryValue extends SqlQueryBaseValue {
+  withClause?: SqlWithClause;
   query: SqlQueryBase;
   pipeOperators: SeparatedArray<SqlPipeOperator>;
 }
 
 /**
- * A pipe syntax query: a root query followed by one or more `|> ...` pipe operators.
+ * A pipe syntax query: a root query followed by one or more `|> ...` pipe operators. The root
+ * query is everything before the first operator, so in `A UNION ALL B |> ...` it is the whole
+ * union.
  *
- * The shared query prefix (`SET`, `EXPLAIN PLAN FOR`, `INSERT` / `REPLACE`) and the
- * `PARTITIONED BY`, `CLUSTERED BY` and `UNION ALL` suffixes wrap the whole pipeline.
- * Ordering and limiting are expressed as `|> ORDER BY` and `|> LIMIT` operators, so the
- * `orderByClause`, `limitClause` and `offsetClause` fields are always `undefined` here.
- * The inherited ORDER BY / LIMIT / OFFSET methods work on the trailing `|> ORDER BY` and
- * `|> LIMIT` operators instead.
+ * The shared query prefix (`SET`, `EXPLAIN PLAN FOR`, `INSERT` / `REPLACE`), a `WITH` in front
+ * of the root query and the `PARTITIONED BY` and `CLUSTERED BY` suffixes wrap the whole
+ * pipeline, so the operators can use the tables of the `WITH` too. Ordering and limiting are
+ * expressed as `|> ORDER BY` and `|> LIMIT` operators, so the `orderByClause`, `limitClause` and
+ * `offsetClause` fields are always `undefined` here. The inherited ORDER BY / LIMIT / OFFSET
+ * methods work on the trailing `|> ORDER BY` and `|> LIMIT` operators instead. Nothing can
+ * follow the operators, so there is no `unionQuery` either (use a `|> UNION ALL` operator).
  */
 export class SqlPipesQuery extends SqlQueryBase {
   static type: SqlTypeDesignator = 'pipesQuery';
@@ -109,12 +122,31 @@ export class SqlPipesQuery extends SqlQueryBase {
       );
     }
 
+    // A WITH in front of the root query takes in the operators too, as it does when parsed
+    if (
+      query instanceof SqlQuery &&
+      query.withClause &&
+      !query.hasParens() &&
+      !query.contextStatements &&
+      !query.explain &&
+      !query.insertClause &&
+      !query.replaceClause
+    ) {
+      return new SqlPipesQuery({
+        withClause: query.withClause,
+        query: query.changeWithClause(undefined),
+        pipeOperators: SeparatedArray.fromArray(pipeOperators),
+        spacing: pick(query.spacing, ['postWithClause']),
+      });
+    }
+
     return new SqlPipesQuery({
       query,
       pipeOperators: SeparatedArray.fromArray(pipeOperators),
     });
   }
 
+  public readonly withClause?: SqlWithClause;
   public readonly query: SqlQueryBase;
   public readonly pipeOperators: SeparatedArray<SqlPipeOperator>;
 
@@ -125,24 +157,52 @@ export class SqlPipesQuery extends SqlQueryBase {
         'a pipes query can not have ORDER BY, LIMIT or OFFSET clauses, use pipe operators instead',
       );
     }
+    if (options.unionQuery) {
+      throw new Error('a pipes query can not have a UNION ALL after it, use |> UNION ALL instead');
+    }
 
+    this.withClause = options.withClause;
     this.query = options.query;
     this.pipeOperators = options.pipeOperators;
   }
 
   public valueOf(): SqlPipesQueryValue {
     const value = super.valueOf() as SqlPipesQueryValue;
+    value.withClause = this.withClause;
     value.query = this.query;
     value.pipeOperators = this.pipeOperators;
     return value;
   }
 
   protected _toRawBodyString(): string {
-    return [
+    const { withClause } = this;
+    const rawParts: string[] = [];
+    if (withClause) {
+      rawParts.push(withClause.toString(), this.getSpace('postWithClause', NEWLINE));
+    }
+
+    rawParts.push(
       this.query.toString(),
       this.getSpace('prePipes', NEWLINE),
       this.pipeOperators.toString(NEWLINE),
-    ].join('');
+    );
+    return rawParts.join('');
+  }
+
+  public changeWithClause(withClause: SqlWithClause | undefined): this {
+    if (this.withClause === withClause) return this;
+    const value = this.valueOf();
+    if (withClause) {
+      value.withClause = withClause;
+    } else {
+      delete value.withClause;
+      value.spacing = this.getSpacingWithout('postWithClause');
+    }
+    return SqlBase.fromValue(value);
+  }
+
+  public getWithParts(): readonly SqlWithPart[] {
+    return this.withClause?.withParts.values || [];
   }
 
   public changeQuery(query: SqlQueryBase): this {
@@ -194,12 +254,20 @@ export class SqlPipesQuery extends SqlQueryBase {
   public removePipeOperator(index: number): SqlQueryBase {
     const pipeOperators = this.pipeOperators.remove(index);
     if (pipeOperators) return this.changePipeOperators(pipeOperators);
-    return this.moveWrapperTo(this.query);
+
+    const { withClause, query } = this;
+    if (!withClause) return this.moveWrapperTo(query);
+    return this.moveWrapperTo(
+      query instanceof SqlQuery && !query.hasParens()
+        ? addWithClause(query, withClause)
+        : new SqlWithQuery({ withClause, query }),
+    );
   }
 
   /**
-   * Puts the parts that wrap the whole pipeline (the prefix, the ingest suffix, the union, the
-   * parens and the outer spacing) onto the given query, which replaces this one.
+   * Puts the parts that wrap the whole pipeline (the prefix, the ingest suffix, the parens and
+   * the outer spacing) onto the given query, which replaces this one. The WITH has to be put on
+   * it first.
    */
   private moveWrapperTo<T extends SqlQueryBase>(query: T): T {
     const value = query.valueOf();
@@ -209,7 +277,6 @@ export class SqlPipesQuery extends SqlQueryBase {
     value.replaceClause = this.replaceClause;
     value.partitionedByClause = this.partitionedByClause;
     value.clusteredByClause = this.clusteredByClause;
-    value.unionQuery = this.unionQuery;
     value.parens = this.parens;
     value.spacing = { ...query.spacing, ...pick(this.spacing, WRAPPER_SPACE_NAMES) };
     value.keywords = { ...query.keywords, ...pick(this.keywords, WRAPPER_KEYWORD_NAMES) };
@@ -223,17 +290,20 @@ export class SqlPipesQuery extends SqlQueryBase {
    * into the query built so far when the standard SQL evaluation order allows it (a WHERE
    * after a WHERE, a GROUP BY after a WHERE, ...), otherwise the query built so far becomes a
    * `SELECT * FROM (...)` sub query. The clauses that carry over keep their casing and
-   * spacing, as does the whitespace between the operators. Pipe queries nested inside this
-   * one are converted too.
+   * spacing, as does the whitespace between the operators. Pipe queries and `FROM` queries
+   * nested inside this one are converted too.
    *
-   * `|> SET` and `|> DROP` can only be converted when the columns of their input are known
-   * from the query itself (after an AGGREGATE or a SELECT, for example), since Druid SQL has
-   * no `SELECT * EXCEPT`. They throw otherwise.
+   * `|> SET`, `|> DROP` and `|> RENAME` can only be converted when the columns of their input
+   * are known from the query itself (after an AGGREGATE or a SELECT, for example), since Druid
+   * SQL has no `SELECT * EXCEPT`. They throw otherwise.
    */
   public unpipe(): SqlQuery {
-    const self = this.walkPostorder((ex, stack) =>
-      stack.length && ex instanceof SqlPipesQuery ? ex.unpipe() : ex,
-    ) as SqlPipesQuery;
+    const self = this.walkPostorder((ex, stack) => {
+      if (!stack.length) return ex;
+      if (ex instanceof SqlPipesQuery) return ex.unpipe();
+      if (ex instanceof SqlFromQuery) return fromQueryToSqlQuery(ex);
+      return ex;
+    }) as SqlPipesQuery;
 
     const { pipeOperators } = self;
     let query = rootToSqlQuery(self.query);
@@ -245,9 +315,7 @@ export class SqlPipesQuery extends SqlQueryBase {
       query = applyPipeOperator(query, pipeOperator, gap || SPACE);
     });
 
-    // SQL can not have an ORDER BY or LIMIT before a UNION ALL
-    if (self.unionQuery && hasOrderingOrLimit(query)) query = wrapInSelectStar(query);
-
+    if (self.withClause) query = addWithClause(query, self.withClause);
     return self.moveWrapperTo(query);
   }
 
@@ -367,6 +435,14 @@ export class SqlPipesQuery extends SqlQueryBase {
     fn: Substitutor,
     postorder: boolean,
   ): this | undefined {
+    if (this.withClause) {
+      const withClause = this.withClause._walkHelper(nextStack, fn, postorder);
+      if (!withClause) return;
+      if (withClause !== this.withClause) {
+        ret = ret.changeWithClause(withClause as SqlWithClause);
+      }
+    }
+
     const query = this.query._walkHelper(nextStack, fn, postorder);
     if (!query) return;
     if (query !== this.query) {
@@ -393,6 +469,18 @@ export class SqlPipesQuery extends SqlQueryBase {
 SqlBase.register(SqlPipesQuery);
 
 /* ~~~~~ Unpiping helpers ~~~~~ */
+
+/**
+ * Puts a WITH clause in front of the query, ahead of any WITH it already has
+ */
+function addWithClause(query: SqlQuery, withClause: SqlWithClause): SqlQuery {
+  if (!query.withClause) return query.changeWithClause(withClause);
+  return query.changeWithClause(
+    withClause.changeWithParts(
+      concatSeparated(withClause.withParts, Separator.COMMA, query.withClause.withParts)!,
+    ),
+  );
+}
 
 function hasOrderingOrLimit(query: SqlQuery): boolean {
   return Boolean(query.orderByClause || query.limitClause || query.offsetClause);
@@ -423,9 +511,12 @@ function isStarQuery(query: SqlQuery): boolean {
   );
 }
 
-function wrapInSelectStar(query: SqlQueryBase): SqlQuery {
+/**
+ * Makes the query a `SELECT * FROM (...)` sub query, with the given name if there is one.
+ */
+function wrapInSelectStar(query: SqlQueryBase, alias?: RefName): SqlQuery {
   const subQuery = query.ensureParens();
-  const wrapped = SqlQuery.selectStarFrom(subQuery);
+  const wrapped = SqlQuery.selectStarFrom(alias ? SqlAlias.create(subQuery, alias) : subQuery);
   return subQuery.toString().includes('\n') ? wrapped : wrapped.changeSpace('preFromClause', SPACE);
 }
 
@@ -433,23 +524,49 @@ function ensureStarQuery(query: SqlQuery): SqlQuery {
   return isStarQuery(query) ? query : wrapInSelectStar(query);
 }
 
+/**
+ * The name that later operators can still use for the input of a `SELECT * FROM t [WHERE ...]`
+ * query (`t`, or its alias), since WHERE, ORDER BY and LIMIT keep it. Wrapping such a query
+ * in a sub query of that name keeps references like `t.x` working.
+ */
+function getRangeName(query: SqlQuery): RefName | undefined {
+  const { selectExpressions, fromClause } = query;
+  if (!selectExpressions || selectExpressions.length() !== 1) return;
+  const star = selectExpressions.first();
+  if (!(star instanceof SqlStar) || star.table) return;
+  if (query.decorator || query.groupByClause || query.havingClause || query.unionQuery) return;
+  if (!fromClause || fromClause.joinParts || fromClause.expressions.length() !== 1) return;
+
+  const from = fromClause.expressions.first();
+  if (from instanceof SqlAlias) return from.alias;
+  if (from instanceof SqlTable) return from.refName;
+  return;
+}
+
+/**
+ * The `SELECT * FROM ...` that a FROM query stands for, with everything around it kept
+ */
+function fromQueryToSqlQuery(query: SqlFromQuery): SqlQuery {
+  const value = query.valueOf();
+  return new SqlQuery({
+    ...value,
+    selectExpressions: SeparatedArray.fromSingleValue(SqlStar.PLAIN),
+    spacing: { ...value.spacing, preFromClause: SPACE },
+  });
+}
+
 function rootToSqlQuery(query: SqlQueryBase): SqlQuery {
+  // Parens around the whole root of the pipeline do not change anything
+  query = query.changeParens([]);
+
   if (query.unionQuery) return wrapInSelectStar(query);
   if (query instanceof SqlQuery) return query;
+  if (query instanceof SqlFromQuery) return fromQueryToSqlQuery(query);
 
-  if (query instanceof SqlFromQuery || query instanceof SqlTableQuery) {
-    const fromClause =
-      query instanceof SqlFromQuery
-        ? new SqlFromClause({
-            expressions: SeparatedArray.fromSingleValue(query.table),
-            keywords: pick(query.keywords, ['from']),
-            spacing: pick(query.spacing, ['postFrom']),
-          })
-        : SqlFromClause.create([query.table]);
-
+  if (query instanceof SqlTableQuery) {
     return new SqlQuery({
       selectExpressions: SeparatedArray.fromSingleValue(SqlStar.PLAIN),
-      fromClause,
+      fromClause: SqlFromClause.create([query.table]),
       orderByClause: query.orderByClause,
       limitClause: query.limitClause,
       offsetClause: query.offsetClause,
@@ -458,6 +575,12 @@ function rootToSqlQuery(query: SqlQueryBase): SqlQuery {
         ...pick(query.spacing, ['preOrderByClause', 'preLimitClause', 'preOffsetClause']),
       },
     });
+  }
+
+  // WITH ... FROM t becomes WITH ... SELECT * FROM t
+  if (query instanceof SqlWithQuery) {
+    const flatQuery = query.changeQuery(rootToSqlQuery(query.query)).flattenWith();
+    if (flatQuery instanceof SqlQuery) return flatQuery;
   }
 
   return wrapInSelectStar(query);
@@ -513,9 +636,18 @@ function changeSelect(
   return new SqlQuery(value);
 }
 
+/**
+ * The items of a pipe AGGREGATE can have an order suffix (`COUNT(*) AS c DESC`), which sorts
+ * the output and is not part of the item itself.
+ */
+function withoutOrderSuffix(ex: SqlExpression): SqlExpression {
+  return ex instanceof SqlOrderByExpression ? ex.expression : ex;
+}
+
 function getGroupKeys(groupByClause: SqlGroupByClause | undefined): SqlExpression[] {
   const keys: SqlExpression[] = [];
-  for (const ex of groupByClause?.expressions?.values || []) {
+  for (const item of groupByClause?.expressions?.values || []) {
+    const ex = withoutOrderSuffix(item);
     const parts = ex instanceof SqlRecord ? ex.expressions?.values || [] : [ex];
     for (const part of parts.map(part => part.changeParens([]))) {
       if (!keys.some(key => key.equals(part))) keys.push(part);
@@ -525,14 +657,70 @@ function getGroupKeys(groupByClause: SqlGroupByClause | undefined): SqlExpressio
 }
 
 /**
- * Standard SQL has no aliases in GROUP BY, the aliased keys are in the select list instead.
+ * Standard SQL has no aliases or order suffixes in GROUP BY, the aliased keys are in the select
+ * list and the order suffixes in an ORDER BY instead.
  */
-function removeGroupByAliases(groupByClause: SqlGroupByClause): SqlGroupByClause {
+function toStandardGroupBy(groupByClause: SqlGroupByClause): SqlGroupByClause {
   const { expressions } = groupByClause;
-  if (!expressions?.values.some(ex => ex instanceof SqlAlias)) return groupByClause;
+  if (
+    !expressions?.values.some(ex => ex instanceof SqlAlias || ex instanceof SqlOrderByExpression)
+  ) {
+    return groupByClause;
+  }
+
   return groupByClause.changeExpressions(
-    expressions.map(ex => (ex instanceof SqlAlias ? ex.expression : ex)),
+    expressions.map(item => {
+      const ex = withoutOrderSuffix(item);
+      return ex instanceof SqlAlias ? ex.expression : ex;
+    }),
   );
+}
+
+/**
+ * The ORDER BY that the order suffixes of an AGGREGATE stand for: the grouping keys first and
+ * then the aggregates, as the output columns go. An aliased item is sorted by its output column.
+ */
+function getAggregateOrderBy(
+  pipeOperator: SqlAggregatePipeOperator,
+): SqlOrderByExpression[] | undefined {
+  const orderByExpressions = pipeOperator
+    .getGroupByExpressions()
+    .concat(pipeOperator.expressions?.values || [])
+    .filter((ex): ex is SqlOrderByExpression => ex instanceof SqlOrderByExpression)
+    .map(orderByExpression => {
+      const ex = orderByExpression.expression;
+      return orderByExpression.changeExpression(
+        ex instanceof SqlAlias ? SqlColumn.optionalQuotes(ex.alias.name) : ex,
+      );
+    });
+
+  return orderByExpressions.length ? orderByExpressions : undefined;
+}
+
+function changeDecorator(
+  query: SqlQuery,
+  decorator: SqlQueryDecorator | undefined,
+  keyword: string | undefined,
+): SqlQuery {
+  const value = query.changeDecorator(decorator).valueOf();
+  const keywords: Partial<Record<KeywordName, string>> = { ...value.keywords };
+  delete keywords.decorator;
+  if (decorator && keyword) keywords.decorator = keyword;
+  value.keywords = keywords;
+  return new SqlQuery(value);
+}
+
+/**
+ * Puts a query that is to be joined with a UNION ALL into the form that can go there: without
+ * parentheses, which would take in the rest of the union, or as a sub query when it has
+ * something that would apply to the whole union.
+ */
+function toUnionOperand(query: SqlQueryBase): SqlQueryBase {
+  if (query instanceof SqlQuery && !query.withClause && !hasLimit(query) && !query.orderByClause) {
+    return query.changeParens([]);
+  }
+
+  return wrapInSelectStar(query);
 }
 
 /**
@@ -584,12 +772,68 @@ function applyPipeOperator(query: SqlQuery, pipeOperator: SqlPipeOperator, gap: 
   }
 
   if (pipeOperator instanceof SqlSelectPipeOperator) {
-    return changeSelect(
-      ensureStarQuery(query),
-      pipeOperator.selectExpressions,
-      pick(pipeOperator.keywords, ['select']),
-      pick(pipeOperator.spacing, ['postSelect']),
+    return changeDecorator(
+      changeSelect(
+        ensureStarQuery(query),
+        pipeOperator.selectExpressions,
+        pick(pipeOperator.keywords, ['select']),
+        pick(pipeOperator.spacing, ['postSelect', 'postDecorator']),
+      ),
+      pipeOperator.decorator,
+      pipeOperator.keywords['decorator'],
     );
+  }
+
+  if (pipeOperator instanceof SqlDistinctPipeOperator) {
+    // DISTINCT goes before the ORDER BY and LIMIT of a SELECT, and can not apply to a whole union
+    return changeDecorator(
+      hasOrderingOrLimit(query) || query.unionQuery ? wrapInSelectStar(query) : query,
+      'DISTINCT',
+      pipeOperator.keywords['distinct'],
+    );
+  }
+
+  if (pipeOperator instanceof SqlAsPipeOperator) {
+    // The single table (or sub query) of a plain SELECT * can take the name itself
+    const { fromClause } = query;
+    if (
+      isStarQuery(query) &&
+      !query.whereClause &&
+      fromClause &&
+      !fromClause.joinParts &&
+      fromClause.expressions.length() === 1
+    ) {
+      return query.changeFromExpressions(
+        fromClause.expressions.map(ex => SqlAlias.create(ex, pipeOperator.alias)),
+      );
+    }
+
+    return wrapInSelectStar(query, pipeOperator.alias);
+  }
+
+  if (pipeOperator instanceof SqlJoinPipeOperator) {
+    // A WHERE before the JOIN has to stay before it, so such a query becomes a sub query
+    const joinQuery =
+      isStarQuery(query) && !query.whereClause
+        ? query
+        : wrapInSelectStar(query, getRangeName(query));
+    return addJoin(joinQuery, pipeOperator.joinPart, gap);
+  }
+
+  if (pipeOperator instanceof SqlUnionPipeOperator) {
+    const operands = pipeOperator.queries.values.map(toUnionOperand);
+    const unionQuery = (hasLimit(query) || query.orderByClause ? wrapInSelectStar(query) : query)
+      .changeUnionQuery(
+        operands.reduceRight((rest, operand) =>
+          operand.changeUnionQuery(rest).changeSpace('preUnion', gap),
+        ),
+      )
+      .changeSpace('preUnion', gap);
+
+    // A UNION without the ALL removes duplicates, which is a DISTINCT over a UNION ALL
+    return pipeOperator.isAll()
+      ? unionQuery
+      : changeDecorator(wrapInSelectStar(unionQuery), 'DISTINCT', undefined);
   }
 
   if (pipeOperator instanceof SqlExtendPipeOperator) {
@@ -614,13 +858,14 @@ function applyPipeOperator(query: SqlQuery, pipeOperator: SqlPipeOperator, gap: 
     const keys = getGroupKeys(groupByClause);
     const groupByExpressions = groupByClause?.expressions;
     const keyList =
-      groupByExpressions && !groupByExpressions.values.some(ex => ex instanceof SqlRecord)
-        ? groupByExpressions
+      groupByExpressions &&
+      !groupByExpressions.values.some(ex => withoutOrderSuffix(ex) instanceof SqlRecord)
+        ? groupByExpressions.map(withoutOrderSuffix)
         : SeparatedArray.fromPossiblyEmptyArray(keys, Separator.COMMA);
     const selectExpressions = concatSeparated(
       keyList,
       new Separator({ separator: ',', right: pipeOperator.getSpace('postAggregate') }),
-      pipeOperator.expressions,
+      pipeOperator.expressions?.map(withoutOrderSuffix),
     );
     if (!selectExpressions) {
       throw new Error('can not unpipe an |> AGGREGATE that has no aggregates or grouping keys');
@@ -632,10 +877,15 @@ function applyPipeOperator(query: SqlQuery, pipeOperator: SqlPipeOperator, gap: 
       pick(starQuery.keywords, ['select']),
       pick(starQuery.spacing, ['postSelect']),
     );
-    if (!groupByClause) return aggregateQuery;
-    return aggregateQuery
-      .changeGroupByClause(removeGroupByAliases(groupByClause))
-      .changeSpace('preGroupByClause', gap);
+    const groupedQuery = groupByClause
+      ? aggregateQuery
+          .changeGroupByClause(toStandardGroupBy(groupByClause))
+          .changeSpace('preGroupByClause', gap)
+      : aggregateQuery;
+
+    const orderByExpressions = getAggregateOrderBy(pipeOperator);
+    if (!orderByExpressions) return groupedQuery;
+    return groupedQuery.changeOrderByClause(SqlOrderByClause.create(orderByExpressions));
   }
 
   if (pipeOperator instanceof SqlOrderByPipeOperator) {
@@ -694,6 +944,32 @@ function applyPipeOperator(query: SqlQuery, pipeOperator: SqlPipeOperator, gap: 
     );
   }
 
+  if (pipeOperator instanceof SqlRenamePipeOperator) {
+    const starQuery = ensureStarQuery(query);
+    const names = getInputNames(starQuery, 'RENAME');
+    const renames = pipeOperator.renames.values;
+    for (const rename of renames) {
+      const name = rename.expression.getOutputName();
+      if (!name || !names.includes(name)) {
+        throw new Error(`can not RENAME unknown column '${name}'`);
+      }
+    }
+
+    // Each rename (a column with an alias) goes in the select list as it is
+    return changeSelect(
+      starQuery,
+      SeparatedArray.fromArray(
+        names.map(
+          name =>
+            renames.find(rename => rename.expression.getOutputName() === name) ||
+            SqlColumn.optionalQuotes(name),
+        ),
+      ),
+      pick(starQuery.keywords, ['select']),
+      {},
+    );
+  }
+
   if (pipeOperator instanceof SqlDropPipeOperator) {
     const starQuery = ensureStarQuery(query);
     const names = getInputNames(starQuery, 'DROP');
@@ -714,4 +990,10 @@ function applyPipeOperator(query: SqlQuery, pipeOperator: SqlPipeOperator, gap: 
   }
 
   throw new Error(`can not unpipe the pipe operator '${pipeOperator.type}'`);
+}
+
+function addJoin(query: SqlQuery, joinPart: SqlJoinPart, gap: string): SqlQuery {
+  const joinedQuery = query.addJoin(joinPart);
+  if (query.hasJoin()) return joinedQuery;
+  return joinedQuery.changeFromClause(joinedQuery.fromClause!.changeSpace('preJoin', gap));
 }
