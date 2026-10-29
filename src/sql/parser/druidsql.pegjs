@@ -2192,10 +2192,23 @@ BooleanLiteral = v:(TrueToken / FalseToken)
   return new S.SqlLiteral(v);
 }
 
-SqlType = UnquotedRefNameFree (__ ArrayToken)? (OpenParen _ SingleQuotedString _ CloseParen)?
+SqlType = SqlTypeName (__ ArrayToken)?
 {
   return S.SqlType.create(text());
 }
+
+SqlTypeName =
+  IntervalToken __ IntervalQualifier
+/ "DOUBLE"i __ "PRECISION"i !IdentifierPart
+/ UnquotedRefNameFree _ OpenParen _ (SingleQuotedString / SqlTypePrecision) _ CloseParen // TYPE('COMPLEX<json>'), DECIMAL(5, 1)
+/ UnquotedRefNameFree
+
+SqlTypePrecision = Digits (_ "," _ Digits)?
+
+// As in INTERVAL DAY, INTERVAL DAY(3) TO SECOND(6), or INTERVAL YEAR TO MONTH
+IntervalQualifier = IntervalQualifierUnit (__ ToToken __ IntervalQualifierUnit)?
+
+IntervalQualifierUnit = TimeUnit "S"i? !IdentifierPart (_ OpenParen _ SqlTypePrecision _ CloseParen)?
 
 /* Numbers */
 

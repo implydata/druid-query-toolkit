@@ -35,7 +35,10 @@ export class SqlType extends SqlExpression {
   static makeEffectiveType(type: string): string {
     const m = /^TYPE\((.+)\)$/i.exec(type);
     if (m) return `TYPE(${m[1]})`;
-    return SqlBase.normalizeKeywordSpace(type.toUpperCase());
+    return SqlBase.normalizeKeywordSpace(type.toUpperCase())
+      .replace(/ ?\( ?/g, '(')
+      .replace(/ ?, ?/g, ', ')
+      .replace(/ ?\)/g, ')');
   }
 
   static create(value: string | SqlType): SqlType {

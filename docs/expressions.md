@@ -156,6 +156,8 @@ SqlExpression.parse(`x::BIGINT`).toFunction(); //=> CAST(x AS BIGINT)
 SqlExpression.parse(`v:a.b::BIGINT`).toFunction(); //=> JSON_VALUE(v, '$.a.b' RETURNING BIGINT)
 ```
 
+Both forms take a type with a precision (`DECIMAL(5, 1)`, `VARCHAR(10)`), `DOUBLE PRECISION`, `... ARRAY`, `TYPE('COMPLEX<json>')` or an interval type (`INTERVAL DAY`, `INTERVAL DAY TO SECOND`). Druid casts a number to an interval in units of the interval's field, so `__time + cnt::INTERVAL HOUR` adds `cnt` hours.
+
 Unlike `CAST`, an infix cast of a column keeps the column's name in the result: Druid names `x::BIGINT` "x". See [Aliases and output names](#aliases-and-output-names).
 
 ## Colon access

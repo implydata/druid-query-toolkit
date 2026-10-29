@@ -20,6 +20,7 @@ import {
   SqlFunction,
   SqlInfixCast,
   SqlMulti,
+  SqlQuery,
   SqlType,
   SqlUnary,
 } from '../..';
@@ -33,6 +34,24 @@ describe('SqlInfixCast', () => {
       backAndForth('x::LONG', SqlInfixCast);
       backAndForth('x::VARCHAR ARRAY', SqlInfixCast);
       backAndForth("x::TYPE('COMPLEX<json>')", SqlInfixCast);
+      backAndForth('x::DECIMAL(5, 1)', SqlInfixCast);
+      backAndForth('x::DOUBLE PRECISION', SqlInfixCast);
+      backAndForth('x::INTERVAL DAY', SqlInfixCast);
+      backAndForth('x::INTERVAL DAY(3) TO SECOND(6)', SqlInfixCast);
+    });
+
+    it('parses casts of numbers to intervals', () => {
+      backAndForth(
+        `SELECT __time + CAST(cnt AS INTERVAL DAY), __time + cnt::INTERVAL HOUR, __time + (cnt * 2)::INTERVAL MONTH, __time - m1::BIGINT::INTERVAL SECOND, __time + (cnt - 3)::INTERVAL YEAR FROM foo`,
+        SqlQuery,
+      );
+      backAndForth(
+        `SELECT __time + (m1 / 2)::DECIMAL(5, 1)::INTERVAL DAY, __time + (m1 - 3.5)::DECIMAL(5, 1)::INTERVAL SECOND FROM foo`,
+        SqlQuery,
+      );
+
+      const sum = SqlExpression.parse('__time + cnt::INTERVAL HOUR') as SqlMulti;
+      expect((sum.getArg(1) as SqlInfixCast).castType.value).toEqual('INTERVAL HOUR');
     });
 
     it('parses different expressions', () => {
