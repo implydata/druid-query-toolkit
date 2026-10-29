@@ -44,6 +44,8 @@ The class of the result tells you what was parsed. Some examples:
 | `TABLE wikipedia`                                 | `SqlTableQuery`        |
 | `VALUES (1, 2), (3, 4)`                           | `SqlValues`            |
 | `WITH a AS (…) (WITH b AS (…) SELECT …)`          | `SqlWithQuery`         |
+| `WITH a AS (…) FROM a`                            | `SqlWithQuery`         |
+| `(FROM a) UNION ALL (FROM b)`                     | `SqlParensQuery`       |
 
 Every node also has a `type` string (`'column'`, `'query'`, `'pipesQuery'`, ...) if you prefer to switch on that. Use `instanceof` for type narrowing in TypeScript:
 
@@ -104,7 +106,6 @@ SqlSetStatement.partitionSetStatements(text); //=> ["SET sqlTimeZone = 'Asia/Tok
 The parser covers Druid SQL broadly, but a few constructs do not parse yet:
 
 - `(a, b) IN (subquery)`
-- `TABLE t` anywhere but as a whole query or a sub-query: `EXPLAIN PLAN FOR TABLE t`, `INSERT INTO dst TABLE t PARTITIONED BY ALL`, `TABLE a UNION ALL TABLE b` and `WITH x AS (...) TABLE x`
 
 <hr>
 

@@ -12,87 +12,101 @@
  * limitations under the License.
  */
 
-import { SPACE } from '../helpers';
+import type { SeparatedArray } from '../helpers';
 import type { SqlTypeDesignator, Substitutor } from '../sql-base';
 import { SqlBase } from '../sql-base';
-import type { SqlExpression } from '../sql-expression';
-import type { SqlNamespace } from '../sql-namespace/sql-namespace';
+import type { SqlJoinPart } from '../sql-clause';
+import { SqlFromClause } from '../sql-clause';
+import { SqlExpression } from '../sql-expression';
 import type { SqlQueryBaseValue } from '../sql-query-base/sql-query-base';
 import { SqlQueryBase } from '../sql-query-base/sql-query-base';
 import { SqlStar } from '../sql-star/sql-star';
 import { SqlTable } from '../sql-table/sql-table';
 
 export interface SqlFromQueryValue extends SqlQueryBaseValue {
-  table: SqlTable;
+  fromClause: SqlFromClause;
 }
 
 /**
- * A pipe syntax `FROM <table>` query. It is usually followed by pipe operators, which turn it
- * into a SqlPipesQuery, but it is also a query on its own.
+ * A pipe syntax `FROM ...` query: a whole FROM clause on its own, with any aliases, joins and
+ * comma separated tables. It is usually followed by pipe operators, which turn it into a
+ * SqlPipesQuery, but it is also a query on its own.
  */
 export class SqlFromQuery extends SqlQueryBase {
   static type: SqlTypeDesignator = 'fromQuery';
 
-  static DEFAULT_FROM_KEYWORD = 'FROM';
-
-  static create(table: SqlFromQuery | SqlTable | string): SqlFromQuery {
-    if (table instanceof SqlFromQuery) return table;
+  static create(from: SqlFromQuery | SqlFromClause | SqlExpression | string): SqlFromQuery {
+    if (from instanceof SqlFromQuery) return from;
     return new SqlFromQuery({
-      table: SqlTable.create(table),
+      fromClause:
+        from instanceof SqlFromClause
+          ? from
+          : SqlFromClause.create([
+              from instanceof SqlExpression ? from.convertToTable() : SqlTable.create(from),
+            ]),
     });
   }
 
   static optionalQuotes(table: SqlFromQuery | SqlTable | string): SqlFromQuery {
     if (table instanceof SqlFromQuery) return table;
-    return new SqlFromQuery({
-      table: SqlTable.optionalQuotes(table),
-    });
+    return SqlFromQuery.create(SqlTable.optionalQuotes(table));
   }
 
-  public readonly table: SqlTable;
+  public readonly fromClause: SqlFromClause;
 
   constructor(options: SqlFromQueryValue) {
     super(options, SqlFromQuery.type);
-    this.table = options.table;
+    this.fromClause = options.fromClause;
   }
 
   public valueOf(): SqlFromQueryValue {
     const value = super.valueOf() as SqlFromQueryValue;
-    value.table = this.table;
+    value.fromClause = this.fromClause;
     return value;
   }
 
   protected _toRawBodyString(): string {
-    return [
-      this.getKeyword('from', SqlFromQuery.DEFAULT_FROM_KEYWORD),
-      this.getSpace('postFrom', SPACE),
-      this.table.toString(),
-    ].join('');
+    return this.fromClause.toString();
   }
 
-  public changeTable(table: SqlTable | string): this {
+  public changeFromClause(fromClause: SqlFromClause): this {
+    if (this.fromClause === fromClause) return this;
     const value = this.valueOf();
-    value.table = SqlTable.create(table);
+    value.fromClause = fromClause;
     return SqlBase.fromValue(value);
   }
 
-  public getTableName(): string {
-    return this.table.getName();
+  public getFromExpressions(): readonly SqlExpression[] {
+    return this.fromClause.expressions.values;
   }
 
-  public changeTableName(name: string): this {
-    return this.changeTable(this.table.changeName(name));
+  public getFirstFromExpression(): SqlExpression {
+    return this.fromClause.expressions.first();
   }
 
-  public getNamespaceName(): string | undefined {
-    return this.table.getNamespaceName();
+  public changeFromExpressions(
+    fromExpressions: SeparatedArray<SqlExpression> | SqlExpression[],
+  ): this {
+    return this.changeFromClause(this.fromClause.changeExpressions(fromExpressions));
   }
 
-  public changeNamespace(namespace: SqlNamespace | undefined): this {
-    return this.changeTable(this.table.changeNamespace(namespace));
+  public hasJoin(): boolean {
+    return this.fromClause.hasJoin();
   }
 
-  // Reads every column of the table, like SELECT *
+  public getJoins(): readonly SqlJoinPart[] {
+    return this.fromClause.getJoins();
+  }
+
+  public addJoin(join: SqlJoinPart): this {
+    return this.changeFromClause(this.fromClause.addJoin(join));
+  }
+
+  public removeAllJoins(): this {
+    return this.changeFromClause(this.fromClause.removeAllJoins());
+  }
+
+  // Reads every column of the FROM clause, like SELECT *
   public getSelectExpressionsArray(): readonly SqlExpression[] {
     return [SqlStar.PLAIN];
   }
@@ -103,10 +117,10 @@ export class SqlFromQuery extends SqlQueryBase {
     fn: Substitutor,
     postorder: boolean,
   ): this | undefined {
-    const table = this.table._walkHelper(nextStack, fn, postorder);
-    if (!table) return;
-    if (table !== this.table) {
-      return ret.changeTable(table as SqlTable);
+    const fromClause = this.fromClause._walkHelper(nextStack, fn, postorder);
+    if (!fromClause) return;
+    if (fromClause !== this.fromClause) {
+      return ret.changeFromClause(fromClause as SqlFromClause);
     }
 
     return ret;

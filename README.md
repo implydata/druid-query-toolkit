@@ -87,7 +87,7 @@ ORDER BY 5 DESC
 
 #### Pipe syntax
 
-Pipe syntax queries (`FROM t |> WHERE ... |> AGGREGATE ...`) parse into a `SqlPipesQuery`, which holds the root query (often a `SqlFromQuery`, a bare `FROM <table>`) and a list of pipe operators: `SqlSelectPipeOperator`, `SqlWherePipeOperator`, `SqlAggregatePipeOperator`, `SqlOrderByPipeOperator`, `SqlLimitPipeOperator`, `SqlExtendPipeOperator`, `SqlSetPipeOperator` and `SqlDropPipeOperator`.
+Pipe syntax queries (`FROM t |> WHERE ... |> AGGREGATE ...`) parse into a `SqlPipesQuery`, which holds the root query (often a `SqlFromQuery`, a bare `FROM ...` clause) and a list of pipe operators: `SqlSelectPipeOperator`, `SqlWherePipeOperator`, `SqlAggregatePipeOperator`, `SqlOrderByPipeOperator`, `SqlLimitPipeOperator`, `SqlUnionPipeOperator`, `SqlExtendPipeOperator`, `SqlSetPipeOperator`, `SqlDropPipeOperator`, `SqlRenamePipeOperator`, `SqlAsPipeOperator`, `SqlDistinctPipeOperator` and `SqlJoinPipeOperator`.
 The ORDER BY and LIMIT methods that every query has work on the trailing `|> ORDER BY` and `|> LIMIT` operators.
 `unpipe()` converts a pipe query into an equivalent `SqlQuery` without pipes, folding the operators into one `SELECT` where it can and nesting sub queries where it has to: `From t |> Where x=1` becomes `SELECT * From t Where x=1`.
 
@@ -122,7 +122,6 @@ For more examples, check out the unit tests.
 Not every valid DruidSQL construct can currently be parsed, the following snippets are not currently supported:
 
 - `(a, b) IN (subquery)`
-- `EXPLAIN PLAN FOR TABLE t`, `INSERT INTO dst TABLE t PARTITIONED BY ALL`, `TABLE a UNION ALL TABLE b`, and `WITH x AS (...) TABLE x` (a bare `TABLE t` and `SELECT * FROM (TABLE t)` do parse, as `SqlTableQuery`)
 
 ## License
 

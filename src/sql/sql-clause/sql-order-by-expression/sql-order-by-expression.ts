@@ -27,7 +27,12 @@ export interface SqlOrderByExpressionValue extends SqlBaseValue {
   nulls?: SqlOrderByNulls;
 }
 
-export class SqlOrderByExpression extends SqlBase {
+/**
+ * An expression with a direction, an item of an ORDER BY. It is an expression itself so it can
+ * also stand in the lists of a pipe AGGREGATE, where an item can carry an order suffix
+ * (`|> AGGREGATE COUNT(*) AS c DESC GROUP BY x ASC`).
+ */
+export class SqlOrderByExpression extends SqlExpression {
   static type: SqlTypeDesignator = 'orderByExpression';
 
   static create(
@@ -143,11 +148,15 @@ export class SqlOrderByExpression extends SqlBase {
     return ret.changeNulls(nulls === 'FIRST' ? 'LAST' : 'FIRST');
   }
 
+  public getOutputName(): string | undefined {
+    return this.expression.getOutputName();
+  }
+
   public _walkInner(
     nextStack: SqlBase[],
     fn: Substitutor,
     postorder: boolean,
-  ): SqlBase | undefined {
+  ): SqlExpression | undefined {
     let ret = this;
 
     const expression = this.expression._walkHelper(nextStack, fn, postorder);

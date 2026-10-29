@@ -27,3 +27,8 @@ export * from './sql-limit-pipe-operator';
 export * from './sql-extend-pipe-operator';
 export * from './sql-set-pipe-operator';
 export * from './sql-drop-pipe-operator';
+export * from './sql-union-pipe-operator';
+export * from './sql-rename-pipe-operator';
+export * from './sql-as-pipe-operator';
+export * from './sql-distinct-pipe-operator';
+export * from './sql-join-pipe-operator';

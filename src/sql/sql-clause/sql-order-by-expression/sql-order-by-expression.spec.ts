@@ -190,6 +190,16 @@ describe('SqlOrderByExpression', () => {
     });
   });
 
+  describe('#getOutputName', () => {
+    it('is the output name of the inner expression', () => {
+      expect(orderBy('x DESC').getOutputName()).toEqual('x');
+      expect(orderBy('x + 1 DESC').getOutputName()).toBeUndefined();
+      expect(
+        SqlOrderByExpression.create(SqlColumn.optionalQuotes('x').as('y'), 'DESC').getOutputName(),
+      ).toEqual('y');
+    });
+  });
+
   describe('#_walkInner', () => {
     it('substitutes the inner expression', () => {
       expect(
@@ -207,6 +217,14 @@ describe('SqlOrderByExpression', () => {
     it('stops when the walker returns undefined', () => {
       const ex = orderBy('x DESC');
       expect(ex.walk(e => (e instanceof SqlColumn ? undefined : e))).toBe(ex);
+    });
+
+    it('throws when the walker replaces it with something that is not an expression', () => {
+      const clause = SqlQuery.parse(`SELECT * FROM t ORDER BY x DESC`).orderByClause!;
+
+      expect(() => clause.walk(e => (e instanceof SqlOrderByExpression ? clause : e))).toThrow(
+        'expression walker must return a SQL expression',
+      );
     });
   });
 

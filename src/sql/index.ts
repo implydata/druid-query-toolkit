@@ -56,4 +56,5 @@ export * from './sql-table-query/sql-table-query';
 export * from './sql-from-query/sql-from-query';
 export * from './sql-query/sql-query';
 export * from './sql-with-query/sql-with-query';
+export * from './sql-parens-query/sql-parens-query';
 export * from './sql-pipes-query/sql-pipes-query';

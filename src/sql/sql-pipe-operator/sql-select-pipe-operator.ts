@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 
+import type { SqlQueryDecorator } from '..';
 import { NEWLINE_INDENT, SeparatedArray, Separator, SPACE } from '../helpers';
 import type { SqlTypeDesignator, Substitutor } from '../sql-base';
 import { SqlBase } from '../sql-base';
@@ -21,11 +22,13 @@ import type { SqlPipeOperatorValue } from './sql-pipe-operator';
 import { SqlPipeOperator } from './sql-pipe-operator';
 
 export interface SqlSelectPipeOperatorValue extends SqlPipeOperatorValue {
+  decorator?: SqlQueryDecorator;
   selectExpressions: SeparatedArray<SqlExpression>;
 }
 
 /**
- * The \`|> SELECT\` pipe operator, which computes a new set of columns from the input.
+ * The \`|> SELECT\` pipe operator, which computes a new set of columns from the input. Like a
+ * SELECT it can be `SELECT DISTINCT` or `SELECT ALL`.
  */
 export class SqlSelectPipeOperator extends SqlPipeOperator {
   static type: SqlTypeDesignator = 'selectPipeOperator';
@@ -34,32 +37,63 @@ export class SqlSelectPipeOperator extends SqlPipeOperator {
 
   static create(
     selectExpressions: SeparatedArray<SqlExpression> | SqlExpression[],
+    decorator?: SqlQueryDecorator,
   ): SqlSelectPipeOperator {
     return new SqlSelectPipeOperator({
+      decorator,
       selectExpressions: SeparatedArray.fromArray(selectExpressions),
     });
   }
 
+  public readonly decorator?: SqlQueryDecorator;
   public readonly selectExpressions: SeparatedArray<SqlExpression>;
 
   constructor(options: SqlSelectPipeOperatorValue) {
     super(options, SqlSelectPipeOperator.type);
+    this.decorator = options.decorator;
     this.selectExpressions = options.selectExpressions;
   }
 
   public valueOf(): SqlSelectPipeOperatorValue {
     const value = super.valueOf() as SqlSelectPipeOperatorValue;
+    value.decorator = this.decorator;
     value.selectExpressions = this.selectExpressions;
     return value;
   }
 
   protected _toRawOperatorString(): string {
+    const { decorator } = this;
     const indentSpace = this.selectExpressions.length() > 1 ? NEWLINE_INDENT : SPACE;
-    return [
+    const rawParts: string[] = [
       this.getKeyword('select', SqlSelectPipeOperator.DEFAULT_SELECT_KEYWORD),
-      this.getSpace('postSelect', indentSpace),
+      this.getSpace('postSelect', decorator ? SPACE : indentSpace),
+    ];
+
+    if (decorator) {
+      rawParts.push(
+        this.getKeyword('decorator', decorator),
+        this.getSpace('postDecorator', indentSpace),
+      );
+    }
+
+    rawParts.push(
       this.selectExpressions.toString(new Separator({ separator: ',', right: indentSpace })),
-    ].join('');
+    );
+
+    return rawParts.join('');
+  }
+
+  public changeDecorator(decorator: SqlQueryDecorator | undefined): this {
+    if (this.decorator === decorator) return this;
+    const value = this.valueOf();
+    if (decorator) {
+      value.decorator = decorator;
+    } else {
+      delete value.decorator;
+      value.spacing = this.getSpacingWithout('postDecorator');
+    }
+    value.keywords = this.getKeywordsWithout('decorator');
+    return SqlBase.fromValue(value);
   }
 
   public changeSelectExpressions(

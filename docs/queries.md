@@ -8,10 +8,11 @@
 | --- | --- | --- |
 | `SqlQuery` | `SELECT ... FROM ... WHERE ... GROUP BY ... HAVING ...`, with an optional `WITH` | [SELECT queries](select-queries.md) |
 | `SqlPipesQuery` | `FROM t \|> WHERE ... \|> AGGREGATE ...` | [Pipe syntax](pipe-syntax.md) |
-| `SqlFromQuery` | `FROM t` on its own (the usual start of a pipe query) | [Pipe syntax](pipe-syntax.md) |
+| `SqlFromQuery` | `FROM t` on its own (the usual start of a pipe query), with any aliases and joins | [Pipe syntax](pipe-syntax.md) |
 | `SqlTableQuery` | `TABLE t` | |
 | `SqlValues` | `VALUES (1, 'a'), (2, 'b')` | |
 | `SqlWithQuery` | `WITH ...` around a body that is not a plain `SELECT` | |
+| `SqlParensQuery` | a query in parentheses with more of the statement outside of them: `(FROM t) UNION ALL (FROM u)` | |
 
 Around its own body, each of them can carry the same wrapper parts, and `SqlQueryBase` has the methods to read and change them:
 
@@ -79,7 +80,7 @@ How each kind of query answers:
 | Query | Output columns | Filters and grouping |
 | --- | --- | --- |
 | `SqlQuery` | its select list | its `WHERE`, `GROUP BY` and `HAVING` |
-| `SqlWithQuery` | from the query it wraps | from the query it wraps |
+| `SqlWithQuery`, `SqlParensQuery` | from the query it wraps | from the query it wraps |
 | `SqlTableQuery`, `SqlFromQuery` | a single `*`, like `SELECT *` | none |
 | `SqlValues`, `SqlPipesQuery` | none, they can not be told from the text yet | none |
 

@@ -59,6 +59,7 @@ export type SqlTypeDesignator =
   | 'tableQuery'
   | 'fromQuery'
   | 'pipesQuery'
+  | 'parensQuery'
   | 'values'
   | 'withClause'
   | 'whereClause'
@@ -106,7 +107,12 @@ export type SqlTypeDesignator =
   | 'limitPipeOperator'
   | 'extendPipeOperator'
   | 'setPipeOperator'
-  | 'dropPipeOperator';
+  | 'dropPipeOperator'
+  | 'unionPipeOperator'
+  | 'renamePipeOperator'
+  | 'asPipeOperator'
+  | 'distinctPipeOperator'
+  | 'joinPipeOperator';
 
 /**
  * The type designators of everything that extends SqlQueryBase. Lets code that sits above
@@ -119,6 +125,7 @@ export const QUERY_TYPE_DESIGNATORS: readonly SqlTypeDesignator[] = [
   'tableQuery',
   'fromQuery',
   'pipesQuery',
+  'parensQuery',
 ];
 
 export type KeywordName =
@@ -132,6 +139,7 @@ export type KeywordName =
   | 'currentRow'
   | 'decorator'
   | 'direction'
+  | 'distinct'
   | 'drop'
   | 'else'
   | 'end'
@@ -163,6 +171,7 @@ export type KeywordName =
   | 'plan'
   | 'preceding'
   | 'range'
+  | 'rename'
   | 'replace'
   | 'row'
   | 'rows'
@@ -235,6 +244,7 @@ export type SpaceName =
   | 'postPartitionBy'
   | 'postPartitionedBy'
   | 'postPipe'
+  | 'postRename'
   | 'postReplace'
   | 'postReplaceClause'
   | 'postRow'

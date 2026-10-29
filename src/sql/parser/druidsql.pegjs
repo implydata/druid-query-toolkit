@@ -170,6 +170,10 @@ SqlColumnDeclaration = column:RefName postColumn:_ columnType:SqlType
 SqlQueryWithPossibleContext = statements:(SqlSetStatement _sc)* query:SqlQueryStatement
 {
   if (!statements.length) return query;
+
+  // The SET statements go outside of the parentheses of a query that is only in parentheses
+  if (query.hasParens()) query = new S.SqlParensQuery({ query: query });
+
   return query
     .changeContextStatements(new S.SeparatedArray(
       statements.map(function(x) { return x[0] }),
@@ -200,13 +204,14 @@ SqlQueryStatement =
   replaceClause:(ReplaceClause _)?
   body:QueryBody
   orderSuffix:QueryOrderSuffix
-  pipes:(_ SqlPipeOperator)*
-  ingestSuffix:QueryIngestSuffix
-  union:(_ UnionClause)?
+  tail:(QueryPipesTail / QueryUnionTail)
 {
   var value = {};
   var keywords = value.keywords = {};
   var spacing = value.spacing = {};
+  var pipes = tail.pipes;
+  var ingestSuffix = tail.ingestSuffix;
+  var union = tail.union;
 
   if (explain) {
     value.explain = true;
@@ -228,19 +233,56 @@ SqlQueryStatement =
     spacing.postReplaceClause = replaceClause[1];
   }
 
+  var hasOrderSuffix = Boolean(Object.keys(orderSuffix.value).length);
+
+  // The pipe operators after `A UNION ALL B` apply to the whole union, but the union is parsed
+  // from the right, so they end up on a pipes query around B. They get taken back out here.
+  var unionPipesQuery;
+  if (union && isBarePipesQuery(union[1].unionQuery)) {
+    unionPipesQuery = union[1].unionQuery;
+  }
+
   var ClassFn;
-  if (pipes.length) {
-    // The body and its ORDER BY / LIMIT / OFFSET form the root query of the pipeline, the
-    // rest of the statement wraps the whole pipeline
-    value.query = new body.ClassFn(Object.assign({}, body.value, orderSuffix.value, {
-      keywords: body.keywords,
-      spacing: Object.assign({}, body.spacing, orderSuffix.spacing)
-    }));
-    value.pipeOperators = new S.SeparatedArray(
-      pipes.map(function(x) { return x[1] }),
-      pipes.slice(1).map(function(x) { return x[0] })
-    );
-    spacing.prePipes = pipes[0][0];
+  if (pipes.length || unionPipesQuery) {
+    // A WITH that is not in parentheses takes in the pipe operators too, so that they can use
+    // its tables
+    var rootBody = body;
+    if (body.value.withClause && (body.ClassFn === S.SqlQuery || body.ClassFn === S.SqlWithQuery)) {
+      value.withClause = body.value.withClause;
+      spacing.postWithClause = body.spacing.postWithClause;
+      rootBody = bodyWithoutWith(body);
+    }
+
+    // The body with its ORDER BY / LIMIT / OFFSET and UNION ALL forms the root query of the
+    // pipeline, the rest of the statement wraps the whole pipeline
+    var rootValue = Object.assign({}, rootBody.value, orderSuffix.value);
+    var rootKeywords = rootValue.keywords = Object.assign({}, rootBody.keywords);
+    var rootSpacing = rootValue.spacing = Object.assign({}, rootBody.spacing, orderSuffix.spacing);
+    if (unionPipesQuery) {
+      Object.assign(rootValue, ingestSuffix.value);
+      Object.assign(rootSpacing, ingestSuffix.spacing);
+      rootSpacing.preUnion = union[0];
+      rootKeywords.union = union[1].unionKeyword;
+      rootSpacing.postUnion = union[1].postUnion;
+      rootValue.unionQuery = unionPipesQuery.query;
+
+      value.pipeOperators = unionPipesQuery.pipeOperators;
+      spacing.prePipes = unionPipesQuery.spacing.prePipes;
+      ingestSuffix = {
+        value: pickDefined(unionPipesQuery, ['partitionedByClause', 'clusteredByClause']),
+        spacing: pickDefined(unionPipesQuery.spacing, ['prePartitionedByClause', 'preClusteredByClause'])
+      };
+    } else {
+      value.pipeOperators = new S.SeparatedArray(
+        pipes.map(function(x) { return x[1] }),
+        pipes.slice(1).map(function(x) { return x[0] })
+      );
+      spacing.prePipes = pipes[0][0];
+    }
+
+    value.query = rootBody.ClassFn === S.SqlParensQuery && !hasOrderSuffix && !unionPipesQuery
+      ? rootBody.value.query
+      : new rootBody.ClassFn(rootValue);
     ClassFn = S.SqlPipesQuery;
   } else {
     // The body decides which class we build
@@ -256,11 +298,25 @@ SqlQueryStatement =
   Object.assign(value, ingestSuffix.value);
   Object.assign(spacing, ingestSuffix.spacing);
 
-  if (union) {
+  if (union && !unionPipesQuery) {
     spacing.preUnion = union[0];
     keywords.union = union[1].unionKeyword;
     spacing.postUnion = union[1].postUnion;
     value.unionQuery = union[1].unionQuery;
+  }
+
+  // A query in parentheses only needs the SqlParensQuery around it to carry the clauses that
+  // go outside of its parentheses
+  if (
+    ClassFn === S.SqlParensQuery &&
+    !explain &&
+    !insertClause &&
+    !replaceClause &&
+    !hasOrderSuffix &&
+    !Object.keys(ingestSuffix.value).length &&
+    !union
+  ) {
+    return value.query;
   }
 
   return new ClassFn(value);
@@ -274,6 +330,7 @@ QueryBody =
 / ValuesBody
 / TableBody
 / FromBody
+/ ParensBody
 
 SelectBody = withClause:(WithClause _)? heart:QueryHeart
 {
@@ -293,24 +350,27 @@ SelectBody = withClause:(WithClause _)? heart:QueryHeart
   return { ClassFn: S.SqlQuery, value: value, keywords: keywords, spacing: spacing };
 }
 
+// A WITH before a SELECT is part of the SqlQuery (see SelectBody), before anything else it
+// makes a SqlWithQuery: a query in parentheses, or a bare VALUES, TABLE or FROM
 WithQueryBody =
   withClause:WithClause
   postWithClause:_
-  OpenParen
-  preQuery:_
-  query:SqlQueryStatement
-  postQuery:_
-  CloseParen
+  query:(SqlQueryInParens / WithBareQuery)
 {
   return {
     ClassFn: S.SqlWithQuery,
     value: {
       withClause: withClause,
-      query: query.addParens(preQuery, postQuery)
+      query: query
     },
     keywords: {},
     spacing: { postWithClause: postWithClause }
   };
+}
+
+WithBareQuery = body:(ValuesBody / TableBody / FromBody)
+{
+  return bodyToSql(body);
 }
 
 ValuesBody =
@@ -340,16 +400,25 @@ TableBody =
   };
 }
 
-FromBody =
-  fromKeyword:FromToken
-  postFrom:_
-  table:SqlTable
+// A FROM query takes a whole FROM clause, with aliases, joins and comma separated tables
+FromBody = fromClause:FromClause
 {
   return {
     ClassFn: S.SqlFromQuery,
-    value: { table: table },
-    keywords: { from: fromKeyword },
-    spacing: { postFrom: postFrom }
+    value: { fromClause: fromClause },
+    keywords: {},
+    spacing: {}
+  };
+}
+
+// A query in parentheses followed by more of the statement, like `(FROM t) UNION ALL ...`
+ParensBody = query:SqlQueryInParens
+{
+  return {
+    ClassFn: S.SqlParensQuery,
+    value: { query: query },
+    keywords: {},
+    spacing: {}
   };
 }
 
@@ -871,6 +940,18 @@ ClusteredByClause = clusteredBy:ClusteredByToken postClusteredBy:_ head:Expressi
   });
 }
 
+// Pipe operators come after the rest of the query, a UNION ALL included (see
+// SqlQueryStatement), and only the ingest suffix can follow them
+QueryPipesTail = pipes:(_ SqlPipeOperator)+ ingestSuffix:QueryIngestSuffix
+{
+  return { pipes: pipes, ingestSuffix: ingestSuffix, union: null };
+}
+
+QueryUnionTail = ingestSuffix:QueryIngestSuffix union:(_ UnionClause)?
+{
+  return { pipes: [], ingestSuffix: ingestSuffix, union: union };
+}
+
 UnionClause = unionKeyword:UnionAllToken postUnion:_ unionQuery:SqlQueryStatement
 {
   return {
@@ -893,21 +974,30 @@ PipeOperatorBody =
 / AggregatePipeOperator
 / OrderByPipeOperator
 / LimitPipeOperator
+/ UnionPipeOperator
 / ExtendPipeOperator
 / SetPipeOperator
 / DropPipeOperator
+/ RenamePipeOperator
+/ AsPipeOperator
+/ DistinctPipeOperator
+/ JoinPipeOperator
 
-SelectPipeOperator =
-  select:SelectToken
-  postSelect:_
-  head:SqlStarOrAliasExpression
-  tail:(CommaSeparator SqlStarOrAliasExpression)*
+SelectPipeOperator = select:SelectClause
 {
-  return new S.SqlSelectPipeOperator({
-    selectExpressions: makeSeparatedArray(head, tail),
-    keywords: { select: select },
-    spacing: { postSelect: postSelect }
-  });
+  var value = {
+    selectExpressions: select.selectExpressions,
+    keywords: { select: select.selectKeyword },
+    spacing: { postSelect: select.postSelect }
+  };
+
+  if (select.decorator) {
+    value.decorator = select.decorator;
+    value.keywords.decorator = select.decoratorKeyword;
+    value.spacing.postDecorator = select.postDecorator;
+  }
+
+  return new S.SqlSelectPipeOperator(value);
 }
 
 WherePipeOperator = whereClause:SqlWhereClause
@@ -919,7 +1009,7 @@ WherePipeOperator = whereClause:SqlWhereClause
 AggregatePipeOperator =
   aggregate:AggregateToken
   postAggregate:_
-  body:(PipeGroupByClause / (SqlAlias (CommaSeparator SqlAlias)* (_ PipeGroupByClause)?))
+  body:(PipeGroupByClause / (PipeAggregateItem (CommaSeparator PipeAggregateItem)* (_ PipeGroupByClause)?))
 {
   var value = {
     keywords: { aggregate: aggregate },
@@ -939,19 +1029,69 @@ AggregatePipeOperator =
   return new S.SqlAggregatePipeOperator(value);
 }
 
-// Unlike in standard SQL the GROUP BY items of an AGGREGATE can have aliases. That form is only
-// taken when some item has one, so everything else parses exactly like a standard GROUP BY.
-PipeGroupByClause = AliasedGroupByClause / GroupByClause
+// An item of an AGGREGATE, in the aggregate list or in the GROUP BY: an expression with an
+// optional alias and an optional order suffix, which sorts the output by it. ASC and DESC
+// start the order suffix, so without an AS they are not taken as an alias.
+PipeAggregateItem =
+  expression:Expression
+  alias:PipeAggregateItemAlias?
+  suffix:(_ (AscToken / DescToken) (_ (NullsFirstToken / NullsLastToken))?)?
+{
+  var item = expression;
 
-AliasedGroupByClause =
+  if (alias) {
+    var aliasValue = {
+      expression: expression,
+      alias: alias.alias,
+      keywords: { as: alias.as || '' },
+      spacing: { preAlias: alias.preAlias }
+    };
+    if (alias.as) aliasValue.spacing.preAs = alias.preAs;
+    item = new S.SqlAlias(aliasValue);
+  }
+
+  if (suffix) {
+    var value = {
+      expression: item,
+      direction: suffix[1].toUpperCase(),
+      keywords: { direction: suffix[1] },
+      spacing: { preDirection: suffix[0] }
+    };
+    if (suffix[2]) {
+      value.spacing.preNulls = suffix[2][0];
+      value.nulls = /first$/i.test(suffix[2][1]) ? 'FIRST' : 'LAST';
+      value.keywords.nulls = suffix[2][1];
+    }
+    item = new S.SqlOrderByExpression(value);
+  }
+
+  return item;
+}
+
+PipeAggregateItemAlias =
+  preAs:_ as:AsToken preAlias:_ alias:RefNameAlias
+{
+  return { preAs: preAs, as: as, preAlias: preAlias, alias: alias };
+}
+/ preAlias:_ !(AscToken / DescToken) alias:RefNameAlias
+{
+  return { preAlias: preAlias, alias: alias };
+}
+
+// Unlike in standard SQL the GROUP BY items of an AGGREGATE can have aliases and order suffixes.
+// That form is only taken when some item has one, so everything else parses exactly like a
+// standard GROUP BY.
+PipeGroupByClause = PipeItemsGroupByClause / GroupByClause
+
+PipeItemsGroupByClause =
   groupBy:GroupByToken
   postGroupBy:_
-  head:SqlAlias
-  tail:(CommaSeparator SqlAlias)*
+  head:PipeAggregateItem
+  tail:(CommaSeparator PipeAggregateItem)*
   &{
-    var expressions = [head].concat(tail.map(function(t) { return t[1]; }));
-    return expressions.some(function(ex) { return ex instanceof S.SqlAlias; }) &&
-      !expressions.some(function(ex) { return ex instanceof S.SqlAlias && ex.columns; });
+    return [head].concat(tail.map(function(t) { return t[1]; })).some(function(ex) {
+      return ex instanceof S.SqlAlias || ex instanceof S.SqlOrderByExpression;
+    });
   }
 {
   return new S.SqlGroupByClause({
@@ -1029,6 +1169,68 @@ DropPipeOperator =
     keywords: { drop: drop },
     spacing: { postDrop: postDrop }
   });
+}
+
+UnionPipeOperator =
+  union:UnionToken
+  postUnion:_
+  decorator:((AllToken / DistinctToken) _)?
+  head:SqlQueryInParens
+  tail:(CommaSeparator SqlQueryInParens)*
+{
+  var value = {
+    queries: makeSeparatedArray(head, tail),
+    keywords: { union: union },
+    spacing: { postUnion: postUnion }
+  };
+
+  if (decorator) {
+    value.decorator = decorator[0].toUpperCase();
+    value.keywords.decorator = decorator[0];
+    value.spacing.postDecorator = decorator[1];
+  }
+
+  return new S.SqlUnionPipeOperator(value);
+}
+
+RenamePipeOperator =
+  rename:RenameToken
+  postRename:_
+  head:PipeRenameItem
+  tail:(CommaSeparator PipeRenameItem)*
+{
+  return new S.SqlRenamePipeOperator({
+    renames: makeSeparatedArray(head, tail),
+    keywords: { rename: rename },
+    spacing: { postRename: postRename }
+  });
+}
+
+// A column and its new name, with or without an AS in between
+PipeRenameItem = item:SqlAlias &{ return item instanceof S.SqlAlias && item.expression instanceof S.SqlColumn && !item.columns; }
+{
+  return item;
+}
+
+AsPipeOperator = as:AsToken postAs:_ alias:RefNameAlias
+{
+  return new S.SqlAsPipeOperator({
+    alias: alias,
+    keywords: { as: as },
+    spacing: { postAs: postAs }
+  });
+}
+
+DistinctPipeOperator = distinct:DistinctToken
+{
+  return new S.SqlDistinctPipeOperator({
+    keywords: { distinct: distinct }
+  });
+}
+
+JoinPipeOperator = joinPart:SqlJoinPart
+{
+  return new S.SqlJoinPipeOperator({ joinPart: joinPart });
 }
 
 // ------------------------------
@@ -1939,7 +2141,9 @@ SqlRecord = row:(RowToken _)? OpenParen postLeftParen:_ head:Expression tail:(Co
   return new S.SqlRecord(value);
 }
 
-SqlQueryInParens = OpenParen leftSpacing:_ ex:(SqlQueryInParens / SqlQueryStatement) rightSpacing:_ CloseParen
+// A statement can itself start with a query in parentheses (see ParensBody), which covers
+// nested parentheses
+SqlQueryInParens = OpenParen leftSpacing:_ ex:SqlQueryStatement rightSpacing:_ CloseParen
 {
   return ex.addParens(leftSpacing, rightSpacing);
 }
@@ -2282,6 +2486,7 @@ PartitionByToken = $("PARTITION"i __ "BY"i !IdentifierPart)
 PositionToken = $("POSITION"i !IdentifierPart)
 PrecedingToken = $("PRECEDING"i !IdentifierPart)
 RangeToken = $("RANGE"i !IdentifierPart)
+RenameToken = $("RENAME"i !IdentifierPart)
 ReplaceToken = $("REPLACE"i !IdentifierPart)
 ReturningToken = $("RETURNING"i !IdentifierPart)
 RollupToken = $("ROLLUP"i !IdentifierPart)
@@ -2303,6 +2508,7 @@ TrimToken = $("TRIM"i !IdentifierPart)
 TrueToken = $("TRUE"i !IdentifierPart) { return { value: true, stringValue: text() }; }
 UnboundedToken = $("UNBOUNDED"i !IdentifierPart)
 UnionAllToken = $("UNION"i !IdentifierPart __ AllToken)
+UnionToken = $("UNION"i !IdentifierPart)
 UsingToken = $("USING"i !IdentifierPart)
 ValuesToken = $("VALUES"i !IdentifierPart)
 WhenToken = $("WHEN"i !IdentifierPart)

@@ -55,6 +55,57 @@
     return new body.ClassFn(value);
   }
 
+  // The body of a SELECT or a SqlWithQuery without its WITH clause, see SqlQueryStatement
+  function bodyWithoutWith(body) {
+    if (body.ClassFn === S.SqlQuery) {
+      var selectValue = Object.assign({}, body.value);
+      delete selectValue.withClause;
+      var selectSpacing = Object.assign({}, body.spacing);
+      delete selectSpacing.postWithClause;
+      return {
+        ClassFn: S.SqlQuery,
+        value: selectValue,
+        keywords: body.keywords,
+        spacing: selectSpacing,
+      };
+    }
+
+    // The query of a SqlWithQuery is either in parentheses or a bare VALUES, TABLE or FROM
+    var query = body.value.query;
+    if (query.hasParens()) {
+      return { ClassFn: S.SqlParensQuery, value: { query: query }, keywords: {}, spacing: {} };
+    }
+
+    var value = query.valueOf();
+    return {
+      ClassFn: query.constructor,
+      value: value,
+      keywords: value.keywords,
+      spacing: value.spacing,
+    };
+  }
+
+  // A pipes query with nothing around it, whose operators can apply to more of the query
+  function isBarePipesQuery(query) {
+    return (
+      query instanceof S.SqlPipesQuery &&
+      !query.hasParens() &&
+      !query.withClause &&
+      !query.contextStatements &&
+      !query.explain &&
+      !query.insertClause &&
+      !query.replaceClause
+    );
+  }
+
+  function pickDefined(record, names) {
+    var ret = {};
+    names.forEach(function (name) {
+      if (typeof record[name] !== 'undefined') ret[name] = record[name];
+    });
+    return ret;
+  }
+
   function makeFunctionName(f) {
     return Array.isArray(f) ? S.RefName.functionName(f[1], true) : S.RefName.functionName(f);
   }

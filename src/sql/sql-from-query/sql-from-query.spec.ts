@@ -13,7 +13,15 @@
  */
 
 import type { SqlComparison } from '../..';
-import { SqlExpression, SqlFromQuery, SqlQuery, SqlTable } from '../..';
+import {
+  SqlColumn,
+  SqlExpression,
+  SqlFromClause,
+  SqlFromQuery,
+  SqlJoinPart,
+  SqlQuery,
+  SqlTable,
+} from '../..';
 import { backAndForth } from '../../test-utils';
 import { sane } from '../../utils';
 
@@ -36,6 +44,16 @@ describe('SqlFromQuery', () => {
         SET x = 1;
         FROM foo
       `,
+      `FROM foo AS t`,
+      `FROM foo t`,
+      `FROM foo, bar`,
+      `FROM foo AS a JOIN bar AS b ON a.x = b.x`,
+      `FROM foo LEFT JOIN bar USING (x)`,
+      `FROM foo CROSS JOIN bar`,
+      `FROM (SELECT x FROM foo) AS t`,
+      `FROM (FROM foo |> WHERE x)`,
+      `FROM UNNEST(ARRAY[1, 2]) AS u(n)`,
+      `FROM TABLE(EXTERN('{}', '{}')) EXTEND (x VARCHAR)`,
     ])('does back and forth with %s', sql => {
       backAndForth(sql, SqlFromQuery);
     });
@@ -63,39 +81,61 @@ describe('SqlFromQuery', () => {
           "clusteredByClause": undefined,
           "contextStatements": undefined,
           "explain": undefined,
-          "insertClause": undefined,
-          "keywords": Object {
-            "from": "FROM",
+          "fromClause": SqlFromClause {
+            "expressions": SeparatedArray {
+              "separators": Array [],
+              "values": Array [
+                SqlTable {
+                  "keywords": Object {},
+                  "namespace": undefined,
+                  "parens": undefined,
+                  "refName": RefName {
+                    "name": "kttm",
+                    "quotes": true,
+                  },
+                  "spacing": Object {},
+                  "type": "table",
+                },
+              ],
+            },
+            "joinParts": undefined,
+            "keywords": Object {
+              "from": "FROM",
+            },
+            "parens": undefined,
+            "spacing": Object {
+              "postFrom": " ",
+            },
+            "type": "fromClause",
           },
+          "insertClause": undefined,
+          "keywords": Object {},
           "limitClause": undefined,
           "offsetClause": undefined,
           "orderByClause": undefined,
           "parens": undefined,
           "partitionedByClause": undefined,
           "replaceClause": undefined,
-          "spacing": Object {
-            "postFrom": " ",
-          },
-          "table": SqlTable {
-            "keywords": Object {},
-            "namespace": undefined,
-            "parens": undefined,
-            "refName": RefName {
-              "name": "kttm",
-              "quotes": true,
-            },
-            "spacing": Object {},
-            "type": "table",
-          },
+          "spacing": Object {},
           "type": "fromQuery",
           "unionQuery": undefined,
         }
       `);
     });
+
+    it('parses the joins into the FROM clause', () => {
+      const fromQuery = SqlExpression.parse(`FROM foo AS a JOIN bar AS b ON a.x = b.x`);
+
+      expect(fromQuery).toBeInstanceOf(SqlFromQuery);
+      expect(String((fromQuery as SqlFromQuery).getFirstFromExpression())).toEqual(`foo AS a`);
+      expect((fromQuery as SqlFromQuery).getJoins().map(String)).toEqual([
+        `JOIN bar AS b ON a.x = b.x`,
+      ]);
+    });
   });
 
   describe('does not parse', () => {
-    it.each([`FROM a.b.c`, `FROM foo AS t`, `FROM foo, bar`, `FROM foo JOIN bar ON true`])(
+    it.each([`FROM`, `FROM foo WHERE x`, `FROM foo GROUP BY x`, `FROM foo HAVING x`])(
       'rejects %s',
       sql => {
         expect(() => SqlExpression.parse(sql)).toThrow('Expected');
@@ -109,6 +149,23 @@ describe('SqlFromQuery', () => {
       expect(SqlFromQuery.create(SqlTable.create('kttm', 'druid')).toString()).toEqual(
         `FROM "druid"."kttm"`,
       );
+    });
+
+    it('takes an aliased table or a sub query', () => {
+      expect(SqlFromQuery.create(SqlTable.create('kttm').as('t')).toString()).toEqual(
+        `FROM "kttm" AS "t"`,
+      );
+      expect(SqlFromQuery.create(SqlQuery.parse(`SELECT a FROM t`)).toString()).toEqual(
+        `FROM (SELECT a FROM t)`,
+      );
+    });
+
+    it('takes a FROM clause', () => {
+      expect(
+        SqlFromQuery.create(
+          SqlFromClause.create([SqlTable.create('a'), SqlTable.create('b')]),
+        ).toString(),
+      ).toEqual(`FROM "a", "b"`);
     });
 
     it('returns a given from query as is', () => {
@@ -131,47 +188,93 @@ describe('SqlFromQuery', () => {
     });
   });
 
-  describe('#changeTable', () => {
-    it('replaces the table', () => {
+  describe('#changeFromClause', () => {
+    it('replaces the FROM clause', () => {
       expect(
-        SqlFromQuery.create('kttm').changeTable(SqlTable.create('wikipedia')).toString(),
+        (SqlExpression.parse(`from kttm`) as SqlFromQuery)
+          .changeFromClause(SqlFromClause.create([SqlTable.create('wikipedia')]))
+          .toString(),
       ).toEqual(`FROM "wikipedia"`);
     });
+
+    it('returns the same query for the same clause', () => {
+      const fromQuery = SqlExpression.parse(`FROM kttm`) as SqlFromQuery;
+
+      expect(fromQuery.changeFromClause(fromQuery.fromClause)).toBe(fromQuery);
+    });
   });
 
-  describe('#getTableName', () => {
-    it('gets the table name', () => {
-      expect((SqlExpression.parse(`FROM druid.kttm`) as SqlFromQuery).getTableName()).toEqual(
-        'kttm',
+  describe('#getFromExpressions', () => {
+    it('gets the comma separated expressions', () => {
+      expect(
+        (SqlExpression.parse(`FROM foo AS a, bar`) as SqlFromQuery)
+          .getFromExpressions()
+          .map(String),
+      ).toEqual([`foo AS a`, `bar`]);
+    });
+  });
+
+  describe('#getFirstFromExpression', () => {
+    it('gets the first expression', () => {
+      expect(
+        String(
+          (SqlExpression.parse(`FROM druid.kttm, bar`) as SqlFromQuery).getFirstFromExpression(),
+        ),
+      ).toEqual(`druid.kttm`);
+    });
+  });
+
+  describe('#changeFromExpressions', () => {
+    it('keeps the keyword and the joins', () => {
+      expect(
+        (SqlExpression.parse(`from  foo JOIN bar ON true`) as SqlFromQuery)
+          .changeFromExpressions([SqlTable.optionalQuotes('baz')])
+          .toString(),
+      ).toEqual(`from  baz JOIN bar ON true`);
+    });
+  });
+
+  describe('#hasJoin', () => {
+    it('works', () => {
+      expect((SqlExpression.parse(`FROM foo`) as SqlFromQuery).hasJoin()).toEqual(false);
+      expect((SqlExpression.parse(`FROM foo JOIN bar ON true`) as SqlFromQuery).hasJoin()).toEqual(
+        true,
       );
     });
   });
 
-  describe('#changeTableName', () => {
-    it('keeps the namespace', () => {
-      expect(
-        (SqlExpression.parse(`FROM druid.kttm`) as SqlFromQuery)
-          .changeTableName('wikipedia')
-          .toString(),
-      ).toEqual(`FROM druid.wikipedia`);
+  describe('#getJoins', () => {
+    it('gets nothing without a join', () => {
+      expect((SqlExpression.parse(`FROM foo`) as SqlFromQuery).getJoins()).toEqual([]);
     });
   });
 
-  describe('#getNamespaceName', () => {
-    it('gets the namespace name', () => {
-      expect((SqlExpression.parse(`FROM druid.kttm`) as SqlFromQuery).getNamespaceName()).toEqual(
-        'druid',
-      );
+  describe('#addJoin', () => {
+    it('adds a join', () => {
+      expect(
+        (SqlExpression.parse(`FROM foo AS a`) as SqlFromQuery)
+          .addJoin(
+            SqlJoinPart.create(
+              'LEFT',
+              SqlTable.optionalQuotes('bar').as('b'),
+              SqlColumn.optionalQuotes('x', 'a').equal(SqlColumn.optionalQuotes('x', 'b')),
+            ),
+          )
+          .toString(),
+      ).toEqual(sane`
+        FROM foo AS a
+        LEFT JOIN bar AS "b" ON a.x = b.x
+      `);
     });
   });
 
-  describe('#changeNamespace', () => {
-    it('removes the namespace', () => {
+  describe('#removeAllJoins', () => {
+    it('removes the joins', () => {
       expect(
-        (SqlExpression.parse(`FROM druid.kttm`) as SqlFromQuery)
-          .changeNamespace(undefined)
+        (SqlExpression.parse(`FROM foo JOIN bar ON true LEFT JOIN baz USING (x)`) as SqlFromQuery)
+          .removeAllJoins()
           .toString(),
-      ).toEqual(`FROM kttm`);
+      ).toEqual(`FROM foo`);
     });
   });
 
@@ -184,7 +287,7 @@ describe('SqlFromQuery', () => {
   });
 
   describe('#walk', () => {
-    it('walks the underlying table', () => {
+    it('walks the FROM clause', () => {
       const fromQuery = SqlExpression.parse(`FROM druid.kttm`);
 
       expect(fromQuery.getUsedTableNames()).toEqual(['kttm']);
@@ -194,6 +297,14 @@ describe('SqlFromQuery', () => {
           .walk(ex => (ex instanceof SqlTable ? SqlTable.optionalQuotes('wikipedia') : ex))
           .toString(),
       ).toEqual(`FROM wikipedia`);
+    });
+
+    it('walks the joins', () => {
+      expect(
+        SqlExpression.parse(`FROM foo JOIN bar ON foo.x = bar.x`)
+          .walk(ex => (ex instanceof SqlColumn ? ex.changeName('y') : ex))
+          .toString(),
+      ).toEqual(`FROM foo JOIN bar ON foo.y = bar.y`);
     });
 
     it('stops when the substitutor returns undefined', () => {

@@ -14,6 +14,7 @@
 
 import type { SqlBase } from '../..';
 import {
+  SqlFromQuery,
   SqlLiteral,
   SqlQuery,
   SqlRecord,
@@ -60,6 +61,32 @@ describe('SqlWithQuery', () => {
       `,
     ])('correctly parses: %s', sql => {
       backAndForth(sql);
+    });
+
+    describe('with a bare body', () => {
+      it.each([
+        `WITH t AS (SELECT * FROM wikipedia) FROM t`,
+        `WITH t AS (FROM wikipedia) FROM t AS a JOIN t AS b ON a.x = b.x`,
+        `WITH t AS (SELECT 1 AS x) VALUES (1), (2)`,
+        `with t as (SELECT 1 AS x)  table  t`,
+        `WITH t AS (SELECT 1 AS x) FROM t LIMIT 5`,
+        sane`
+          INSERT INTO dst
+          WITH ext AS (SELECT * FROM TABLE(EXTERN('{}', '{}')))
+          FROM ext
+          PARTITIONED BY ALL TIME
+        `,
+      ])('does back and forth with %s', sql => {
+        backAndForth(sql, SqlWithQuery);
+      });
+
+      it('wraps the bare query', () => {
+        const query = parseWithQuery(`WITH t AS (SELECT 1 AS x) FROM t LIMIT 5`);
+
+        expect(query.query).toBeInstanceOf(SqlFromQuery);
+        expect(query.query.hasParens()).toEqual(false);
+        expect(query.limitClause?.toString()).toEqual(`LIMIT 5`);
+      });
     });
 
     it('parses to the expected tree', () => {
@@ -449,6 +476,9 @@ describe('SqlWithQuery', () => {
       const query = parseWithQuery(`WITH a AS (SELECT 1) (VALUES (1))`);
 
       expect(query.flattenWith()).toBe(query);
+      expect(parseWithQuery(`WITH a AS (SELECT 1) FROM a`).flattenWith().toString()).toEqual(
+        `WITH a AS (SELECT 1) FROM a`,
+      );
     });
   });
 
