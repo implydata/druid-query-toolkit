@@ -724,6 +724,9 @@ describe('SqlPipesQuery', () => {
       expect(unpipe(`FROM t |> LIMIT 3 |> ORDER BY a`)).toEqual(
         `SELECT * FROM (SELECT * FROM t LIMIT 3) ORDER BY a`,
       );
+      expect(unpipe(`FROM t |> SELECT a::BIGINT |> ORDER BY a`)).toEqual(
+        `SELECT a::BIGINT FROM t ORDER BY a`,
+      );
     });
 
     it('keeps NULLS FIRST and NULLS LAST', () => {
@@ -755,6 +758,13 @@ describe('SqlPipesQuery', () => {
       expect(unpipe(`FROM t |> SELECT a, b |> WHERE a > 1 |> DROP b`)).toEqual(
         `SELECT a FROM (SELECT a, b FROM t) WHERE a > 1`,
       );
+
+      expect(unpipe(`FROM t |> SELECT a, b::BIGINT, v:c |> DROP a`)).toEqual(sane`
+        SELECT
+          b,
+          c
+        FROM (SELECT a, b::BIGINT, v:c FROM t)
+      `);
     });
 
     it('throws for SET and DROP when the input columns are not known', () => {
@@ -765,6 +775,9 @@ describe('SqlPipesQuery', () => {
         'can not unpipe |> SET because the columns of its input are not known',
       );
       expect(() => unpipe(`FROM t |> SELECT a, b + 1 |> DROP a`)).toThrow(
+        'can not unpipe |> DROP because the columns of its input are not known',
+      );
+      expect(() => unpipe(`FROM t |> SELECT a, a::BIGINT |> DROP a`)).toThrow(
         'can not unpipe |> DROP because the columns of its input are not known',
       );
       expect(() => unpipe(`FROM t |> SELECT a, u.* |> DROP a`)).toThrow(

@@ -281,6 +281,19 @@ describe('SqlColonAccess', () => {
     });
   });
 
+  describe('#getOutputName', () => {
+    it('is named after the last segment when it is a field', () => {
+      expect(SqlExpression.parse('v:a.b').getOutputName()).toEqual('b');
+      expect(SqlExpression.parse('v:a."b c"').getOutputName()).toEqual('b c');
+      expect(SqlExpression.parse("v:[0]['b']").getOutputName()).toEqual('b');
+    });
+
+    it('is unnamed when the last segment is an index or an empty string', () => {
+      expect(SqlExpression.parse('v:a[0]').getOutputName()).toBeUndefined();
+      expect(SqlExpression.parse("v:['']").getOutputName()).toBeUndefined();
+    });
+  });
+
   describe('#getJsonPath', () => {
     it('makes the matching JSON path', () => {
       expect((SqlExpression.parse('v:a.b') as SqlColonAccess).getJsonPath()).toEqual('$.a.b');

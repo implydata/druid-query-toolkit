@@ -34,6 +34,19 @@
     });
   }
 
+  function makeInfixCasts(expression, casts) {
+    return casts.reduce(function (ex, cast) {
+      return new S.SqlInfixCast({
+        expression: ex,
+        castType: cast.castType,
+        spacing: {
+          preDoubleColon: cast.preDoubleColon,
+          postDoubleColon: cast.postDoubleColon,
+        },
+      });
+    }, expression);
+  }
+
   function makeSeparatorsList(tail) {
     return tail.map(function (t) {
       return new S.Separator({

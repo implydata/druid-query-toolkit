@@ -26,6 +26,7 @@ import {
   SqlColumn,
   SqlComparison,
   SqlFunction,
+  SqlInfixCast,
   SqlLiteral,
   SqlMulti,
   SqlOrderByExpression,
@@ -432,6 +433,15 @@ export abstract class SqlExpression extends SqlBase {
    */
   public access(...path: SqlColonAccessPathElement[]): SqlColonAccess {
     return SqlColonAccess.create(this, path);
+  }
+
+  // SqlInfixCast
+
+  /**
+   * An infix cast of this expression: `C('x').infixCast('BIGINT')` is `"x"::BIGINT`
+   */
+  public infixCast(castType: SqlType | string): SqlInfixCast {
+    return SqlInfixCast.create(this, castType);
   }
 
   // Logic

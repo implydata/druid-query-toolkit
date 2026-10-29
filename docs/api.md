@@ -304,6 +304,13 @@ _Returns_: `SqlColonAccess`
 
 Colon access, `expression:a.b[0]`. The expression gets parens unless it is a term. On a `SqlColonAccess` it extends the path (`v:a` becomes `v:a.b`).
 
+### expression.infixCast(type)
+
+`type`: `SqlType | string`\
+_Returns_: `SqlInfixCast`
+
+Infix cast, `expression::type`. The expression gets parens unless it is a term, a colon access or another infix cast.
+
 ### expression.as(alias, forceQuotes?)
 
 `alias`: `string | RefName`\
@@ -329,7 +336,7 @@ Adds an alias only if there is none.
 
 _Returns_: `string | undefined`
 
-The name of the result column this expression produces as a select expression: the alias, or the name of a bare column.
+The name of the result column this expression produces as a select expression: the alias, the name of a bare column, the column an infix cast casts (`x::BIGINT` is "x") or the last field of a colon access (`v:a.b` is "b"). Druid drops the last two names when the select list has a `*` or another column of that name, which `query.getOutputColumns()` takes into account.
 
 ### expression.getUnderlyingExpression(), expression.changeUnderlyingExpression(expression)
 
@@ -695,7 +702,7 @@ All of these extend [`SqlQueryBase`](#sqlquerybase).
 
 ## Expression classes
 
-The classes an expression parses into, and their own methods, are listed in [Expressions](expressions.md#reading-specific-kinds-of-expression). They are `SqlColumn`, `SqlTable`, `SqlNamespace`, `SqlStar`, `SqlLiteral`, `SqlPlaceholder`, `SqlInterval`, `SqlType`, `SqlFunction`, `SqlComparison`, `SqlMulti`, `SqlUnary`, `SqlAlias`, `SqlCase`, `SqlRecord`, `SqlLabeledExpression`, `SqlKeyValue` and `SqlColonAccess`, plus the query classes above.
+The classes an expression parses into, and their own methods, are listed in [Expressions](expressions.md#reading-specific-kinds-of-expression). They are `SqlColumn`, `SqlTable`, `SqlNamespace`, `SqlStar`, `SqlLiteral`, `SqlPlaceholder`, `SqlInterval`, `SqlType`, `SqlFunction`, `SqlComparison`, `SqlMulti`, `SqlUnary`, `SqlAlias`, `SqlCase`, `SqlRecord`, `SqlLabeledExpression`, `SqlKeyValue`, `SqlColonAccess` and `SqlInfixCast`, plus the query classes above.
 
 ## Types
 

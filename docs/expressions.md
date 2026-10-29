@@ -146,7 +146,17 @@ SqlExpression.concat(C('a'), L('-'), C('b')); //=> "a" || '-' || "b"
 ```js
 C('x').cast('BIGINT'); //=> CAST("x" AS BIGINT)
 C('x').cast(SqlType.VARCHAR); //=> CAST("x" AS VARCHAR)
+C('x').infixCast('BIGINT'); //=> "x"::BIGINT
 ```
+
+Druid also takes the PostgreSQL style infix cast, `x::BIGINT`, as sugar for `CAST(x AS BIGINT)`. DQT parses and builds it as `SqlInfixCast`, with the cast `expression` and its `castType`. It binds tighter than any operator, so `-x::BIGINT` is `-(x::BIGINT)` and `'a' || x::VARCHAR` is `'a' || (x::VARCHAR)`, but looser than [colon access](#colon-access), so `v:a::BIGINT` casts `v:a`. Casts chain: `x::VARCHAR::BIGINT`. `toFunction()` gives the call it stands for: a `CAST`, or a `JSON_VALUE` with a `RETURNING` type when it casts a colon access.
+
+```js
+SqlExpression.parse(`x::BIGINT`).toFunction(); //=> CAST(x AS BIGINT)
+SqlExpression.parse(`v:a.b::BIGINT`).toFunction(); //=> JSON_VALUE(v, '$.a.b' RETURNING BIGINT)
+```
+
+Unlike `CAST`, an infix cast of a column keeps the column's name in the result: Druid names `x::BIGINT` "x". See [Aliases and output names](#aliases-and-output-names).
 
 ## Colon access
 
@@ -165,7 +175,7 @@ C('payload').access('user', 'first name', 0); //=> the same thing, as a shorthan
 C('payload').access('user').access('name'); //=> "payload":user.name (extends the path)
 ```
 
-Only one colon is allowed: write `v:a.b`, not `v:a:b`. Colon access binds tighter than any operator, so `-v:a` is `-(v:a)`. In the short form of `JSON_OBJECT` the first colon always separates the key from the value, so `JSON_OBJECT(k:v:z)` has the key `k` and the value `v:z`. A short key must be a term or a `||` of terms, and a colon access in it needs parens: `JSON_OBJECT((v:a): 1)`. `SqlKeyValue` adds these parens for you when it prints the short form.
+Only one colon is allowed: write `v:a.b`, not `v:a:b`. Colon access binds tighter than any operator, so `-v:a` is `-(v:a)`. To read a value as a given type, add an [infix cast](#casting): `v:a.b::BIGINT` means `JSON_VALUE(v, '$.a.b' RETURNING BIGINT)`. In the short form of `JSON_OBJECT` the first colon always separates the key from the value, so `JSON_OBJECT(k:v:z)` has the key `k` and the value `v:z`. A short key must be a term, an infix cast of a term or a `||` of those, and a colon access in it needs parens: `JSON_OBJECT((v:a): 1)`. `SqlKeyValue` adds these parens for you when it prints the short form.
 
 ## Aliases and output names
 
@@ -181,7 +191,7 @@ selectExpression.getUnderlyingExpression(); //=> LOWER(page)
 - `as(alias)` always adds an alias: `F.count().as('Count')` gives `COUNT(*) AS "Count"`. Pass `true` as a second argument to force quotes.
 - `setAlias(alias)` sets the alias, or removes it when `alias` is `undefined`.
 - `ifUnnamedAliasAs(alias)` adds an alias only if there is not one already: `C('x').add(L(1)).ifUnnamedAliasAs('z')` gives `"x" + 1 AS "z"`, while `C('x').as('q').ifUnnamedAliasAs('z')` stays `"x" AS "q"`.
-- `getOutputName()` is the name the column will have in the result: the alias, or the column name for a bare column, or `undefined` for an unnamed expression (Druid calls those `EXPR$0`, `EXPR$1`, ...).
+- `getOutputName()` is the name the column will have in the result: the alias, or the column name for a bare column, or `undefined` for an unnamed expression (Druid calls those `EXPR$0`, `EXPR$1`, ...). Druid names an infix cast of a column after the column (`x::BIGINT` is "x") and a colon access after its last field (`v:a.b` is "b", `v:a[0]` is unnamed), but only when the select list has no `*` and no other column of that name. The query methods such as `getOutputColumns()` take that into account.
 - `getUnderlyingExpression()` strips the alias, and `changeUnderlyingExpression(ex)` replaces what is under it.
 
 The web console's "Cast to..." action on a result column header is a one liner with these:
@@ -257,6 +267,7 @@ Narrow with `instanceof` and then use the class's own accessors:
 | `SqlAlias` | `getAliasName()`, `changeAlias(name)`, `expression`, `changeExpression(ex)` |
 | `SqlCase` | `caseExpression`, `whenThenParts`, `elseExpression` |
 | `SqlColonAccess` (`v:a.b`) | `base`, `changeBase(ex)`, `getPath()`, `changePath(path)`, `getJsonPath()`, `toJsonValue(returningType?)` |
+| `SqlInfixCast` (`x::BIGINT`) | `expression`, `changeExpression(ex)`, `castType`, `changeCastType(type)`, `toFunction()` |
 
 ```js
 const ex = SqlExpression.parse(`APPROX_QUANTILE_DS("added", 0.98)`);

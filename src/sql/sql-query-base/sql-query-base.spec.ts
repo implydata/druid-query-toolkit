@@ -372,6 +372,44 @@ describe('SqlQueryBase', () => {
         SqlQuery.parse(`SELECT channel, COUNT(*), SUM(x) AS s FROM t`).getOutputColumns(),
       ).toEqual(['channel', 'EXPR$1', 's']);
     });
+
+    it('names an infix cast or a colon access after what it reads', () => {
+      expect(
+        SqlQuery.parse(
+          `SELECT dim1::BIGINT, t.m1::DOUBLE, cnt::VARCHAR::BIGINT, nest:x, nest:y.z::BIGINT, nest:a[1] FROM t`,
+        ).getOutputColumns(),
+      ).toEqual(['dim1', 'm1', 'cnt', 'x', 'z', 'EXPR$5']);
+    });
+
+    it('leaves an aliased or unnamed infix cast as it is', () => {
+      expect(
+        SqlQuery.parse(
+          `SELECT dim1::BIGINT AS d, CAST(dim1 AS BIGINT), (dim1 || 'x')::VARCHAR FROM t`,
+        ).getOutputColumns(),
+      ).toEqual(['d', 'EXPR$1', 'EXPR$2']);
+    });
+
+    it('does not name an infix cast or a colon access after a name another column has', () => {
+      expect(
+        SqlQuery.parse(
+          `SELECT dim1, dim1::BIGINT, m1::BIGINT, m1::DOUBLE, nest:x, x, cnt::VARCHAR FROM t`,
+        ).getOutputColumns(),
+      ).toEqual(['dim1', 'EXPR$1', 'EXPR$2', 'EXPR$3', 'EXPR$4', 'x', 'cnt']);
+
+      expect(
+        SqlQuery.parse(
+          `SELECT 'x', "EXPR$0"::BIGINT FROM (SELECT dim1 AS "EXPR$0" FROM t)`,
+        ).getOutputColumns(),
+      ).toEqual(['EXPR$0', 'EXPR$1']);
+    });
+
+    it('does not name an infix cast or a colon access next to a star', () => {
+      expect(SqlQuery.parse(`SELECT *, dim1::BIGINT, nest:x FROM t`).getOutputColumns()).toEqual([
+        'EXPR$0',
+        'EXPR$1',
+        'EXPR$2',
+      ]);
+    });
   });
 
   describe('#getSelectIndexesForColumn', () => {
@@ -402,6 +440,15 @@ describe('SqlQueryBase', () => {
       expect(query.isRealOutputColumnAtSelectIndex(1)).toEqual(false);
       expect(query.isRealOutputColumnAtSelectIndex(2)).toEqual(true);
       expect(query.isRealOutputColumnAtSelectIndex(3)).toEqual(false);
+    });
+
+    it('tells if an infix cast gets a name', () => {
+      const query = SqlQuery.parse(`SELECT dim1, dim1::BIGINT, m1::BIGINT FROM t`);
+
+      expect(query.isRealOutputColumnAtSelectIndex(0)).toEqual(true);
+      expect(query.isRealOutputColumnAtSelectIndex(1)).toEqual(false);
+      expect(query.isRealOutputColumnAtSelectIndex(2)).toEqual(true);
+      expect(query.isRealOutputColumnAtSelectIndex(-1)).toEqual(true);
     });
   });
 

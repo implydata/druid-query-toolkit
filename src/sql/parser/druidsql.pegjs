@@ -127,9 +127,14 @@ ShortKeyValueForm = key:ShortKey postKeyExpression:_ ":" preValueExpression:_ va
   });
 }
 
-ShortKey = head:BaseType tail:(_ '||' _ BaseType)*
+ShortKey = head:ShortKeyTerm tail:(_ '||' _ ShortKeyTerm)*
 {
   return maybeMakeMulti('||', head, tail);
+}
+
+ShortKeyTerm = expression:BaseType casts:InfixCastTail*
+{
+  return makeInfixCasts(expression, casts);
 }
 
 SqlExtendClause =
@@ -1246,6 +1251,7 @@ Expressions are defined below in acceding priority order
   Multiplicative (*), Division (/)
   Unary identity (+), negation (-)
   Concat (||)
+  Infix cast (x::BIGINT)
   Colon access (v:a.b)
 */
 
@@ -1442,9 +1448,23 @@ UnaryExpression = op:[+-] postOp:_ !Number argument:ConcatExpression
 }
   / ConcatExpression
 
-ConcatExpression = head:ColonAccessExpression tail:(_ '||' _ ColonAccessExpression)*
+ConcatExpression = head:InfixCastExpression tail:(_ '||' _ InfixCastExpression)*
 {
   return maybeMakeMulti('||', head, tail);
+}
+
+InfixCastExpression = expression:ColonAccessExpression casts:InfixCastTail*
+{
+  return makeInfixCasts(expression, casts);
+}
+
+InfixCastTail = preDoubleColon:_ "::" postDoubleColon:_ castType:SqlType
+{
+  return {
+    castType: castType,
+    preDoubleColon: preDoubleColon,
+    postDoubleColon: postDoubleColon
+  };
 }
 
 ColonAccessExpression = base:BaseType colon:(_ ":" _ ColonAccessFirstSegment ColonAccessSegment*)?

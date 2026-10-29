@@ -34,6 +34,14 @@ describe('pattern-contains', () => {
       ).toEqual(pattern);
     });
 
+    it('fits ICONTAINS_STRING on an infix cast column', () => {
+      expect(
+        CONTAINS_PATTERN_DEFINITION.fit(
+          SqlExpression.parse(`ICONTAINS_STRING("lol"::VARCHAR, 'hello')`),
+        ),
+      ).toEqual(pattern);
+    });
+
     it('fits ICONTAINS_STRING on a bare column', () => {
       expect(
         CONTAINS_PATTERN_DEFINITION.fit(SqlExpression.parse(`ICONTAINS_STRING("lol", 'hello')`)),
@@ -53,6 +61,8 @@ describe('pattern-contains', () => {
       `CONTAINS_STRING("lol", 'hello')`,
       `ICONTAINS_STRING()`,
       `ICONTAINS_STRING(UPPER("lol"), 'hello')`,
+      `ICONTAINS_STRING("lol"::BIGINT, 'hello')`,
+      `ICONTAINS_STRING(v:lol::VARCHAR, 'hello')`,
       `ICONTAINS_STRING("lol")`,
       `ICONTAINS_STRING("lol", '')`,
     ])('does not fit %s', sql => {

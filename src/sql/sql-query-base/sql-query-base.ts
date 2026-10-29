@@ -26,8 +26,10 @@ import {
   SqlOrderByClause,
   SqlReplaceClause,
 } from '../sql-clause';
+import { SqlColonAccess } from '../sql-colon-access/sql-colon-access';
 import { SqlColumn } from '../sql-column/sql-column';
 import { SqlExpression } from '../sql-expression';
+import { SqlInfixCast } from '../sql-infix-cast/sql-infix-cast';
 import { SqlLiteral } from '../sql-literal/sql-literal';
 import { SqlSetStatement } from '../sql-set-statement/sql-set-statement';
 import { SqlStar } from '../sql-star/sql-star';
@@ -497,8 +499,31 @@ export abstract class SqlQueryBase extends SqlExpression {
     return this.getSelectExpressionsArray().some(v => v instanceof SqlStar);
   }
 
+  /**
+   * The names of the output columns, undefined where Druid makes up an EXPR$n name. Druid names an
+   * infix cast or a colon access (`x::BIGINT` is "x", `v:a.b` is "b") only when the select list has
+   * no `*` and no other output column of that name.
+   */
+  private getOutputNames(): (string | undefined)[] {
+    const selectExpressions = this.getSelectExpressionsArray();
+    const outputColumns = selectExpressions.map(SqlQueryBase.getSelectExpressionOutput);
+    const hasStar = this.hasStarInSelect();
+    return selectExpressions.map(selectExpression => {
+      const name = selectExpression.getOutputName();
+      if (selectExpression instanceof SqlInfixCast || selectExpression instanceof SqlColonAccess) {
+        return !hasStar && outputColumns.filter(c => c === name).length === 1 ? name : undefined;
+      }
+      return name;
+    });
+  }
+
+  private getOutputNameForIndex(selectIndex: number): string | undefined {
+    const outputNames = this.getOutputNames();
+    return outputNames[normalizeIndex(selectIndex, outputNames.length)];
+  }
+
   public getOutputColumns(): string[] {
-    return this.getSelectExpressionsArray().map(SqlQueryBase.getSelectExpressionOutput);
+    return this.getOutputNames().map((name, i) => name || `EXPR$${i}`);
   }
 
   public getSelectIndexesForColumn(column: string): number[] {
@@ -514,9 +539,7 @@ export abstract class SqlQueryBase extends SqlExpression {
   }
 
   public getSelectIndexForOutputColumn(outputColumn: string): number {
-    return this.getSelectExpressionsArray().findIndex((selectExpression, i) => {
-      return SqlQueryBase.getSelectExpressionOutput(selectExpression, i) === outputColumn;
-    });
+    return this.getOutputColumns().indexOf(outputColumn);
   }
 
   protected expressionRefersToSelectIndex(
@@ -532,7 +555,7 @@ export abstract class SqlQueryBase extends SqlExpression {
     }
 
     if (allowAliasReferences && ex instanceof SqlColumn) {
-      return selectExpression.getOutputName() === ex.getName();
+      return this.getOutputNameForIndex(selectIndex) === ex.getName();
     }
 
     return selectExpression.getUnderlyingExpression().contains(ex);
@@ -547,9 +570,7 @@ export abstract class SqlQueryBase extends SqlExpression {
     }
 
     if (allowAliasReferences && ex instanceof SqlColumn) {
-      const refIdx = selectExpressionsArray.findIndex((selectExpression, i) => {
-        return SqlQueryBase.getSelectExpressionOutput(selectExpression, i) === ex.getName();
-      });
+      const refIdx = this.getOutputColumns().indexOf(ex.getName());
       if (refIdx !== -1) {
         return refIdx;
       }
@@ -561,9 +582,7 @@ export abstract class SqlQueryBase extends SqlExpression {
   }
 
   public isRealOutputColumnAtSelectIndex(selectIndex: number): boolean {
-    const selectExpression = this.getSelectExpressionForIndex(selectIndex);
-    if (!selectExpression) return false;
-    return Boolean(selectExpression.getOutputName());
+    return Boolean(this.getOutputNameForIndex(selectIndex));
   }
 
   public isGroupedSelectIndex(selectIndex: number): boolean {
@@ -587,10 +606,7 @@ export abstract class SqlQueryBase extends SqlExpression {
 
   public getGroupedOutputColumns(): string[] {
     if (!this.hasGroupBy()) return [];
-    return filterMap(this.getSelectExpressionsArray(), (selectExpression, i) => {
-      if (!this.isGroupedSelectIndex(i)) return;
-      return SqlQueryBase.getSelectExpressionOutput(selectExpression, i);
-    });
+    return this.getOutputColumns().filter((_outputColumn, i) => this.isGroupedSelectIndex(i));
   }
 
   public isAggregateSelectIndex(selectIndex: number): boolean {
@@ -611,10 +627,7 @@ export abstract class SqlQueryBase extends SqlExpression {
 
   public getAggregateOutputColumns(): string[] {
     if (!this.hasGroupBy()) return [];
-    return filterMap(this.getSelectExpressionsArray(), (selectExpression, i) => {
-      if (!this.isAggregateSelectIndex(i)) return;
-      return SqlQueryBase.getSelectExpressionOutput(selectExpression, i);
-    });
+    return this.getOutputColumns().filter((_outputColumn, i) => this.isAggregateSelectIndex(i));
   }
 
   /* ~~~~~ WHERE ~~~~~ */
@@ -653,6 +666,7 @@ export abstract class SqlQueryBase extends SqlExpression {
     const groupByExpressions = this.getGroupByExpressions();
     if (!groupByExpressions) return [];
 
+    const outputColumns = this.getOutputColumns();
     return groupByExpressions.map(ex => {
       const selectIndex = this.getSelectIndexForExpression(ex, true);
       if (selectIndex === -1) {
@@ -666,7 +680,7 @@ export abstract class SqlQueryBase extends SqlExpression {
         return {
           expression: selectExpression.getUnderlyingExpression(),
           selectIndex,
-          outputColumn: SqlQueryBase.getSelectExpressionOutput(selectExpression, selectIndex),
+          outputColumn: outputColumns[selectIndex],
           orderByExpression: this.getOrderByForSelectIndex(selectIndex),
         };
       }
@@ -779,10 +793,7 @@ export abstract class SqlQueryBase extends SqlExpression {
 
   public getOrderedOutputColumns(): string[] {
     if (!this.getOrderByClause()) return [];
-    return filterMap(this.getSelectExpressionsArray(), (selectExpression, i) => {
-      if (!this.getOrderByForSelectIndex(i)) return;
-      return SqlQueryBase.getSelectExpressionOutput(selectExpression, i);
-    });
+    return this.getOutputColumns().filter((_outputColumn, i) => this.getOrderByForSelectIndex(i));
   }
 
   public addOrderBy(orderBy: SqlOrderByExpression): this {

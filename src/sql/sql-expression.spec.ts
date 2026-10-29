@@ -20,6 +20,7 @@ import {
   SqlExpression,
   SqlLiteral,
   SqlMulti,
+  SqlType,
   SqlWhenThenPart,
 } from '..';
 import { backAndForth, backAndForthPrettify, mapString } from '../test-utils';
@@ -887,6 +888,17 @@ describe('SqlExpression', () => {
 
     it('rejects an empty path', () => {
       expect(() => x.access()).toThrow('colon access path must have at least one element');
+    });
+  });
+
+  describe('#infixCast', () => {
+    it('makes an infix cast', () => {
+      expect(String(SqlColumn.create('x').infixCast('BIGINT'))).toEqual('"x"::BIGINT');
+      expect(String(x.access('a').infixCast(SqlType.VARCHAR))).toEqual('x:a::VARCHAR');
+    });
+
+    it('adds parens to an expression that is not a term', () => {
+      expect(String(x.add(y).infixCast('BIGINT'))).toEqual('(x + y)::BIGINT');
     });
   });
 

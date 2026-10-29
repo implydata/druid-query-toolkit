@@ -59,10 +59,16 @@ describe('SqlKeyValue', () => {
     it('keeps a key that parses back as a short key', () => {
       const key = SqlExpression.parse("'a' || F(b) || (v:c)");
       expect(SqlKeyValue.ensureShortKey(key)).toBe(key);
+
+      const castKey = SqlExpression.parse("'a' || b::VARCHAR || (v:c)::VARCHAR");
+      expect(SqlKeyValue.ensureShortKey(castKey)).toBe(castKey);
     });
 
     it('adds parens to any other key', () => {
       expect(SqlKeyValue.ensureShortKey(SqlExpression.parse('v:a')).toString()).toEqual('(v:a)');
+      expect(SqlKeyValue.ensureShortKey(SqlExpression.parse('v:a::VARCHAR')).toString()).toEqual(
+        '(v:a::VARCHAR)',
+      );
       expect(SqlKeyValue.ensureShortKey(SqlExpression.parse('a = b')).toString()).toEqual(
         '(a = b)',
       );

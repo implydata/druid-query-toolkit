@@ -16,8 +16,15 @@ import type { SqlBaseValue, SqlTypeDesignator, Substitutor } from '../sql-base';
 import { SqlBase } from '../sql-base';
 import { SqlColonAccess } from '../sql-colon-access/sql-colon-access';
 import { SqlExpression } from '../sql-expression';
+import { SqlInfixCast } from '../sql-infix-cast/sql-infix-cast';
 import type { LiteralValue } from '../sql-literal/sql-literal';
 import { SqlMulti } from '../sql-multi/sql-multi';
+
+// A term, or an infix cast of one (`k::VARCHAR`)
+function isShortKeyTerm(ex: SqlExpression): boolean {
+  if (ex instanceof SqlInfixCast && !ex.hasParens()) return isShortKeyTerm(ex.expression);
+  return SqlColonAccess.ensureTerm(ex) === ex;
+}
 
 export interface SqlKeyValueValue extends SqlBaseValue {
   key: SqlExpression;
@@ -58,11 +65,9 @@ export class SqlKeyValue extends SqlExpression {
    */
   static ensureShortKey(key: SqlExpression): SqlExpression {
     if (key instanceof SqlMulti && key.op === '||' && !key.hasParens()) {
-      return key.args.values.every(arg => SqlColonAccess.ensureTerm(arg) === arg)
-        ? key
-        : key.ensureParens();
+      return key.args.values.every(isShortKeyTerm) ? key : key.ensureParens();
     }
-    return SqlColonAccess.ensureTerm(key);
+    return isShortKeyTerm(key) ? key : key.ensureParens();
   }
 
   public readonly key: SqlExpression;
