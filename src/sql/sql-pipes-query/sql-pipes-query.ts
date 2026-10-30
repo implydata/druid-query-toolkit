@@ -232,13 +232,13 @@ export class SqlPipesQuery extends SqlQueryBase {
    * it, so any comment that was written above the operator now after it stays with that one.
    */
   public insertPipeOperator(index: number, pipeOperator: SqlPipeOperator): this {
-    const { values, separators } = this.pipeOperators;
+    const { values } = this.pipeOperators;
     const n = values.length;
     index = clampIndex(normalizeIndex(index, n), 0, n);
     return this.changePipeOperators(
       new SeparatedArray(
         insert(values, index, pipeOperator),
-        insert(separators, Math.max(index - 1, 0), undefined),
+        insert(paddedSeparators(this.pipeOperators), Math.max(index - 1, 0), undefined),
       ),
     );
   }
