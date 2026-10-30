@@ -1,5 +1,12 @@
 # druid-query-toolkit
 
+## 1.8.0
+
+### Minor Changes
+
+- 464269c: Parse the infix cast (`x::BIGINT`, `v:a::BIGINT`) as the new `SqlInfixCast`, build it with `ex.infixCast(type)`, and turn it into the `CAST` or `JSON_VALUE ... RETURNING` call it is sugar for with `toFunction()`. Output names follow Druid: `x::BIGINT` is named "x" and `v:a.b` is named "b", unless the select list has a `*` or another column of that name. The contains and regexp filter patterns also recognize `x::VARCHAR`. Types in `CAST` and `::` can be interval types (`INTERVAL DAY`, `INTERVAL DAY TO SECOND`), have a precision (`DECIMAL(5, 1)`) or be `DOUBLE PRECISION`
+- 276752f: Support the rest of Druid's pipe syntax: the `|> UNION [ALL | DISTINCT] (...)`, `|> JOIN`, `|> AS`, `|> DISTINCT` and `|> RENAME` operators (`SqlUnionPipeOperator`, `SqlJoinPipeOperator`, `SqlAsPipeOperator`, `SqlDistinctPipeOperator`, `SqlRenamePipeOperator`), `|> SELECT DISTINCT` / `ALL`, order suffixes on the items of `|> AGGREGATE` (`COUNT(*) AS c DESC GROUP BY a ASC NULLS LAST`, where `ASC` / `DESC` used to be read as an alias), `WITH ... FROM` (and `WITH ... TABLE` / `VALUES`), and queries in parentheses followed by more of the statement (`(FROM t) UNION ALL (FROM u) |> ...`, the new `SqlParensQuery`). `unpipe()` converts all of them. `SqlFromQuery` now holds a whole FROM clause, so it takes aliases, joins, comma separated tables and sub-queries: its `table` and table methods (`getTableName`, `changeTable`, ...) are replaced by `fromClause` and FROM clause methods (`getFromExpressions`, `changeFromExpressions`, `getJoins`, `addJoin`, ...). `SqlOrderByExpression` is now an `SqlExpression`. Pipe operators after a `UNION ALL` now apply to the whole union rather than its last query, and a `WITH` in front of the starting query takes in the operators too (the new `SqlPipesQuery.withClause`), so they can use its tables; `unpipe()` keeps that scoping. A `UNION ALL` after pipe operators (`FROM t |> WHERE x UNION ALL FROM u`) no longer parses.
+
 ## 1.7.0
 
 ### Minor Changes
