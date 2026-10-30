@@ -1,5 +1,11 @@
 # druid-query-toolkit
 
+## 1.8.1
+
+### Patch Changes
+
+- 7001c93: Fix `SqlPipesQuery` operator inserts throwing when the query was created from a plain array of operators
+
 ## 1.8.0
 
 ### Minor Changes
