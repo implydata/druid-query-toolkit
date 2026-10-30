@@ -563,6 +563,18 @@ describe('SqlPipesQuery', () => {
           .toString(),
       ).toEqual(`FROM t |> WHERE x\n|> WHERE "y" |> LIMIT 1`);
     });
+
+    it('inserts into operators that were created without separators', () => {
+      expect(
+        SqlPipesQuery.create(SqlFromQuery.create('t'), [
+          SqlWherePipeOperator.create(SqlColumn.create('x')),
+          SqlLimitPipeOperator.create(5),
+        ])
+          .insertPipeOperator(1, SqlWherePipeOperator.create(SqlColumn.create('y')))
+          .appendPipeOperator(SqlWherePipeOperator.create(SqlColumn.create('z')))
+          .toString(),
+      ).toEqual(`FROM "t"\n|> WHERE "x"\n|> WHERE "y"\n|> LIMIT 5\n|> WHERE "z"`);
+    });
   });
 
   describe('#appendPipeOperator', () => {
