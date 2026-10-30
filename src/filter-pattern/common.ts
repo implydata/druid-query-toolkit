@@ -13,7 +13,7 @@
  */
 
 import type { LiteralValue, SqlExpression, SqlRecord } from '../sql';
-import { SqlFunction, SqlLiteral, SqlType, SqlUnary } from '../sql';
+import { SqlFunction, SqlInfixCast, SqlLiteral, SqlType, SqlUnary } from '../sql';
 import { filterMap } from '../utils';
 
 export interface FilterPatternDefinition<P> {
@@ -48,6 +48,9 @@ export function unwrapCastAsVarchar(ex: SqlExpression): SqlExpression {
     if (t instanceof SqlType && t.getEffectiveType() === 'VARCHAR') {
       return ex.getArg(0)!;
     }
+  }
+  if (ex instanceof SqlInfixCast && ex.castType.getEffectiveType() === 'VARCHAR') {
+    return ex.expression;
   }
   return ex;
 }

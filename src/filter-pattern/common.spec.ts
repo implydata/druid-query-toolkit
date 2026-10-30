@@ -77,6 +77,9 @@ describe('common', () => {
       expect(
         String(unwrapCastAsVarchar(SqlExpression.parse('CAST(t."channel" AS VARCHAR)'))),
       ).toEqual('t."channel"');
+      expect(String(unwrapCastAsVarchar(SqlExpression.parse('t."channel"::varchar')))).toEqual(
+        't."channel"',
+      );
     });
 
     it('works when there is nothing to unwrap', () => {
@@ -88,6 +91,9 @@ describe('common', () => {
     it('does not unwrap a cast to another type', () => {
       expect(String(unwrapCastAsVarchar(SqlExpression.parse('CAST("channel" AS BIGINT)')))).toEqual(
         'CAST("channel" AS BIGINT)',
+      );
+      expect(String(unwrapCastAsVarchar(SqlExpression.parse('"channel"::BIGINT')))).toEqual(
+        '"channel"::BIGINT',
       );
     });
 

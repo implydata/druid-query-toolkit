@@ -34,6 +34,8 @@ The class of the result tells you what was parsed. Some examples:
 | `x = 1`, `x IN (1, 2)`, `x BETWEEN 1 AND 2`, `x LIKE 'a%'` | `SqlComparison` |
 | `a AND b`, `a OR b`, `a + b`, `a \|\| b`          | `SqlMulti`             |
 | `NOT x`, `-x`                                     | `SqlUnary`             |
+| `v:a.b`                                           | `SqlColonAccess`       |
+| `x::BIGINT`                                       | `SqlInfixCast`         |
 | `x AS y`                                          | `SqlAlias`             |
 | `CASE WHEN … END`                                 | `SqlCase`              |
 | `INTERVAL '1' DAY`                                | `SqlInterval`          |

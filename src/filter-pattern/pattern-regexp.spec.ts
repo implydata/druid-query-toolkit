@@ -34,6 +34,12 @@ describe('pattern-regexp', () => {
       ).toEqual(pattern);
     });
 
+    it('fits REGEXP_LIKE on an infix cast column', () => {
+      expect(
+        REGEXP_PATTERN_DEFINITION.fit(SqlExpression.parse(`REGEXP_LIKE("lol"::VARCHAR, '^h.*o$')`)),
+      ).toEqual(pattern);
+    });
+
     it('fits REGEXP_LIKE on a bare column', () => {
       expect(
         REGEXP_PATTERN_DEFINITION.fit(SqlExpression.parse(`REGEXP_LIKE("lol", '^h.*o$')`)),
@@ -51,6 +57,7 @@ describe('pattern-regexp', () => {
       `REGEXP_EXTRACT("lol", 'x')`,
       `REGEXP_LIKE()`,
       `REGEXP_LIKE(UPPER("lol"), 'x')`,
+      `REGEXP_LIKE("lol"::BIGINT, 'x')`,
       `REGEXP_LIKE("lol", "other")`,
     ])('does not fit %s', sql => {
       expect(REGEXP_PATTERN_DEFINITION.fit(SqlExpression.parse(sql))).toBeUndefined();

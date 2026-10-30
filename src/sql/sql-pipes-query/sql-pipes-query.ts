@@ -728,16 +728,18 @@ function toUnionOperand(query: SqlQueryBase): SqlQueryBase {
  */
 function getOutputNames(query: SqlQuery): string[] | undefined {
   const names: string[] = [];
-  for (const ex of query.getSelectExpressionsArray()) {
+  const selectExpressions = query.getSelectExpressionsArray();
+  const outputColumns = query.getOutputColumns();
+  for (let i = 0; i < selectExpressions.length; i++) {
+    const ex = selectExpressions[i]!;
     if (ex instanceof SqlStar) {
       if (ex.table) return;
       const starNames = getStarNames(query);
       if (!starNames) return;
       names.push(...starNames);
     } else {
-      const name = ex.getOutputName();
-      if (!name) return;
-      names.push(name);
+      if (!query.isRealOutputColumnAtSelectIndex(i)) return;
+      names.push(outputColumns[i]!);
     }
   }
   return names;

@@ -868,6 +868,16 @@ describe('SqlQuery (operations)', () => {
         expect(query.getSelectIndexForExpression(SqlLiteral.index(6), false)).toEqual(-1);
         expect(query.getSelectIndexForExpression(SqlLiteral.index(5), false)).toEqual(5);
       });
+
+      it('refers to an infix cast by the name it gets', () => {
+        const m1 = SqlExpression.parse('m1');
+        const castQuery = SqlQuery.parse(`SELECT dim1, m1::BIGINT FROM t`);
+        expect(castQuery.getSelectIndexForExpression(m1, true)).toEqual(1);
+        expect(castQuery.getSelectIndexForExpression(m1, false)).toEqual(-1);
+
+        const dupQuery = SqlQuery.parse(`SELECT m1::BIGINT, m1 FROM t`);
+        expect(dupQuery.getSelectIndexForExpression(m1, true)).toEqual(1);
+      });
     });
 
     describe('#getGroupedSelectExpressions', () => {

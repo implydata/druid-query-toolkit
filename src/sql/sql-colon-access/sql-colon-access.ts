@@ -182,6 +182,16 @@ export class SqlColonAccess extends SqlExpression {
   }
 
   /**
+   * Druid names a colon access after its last segment when that is a field (`v:a.b` is "b"), and
+   * leaves it unnamed when that is an index
+   */
+  public getOutputName(): string | undefined {
+    const path = this.getPath();
+    const last = path[path.length - 1];
+    return typeof last === 'string' && last ? last : undefined;
+  }
+
+  /**
    * The JSON path (as taken by JSON_VALUE) that matches this path, like `$.a['b c'][0]`
    */
   public getJsonPath(): string {

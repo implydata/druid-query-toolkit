@@ -12,8 +12,8 @@
  * limitations under the License.
  */
 
-import type { SqlFunction } from '../..';
-import { SqlExpression, SqlType } from '../..';
+import { SqlExpression, SqlFunction, SqlType } from '../..';
+import { backAndForth } from '../../test-utils';
 
 describe('SqlType', () => {
   describe('parses', () => {
@@ -23,6 +23,43 @@ describe('SqlType', () => {
       expect(type.toString()).toEqual('varchar');
       expect(type.value).toEqual('VARCHAR');
       expect(type.getNativeType()).toEqual('string');
+    });
+
+    it('parses interval types', () => {
+      for (const sql of [
+        'CAST(x AS INTERVAL DAY)',
+        'CAST(x AS interval hours)',
+        'CAST(x AS INTERVAL YEAR TO MONTH)',
+        'CAST(x AS INTERVAL DAY(3) TO SECOND(6))',
+        'CAST(x AS INTERVAL SECOND (3, 6))',
+      ]) {
+        backAndForth(sql, SqlFunction);
+      }
+
+      const cast = SqlExpression.parse('CAST(x AS interval  day to second)') as SqlFunction;
+      expect(cast.getCastType()!.value).toEqual('INTERVAL DAY TO SECOND');
+    });
+
+    it('parses types with a precision or more than one word', () => {
+      for (const sql of [
+        'CAST(x AS DECIMAL(5, 1))',
+        'CAST(x AS VARCHAR(10))',
+        'CAST(x AS TIMESTAMP(3))',
+        'CAST(x AS VARCHAR(10) ARRAY)',
+        'CAST(x AS DOUBLE PRECISION)',
+      ]) {
+        backAndForth(sql, SqlFunction);
+      }
+
+      const cast = SqlExpression.parse('CAST(x AS decimal( 5,1 ))') as SqlFunction;
+      expect(cast.getCastType()!.value).toEqual('DECIMAL(5, 1)');
+    });
+  });
+
+  describe('does not parse', () => {
+    it('does not parse an incomplete interval type', () => {
+      expect(() => SqlExpression.parse('CAST(x AS INTERVAL DAY TO)')).toThrow();
+      expect(() => SqlExpression.parse('CAST(x AS INTERVAL DAY(x))')).toThrow();
     });
   });
 
@@ -62,6 +99,10 @@ describe('SqlType', () => {
     it('upper cases and normalizes the spacing', () => {
       expect(SqlType.makeEffectiveType('bigint')).toEqual('BIGINT');
       expect(SqlType.makeEffectiveType('double  \n array')).toEqual('DOUBLE ARRAY');
+      expect(SqlType.makeEffectiveType('decimal ( 5 ,1 )')).toEqual('DECIMAL(5, 1)');
+      expect(SqlType.makeEffectiveType('Interval Day(3) to  Second(6)')).toEqual(
+        'INTERVAL DAY(3) TO SECOND(6)',
+      );
     });
 
     it('does not change the case inside TYPE(...)', () => {

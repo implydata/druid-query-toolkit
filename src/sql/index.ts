@@ -30,6 +30,7 @@ export * from './sql-table/sql-table';
 export * from './sql-star/sql-star';
 export * from './sql-column/sql-column';
 export * from './sql-colon-access/sql-colon-access';
+export * from './sql-infix-cast/sql-infix-cast';
 export * from './sql-multi/sql-multi';
 export * from './sql-unary/sql-unary';
 export * from './sql-comparison/sql-between-part';
