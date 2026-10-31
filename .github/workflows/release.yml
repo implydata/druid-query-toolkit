@@ -40,12 +40,10 @@ jobs:
 
       - name: Create Release Pull Request or Publish to npm
         id: changesets
-        uses: changesets/action@v1
+        uses: changesets/action@v2
         with:
-          publish: npx changeset publish
-          createGithubReleases: true
+          publish-script: npx changeset publish
+          create-github-releases: true
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          # https://github.com/changesets/action/issues/132
+          # npm auth comes from the .npmrc that setup-node writes for registry-url
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
