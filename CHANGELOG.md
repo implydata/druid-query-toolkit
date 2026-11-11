@@ -1,5 +1,11 @@
 # druid-query-toolkit
 
+## 1.8.2
+
+### Patch Changes
+
+- 95d1754: Fix parsing of a sign followed by whitespace and a number (`- 1`, `x * - 1`, `- -1`) and of long number literals with an exponent and no decimal point (`8640000000000000E0`)
+
 ## 1.8.1
 
 ### Patch Changes
