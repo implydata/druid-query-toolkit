@@ -121,6 +121,10 @@ describe('SqlLiteral', () => {
       '-5E2',
       '-5E02',
       '-5e-2',
+      '8640000000000000E0',
+      '-864000000000000E0',
+      '1E00000000000000',
+      '8640000000000000.0E0',
     ])('number literal %s parses to correct value', num => {
       backAndForth(num);
       expect((SqlExpression.parse(num) as SqlLiteral).value).toEqual(parseFloat(num));
