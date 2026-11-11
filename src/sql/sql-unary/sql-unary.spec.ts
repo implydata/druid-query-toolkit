@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { SqlExpression } from '../..';
+import { SqlExpression, SqlLiteral, SqlUnary } from '../..';
 import { backAndForth } from '../../test-utils';
 
 describe('SqlUnary', () => {
@@ -46,6 +46,82 @@ describe('SqlUnary', () => {
           "type": "unary",
         }
       `);
+    });
+
+    it('minus with whitespace before a number', () => {
+      const sql = `- 1`;
+
+      backAndForth(sql, SqlUnary);
+
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        SqlUnary {
+          "argument": SqlLiteral {
+            "keywords": Object {},
+            "parens": undefined,
+            "spacing": Object {},
+            "stringValue": "1",
+            "type": "literal",
+            "value": 1,
+          },
+          "keywords": Object {
+            "op": "-",
+          },
+          "op": "-",
+          "parens": undefined,
+          "spacing": Object {
+            "postOp": " ",
+          },
+          "type": "unary",
+        }
+      `);
+    });
+
+    it('minus of a negative number', () => {
+      const sql = `- -1`;
+
+      backAndForth(sql, SqlUnary);
+
+      expect(SqlExpression.parse(sql)).toMatchInlineSnapshot(`
+        SqlUnary {
+          "argument": SqlLiteral {
+            "keywords": Object {},
+            "parens": undefined,
+            "spacing": Object {},
+            "stringValue": "-1",
+            "type": "literal",
+            "value": -1,
+          },
+          "keywords": Object {
+            "op": "-",
+          },
+          "op": "-",
+          "parens": undefined,
+          "spacing": Object {
+            "postOp": " ",
+          },
+          "type": "unary",
+        }
+      `);
+    });
+
+    it.each([
+      '+ 1',
+      '- 1.5E0',
+      '(- 1.5E0)',
+      '+-1',
+      '- .5',
+      '- 1e3',
+      '-\n1',
+      'x * - 1',
+      'x - - 1',
+      'NOT - 1',
+    ])('sign followed by whitespace or another sign, then a number: %s', sql => {
+      backAndForth(sql);
+    });
+
+    it('minus directly before a number is a literal', () => {
+      backAndForth('-1', SqlLiteral);
+      backAndForth('-.5', SqlLiteral);
     });
 
     it('single not expression', () => {

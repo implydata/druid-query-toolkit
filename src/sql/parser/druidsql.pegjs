@@ -1432,8 +1432,9 @@ DivisionExpression = head:UnaryExpression tail:(_ '/' _ UnaryExpression)*
   return maybeMakeMulti('/', head, tail);
 }
 
-// !Number is to make sure that -3 parses as a number and not as -(3)
-UnaryExpression = op:[+-] postOp:_ !Number argument:ConcatExpression
+// The sign must not be followed directly by the digits of a number, so that -3 parses as a number
+// and not as -(3). The check comes before the whitespace: `- 3` is -(3) and `- -3` is -(-3).
+UnaryExpression = op:[+-] !(Digit / Fraction) postOp:_ argument:ConcatExpression
 {
   return new S.SqlUnary({
     op: op,
@@ -2219,7 +2220,7 @@ Number "Number" =
 {
   var str = text();
   return {
-    value: str.length > 15 && str.indexOf('.') === -1 ? BigInt(str) : +str,
+    value: str.length > 15 && /^[+-]?\d+$/.test(str) ? BigInt(str) : +str,
     stringValue: str
   };
 }
