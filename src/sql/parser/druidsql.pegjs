@@ -2215,12 +2215,12 @@ IntervalQualifierUnit = TimeUnit "S"i? !IdentifierPart (_ OpenParen _ SqlTypePre
 
 Number "Number" =
   [+-]?
-  ((Digits Fraction?) / Fraction)
+  ((Digits ('.' Digits?)?) / Fraction)
   ('e'i [+-]? Digits)?
 {
   var str = text();
   return {
-    value: str.length > 15 && /^[+-]?\d+$/.test(str) ? BigInt(str) : +str,
+    value: str.length > 15 && /^[+-]?\d+\.?$/.test(str) ? BigInt(str.replace(/\.$/, '')) : +str,
     stringValue: str
   };
 }

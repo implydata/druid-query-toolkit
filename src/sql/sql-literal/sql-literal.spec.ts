@@ -125,9 +125,29 @@ describe('SqlLiteral', () => {
       '-864000000000000E0',
       '1E00000000000000',
       '8640000000000000.0E0',
+      '1.',
+      '+1.',
+      '-1.',
+      '1.E0',
+      '1.e-3',
+      '8640000000000000.E0',
     ])('number literal %s parses to correct value', num => {
       backAndForth(num);
       expect((SqlExpression.parse(num) as SqlLiteral).value).toEqual(parseFloat(num));
+    });
+
+    it('parses a long integer literal that ends in a point as a bigint', () => {
+      backAndForth('8640000000000000.');
+      expect((SqlExpression.parse('8640000000000000.') as SqlLiteral).value).toEqual(
+        BigInt('8640000000000000'),
+      );
+    });
+
+    it('parses number literals that end in a point inside expressions', () => {
+      backAndForth('ARRAY[1., 2.]');
+      backAndForth('x + 1.');
+      backAndForth('CAST(1. AS DOUBLE)');
+      backAndForth('SELECT * FROM t WHERE x > 1.');
     });
 
     it('number literals', () => {
