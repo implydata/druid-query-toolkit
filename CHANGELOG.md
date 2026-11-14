@@ -1,5 +1,11 @@
 # druid-query-toolkit
 
+## 1.8.3
+
+### Patch Changes
+
+- 0ff2f38: Parse number literals that end in a point, such as `1.` and `1.E0`
+
 ## 1.8.2
 
 ### Patch Changes
