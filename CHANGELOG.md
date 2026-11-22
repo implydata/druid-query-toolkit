@@ -1,5 +1,11 @@
 # druid-query-toolkit
 
+## 1.8.4
+
+### Patch Changes
+
+- df0a677: Walk into a function's window spec (`OVER (...)`), and add `SqlFunction#changeWindowSpec`
+
 ## 1.8.3
 
 ### Patch Changes
