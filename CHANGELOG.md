@@ -1,5 +1,13 @@
 # druid-query-toolkit
 
+## 1.8.4
+
+### Patch Changes
+
+- d956ede: `prettify()` also resets the spacing and casing of the keyword separators in function arguments (`CAST(x  as  BIGINT)`, `EXTRACT(day  from  t)`, `TRIM(BOTH 'x'  from  y)`), and the spacing around the dots of a qualified column or star (`s . t . c`, `t . *`) and inside a colon access (`v:a . b [ 'c' ]`)
+- d956ede: Walks also visit the frame bounds of a window spec and column lists (`AS x (a, b)`, `INSERT INTO t (a, b)`, `WITH w (a, b)`, `USING (a, b)`), so `prettify()` now formats all of them, along with the separators of `PARTITION BY` and `EXTEND (...)`. A function with `FILTER (...)` or `OVER (...)` followed by `EXTEND (...)` prints its clauses in the order they were written, and no longer drops the `EXTEND`
+- df0a677: Walk into a function's window spec (`OVER (...)`), and add `SqlFunction#changeWindowSpec`. `getUsedColumnNames`, `fillPlaceholders` and other walks now see the expressions inside `OVER (...)`
+
 ## 1.8.3
 
 ### Patch Changes
