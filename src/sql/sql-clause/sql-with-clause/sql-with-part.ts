@@ -108,6 +108,14 @@ export class SqlWithPart extends SqlBase {
   ): SqlBase | undefined {
     let ret = this;
 
+    if (this.columns) {
+      const columns = this.columns._walkHelper(nextStack, fn, postorder);
+      if (!columns) return;
+      if (columns !== this.columns) {
+        ret = ret.changeColumns(columns as SqlColumnList);
+      }
+    }
+
     const query = this.query._walkHelper(nextStack, fn, postorder);
     if (!query) return;
     if (query !== this.query) {

@@ -12,8 +12,7 @@
  * limitations under the License.
  */
 
-import type { SqlColumnList } from '../../..';
-import { SqlExpression, SqlJoinPart, SqlTable } from '../../..';
+import { SqlColumnList, SqlExpression, SqlJoinPart, SqlQuery, SqlTable } from '../../..';
 
 describe('SqlJoinPart', () => {
   describe('.create', () => {
@@ -207,6 +206,21 @@ describe('SqlJoinPart', () => {
       // The implementation only removes 'natural' from keywords, not the property,
       // so we need to test that it's still displayed as NATURAL but we remove it from output
       expect(usingJoin.toString()).toEqual('NATURAL LEFT JOIN "right_table" USING (id, name)');
+    });
+  });
+
+  describe('#_walkInner', () => {
+    it('visits and substitutes the using columns', () => {
+      const joinPart = SqlQuery.parse(`SELECT * FROM t JOIN u USING ( a ,b )`).getJoins()[0]!;
+      const seen: string[] = [];
+      const walked = joinPart.walk(ex => {
+        seen.push(ex.type);
+        return ex instanceof SqlColumnList ? ex.clearOwnSeparators() : ex;
+      });
+      expect(seen).toEqual(['joinPart', 'table', 'columnList']);
+      expect(String(walked)).toEqual('JOIN u USING ( a, b )');
+      expect(joinPart.walk(ex => ex)).toBe(joinPart);
+      expect(joinPart.walk(ex => (ex instanceof SqlColumnList ? undefined : ex))).toBe(joinPart);
     });
   });
 });

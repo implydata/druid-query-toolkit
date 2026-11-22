@@ -181,6 +181,26 @@ export class SqlWindowSpec extends SqlBase {
       }
     }
 
+    if (this.frameBound1) {
+      const frameBound1 = this.frameBound1._walkHelper(nextStack, fn, postorder);
+      if (!frameBound1) return;
+      if (frameBound1 !== this.frameBound1) {
+        const value = ret.valueOf();
+        value.frameBound1 = frameBound1 as SqlFrameBound;
+        ret = SqlBase.fromValue(value);
+      }
+    }
+
+    if (this.frameBound2) {
+      const frameBound2 = this.frameBound2._walkHelper(nextStack, fn, postorder);
+      if (!frameBound2) return;
+      if (frameBound2 !== this.frameBound2) {
+        const value = ret.valueOf();
+        value.frameBound2 = frameBound2 as SqlFrameBound;
+        ret = SqlBase.fromValue(value);
+      }
+    }
+
     return ret;
   }
 }

@@ -15,6 +15,7 @@
 import { backAndForth } from '../../../test-utils';
 import {
   SqlColumn,
+  SqlColumnList,
   SqlExpression,
   SqlQuery,
   SqlReplaceClause,
@@ -105,6 +106,23 @@ describe('SqlReplaceClause', () => {
 
     it('returns the same instance when nothing changes', () => {
       expect(clause.walk(ex => ex)).toBe(clause);
+    });
+
+    it('visits and substitutes the column list', () => {
+      const withColumns = SqlQuery.parse(
+        `REPLACE INTO t ( a ,b ) OVERWRITE WHERE c SELECT 1, 2`,
+      ).replaceClause!;
+      const seen: string[] = [];
+      const walked = withColumns.walk(ex => {
+        seen.push(ex.type);
+        return ex instanceof SqlColumnList ? ex.clearOwnSeparators() : ex;
+      });
+      expect(seen).toEqual(['replaceClause', 'table', 'columnList', 'whereClause', 'column']);
+      expect(String(walked)).toEqual(`REPLACE INTO t ( a, b ) OVERWRITE WHERE c`);
+      expect(withColumns.walk(ex => ex)).toBe(withColumns);
+      expect(withColumns.walk(ex => (ex instanceof SqlColumnList ? undefined : ex))).toBe(
+        withColumns,
+      );
     });
 
     it('substitutes the table', () => {

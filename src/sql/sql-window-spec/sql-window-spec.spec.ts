@@ -284,6 +284,60 @@ describe('SqlWindowSpec', () => {
       );
     });
 
+    it('visits the frame bounds after the clauses', () => {
+      const windowSpec = parseWindowSpec(
+        `(PARTITION BY a ORDER BY b ROWS BETWEEN 1 PRECEDING AND CURRENT ROW)`,
+      );
+      const seen: string[] = [];
+      windowSpec.walk(ex => {
+        seen.push(ex.type);
+        return ex;
+      });
+      expect(seen).toEqual([
+        'windowSpec',
+        'partitionByClause',
+        'column',
+        'orderByClause',
+        'orderByExpression',
+        'column',
+        'frameBound',
+        'frameBound',
+      ]);
+    });
+
+    it('substitutes the frame bounds and keeps the formatting elsewhere', () => {
+      const windowSpec = parseWindowSpec(
+        `( order by b  rows  between 1 preceding  and  current row )`,
+      );
+      expect(
+        String(
+          windowSpec.walk(ex =>
+            ex instanceof SqlFrameBound && ex.boundValue === 1 ? SqlFrameBound.preceding(2) : ex,
+          ),
+        ),
+      ).toEqual(`( order by b  rows  between 2 PRECEDING  and  current row )`);
+      expect(
+        String(
+          windowSpec.walk(ex =>
+            ex instanceof SqlFrameBound && ex.boundValue === 'currentRow'
+              ? SqlFrameBound.following('unbounded')
+              : ex,
+          ),
+        ),
+      ).toEqual(`( order by b  rows  between 1 preceding  and  UNBOUNDED FOLLOWING )`);
+    });
+
+    it('stops when the substitutor returns nothing for a frame bound', () => {
+      const windowSpec = parseWindowSpec(`(ORDER BY b ROWS BETWEEN 1 PRECEDING AND CURRENT ROW)`);
+      expect(
+        windowSpec.walk(ex => {
+          if (ex instanceof SqlColumn) return ex.changeName('c');
+          if (ex instanceof SqlFrameBound && ex.boundValue === 'currentRow') return;
+          return ex;
+        }),
+      ).toBe(windowSpec);
+    });
+
     it('returns the same instance when nothing changes', () => {
       const windowSpec = parseWindowSpec(`(PARTITION BY a ORDER BY b)`);
       expect(windowSpec.walk(ex => ex)).toBe(windowSpec);

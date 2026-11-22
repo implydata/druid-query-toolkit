@@ -75,6 +75,9 @@ describe('SqlFunction', () => {
       `TABLE(extern('{...}', '{...}')) EXTEND (x VARCHAR, y BIGINT, z TYPE('COMPLEX<json>'))`,
       `TABLE(extern('{...}', '{...}'))  (x VARCHAR, y BIGINT, z TYPE('COMPLEX<json>'))`,
       `TABLE(extern('{...}', '{...}'))  EXTEND  (xs VARCHAR   ARRAY, ys BIGINT  ARRAY, zs DOUBLE  ARRAY)`,
+      `TABLE(x)  FILTER (WHERE a)  EXTEND (a VARCHAR)`,
+      `TABLE(x)  OVER (ORDER BY a)  EXTEND (a VARCHAR)`,
+      `TABLE(x) FILTER (WHERE a)  OVER (ORDER BY a)  EXTEND (a VARCHAR)`,
       `SUM(COUNT(*)) OVER ()`,
       `SUM(COUNT(*))   Over  ("windowName"  Order by COUNT(*) Desc)`,
       `ROW_NUMBER() OVER (PARTITION BY t."country", t."city" ORDER BY COUNT(*) DESC)`,
@@ -1931,6 +1934,13 @@ describe('SqlFunction', () => {
         'SUM(x) OVER (PARTITION BY a)',
       );
     });
+
+    it('returns the same instance when given the window spec it already has', () => {
+      const fn = SqlExpression.parse(`SUM(x) OVER (PARTITION BY a)`) as SqlFunction;
+
+      expect(fn.changeWindowSpec(fn.windowSpec)).toBe(fn);
+      expect(fn.changeWindowSpec(undefined).changeWindowSpec(undefined).windowSpec).toBeUndefined();
+    });
   });
 
   describe('#isAggregation', () => {
@@ -2163,6 +2173,19 @@ describe('SqlFunction', () => {
         'b',
         '1',
       ]);
+    });
+
+    it('visits the filter, the window spec and the extend clause in the order they are written', () => {
+      const fn = SqlExpression.parse(
+        `TABLE(x) FILTER (WHERE a) OVER (ORDER BY b) EXTEND (c VARCHAR)`,
+      );
+
+      const seen: string[] = [];
+      fn.walk(ex => {
+        if (ex.type.endsWith('Clause') || ex.type === 'windowSpec') seen.push(ex.type);
+        return ex;
+      });
+      expect(seen).toEqual(['whereClause', 'windowSpec', 'orderByClause', 'extendClause']);
     });
 
     it('keeps the same instance when nothing changes in the window spec', () => {

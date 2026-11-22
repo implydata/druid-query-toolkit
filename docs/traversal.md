@@ -97,6 +97,8 @@ SqlExpression.parse('a + b').walk(ex => (ex instanceof SqlColumn ? F('ABS', ex) 
 //=> ABS(a) + ABS(b)
 ```
 
+A walk reaches every node, not only expressions: clauses, the window spec of `SUM(x) OVER (...)` with its partition by, order by and frame bounds, and column lists such as the one in `WITH w (a, b) AS ...`. Two things are deliberately not visited on their own: the table or namespace that qualifies a name (`t` in `t.x` is part of the `SqlColumn`, so `getTables()` only finds real table references), and the type of an infix cast (`x::BIGINT`).
+
 ### walkPostorder
 
 `walkPostorder(fn)` visits the children before their parent, so `fn` sees a parent after its children have already been replaced. Use it when a change to a parent depends on its (already changed) children, for example to simplify from the bottom up:

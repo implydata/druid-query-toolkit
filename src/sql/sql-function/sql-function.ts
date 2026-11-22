@@ -336,8 +336,6 @@ export class SqlFunction extends SqlExpression {
           this.getSpace('postFilter'),
           this.whereClause.toString(),
         );
-      } else if (this.extendClause) {
-        rawParts.push(this.getSpace('preExtend'), this.extendClause.toString());
       }
 
       if (this.windowSpec) {
@@ -347,6 +345,10 @@ export class SqlFunction extends SqlExpression {
           this.getSpace('postOver'),
           this.windowSpec.toString(),
         );
+      }
+
+      if (this.extendClause) {
+        rawParts.push(this.getSpace('preExtend'), this.extendClause.toString());
       }
     }
 
@@ -507,6 +509,7 @@ export class SqlFunction extends SqlExpression {
   }
 
   public changeWindowSpec(windowSpec: SqlWindowSpec | undefined): this {
+    if (this.windowSpec === windowSpec) return this;
     const value = this.valueOf();
     if (windowSpec) {
       value.windowSpec = windowSpec;
@@ -545,19 +548,19 @@ export class SqlFunction extends SqlExpression {
       }
     }
 
-    if (this.extendClause) {
-      const extendClause = this.extendClause._walkHelper(nextStack, fn, postorder);
-      if (!extendClause) return;
-      if (extendClause !== this.extendClause) {
-        ret = ret.changeExtendClause(extendClause as SqlExtendClause);
-      }
-    }
-
     if (this.windowSpec) {
       const windowSpec = this.windowSpec._walkHelper(nextStack, fn, postorder);
       if (!windowSpec) return;
       if (windowSpec !== this.windowSpec) {
         ret = ret.changeWindowSpec(windowSpec as SqlWindowSpec);
+      }
+    }
+
+    if (this.extendClause) {
+      const extendClause = this.extendClause._walkHelper(nextStack, fn, postorder);
+      if (!extendClause) return;
+      if (extendClause !== this.extendClause) {
+        ret = ret.changeExtendClause(extendClause as SqlExtendClause);
       }
     }
 

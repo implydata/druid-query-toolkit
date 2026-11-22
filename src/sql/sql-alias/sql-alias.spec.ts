@@ -14,7 +14,7 @@
 
 import { backAndForth } from '../../test-utils';
 import type { SqlBase } from '..';
-import { RefName, SqlAlias, SqlColumn, SqlExpression, SqlQuery, SqlTable } from '..';
+import { RefName, SqlAlias, SqlColumn, SqlColumnList, SqlExpression, SqlQuery, SqlTable } from '..';
 
 describe('SqlAlias', () => {
   describe('parses', () => {
@@ -275,6 +275,21 @@ describe('SqlAlias', () => {
           .walk(ex => (ex instanceof SqlColumn ? ex.changeName(ex.getName().toUpperCase()) : ex))
           .toString(),
       ).toEqual('A + B AS "c"');
+    });
+
+    it('visits and substitutes the column list', () => {
+      const withColumns = SqlQuery.parse(`SELECT * FROM t AS x ( a ,b )`).getFirstFromExpression()!;
+      const seen: string[] = [];
+      const walked = withColumns.walk(ex => {
+        seen.push(ex.type);
+        return ex instanceof SqlColumnList ? ex.clearOwnSeparators() : ex;
+      });
+      expect(seen).toEqual(['alias', 'table', 'columnList']);
+      expect(String(walked)).toEqual('t AS x ( a, b )');
+      expect(withColumns.walk(ex => ex)).toBe(withColumns);
+      expect(withColumns.walk(ex => (ex instanceof SqlColumnList ? undefined : ex))).toBe(
+        withColumns,
+      );
     });
 
     it('abandons all changes when the expression aborts the walk', () => {

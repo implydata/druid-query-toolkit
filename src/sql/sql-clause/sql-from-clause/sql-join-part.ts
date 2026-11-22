@@ -204,6 +204,14 @@ export class SqlJoinPart extends SqlBase {
       }
     }
 
+    if (this.usingColumns) {
+      const usingColumns = this.usingColumns._walkHelper(nextStack, fn, postorder);
+      if (!usingColumns) return;
+      if (usingColumns !== this.usingColumns) {
+        ret = ret.changeUsingColumns(usingColumns as SqlColumnList);
+      }
+    }
+
     return ret;
   }
 }

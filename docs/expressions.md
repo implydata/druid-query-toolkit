@@ -262,7 +262,7 @@ Narrow with `instanceof` and then use the class's own accessors:
 | --- | --- |
 | `SqlColumn` | `getName()`, `changeName(name)`, `getTableName()`, `changeTableName(name)`, `changeTable(table)` |
 | `SqlLiteral` | `value`, `getStringValue()`, `getNumberValue()`, `getDateValue()`, `isIndex()`, `getIndexValue()`, `SqlLiteral.isTrue(ex)` |
-| `SqlFunction` | `getEffectiveFunctionName()` (upper case), `getEffectiveDecorator()`, `numArgs()`, `getArg(i)`, `getArgArray()`, `getArgAsString(i)`, `getArgAsNumber(i)`, `changeArg(i, ex)`, `changeArgs(args)`, `getWhereExpression()`, `addWhere(...)`, `isCountStar()`, `getCastType()` |
+| `SqlFunction` | `getEffectiveFunctionName()` (upper case), `getEffectiveDecorator()`, `numArgs()`, `getArg(i)`, `getArgArray()`, `getArgAsString(i)`, `getArgAsNumber(i)`, `changeArg(i, ex)`, `changeArgs(args)`, `getWhereExpression()`, `addWhere(...)`, `windowSpec`, `changeWindowSpec(windowSpec)`, `isCountStar()`, `getCastType()` |
 | `SqlComparison` | `op`, `lhs`, `rhs`, `changeLhs(ex)`, `changeRhs(ex)`, `negate()`, `getLikeMatchPattern()` |
 | `SqlMulti` (`AND`, `OR`, `+`, ...) | `op`, `numArgs()`, `getArg(i)`, `getArgArray()`, `changeArgs(args)` |
 | `SqlUnary` (`NOT`, `-`) | `op`, `argument`, `changeArgument(ex)` |

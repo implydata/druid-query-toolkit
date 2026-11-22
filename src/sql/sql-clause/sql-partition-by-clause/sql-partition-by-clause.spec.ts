@@ -132,6 +132,14 @@ describe('SqlPartitionByClause', () => {
     });
   });
 
+  describe('#clearOwnSeparators', () => {
+    it('resets the separators to the default', () => {
+      const clause = (SqlExpression.parse(`SUM(x) OVER (PARTITION BY a ,b  ,  c)`) as SqlFunction)
+        .windowSpec!.partitionByClause!;
+      expect(String(clause.clearOwnSeparators())).toEqual(`PARTITION BY a, b, c`);
+    });
+  });
+
   describe('#_walkInner', () => {
     const clause = SqlPartitionByClause.create([SqlColumn.create('a'), SqlColumn.create('b')]);
 

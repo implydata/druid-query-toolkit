@@ -117,6 +117,16 @@ export class SqlAlias extends SqlExpression {
       ret = ret.changeExpression(expression);
     }
 
+    if (this.columns) {
+      const columns = this.columns._walkHelper(nextStack, fn, postorder);
+      if (!columns) return;
+      if (columns !== this.columns) {
+        const value = ret.valueOf();
+        value.columns = columns as SqlColumnList;
+        ret = SqlBase.fromValue(value);
+      }
+    }
+
     return ret;
   }
 

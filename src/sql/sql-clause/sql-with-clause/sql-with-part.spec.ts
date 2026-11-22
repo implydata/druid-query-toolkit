@@ -122,6 +122,19 @@ describe('SqlWithPart', () => {
       ).toEqual('t AS (SELECT * FROM "b")');
     });
 
+    it('visits and substitutes the column list', () => {
+      const part = withPart('t ( a ,b ) AS (SELECT 1, 2)');
+      const seen: string[] = [];
+      const walked = part.walk(ex => {
+        seen.push(ex.type);
+        return ex instanceof SqlColumnList ? ex.clearOwnSeparators() : ex;
+      });
+      expect(seen).toEqual(['withPart', 'columnList', 'query', 'literal', 'literal']);
+      expect(String(walked)).toEqual('t ( a, b ) AS (SELECT 1, 2)');
+      expect(part.walk(ex => ex)).toBe(part);
+      expect(part.walk(ex => (ex instanceof SqlColumnList ? undefined : ex))).toBe(part);
+    });
+
     it('returns the same instance when nothing changes', () => {
       const part = withPart('t AS (SELECT * FROM a)');
       expect(part.walk(ex => ex)).toBe(part);
