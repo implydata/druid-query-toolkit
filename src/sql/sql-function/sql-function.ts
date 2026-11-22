@@ -506,6 +506,18 @@ export class SqlFunction extends SqlExpression {
     return SqlBase.fromValue(value);
   }
 
+  public changeWindowSpec(windowSpec: SqlWindowSpec | undefined): this {
+    const value = this.valueOf();
+    if (windowSpec) {
+      value.windowSpec = windowSpec;
+    } else {
+      delete value.windowSpec;
+      value.keywords = this.getKeywordsWithout('over');
+      value.spacing = this.getSpacingWithout('preOver', 'postOver');
+    }
+    return SqlBase.fromValue(value);
+  }
+
   public isAggregation(knownAggregations: string[]): boolean {
     return Boolean(this.whereClause || knownAggregations.includes(this.getEffectiveFunctionName()));
   }
@@ -538,6 +550,14 @@ export class SqlFunction extends SqlExpression {
       if (!extendClause) return;
       if (extendClause !== this.extendClause) {
         ret = ret.changeExtendClause(extendClause as SqlExtendClause);
+      }
+    }
+
+    if (this.windowSpec) {
+      const windowSpec = this.windowSpec._walkHelper(nextStack, fn, postorder);
+      if (!windowSpec) return;
+      if (windowSpec !== this.windowSpec) {
+        ret = ret.changeWindowSpec(windowSpec as SqlWindowSpec);
       }
     }
 

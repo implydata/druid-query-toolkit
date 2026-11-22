@@ -22,6 +22,7 @@ import {
   SqlKeyValue,
   SqlLiteral,
   SqlNamespace,
+  SqlQuery,
   SqlStar,
   SqlType,
   SqlWhereClause,
@@ -1903,6 +1904,35 @@ describe('SqlFunction', () => {
     });
   });
 
+  describe('#changeWindowSpec', () => {
+    it('sets the window spec', () => {
+      const fn = SqlExpression.parse(`SUM(x)`) as SqlFunction;
+      const windowSpec = (SqlExpression.parse(`SUM(y) OVER (PARTITION BY a)`) as SqlFunction)
+        .windowSpec;
+
+      expect(fn.changeWindowSpec(windowSpec).toString()).toEqual('SUM(x) OVER (PARTITION BY a)');
+    });
+
+    it('replaces the window spec and keeps the OVER keyword and spacing', () => {
+      const fn = SqlExpression.parse(`SUM(x)  over  (PARTITION BY a)`) as SqlFunction;
+      const windowSpec = (SqlExpression.parse(`SUM(y) OVER (ORDER BY b)`) as SqlFunction)
+        .windowSpec;
+
+      expect(fn.changeWindowSpec(windowSpec).toString()).toEqual('SUM(x)  over  (ORDER BY b)');
+    });
+
+    it('removes the window spec, its OVER keyword and its spacing', () => {
+      const fn = SqlExpression.parse(`SUM(x)  over  (PARTITION BY a)`) as SqlFunction;
+
+      const changed = fn.changeWindowSpec(undefined);
+      expect(changed.keywords).toEqual({});
+      expect(changed.toString()).toEqual('SUM(x)');
+      expect(changed.changeWindowSpec(fn.windowSpec).toString()).toEqual(
+        'SUM(x) OVER (PARTITION BY a)',
+      );
+    });
+  });
+
   describe('#isAggregation', () => {
     it('is true for known aggregations and filtered functions', () => {
       expect((SqlExpression.parse(`sum(x)`) as SqlFunction).isAggregation(['SUM'])).toEqual(true);
@@ -2040,6 +2070,106 @@ describe('SqlFunction', () => {
 
       const extended = SqlExpression.parse(`TABLE(x) EXTEND (a VARCHAR)`);
       expect(extended.walkPostorder(stopOn(ex => ex instanceof SqlExtendClause))).toBe(extended);
+    });
+
+    it('visits the partition by and order by expressions of the window spec', () => {
+      const query = SqlQuery.parse(
+        'SELECT ROW_NUMBER() OVER (PARTITION BY a ORDER BY b) AS n FROM t',
+      );
+
+      const seen: string[] = [];
+      query.walk(ex => {
+        if (ex instanceof SqlColumn) seen.push(ex.getName());
+        return ex;
+      });
+      expect(seen).toEqual(['a', 'b']);
+    });
+
+    it('visits the window spec expressions before the function in a postorder walk', () => {
+      const fn = SqlExpression.parse(`SUM(x) OVER (PARTITION BY a ORDER BY b)`);
+
+      const seen: string[] = [];
+      fn.walkPostorder(ex => {
+        if (ex instanceof SqlColumn || ex instanceof SqlFunction) seen.push(String(ex));
+        return ex;
+      });
+      expect(seen).toEqual(['x', 'a', 'b', 'SUM(x) OVER (PARTITION BY a ORDER BY b)']);
+    });
+
+    it('substitutes in the window spec and keeps the formatting elsewhere', () => {
+      const fn = SqlExpression.parse(
+        `sum( x )  filter ( where y = 1 )  over  ( partition by a  order by b desc rows 1 preceding )`,
+      );
+
+      expect(
+        fn
+          .walk(ex =>
+            ex instanceof SqlColumn && ex.getName() === 'b' ? SqlColumn.create('c') : ex,
+          )
+          .toString(),
+      ).toEqual(
+        `sum( x )  filter ( where y = 1 )  over  ( partition by a  order by "c" desc rows 1 preceding )`,
+      );
+    });
+
+    it('substitutes in the window spec of a query', () => {
+      const query = SqlQuery.parse(
+        'SELECT ROW_NUMBER() OVER (PARTITION BY a ORDER BY b) AS n FROM t',
+      );
+
+      expect(
+        query
+          .walk(ex =>
+            ex instanceof SqlColumn && ex.getName() === 'b' ? SqlColumn.create('c') : ex,
+          )
+          .toString(),
+      ).toEqual('SELECT ROW_NUMBER() OVER (PARTITION BY a ORDER BY "c") AS n FROM t');
+    });
+
+    it('stops when the callback returns nothing inside the window spec', () => {
+      const fn = SqlExpression.parse(`SUM(x) OVER (PARTITION BY a ORDER BY b)`);
+
+      const seen: string[] = [];
+      const ret = fn.walk(ex => {
+        seen.push(String(ex));
+        if (ex instanceof SqlColumn && ex.getName() === 'a') return;
+        if (ex instanceof SqlColumn) return SqlColumn.create(ex.getName() + '1');
+        return ex;
+      });
+      expect(ret).toBe(fn);
+      expect(seen).toEqual([
+        'SUM(x) OVER (PARTITION BY a ORDER BY b)',
+        'x',
+        '(PARTITION BY a ORDER BY b)',
+        'PARTITION BY a',
+        'a',
+      ]);
+    });
+
+    it('walks a function without OVER as before', () => {
+      const fn = SqlExpression.parse(`SUM(a) FILTER (WHERE b = 1)`);
+
+      const seen: string[] = [];
+      const ret = fn.walk(ex => {
+        seen.push(String(ex));
+        return ex;
+      });
+      expect(ret).toBe(fn);
+      expect(seen).toEqual([
+        'SUM(a) FILTER (WHERE b = 1)',
+        'a',
+        '(WHERE b = 1)',
+        'b = 1',
+        'b',
+        '1',
+      ]);
+    });
+
+    it('keeps the same instance when nothing changes in the window spec', () => {
+      const fn = SqlExpression.parse(`SUM(x) OVER (PARTITION BY a ORDER BY b ROWS 1 PRECEDING)`);
+
+      expect(fn.walk(ex => ex)).toBe(fn);
+      expect(fn.walkPostorder(ex => ex)).toBe(fn);
     });
   });
 });
