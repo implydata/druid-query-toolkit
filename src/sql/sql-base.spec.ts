@@ -672,6 +672,25 @@ describe('SqlBase', () => {
       ).toEqual(`TABLE(EXTERN('a')) EXTEND (a VARCHAR, b BIGINT)`);
     });
 
+    it('prettifies the keyword separators of function arguments', () => {
+      const sql = `cast( x  as  bigint ) + extract( day  from  t ) + position( 'a'  in  s  from  2 )`;
+      expect(parseSql(sql).prettify().toString()).toEqual(
+        `CAST(x AS BIGINT) + EXTRACT(day FROM t) + POSITION('a' IN s FROM 2)`,
+      );
+      expect(parseSql(sql).prettify({ keywordCasing: 'preserve' }).toString()).toEqual(
+        `cast(x as bigint) + extract(day from t) + position('a' in s from 2)`,
+      );
+    });
+
+    it('prettifies the spacing of dotted names and colon access', () => {
+      expect(parseSql(`s . t . c + t . x + v : a . b [ 'c' ] [ 0 ]`).prettify().toString()).toEqual(
+        `s.t.c + t.x + v:a.b['c'][0]`,
+      );
+      expect(SqlQuery.parse(`select t . * from s . t`).prettify().toString()).toEqual(
+        `SELECT t.*\nFROM s.t`,
+      );
+    });
+
     it('upper cases the unit of an interval', () => {
       expect(parseSql(`x - interval '1' day`).prettify().toString()).toEqual(
         `x - INTERVAL '1' DAY`,

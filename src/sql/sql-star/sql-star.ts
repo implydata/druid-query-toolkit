@@ -89,6 +89,18 @@ export class SqlStar extends SqlExpression {
     if (!table) return this;
     return this.changeTable(table.prettyTrim(maxLength));
   }
+
+  /**
+   * Also resets the spacing of the table (and its namespace), which a walk does not visit on
+   * its own
+   */
+  public resetOwnSpacing(): this {
+    const { table } = this;
+    const ret = super.resetOwnSpacing();
+    if (!table) return ret;
+    const newTable = table.resetOwnSpacing();
+    return newTable === table ? ret : ret.changeTable(newTable);
+  }
 }
 
 SqlBase.register(SqlStar);

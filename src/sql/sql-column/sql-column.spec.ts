@@ -571,6 +571,17 @@ describe('SqlColumn', () => {
     });
   });
 
+  describe('#resetOwnSpacing', () => {
+    it('resets the spacing of the table and namespace too', () => {
+      expect(String(SqlExpression.parse('s . t  .  c').resetOwnSpacing())).toEqual('s.t.c');
+    });
+
+    it('returns the same instance when there is no spacing', () => {
+      const column = SqlColumn.create('c', SqlTable.create('t', 's'));
+      expect(column.resetOwnSpacing()).toBe(column);
+    });
+  });
+
   describe('#convertToTable', () => {
     it('converts a namespaced column with double quotes', () => {
       const sql = `"namespace"  . "table"`;

@@ -170,4 +170,16 @@ describe('SqlStar', () => {
       expect(SqlStar.PLAIN.prettyTrim(6)).toBe(SqlStar.PLAIN);
     });
   });
+
+  describe('#resetOwnSpacing', () => {
+    it('resets the spacing of the table and namespace too', () => {
+      expect(String(parseStar('s . t  .  *').resetOwnSpacing())).toEqual('s.t.*');
+    });
+
+    it('returns the same instance when there is no spacing', () => {
+      const star = SqlStar.create(SqlTable.create('t', 's'));
+      expect(star.resetOwnSpacing()).toBe(star);
+      expect(SqlStar.PLAIN.resetOwnSpacing()).toBe(SqlStar.PLAIN);
+    });
+  });
 });

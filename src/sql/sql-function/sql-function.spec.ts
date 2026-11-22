@@ -1965,6 +1965,15 @@ describe('SqlFunction', () => {
       );
     });
 
+    it('resets the spaces around a keyword separator and keeps its casing', () => {
+      expect(String(SqlExpression.parse(`CAST(x  as\nBIGINT)`).clearOwnSeparators())).toEqual(
+        'CAST(x as BIGINT)',
+      );
+      expect(
+        String(SqlExpression.parse(`JSON_VALUE(j ,'$.x'  Returning  DOUBLE)`).clearOwnSeparators()),
+      ).toEqual(`JSON_VALUE(j, '$.x' Returning DOUBLE)`);
+    });
+
     it('returns the same instance when there are no args', () => {
       const fn = SqlExpression.parse(`CURRENT_TIMESTAMP`);
 
@@ -1979,10 +1988,21 @@ describe('SqlFunction', () => {
       ).toEqual('SUM(x) FILTER (where y = 1)');
     });
 
+    it('upper cases the keyword separators and keeps their spacing', () => {
+      expect(SqlExpression.parse(`CAST(x  as  BIGINT)`).resetOwnKeywords().toString()).toEqual(
+        'CAST(x  AS  BIGINT)',
+      );
+      expect(SqlExpression.parse(`trim(both 'x' from y)`).resetOwnKeywords().toString()).toEqual(
+        `TRIM(BOTH 'x' FROM y)`,
+      );
+    });
+
     it('returns the same instance when there is nothing to reset', () => {
       const fn = SqlExpression.parse(`SUM(x)`);
 
       expect(fn.resetOwnKeywords()).toBe(fn);
+      const cast = SqlExpression.parse(`CAST(x AS BIGINT)`);
+      expect(cast.resetOwnKeywords()).toBe(cast);
     });
   });
 

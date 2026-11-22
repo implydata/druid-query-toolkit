@@ -226,6 +226,24 @@ export class SqlColonAccess extends SqlExpression {
     return this.changeSegments(this.segments.concat(SqlColonAccess.pathToSegments(path)));
   }
 
+  /**
+   * Also resets the spacing around the dots and brackets of the segments
+   */
+  public resetOwnSpacing(): this {
+    const ret = super.resetOwnSpacing();
+    const hasSegmentSpacing = this.segments.some(segment =>
+      isNameSegment(segment)
+        ? segment.preDot || segment.postDot
+        : segment.preBracket || segment.postLeftBracket || segment.preRightBracket,
+    );
+    if (!hasSegmentSpacing) return ret;
+    return ret.changeSegments(
+      this.segments.map(segment =>
+        isNameSegment(segment) ? { name: segment.name } : { value: segment.value },
+      ),
+    );
+  }
+
   public _walkInner(
     nextStack: SqlBase[],
     fn: Substitutor,
