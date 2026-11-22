@@ -59,6 +59,12 @@ export class SqlExtendClause extends SqlClause {
     ].join('');
   }
 
+  public clearOwnSeparators(): this {
+    const value = this.valueOf();
+    value.columnDeclarations = this.columnDeclarations.clearSeparators();
+    return SqlBase.fromValue(value);
+  }
+
   public _walkInner(
     nextStack: SqlBase[],
     fn: Substitutor,

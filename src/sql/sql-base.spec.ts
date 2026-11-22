@@ -15,7 +15,7 @@
 import { sane } from '../utils';
 
 import type { SqlExpression } from '.';
-import { SeparatedArray, SqlCase, SqlColumn, SqlLiteral, SqlTable } from '.';
+import { SeparatedArray, SqlCase, SqlColumn, SqlLiteral, SqlQuery, SqlTable } from '.';
 import { parse as parseSql } from './parser';
 import { SqlBase } from './sql-base';
 
@@ -629,6 +629,66 @@ describe('SqlBase', () => {
 
     it('keeps a lower case naked function a function', () => {
       expect(parseSql('current_timestamp').prettify().toString()).toEqual('CURRENT_TIMESTAMP');
+    });
+
+    it('prettifies all of a window spec', () => {
+      const sql = `sum( x )  over  ( w  partition by a ,b  order by c desc , d  rows  between  1  preceding  and  current  row )`;
+      expect(parseSql(sql).prettify().toString()).toEqual(
+        `SUM(x) OVER (w PARTITION BY a, b ORDER BY c DESC, d ROWS BETWEEN 1 PRECEDING AND CURRENT ROW)`,
+      );
+      expect(parseSql(sql).prettify({ keywordCasing: 'preserve' }).toString()).toEqual(
+        `sum(x) over (w partition by a, b order by c desc, d rows between 1 preceding and current row)`,
+      );
+    });
+
+    it('prettifies column lists', () => {
+      expect(
+        SqlQuery.parse(
+          `insert into t ( a ,b ) with w ( a ,b ) as (select 1, 2) select * from w  as  x ( a ,b ) join u using ( a ,b )`,
+        )
+          .prettify()
+          .toString(),
+      ).toEqual(
+        sane`
+          INSERT INTO t (a, b)
+          WITH w (a, b) AS (
+            SELECT
+              1,
+              2
+          )
+          SELECT *
+          FROM w AS x (a, b)
+          JOIN u USING (a, b)
+        `,
+      );
+      expect(
+        SqlQuery.parse(`replace into t ( a ,b ) overwrite all select 1`).prettify().toString(),
+      ).toEqual(`REPLACE INTO t (a, b) OVERWRITE ALL\nSELECT 1`);
+    });
+
+    it('prettifies the column declarations of an extend clause', () => {
+      expect(
+        parseSql(`table( extern( 'a' ) )  extend ( a  varchar ,b bigint )`).prettify().toString(),
+      ).toEqual(`TABLE(EXTERN('a')) EXTEND (a VARCHAR, b BIGINT)`);
+    });
+
+    it('prettifies the keyword separators of function arguments', () => {
+      const sql = `cast( x  as  bigint ) + extract( day  from  t ) + position( 'a'  in  s  from  2 )`;
+      expect(parseSql(sql).prettify().toString()).toEqual(
+        `CAST(x AS BIGINT) + EXTRACT(day FROM t) + POSITION('a' IN s FROM 2)`,
+      );
+      expect(parseSql(sql).prettify({ keywordCasing: 'preserve' }).toString()).toEqual(
+        `cast(x as bigint) + extract(day from t) + position('a' in s from 2)`,
+      );
+    });
+
+    it('prettifies the spacing of dotted names and colon access', () => {
+      expect(parseSql(`s . t . c + t . x + v : a . b [ 'c' ] [ 0 ]`).prettify().toString()).toEqual(
+        `s.t.c + t.x + v:a.b['c'][0]`,
+      );
+      expect(SqlQuery.parse(`select t . * from s . t`).prettify().toString()).toEqual(
+        `SELECT t.*\nFROM s.t`,
+      );
     });
 
     it('upper cases the unit of an interval', () => {

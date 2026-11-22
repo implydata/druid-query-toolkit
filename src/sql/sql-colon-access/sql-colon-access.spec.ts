@@ -348,6 +348,19 @@ describe('SqlColonAccess', () => {
     });
   });
 
+  describe('#resetOwnSpacing', () => {
+    it('resets the spacing around the colon, dots and brackets', () => {
+      expect(String(SqlExpression.parse(`v : a . b [ 'c' ] [ 0 ] . d`).resetOwnSpacing())).toEqual(
+        `v:a.b['c'][0].d`,
+      );
+    });
+
+    it('returns the same instance when there is no spacing', () => {
+      const access = SqlColonAccess.create(SqlColumn.create('v'), ['a', 'b c', 0]);
+      expect(access.resetOwnSpacing()).toBe(access);
+    });
+  });
+
   describe('#walk', () => {
     it('walks into the base but not the segments', () => {
       const access = SqlExpression.parse('v:a.b');

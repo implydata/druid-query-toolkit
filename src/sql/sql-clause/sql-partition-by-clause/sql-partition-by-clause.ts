@@ -63,6 +63,12 @@ export class SqlPartitionByClause extends SqlClause {
     return SqlBase.fromValue(value);
   }
 
+  public clearOwnSeparators(): this {
+    const value = this.valueOf();
+    value.expressions = this.expressions.clearSeparators();
+    return SqlBase.fromValue(value);
+  }
+
   public _walkInner(
     nextStack: SqlBase[],
     fn: Substitutor,

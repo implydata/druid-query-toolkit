@@ -336,8 +336,6 @@ export class SqlFunction extends SqlExpression {
           this.getSpace('postFilter'),
           this.whereClause.toString(),
         );
-      } else if (this.extendClause) {
-        rawParts.push(this.getSpace('preExtend'), this.extendClause.toString());
       }
 
       if (this.windowSpec) {
@@ -347,6 +345,10 @@ export class SqlFunction extends SqlExpression {
           this.getSpace('postOver'),
           this.windowSpec.toString(),
         );
+      }
+
+      if (this.extendClause) {
+        rawParts.push(this.getSpace('preExtend'), this.extendClause.toString());
       }
     }
 
@@ -507,6 +509,7 @@ export class SqlFunction extends SqlExpression {
   }
 
   public changeWindowSpec(windowSpec: SqlWindowSpec | undefined): this {
+    if (this.windowSpec === windowSpec) return this;
     const value = this.valueOf();
     if (windowSpec) {
       value.windowSpec = windowSpec;
@@ -545,14 +548,6 @@ export class SqlFunction extends SqlExpression {
       }
     }
 
-    if (this.extendClause) {
-      const extendClause = this.extendClause._walkHelper(nextStack, fn, postorder);
-      if (!extendClause) return;
-      if (extendClause !== this.extendClause) {
-        ret = ret.changeExtendClause(extendClause as SqlExtendClause);
-      }
-    }
-
     if (this.windowSpec) {
       const windowSpec = this.windowSpec._walkHelper(nextStack, fn, postorder);
       if (!windowSpec) return;
@@ -561,22 +556,63 @@ export class SqlFunction extends SqlExpression {
       }
     }
 
+    if (this.extendClause) {
+      const extendClause = this.extendClause._walkHelper(nextStack, fn, postorder);
+      if (!extendClause) return;
+      if (extendClause !== this.extendClause) {
+        ret = ret.changeExtendClause(extendClause as SqlExtendClause);
+      }
+    }
+
     return ret;
   }
 
+  /**
+   * Resets the commas to the default, and the spaces around a keyword separator (the `AS` of a
+   * `CAST`, the `FROM` of an `EXTRACT`, ...) to a single space each. The keyword stays as written.
+   */
   public clearOwnSeparators(): this {
     if (!this.args) return this;
     const value = this.valueOf();
-    value.args = this.args.clearSeparatorsMatching(',');
+    value.args = this.mapKeywordSeparators(separator =>
+      Separator.symmetricSpace(separator.separator),
+    ).clearSeparatorsMatching(',');
     return SqlBase.fromValue(value);
+  }
+
+  private mapKeywordSeparators(
+    fn: (separator: Separator) => Separator,
+  ): SeparatedArray<SqlExpression> {
+    const { args } = this;
+    if (!args) throw new Error('must have args');
+    let changed = false;
+    const separators = args.separators.map(separator => {
+      if (!(separator instanceof Separator) || separator.separator === ',') return separator;
+      const newSeparator = fn(separator);
+      if (String(newSeparator) === String(separator)) return separator;
+      changed = true;
+      return newSeparator;
+    });
+    return changed ? new SeparatedArray(args.values, separators) : args;
   }
 
   public resetOwnKeywords() {
     const upperCaseName = this.getEffectiveFunctionName();
-    if (Object.keys(this.keywords).length === 0 && upperCaseName === this.functionName.name) {
+    const args = this.args
+      ? this.mapKeywordSeparators(
+          ({ left, separator, right }) =>
+            new Separator({ left, separator: separator.toUpperCase(), right }),
+        )
+      : undefined;
+    if (
+      Object.keys(this.keywords).length === 0 &&
+      upperCaseName === this.functionName.name &&
+      args === this.args
+    ) {
       return this;
     }
     const value = this.valueOf();
+    value.args = args;
     // An unquoted name parsed fine, so its upper cased form is valid too (naked functions like CURRENT_TIMESTAMP are reserved words)
     value.functionName = this.functionName.quotes
       ? this.functionName.changeNameAsFunctionName(upperCaseName)

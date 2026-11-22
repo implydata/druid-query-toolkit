@@ -113,6 +113,16 @@ export class SqlInsertClause extends SqlClause {
       ret = ret.changeTable(table);
     }
 
+    if (this.columns) {
+      const columns = this.columns._walkHelper(nextStack, fn, postorder);
+      if (!columns) return;
+      if (columns !== this.columns) {
+        const value = ret.valueOf();
+        value.columns = columns as SqlColumnList;
+        ret = SqlBase.fromValue(value);
+      }
+    }
+
     return ret;
   }
 }

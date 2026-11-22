@@ -13,7 +13,14 @@
  */
 
 import { backAndForth } from '../../../test-utils';
-import { SqlExpression, SqlFunction, SqlInsertClause, SqlQuery, SqlTable } from '../..';
+import {
+  SqlColumnList,
+  SqlExpression,
+  SqlFunction,
+  SqlInsertClause,
+  SqlQuery,
+  SqlTable,
+} from '../..';
 
 describe('SqlInsertClause', () => {
   describe('parses', () => {
@@ -117,6 +124,21 @@ describe('SqlInsertClause', () => {
       expect(
         clause.walk(ex => (ex instanceof SqlTable ? SqlTable.create('u') : ex)).toString(),
       ).toEqual(`INSERT INTO "u"`);
+    });
+
+    it('visits and substitutes the column list', () => {
+      const withColumns = SqlQuery.parse(`INSERT INTO t ( a ,b ) SELECT 1, 2`).insertClause!;
+      const seen: string[] = [];
+      const walked = withColumns.walk(ex => {
+        seen.push(ex.type);
+        return ex instanceof SqlColumnList ? ex.clearOwnSeparators() : ex;
+      });
+      expect(seen).toEqual(['insertClause', 'table', 'columnList']);
+      expect(String(walked)).toEqual(`INSERT INTO t ( a, b )`);
+      expect(withColumns.walk(ex => ex)).toBe(withColumns);
+      expect(withColumns.walk(ex => (ex instanceof SqlColumnList ? undefined : ex))).toBe(
+        withColumns,
+      );
     });
 
     it('substitutes inside an export target', () => {

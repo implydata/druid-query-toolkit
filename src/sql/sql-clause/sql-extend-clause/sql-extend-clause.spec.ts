@@ -46,6 +46,15 @@ describe('SqlExtendClause', () => {
     });
   });
 
+  describe('#clearOwnSeparators', () => {
+    it('resets the separators to the default', () => {
+      const fn = SqlExpression.parse(`TABLE(x) EXTEND (a VARCHAR ,b BIGINT  ,  c DOUBLE)`);
+      expect(String((fn as SqlFunction).extendClause!.clearOwnSeparators())).toEqual(
+        `EXTEND (a VARCHAR, b BIGINT, c DOUBLE)`,
+      );
+    });
+  });
+
   describe('#_walkInner', () => {
     const clause = SqlExtendClause.create([
       SqlColumnDeclaration.create('x', 'VARCHAR'),

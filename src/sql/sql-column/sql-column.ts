@@ -131,6 +131,18 @@ export class SqlColumn extends SqlExpression {
     return ret;
   }
 
+  /**
+   * Also resets the spacing of the table (and its namespace), which a walk does not visit on
+   * its own
+   */
+  public resetOwnSpacing(): this {
+    const { table } = this;
+    const ret = super.resetOwnSpacing();
+    if (!table) return ret;
+    const newTable = table.resetOwnSpacing();
+    return newTable === table ? ret : ret.changeTable(newTable);
+  }
+
   public convertToTable(): SqlTable {
     const { refName, table, spacing } = this;
     return new SqlTable({
